@@ -1,0 +1,122 @@
+/* ==========================================================================
+   $BASE-TIME-PICKER
+   ========================================================================== */
+/**
+ * The list of times.
+ */
+.picker__list {
+  list-style: none !important;
+  padding: 0.75em 0 4.2em !important;
+  margin: 0 !important;
+}
+/**
+ * The times on the clock.
+ */
+.picker__list-item {
+  border-bottom: 1px solid #dddddd !important;
+  border-top: 1px solid #dddddd !important;
+  margin-bottom: -1px !important;
+  position: relative !important;
+  background: #ffffff !important;
+  padding: .75em 1.25em !important;
+}
+@media (min-height: 46.75em) {
+  .picker__list-item {
+    padding: .5em 1em !important;
+  }
+}
+/* Hovered time */
+.picker__list-item:hover {
+  cursor: pointer !important;
+  color: #000000 !important;
+  background: #b1dcfb !important;
+  border-color: #0089ec !important;
+  z-index: 10 !important;
+}
+/* Selected time */
+.picker__list-item--selected,
+.picker__list-item--selected:hover {
+  border-color: #0089ec !important;
+  z-index: 10 !important;
+}
+/* Highlighted time */
+.picker__list-item--highlighted {
+  background: #b1dcfb !important;
+}
+/* Highlighted and hovered/focused time */
+.picker__list-item--highlighted:hover,
+.picker--focused .picker__list-item--highlighted {
+  background: #0089ec !important;
+  color: #ffffff !important;
+}
+/* Disabled time */
+.picker__list-item--disabled,
+.picker__list-item--disabled:hover,
+.picker--focused .picker__list-item--disabled {
+  background: #f5f5f5 !important;
+  border-color: #f5f5f5 !important;
+  color: #dddddd !important;
+  cursor: default !important;
+  border-color: #dddddd !important;
+  z-index: auto !important;
+}
+/**
+ * The clear button
+ */
+.picker--time .picker__button--clear {
+  display: block !important;
+  width: 80% !important;
+  margin: 1em auto 0 !important;
+  padding: 1em 1.25em !important;
+  background: none !important;
+  border: 0 !important;
+  font-weight: 500 !important;
+  font-size: .67em !important;
+  text-align: center !important;
+  text-transform: uppercase !important;
+  color: #666 !important;
+}
+.picker--time .picker__button--clear:hover,
+.picker--time .picker__button--clear:focus {
+  color: #000000 !important;
+  background: #b1dcfb !important;
+  background: #ee2200 !important;
+  border-color: #ee2200 !important;
+  cursor: pointer !important;
+  color: #ffffff !important;
+  outline: none !important;
+}
+.picker--time .picker__button--clear:before {
+  top: -0.25em !important;
+  color: #666 !important;
+  font-size: 1.25em !important;
+  font-weight: bold !important;
+}
+.picker--time .picker__button--clear:hover:before,
+.picker--time .picker__button--clear:focus:before {
+  color: #ffffff !important;
+}
+
+/* ==========================================================================
+   $DEFAULT-TIME-PICKER
+   ========================================================================== */
+/**
+ * The frame the bounds the time picker.
+ */
+.picker--time .picker__frame {
+  min-width: 256px !important;
+  max-width: 320px !important;
+}
+/**
+ * The picker box.
+ */
+.picker--time .picker__box {
+  font-size: 1em !important;
+  background: #f2f2f2 !important;
+  padding: 0 !important;
+}
+@media (min-height: 40.125em) {
+  .picker--time .picker__box {
+    margin-bottom: 5em !important;
+  }
+}

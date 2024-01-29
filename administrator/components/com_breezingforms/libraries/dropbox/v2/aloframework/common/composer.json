@@ -1,0 +1,37 @@
+{
+  "name": "aloframework/common",
+  "description": "Common elements of AloFramework",
+  "prefer-stable": true,
+  "type": "library",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/aloframework/common",
+  "keywords": [
+    "PHP",
+    "5.4",
+    "AloFramework",
+    "common",
+    "components"
+  ],
+  "authors": [
+    {
+      "name": "Art",
+      "email": "a.molcanovas@gmail.com",
+      "role": "Developer",
+      "homepage": "https://github.com/Alorel"
+    }
+  ],
+  "support": {
+    "issues": "https://github.com/aloframework/common/issues"
+  },
+  "require": {
+    "php": ">=5.4"
+  },
+  "suggest": {
+    "ext-openssl": "Makes randomiser functions cryptographically secure"
+  },
+  "autoload": {
+    "psr-4": {
+      "AloFramework\\Common\\": "src"
+    }
+  }
+}

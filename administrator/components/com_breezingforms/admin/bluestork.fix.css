@@ -1,0 +1,33 @@
+div.current input, div.current textarea, div.current select {
+clear:both;
+float:inherit;
+margin:0;
+}
+div.current label {
+clear:both;
+display:inline;
+float:none;
+margin-top:0;
+min-width:0;
+}
+fieldset input, fieldset textarea, fieldset img, fieldset button {
+float:none;
+margin:5px 5px 5px 0;
+width:auto;
+}
+fieldset label {
+clear:left;
+display:inline;
+float:none;
+margin:5px 0;
+}
+
+.bfAdvanced fieldset legend,
+.bfProperties fieldset legend{
+ margin-bottom: 0px !important;   
+}
+.radio input[type="radio"], .checkbox input[type="checkbox"] {
+    float: none !important;
+    margin-left: 0 !important;
+    margin-right: 2px;
+}

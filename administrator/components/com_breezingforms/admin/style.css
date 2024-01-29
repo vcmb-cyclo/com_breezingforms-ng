@@ -1,0 +1,507 @@
+/* QUICKMODE OPTIONS */
+.bfTrans em{
+    color: red;
+}
+
+.bfLanguageButton{
+    display: inline-block;
+    width: 40px;
+    height: 30px;
+    line-height: 30px;
+    background-color: #0088CC;
+    color: white;
+    font-size: 12px;
+    text-align: center;
+    cursor: pointer;
+    margin-bottom: 5px;
+}
+
+.bfLanguageButton.bfLanguageButtonActive{
+    background-color: red;   
+}
+
+#bfQuickModeWrapper, #bfQuickModeWrapper li, #bfQuickModeWrapper li a, #bfQuickModeWrapper label{
+    font-weight: normal !important;
+}
+
+.ui-tabs-panel {
+    background: none; /* declare background color for container to avoid distorted fonts in IE while fading */
+}
+
+#menutab div.m {
+    border: none;
+    border-top: 1px solid #0088CC !important;
+    border-radius: 0 !important;
+    -moz-border-radius: 0 !important;
+    -webkit-border-radius: 0 !important;
+    padding: 0 8px !important;
+    min-width: 90% !important;
+}
+
+#bfSaveQueue{
+	font: 11px Verdana, Geneva, sans-serif;
+	border: 2px solid #E5E5E5;
+	background-color: #F5F5F5;
+	margin-top: 5px;
+	padding: 10px;
+	width: 350px;
+        text-align: center;
+        font-weight: bold;
+}
+
+
+#bfQuickModeWrapper {
+overflow:hidden;width: 100%;
+}
+
+#bfQuickModeLeft {
+	float: left;
+	width: 300px;
+}
+
+#bfQuickModeRight {
+	padding-left: 310px;
+}
+
+@media (max-width: 767px) {
+    #bfQuickModeLeft {
+	float: none;
+	width: 100%;
+    }
+    
+    #bfQuickModeRight {
+	padding-left: 0;
+        width: 75%;
+    }
+    
+    #bfQuickModeWrapper label.bfPropertyLabel {
+        float: none !important;
+        min-width: 100%;
+        display:block;
+    }
+    
+    #bfQuickModeWrapper input[type=text], #bfQuickModeWrapper input[type=password], #bfQuickModeWrapper textarea, #bfQuickModeWrapper select {
+        width: 100% !important;
+    }
+}
+
+#bfElementExplorer {
+	width: auto;
+	overflow: auto;
+}
+
+/* ##### hr ##### */
+
+#bfQuickModeWrapper hr {
+	color:#ccc;
+	background-color:#ccc;
+	height:1px;
+	border:none;
+	margin: 10px 0px 10px 0px;
+}
+
+/* ##### inputs ##### */
+
+#bfQuickModeWrapper fieldset {
+	padding: 10px;
+}
+
+#bfQuickModeWrapper label.bfPropertyLabel {
+	float: left;
+	min-width: 40%;
+	margin-right: 10px;
+}
+
+#bfQuickModeWrapper textarea {
+	height: 100px;
+}
+
+#bfQuickModeWrapper input[type=text], #bfQuickModeWrapper input[type=password], #bfQuickModeWrapper textarea, #bfQuickModeWrapper select {
+    border: 1px solid #bbb;
+    padding: 2px;
+    line-height: normal;
+    background: #f8f8f8;
+    font-size: 100%;
+    width: 50%;
+}
+
+#bfQuickModeWrapper textarea:hover, #bfQuickModeWrapper input[type='text']:hover, #bfQuickModeWrapper input[type='password']:hover, #bfQuickModeWrapper select:hover {
+    border-color: #92c1ff;
+}
+
+#bfQuickModeWrapper textarea:focus, #bfQuickModeWrapper input[type='text']:focus, #bfQuickModeWrapper input[type='password']:focus, #bfQuickModeWrapper select:focus {
+    border-color: #0071bc; outline: 2px solid #92c1ff;
+}
+
+#bfQuickModeWrapper input[type='button'], #bfQuickModeWrapper input[type='submit'], #bfQuickModeWrapper input[type='checkbox'], #bfQuickModeWrapper input[type='image'], #bfQuickModeWrapper input[type='radio'], #bfQuickModeWrapper input[type='reset'], #bfQuickModeWrapper select, #bfQuickModeWrapper button {
+    cursor: pointer;
+}
+
+#bfQuickModeWrapper input[type='hidden'] { display: none; }
+
+.bfClearfix:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+
+/* option tabs */
+.ui-tabs-nav{
+    height: 37px;
+}
+
+@media (max-width: 767px) {
+    #menutab div.m{
+        border-top: none !important;
+    }
+}
+
+.ui-tabs-nav a, .ui-tabs-nav a span {
+    float: left !important;
+    padding: 3px 12px !important;
+    background: #0088CC !important;
+    font-size: 16px;
+}
+
+.tab-items {
+    padding-right: 0 !important;
+    background: none !important;
+}
+
+.tab-element { padding-right: 0 !important; background: none !important;}
+.tab-form { padding-right: 25px !important; background: none !important;}
+
+.bfFadingMessage{
+    margin-bottom: 10px;
+}
+
+.bfPropertyWrap, .bfPropertyWrap:active, .bfPropertyWrap:visited{
+    min-height: 30px;
+    background-color: transparent;
+    padding: 5px;
+    padding-top: 10px;
+    border-left-style: solid;
+    border-left-width: 3px;
+    border-left-color: transparent;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-bottom-color: #fafafa;
+}
+
+.bfPropertyWrap:hover{
+    background-color: #FCFCFC;
+    border-left-style: solid;
+    border-left-width: 3px;
+    border-left-color: #0088CC;
+}
+
+/* Record Manager */
+
+#bfFormSelection{
+    float: left;
+    margin-right: 10px;
+    margin-top: 7px;
+}
+
+#bfFormSelection{
+    max-width: 50% !important;
+}
+
+@media (max-width: 767px) {
+    #bfFormSelection{
+        float: none;
+        margin-right: 0;
+        margin-top: 7px;
+        width: 100%;
+        max-width: 100% !important;
+    }
+}
+
+
+/* Available Fields */
+
+#bfAvailableFieldsMenu{
+    position: relative;
+    float: left;
+    z-index: 1;
+    display: inline-block;
+    zoom: 1;
+}
+
+@media (max-width: 767px) {
+    #bfAvailableFieldsMenu{
+        float: none;
+        display: block;
+    }
+}
+
+#bfAvailableFieldsMenu input[type="radio"], #bfAvailableFieldsMenu input[type="checkbox"] {
+    margin: 0;
+}
+
+#bfAvailableFieldsWrapper{
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 165px;
+    background-color: #ffffff;
+    border: 1px solid #2d89ef;
+    padding: 3px;
+    min-width: 150px;
+}
+
+@media (max-width: 767px) {
+  #bfAvailableFieldsWrapper{
+    position: relative;
+    width: 100%;
+    min-width: 50px;
+    border: none;
+    padding: 0;
+    padding-top: 7px;
+    left: 0;
+  }
+}
+
+
+#bfAvailableFieldsOpen{
+    padding: 10px;
+    background-color: #faa732;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+#bfAvailableFields{
+    display: none;
+    max-height: 400px;
+    overflow: auto;
+    width: 500px;
+    margin-top: 10px;
+}
+
+@media (max-width: 767px) {
+    #bfAvailableFields{
+        width: 100%;
+    }
+}
+
+#bfAvailableFields table{
+    border: 0;
+}
+
+#bfAvailableFields table td {
+    padding-bottom: 10px;
+}
+
+
+.bfAvailableFields label {
+    vertical-align: text-bottom;
+    text-align: center;
+}
+
+.bfAvailableField {
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+    background-color: #2d89ef;
+    width: 120px;
+    color: #ffffff;
+    height: 60px;
+}
+
+
+
+/* Search */
+
+#bfSearchMenu{
+    position: relative;
+    float: left;
+    z-index: 2;
+    display: inline-block;
+    zoom: 1;
+}
+
+@media (max-width: 767px) {
+    #bfSearchMenu{
+        float: none;
+        display: block;
+        padding-bottom: 0;
+    }
+}
+
+#bfSearchMenu input[type="radio"], #bfSearchMenu input[type="checkbox"] {
+    margin: 0;
+}
+
+#bfSearchWrapper{
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #ffffff;
+    border: 1px solid #2d89ef;
+    padding: 3px;
+    min-width: 150px;
+}
+
+@media (max-width: 767px) {
+  #bfSearchWrapper{
+    position: relative;
+    width: 100%;
+    min-width: 50px;
+    border: none;
+    padding: 0;
+  }
+}
+
+#bfSearch{
+    display: none;
+    max-height: 400px;
+    overflow: auto;
+    width: 500px;
+    margin-top: 10px;
+}
+
+@media (max-width: 767px) {
+    #bfSearch{
+        display: none;
+        max-height: 400px;
+        overflow: auto;
+        width: 100%;
+        margin-top: 10px;
+    }
+}
+
+#bfSearchOpen{
+    padding: 10px;
+    background-color: #faa732;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+#bfrecordsearch {
+    width: 95%;
+}
+
+#bfrecordsearchdatefromtowrap, #bfrecordsearchtimefromtowrap{
+    width: 95%;
+}
+
+#bfrecordsearchdatefromwrap, #bfrecordsearchdatetowrap{
+    float: left;
+    width: 55%;
+}
+
+#bfrecordsearchtimefromwrap, #bfrecordsearchtimetowrap{
+    float: left;
+    width: 40%;
+}
+
+@media (max-width: 767px) {
+    #bfrecordsearchdatefromtowrap, #bfrecordsearchtimefromtowrap{
+        width: 100%;
+    }
+
+    #bfrecordsearchdatefromwrap, #bfrecordsearchdatetowrap{
+        float: none;
+        width: 100%;
+    }
+
+    #bfrecordsearchtimefromwrap, #bfrecordsearchtimetowrap{
+        float: none;
+        width: 100%;
+    }
+    
+    #bfrecordsearchtimefrom, #bfrecordsearchdatefrom, #bfrecordsearchdateto, #bfrecordsearchtimeto{
+        width: 95%;
+    }
+}
+
+/** RecordManager Custom CSS */
+
+.jtable-column-header{
+    overflow: hidden;
+}
+
+.jtable-data-row td{
+    overflow: auto;
+    max-width: 100px !important;
+}
+
+.jtable-main-container div.jtable-main-container > div.jtable-title{
+    background-color: #92c1ff;
+}
+
+.jtable-main-container .jtable-main-container .jtable th{
+    display: none;
+}
+
+.jtable-main-container div.jtable-main-container .jtable-command-column{
+    width: 1%;
+}
+
+.jtable-main-container div.jtable-main-container > table.jtable > tbody > tr{
+    background-color: #ffffff;
+}
+
+.jtable-main-container div.jtable-main-container .jtable-command-column{
+    vertical-align: top !important;
+}
+
+.jtable-no-data-row{
+    display: none;
+}
+
+
+
+.ui-dialog{
+    z-index: 200001;
+}
+
+div.jtable-main-container > table.jtable > tbody > tr.jtable-row-even.jtable-row-selected {
+    color: #333;
+    background-color: #f9f9f9;
+}
+
+div.jtable-main-container > table.jtable > tbody > tr.jtable-row-selected {
+    color: #333;
+    background-color: inherit;
+}
+
+.bfDetailsTable{
+    width: 100%;
+}
+
+.bfDetailsTable td
+{
+    padding: 5px;
+}
+
+.bfDetailsTable tr:nth-child(2n){
+    background: #F5F5F5;
+}
+
+.bfDetailsTableLabelCol{
+    width: 20%;
+    overflow: auto;
+    max-width: 100px !important;
+}
+
+.bfDetailsTableLabelCol strong{
+    color: #bbb;
+}
+
+.bfDetailsTableValueCol{
+    width: 30%;
+}
+
+.bfDetailsTableHead{
+    background: #92c1ff;
+    color: #ffffff;
+}
+
+.ct-records-cell-centered{
+    text-align: center;
+    width: 7% !important;
+}

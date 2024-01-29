@@ -1,0 +1,129 @@
+/* Caution! Ensure accessibility in print and other media types... */
+@media projection, screen { /* Use class for showing/hiding tab content, so that visibility can be better controlled in different media types... */
+    .ui-tabs-hide {
+        display: none !important;
+    }
+}
+
+/* Hide useless elements in print layouts... */
+@media print {
+    .ui-tabs-nav {
+        display: none !important;
+    }
+}
+
+/* Skin */
+.ui-tabs-nav, .ui-tabs-panel {
+    /*font-family: "Trebuchet MS", Trebuchet, Verdana, Helvetica, Arial, sans-serif !important;*/
+    font-size: 12px !important;
+}
+.ui-tabs-nav {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 0 0 3px !important;
+}
+.ui-tabs-nav:after { /* clearing without presentational markup, IE gets extra treatment */
+    display: block !important;
+    clear: both !important;
+    content: " " !important;
+}
+.ui-tabs-nav li {
+    float: left !important;
+    margin: 0 0 0 2px !important;
+    font-weight: bold !important;
+}
+.ui-tabs-nav a, .ui-tabs-nav a span {
+    float: left !important; /* fixes dir=ltr problem and other quirks IE */
+    padding: 0 12px !important;
+    background: url(i/tabs.png) no-repeat !important;
+}
+.ui-tabs-nav a {
+    margin: 5px 0 0 !important; /* position: relative makes opacity fail for disabled tab in IE */
+    padding-left: 0 !important;
+    background-position: 100% 0 !important;
+    text-decoration: none !important;
+    white-space: nowrap !important; /* @ IE 6 */
+    outline: 0 !important; /* @ Firefox, prevent dotted border after click */    
+}
+.ui-tabs-nav a:link, .ui-tabs-nav a:visited {
+    color: #fff !important;
+}
+.ui-tabs-nav .ui-tabs-selected a {
+    position: relative !important;
+    top: 1px !important;
+    z-index: 2 !important;
+    margin-top: 0 !important;
+    background-position: 100% -23px !important;
+}
+.ui-tabs-nav a span {
+    padding-top: 1px !important;
+    padding-right: 0 !important;
+    height: 20px !important;
+    background-position: 0 0 !important;
+    line-height: 20px !important;
+}
+.ui-tabs-nav .ui-tabs-selected a span {
+    padding-top: 0 !important;
+    height: 27px !important;
+    background-position: 0 -23px !important;
+    line-height: 27px !important;
+}
+.ui-tabs-nav .ui-tabs-selected a:link, .ui-tabs-nav .ui-tabs-selected a:visited,
+.ui-tabs-nav .ui-tabs-disabled a:link, .ui-tabs-nav .ui-tabs-disabled a:visited { /* @ Opera, use pseudo classes otherwise it confuses cursor... */
+    cursor: text !important;
+}
+.ui-tabs-nav a:hover, .ui-tabs-nav a:focus, .ui-tabs-nav a:active,
+.ui-tabs-nav .ui-tabs-unselect a:hover, .ui-tabs-nav .ui-tabs-unselect a:focus, .ui-tabs-nav .ui-tabs-unselect a:active { /* @ Opera, we need to be explicit again here now... */
+    cursor: pointer !important;
+}
+.ui-tabs-disabled {
+    opacity: .4 !important;
+    filter: alpha(opacity=40) !important;
+}
+.ui-tabs-nav .ui-tabs-disabled a:link, .ui-tabs-nav .ui-tabs-disabled a:visited {
+    color: #000 !important;
+}
+.ui-tabs-panel {
+    /*border: 1px solid #519e2d !important;
+    padding: 10px !important;*/
+    background: #fff !important; /* declare background color for container to avoid distorted fonts in IE while fading */
+}
+/*.ui-tabs-loading em {
+    padding: 0 0 0 20px !important;
+    background: url(loading.gif) no-repeat 0 50% !important;
+}*/
+
+/* Additional IE specific bug fixes... */
+* html .ui-tabs-nav { /* auto clear @ IE 6 & IE 7 Quirks Mode */
+    display: inline-block !important;
+}
+*:first-child+html .ui-tabs-nav  { /* auto clear @ IE 7 Standards Mode - do not group selectors, otherwise IE 6 will ignore complete rule (because of the unknown + combinator)... */
+    display: inline-block !important;
+}
+
+/* Icons */
+
+.tab-items { padding-right: 25px !important; background: url('i/icon_items.png') right no-repeat !important;}
+.tab-element { padding-right: 25px !important; background: url('i/icon_elements.png') right no-repeat !important;}
+.tab-form { padding-right: 25px !important; background: url('i/icon_forms.png') right no-repeat !important;}
+
+.ui-accordion-content span { padding-left: 25px !important; }
+
+.icon-statictext { background: url('i/icon_static-text.png') left no-repeat !important; }
+.icon-textfield { background: url('i/icon_text-field.png') left no-repeat !important; }
+.icon-textarea { background: url('i/icon_text-area.png') left no-repeat !important; }
+.icon-checkboxx { background: url('i/icon_check-box.png') left no-repeat !important; }
+.icon-radio { background: url('i/icon_radio.png') left no-repeat !important; }
+.icon-select { background: url('i/icon_select.png') left no-repeat !important; }
+.icon-filee { background: url('i/icon_file.png') left no-repeat !important; }
+.icon-tooltip { background: url('i/icon_tooltip.png') left no-repeat !important; }
+.icon-icon { background: url('i/icon_icon.png') left no-repeat !important; }
+.icon-submitbutton { background: url('i/icon_submit-button.png') left no-repeat !important; }
+.icon-imagebutton { background: url('i/icon_image-button.png') left no-repeat !important; }
+.icon-hiddeninput { background: url('i/icon_hidden-input.png') left no-repeat !important; }
+.icon-captcha { background: url('i/icon_captcha.png') left no-repeat !important; }
+.icon-calendarr { background: url('i/icon_calendar.png') left no-repeat !important; }
+.icon-paypal { background: url('i/icon_paypal.png') left no-repeat !important; }
+.icon-sofort { background: url('i/icon_sofort.png') left no-repeat !important; }
+
+.icon-trashcan { padding: 10px 0px 15px 30px !important; background: url('i/trashcan.png') left no-repeat !important; display: block !important; color: #0b55c4 !important; font-weight: bold !important; }

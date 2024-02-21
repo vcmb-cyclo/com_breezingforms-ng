@@ -21,6 +21,9 @@ class bfRecordManagement {
         jimport('joomla.filesystem.file');
         jimport('joomla.filesystem.folder');
 
+        jimport('joomla.version');
+        $version = new JVersion();
+        
         $this->version = $version->getShortVersion();
         $this->tz = new DateTimeZone(JFactory::getApplication()->getCfg('offset'));
 

@@ -1141,18 +1141,18 @@ function bfTriggerRules() {
                 $scriptjs_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . $this->bsVersion . '/' . $this->rootMdata['themebootstrap'] . '/script.js';
                 $scriptphp_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . $this->bsVersion . '/' . $this->rootMdata['themebootstrap'] . '/script.php';
 
-                if ($this->rootMdata['themebootstrap'] != '' && $this->rootMdata['themebootstrap'] != 'none' && JFile::exists($themecss_path)) {
+                if ($this->rootMdata['themebootstrap'] != '' && $this->rootMdata['themebootstrap'] != 'none' && file_exists($themecss_path)) {
 
-                    if (JFile::exists($vars_path)) {
+                    if (file_exists($vars_path)) {
                         $vars = BFFile::read($vars_path);
                     }
-                    if (JFile::exists($themecss_path)) {
+                    if (file_exists($themecss_path)) {
                         $themecss = BFFile::read($themecss_path);
                     }
-                    if (JFile::exists($scriptphp_path)) {
+                    if (file_exists($scriptphp_path)) {
                         require_once( $scriptphp_path );
                     }
-                    if (JFile::exists($scriptjs_path)) {
+                    if (file_exists($scriptjs_path)) {
                         $scriptjs = BFFile::read($scriptjs_path);
                     }
 
@@ -2749,7 +2749,7 @@ function bfTriggerRules() {
             $lang = JFactory::getApplication()->getLanguage()->getTag();
             $lang = explode('-', $lang);
             $lang = strtolower($lang[0]);
-            if (JFile::exists(JPATH_SITE . '/components/com_breezingforms/libraries/jquery/pickadate/translations/' . $lang . '.js')) {
+            if (file_exists(JPATH_SITE . '/components/com_breezingforms/libraries/jquery/pickadate/translations/' . $lang . '.js')) {
                 JFactory::getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/pickadate/translations/' . $lang . '.js');
             }
 

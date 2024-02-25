@@ -238,7 +238,7 @@ class BFQuickModeMobile{
 			$lang = JFactory::getApplication()->getLanguage()->getTag();
 			$lang = explode('-', $lang);
 			$lang = strtolower($lang[0]);
-			if(JFile::exists(JPATH_SITE.'/components/com_breezingforms/libraries/jquery/pickadate/translations/'.$lang.'.js')){
+			if(file_exists(JPATH_SITE.'/components/com_breezingforms/libraries/jquery/pickadate/translations/'.$lang.'.js')){
 				$this->addScript(Uri::root(true).'/components/com_breezingforms/libraries/jquery/pickadate/translations/'.$lang.'.js');
 			}
 
@@ -246,7 +246,7 @@ class BFQuickModeMobile{
 			$this->addStyleSheet(Uri::root(true).'/components/com_breezingforms/libraries/jquery/pickadate/themes/default.date.css');
 		}
 
-		if(JFile::exists(JPATH_SITE . '/media/breezingforms/themes/jq.mobile.external-png.1.4.5.min.css')){
+		if(file_exists(JPATH_SITE . '/media/breezingforms/themes/jq.mobile.external-png.1.4.5.min.css')){
 			$this->addStyleSheet( Uri::root(true) . '/media/breezingforms/themes/jq.mobile.external-png.1.4.5.min.css' );
 		}else{
 			$this->addStyleSheet( Uri::root(true) . '/media/breezingforms/themes/jq.mobile.1.4.5.icons.min.css' );
@@ -254,7 +254,7 @@ class BFQuickModeMobile{
 
 		$this->addStyleSheet( Uri::root(true) . '/media/breezingforms/themes/jq.mobile.1.4.5.min.css' );
 
-		if(JFile::exists(JPATH_SITE . '/media/breezingforms/themes/jq.mobile.1.4.5.custom.css')){
+		if(file_exists(JPATH_SITE . '/media/breezingforms/themes/jq.mobile.1.4.5.custom.css')){
 			$this->addStyleSheet( Uri::root(true) . '/media/breezingforms/themes/jq.mobile.1.4.5.custom.css' );
 		}
 

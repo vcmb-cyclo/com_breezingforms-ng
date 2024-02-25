@@ -18,6 +18,7 @@
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\Uri\Uri;
+use Joomla\Filesystem\File;
 
 require_once(JPATH_SITE . '/administrator/components/com_breezingforms/libraries/crosstec/classes/BFFactory.php');
 require_once(JPATH_SITE . '/administrator/components/com_breezingforms/libraries/crosstec/classes/BFRequest.php');
@@ -506,11 +507,11 @@ if (
                         $parts = explode('_', $file);
                         if (count($parts) >= 5) {
                             if ($parts[count($parts) - 1] == 'flashtmp') {
-                                if (@JFile::exists($sourcePath . $file) && @is_readable($sourcePath . $file)) {
+                                if (@file_exists($sourcePath . $file) && @is_readable($sourcePath . $file)) {
                                     $fileCreationTime = @filectime($sourcePath . $file);
                                     $fileAge = time() - $fileCreationTime;
                                     if ($fileAge >= 86400) {
-                                        @JFile::delete($sourcePath . $file);
+                                        @File::delete($sourcePath . $file);
                                     }
                                 }
                             }
@@ -527,11 +528,11 @@ if (
                         $parts = explode('_', $file);
                         if (count($parts) >= 5) {
                             if ($parts[count($parts) - 1] == 'chunktmp') {
-                                if (@JFile::exists($sourcePath . $file) && @is_readable($sourcePath . $file)) {
+                                if (@file_exists($sourcePath . $file) && @is_readable($sourcePath . $file)) {
                                     $fileCreationTime = @filectime($sourcePath . $file);
                                     $fileAge = time() - $fileCreationTime;
                                     if ($fileAge >= 86400) {
-                                        @JFile::delete($sourcePath . $file);
+                                        @File::delete($sourcePath . $file);
                                     }
                                 }
                             }
@@ -547,11 +548,11 @@ if (
                     if ($file != "." && $file != "..") {
                         $parts = explode('_', $file);
                         if (count($parts) == 4) {
-                            if (@JFile::exists($sourcePath . $file) && @is_readable($sourcePath . $file)) {
+                            if (@file_exists($sourcePath . $file) && @is_readable($sourcePath . $file)) {
                                 $fileCreationTime = @filectime($sourcePath . $file);
                                 $fileAge = time() - $fileCreationTime;
                                 if ($fileAge >= 86400) {
-                                    @JFile::delete($sourcePath . $file);
+                                    @File::delete($sourcePath . $file);
                                 }
                             }
                         }
@@ -818,7 +819,7 @@ if (
                             $db->query();
 
                             // trigger a script after succeeded payment?
-                            if (JFile::exists(JPATH_SITE . '/bf_paypalipn_success.php')) {
+                            if (file_exists(JPATH_SITE . '/bf_paypalipn_success.php')) {
                                 require_once(JPATH_SITE . '/bf_paypalipn_success.php');
                             }
 
@@ -1015,7 +1016,7 @@ if (
                         $db->execute();
 
                         // trigger a script after succeeded payment?
-                        if (JFile::exists(JPATH_SITE . '/bf_stripe_success.php')) {
+                        if (file_exists(JPATH_SITE . '/bf_stripe_success.php')) {
                             require_once(JPATH_SITE . '/bf_stripe_success.php');
                         }
 
@@ -1265,7 +1266,7 @@ if (
                                 $db->query();
 
                                 // trigger a script after succeeded payment?
-                                if (JFile::exists(JPATH_SITE . '/bf_paypal_success.php')) {
+                                if (file_exists(JPATH_SITE . '/bf_paypal_success.php')) {
                                     require_once(JPATH_SITE . '/bf_paypal_success.php');
                                 }
 
@@ -1657,7 +1658,7 @@ if (
                             }
 
                             // trigger a script after succeeded payment?
-                            if (JFile::exists(JPATH_SITE . '/bf_sofortueberweisung_success.php')) {
+                            if (file_exists(JPATH_SITE . '/bf_sofortueberweisung_success.php')) {
                                 require_once(JPATH_SITE . '/bf_sofortueberweisung_success.php');
                             }
 
@@ -1775,8 +1776,8 @@ if (
             switch ($mdata['bfType']) {
                 case 'bfFile':
                     if (isset($mdata['flashUploaderBytes']) && intval($mdata['flashUploaderBytes']) > 0 && isset($mdata['bfName']) && trim($mdata['bfName']) == trim(BFRequest::getVar('itemName', ''))) {
-                        if (JFile::exists($finaltargetFile) && @filesize($finaltargetFile) > intval($mdata['flashUploaderBytes'])) {
-                            @JFile::delete($finaltargetFile);
+                        if (file_exists($finaltargetFile) && @filesize($finaltargetFile) > intval($mdata['flashUploaderBytes'])) {
+                            @File::delete($finaltargetFile);
                             echo trim($mdata['label']) . ': ' . BFText::_('COM_BREEZINGFORMS_FLASH_UPLOADER_TOO_LARGE');
                             exit;
                         }
@@ -1813,7 +1814,7 @@ if (
                 $targetFile = str_replace('//', '/', $targetPath) . 'chunks' . DS . BFRequest::getInt('offset', 0) . '_' . bf_sanitizeFilename(BFRequest::getVar('name', 'unknown')) . '_' . BFRequest::getVar('itemName', '') . '_' . BFRequest::getVar('bfFlashUploadTicket') . '_' . $secureTicket . '_chunktmp';
                 $finaltargetFile = str_replace('//', '/', $targetPath) . bf_sanitizeFilename(BFRequest::getVar('name', 'unknown')) . '_' . BFRequest::getVar('itemName', '') . '_' . BFRequest::getVar('bfFlashUploadTicket') . '_' . $secureTicket . '_flashtmp';
 
-                if (@JFile::upload($tempFile, $targetFile)) {
+                if (@File::upload($tempFile, $targetFile)) {
 
                     $chunky = @BFFile::read($targetFile);
 
@@ -1830,11 +1831,11 @@ if (
                         // and hope the file is not exceeding the
                         // php memory limit
                         $final = '';
-                        if (@JFile::exists($finaltargetFile)) {
+                        if (@file_exists($finaltargetFile)) {
                             $final = @BFFile::read($finaltargetFile);
                         }
                         $newbuf = $final . $chunky;
-                        @JFile::write($finaltargetFile, $newbuf);
+                        @File::write($finaltargetFile, $newbuf);
                     }
 
                     require_once(JPATH_SITE . '/administrator/components/com_breezingforms/libraries/Zend/Json/Decoder.php');
@@ -1842,7 +1843,7 @@ if (
                     $dataObject = Zend_Json::decode(bf_b64dec($objectList[0]->template_code));
 
                     bfProcess($dataObject, $finaltargetFile);
-                    @JFile::delete($targetFile);
+                    @File::delete($targetFile);
                 } else {
                     echo 'Could not upload file ' . addslashes($_FILES['Filedata']['name']) . '!';
                 }

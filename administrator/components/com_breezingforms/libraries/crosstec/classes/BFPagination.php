@@ -309,7 +309,7 @@ class BFPagination
 		$itemOverride = false;
 		$listOverride = false;
 
-		if( JFile::exists(JPATH_SITE.DS.'media'.DS.'breezingforms'.DS.'misc'.DS.'pagination.php') ){
+		if( file_exists(JPATH_SITE.DS.'media'.DS.'breezingforms'.DS.'misc'.DS.'pagination.php') ){
                     $chromePath = JPATH_SITE.DS.'media'.DS.'breezingforms'.DS.'misc'.DS.'pagination.php';
                 }else{
                     $chromePath = JPATH_SITE.DS.'administrator'.DS.'components'.DS.'com_breezingforms'.DS.'libraries'.DS.'crosstec'.DS.'classes'.DS.'BFPaginationChrome';
@@ -429,7 +429,7 @@ class BFPagination
 		$list['pagescounter'] = $this->getPagesCounter();
 		$list['pageslinks'] = $this->getPagesLinks();
                 
-                if( JFile::exists(JPATH_SITE.DS.'media'.DS.'breezingforms'.DS.'misc'.DS.'pagination.php') ){
+                if( file_exists(JPATH_SITE.DS.'media'.DS.'breezingforms'.DS.'misc'.DS.'pagination.php') ){
                     $chromePath = JPATH_SITE.DS.'media'.DS.'breezingforms'.DS.'misc'.DS.'pagination.php';
                 }else{
                     $chromePath = JPATH_SITE.DS.'administrator'.DS.'components'.DS.'com_breezingforms'.DS.'libraries'.DS.'crosstec'.DS.'classes'.DS.'BFPaginationChrome';

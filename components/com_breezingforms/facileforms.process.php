@@ -14,9 +14,7 @@ use Joomla\Event\Event;
 use Joomla\Event\EventInterface;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Filesystem\Folder;
-
-jimport('joomla.filesystem.file');
-jimport('joomla.filesystem.folder');
+use Joomla\Filesystem\File;
 
 class bfMobile {
 
@@ -2150,7 +2148,7 @@ class HTML_facileFormsProcessor {
         $path = str_replace('{userid}', JFactory::getUser()->get('id', 0), $path);
         $path = str_replace('{username}', JFactory::getUser()->get('username', 'anonymous') . '_' . JFactory::getUser()->get('id', 0), $path);
         $path = str_replace('{name}', JFactory::getUser()->get('name', 'Anonymous') . '_' . JFactory::getUser()->get('id', 0), $path);
-        $path = str_replace('{field}', JFile::makeSafe(strtolower(trim($field_name))), $path);
+        $path = str_replace('{field}', File::makeSafe(strtolower(trim($field_name))), $path);
 
         jimport('joomla.version');
         $version = new JVersion();
@@ -2218,7 +2216,7 @@ class HTML_facileFormsProcessor {
         $cbFrontend = true;
         $cbFull = false;
 
-        if (JFile::exists(JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_contentbuilder' . DS . 'contentbuilder.xml')) {
+        if (file_exists(JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_contentbuilder' . DS . 'contentbuilder.xml')) {
 
             if (JFactory::getApplication()->isClient('administrator')) {
                 $cbFrontend = false;
@@ -4415,7 +4413,7 @@ class HTML_facileFormsProcessor {
 
             $record_return = $record->id;
 
-            if ($record_return && JFile::exists(JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_contentbuilder' . DS . 'contentbuilder.xml')) {
+            if ($record_return && file_exists(JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_contentbuilder' . DS . 'contentbuilder.xml')) {
                 $last_update = JFactory::getDate();
                 jimport('joomla.version');
                 $version = new JVersion();
@@ -4462,8 +4460,8 @@ class HTML_facileFormsProcessor {
                                     if (strpos(strtolower($_values[$_key]), '{cbsite}') === 0) {
                                         $_values[$_key] = str_replace(array('{cbsite}', '{CBSite}'), array(JPATH_SITE, JPATH_SITE), $_values[$_key]);
                                     }
-                                    if (JFile::exists($_values[$_key])) {
-                                        JFile::delete($_values[$_key]);
+                                    if (file_exists($_values[$_key])) {
+                                        File::delete($_values[$_key]);
                                     }
                                     if (!isset($_files_deleted[$_rec->recElementId])) {
                                         $_files_deleted[$_rec->recElementId] = array();
@@ -4845,17 +4843,17 @@ class HTML_facileFormsProcessor {
         }
 
         $file = JPATH_SITE . '/media/breezingforms/pdftpl/' . $this->formrow->name . '_pdf_attachment.php';
-        if (!JFile::exists($file)) {
+        if (!file_exists($file)) {
             $file = JPATH_SITE . '/media/breezingforms/pdftpl/pdf_attachment.php';
         }
 
         if ($mailback) {
             $mb_file = JPATH_SITE . '/media/breezingforms/pdftpl/' . $this->formrow->name . '_pdf_mailback_attachment.php';
-            if (JFile::exists($mb_file)) {
+            if (file_exists($mb_file)) {
                 $file = $mb_file;
             } else {
                 $mb_file = JPATH_SITE . '/media/breezingforms/pdftpl/pdf_mailback_attachment.php';
-                if (JFile::exists($mb_file)) {
+                if (file_exists($mb_file)) {
                     $file = $mb_file;
                 }
             }
@@ -5012,7 +5010,7 @@ class HTML_facileFormsProcessor {
 
                 $value = str_replace(array('.', 'ä', 'ü', 'ö', 'Ä', 'Ü', 'Ö', 'ß'), array('_', 'ae', 'ue', 'oe', 'Ae', 'Ue', 'Oe', 'ss'), $data[_FF_DATA_VALUE]);
 
-                $fm = str_replace('{' . strtolower($data[_FF_DATA_NAME]) . ':value}', JFile::makeSafe(trim($value)), $fm);
+                $fm = str_replace('{' . strtolower($data[_FF_DATA_NAME]) . ':value}', File::makeSafe(trim($value)), $fm);
             }
 
             $fm = str_replace('{filemask:_separator}', '_', $fm);
@@ -5150,17 +5148,17 @@ class HTML_facileFormsProcessor {
         }
         mt_srand();
         $csvname = $this->uploads . '/ffexport-' . $date_stamp . '-' . mt_rand(0, mt_getrandmax()) . '.csv';
-        JFile::makeSafe($csvname);
+        File::makeSafe($csvname);
         if (function_exists('mb_convert_encoding')) {
             $to_encoding = 'UTF-16LE';
             $from_encoding = 'UTF-8';
             $chrchr = chr(255) . chr(254) . mb_convert_encoding($head . $out, $to_encoding, $from_encoding);
-            if (!JFile::write($csvname, $chrchr)) {
+            if (!File::write($csvname, $chrchr)) {
                 $this->status = _FF_STATUS_ATTACHMENT_FAILED;
             } // if
         } else {
             $head_out = $head . $out;
-            if (!JFile::write($csvname, $head_out)) {
+            if (!File::write($csvname, $head_out)) {
                 $this->status = _FF_STATUS_ATTACHMENT_FAILED;
             } // if
         }
@@ -5250,8 +5248,8 @@ class HTML_facileFormsProcessor {
         $xml .= indent(1) . '</record>' . nl() .
                 '</FacileFormsExport>' . nl();
 
-        JFile::makeSafe($xmlname);
-        if (!JFile::write($xmlname, $xml)) {
+        File::makeSafe($xmlname);
+        if (!File::write($xmlname, $xml)) {
             $this->status = _FF_STATUS_ATTACHMENT_FAILED;
         } // if
 
@@ -5862,7 +5860,7 @@ class HTML_facileFormsProcessor {
             mt_srand();
             $paymentFile = $this->form . '_' . $this->record_id . '_admin_' . md5(date('YmdHis') . mt_rand(0, mt_getrandmax())) . '.txt';
             $i = 0;
-            while (JFile::exists($paymentCache . $paymentFile)) {
+            while (file_exists($paymentCache . $paymentFile)) {
                 if ($i > 1000) {
                     break;
                 }
@@ -5871,7 +5869,7 @@ class HTML_facileFormsProcessor {
                 $i++;
             }
 
-            if (!JFile::exists($paymentCache . $paymentFile)) {
+            if (!file_exists($paymentCache . $paymentFile)) {
                 $later_content = serialize(array(
                     'from' => $from,
                     'fromname' => $fromname,
@@ -5882,7 +5880,7 @@ class HTML_facileFormsProcessor {
                     'isHtml' => $isHtml,
                     'alt_sender' => $alt_sender
                 ));
-                JFile::write($paymentCache . $paymentFile, $later_content);
+                File::write($paymentCache . $paymentFile, $later_content);
             }
         }
     }
@@ -6534,7 +6532,7 @@ class HTML_facileFormsProcessor {
             mt_srand();
             $paymentFile = $this->form . '_' . $this->record_id . '_mailback_' . md5(date('YmdHis') . mt_rand(0, mt_getrandmax())) . '.txt';
             $i = 0;
-            while (JFile::exists($paymentCache . $paymentFile)) {
+            while (file_exists($paymentCache . $paymentFile)) {
                 if ($i > 1000) {
                     break;
                 }
@@ -6543,7 +6541,7 @@ class HTML_facileFormsProcessor {
                 $i++;
             }
 
-            if (!JFile::exists($paymentCache . $paymentFile)) {
+            if (!file_exists($paymentCache . $paymentFile)) {
 
                 for ($i = 0; $i < $recipientsSize; $i++) {
                     if (isset($mailbackfiles[$recipients[$i]])) {
@@ -6576,7 +6574,7 @@ class HTML_facileFormsProcessor {
                     'isHtml' => $isHtml,
                     'alt_sender' => $alt_sender
                 ));
-                JFile::write($paymentCache . $paymentFile, $later_content);
+                File::write($paymentCache . $paymentFile, $later_content);
             }
         }
 
@@ -6814,9 +6812,9 @@ class HTML_facileFormsProcessor {
                 $fname = BFRequest::getVar('ff_nm_' . $row->name, array(), 'POST', 'HTML', BFREQUEST_ALLOWHTML);
 
                 foreach ($fname As $_fname) {
-                    $fm = str_replace('{filemask:' . strtolower($row->name) . '}', JFile::makeSafe(trim($_fname)), $fm);
+                    $fm = str_replace('{filemask:' . strtolower($row->name) . '}', File::makeSafe(trim($_fname)), $fm);
                     // so it works the same like for folders
-                    $fm = str_replace('{' . strtolower($row->name) . ':value}', JFile::makeSafe(trim($_fname)), $fm);
+                    $fm = str_replace('{' . strtolower($row->name) . ':value}', File::makeSafe(trim($_fname)), $fm);
                 }
             }
             $fm = str_replace('{filemask:_separator}', '_', $fm);
@@ -6827,27 +6825,27 @@ class HTML_facileFormsProcessor {
             $fm = str_replace('{filemask:_date}', trim($date_stamp2), $fm);
             $fm = str_replace('{filemask:_timestamp}', trim(time()), $fm);
             $fm = str_replace('{filemask:_random}', trim(mt_rand(0, mt_getrandmax())), $fm);
-            $fm = str_replace('{filemask:_filename}', trim(basename($userfile_name, '.' . JFile::getExt($userfile_name))), $fm);
+            $fm = str_replace('{filemask:_filename}', trim(basename($userfile_name, '.' . File::getExt($userfile_name))), $fm);
             if ($fm == '') {
                 $fm = '__empty__';
             }
-            $userfile_name = $fm . '.' . JFile::getExt($userfile_name);
+            $userfile_name = $fm . '.' . File::getExt($userfile_name);
         }
 
         //if ($timestamp)
         //	$userfile_name = $date_stamp . '_' . $userfile_name;
         $path = $baseDir . DS . $userfile_name;
         //if ($timestamp) $path .= '.'.date('YmdHis');
-        if (JFile::exists($path) && JFactory::getSession()->get('bfFileUploadOverride', true)) {
+        if (file_exists($path) && JFactory::getSession()->get('bfFileUploadOverride', true)) {
             $rnd = md5(mt_rand(0, mt_getrandmax()));
             $path = $baseDir . DS . $rnd . '_' . $userfile_name;
             //if ($timestamp) $path .= '.'.date('YmdHis');
-            if (JFile::exists($path)) {
+            if (file_exists($path)) {
                 $this->status = _FF_STATUS_UPLOAD_FAILED;
                 $this->message = BFText::_('COM_BREEZINGFORMS_PROCESS_FILEEXISTS');
                 return '';
             }
-        } else if (JFile::exists($path) && !JFactory::getSession()->get('bfFileUploadOverride', true)) {
+        } else if (file_exists($path) && !JFactory::getSession()->get('bfFileUploadOverride', true)) {
             unlink($path);
         }
 
@@ -6956,7 +6954,7 @@ class HTML_facileFormsProcessor {
                                 @imagejpeg($resized);
                                 $buffer = ob_get_contents();
                                 ob_end_clean();
-                                JFile::write($path, $buffer);
+                                File::write($path, $buffer);
                                 @imagedestroy($resized);
                             }
                             @imagedestroy($resource);
@@ -6971,7 +6969,7 @@ class HTML_facileFormsProcessor {
                                 @imagegif($resized);
                                 $buffer = ob_get_contents();
                                 ob_end_clean();
-                                JFile::write($path, $buffer);
+                                File::write($path, $buffer);
                                 @imagedestroy($resized);
                             }
                             @imagedestroy($resource);
@@ -6986,7 +6984,7 @@ class HTML_facileFormsProcessor {
                                 @imagepng($resized);
                                 $buffer = ob_get_contents();
                                 ob_end_clean();
-                                JFile::write($path, $buffer);
+                                File::write($path, $buffer);
                                 @imagedestroy($resized);
                             }
                             @imagedestroy($resource);
@@ -7154,11 +7152,11 @@ class HTML_facileFormsProcessor {
                             if ($cbResult !== null && isset($cbResult['data']) && $cbResult['data'] != null) {
                                 $rowdata1 = JPath::clean(str_replace($this->findtags, $this->replacetags, $row->data1));
                                 if ($cbResult['data']['protect_upload_directory']) {
-                                    if (is_dir($rowdata1) && !JFile::exists($rowdata1 . '/' . '.htaccess'))
-                                        JFile::write($rowdata1 . '/' . '.htaccess', $def = 'deny from all');
+                                    if (is_dir($rowdata1) && !file_exists($rowdata1 . '/' . '.htaccess'))
+                                        File::write($rowdata1 . '/' . '.htaccess', $def = 'deny from all');
                                 } else {
-                                    if (is_dir($rowdata1) && JFile::exists($rowdata1 . '/' . '.htaccess'))
-                                        JFile::delete($rowdata1 . '/' . '.htaccess');
+                                    if (is_dir($rowdata1) && file_exists($rowdata1 . '/' . '.htaccess'))
+                                        File::delete($rowdata1 . '/' . '.htaccess');
                                 }
                             }
 
@@ -7320,9 +7318,9 @@ class HTML_facileFormsProcessor {
                                                                         $fname = BFRequest::getVar('ff_nm_' . $row2->name, array(), 'POST', 'HTML', BFREQUEST_ALLOWHTML);
 
                                                                         foreach ($fname As $_fname) {
-                                                                            $fm = str_replace('{filemask:' . strtolower($row2->name) . '}', JFile::makeSafe(trim($_fname)), $fm);
+                                                                            $fm = str_replace('{filemask:' . strtolower($row2->name) . '}', File::makeSafe(trim($_fname)), $fm);
                                                                             // so it works the same like for folders
-                                                                            $fm = str_replace('{' . strtolower($row2->name) . ':value}', JFile::makeSafe(trim($_fname)), $fm);
+                                                                            $fm = str_replace('{' . strtolower($row2->name) . ':value}', File::makeSafe(trim($_fname)), $fm);
                                                                         }
                                                                     }
 
@@ -7334,11 +7332,11 @@ class HTML_facileFormsProcessor {
                                                                     $fm = str_replace('{filemask:_date}', trim($date_stamp2), $fm);
                                                                     $fm = str_replace('{filemask:_timestamp}', trim(time()), $fm);
                                                                     $fm = str_replace('{filemask:_random}', trim(mt_rand(0, mt_getrandmax())), $fm);
-                                                                    $fm = str_replace('{filemask:_filename}', trim(basename($userfile_name, '.' . JFile::getExt($userfile_name))), $fm);
+                                                                    $fm = str_replace('{filemask:_filename}', trim(basename($userfile_name, '.' . File::getExt($userfile_name))), $fm);
                                                                     if ($fm == '') {
                                                                         $fm = '__empty__';
                                                                     }
-                                                                    $userfile_name = $fm . '.' . JFile::getExt($userfile_name);
+                                                                    $userfile_name = $fm . '.' . File::getExt($userfile_name);
                                                                 }
 
                                                                 //if ($row->flag1)
@@ -7369,13 +7367,13 @@ class HTML_facileFormsProcessor {
                                                                     return;
 
                                                                 if (@is_readable($sourcePath . $file) && @file_exists($baseDir) && @is_dir($baseDir)) {
-                                                                    @JFile::copy($sourcePath . $file, $path);
+                                                                    @File::copy($sourcePath . $file, $path);
                                                                 } else {
                                                                     $this->status = _FF_STATUS_UPLOAD_FAILED;
                                                                     $this->message = BFText::_('COM_BREEZINGFORMS_PROCESS_FILEMOVEFAILED');
                                                                     return;
                                                                 }
-                                                                @JFile::delete($sourcePath . $file);
+                                                                @File::delete($sourcePath . $file);
 
                                                                 $serverPath = $path;
 
@@ -7548,11 +7546,11 @@ class HTML_facileFormsProcessor {
                                         if (!is_dir(JPATH_SITE . '/media/breezingforms/signatures/')) {
                                             Folder::create(JPATH_SITE . '/media/breezingforms/signatures/');
                                             $def = '';
-                                            JFile::write(JPATH_SITE . '/media/breezingforms/signatures/index.html', $def);
+                                            File::write(JPATH_SITE . '/media/breezingforms/signatures/index.html', $def);
                                         }
                                         $sig_decoded = bf_b64dec($value);
                                         $sig_file = JPATH_SITE . '/media/breezingforms/signatures/' . $row->name . '-' . md5($value) . '.png';
-                                        JFile::write($sig_file, $sig_decoded);
+                                        File::write($sig_file, $sig_decoded);
                                         $value = basename($sig_file);
 
                                         $sigValues .= $value;

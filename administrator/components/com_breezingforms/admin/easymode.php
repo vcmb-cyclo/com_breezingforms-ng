@@ -56,7 +56,7 @@ if($easyMode->getUserBrowser() == 'firefox' || $easyMode->getUserBrowser() == 'c
                         jimport('joomla.filesystem.file');
                         jimport('joomla.filesystem.folder');
 
-                        if(JFile::exists(JPATH_SITE . DS . 'administrator' . DS . 'components' . DS . 'com_contentbuilder' . DS . 'classes' . DS . 'contentbuilder.php'))
+                        if(file_exists(JPATH_SITE . DS . 'administrator' . DS . 'components' . DS . 'com_contentbuilder' . DS . 'classes' . DS . 'contentbuilder.php'))
                         {
                             require_once(JPATH_SITE . DS . 'administrator' . DS . 'components' . DS . 'com_contentbuilder' . DS . 'classes' . DS . 'contentbuilder.php');
                             $cbForm = contentbuilder::getForm('com_breezingforms', $formId);

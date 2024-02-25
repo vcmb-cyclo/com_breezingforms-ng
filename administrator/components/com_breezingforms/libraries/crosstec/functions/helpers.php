@@ -10,6 +10,7 @@
 defined( '_JEXEC' ) or die( 'Direct Access to this location is not allowed.' );
 
 use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\Filesystem\File;
 
 function bf_sanitizeFilename( $fileName, $defaultIfEmpty = 'upload', $separator = '_', $lowerCase = true ) {
 	// Gather file informations and store its extension
@@ -503,7 +504,7 @@ function bf_sendNotificationByPaymentCache( $formId, $recordId, $type = 'admin' 
 				if ( count( $parts ) == 4 ) {
 					if ( $parts[0] == intval( $formId ) && $parts[1] == intval( $recordId ) && $parts[2] == $type ) {
 						$contents = unserialize( BFFile::read( $sourcePath . $file ) );
-						JFile::delete( $sourcePath . $file );
+						File::delete( $sourcePath . $file );
 						break;
 					}
 				}

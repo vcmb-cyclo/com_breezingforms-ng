@@ -12,7 +12,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\Version;
 use Joomla\Filesystem\Folder;
-
+use Joomla\Filesystem\File;
 
 require_once(JPATH_SITE . '/administrator/components/com_breezingforms/libraries/crosstec/classes/BFFactory.php');
 require_once(JPATH_SITE . '/administrator/components/com_breezingforms/libraries/crosstec/classes/BFRequest.php');
@@ -85,7 +85,7 @@ $sourcePath = JPATH_SITE . DS . 'components' . DS . 'com_breezingforms' . DS . '
 if (@file_exists($sourcePath) && @is_readable($sourcePath) && @is_dir($sourcePath) && $handle = @opendir($sourcePath)) {
     while (false !== ($file = @readdir($handle))) {
         if ($file != "." && $file != ".." && $file != "index.html") {
-            @JFile::delete($sourcePath . $file);
+            @File::delete($sourcePath . $file);
         }
     }
     @closedir($handle);
@@ -95,7 +95,7 @@ $sourcePath = JPATH_SITE . DS . 'administrator' . DS . 'components' . DS . 'com_
 if (@file_exists($sourcePath) && @is_readable($sourcePath) && @is_dir($sourcePath) && $handle = @opendir($sourcePath)) {
     while (false !== ($file = @readdir($handle))) {
         if ($file != "." && $file != ".." && $file != "index.html" && $file != "stdlib.english.xml") {
-            @JFile::delete($sourcePath . $file);
+            @File::delete($sourcePath . $file);
         }
     }
     @closedir($handle);
@@ -105,8 +105,8 @@ if (!is_dir(JPATH_SITE . DS . 'media' . DS . 'breezingforms')) {
     Folder::create(JPATH_SITE . DS . 'media' . DS . 'breezingforms');
 }
 
-if (!JFile::exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'index.html')) {
-    JFile::copy(
+if (!file_exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'index.html')) {
+    File::copy(
         JPATH_SITE . DS . 'components' . DS . 'com_breezingforms' . DS . 'index.html',
         JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'index.html'
     );
@@ -141,8 +141,8 @@ if (!is_dir(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'downloadtpl
     );
 }
 
-if (!JFile::exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'downloadtpl' . DS . 'stripe_download.php')) {
-    JFile::copy(
+if (!file_exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'downloadtpl' . DS . 'stripe_download.php')) {
+    File::copy(
         JPATH_SITE . DS . 'components' . DS . 'com_breezingforms' . DS . 'downloadtpl' . DS . 'stripe_download.php',
         JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'downloadtpl' . DS . 'stripe_download.php'
     );
@@ -152,7 +152,7 @@ if (!JFile::exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'down
 
 if (!is_dir(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'uploads')) {
     Folder::create(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'uploads');
-    JFile::copy(
+    File::copy(
         JPATH_SITE . DS . 'components' . DS . 'com_breezingforms' . DS . 'uploads' . DS . 'index.html',
         JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'uploads' . DS . 'index.html'
     );
@@ -160,9 +160,9 @@ if (!is_dir(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'uploads')) 
 
 // Default upload folder is now htaccess protected 2016-02-16
 
-if (!JFile::exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'uploads' . DS . '.htaccess')) {
+if (!file_exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'uploads' . DS . '.htaccess')) {
     $def = 'deny from all';
-    JFile::write(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'uploads' . DS . '.htaccess', $def);
+    File::write(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'uploads' . DS . '.htaccess', $def);
 }
 
 #### PAYMENT CACHE
@@ -172,9 +172,9 @@ if (!is_dir(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'payment_cac
 
 }
 
-if (!JFile::exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'payment_cache' . DS . '.htaccess')) {
+if (!file_exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'payment_cache' . DS . '.htaccess')) {
     $def = 'deny from all';
-    JFile::write(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'payment_cache' . DS . '.htaccess', $def);
+    File::write(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'payment_cache' . DS . '.htaccess', $def);
 }
 
 #### DROPBOX CUSTOM KEYS
@@ -182,8 +182,8 @@ if (!JFile::exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'paym
 if (!is_dir(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'dropbox')) {
     Folder::create(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'dropbox');
     $def = 'deny from all';
-    JFile::write(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'dropbox' . DS . '.htaccess', $def);
-    JFile::copy(
+    File::write(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'dropbox' . DS . '.htaccess', $def);
+    File::copy(
         JPATH_SITE . DS . 'administrator' . DS . 'components' . DS . 'com_breezingforms' . DS . 'libraries' . DS . 'dropbox' . DS . 'config.json',
         JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'dropbox' . DS . 'config.json'
     );
@@ -238,22 +238,22 @@ if (!is_dir(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . D
     );
 }
 
-if (!JFile::exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'jq.mobile.1.4.5.min.css')) {
-    JFile::copy(
+if (!file_exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'jq.mobile.1.4.5.min.css')) {
+    File::copy(
         JPATH_SITE . DS . 'components' . DS . 'com_breezingforms' . DS . 'themes' . DS . 'quickmode' . DS . 'jq.mobile.1.4.5.min.css',
         JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'jq.mobile.1.4.5.min.css'
     );
 }
 
-if (!JFile::exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'jq.mobile.1.4.5.icons.min.css')) {
-    JFile::copy(
+if (!file_exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'jq.mobile.1.4.5.icons.min.css')) {
+    File::copy(
         JPATH_SITE . DS . 'components' . DS . 'com_breezingforms' . DS . 'themes' . DS . 'quickmode' . DS . 'jq.mobile.1.4.5.icons.min.css',
         JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'jq.mobile.1.4.5.icons.min.css'
     );
 }
 
-if (!JFile::exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'ajax-loader.gif')) {
-    JFile::copy(
+if (!file_exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'ajax-loader.gif')) {
+    File::copy(
         JPATH_SITE . DS . 'components' . DS . 'com_breezingforms' . DS . 'themes' . DS . 'quickmode' . DS . 'ajax-loader.gif',
         JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'ajax-loader.gif'
     );
@@ -261,24 +261,24 @@ if (!JFile::exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'them
 
 #### DELETE SYSTEM THEMES FILES FROM MEDIA FOLDER (the ones in the original themes path are being used)
 
-if (JFile::exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'system.css')) {
-    JFile::delete(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'system.css');
+if (file_exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'system.css')) {
+    File::delete(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'system.css');
 }
 
-if (JFile::exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'system.ie7.css')) {
-    JFile::delete(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'system.ie7.css');
+if (file_exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'system.ie7.css')) {
+    File::delete(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'system.ie7.css');
 }
 
-if (JFile::exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'system.ie6.css')) {
-    JFile::delete(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'system.ie6.css');
+if (file_exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'system.ie6.css')) {
+    File::delete(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'system.ie6.css');
 }
 
-if (JFile::exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'system.ie.css')) {
-    JFile::delete(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'system.ie.css');
+if (file_exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'system.ie.css')) {
+    File::delete(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes' . DS . 'system.ie.css');
 }
 
-if (JFile::exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes-bootstrap' . DS . 'system.css')) {
-    JFile::delete(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes-bootstrap' . DS . 'system.css');
+if (file_exists(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes-bootstrap' . DS . 'system.css')) {
+    File::delete(JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . 'themes-bootstrap' . DS . 'system.css');
 }
 
 /**
@@ -316,11 +316,11 @@ if (@file_exists($sourcePath) && @is_readable($sourcePath) && @is_dir($sourcePat
         if ($file != "." && $file != "..") {
             $parts = explode('_', $file);
             if (count($parts) == 3 && $parts[0] == 'ajaxsave') {
-                if (@JFile::exists($sourcePath . $file) && @is_readable($sourcePath . $file)) {
+                if (@file_exists($sourcePath . $file) && @is_readable($sourcePath . $file)) {
                     $fileCreationTime = @filectime($sourcePath . $file);
                     $fileAge = time() - $fileCreationTime;
                     if ($fileAge >= 86400) {
-                        @JFile::delete($sourcePath . $file);
+                        @File::delete($sourcePath . $file);
                     }
                 }
             }

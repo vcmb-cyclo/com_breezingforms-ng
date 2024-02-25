@@ -8,6 +8,8 @@
 **/
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
+use Joomla\Filesystem\File;
+
 require_once($ff_admpath.'/admin/quickmode.html.php');
 require_once($ff_admpath.'/admin/quickmode.class.php');
 require_once($ff_admpath.'/libraries/Zend/Json/Decoder.php');
@@ -28,7 +30,7 @@ switch($task){
             $rndAdd = BFRequest::getVar('rndAdd',0);
             $_dest = JPATH_SITE . '/media/breezingforms/ajax_cache/ajaxsave_' . $chunkIdx . '_' . $rndAdd . '.txt';
             $_chunk = BFRequest::getVar('chunk','');
-            @JFile::write($_dest, $_chunk);
+            @File::write($_dest, $_chunk);
             @ob_end_clean();
 
             if($chunkIdx == $chunksLength - 1){
@@ -36,7 +38,7 @@ switch($task){
                 $contents = '';
                 for($i = 0; $i < $chunksLength;$i++){
                     $contents .= @BFFile::read(JPATH_SITE . '/media/breezingforms/ajax_cache/ajaxsave_' . $i . '_' . $rndAdd . '.txt');
-                    @JFile::delete(JPATH_SITE . '/media/breezingforms/ajax_cache/ajaxsave_' . $i . '_' . $rndAdd . '.txt');
+                    @File::delete(JPATH_SITE . '/media/breezingforms/ajax_cache/ajaxsave_' . $i . '_' . $rndAdd . '.txt');
                 }
 
                 $formId = 0;
@@ -52,7 +54,7 @@ switch($task){
                 // CONTENTBUILDER
                 jimport('joomla.filesystem.file');
                 jimport('joomla.filesystem.folder');
-                if(JFile::exists(JPATH_SITE . DS . 'administrator' . DS . 'components' . DS . 'com_contentbuilder' . DS . 'classes' . DS . 'contentbuilder.php'))
+                if(file_exists(JPATH_SITE . DS . 'administrator' . DS . 'components' . DS . 'com_contentbuilder' . DS . 'classes' . DS . 'contentbuilder.php'))
                 {
                     require_once(JPATH_SITE . DS . 'administrator' . DS . 'components' . DS . 'com_contentbuilder' . DS . 'classes' . DS . 'contentbuilder.php');
                     $cbForm = contentbuilder::getForm('com_breezingforms', $formId);

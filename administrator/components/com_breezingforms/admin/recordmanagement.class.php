@@ -12,6 +12,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 use Joomla\CMS\Factory;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Uri\Uri;
+use Joomla\Filesystem\File;
 
 class bfRecordManagement {
 
@@ -610,7 +611,7 @@ class bfRecordManagement {
         $lang = JFactory::getLanguage()->getTag();
         $lang = explode('-', $lang);
         $lang = strtolower($lang[0]);
-        if (JFile::exists(JPATH_SITE . '/components/com_breezingforms/libraries/jquery/jtable/localization/jquery.jtable.' . $lang . '.js')) {
+        if (file_exists(JPATH_SITE . '/components/com_breezingforms/libraries/jquery/jtable/localization/jquery.jtable.' . $lang . '.js')) {
             JFactory::getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/jtable/localization/jquery.jtable.' . $lang . '.js');
         }
 
@@ -2067,7 +2068,7 @@ class bfRecordManagement {
                                     $file = str_replace(array('{site}', '{site}'), array(JPATH_SITE, JPATH_SITE), $file);
                                 }
 
-                                if (!JFile::exists($file)) {
+                                if (!file_exists($file)) {
                                     $out .= 'file not found on server:<br/>' . basename($file) . '<br/>';
                                 } else {
                                     $out .= $this->renderFile($file, $record['bfrecord_id'], $record['bfrecord_custom_element_id_' . $name], $fileIdx);
@@ -2088,7 +2089,7 @@ class bfRecordManagement {
 
                                 $file = JPATH_SITE . '/media/breezingforms/signatures/' . $file;
 
-                                if (!JFile::exists($file)) {
+                                if (!file_exists($file)) {
                                     $out .= 'file not found on server:<br/>' . basename($file) . '<br/>';
                                 } else {
                                     $out .= $this->renderFile($file, $record['bfrecord_id'], $record['bfrecord_custom_element_id_' . $name], $fileIdx);
@@ -2144,7 +2145,7 @@ class bfRecordManagement {
         jimport('joomla.filesystem.folder');
         jimport('joomla.database.table');
 
-        if (JFile::exists(JPATH_SITE . DS . 'administrator' . DS . 'components' . DS . 'com_contentbuilder' . DS . 'classes' . DS . 'contentbuilder.php')) {
+        if (file_exists(JPATH_SITE . DS . 'administrator' . DS . 'components' . DS . 'com_contentbuilder' . DS . 'classes' . DS . 'contentbuilder.php')) {
             $isContentBuilder = true;
         }
 
@@ -2478,7 +2479,7 @@ class bfRecordManagement {
         ArrayHelper::toInteger($ids);
 
         $file = JPATH_SITE . '/media/breezingforms/pdftpl/export_custom_pdf.php';
-        if (!JFile::exists($file)) {
+        if (!file_exists($file)) {
             $file = JPATH_SITE . '/media/breezingforms/pdftpl/export_pdf.php';
         }
 
@@ -2508,7 +2509,7 @@ class bfRecordManagement {
         if($form_name != ''){
 
             $file2 = JPATH_SITE . '/media/breezingforms/pdftpl/'.$form_name.'_export_pdf.php';
-            if (JFile::exists($file2)) {
+            if (file_exists($file2)) {
                 $file = JPATH_SITE . '/media/breezingforms/pdftpl/'.$form_name.'_export_pdf.php';
             }
         }
@@ -2921,9 +2922,9 @@ class bfRecordManagement {
         }
 
         $csvname = JPATH_SITE . '/components/com_breezingforms/exports/'.( $form_name != '' ? $form_name . '-' : '' ).'ffexport-' . $date_stamp . '.csv';
-        JFile::makeSafe($csvname);
+        File::makeSafe($csvname);
 
-        //if (!JFile::write($csvname,$headout = $head.$out)) {
+        //if (!File::write($csvname,$headout = $head.$out)) {
         //	echo "<script> alert('".addslashes(BFText::_('COM_BREEZINGFORMS_RECORDS_XMLNORWRTBL'))."'); window.history.go(-1);</script>\n";
         //	exit();
         //} // if
@@ -2944,7 +2945,7 @@ class bfRecordManagement {
           $zip = JArchive::getAdapter('zip');
           $path = JPATH_SITE.'/components/com_breezingforms/exports/ffexport-csv-'.date('YmdHis').'.zip';
           $zip->create($path, $files);
-          JFile::delete($csvname);
+          File::delete($csvname);
          */
         @ob_end_clean();
 
@@ -3115,8 +3116,8 @@ class bfRecordManagement {
         } // for
         $xml .= '</FacileFormsExport>' . nl();
 
-        //$xmlname = JFile::makeSafe($xmlname);
-        //if (!JFile::write($xmlname,$xml)) {
+        //$xmlname = File::makeSafe($xmlname);
+        //if (!File::write($xmlname,$xml)) {
         //	echo "<script> alert('".addslashes(BFText::_('COM_BREEZINGFORMS_RECORDS_XMLNORWRTBL'))."'); window.history.go(-1);</script>\n";
         //	exit();
         //} // if

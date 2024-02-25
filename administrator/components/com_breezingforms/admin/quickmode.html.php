@@ -5298,7 +5298,7 @@ class QuickModeHtml {
                 $folder = 'themes-bootstrap3';
             }
             $themesbootstrap_path = JPATH_SITE . DS . 'media' . DS . 'breezingforms' . DS . $folder . DS . $themeboostrapfolder . DS;
-            if (is_dir($themesbootstrap_path) && JFile::exists($themesbootstrap_path . 'vars.txt')) {
+            if (is_dir($themesbootstrap_path) && file_exists($themesbootstrap_path . 'vars.txt')) {
                 $varscontent = htmlentities(BFFile::read($themesbootstrap_path . 'vars.txt'), ENT_QUOTES, 'UTF-8');
                 if ($varscontent) {
                     echo '<br/>

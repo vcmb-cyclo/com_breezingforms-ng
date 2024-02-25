@@ -8,6 +8,7 @@
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use \Joomla\CMS\Filesystem\File;
+use Joomla\Filesystem\Folder;
 
 class BFFactory {
 
@@ -543,7 +544,7 @@ class com_breezingformsInstallerScript
 
         if(file_exists($base_path)) {
 
-            $folders = @JFolder::folders($base_path);
+            $folders = @Folder::folders($base_path);
 
             if(count($folders) != 0) {
 

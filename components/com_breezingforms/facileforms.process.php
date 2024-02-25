@@ -13,6 +13,7 @@ use Joomla\CMS\Factory;
 use Joomla\Event\Event;
 use Joomla\Event\EventInterface;
 use Joomla\CMS\Uri\Uri;
+use Joomla\Filesystem\Folder;
 
 jimport('joomla.filesystem.file');
 jimport('joomla.filesystem.folder');
@@ -2192,10 +2193,10 @@ class HTML_facileFormsProcessor {
         $parts = explode(DS, $endpath);
         $inner_path = '';
         foreach ($parts As $part) {
-            if (!JFolder::exists($inner_path . $part)) {
+            if (!is_dir($inner_path . $part)) {
                 $inner_path .= DS;
             }
-            JFolder::create($inner_path . $part);
+            Folder::create($inner_path . $part);
             $inner_path .= $part;
         }
         return $endpath . $after;
@@ -4928,7 +4929,7 @@ class HTML_facileFormsProcessor {
         $font_loaded = false;
         $ttf_name = '';
 
-        if (JFolder::exists(JPATH_SITE . '/media/breezingforms/pdftpl/fonts/')) {
+        if (is_dir(JPATH_SITE . '/media/breezingforms/pdftpl/fonts/')) {
 
             $sourcePath = JPATH_SITE . '/media/breezingforms/pdftpl/fonts/';
             if (@file_exists($sourcePath) && @is_readable($sourcePath) && @is_dir($sourcePath) && $handle = @opendir($sourcePath)) {
@@ -7153,10 +7154,10 @@ class HTML_facileFormsProcessor {
                             if ($cbResult !== null && isset($cbResult['data']) && $cbResult['data'] != null) {
                                 $rowdata1 = JPath::clean(str_replace($this->findtags, $this->replacetags, $row->data1));
                                 if ($cbResult['data']['protect_upload_directory']) {
-                                    if (JFolder::exists($rowdata1) && !JFile::exists($rowdata1 . '/' . '.htaccess'))
+                                    if (is_dir($rowdata1) && !JFile::exists($rowdata1 . '/' . '.htaccess'))
                                         JFile::write($rowdata1 . '/' . '.htaccess', $def = 'deny from all');
                                 } else {
-                                    if (JFolder::exists($rowdata1) && JFile::exists($rowdata1 . '/' . '.htaccess'))
+                                    if (is_dir($rowdata1) && JFile::exists($rowdata1 . '/' . '.htaccess'))
                                         JFile::delete($rowdata1 . '/' . '.htaccess');
                                 }
                             }
@@ -7544,8 +7545,8 @@ class HTML_facileFormsProcessor {
                                 foreach ($values as $value) {
 
                                     if ($row->type == 'Signature' && $value != '') {
-                                        if (!JFolder::exists(JPATH_SITE . '/media/breezingforms/signatures/')) {
-                                            JFolder::create(JPATH_SITE . '/media/breezingforms/signatures/');
+                                        if (!is_dir(JPATH_SITE . '/media/breezingforms/signatures/')) {
+                                            Folder::create(JPATH_SITE . '/media/breezingforms/signatures/');
                                             $def = '';
                                             JFile::write(JPATH_SITE . '/media/breezingforms/signatures/index.html', $def);
                                         }

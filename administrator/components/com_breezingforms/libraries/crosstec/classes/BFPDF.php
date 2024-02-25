@@ -44,7 +44,7 @@ class BFPDF extends TCPDF{
 
         $active_found = '';
 
-        if( JFolder::exists(JPATH_SITE.'/media/breezingforms/pdftpl/fonts/') ){
+        if( is_dir(JPATH_SITE.'/media/breezingforms/pdftpl/fonts/') ){
 
             $sourcePath = JPATH_SITE.'/media/breezingforms/pdftpl/fonts/';
             if (@file_exists($sourcePath) && @is_readable($sourcePath) && @is_dir($sourcePath) && $handle = @opendir($sourcePath)) {
@@ -110,7 +110,7 @@ class BFPDF extends TCPDF{
 
         $active_found = '';
 
-        if( JFolder::exists(JPATH_SITE.'/media/breezingforms/pdftpl/fonts/') ){
+        if( is_dir(JPATH_SITE.'/media/breezingforms/pdftpl/fonts/') ){
 
             $sourcePath = JPATH_SITE.'/media/breezingforms/pdftpl/fonts/';
             if (@file_exists($sourcePath) && @is_readable($sourcePath) && @is_dir($sourcePath) && $handle = @opendir($sourcePath)) {

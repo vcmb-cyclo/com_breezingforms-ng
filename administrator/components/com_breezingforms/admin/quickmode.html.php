@@ -1,7 +1,7 @@
 <?php
 /**
  * BreezingForms - A Joomla Forms Application
- * @version 1.9
+ * @version 5.0
  * @package BreezingForms
  * @copyright (C) 2008-2020 by Markus Bopp
  * @copyright (C) 2024 by XDA+GIL
@@ -21,8 +21,6 @@ class QuickModeHtml
         $active_language_code = htmlentities(BFRequest::getVar('active_language_code', ''), ENT_QUOTES, 'UTF-8');
         HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
         JHTML::_('behavior.keepalive');
-        jimport('joomla.version');
-        $version = new JVersion();
         $iconBase = '../administrator/components/com_breezingforms/libraries/jquery/themes/quickmode/i/';
         JFactory::getDocument()->addStyleSheet(Uri::root() . 'administrator/components/com_breezingforms/libraries/jquery/themes/quickmode/quickmode.all.css');
         JFactory::getDocument()->addStyleSheet(Uri::root() . 'administrator/components/com_breezingforms/libraries/jquery/jtree/tree_component.css');

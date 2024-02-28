@@ -1,9 +1,10 @@
 <?php
 /**
  * BreezingForms - A Joomla Forms Application
- * @version 1.8
+ * @version 5.0
  * @package BreezingForms
  * @copyright (C) 2008-2012 by Markus Bopp
+ * @copyright Copyright (C) 2024 by XDA+GIL
  * @license Released under the terms of the GNU General Public License
  * */
 
@@ -17,7 +18,7 @@ use Joomla\Filesystem\File;
 class bfRecordManagement
 {
 
-    private $version = '1.5';
+    private $version = '5.0';
     private $tz = 'UTC';
 
     function __construct()
@@ -52,21 +53,13 @@ class bfRecordManagement
     {
 
         @ob_end_clean();
-
         $out = array();
-
         $db = BFFactory::getdbo();
-
         $db->setQuery("Select * From #__facileforms_elements Where published = 1 And `name` <> 'bfFakeName' And `name` <> 'bfFakeName2' And `name` <> 'bfFakeName3' And `name` <> 'bfFakeName4' And `name` <> 'bfFakeName5' And  form = " . BFRequest::getInt('form_id', 0) . " Order By `ordering`");
-
         $out['fields'] = $db->loadAssocList();
-
         $db->setQuery("Select filter_state From #__facileforms_forms Where id = " . BFRequest::getInt('form_id', 0));
-
         $out['filter_state'] = @unserialize($db->loadResult());
-
         echo json_encode($out);
-
         exit;
     }
 

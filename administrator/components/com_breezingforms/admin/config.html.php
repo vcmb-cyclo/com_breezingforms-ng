@@ -8,9 +8,6 @@
  **/
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
-jimport('joomla.version');
-$version = new JVersion();
-
 if (BFRequest::getVar('act', '') == 'configuration') {
 	JToolBarHelper::preferences('com_breezingforms');
 }
@@ -425,8 +422,7 @@ class HTML_facileFormsConf
 			<table cellpadding="4" cellspacing="0" border="0" width="100%" class="adminlist table table-striped">
 				<tr>
 					<th nowrap align="center"><input type="checkbox" name="toggle" value=""
-							onclick="<?php $version = new JVersion();
-							echo version_compare($version->getShortVersion(), '3.0', '>=') ? 'Joomla.checkAll(this);' : 'checkAll(' . count($rows) . ');'; ?>" />
+							onclick='Joomla.checkAll(this);' />
 					</th>
 					<th style="width: 70%" nowrap colspan="4" align="left">
 						<?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_PACKAGE'); ?>
@@ -449,9 +445,7 @@ class HTML_facileFormsConf
 					<tr class="row<?php echo $k; ?>">
 						<td nowrap valign="top" align="center"><input type="checkbox" id="cb<?php echo $i; ?>" name="ids[]"
 								value="<?php echo $row->id; ?>"
-								onclick="<?php jimport('joomla.version');
-								$version = new JVersion();
-								echo version_compare($version->getShortVersion(), '3.0', '>=') ? 'Joomla.isChecked(this.checked);' : 'isChecked(this.checked);'; ?>" />
+								onclick="Joomla.isChecked(this.checked);" />
 						</td>
 						<td nowrap valign="top" align="left">
 							<strong>

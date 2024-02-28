@@ -9,6 +9,8 @@
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\Factory;
+use Joomla\Database\DatabaseInterface;
 
 require_once($ff_admpath.'/admin/piece.html.php');
 
@@ -16,8 +18,8 @@ class facileFormsPiece
 {
 	static function edit($option, $pkg, $ids)
 	{
-		$database = BFFactory::getDbo();
-                ArrayHelper::toInteger($ids);
+		$database = Factory::getContainer()->get(DatabaseInterface::class);
+    	ArrayHelper::toInteger($ids);
 		$typelist = array();
 		$typelist[] = array('Untyped',BFText::_('COM_BREEZINGFORMS_PIECES_UNTYPED'));
 		$typelist[] = array('Before Form',BFText::_('COM_BREEZINGFORMS_PIECES_BEFOREFORM'));
@@ -37,7 +39,7 @@ class facileFormsPiece
 
 	static function save($option, $pkg)
 	{
-		$database = BFFactory::getDbo();
+		$database = Factory::getContainer()->get(DatabaseInterface::class);
 		$row = new facileFormsPieces($database);
 		// bind it to the table
 		
@@ -61,7 +63,7 @@ class facileFormsPiece
 
 	static function copy($option, $pkg, $ids)
 	{
-		$database = BFFactory::getDbo();
+		$database = Factory::getContainer()->get(DatabaseInterface::class);
                 ArrayHelper::toInteger($ids);
 		$total = count($ids);
 		$row = new facileFormsPieces($database);
@@ -76,7 +78,7 @@ class facileFormsPiece
 
 	static function del($option, $pkg, $ids)
 	{
-		$database = BFFactory::getDbo();
+		$database = Factory::getContainer()->get(DatabaseInterface::class);
                 ArrayHelper::toInteger($ids);
 		if (count($ids)) {
 			$ids = implode(',', $ids);
@@ -90,7 +92,7 @@ class facileFormsPiece
 
 	static function publish($option, $pkg, $ids, $publish)
 	{
-		$database = BFFactory::getDbo();
+		$database = Factory::getContainer()->get(DatabaseInterface::class);
                 ArrayHelper::toInteger($ids);
 		$ids = implode( ',', $ids );
 		$database->setQuery(
@@ -105,7 +107,7 @@ class facileFormsPiece
 
 	static function listitems($option, $pkg)
 	{
-		$database = BFFactory::getDbo();
+		$database = Factory::getContainer()->get(DatabaseInterface::class);
 
 		$database->setQuery(
 			"select distinct  package as name ".
@@ -113,8 +115,16 @@ class facileFormsPiece
 			"where package is not null and package!='' ".
 			"order by name"
 		);
-		$pkgs = $database->loadObjectList();
-		if ($database->getErrorNum()) { echo $database->stderr(); return false; }
+		
+		
+		try{
+			$pkgs = $database->loadObjectList();
+		} catch(Exception $e){
+			echo $e->getCode() . ' : ' .$e->getMessage();
+			return false;
+		}
+
+
 		$pkgok = $pkg=='';
 		if (!$pkgok && count($pkgs)) foreach ($pkgs as $p) if ($p->name==$pkg) { $pkgok = true; break; }
 		if (!$pkgok) $pkg = '';
@@ -128,7 +138,13 @@ class facileFormsPiece
 			"order by type, name, id desc"
 		);
 		$rows = $database->loadObjectList();
-		if ($database->getErrorNum()) { echo $database->stderr(); return false; }
+
+		try{
+			$rows = $database->loadObjectList();
+		} catch(Exception $e){
+			echo $e->getCode() . ' : ' .$e->getMessage();
+			return false;
+		}
 
 		HTML_facileFormsPiece::listitems($option, $rows, $pkglist);
 	} // listitems

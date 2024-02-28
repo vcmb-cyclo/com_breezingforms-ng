@@ -10,6 +10,9 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\Uri\Uri;
 use Joomla\Filesystem\File;
+use Joomla\CMS\Table\Table;
+use Joomla\CMS\Factory;
+use Joomla\Database\DatabaseInterface;
 
 global $ff_version, $ff_resnames, $ff_request, $ff_target;
 
@@ -182,7 +185,7 @@ function initFacileForms()
 	if (!isset($ff_mossite)) {
 		if ($ff_config->livesite == 0) {
 			//$ff_mossite = str_replace('\\','/', Uri::root());
-			$ff_mossite = JUri::root();
+			$ff_mossite = Uri::root();
 		} else {
 			$s = empty($_SERVER["HTTPS"]) ? '' : (($_SERVER["HTTPS"] == "on") ? "s" : "");
 			$s = !empty($_SERVER['HTTP_X_FORWARDED_PROTO']) ? 's' : $s;
@@ -369,21 +372,21 @@ class facileFormsConf
 		}
 
 		/**
-$existed = file_exists($configfile);
-if ($fp = fopen($configfile, "w")) {
-	fputs($fp, $config, strlen($config));
-	fclose($fp);
-	if (!$existed) {
-		$filemode = NULL;
-		if (isset($mosConfig_fileperms)) {
-			if ($mosConfig_fileperms!='')
-				$filemode = octdec($mosConfig_fileperms);
-		} else
-			$filemode = 0644;
-		if (isset($filemode)) @chmod($configfile, $filemode);
-	} // if
-} // if
-		*/
+	  $existed = file_exists($configfile);
+	  if ($fp = fopen($configfile, "w")) {
+		  fputs($fp, $config, strlen($config));
+		  fclose($fp);
+		  if (!$existed) {
+			  $filemode = NULL;
+			  if (isset($mosConfig_fileperms)) {
+				  if ($mosConfig_fileperms!='')
+					  $filemode = octdec($mosConfig_fileperms);
+			  } else
+				  $filemode = 0644;
+			  if (isset($filemode)) @chmod($configfile, $filemode);
+		  } // if
+	  } // if
+			  */
 	} // store
 
 	function bindRequest($request)
@@ -394,7 +397,7 @@ if ($fp = fopen($configfile, "w")) {
 	} // bindRequest
 } // class facileFormsConf
 
-class facileFormsMenus extends JTable
+class facileFormsMenus extends Table
 {
 	var $id = null;     // identifier
 	var $package = null;     // package name
@@ -411,7 +414,7 @@ class facileFormsMenus extends JTable
 
 	function __construct(&$db)
 	{
-		parent::__construct('#__facileforms_compmenus', 'id', JFactory::getDbo());
+		parent::__construct('#__facileforms_compmenus', 'id', Factory::getContainer()->get(DatabaseInterface::class));
 	} // constructor
 
 	public function load($id = null, $reset = true)
@@ -433,7 +436,7 @@ class facileFormsMenus extends JTable
 
 } // class facileFormsMenus
 
-class facileFormsForms extends JTable
+class facileFormsForms extends Table
 {
 	var $id = null;     // identifier
 	var $package = null;     // package name
@@ -525,7 +528,7 @@ class facileFormsForms extends JTable
 
 	function __construct(&$db)
 	{
-		parent::__construct('#__facileforms_forms', 'id', JFactory::getDbo());
+		parent::__construct('#__facileforms_forms', 'id', Factory::getContainer()->get(DatabaseInterface::class));
 	} // constructor
 
 	public function load($id = null, $reset = true)
@@ -556,7 +559,7 @@ class facileFormsForms extends JTable
 
 } // class facileFormsForms
 
-class facileFormsElements extends JTable
+class facileFormsElements extends Table
 {
 	var $id = null;     // general parameters
 	var $form = null;     // form id
@@ -634,7 +637,7 @@ Query List Settings: border / cellspacing / cellpadding / <tr(h)>class / <tr(1)>
 
 	function __construct(&$db)
 	{
-		parent::__construct('#__facileforms_elements', 'id', JFactory::getDbo());
+		parent::__construct('#__facileforms_elements', 'id', Factory::getContainer()->get(DatabaseInterface::class));
 	} // constructor
 
 	public function load($id = null, $reset = null)
@@ -656,7 +659,7 @@ Query List Settings: border / cellspacing / cellpadding / <tr(h)>class / <tr(1)>
 
 } // class facileFormsElements
 
-class facileFormsScripts extends JTable
+class facileFormsScripts extends Table
 {
 	var $id = null;     // identifier
 	var $published = null;     // is published
@@ -669,7 +672,7 @@ class facileFormsScripts extends JTable
 
 	function __construct(&$db)
 	{
-		parent::__construct('#__facileforms_scripts', 'id', JFactory::getDbo());
+		parent::__construct('#__facileforms_scripts', 'id', Factory::getContainer()->get(DatabaseInterface::class));
 	} // constructor
 
 	public function load($id = null, $reset = true)
@@ -698,7 +701,7 @@ class facileFormsScripts extends JTable
 
 } // class facileFormsScripts
 
-class facileFormsPieces extends JTable
+class facileFormsPieces extends Table
 {
 	var $id = null;     // identifier
 	var $published = null;     // is published
@@ -711,7 +714,7 @@ class facileFormsPieces extends JTable
 
 	function __construct(&$db)
 	{
-		parent::__construct('#__facileforms_pieces', 'id', JFactory::getDbo());
+		parent::__construct('#__facileforms_pieces', 'id', Factory::getContainer()->get(DatabaseInterface::class));
 	} // constructor
 
 	public function load($id = null, $reset = true)
@@ -740,7 +743,7 @@ class facileFormsPieces extends JTable
 
 } // class facileFormsPieces
 
-class facileFormsRecords extends JTable
+class facileFormsRecords extends Table
 {
 	var $id = null;     // identifier
 	var $submitted = null;     // date and time
@@ -761,7 +764,7 @@ class facileFormsRecords extends JTable
 
 	function __construct(&$db)
 	{
-		parent::__construct('#__facileforms_records', 'id', JFactory::getDbo());
+		parent::__construct('#__facileforms_records', 'id', Factory::getContainer()->get(DatabaseInterface::class));
 	} // constructor
 
 	public function load($id = null, $reset = true)
@@ -783,7 +786,7 @@ class facileFormsRecords extends JTable
 
 } // class facileFormsRecords
 
-class facileFormsSubrecords extends JTable
+class facileFormsSubrecords extends Table
 {
 	var $id = null;     // identifier
 	var $record = null;     // record id
@@ -794,7 +797,7 @@ class facileFormsSubrecords extends JTable
 
 	function __construct(&$db)
 	{
-		parent::__construct('#__facileforms_subrecords', 'id', JFactory::getDbo());
+		parent::__construct('#__facileforms_subrecords', 'id', Factory::getContainer()->get(DatabaseInterface::class));
 	} // constructor
 
 	public function load($id = null, $reset = true)

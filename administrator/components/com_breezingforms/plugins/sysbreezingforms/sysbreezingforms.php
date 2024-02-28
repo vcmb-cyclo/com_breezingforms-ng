@@ -4,6 +4,7 @@
  * @subpackage  System.log
  *
  * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
+ * @copyright   Copyright (C) 2024 by XDA+GIL
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
@@ -26,9 +27,7 @@ class PlgSystemSysbreezingforms extends JPlugin
         $app = JFactory::getApplication();
 
         try {
-
-            if (
-                JFactory::getApplication()->isClient('administrator') &&
+                $bNotValid = JFactory::getApplication()->isClient('administrator') &&
                 (
                     (
                         $app->input->getString('option') == 'com_breezingforms' &&
@@ -38,9 +37,10 @@ class PlgSystemSysbreezingforms extends JPlugin
                     ||
                     $app->input->getString('option') == 'com_installer' &&
                     $app->input->getString('view', '') == 'update'
-                )
-            ) {
+                    );
 
+//            if ($bNotValid) {
+                if (false) {
                 $message = 'Please enter your update key in the BreezingForms configuration.<br />Without this key you won\'t be able to receive future upates.<br />You can get your personal update key at Crosstec.org in the My Account => My Downloads section after login.<br />If your membership is expired, you can renew it by <a style="font-weight: bold; text-decoration: underline;" target="_blank" href="https://crosstec.org/en/downloads/joomla-forms.html">purchasing a membership</a>.';
 
                 $db = JFactory::getDbo();
@@ -58,9 +58,7 @@ class PlgSystemSysbreezingforms extends JPlugin
                             $time = strtotime(JHTML::_('date', 'now', 'Y-m-d H:i:s', false));
 
                             if ($time > $exp[0]) {
-
                                 $message = 'Your membership for the update key seems to be expired, you can renew it by <a style="font-weight: bold; text-decoration: underline;" target="_blank" href="https://crosstec.org/en/downloads/joomla-forms.html">purchasing a membership</a>.<br/>After purchase, please get the update key from My Account => My Downloads at Crosstec.org and enter it in the BreezingForms configuration.';
-
                                 $query = '';
                             }
                         }

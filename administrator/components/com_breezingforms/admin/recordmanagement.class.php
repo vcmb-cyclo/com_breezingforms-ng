@@ -18,7 +18,6 @@ use Joomla\Filesystem\File;
 class bfRecordManagement
 {
 
-    private $version = '5.0';
     private $tz = 'UTC';
 
     function __construct()
@@ -26,10 +25,6 @@ class bfRecordManagement
         jimport('joomla.filesystem.file');
         jimport('joomla.filesystem.folder');
 
-        jimport('joomla.version');
-        $version = new JVersion();
-
-        $this->version = $version->getShortVersion();
         $this->tz = new DateTimeZone(JFactory::getApplication()->getCfg('offset'));
 
         // bfRecordsTableContainer

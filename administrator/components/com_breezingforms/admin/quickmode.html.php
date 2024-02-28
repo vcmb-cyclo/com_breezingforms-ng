@@ -5535,14 +5535,12 @@ class QuickModeHtml
                                                     <?php echo BFText::_('COM_BREEZINGFORMS_CHOOSE_THEME_ENGINE'); ?>
                                                 </label>
                                                 <input
-                                                    onclick="JQuery('#bfThemeBootstrapDiv').css('display', 'none');JQuery('#bfThemeBreezingFormsDiv').css('display', 'block');"
-                                                    <?php echo (version_compare($version->getShortVersion(), '3.0', '<') ? 'checked="checked" ' : ''); ?>type="radio"
+                                                    onclick="JQuery('#bfThemeBootstrapDiv').css('display', 'none');JQuery('#bfThemeBreezingFormsDiv').css('display', 'block');" type="radio"
                                                     name="bfThemeBootstrapThemeEngine" value=""
                                                     id="bfThemeBootstrapThemeBreezingForms" /> BreezingForms
                                                 <input
-                                                    onclick="JQuery('#bfThemeBootstrapDiv').css('display', 'block');
-                                                                                            JQuery('#bfThemeBreezingFormsDiv').css('display', 'none');"
-                                                    <?php echo (version_compare($version->getShortVersion(), '3.0', '>=') ? 'checked="checked" ' : ''); ?>type="radio"
+                                                    onclick="JQuery('#bfThemeBootstrapDiv').css('display', 'block'); JQuery('#bfThemeBreezingFormsDiv').css('display', 'none');" 
+                                                    type="radio"
                                                     name="bfThemeBootstrapThemeEngine" value=""
                                                     id="bfThemeBootstrapThemeBootstrap" />
                                                 <?php echo BFText::_('COM_BREEZINGFORMS_THEME_ENGINE_BOOTSTRAP'); ?>
@@ -5568,14 +5566,6 @@ class QuickModeHtml
                                                     </select>
                                                 </div>
                                             </div>
-                                            <?php
-                                            if (version_compare($version->getShortVersion(), '3.0', '<')) {
-                                                ?>
-                                                <br />
-                                                <br />
-                                                <?php
-                                            }
-                                            ?>
                                             <div id="bfThemeBootstrapDiv" style="display:none;">
                                                 <legend>
                                                     <?php echo BFText::_('COM_BREEZINGFORMS_ADVANCED_THEME_BOOTSTRAP_ENGINE'); ?>
@@ -5615,16 +5605,7 @@ class QuickModeHtml
                                                         ?>
                                                     </select>
                                                 </div>
-                                                <?php
-                                                if (version_compare($version->getShortVersion(), '3.0', '<')) {
-                                                    ?>
-                                                    <br />
-                                                    <br />
-                                                    <?php
-                                                }
-                                                ?>
-
-
+  
                                                 <div class="bfPropertyWrap" style="display:none;">
                                                     <label class="bfPropertyLabel hasTooltip"
                                                         title="<?php echo bf_tooltipText(BFText::_('COM_BREEZINGFORMS_QM_THEME_USE_BOOTSTRAP3_TIP')); ?>"
@@ -5669,28 +5650,6 @@ class QuickModeHtml
                                                     </label>
                                                     <input type="text" value="" id="bfThemeBootstrap3Classpfx" />
                                                 </div>
-
-
-                                                <?php
-                                                if (version_compare($version->getShortVersion(), '3.0', '<')) {
-                                                    ?>
-                                                    <div class="bfPropertyWrap">
-                                                        <label class="bfPropertyLabel hasTooltip"
-                                                            title="<?php echo bf_tooltipText(BFText::_('COM_BREEZINGFORMS_QM_THEME_BOOTSTRAP_LEGACY')); ?>"
-                                                            for="bfThemeBootstrapUseLegacyYes">
-                                                            <?php echo BFText::_('COM_BREEZINGFORMS_THEME_BOOTSTRAP_USE_LEGACY'); ?>
-                                                        </label>
-
-                                                        <input checked="checked" type="radio" name="bfThemeBootstrapUseLegacy"
-                                                            value="" id="bfThemeBootstrapUseLegacyYes" />
-                                                        <?php echo BFText::_('COM_BREEZINGFORMS_YES'); ?>
-                                                        <input type="radio" name="bfThemeBootstrapUseLegacy" value=""
-                                                            id="bfThemeBootstrapUseLegacyNo" />
-                                                        <?php echo BFText::_('COM_BREEZINGFORMS_NO'); ?>
-                                                    </div>
-                                                    <?php
-                                                }
-                                                ?>
 
 
                                                 <div class="bfPropertyWrap">
@@ -5790,14 +5749,7 @@ class QuickModeHtml
                                                 }
                                                 ?>
                                             </div>
-                                            <?php
-                                            if (version_compare($version->getShortVersion(), '3.0', '<')) {
-                                                ?>
-                                                <br />
-                                                <br />
-                                                <?php
-                                            }
-                                            ?>
+ 
                                             <legend>
                                                 <?php echo BFText::_('COM_BREEZINGFORMS_ADVANCED_FORM_OTHER'); ?>
                                             </legend>

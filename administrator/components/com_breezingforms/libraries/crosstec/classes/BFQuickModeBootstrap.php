@@ -10,6 +10,7 @@
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Language\Text;
 
 jimport('joomla.filesystem.file');
 
@@ -1556,13 +1557,13 @@ class BFQuickModeBootstrap
                             ob_start();
                             ?>
                                     <script type="text/javascript">
-                                                                                                                        <!--
-                                                                                                            function bf_add_yearscroller(fieldname) {
-                                                                                                                            if (!JQuery("#bfCalExt" + fieldname).length) {
-                                                                                                                                // prev
-                                                                                                                                if (JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").get(0).selectedIndex > 0) {
-                                                                                                                                    JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").before('<img id="bfCalExt' + fieldname + '" onclick="JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').get(0).selectedIndex=JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').get(0).selectedIndex-1;JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').trigger(\'change\')" border="0" src="<?php echo Juri::root(true) . '/components/com_breezingforms/libraries/jquery/pickadate/minusyear.png' ?>" style="width: 30px; vertical - align: top; cursor: pointer; " />');
-                                                                                                                                }
+                                                                                                                                                            <!--
+                                                                                                                                                function bf_add_yearscroller(fieldname) {
+                                                                                                                                                                if (!JQuery("#bfCalExt" + fieldname).length) {
+                                                                                                                                                                    // prev
+                                                                                                                                                                    if (JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").get(0).selectedIndex > 0) {
+                                                                                                                                                                        JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").before('<img id="bfCalExt' + fieldname + '" onclick="JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').get(0).selectedIndex=JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').get(0).selectedIndex-1;JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').trigger(\'change\')" border="0" src="<?php echo Juri::root(true) . '/components/com_breezingforms/libraries/jquery/pickadate/minusyear.png' ?>" style="width: 30px; vertical - align: top; cursor: pointer; " />');
+                                                                                                                                                                    }
                                         // next
                                         if (JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").get(0).selectedIndex + 1 < JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").get(0).options.length) {
                                             JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").after('<img id="bfCalExt' + fieldname + '" onclick="JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').get(0).selectedIndex=JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').get(0).selectedIndex+1;JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').trigger(\'change\')" border="0" src="<?php echo Juri::root(true) . '/components/com_breezingforms/libraries/jquery/pickadate/plusyear.png' ?>" style="width: 30px; vertical-align: top; cursor:pointer;" />');
@@ -1590,8 +1591,8 @@ class BFQuickModeBootstrap
                                                 bf_add_yearscroller(fieldname);
                                             }
                                         }, 200);
-                                                                                                                            }
-                                                                                                                        }
+                                                                                                                                                                }
+                                                                                                                                                            }
                                         //-->
                                     </script>
                                 <?php
@@ -1703,7 +1704,7 @@ class BFQuickModeBootstrap
                         echo '<span class="' . $this->bsClass('nonform-control') . '">';
 
                         echo '<div class="bfSignature" id="bfSignature' . $mdata['dbId'] . '"><div class="bfSignatureCanvasBorder"><canvas></canvas></div>' . "\n";
-                        echo '<button onclick="bf_Signature' . $mdata['dbId'] . 'Reset(bf_signaturePad' . $mdata['dbId'] . ');" class="bfSignatureResetButton button ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . '"><span>' . JText::_('COM_BREEZINGFORMS_SIGNATURE_RESET_BUTTON') . '</span></button>' . "\n";
+                        echo '<button onclick="bf_Signature' . $mdata['dbId'] . 'Reset(bf_signaturePad' . $mdata['dbId'] . ');" class="bfSignatureResetButton button ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . '"><span>' . Text::_('COM_BREEZINGFORMS_SIGNATURE_RESET_BUTTON') . '</span></button>' . "\n";
                         echo '</div>';
                         echo '</span>';
                         echo '</div>';

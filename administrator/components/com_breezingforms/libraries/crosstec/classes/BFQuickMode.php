@@ -11,6 +11,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Language\Text;
 
 require_once(JPATH_SITE . '/administrator/components/com_breezingforms/libraries/Zend/Json/Decoder.php');
 require_once(JPATH_SITE . '/administrator/components/com_breezingforms/libraries/Zend/Json/Encoder.php');
@@ -2098,7 +2099,7 @@ function bfTriggerRules() {
 						');
 
 						echo '<div class="bfSignature" id="bfSignature' . $mdata['dbId'] . '"><div class="bfSignatureCanvasBorder"><canvas></canvas></div>'."\n";
-						echo '<button class="btn btn-primary" onclick="bf_Signature' . $mdata['dbId'] . 'Reset(bf_signaturePad' . $mdata['dbId'] . ');" class="bfSignatureResetButton button"><span>'.JText::_('COM_BREEZINGFORMS_SIGNATURE_RESET_BUTTON').'</span></button>'."\n";
+						echo '<button class="btn btn-primary" onclick="bf_Signature' . $mdata['dbId'] . 'Reset(bf_signaturePad' . $mdata['dbId'] . ');" class="bfSignatureResetButton button"><span>'.Text::_('COM_BREEZINGFORMS_SIGNATURE_RESET_BUTTON').'</span></button>'."\n";
 						echo '<span class=\'bfSignature' . $mdata['bfName'] . '\'></span>';
 						echo '</div>';
 						echo '<input class="ff_elem" type="hidden" name="ff_nm_' . $mdata['bfName'] . '[]" value="" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";

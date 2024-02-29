@@ -14,12 +14,12 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 use Joomla\CMS\Version;
 use Joomla\Filesystem\Folder;
 use Joomla\Filesystem\File;
+use Joomla\CMS\Language\Text;
 
 require_once(JPATH_SITE . '/administrator/components/com_breezingforms/libraries/crosstec/classes/BFFactory.php');
 require_once(JPATH_SITE . '/administrator/components/com_breezingforms/libraries/crosstec/classes/BFRequest.php');
 
 if (BFRequest::getVar('mosmsg', '') != '') {
-
     JFactory::getApplication()->enqueueMessage(BFRequest::getVar('mosmsg', ''));
 }
 
@@ -69,7 +69,7 @@ jimport('joomla.filesystem.file');
 jimport('joomla.filesystem.folder');
 
 if (!JFactory::getUser()->authorise('core.manage', 'com_breezingforms')) {
-    JFactory::getApplication()->enqueueMessage(JText::_('JERROR_ALERTNOAUTHOR'), 'error');
+    JFactory::getApplication()->enqueueMessage(Text::_('JERROR_ALERTNOAUTHOR'), 'error');
     JFactory::getApplication()->redirect('index.php', 403);
     return;
 }

@@ -17,6 +17,7 @@ require_once(JPATH_SITE . '/administrator/components/com_breezingforms/libraries
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Language\Text;
 
 class BFQuickModeOnePage
 {
@@ -709,7 +710,7 @@ function bfTriggerRules() {
                                     inst.open();
 
                                 }else{
-                                    alert(' . json_encode(JText::_('COM_BREEZINGFORMS_PROCESS_SUBMITSUCCESS')) . ');
+                                    alert(' . json_encode(Text::_('COM_BREEZINGFORMS_PROCESS_SUBMITSUCCESS')) . ');
                                     JQuery(".bfPage").css("pointer-events","auto");
                                     JQuery(".bfPage").css("opacity","1.0");
                                     ff_currentpage = JQuery(".bfPage").size() + 1;
@@ -1416,10 +1417,13 @@ function bfTriggerRules() {
                                     array(
                                         "\n",
                                         "\r"
-                                    ), array(
+                                    ),
+                                    array(
                                         "",
                                         ""
-                                    ), htmlentities($content, ENT_QUOTES, 'UTF-8')) . '" class="editlinktip hasTooltip">';
+                                    ),
+                                    htmlentities($content, ENT_QUOTES, 'UTF-8')
+                                ) . '" class="editlinktip hasTooltip">';
                                 $tipClose = '</span>';
                             } else {
                                 $content = trim($mdata['hint']);
@@ -2351,13 +2355,13 @@ function bfTriggerRules() {
                             ob_start();
                             ?>
                                     <script type="text/javascript">
-                                                                                    <!--
-                                                                        function bf_add_yearscroller(fieldname) {
-                                                                                        if (!JQuery("#bfCalExt" + fieldname).length) {
-                                                                                            // prev
-                                                                                            if (JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").get(0).selectedIndex > 0) {
-                                                                                                JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").before('<img id="bfCalExt' + fieldname + '" onclick="JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').get(0).selectedIndex=JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').get(0).selectedIndex-1;JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').trigger(\'change\')" border="0" src="<?php echo Juri::root(true) . '/components/com_breezingforms/libraries/jquery/pickadate/minusyear.png' ?>" style="width: 30px; vertical - align: top; cursor: pointer; " />');
-                                                                                            }
+                                                                                                                        <!--
+                                                                                                            function bf_add_yearscroller(fieldname) {
+                                                                                                                            if (!JQuery("#bfCalExt" + fieldname).length) {
+                                                                                                                                // prev
+                                                                                                                                if (JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").get(0).selectedIndex > 0) {
+                                                                                                                                    JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").before('<img id="bfCalExt' + fieldname + '" onclick="JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').get(0).selectedIndex=JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').get(0).selectedIndex-1;JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').trigger(\'change\')" border="0" src="<?php echo Juri::root(true) . '/components/com_breezingforms/libraries/jquery/pickadate/minusyear.png' ?>" style="width: 30px; vertical - align: top; cursor: pointer; " />');
+                                                                                                                                }
                                         // next
                                         if (JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").get(0).selectedIndex + 1 < JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").get(0).options.length) {
                                             JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").after('<img id="bfCalExt' + fieldname + '" onclick="JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').get(0).selectedIndex=JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').get(0).selectedIndex+1;JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').trigger(\'change\')" border="0" src="<?php echo Juri::root(true) . '/components/com_breezingforms/libraries/jquery/pickadate/plusyear.png' ?>" style="width: 30px; vertical-align: top; cursor:pointer;" />');
@@ -2385,8 +2389,8 @@ function bfTriggerRules() {
                                                 bf_add_yearscroller(fieldname);
                                             }
                                         }, 200);
-                                                                                        }
-                                                                                    }
+                                                                                                                            }
+                                                                                                                        }
                                         //-->
                                     </script>
                                 <?php
@@ -2498,7 +2502,7 @@ function bfTriggerRules() {
                         echo '<span class="' . $this->bsClass('nonform-control') . '">';
 
                         echo '<div class="bfSignature" id="bfSignature' . $mdata['dbId'] . '"><div class="bfSignatureCanvasBorder"><canvas></canvas></div>' . "\n";
-                        echo '<button onclick="bf_Signature' . $mdata['dbId'] . 'Reset(bf_signaturePad' . $mdata['dbId'] . ');" class="bfSignatureResetButton button ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . '"><span>' . JText::_('COM_BREEZINGFORMS_SIGNATURE_RESET_BUTTON') . '</span></button>' . "\n";
+                        echo '<button onclick="bf_Signature' . $mdata['dbId'] . 'Reset(bf_signaturePad' . $mdata['dbId'] . ');" class="bfSignatureResetButton button ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . '"><span>' . Text::_('COM_BREEZINGFORMS_SIGNATURE_RESET_BUTTON') . '</span></button>' . "\n";
                         echo '</div>';
 
                         echo '</span>';

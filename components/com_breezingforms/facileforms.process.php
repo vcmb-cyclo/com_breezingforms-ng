@@ -17,12 +17,11 @@ use Joomla\CMS\Uri\Uri;
 use Joomla\Filesystem\Folder;
 use Joomla\Filesystem\File;
 use Joomla\CMS\Router\Route;
+use Joomla\CMS\Language\Text;
 
 class bfMobile
 {
-
     public $isMobile = false;
-
 }
 
 $mainframe = Factory::getApplication();
@@ -571,7 +570,7 @@ class HTML_facileFormsProcessor
         $this->submitted = $submitted->format('Y-m-d H:i:s');
 
         /*
-          $format = JText::_('DATE_FORMAT_LC2');
+          $format = Text::_('DATE_FORMAT_LC2');
           if ( !$format ) {
           $this->submitted = date('Y-m-d H:i:s');
           }else{
@@ -2353,7 +2352,7 @@ class HTML_facileFormsProcessor
                 }
 
                 if (count($cbForms) && !$cbAuth) {
-                    throw new Exception(JText::_('COM_CONTENTBUILDER_PERMISSIONS_NEW_NOT_ALLOWED'), 403);
+                    throw new Exception(Text::_('COM_CONTENTBUILDER_PERMISSIONS_NEW_NOT_ALLOWED'), 403);
                 }
             }
 
@@ -2362,10 +2361,10 @@ class HTML_facileFormsProcessor
                 // test the permissions of given record
                 if (BFRequest::getInt('cb_record_id', 0)) {
                     contentbuilder::setPermissions(BFRequest::getInt('cb_form_id', 0), BFRequest::getInt('cb_record_id', 0), $cbFrontend ? '_fe' : '');
-                    contentbuilder::checkPermissions('edit', JText::_('COM_CONTENTBUILDER_PERMISSIONS_EDIT_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
+                    contentbuilder::checkPermissions('edit', Text::_('COM_CONTENTBUILDER_PERMISSIONS_EDIT_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
                 } else {
                     contentbuilder::setPermissions(BFRequest::getInt('cb_form_id', 0), 0, $cbFrontend ? '_fe' : '');
-                    contentbuilder::checkPermissions('new', JText::_('COM_CONTENTBUILDER_PERMISSIONS_NEW_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
+                    contentbuilder::checkPermissions('new', Text::_('COM_CONTENTBUILDER_PERMISSIONS_NEW_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
                 }
 
                 $db->setQuery("Select * From #__contentbuilder_forms Where id = " . BFRequest::getInt('cb_form_id', 0) . " And published = 1");
@@ -2376,7 +2375,7 @@ class HTML_facileFormsProcessor
                     $cbRecord = $cbForm->getRecord(BFRequest::getInt('cb_record_id', 0), $cbData['published_only'], $cbFrontend ? ($cbData['own_only_fe'] ? JFactory::getUser()->get('id', 0) : -1) : ($cbData['own_only'] ? JFactory::getUser()->get('id', 0) : -1), $cbFrontend ? $cbData['show_all_languages_fe'] : true);
 
                     if (!count($cbRecord) && !BFRequest::getBool('cbIsNew')) {
-                        throw new Exception(JText::_('COM_CONTENTBUILDER_RECORD_NOT_FOUND'), 404);
+                        throw new Exception(Text::_('COM_CONTENTBUILDER_RECORD_NOT_FOUND'), 404);
                     }
                 }
             }
@@ -4202,7 +4201,7 @@ class HTML_facileFormsProcessor
                 var bf_mobile_url = ' . json_encode($return_url) . ';
                 //-->
                 </script>';
-                echo '<div style="display: block; text-align: center;"><button class="ff_elem btn btn-primary" onclick="location.href=bf_mobile_url;"><span>' . JText::_('COM_BREEZINGFORMS_MOBILE_VERSION') . '</span></button></div><div></div>';
+                echo '<div style="display: block; text-align: center;"><button class="ff_elem btn btn-primary" onclick="location.href=bf_mobile_url;"><span>' . Text::_('COM_BREEZINGFORMS_MOBILE_VERSION') . '</span></button></div><div></div>';
             }
 
             $quickMode->render();
@@ -4819,7 +4818,7 @@ class HTML_facileFormsProcessor
                     }
                     $cbData->items = $cbResult['form']->getRecord($record_return, $cbData->published_only, $cbResult['frontend'] ? ($cbData->own_only_fe ? JFactory::getUser()->get('id', 0) : -1) : ($cbData->own_only ? JFactory::getUser()->get('id', 0) : -1), true);
                     if (!count($cbData->items)) {
-                        throw new Exception(JText::_('COM_CONTENTBUILDER_RECORD_NOT_FOUND'), 404);
+                        throw new Exception(Text::_('COM_CONTENTBUILDER_RECORD_NOT_FOUND'), 404);
                     }
                     $config = array();
                     foreach ($this->savedata as $data) {
@@ -8066,15 +8065,15 @@ class HTML_facileFormsProcessor
                         $opt_in_link = $domainAddress . '?option=com_breezingforms&opt_in=true&id=' . $lastID . '&' . 'token=' . bf_b64enc($token);
                         $opt_out_link = $domainAddress . '?option=com_breezingforms&opt_out=true&id=' . $lastID . '&' . 'token=' . bf_b64enc($token);
 
-                        $message = JText::_('COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_EMAIL_TEXT');
-                        $message .= '<a href="' . $opt_in_link . '">' . JText::_('COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_VERIFY_HERE') . '</a>';
-                        $message .= JText::_('COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_OUT_EMAIL_TEXT');
-                        $message .= '<a href="' . $opt_out_link . '">' . JText::_('COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_UNVERIFY_HERE') . '</a>';
-                        $message .= JText::_('COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_EMAIL_TEXT_FOOTER');
+                        $message = Text::_('COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_EMAIL_TEXT');
+                        $message .= '<a href="' . $opt_in_link . '">' . Text::_('COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_VERIFY_HERE') . '</a>';
+                        $message .= Text::_('COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_OUT_EMAIL_TEXT');
+                        $message .= '<a href="' . $opt_out_link . '">' . Text::_('COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_UNVERIFY_HERE') . '</a>';
+                        $message .= Text::_('COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_EMAIL_TEXT_FOOTER');
 
                         $body = $message;
                         $mailer->isHtml(true);
-                        $mailer->setSubject(JText::_('COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_EMAIL_SUBJECT'));
+                        $mailer->setSubject(Text::_('COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_EMAIL_SUBJECT'));
                         $mailer->setBody($body);
                         $mailer->setSender($sender);
                         $mailer->Send();

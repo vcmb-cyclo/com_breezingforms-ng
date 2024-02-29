@@ -3,9 +3,12 @@
  * @package     BreezingForms
  * @author      Markus Bopp
  * @link        http://www.crosstec.de
+ * @copyright Copyright (C) 2024 by XDA+GIL
  * @license     GNU/GPL
  */
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
+
+use Joomla\CMS\Language\Text;
 
 if (!defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);
@@ -33,19 +36,19 @@ $mgconfig = BFRequest::getVar('act', '') == 'configuration';
 
 $add = '';
 if ($recs)
-    $add = ': ' . JText::_('COM_BREEZINGFORMS_MANAGERECS');
+    $add = ': ' . Text::_('COM_BREEZINGFORMS_MANAGERECS');
 if ($mgforms)
-    $add = ': ' . JText::_('COM_BREEZINGFORMS_MANAGEFORMS');
+    $add = ': ' . Text::_('COM_BREEZINGFORMS_MANAGEFORMS');
 if ($mgscripts)
-    $add = ': ' . JText::_('COM_BREEZINGFORMS_MANAGESCRIPTS');
+    $add = ': ' . Text::_('COM_BREEZINGFORMS_MANAGESCRIPTS');
 if ($mgpieces)
-    $add = ': ' . JText::_('COM_BREEZINGFORMS_MANAGEPIECES');
+    $add = ': ' . Text::_('COM_BREEZINGFORMS_MANAGEPIECES');
 if ($mgintegrate)
-    $add = ': ' . JText::_('COM_BREEZINGFORMS_INTEGRATOR');
+    $add = ': ' . Text::_('COM_BREEZINGFORMS_INTEGRATOR');
 if ($mgmenus)
-    $add = ': ' . JText::_('COM_BREEZINGFORMS_MANAGEMENUS');
+    $add = ': ' . Text::_('COM_BREEZINGFORMS_MANAGEMENUS');
 if ($mgconfig)
-    $add = ': ' . JText::_('COM_BREEZINGFORMS_CONFIG');
+    $add = ': ' . Text::_('COM_BREEZINGFORMS_CONFIG');
 
 $app = JFactory::getApplication();
 $app->JComponentTitle = "BreezingForms" . $add;

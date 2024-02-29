@@ -4,6 +4,7 @@
  * @version 1.9
  * @package BreezingForms
  * @copyright (C) 2008-2020 by Markus Bopp
+ * @copyright Copyright (C) 2024 by XDA+GIL
  * @license Released under the terms of the GNU General Public License
  **/
 
@@ -11,9 +12,9 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
 
 if (BFRequest::getVar('task') == 'editor_saved') {
-
     JFactory::getDocument()->addScriptDeclaration('
     parent.jQuery(".modal-header .close").trigger("click");
     ');
@@ -54,9 +55,9 @@ $editor = Editor::getInstance(Factory::getApplication()->get('editor'));
 
 echo '<form action="index.php" method="post" name="adminForm" id="adminForm">';
 
-echo '<input type="submit" class="btn btn-primary" value="' . JText::_('SAVE') . '" onclick="saveText();"/><br/><br/>';
+echo '<input type="submit" class="btn btn-primary" value="' . Text::_('SAVE') . '" onclick="saveText();"/><br/><br/>';
 echo '<div id="bfModalContainer" style="width:900px;">' . $editor->display("bfEditor", '', 900, 300, 40, 20, false) . '</div>';
-echo '<br/><input type="submit" class="btn btn-primary" value="' . JText::_('SAVE') . '" onclick="saveText();"/>';
+echo '<br/><input type="submit" class="btn btn-primary" value="' . Text::_('SAVE') . '" onclick="saveText();"/>';
 
 echo '<script>
 function bfLoadText(){

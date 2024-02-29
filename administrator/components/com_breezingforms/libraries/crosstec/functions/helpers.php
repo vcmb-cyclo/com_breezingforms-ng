@@ -12,6 +12,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\Filesystem\File;
+use Joomla\CMS\Language\Text;
 
 function bf_sanitizeFilename($fileName, $defaultIfEmpty = 'upload', $separator = '_', $lowerCase = true)
 {
@@ -71,10 +72,10 @@ function bf_tooltipText($title = '', $content = '', $translate = 1, $escape = 1)
 		list($title, $content) = explode('::', $title, 2);
 	}
 
-	// Pass texts through the JText.
+	// Pass texts through the Text.
 	if ($translate) {
-		$title = JText::_($title);
-		$content = JText::_($content);
+		$title = Text::_($title);
+		$content = Text::_($content);
 	}
 
 	// Escape the texts.
@@ -145,7 +146,7 @@ function bf_startsWith($haystack, $needle)
 {
 	$length = strlen($needle);
 
-	return (substr($haystack, 0, $length) === $needle);
+	return(substr($haystack, 0, $length) === $needle);
 }
 
 function bf_endsWith($haystack, $needle)
@@ -155,7 +156,7 @@ function bf_endsWith($haystack, $needle)
 		return true;
 	}
 
-	return (substr($haystack, -$length) === $needle);
+	return(substr($haystack, -$length) === $needle);
 }
 
 
@@ -382,13 +383,13 @@ function bf_createMail($from, $fromname, $subject, $body, $alt_sender = '')
 	$mail = JFactory::getMailer();
 
 	/*
-			 try {
+				try {
 
-				 $mail->setSender( array( $alt_sender ? $alt_sender : $_mailfrom, $fromname ? $fromname : $_fromname ) );
+					$mail->setSender( array( $alt_sender ? $alt_sender : $_mailfrom, $fromname ? $fromname : $_fromname ) );
 
-			 } catch ( Exception $e ) {
+				} catch ( Exception $e ) {
 
-			 }*/
+				}*/
 
 	$mail->setSubject($subject);
 	$mail->setBody($body);
@@ -554,7 +555,7 @@ function bf_isUTF8($string)
 
 		return @!((ord($enc[0]) != 239) && (ord($enc[1]) != 187) && (ord($enc[2]) != 191));
 	} else {
-		return (utf8_encode(utf8_decode($string)) == $string);
+		return(utf8_encode(utf8_decode($string)) == $string);
 	}
 }
 

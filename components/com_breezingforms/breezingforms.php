@@ -5,6 +5,7 @@
  * @version 1.9
  * @package BreezingForms
  * @copyright (C) 2008-2020 by Markus Bopp
+ * @copyright Copyright (C) 2024 by XDA+GIL 
  * @license Released under the terms of the GNU General Public License
  *
  * This is the main component entry point that will be called by joomla or mambo
@@ -19,6 +20,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\Uri\Uri;
 use Joomla\Filesystem\File;
+use Joomla\CMS\Language\Text;
 
 require_once(JPATH_SITE . '/administrator/components/com_breezingforms/libraries/crosstec/classes/BFFactory.php');
 require_once(JPATH_SITE . '/administrator/components/com_breezingforms/libraries/crosstec/classes/BFRequest.php');
@@ -291,7 +293,7 @@ if (
         } else {
 
             if (BFRequest::getVar('option', '') != 'com_breezingforms') {
-                throw new Exception(JText::_('No form id or name provided!'), 404);
+                throw new Exception(Text::_('No form id or name provided!'), 404);
             } else {
                 echo '[No form id or name provided!]';
             }
@@ -986,7 +988,7 @@ if (
                     if ($session->payment_status != 'paid') {
 
                         //echo $_GET['session_id'].'<br>bf dont understand new stripe and says it was diclined lol: <br>'.var_dump($session);
-                        $msg = JText::_("COM_BREEZINGFORMS_STRIPE_DECLINED");
+                        $msg = Text::_("COM_BREEZINGFORMS_STRIPE_DECLINED");
 
                         require_once(JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
                     } else {
@@ -1043,7 +1045,7 @@ if (
                     }
                 } catch (\Stripe\Error\Card $e) {
 
-                    $msg = JText::_("COM_BREEZINGFORMS_STRIPE_DECLINED");
+                    $msg = Text::_("COM_BREEZINGFORMS_STRIPE_DECLINED");
                     require_once(JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
                 }
 
@@ -1239,7 +1241,7 @@ if (
                     if ($checkPP && (($options['amount'] > 0 && $keyarray['mc_gross'] != (doubleval($options['amount']) + doubleval($options['tax']))) || $keyarray['mc_currency'] != strtoupper($options['currencyCode']))) {
 
                         $success = false;
-                        $msg = JText::_("Payment was not correct (amount/currency)");
+                        $msg = Text::_("Payment was not correct (amount/currency)");
                         require_once(JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
                     } else {
 
@@ -1308,24 +1310,24 @@ if (
                                         }
                                     } else {
                                         $success = false;
-                                        $msg = JText::_("This transaction was already processed");
+                                        $msg = Text::_("This transaction was already processed");
                                         require_once(JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
                                     }
                                 }
                             }
                         } else {
                             $success = false;
-                            $msg = JText::_("Could not find record!");
+                            $msg = Text::_("Could not find record!");
                             require_once(JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
                         }
                     }
                 } else if (strcmp($lines[0], "FAIL") == 0) {
                     $success = false;
-                    $msg = JText::_("Verification failed");
+                    $msg = Text::_("Verification failed");
                     require_once(JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
                 } else {
                     $success = false;
-                    $msg = JText::_("Verification did not return any values");
+                    $msg = Text::_("Verification did not return any values");
                     require_once(JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
                 }
 
@@ -1454,7 +1456,7 @@ if (
 
     $tx_token = BFRequest::getVar('tx', '');
     if ($tx_token == '') {
-        $msg = JText::_("This transaction id is empty!");
+        $msg = Text::_("This transaction id is empty!");
         require_once(JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
     } else {
 
@@ -1518,8 +1520,8 @@ if (
                 }
             }
         } else {
-            $msg = JText::_("COM_BREEZINGFORMS_MISSING_PAYMENT_INFORMATION");
-            $tx_token = JText::_("COM_BREEZINGFORMS_NOT_AVAILABLE");
+            $msg = Text::_("COM_BREEZINGFORMS_MISSING_PAYMENT_INFORMATION");
+            $tx_token = Text::_("COM_BREEZINGFORMS_NOT_AVAILABLE");
             if (BFRequest::getVar('tx', '') != '') {
                 $tx_token = BFRequest::getVar('tx', '');
             }
@@ -1869,7 +1871,7 @@ if (
     $database->setQuery("UPDATE #__facileforms_records SET opted=1, opt_ip = " . $database->quote($ip) . ", opt_date = " . $database->quote(JHtml::date('now', 'Y-m-d H:i:s')) . " WHERE opt_token = " . $database->quote($token) . " And id=" . $database->quote($userSubmitedID) . " And opted = 0");
     $database->execute();
 
-    echo JText::_("COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_EMAIL_THANK_YOU");
+    echo Text::_("COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_EMAIL_THANK_YOU");
 
     // DOUBLE OPT IN END
 } else if (BFRequest::getVar('opt_out') == 'true') {
@@ -1884,7 +1886,7 @@ if (
     $database->setQuery("UPDATE #__facileforms_records SET opted=0, opt_ip = " . $database->quote($ip) . ", opt_date = " . $database->quote(JHtml::date('now', 'Y-m-d H:i:s')) . " WHERE opt_token = " . $database->quote($token) . " And id=" . $database->quote($userSubmitedID) . " And opted = 1");
     $database->execute();
 
-    echo JText::_("COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_OUT_EMAIL_THANK_YOU");
+    echo Text::_("COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_OUT_EMAIL_THANK_YOU");
 }
 
 if (BFRequest::getBool('raw', false)) {

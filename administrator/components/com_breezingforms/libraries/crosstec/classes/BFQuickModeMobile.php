@@ -13,6 +13,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Language\Text;
 
 require_once(JPATH_SITE . '/administrator/components/com_breezingforms/libraries/Zend/Json/Decoder.php');
 require_once(JPATH_SITE . '/administrator/components/com_breezingforms/libraries/Zend/Json/Encoder.php');
@@ -87,18 +88,18 @@ class BFQuickModeMobile
 	public function parseToggleFields($code)
 	{
 		/*
-						 example codes:
+							   example codes:
 
-						turn on element bla if blub is on
-						turn off section bla if blub is on
-						turn on section bla if blub is off
-						turn off element bla if blub is off
+							  turn on element bla if blub is on
+							  turn off section bla if blub is on
+							  turn on section bla if blub is off
+							  turn off element bla if blub is off
 
-									if element opener is off set opener huhuu
+										  if element opener is off set opener huhuu
 
-						syntax:
-						ACTION STATE TARGETCATEGORY TARGETNAME if SRCNAME is VALUE
-					 */
+							  syntax:
+							  ACTION STATE TARGETCATEGORY TARGETNAME if SRCNAME is VALUE
+						   */
 
 		$parsed = '';
 		$code = str_replace("\r", '', $code);
@@ -1983,7 +1984,7 @@ function bfTriggerRules() {
                                    JQuery(this).closest(".js-calendar").css("display", "none");
                                 });
                                 
-                                JQuery("#ff_elem' . $mdata['dbId'] . '_btn").html(' . json_encode(JText::_('COM_BREEZINGFORMS_CALENDAR_OPEN')) . ');
+                                JQuery("#ff_elem' . $mdata['dbId'] . '_btn").html(' . json_encode(Text::_('COM_BREEZINGFORMS_CALENDAR_OPEN')) . ');
                                 
                             }, 100);                            
                             
@@ -2114,7 +2115,7 @@ function bfTriggerRules() {
 						');
 
 						echo '<div class="bfSignature" id="bfSignature' . $mdata['dbId'] . '"><div class="bfSignatureCanvasBorder"><canvas></canvas></div>' . "\n";
-						echo '<button onclick="bf_Signature' . $mdata['dbId'] . 'Reset(bf_signaturePad' . $mdata['dbId'] . ');" class="bfSignatureResetButton button btn btn-primary"><span>' . JText::_('COM_BREEZINGFORMS_SIGNATURE_RESET_BUTTON') . '</span></button>' . "\n";
+						echo '<button onclick="bf_Signature' . $mdata['dbId'] . 'Reset(bf_signaturePad' . $mdata['dbId'] . ');" class="bfSignatureResetButton button btn btn-primary"><span>' . Text::_('COM_BREEZINGFORMS_SIGNATURE_RESET_BUTTON') . '</span></button>' . "\n";
 						echo '</div>';
 						echo '<input class="ff_elem" type="hidden" name="ff_nm_' . $mdata['bfName'] . '[]" value="" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
 

@@ -15,6 +15,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\Event\Event;
 use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\CMS\Language\Text;
 
 class HTML_facileFormsForm
 {
@@ -405,7 +406,7 @@ class HTML_facileFormsForm
         </script>
         <fieldset>
             <legend>
-                <?php echo JText::_('COM_BREEZINGFORMS_FORMSETUP'); ?>:
+                <?php echo Text::_('COM_BREEZINGFORMS_FORMSETUP'); ?>:
                 <?php echo htmlentities($row->title, ENT_QUOTES, 'UTF-8') ?>
             </legend>
 

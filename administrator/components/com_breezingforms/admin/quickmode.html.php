@@ -16,6 +16,7 @@ use Joomla\CMS\HTML\Helpers\Bootstrap;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Language\LanguageHelper;
 
 class QuickModeHtml
 {
@@ -3466,7 +3467,7 @@ class QuickModeHtml
             jQuery(\'.bfTrans\').css("display", "none");
         });
         ');
-        if ($formId > 0 && count(JLanguageHelper::getLanguages()) > 1) {
+        if ($formId > 0 && count(LanguageHelper::getLanguages()) > 1) {
             if ($active_language_code != '' && $active_language_code != $default) {
                 Factory::getDocument()->addScriptDeclaration('
                 jQuery(document).ready(function () {
@@ -3480,7 +3481,7 @@ class QuickModeHtml
                 <?php echo $default; ?>
             </div>
             <?php
-            $languages = JLanguageHelper::getLanguages();
+            $languages = LanguageHelper::getLanguages();
             foreach ($languages as $language) {
                 if ($language->lang_code != $default) {
                     ?>

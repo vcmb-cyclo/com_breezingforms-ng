@@ -20,6 +20,7 @@ use Joomla\Filesystem\File;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Language\LanguageHelper;
 
 class bfMobile
 {
@@ -5986,7 +5987,7 @@ class HTML_facileFormsProcessor
     function getFieldTranslated($field, $name, &$res, $dataObject = null, $childrenLength = 0)
     {
 
-        if (count(JLanguageHelper::getLanguages()) == 1) {
+        if (count(LanguageHelper::getLanguages()) == 1) {
             return;
         }
 

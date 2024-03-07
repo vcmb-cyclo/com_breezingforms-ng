@@ -53,21 +53,21 @@ if (!defined('_DATE_FORMAT_LC2'))
     DEFINE('_DATE_FORMAT_LC2', Text::_('DATE_FORMAT_LC2'));
 
 /**
- * Legacy constant, use JFilterInput instead
+ * Legacy constant, use InputFilter instead
  * @deprecated	As of version 1.5
  */
 if (!defined('_MOS_NOTRIM'))
     DEFINE("_MOS_NOTRIM", 0x0001);
 
 /**
- * Legacy constant, use JFilterInput instead
+ * Legacy constant, use InputFilter instead
  * @deprecated	As of version 1.5
  */
 if (!defined('_MOS_ALLOWHTML'))
     DEFINE("_MOS_ALLOWHTML", 0x0002);
 
 /**
- * Legacy constant, use JFilterInput instead
+ * Legacy constant, use InputFilter instead
  * @deprecated	As of version 1.5
  */
 if (!defined('_MOS_ALLOWRAW'))

@@ -84,7 +84,7 @@ class BFRequest
      * @param   string   $name     Variable name.
      * @param   mixed    $default  Default value if the variable does not exist.
      * @param   string   $hash     Where the var should come from (POST, GET, FILES, COOKIE, METHOD).
-     * @param   string   $type     Return type for the variable, for valid values see {@link JFilterInput::clean()}.
+     * @param   string   $type     Return type for the variable, for valid values see {@link InputFilter::clean()}.
      * @param   integer  $mask     Filter mask for the variable.
      *
      * @return  mixed  Requested variable.
@@ -485,7 +485,7 @@ class BFRequest
      *                           2 = allow_raw: If set, no more filtering is performed, higher bits are ignored.
      *                           4 = allow_html: HTML is allowed, but passed through a safe HTML filter first. If set, no more filtering
      *                               is performed. If no bits other than the 1 bit is set, a strict filter is applied.
-     * @param   string   $type  The variable type {@see JFilterInput::clean()}.
+     * @param   string   $type  The variable type {@see InputFilter::clean()}.
      *
      * @return  mixed  Same as $var
      *
@@ -507,12 +507,12 @@ class BFRequest
             // If the allow raw flag is set, do not modify the variable
         } elseif ($mask & 4) {
             // If the allow HTML flag is set, apply a safe HTML filter to the variable
-            $safeHtmlFilter = JFilterInput::getInstance(array(), array(), 1, 1);
+            $safeHtmlFilter = InputFilter::getInstance(array(), array(), 1, 1);
             $var = $safeHtmlFilter->clean($var, $type);
         } else {
             // Since no allow flags were set, we will apply the most strict filter to the variable
             // $tags, $attr, $tag_method, $attr_method, $xss_auto use defaults.
-            $noHtmlFilter = JFilterInput::getInstance();
+            $noHtmlFilter = InputFilter::getInstance();
             $var = $noHtmlFilter->clean($var, $type);
         }
 

@@ -12,6 +12,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 use Joomla\CMS\Factory;
 use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\HTML\Helpers\Bootstrap;
 use Joomla\CMS\Uri\Uri;
 
 class QuickModeHtml
@@ -3408,7 +3409,7 @@ class QuickModeHtml
         </script>
 
         <?php
-        echo HTMLHelperBootstrap::renderModal(
+        echo Bootstrap::renderModal(
             'bfPreviewModal',
             array(
                 'url' => Uri::root() . "index.php?format=html&tmpl=component&option=com_breezingforms&ff_form=" . $formId . "&ff_page=1",
@@ -3417,7 +3418,7 @@ class QuickModeHtml
             )
         );
 
-        echo HTMLHelperBootstrap::renderModal(
+        echo Bootstrap::renderModal(
             'bfPreviewModal2',
             array(
                 'url' => Uri::root() . "index.php?format=html&option=com_breezingforms&ff_form=" . $formId . "&ff_page=1",
@@ -3768,7 +3769,7 @@ class QuickModeHtml
                                                 </label>
 
                                                 <?php
-                                                echo HTMLHelperBootstrap::renderModal(
+                                                echo Bootstrap::renderModal(
                                                     'bfPropertiesIntroModal',
                                                     array(
                                                         'url' => "index.php?option=com_breezingforms&tmpl=component&act=quickmode_editor",
@@ -3797,7 +3798,7 @@ class QuickModeHtml
 
 
                                                 <?php
-                                                echo HTMLHelperBootstrap::renderModal(
+                                                echo Bootstrap::renderModal(
                                                     'bfPropertiesIntroModal2',
                                                     array(
                                                         'url' => "index.php?option=com_breezingforms&tmpl=component&act=quickmode_editor&active_language_code=" . $active_language_code,
@@ -3892,7 +3893,7 @@ class QuickModeHtml
 
 
                                                 <?php
-                                                echo HTMLHelperBootstrap::renderModal(
+                                                echo Bootstrap::renderModal(
                                                     'bfPropertiesDescriptionModal',
                                                     array(
                                                         'url' => "index.php?option=com_breezingforms&tmpl=component&act=quickmode_editor",
@@ -3920,7 +3921,7 @@ class QuickModeHtml
                                                 </label>
 
                                                 <?php
-                                                echo HTMLHelperBootstrap::renderModal(
+                                                echo Bootstrap::renderModal(
                                                     'bfPropertiesDescriptionModal2',
                                                     array(
                                                         'url' => "index.php?option=com_breezingforms&tmpl=component&act=quickmode_editor&active_language_code=" . $active_language_code,

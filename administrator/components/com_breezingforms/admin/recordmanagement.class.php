@@ -15,6 +15,7 @@ use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Filesystem\File;
 use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\HTML\Helpers\Bootstrap;
 
 class bfRecordManagement
 {
@@ -571,7 +572,7 @@ class bfRecordManagement
     function listRecords()
     {
 
-        HTMLHelper::_('behavior.keepalive');
+        JHTML::_('behavior.keepalive');
 
 
         JToolBarHelper::custom('exportPdf', 'download', 'download', BFText::_('COM_BREEZINGFORMS_PDF'), false);
@@ -616,7 +617,7 @@ class bfRecordManagement
         </script>
         <?php
 
-        echo HTMLHelperBootstrap::renderModal(
+        echo Bootstrap::renderModal(
             'bfCsvModal',
             array(
                 'url' => 'index.php',

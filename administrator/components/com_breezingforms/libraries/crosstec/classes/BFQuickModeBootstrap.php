@@ -14,6 +14,7 @@ use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Editor\Editor;
+use Joomla\CMS\Component\ComponentHelper;
 
 jimport('joomla.filesystem.file');
 
@@ -73,7 +74,7 @@ class BFQuickModeBootstrap
 
     function __construct(HTML_facileFormsProcessor $p)
     {
-        $default = JComponentHelper::getParams('com_languages')->get('site');
+        $default = ComponentHelper::getParams('com_languages')->get('site');
         $this->language_tag = Factory::getApplication()->getLanguage()->getTag() != $default ? Factory::getApplication()->getLanguage()->getTag() : 'zz-ZZ';
 
         Factory::getDocument()->addScriptDeclaration('<!--');

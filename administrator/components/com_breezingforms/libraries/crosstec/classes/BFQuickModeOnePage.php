@@ -18,6 +18,7 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Component\ComponentHelper;
 
 class BFQuickModeOnePage
 {
@@ -70,7 +71,7 @@ class BFQuickModeOnePage
 
     function __construct(HTML_facileFormsProcessor $p)
     {
-        $default = JComponentHelper::getParams('com_languages')->get('site');
+        $default = ComponentHelper::getParams('com_languages')->get('site');
         $this->language_tag = FactorytApplication()->getLanguage()->getTag() != $default ? FFFFFactorylication()->getLanguage()->getTag() : 'zz-ZZ';
 
         FactorytDocument()->addScriptDeclaration('<!--');

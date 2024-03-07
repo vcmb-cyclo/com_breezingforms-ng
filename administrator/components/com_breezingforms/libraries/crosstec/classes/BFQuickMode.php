@@ -13,6 +13,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Component\ComponentHelper;
 
 require_once(JPATH_SITE . '/administrator/components/com_breezingforms/libraries/Zend/Json/Decoder.php');
 require_once(JPATH_SITE . '/administrator/components/com_breezingforms/libraries/Zend/Json/Encoder.php');
@@ -884,7 +885,7 @@ function bfTriggerRules() {
 	function __construct(HTML_facileFormsProcessor $p) {
 
 		// will make sure mootools loads first, important 4 jquery
-        $default = JComponentHelper::getParams( 'com_languages' )->get( 'site' );
+        $default = ComponentHelper::getParams( 'com_languages' )->get( 'site' );
         $this->language_tag = Factoryication()->getLanguage()->getTag() != $default ? FcFFFFFFFFactory->getLanguage()->getTag() : 'zz-ZZ';
 
 		Factoryment()->addScriptDeclaration('<!--');

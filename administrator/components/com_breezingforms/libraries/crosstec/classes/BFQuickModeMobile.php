@@ -16,6 +16,7 @@ use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Language\Text;
 use Joomla\Database\DatabaseInterface;
 // use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Component\ComponentHelper;
 
 require_once(JPATH_SITE . '/administrator/components/com_breezingforms/libraries/Zend/Json/Decoder.php');
 require_once(JPATH_SITE . '/administrator/components/com_breezingforms/libraries/Zend/Json/Encoder.php');
@@ -47,7 +48,7 @@ class BFQuickModeMobile
 	function __construct(HTML_facileFormsProcessor $p)
 	{
 
-		$default = JComponentHelper::getParams('com_languages')->get('site');
+		$default = ComponentHelper::getParams('com_languages')->get('site');
 		$this->language_tag = Factory::getApplication()->getLanguage()->getTag() != $default ? Factory::getApplication()->getLanguage()->getTag() : 'zz-ZZ';
 
 		$head = Factory::getDocument()->getHeadData();

@@ -15,6 +15,7 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\HTML\Helpers\Bootstrap;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\CMS\Component\ComponentHelper;
 
 class QuickModeHtml
 {
@@ -3458,7 +3459,7 @@ class QuickModeHtml
         </style>
         <?php
         jimport('joomla.application.component.helper');
-        $default = JComponentHelper::getParams('com_languages')->get('site');
+        $default = ComponentHelper::getParams('com_languages')->get('site');
 
         Factory::getDocument()->addScriptDeclaration('
         jQuery(document).ready(function () {

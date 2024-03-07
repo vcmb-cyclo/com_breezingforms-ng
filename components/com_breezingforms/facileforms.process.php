@@ -19,6 +19,7 @@ use Joomla\Filesystem\Folder;
 use Joomla\Filesystem\File;
 use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Component\ComponentHelper;
 
 class bfMobile
 {
@@ -5970,7 +5971,7 @@ class HTML_facileFormsProcessor
             $dataObject = Zend_Json::decode(bf_b64dec($this->formrow->template_code));
             $rootMdata = $dataObject['properties'];
 
-            $default = JComponentHelper::getParams('com_languages')->get('site');
+            $default = ComponentHelper::getParams('com_languages')->get('site');
             $language_tag = Factory::getApplication()->getLanguage()->getTag() != $default ? Factory::getApplication()->getLanguage()->getTag() : 'zz-ZZ';
 
             /* translatables */
@@ -6000,7 +6001,7 @@ class HTML_facileFormsProcessor
                 if ($dataObject['properties']['type'] == 'element' && isset($dataObject['properties']['bfName'])) {
                     $language_tag = '';
                     jimport('joomla.application.component.helper');
-                    $default = JComponentHelper::getParams('com_languages')->get('site');
+                    $default = ComponentHelper::getParams('com_languages')->get('site');
                     $language_tag = Factory::getApplication()->getLanguage()->getTag() != $default ? Factory::getApplication()->getLanguage()->getTag() : 'zz-ZZ';
                     if (trim($name) == trim($dataObject['properties']['bfName']) && isset($dataObject['properties'][$field . '_translation' . $language_tag]) && $dataObject['properties'][$field . '_translation' . $language_tag] != '') {
                         $res = addslashes($dataObject['properties'][$field . '_translation' . $language_tag]);

@@ -28,7 +28,7 @@ class bfRecordManagement
         jimport('joomla.filesystem.file');
         jimport('joomla.filesystem.folder');
 
-        $this->tz = new DateTimeZone(Factory::getApplication()->getCfg('offset'));
+        $this->tz = new DateTimeZone(Factory::getApplication()->get('offset'));
 
         // bfRecordsTableContainer
     }
@@ -1779,7 +1779,7 @@ class bfRecordManagement
 
         // date search
         $tz = 'UTC';
-        $tz = new DateTimeZone(Factory::getApplication()->getCfg('offset'));
+        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
 
         $now = Factory::getDate();
         $now = Factory::getDate('now', $tz);
@@ -1792,7 +1792,7 @@ class bfRecordManagement
         $searchdatefrom = BFRequest::getVar('searchdatefrom', '');
         $searchtimefrom = BFRequest::getVar('searchtimefrom', '');
 
-        $tz = new DateTimeZone(Factory::getApplication()->getCfg('offset'));
+        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
 
         if ($searchdatefrom != '') {
             $searchdatefrom = Factory::getDate($searchdatefrom, $tz);
@@ -1819,7 +1819,7 @@ class bfRecordManagement
         $searchdateto = BFRequest::getVar('searchdateto', '');
         $searchtimeto = BFRequest::getVar('searchtimeto', '');
 
-        $tz = new DateTimeZone(Factory::getApplication()->getCfg('offset'));
+        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
 
         if ($searchdateto != '') {
             $searchdateto = Factory::getDate($searchdateto, $tz);
@@ -2504,7 +2504,7 @@ class bfRecordManagement
         }
 
         $tz = 'UTC';
-        $tz = new DateTimeZone(Factory::getApplication()->getCfg('offset'));
+        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
 
         $date_stamp = date('YmdHis');
         $date_ = Factory::getDate('now', $tz);
@@ -2850,7 +2850,7 @@ class bfRecordManagement
         }
 
         $tz = 'UTC';
-        $tz = new DateTimeZone(Factory::getApplication()->getCfg('offset'));
+        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
 
         $date_stamp = date('YmdHis');
         $date_ = Factory::getDate('now', $tz);
@@ -2928,7 +2928,7 @@ class bfRecordManagement
         ArrayHelper::toInteger($ids);
 
         $tz = 'UTC';
-        $tz = new DateTimeZone(Factory::getApplication()->getCfg('offset'));
+        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
 
         $date_stamp = date('YmdHis');
         $date_file = date('Y-m-d H:i:s');

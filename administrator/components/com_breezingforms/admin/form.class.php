@@ -493,7 +493,7 @@ class facileFormsForm
             foreach ($pkgs as $p)
                 $pkglist[] = array($p->name == $pkg, $p->name);
 
-        $limit = Factory::getApplication()->getUserStateFromRequest('global.list.limit', 'limit', Factory::getApplication()->getCfg('list_limit'), 'int');
+        $limit = Factory::getApplication()->getUserStateFromRequest('global.list.limit', 'limit', Factory::getApplication()->get('list_limit'), 'int');
         $limitstart = 0;
         if (isset($_REQUEST['limit']) && isset($_REQUEST['limitstart'])) {
             $limit = intval($_REQUEST['limit']);

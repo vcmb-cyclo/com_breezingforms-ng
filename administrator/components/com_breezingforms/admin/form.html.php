@@ -2148,7 +2148,7 @@ class HTML_facileFormsForm
                     $k = 1 - $k;
                 } // for
         
-                $limit = Factory::getApplication()->getUserStateFromRequest('global.list.limit', 'limit', Factory::getApplication()->getCfg('list_limit'), 'int');
+                $limit = Factory::getApplication()->getUserStateFromRequest('global.list.limit', 'limit', Factory::getApplication()->get('list_limit'), 'int');
                 $pagination = facileFormsForm::getPagination($total, $limit, BFRequest::getInt('limitstart', 0));
                 $pages_links = $pagination->getPagesLinks();
                 ?>

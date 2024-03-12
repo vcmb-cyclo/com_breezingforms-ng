@@ -567,7 +567,7 @@ class HTML_facileFormsProcessor
 
 
         $tz = 'UTC';
-        $tz = new DateTimeZone(Factory::getApplication()->getCfg('offset'));
+        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
 
         $submitted = Factory::getDate();
         $submitted = Factory::getDate('now', $tz);
@@ -2257,7 +2257,7 @@ class HTML_facileFormsProcessor
         $path = str_replace('{field}', File::makeSafe(strtolower(trim($field_name))), $path);
 
         $tz = 'UTC';
-        $tz = new DateTimeZone(Factory::getApplication()->getCfg('offset'));
+        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
 
         $date_stamp1 = date('Y_m_d');
         $date_stamp2 = date('H_i_s');
@@ -4949,7 +4949,7 @@ class HTML_facileFormsProcessor
         global $ff_compath;
 
         $tz = 'UTC';
-        $tz = new DateTimeZone(Factory::getApplication()->getCfg('offset'));
+        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
 
         $file = JPATH_SITE . '/media/breezingforms/pdftpl/' . $this->formrow->name . '_pdf_attachment.php';
         if (!file_exists($file)) {
@@ -5159,7 +5159,7 @@ class HTML_facileFormsProcessor
         $inverted = isset($ff_config->csvinverted) ? $ff_config->csvinverted : false;
 
         $tz = 'UTC';
-        $tz = new DateTimeZone(Factory::getApplication()->getCfg('offset'));
+        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
 
         $csvdelimiter = stripslashes($ff_config->csvdelimiter);
         $csvquote = stripslashes($ff_config->csvquote);
@@ -5268,7 +5268,7 @@ class HTML_facileFormsProcessor
         global $ff_compath, $ff_version, $mosConfig_fileperms;
 
         $tz = 'UTC';
-        $tz = new DateTimeZone(Factory::getApplication()->getCfg('offset'));
+        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
 
         $date_stamp = date('YmdHis');
         $submitted = $this->submitted;
@@ -5521,7 +5521,7 @@ class HTML_facileFormsProcessor
                 $PROCESS_SUBMITTEDAT = BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTEDAT');
 
                 $tz = 'UTC';
-                $tz = new DateTimeZone(Factory::getApplication()->getCfg('offset'));
+                $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
 
                 $SUBMITTED = $this->submitted;
                 $date_ = Factory::getDate($this->submitted, $tz);
@@ -5581,7 +5581,7 @@ class HTML_facileFormsProcessor
                 // fallback if no template exists
 
                 $tz = 'UTC';
-                $tz = new DateTimeZone(Factory::getApplication()->getCfg('offset'));
+                $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
 
                 $submitted = $this->submitted;
                 $date_ = Factory::getDate($this->submitted, $tz);
@@ -5633,7 +5633,7 @@ class HTML_facileFormsProcessor
             $SUBMITTED = $this->submitted;
 
             $tz = 'UTC';
-            $tz = new DateTimeZone(Factory::getApplication()->getCfg('offset'));
+            $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
 
             $date_ = Factory::getDate($this->submitted, $tz);
             $offset = $date_->getOffsetFromGMT();
@@ -6284,7 +6284,7 @@ class HTML_facileFormsProcessor
                 $SUBMITTED = $this->submitted;
 
                 $tz = 'UTC';
-                $tz = new DateTimeZone(Factory::getApplication()->getCfg('offset'));
+                $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
 
                 $date_ = Factory::getDate($this->submitted, $tz);
                 $offset = $date_->getOffsetFromGMT();
@@ -6358,7 +6358,7 @@ class HTML_facileFormsProcessor
                 $form_title_translated = $this->getFormTitleTranslated();
 
                 $tz = 'UTC';
-                $tz = new DateTimeZone(Factory::getApplication()->getCfg('offset'));
+                $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
 
                 $submitted = $this->submitted;
                 $date_ = Factory::getDate($this->submitted, $tz);
@@ -6420,7 +6420,7 @@ class HTML_facileFormsProcessor
             $SUBMITTED = $this->submitted;
 
             $tz = 'UTC';
-            $tz = new DateTimeZone(Factory::getApplication()->getCfg('offset'));
+            $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
 
             $submitted = $this->submitted;
             $date_ = Factory::getDate($this->submitted, $tz);
@@ -6815,7 +6815,7 @@ class HTML_facileFormsProcessor
             return '';
 
         $tz = 'UTC';
-        $tz = new DateTimeZone(Factory::getApplication()->getCfg('offset'));
+        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
 
         $date_stamp = date('Y_m_d_H_i_s');
         $date_ = Factory::getDate($this->submitted, $tz);
@@ -7300,7 +7300,7 @@ class HTML_facileFormsProcessor
                                     if (@file_exists($sourcePath) && @is_readable($sourcePath) && @is_dir($sourcePath)) {
 
                                         $tz = 'UTC';
-                                        $tz = new DateTimeZone(Factory::getApplication()->getCfg('offset'));
+                                        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
 
                                         $date_stamp = date('Y_m_d_H_i_s');
                                         $date_ = Factory::getDate($this->submitted, $tz);

@@ -22,6 +22,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Language\LanguageHelper;
 use Joomla\Filesystem\Path;
+use Joomla\CMS\Environment\Browser;
 
 class bfMobile
 {
@@ -543,18 +544,18 @@ class HTML_facileFormsProcessor
         $this->editable = $editable;
         $this->editable_override = $editable_override;
 
-        if (!class_exists('JBrowser')) {
+        if (!class_exists('Browser')) {
             require_once(JPATH_SITE . '/libraries/joomla/environment/browser.php');
         }
         $this->ip = $_SERVER['REMOTE_ADDR'];
         if ($ff_config->disable_ip == "1") {
             $this->ip = 0;
         }
-        $this->agent = JBrowser::getInstance()->getAgentString();
+        $this->agent = Browser::getInstance()->getAgentString();
 
-        $this->browser = JBrowser::getInstance()->getAgentString();
+        $this->browser = Browser::getInstance()->getAgentString();
 
-        $jbrowserInstance = JBrowser::getInstance();
+        $jbrowserInstance = Browser::getInstance();
         $this->opsys = $jbrowserInstance->getPlatform();
 
         if ($ff_config->getprovider == 0)

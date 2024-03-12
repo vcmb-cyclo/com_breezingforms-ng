@@ -16,6 +16,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 use Joomla\String\StringHelper;
+use Joomla\CMS\Filter\OutputFilter;
 
 function bf_sanitizeFilename($fileName, $defaultIfEmpty = 'upload', $separator = '_', $lowerCase = true)
 {
@@ -28,7 +29,7 @@ function bf_sanitizeFilename($fileName, $defaultIfEmpty = 'upload', $separator =
 	if (function_exists('transliterator_transliterate')) {
 
 		$fileName = @transliterator_transliterate('Any-Latin; Latin-ASCII; NFD; [:Nonspacing Mark:] Remove; NFC; Lower();', $fileInfos['filename']);
-		$fileName = JFilterOutput::stringURLSafe($fileName);
+		$fileName = OutputFilter::stringURLSafe($fileName);
 		if (trim($fileName) == '') {
 
 			$allowed = "/[^a-z0-9\\.\\-\\_]/i";

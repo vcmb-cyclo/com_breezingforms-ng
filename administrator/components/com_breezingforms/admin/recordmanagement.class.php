@@ -573,7 +573,7 @@ class bfRecordManagement
     function listRecords()
     {
 
-        JHTML::_('behavior.keepalive');
+        HTMLHelper::_('behavior.keepalive');
 
 
         ToolBarHelper::custom('exportPdf', 'download', 'download', BFText::_('COM_BREEZINGFORMS_PDF'), false);

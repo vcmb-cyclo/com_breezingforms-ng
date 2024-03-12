@@ -23,6 +23,7 @@ use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Language\LanguageHelper;
 use Joomla\Filesystem\Path;
 use Joomla\CMS\Environment\Browser;
+use Joomla\CMS\HTML\HTMLHelper;
 
 class bfMobile
 {
@@ -4209,7 +4210,7 @@ class HTML_facileFormsProcessor
             $quickMode->render();
         } else { // case if forms done with the easy mode
             // always load calendar
-            JHTML::_('behavior.calendar');
+            HTMLHelper::_('behavior.calendar');
 
             echo '
 			<style type="text/css">
@@ -8419,7 +8420,7 @@ transition: box-shadow .15s linear;
                                     if (!$this->inline)
                                         $html .= '<html><head><meta charset="UTF-8"></head><body>';
 
-                                    JHTML::_('bootstrap.modal');
+                                    HTMLHelper::_('bootstrap.modal');
 
                                     $ppselect = BFRequest::getVar('ff_nm_bfPaymentSelect', array());
                                     if (count($ppselect) != 0) {
@@ -8545,7 +8546,7 @@ transition: box-shadow .15s linear;
                                     if (!$this->inline)
                                         $html .= '<html><head></head><body>';
 
-                                    JHTML::_('bootstrap.modal');
+                                    HTMLHelper::_('bootstrap.modal');
 
                                     $options = $element['options'];
 

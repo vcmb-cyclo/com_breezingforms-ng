@@ -297,7 +297,7 @@ class facileFormsForm
         $row->reorder("");
 
         PluginHelper::importPlugin('breezingforms_addons');
-        Factory::getApplication()->triggerEvent('onPropertiesSave', array(BFRequest::getInt('id', 0)));
+        Factory::getApplication()->getDispatcher()->dispatch('onPropertiesSave', array(BFRequest::getInt('id', 0)));
 
         if (trim($caller) == '') {
             $caller = "index.php?option=$option&act=manageforms&pkg=$pkg";

@@ -17,6 +17,7 @@ use Joomla\Filesystem\File;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\HTML\Helpers\Bootstrap;
 use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\CMS\Table\Table;
 
 class bfRecordManagement
 {
@@ -2119,7 +2120,7 @@ class bfRecordManagement
                         foreach ($articles as $article) {
                             $article_items[] = $db->Quote('com_content.article.' . $article);
 
-                            $table = JTable::getInstance('content');
+                            $table = Table::getInstance('content');
 
                             // Trigger the onContentBeforeDelete event.
                             if ($table->load($article)) {

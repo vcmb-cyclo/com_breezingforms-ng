@@ -18,6 +18,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Log\Log;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Plugin\PluginHelper;
+use Joomla\CMS\Pagination\Pagination;
 
 require_once($ff_admpath . '/admin/form.html.php');
 
@@ -544,7 +545,7 @@ class facileFormsForm
                 $pagination = new BFPagination($total, $limitstart, $limit);
             } else {
                 jimport('joomla.html.pagination');
-                $pagination = new JPagination($total, $limitstart, $limit);
+                $pagination = new Pagination($total, $limitstart, $limit);
             }
         }
         return $pagination;

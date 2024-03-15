@@ -438,7 +438,7 @@ function bf_createMail($from, $fromname, $subject, $body, $alt_sender = '')
 function bf_sendNotificationBySession($session)
 {
 
-	$contents = Factory::getSession()->get($session, array());
+	$contents = Factory::getApplication()->getSession()->get($session, array());
 
 	if (count($contents) != 0) {
 
@@ -480,7 +480,7 @@ function bf_sendNotificationBySession($session)
 		}
 	}
 
-	Factory::getSession()->set($session, array());
+	Factory::getApplication()->getSession()->set($session, array());
 }
 
 function bf_sendNotificationByPaymentCache($formId, $recordId, $type = 'admin')

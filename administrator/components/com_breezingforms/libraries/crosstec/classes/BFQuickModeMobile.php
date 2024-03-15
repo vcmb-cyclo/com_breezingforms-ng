@@ -251,9 +251,9 @@ class BFQuickModeMobile
 		$this->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/tooltip.js');
 
 		if ($this->hasFlashUpload) {
-			$tickets = Factory::getSession()->get('bfFlashUploadTickets', array());
+			$tickets = Factory::getApplication()->getSession()->get('bfFlashUploadTickets', array());
 			$tickets[$this->flashUploadTicket] = array(); // stores file info for later processing
-			Factory::getSession()->set('bfFlashUploadTickets', $tickets);
+			Factory::getApplication()->getSession()->set('bfFlashUploadTickets', $tickets);
 			$this->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/center.js');
 			$this->addScriptDeclaration('
                         var bfUploaders = [];

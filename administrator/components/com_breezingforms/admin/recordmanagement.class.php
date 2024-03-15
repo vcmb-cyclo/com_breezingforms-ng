@@ -276,7 +276,7 @@ class bfRecordManagement
         global $ff_config;
 
         $form = BFRequest::getInt('form_selection');
-        Factory::getSession()->set('form', $form);
+        Factory::getApplication()->getSession()->set('form', $form);
         if ($form == 0) {
             echo BFText::_('COM_BREEZINGFORMS_IMPORT_CSV_MSG');
             return;
@@ -361,7 +361,7 @@ class bfRecordManagement
 
         $db = BFFactory::getdbo();
 
-        $form = Factory::getSession()->get('form');
+        $form = Factory::getApplication()->getSession()->get('form');
         $encoding = $_POST["encoding"];
         $file = $_FILES['csv_file']['tmp_name'];
 

@@ -307,9 +307,9 @@ class BFQuickModeBootstrap
         }
 
         if ($this->hasFlashUpload) {
-            $tickets = Factory::getSession()->get('bfFlashUploadTickets', array());
+            $tickets = Factory::getApplication()->getSession()->get('bfFlashUploadTickets', array());
             $tickets[$this->flashUploadTicket] = array(); // stores file info for later processing
-            Factory::getSession()->set('bfFlashUploadTickets', $tickets);
+            Factory::getApplication()->getSession()->set('bfFlashUploadTickets', $tickets);
             echo '<input type="hidden" name="bfFlashUploadTicket" value="' . $this->flashUploadTicket . '"/>' . "\n";
             Factory::getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/center.js');
             Factory::getDocument()->addScriptDeclaration('

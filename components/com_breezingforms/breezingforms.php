@@ -178,8 +178,8 @@ if (
             addRequestParams($params->get('ff_mod_parpub', ''));
             $pagetitle = false;
 
-            Factory::getSession()->set('ff_editableMod' . $xModuleId . $formname, intval($params->get('ff_mod_editable', $editable)));
-            Factory::getSession()->set('ff_editable_overrideMod' . $xModuleId . $formname, intval($params->get('ff_mod_editable_override', $editable_override)));
+            Factory::getApplication()->getSession()->set('ff_editableMod' . $xModuleId . $formname, intval($params->get('ff_mod_editable', $editable)));
+            Factory::getApplication()->getSession()->set('ff_editable_overrideMod' . $xModuleId . $formname, intval($params->get('ff_mod_editable_override', $editable_override)));
         } else if (isset($ff_applic) && $ff_applic == 'plg_facileforms') {
 
             $formname = htmlentities(BFRequest::getVar('ff_name', ''), ENT_QUOTES, 'UTF-8');
@@ -318,19 +318,19 @@ if (
 
         // set by module
         if ((BFRequest::getVar('ff_applic') == 'mod_facileforms' || (isset($ff_applic) && $ff_applic == 'mod_facileforms'))) {
-            if (Factory::getSession()->get('ff_editableMod' . $xModuleId . $form->name, 0) != 0) {
-                $editable = Factory::getSession()->get('ff_editableMod' . $xModuleId . $form->name, 0);
-            } else if (Factory::getSession()->get('ff_editableMod' . BFRequest::getInt('ff_module_id', 0) . $form->name, 0) != 0) {
-                $editable = Factory::getSession()->get('ff_editableMod' . BFRequest::getInt('ff_module_id', 0) . $form->name, 0);
+            if (Factory::getApplication()->getSession()->get('ff_editableMod' . $xModuleId . $form->name, 0) != 0) {
+                $editable = Factory::getApplication()->getSession()->get('ff_editableMod' . $xModuleId . $form->name, 0);
+            } else if (Factory::getApplication()->getSession()->get('ff_editableMod' . BFRequest::getInt('ff_module_id', 0) . $form->name, 0) != 0) {
+                $editable = Factory::getApplication()->getSession()->get('ff_editableMod' . BFRequest::getInt('ff_module_id', 0) . $form->name, 0);
             }
         }
 
         // set by module
         if ((BFRequest::getVar('ff_applic') == 'mod_facileforms' || (isset($ff_applic) && $ff_applic == 'mod_facileforms'))) {
-            if (Factory::getSession()->get('ff_editable_overrideMod' . $xModuleId . $form->name, 0) != 0) {
-                $editable_override = Factory::getSession()->get('ff_editable_overrideMod' . $xModuleId . $form->name, 0);
-            } else if (Factory::getSession()->get('ff_editable_overrideMod' . BFRequest::getInt('ff_module_id', 0) . $form->name, 0) != 0) {
-                $editable_override = Factory::getSession()->get('ff_editable_overrideMod' . BFRequest::getInt('ff_module_id', 0) . $form->name, 0);
+            if (Factory::getApplication()->getSession()->get('ff_editable_overrideMod' . $xModuleId . $form->name, 0) != 0) {
+                $editable_override = Factory::getApplication()->getSession()->get('ff_editable_overrideMod' . $xModuleId . $form->name, 0);
+            } else if (Factory::getApplication()->getSession()->get('ff_editable_overrideMod' . BFRequest::getInt('ff_module_id', 0) . $form->name, 0) != 0) {
+                $editable_override = Factory::getApplication()->getSession()->get('ff_editable_overrideMod' . BFRequest::getInt('ff_module_id', 0) . $form->name, 0);
             }
         }
 
@@ -936,7 +936,7 @@ if (
 
                     if (!$exists) {
 
-                        /* XDA if( Factory::getSession()->get('bf_stripe_last_payment_amount'.$record_id, null) == null ){
+                        /* XDA if( Factory::getApplication()->getSession()->get('bf_stripe_last_payment_amount'.$record_id, null) == null ){
 
             BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_COULD_NOT_FIND_STRIPE_AMOUNT'));
             exit;
@@ -944,7 +944,7 @@ if (
 
                         $stripearray = array();
                         $stripearray = [
-                            "amount" => Factory::getSession()->get('bf_stripe_last_payment_amount' . $record_id, null),
+                            "amount" => Factory::getApplication()->getSession()->get('bf_stripe_last_payment_amount' . $record_id, null),
                             // amount in cents, again
                             "currency" => strtolower($options['currencyCode']),
                             "source" => $tx_token,
@@ -952,9 +952,9 @@ if (
                             "metadata" => array()
                             //,"metadata" => array("Order ID" => $_session_cart['order_id'])
                         ];
-                        if (Factory::getSession()->get('emailfield', '') !== '') {
-                            $stripearray += ['receipt_email' => Factory::getSession()->get('emailfield', '')];
-                            Factory::getSession()->clear('emailfield');
+                        if (Factory::getApplication()->getSession()->get('emailfield', '') !== '') {
+                            $stripearray += ['receipt_email' => Factory::getApplication()->getSession()->get('emailfield', '')];
+                            Factory::getApplication()->getSession()->clear('emailfield');
                         }
                         //$charge = \Stripe\Charge::create( $stripearray );
                         /*
@@ -974,7 +974,7 @@ if (
                           ]);*/
 
 
-                        Factory::getSession()->clear('bf_stripe_last_payment_amount' . $record_id);
+                        Factory::getApplication()->getSession()->clear('bf_stripe_last_payment_amount' . $record_id);
                     } else {
 
                         $exploded = explode(':', $exists);
@@ -1809,11 +1809,11 @@ if (
             $tempFile = $_FILES['Filedata']['tmp_name'];
             $targetPath = JPATH_SITE . '/components/com_breezingforms/uploads/';
             if (@file_exists($targetPath) && @is_dir($targetPath)) {
-                $secureTicket = Factory::getSession()->get('secure_ticket', '', 'com_breezingforms');
+                $secureTicket = Factory::getApplication()->getSession()->get('secure_ticket', '', 'com_breezingforms');
                 if ($secureTicket == '') {
                     mt_srand();
                     $secureTicket = md5(strtotime('now') . mt_rand(0, mt_getrandmax()));
-                    Factory::getSession()->set('secure_ticket', $secureTicket, 'com_breezingforms');
+                    Factory::getApplication()->getSession()->set('secure_ticket', $secureTicket, 'com_breezingforms');
                 }
 
                 $targetFile = str_replace('//', '/', $targetPath) . 'chunks' . DS . BFRequest::getInt('offset', 0) . '_' . bf_sanitizeFilename(BFRequest::getVar('name', 'unknown')) . '_' . BFRequest::getVar('itemName', '') . '_' . BFRequest::getVar('bfFlashUploadTicket') . '_' . $secureTicket . '_chunktmp';

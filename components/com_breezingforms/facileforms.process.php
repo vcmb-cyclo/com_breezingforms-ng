@@ -2398,9 +2398,9 @@ class HTML_facileFormsProcessor
         if (trim($this->formrow->template_code_processed) == 'QuickMode') {
 
             if (isset($_GET['non_mobile']) && BFRequest::getBool('non_mobile', 0)) {
-                Factory::getSession()->clear('com_breezingforms.mobile');
+                Factory::getApplication()->getSession()->clear('com_breezingforms.mobile');
             } else if (isset($_GET['mobile']) && BFRequest::getBool('mobile', 0)) {
-                Factory::getSession()->set('com_breezingforms.mobile', true);
+                Factory::getApplication()->getSession()->set('com_breezingforms.mobile', true);
             }
 
             require_once(JPATH_SITE . '/administrator/components/com_breezingforms/libraries/Zend/Json/Decoder.php');
@@ -2419,7 +2419,7 @@ class HTML_facileFormsProcessor
 
             if (BFRequest::getVar('ff_applic', '') != 'mod_facileforms' && BFRequest::getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
                 $is_device = true;
-                $this->isMobile = isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile'] ? true : (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && Factory::getSession()->get('com_breezingforms.mobile', false) ? true : false);
+                $this->isMobile = isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile'] ? true : (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && Factory::getApplication()->getSession()->get('com_breezingforms.mobile', false) ? true : false);
             } else {
                 $this->isMobile = false;
 
@@ -4543,7 +4543,7 @@ class HTML_facileFormsProcessor
                 $db->setQuery("Select id From #__contentbuilder_records Where `type` = 'com_breezingforms' And `reference_id` = " . $db->Quote($this->form) . " And record_id = " . $db->Quote($record_return));
                 $res = $db->loadResult();
                 if (!$res) {
-                    $db->setQuery("Insert Into #__contentbuilder_records (session_id,`type`,last_update, published, record_id, reference_id) Values ('" . Factory::getSession()->getId() . "','com_breezingforms'," . $db->Quote($last_update) . ",0, " . $db->Quote($record_return) . ", " . $db->Quote($this->form) . ")");
+                    $db->setQuery("Insert Into #__contentbuilder_records (session_id,`type`,last_update, published, record_id, reference_id) Values ('" . Factory::getApplication()->getSession()->getId() . "','com_breezingforms'," . $db->Quote($last_update) . ",0, " . $db->Quote($record_return) . ", " . $db->Quote($this->form) . ")");
                     $db->execute();
                 } else {
                     $db->setQuery("Update #__contentbuilder_records Set last_update = " . $db->Quote($last_update) . ",edited = edited + 1 Where `type` = 'com_breezingforms' And `reference_id` = " . $db->Quote($this->form) . " And record_id = " . $db->Quote($record_return));
@@ -4775,7 +4775,7 @@ class HTML_facileFormsProcessor
                             $created_down = $date->toSql();
                         }
 
-                        $db->setQuery("Insert Into #__contentbuilder_records (session_id,`type`,last_update,is_future,lang_code, sef, published, record_id, reference_id, publish_up, publish_down) Values ('" . Factory::getSession()->getId() . "','com_breezingforms'," . $db->Quote($last_update) . ",$is_future, " . $db->Quote($language) . "," . $db->Quote(trim($sef)) . "," . $db->Quote($cbData->auto_publish && !$is_future ? 1 : 0) . ", " . $db->Quote($record_return) . ", " . $db->Quote($cbResult['form']->getReferenceId()) . ", " . $db->Quote($created_up) . ", " . $db->Quote($created_down) . ")");
+                        $db->setQuery("Insert Into #__contentbuilder_records (session_id,`type`,last_update,is_future,lang_code, sef, published, record_id, reference_id, publish_up, publish_down) Values ('" . Factory::getApplication()->getSession()->getId() . "','com_breezingforms'," . $db->Quote($last_update) . ",$is_future, " . $db->Quote($language) . "," . $db->Quote(trim($sef)) . "," . $db->Quote($cbData->auto_publish && !$is_future ? 1 : 0) . ", " . $db->Quote($record_return) . ", " . $db->Quote($cbResult['form']->getReferenceId()) . ", " . $db->Quote($created_up) . ", " . $db->Quote($created_down) . ")");
                         $db->execute();
 
                     } else {
@@ -6885,7 +6885,7 @@ class HTML_facileFormsProcessor
         //	$userfile_name = $date_stamp . '_' . $userfile_name;
         $path = $baseDir . DS . $userfile_name;
         //if ($timestamp) $path .= '.'.date('YmdHis');
-        if (file_exists($path) && Factory::getSession()->get('bfFileUploadOverride', true)) {
+        if (file_exists($path) && Factory::getApplication()->getSession()->get('bfFileUploadOverride', true)) {
             $rnd = md5(mt_rand(0, mt_getrandmax()));
             $path = $baseDir . DS . $rnd . '_' . $userfile_name;
             //if ($timestamp) $path .= '.'.date('YmdHis');
@@ -6894,7 +6894,7 @@ class HTML_facileFormsProcessor
                 $this->message = BFText::_('COM_BREEZINGFORMS_PROCESS_FILEEXISTS');
                 return '';
             }
-        } else if (file_exists($path) && !Factory::getSession()->get('bfFileUploadOverride', true)) {
+        } else if (file_exists($path) && !Factory::getApplication()->getSession()->get('bfFileUploadOverride', true)) {
             unlink($path);
         }
 
@@ -7294,7 +7294,7 @@ class HTML_facileFormsProcessor
                                 } // for
                             } // if
                             if (BFRequest::getVar('bfFlashUploadTicket', '') != '') {
-                                $tickets = Factory::getSession()->get('bfFlashUploadTickets', array());
+                                $tickets = Factory::getApplication()->getSession()->get('bfFlashUploadTickets', array());
                                 mt_srand();
                                 if (isset($tickets[BFRequest::getVar('bfFlashUploadTicket', mt_rand(0, mt_getrandmax()))])) {
                                     $sourcePath = JPATH_SITE . '/components/com_breezingforms/uploads/';
@@ -7393,7 +7393,7 @@ class HTML_facileFormsProcessor
                                                                 //	$userfile_name = $date_stamp . '_' . $userfile_name;
                                                                 $path = $baseDir . DS . $userfile_name;
                                                                 //if ($row->flag1) $path .= '.'.date('YmdHis');
-                                                                if (file_exists($path) && Factory::getSession()->get('bfFileUploadOverride', true)) {
+                                                                if (file_exists($path) && Factory::getApplication()->getSession()->get('bfFileUploadOverride', true)) {
                                                                     $rnd = md5(mt_rand(0, mt_getrandmax()));
                                                                     $path = $baseDir . DS . $rnd . '_' . $userfile_name;
                                                                     //if ($row->flag1) $path .= '.'.date('YmdHis');
@@ -7402,7 +7402,7 @@ class HTML_facileFormsProcessor
                                                                         $this->message = BFText::_('COM_BREEZINGFORMS_PROCESS_FILEEXISTS');
                                                                         return '';
                                                                     }
-                                                                } else if (file_exists($path) && !Factory::getSession()->get('bfFileUploadOverride', true)) {
+                                                                } else if (file_exists($path) && !Factory::getApplication()->getSession()->get('bfFileUploadOverride', true)) {
                                                                     unlink($path);
                                                                 }
 
@@ -7816,7 +7816,7 @@ class HTML_facileFormsProcessor
 
             if (BFRequest::getVar('ff_applic', '') != 'mod_facileforms' && BFRequest::getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
                 $is_device = true;
-                $this->isMobile = isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile'] ? true : (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && Factory::getSession()->get('com_breezingforms.mobile', false) ? true : false);
+                $this->isMobile = isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile'] ? true : (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && Factory::getApplication()->getSession()->get('com_breezingforms.mobile', false) ? true : false);
             } else
                 $this->isMobile = false;
 
@@ -8010,11 +8010,11 @@ class HTML_facileFormsProcessor
                                 )
                             ));
 
-                            $tickets = Factory::getSession()->get('bfFlashUploadTickets', array());
+                            $tickets = Factory::getApplication()->getSession()->get('bfFlashUploadTickets', array());
                             mt_srand();
                             if (isset($tickets[BFRequest::getVar('bfFlashUploadTicket', mt_rand(0, mt_getrandmax()))])) {
                                 unset($tickets[BFRequest::getVar('bfFlashUploadTicket')]);
-                                Factory::getSession()->set('bfFlashUploadTickets', $tickets);
+                                Factory::getApplication()->getSession()->set('bfFlashUploadTickets', $tickets);
                             }
                         }
                     } // if
@@ -8087,7 +8087,7 @@ class HTML_facileFormsProcessor
             Factory::getContainer()->get(DatabaseInterface::class)->setQuery("SELECT MAX(id) FROM #__facileforms_records");
             $lastid = Factory::getContainer()->get(DatabaseInterface::class)->loadResult();
             $_SESSION['virtuemart_bf_id'] = $lastid;
-            $session = Factory::getSession();
+            $session = Factory::getApplication()->getSession;
             $session->set('virtuemart_bf_id', $lastid);
 
             $code = '';
@@ -8198,7 +8198,7 @@ class HTML_facileFormsProcessor
 
                                 $options['amount'] = round(floatval($options['amount']), 2) * 100;
 
-                                Factory::getSession()->set('bf_stripe_last_payment_amount' . $this->record_id, $options['amount']);
+                                Factory::getApplication()->getSession()->set('bf_stripe_last_payment_amount' . $this->record_id, $options['amount']);
 
                                 $html = '';
 
@@ -8267,7 +8267,7 @@ transition: box-shadow .15s linear;
                                 $returnurl = Uri::root() . "index.php?option=com_breezingforms&confirmStripe=true&form_id=" . $this->form . "&record_id=" . $this->record_id;
                                 if (isset($options['emailfield']) && $options['emailfield'] !== '') {
                                     $stripeemail = strtolower(BFRequest::getVar('ff_nm_' . $options['emailfield'], '')[0]);
-                                    Factory::getSession()->set('emailfield', $stripeemail);
+                                    Factory::getApplication()->getSession()->set('emailfield', $stripeemail);
                                 }
 
                                 // XDA BEGIN
@@ -8334,7 +8334,7 @@ transition: box-shadow .15s linear;
                                 $returnurl = Uri::root() . "index.php?option=com_breezingforms&confirmStripe=true&form_id=" . $this->form . "&record_id=" . $this->record_id;
                                 if (isset($options['emailfield']) && $options['emailfield'] !== '') {
                                     $stripeemail = strtolower(BFRequest::getVar('ff_nm_' . $options['emailfield'], '')[0]);
-                                    Factory::getSession()->set('emailfield', $stripeemail);
+                                    Factory::getApplication()->getSession()->set('emailfield', $stripeemail);
                                 }
 
                                 $html .= '
@@ -8820,8 +8820,8 @@ transition: box-shadow .15s linear;
 
         unset($_SESSION['ff_editable_overridePlg' . BFRequest::getInt('ff_contentid', 0) . $this->form_id]);
         unset($_SESSION['ff_editablePlg' . BFRequest::getInt('ff_contentid', 0) . $this->form_id]);
-        Factory::getSession()->set('ff_editableMod' . BFRequest::getInt('ff_module_id', 0) . $this->form_id, 0);
-        Factory::getSession()->set('ff_editable_overrideMod' . BFRequest::getInt('ff_module_id', 0) . $this->form_id, 0);
+        Factory::getApplication()->getSession()->set('ff_editableMod' . BFRequest::getInt('ff_module_id', 0) . $this->form_id, 0);
+        Factory::getApplication()->getSession()->set('ff_editable_overrideMod' . BFRequest::getInt('ff_module_id', 0) . $this->form_id, 0);
 
         if (!defined('VMBFCF_RUNNING')) {
             exit;

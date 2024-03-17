@@ -10,6 +10,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
 
 if (!defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);
@@ -21,10 +22,10 @@ $controller->redirect();
 
 require_once(JPATH_SITE . DS . 'administrator' . DS . 'components' . DS . 'com_breezingforms' . DS . 'admin.breezingforms.php');
 
-Factory::getDocument()->addScript(JUri::root(true) . '/administrator/components/com_breezingforms/assets/js/custom.js');
-Factory::getDocument()->addStyleSheet(JUri::root(true) . '/administrator/components/com_breezingforms/assets/css/custom.css');
+Factory::getDocument()->addScript(Uri::root(true) . '/administrator/components/com_breezingforms/assets/js/custom.js');
+Factory::getDocument()->addStyleSheet(Uri::root(true) . '/administrator/components/com_breezingforms/assets/css/custom.css');
 
-Factory::getDocument()->addStyleSheet(JUri::root(true) . '/administrator/components/com_breezingforms/assets/font-awesome/css/font-awesome.css');
+Factory::getDocument()->addStyleSheet(Uri::root(true) . '/administrator/components/com_breezingforms/assets/font-awesome/css/font-awesome.css');
 
 
 $recs = BFRequest::getVar('act', '') == 'managerecs' || BFRequest::getVar('act', '') == 'recordmanagement' || BFRequest::getVar('act', '') == '';

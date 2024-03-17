@@ -10,6 +10,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Filter\InputFilter;
+use Joomla\CMS\Uri\Uri;
 
 /**
  * Create the request global object
@@ -45,7 +46,7 @@ class BFRequest
      */
     public static function getUri()
     {
-        $uri = JUri::getInstance();
+        $uri = Uri::getInstance();
 
         return $uri->toString(array('path', 'query'));
     }

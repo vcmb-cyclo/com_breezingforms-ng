@@ -10,10 +10,8 @@
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\Editor\Editor;
-use Joomla\CMS\Event\AbstractEvent;
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
-use Joomla\Event\Event;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Plugin\PluginHelper;
@@ -145,6 +143,7 @@ class HTML_facileFormsForm
         });
     ";
 
+    
         Factory::getDocument()->addScriptDeclaration($jquery);
         ?>
 

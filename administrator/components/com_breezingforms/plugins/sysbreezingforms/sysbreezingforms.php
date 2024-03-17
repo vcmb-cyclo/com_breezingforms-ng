@@ -13,13 +13,14 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Plugin\CMSPlugin;
 
 /**
  * Joomla! System Logging Plugin.
  *
  * @since  1.5
  */
-class PlgSystemSysbreezingforms extends JPlugin
+class PlgSystemSysbreezingforms extends CMSPlugin
 {
     public function onBeforeRender()
     {

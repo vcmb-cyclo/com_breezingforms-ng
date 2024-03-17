@@ -6,7 +6,7 @@
  * @copyright (C) 2008-2020 by Markus Bopp
  * @license Released under the terms of the GNU General Public License
  **/
-defined('_JEXEC') or die('Direct Access to this location is not allowed.');
+defined('_JEXEC') or die ('Direct Access to this location is not allowed.');
 
 use Joomla\Filesystem\File;
 use Joomla\CMS\Factory;
@@ -161,17 +161,17 @@ class QuickMode
 
 		$element = $this->getDefaultElement();
 
-		if (isset($dataObject['attributes']) && isset($dataObject['properties'])) {
+		if (isset ($dataObject['attributes']) && isset ($dataObject['properties'])) {
 			$mdata = $dataObject['properties'];
 
 			if ($mdata['type'] == 'root') {
-				if (isset($mdata['themebootstrap']) && $mdata['themebootstrap'] && isset($mdata['themebootstrapvars']) && $mdata['themebootstrapvars'] && isset($mdata['themebootstrapbefore']) && $mdata['themebootstrapbefore'] == $mdata['themebootstrap']) {
+				if (isset ($mdata['themebootstrap']) && $mdata['themebootstrap'] && isset ($mdata['themebootstrapvars']) && $mdata['themebootstrapvars'] && isset ($mdata['themebootstrapbefore']) && $mdata['themebootstrapbefore'] == $mdata['themebootstrap']) {
 					jimport('joomla.filesystem.file');
 					jimport('joomla.filesystem.folder');
 
 					$folder = 'themes-bootstrap';
 
-					if (isset($mdata['themebootstrapUse3']) && $mdata['themebootstrapUse3']) {
+					if (isset ($mdata['themebootstrapUse3']) && $mdata['themebootstrapUse3']) {
 
 						$folder = 'themes-bootstrap3';
 					}
@@ -193,7 +193,7 @@ class QuickMode
 					case 'bfTextfield':
 						$element['bfType'] = 'Text';
 						$element['options']['value'] = $mdata['value'];
-						$element['options']['placeholder'] = isset($mdata['placeholder']) ? $mdata['placeholder'] : '';
+						$element['options']['placeholder'] = isset ($mdata['placeholder']) ? $mdata['placeholder'] : '';
 						$element['data1'] = $mdata['value'];
 						$element['options']['password'] = $mdata['password'];
 						$element['flag1'] = $mdata['password'] ? 1 : 0;
@@ -207,7 +207,7 @@ class QuickMode
 						$element['options']['value'] = $mdata['value'];
 						$element['data1'] = $mdata['value'];
 
-						$element['options']['placeholder'] = isset($mdata['placeholder']) ? $mdata['placeholder'] : '';
+						$element['options']['placeholder'] = isset ($mdata['placeholder']) ? $mdata['placeholder'] : '';
 						break;
 					case 'bfSelect':
 						$element['bfType'] = 'Select List';
@@ -243,13 +243,13 @@ class QuickMode
 						$element['bfType'] = 'File Upload';
 						$element['options']['allowedFileExtensions'] = strtolower($mdata['allowedFileExtensions']);
 						$element['options']['timestamp'] = $mdata['timestamp'];
-						$element['options']['useUrl'] = isset($mdata['useUrl']) ? $mdata['useUrl'] : false;
-						$element['options']['html5'] = isset($mdata['html5']) ? $mdata['html5'] : false;
-						$element['options']['useUrlDownloadDirectory'] = isset($mdata['useUrlDownloadDirectory']) ? $mdata['useUrlDownloadDirectory'] : false;
-						$element['options']['resize_target_width'] = isset($mdata['resize_target_width']) ? $mdata['resize_target_width'] : '';
-						$element['options']['resize_target_height'] = isset($mdata['resize_target_height']) ? $mdata['resize_target_height'] : '';
-						$element['options']['resize_type'] = isset($mdata['resize_type']) ? $mdata['resize_type'] : '';
-						$element['options']['resize_bgcolor'] = isset($mdata['resize_bgcolor']) ? $mdata['resize_bgcolor'] : '';
+						$element['options']['useUrl'] = isset ($mdata['useUrl']) ? $mdata['useUrl'] : false;
+						$element['options']['html5'] = isset ($mdata['html5']) ? $mdata['html5'] : false;
+						$element['options']['useUrlDownloadDirectory'] = isset ($mdata['useUrlDownloadDirectory']) ? $mdata['useUrlDownloadDirectory'] : false;
+						$element['options']['resize_target_width'] = isset ($mdata['resize_target_width']) ? $mdata['resize_target_width'] : '';
+						$element['options']['resize_target_height'] = isset ($mdata['resize_target_height']) ? $mdata['resize_target_height'] : '';
+						$element['options']['resize_type'] = isset ($mdata['resize_type']) ? $mdata['resize_type'] : '';
+						$element['options']['resize_bgcolor'] = isset ($mdata['resize_bgcolor']) ? $mdata['resize_bgcolor'] : '';
 
 						$element['flag1'] = $mdata['timestamp'] ? 1 : 0;
 						$element['options']['uploadDirectory'] = $mdata['uploadDirectory'];
@@ -273,7 +273,7 @@ class QuickMode
 						break;
 					case 'bfCaptcha':
 						$element['bfType'] = 'Captcha';
-						$element['width'] = isset($mdata['width']) ? intval($mdata['width']) : 230;
+						$element['width'] = isset ($mdata['width']) ? intval($mdata['width']) : 230;
 						break;
 					case 'bfNumberInput':
 						$element['bfType'] = 'Number Input';
@@ -296,7 +296,7 @@ class QuickMode
 					case 'bfPayPal':
 						$element['bfType'] = 'PayPal';
 						$element['options']['testaccount'] = $mdata['testaccount'];
-						$element['options']['useIpn'] = isset($mdata['useIpn']) ? $mdata['useIpn'] : false;
+						$element['options']['useIpn'] = isset ($mdata['useIpn']) ? $mdata['useIpn'] : false;
 						$element['options']['downloadableFile'] = $mdata['downloadableFile'];
 						$element['options']['filepath'] = $mdata['filepath'];
 						$element['options']['downloadTries'] = $mdata['downloadTries'];
@@ -309,7 +309,7 @@ class QuickMode
 						$element['options']['amount'] = $mdata['amount'];
 						$element['options']['tax'] = $mdata['tax'];
 						$element['options']['thankYouPage'] = $mdata['thankYouPage'];
-						$element['options']['cancelURL'] = isset($mdata['cancelURL']) ? $mdata['cancelURL'] : '';
+						$element['options']['cancelURL'] = isset ($mdata['cancelURL']) ? $mdata['cancelURL'] : '';
 						$element['options']['locale'] = $mdata['locale'];
 						$element['options']['currencyCode'] = $mdata['currencyCode'];
 						$element['options']['image'] = $mdata['image'];
@@ -329,7 +329,7 @@ class QuickMode
 						$element['options']['currencyCode'] = $mdata['currencyCode'];
 						$element['options']['sendNotificationAfterPayment'] = $mdata['sendNotificationAfterPayment'];
 						$element['options']['image'] = $mdata['image'];
-						$element['options']['emailfield'] = isset($mdata['emailfield']) ? $mdata['emailfield'] : '';
+						$element['options']['emailfield'] = isset ($mdata['emailfield']) ? $mdata['emailfield'] : '';
 						$element['data1'] = $mdata['image'];
 						break;
 					case 'bfSofortueberweisung':
@@ -348,7 +348,7 @@ class QuickMode
 						$element['options']['language_id'] = $mdata['language_id'];
 						$element['options']['currency_id'] = $mdata['currency_id'];
 						$element['options']['image'] = $mdata['image'];
-						$element['options']['sendNotificationAfterPayment'] = isset($mdata['sendNotificationAfterPayment']) ? $mdata['sendNotificationAfterPayment'] : false;
+						$element['options']['sendNotificationAfterPayment'] = isset ($mdata['sendNotificationAfterPayment']) ? $mdata['sendNotificationAfterPayment'] : false;
 						$element['data1'] = $mdata['image'];
 						break;
 					default:
@@ -363,8 +363,8 @@ class QuickMode
 				$element['orderNumber'] = $mdata['orderNumber'] != -1 ? $mdata['orderNumber'] : $areas->container[0]['elementCount'];
 				$element['tabIndex'] = $mdata['tabIndex'];
 				$element['logging'] = $mdata['logging'];
-				$element['options']['readonly'] = isset($mdata['readonly']) ? $mdata['readonly'] : false;
-				$element['flag2'] = isset($mdata['readonly']) && $mdata['readonly'] ? 1 : 0;
+				$element['options']['readonly'] = isset ($mdata['readonly']) ? $mdata['readonly'] : false;
+				$element['flag2'] = isset ($mdata['readonly']) && $mdata['readonly'] ? 1 : 0;
 				// validation
 				$element['script3id'] = $mdata['validationId'];
 				$element['script3code'] = $mdata['validationCode'];
@@ -376,21 +376,21 @@ class QuickMode
 				// init
 				$element['script1id'] = $mdata['initId'];
 				$element['script1code'] = $mdata['initCode'];
-				$element['script1flag1'] = isset($mdata['initFormEntry']) ? $mdata['initFormEntry'] : '';
-				$element['script1flag2'] = isset($mdata['initPageEntry']) ? $mdata['initPageEntry'] : '';
+				$element['script1flag1'] = isset ($mdata['initFormEntry']) ? $mdata['initFormEntry'] : '';
+				$element['script1flag2'] = isset ($mdata['initPageEntry']) ? $mdata['initPageEntry'] : '';
 				$element['functionNameScript1'] = $mdata['initFunctionName'];
 				$element['script1cond'] = $mdata['initCondition'];
 				// action
 				$element['script2id'] = $mdata['actionId'];
-				$element['script2code'] = isset($mdata['actionCode']) ? $mdata['actionCode'] : '';
-				$element['script2flag1'] = isset($mdata['actionClick']) ? $mdata['actionClick'] : '';
-				$element['script2flag2'] = isset($mdata['actionBlur']) ? $mdata['actionBlur'] : '';
-				$element['script2flag3'] = isset($mdata['actionChange']) ? $mdata['actionChange'] : '';
-				$element['script2flag4'] = isset($mdata['actionFocus']) ? $mdata['actionFocus'] : '';
-				$element['script2flag5'] = isset($mdata['actionSelect']) ? $mdata['actionSelect'] : '';
+				$element['script2code'] = isset ($mdata['actionCode']) ? $mdata['actionCode'] : '';
+				$element['script2flag1'] = isset ($mdata['actionClick']) ? $mdata['actionClick'] : '';
+				$element['script2flag2'] = isset ($mdata['actionBlur']) ? $mdata['actionBlur'] : '';
+				$element['script2flag3'] = isset ($mdata['actionChange']) ? $mdata['actionChange'] : '';
+				$element['script2flag4'] = isset ($mdata['actionFocus']) ? $mdata['actionFocus'] : '';
+				$element['script2flag5'] = isset ($mdata['actionSelect']) ? $mdata['actionSelect'] : '';
 				$element['functionNameScript2'] = $mdata['actionFunctionName'];
-				$element['script2cond'] = isset($mdata['actionCondition']) ? $mdata['actionCondition'] : '';
-				$element['hideInMailback'] = isset($mdata['hideInMailback']) ? $mdata['hideInMailback'] : false;
+				$element['script2cond'] = isset ($mdata['actionCondition']) ? $mdata['actionCondition'] : '';
+				$element['hideInMailback'] = isset ($mdata['hideInMailback']) ? $mdata['hideInMailback'] : false;
 				$element['page'] = $page;
 				$element['dbId'] = $mdata['dbId'];
 				$element['qId'] = $dataObject['attributes']['id'];
@@ -399,7 +399,7 @@ class QuickMode
 			}
 		}
 
-		if (isset($dataObject['children']) && count($dataObject['children']) != 0) {
+		if (isset ($dataObject['children']) && count($dataObject['children']) != 0) {
 			$childrenAmount = count($dataObject['children']);
 			for ($i = 0; $i < $childrenAmount; $i++) {
 				$this->createAreasFromTree($dataObject['children'][$i], $areas, $page);
@@ -410,7 +410,7 @@ class QuickMode
 	public function updateDbId(&$dataObject, $id, $dbId)
 	{
 
-		if (isset($dataObject['attributes']) && isset($dataObject['properties'])) {
+		if (isset ($dataObject['attributes']) && isset ($dataObject['properties'])) {
 			$mdata = $dataObject['properties'];
 
 			if ($mdata['type'] == 'element' && $dataObject['attributes']['id'] === $id) {
@@ -421,7 +421,7 @@ class QuickMode
 			}
 		}
 
-		if (isset($dataObject['children']) && count($dataObject['children']) != 0) {
+		if (isset ($dataObject['children']) && count($dataObject['children']) != 0) {
 			$childrenAmount = count($dataObject['children']);
 			for ($i = 0; $i < $childrenAmount; $i++) {
 				$this->updateDbId($dataObject['children'][$i], $id, $dbId);
@@ -631,7 +631,7 @@ class QuickMode
 								" . $this->db->Quote($element['mailback']) . ",
 								" . $this->db->Quote($element['mailbackfile']) . ",
 								" . $this->db->Quote($form) . ",
-								" . $this->db->Quote(isset($element['page']) ? $element['page'] : 1) . ",
+								" . $this->db->Quote(isset ($element['page']) ? $element['page'] : 1) . ",
 								'1',
 								" . $this->db->Quote($element['orderNumber']) . ",
 								" . $this->db->Quote($element['name']) . ",
@@ -707,7 +707,7 @@ class QuickMode
 								mailback=" . $this->db->Quote($element['mailback']) . ",
 								mailbackfile=" . $this->db->Quote($element['mailbackfile']) . ",
 								form=" . $this->db->Quote($form) . ",
-								page=" . $this->db->Quote(isset($element['page']) ? $element['page'] : 1) . ",
+								page=" . $this->db->Quote(isset ($element['page']) ? $element['page'] : 1) . ",
 								published='1',
 								ordering=" . $this->db->Quote($element['orderNumber']) . ",
 								name=" . $this->db->Quote($element['name']) . ",

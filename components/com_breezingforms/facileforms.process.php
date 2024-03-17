@@ -31,8 +31,6 @@ class bfMobile
     public $isMobile = false;
 }
 
-$mainframe = Factory::getApplication();
-
 $ff_processor = null;
 
 define('_FF_PACKBREAKAFTER', 250);
@@ -301,7 +299,7 @@ function _ff_traceExit($line, $retval = null)
 
 function _ff_errorHandler($errno, $errstr, $errfile, $errline)
 {
-    global $ff_processor, $ff_mossite, $database;
+    global $ff_processor, $ff_mossite;
     $database = Factory::getContainer()->get(DatabaseInterface::class);
 
     if (isset($ff_processor->dying) && $ff_processor->dying)
@@ -516,6 +514,8 @@ class HTML_facileFormsProcessor
     public $isMobile = false;
     public $quickmode = null;
     public $legacy_wrap = true;
+    var $app;
+    var $database;
 
     function __construct(
         $runmode, // _FF_RUNMODE_FRONTEND, ..._BACKEND, ..._PREVIEW
@@ -530,9 +530,9 @@ class HTML_facileFormsProcessor
         $editable = 0,
         $editable_override = 0
     ) {
-        global $database, $ff_config, $ff_mossite, $ff_mospath, $ff_processor;
+        global $ff_config, $ff_mossite, $ff_mospath, $ff_processor;
         $ff_processor = $this;
-        $database = Factory::getContainer()->get(DatabaseInterface::class);
+        $this->database = Factory::getContainer()->get(DatabaseInterface::class);
         $this->dying = false;
         $this->runmode = $runmode;
         $this->inframe = $inframe;
@@ -545,6 +545,7 @@ class HTML_facileFormsProcessor
         $this->suffix = trim($suffix);
         $this->editable = $editable;
         $this->editable_override = $editable_override;
+        $this->app = Factory::getApplication();
 
         if (!class_exists('Joomla\CMS\Environment\Browser')) {
             require_once(JPATH_SITE . '/libraries/joomla/environment/browser.php');
@@ -569,7 +570,7 @@ class HTML_facileFormsProcessor
 
 
         $tz = 'UTC';
-        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
+        $tz = new DateTimeZone($this->app->get('offset'));
 
         $submitted = Factory::getDate();
         $submitted = Factory::getDate('now', $tz);
@@ -588,16 +589,16 @@ class HTML_facileFormsProcessor
           $this->submitted = $instance->toFormat($format);
           } */
 
-        $this->formrow = new facileFormsForms($database);
+        $this->formrow = new facileFormsForms($this->database);
         $this->formrow->load($form);
 
         if ($this->formrow->published) {
-            $database->setQuery(
+            $this->database->setQuery(
                 "select * from #__facileforms_elements " .
                 "where form=" . $this->form . " and published=1 " .
                 "order by page, ordering"
             );
-            $this->rows = $database->loadObjectList();
+            $this->rows = $this->database->loadObjectList();
             $this->rowcount = count($this->rows);
         } // if
         $this->inline = 0;
@@ -1273,13 +1274,12 @@ class HTML_facileFormsProcessor
     {
         if ($this->dying)
             return '';
-        global $database;
-        $database = Factory::getContainer()->get(DatabaseInterface::class);
-        $database->setQuery(
+
+        $this->database->setQuery(
             'select code, name from #__facileforms_pieces ' .
             'where id=' . $id . ' and published=1 '
         );
-        $rows = $database->loadObjectList();
+        $rows = $this->database->loadObjectList();
         if ($rows && count($rows)) {
             $name = $rows[0]->name;
             return $rows[0]->code;
@@ -1293,14 +1293,12 @@ class HTML_facileFormsProcessor
     {
         if ($this->dying)
             return '';
-        global $database;
-        $database = Factory::getContainer()->get(DatabaseInterface::class);
-        $database->setQuery(
+        $this->database->setQuery(
             'select id, code from #__facileforms_pieces ' .
             'where name=\'' . $name . '\' and published=1 ' .
             'order by id desc'
         );
-        $rows = $database->loadObjectList();
+        $rows = $this->database->loadObjectList();
         if ($rows && count($rows)) {
             $id = $rows[0]->id;
             return $rows[0]->code;
@@ -1477,16 +1475,15 @@ class HTML_facileFormsProcessor
     {
         if ($this->dying)
             return '';
-        global $database;
-        $database = Factory::getContainer()->get(DatabaseInterface::class);
+        
         $funcname = '';
         switch ($row->script2cond) {
             case 1:
-                $database->setQuery(
+                $this->database->setQuery(
                     "select name from #__facileforms_scripts " .
                     "where id=" . $row->script2id . " and published=1 "
                 );
-                $funcname = $database->loadResult();
+                $funcname = $this->database->loadResult();
                 break;
             case 2:
                 $funcname = 'ff_' . $row->name . '_action';
@@ -1514,8 +1511,7 @@ class HTML_facileFormsProcessor
 
     function loadBuiltins(&$library)
     {
-        global $database, $ff_config, $ff_request;
-        $database = Factory::getContainer()->get(DatabaseInterface::class);
+        global $ff_config, $ff_request;
         if ($this->dying)
             return;
         $library[] = array('FF_STATUS_OK', 'var FF_STATUS_OK = ' . _FF_STATUS_OK . ';');
@@ -1674,11 +1670,11 @@ class HTML_facileFormsProcessor
             $funcname = '';
             switch ($row->script3cond) {
                 case 1:
-                    $database->setQuery(
+                    $this->database->setQuery(
                         "select name from #__facileforms_scripts " .
                         "where id=" . $row->script3id . " and published=1 "
                     );
-                    $funcname = $database->loadResult();
+                    $funcname = $this->database->loadResult();
                     break;
                 case 2:
                     $funcname = 'ff_' . $row->name . '_validation';
@@ -1715,7 +1711,7 @@ class HTML_facileFormsProcessor
         if ($curr > 0)
             $code .= "    } // if" . nl();
         $code .= 'if(error != "" && document.getElementById(\'ff_capimgValue\')){
-                 document.getElementById(\'ff_capimgValue\').src = \'' . Uri::root(true) . (Factory::getApplication()->isClient('administrator') ? '/administrator' : '') . '/components/com_breezingforms/images/captcha/securimage_show.php?bfMathRandom=\' + Math.random();
+                 document.getElementById(\'ff_capimgValue\').src = \'' . Uri::root(true) . ($this->app->isClient('administrator') ? '/administrator' : '') . '/components/com_breezingforms/images/captcha/securimage_show.php?bfMathRandom=\' + Math.random();
                  document.getElementById(\'bfCaptchaEntry\').value = "";
             }';
         $code .= 'if(error!="" && document.getElementById("bfSubmitButton")){document.getElementById("bfSubmitButton").disabled = false;}' . nl();
@@ -1731,11 +1727,11 @@ class HTML_facileFormsProcessor
         $funcname = '';
         switch ($this->formrow->script1cond) {
             case 1:
-                $database->setQuery(
+                $this->database->setQuery(
                     "select name from #__facileforms_scripts " .
                     "where id=" . $this->formrow->script1id . " and published=1 "
                 );
-                $funcname = $database->loadResult();
+                $funcname = $this->database->loadResult();
                 break;
             case 2:
                 $funcname = 'ff_' . $this->formrow->name . '_init';
@@ -1753,11 +1749,11 @@ class HTML_facileFormsProcessor
             $funcname = '';
             switch ($row->script1cond) {
                 case 1:
-                    $database->setQuery(
+                    $this->database->setQuery(
                         "select name from #__facileforms_scripts " .
                         "where id=" . $row->script1id . " and published=1 "
                     );
-                    $funcname = $database->loadResult();
+                    $funcname = $this->database->loadResult();
                     break;
                 case 2:
                     $funcname = 'ff_' . $row->name . '_init';
@@ -1782,11 +1778,11 @@ class HTML_facileFormsProcessor
             $funcname = '';
             switch ($row->script1cond) {
                 case 1:
-                    $database->setQuery(
+                    $this->database->setQuery(
                         "select name from #__facileforms_scripts " .
                         "where id=" . $row->script1id . " and published=1 "
                     );
-                    $funcname = $database->loadResult();
+                    $funcname = $this->database->loadResult();
                     break;
                 case 2:
                     $funcname = 'ff_' . $row->name . '_init';
@@ -1966,16 +1962,14 @@ class HTML_facileFormsProcessor
 
     function loadScripts(&$library)
     {
-        global $database;
-        $database = Factory::getContainer()->get(DatabaseInterface::class);
         if ($this->dying)
             return;
-        $database->setQuery(
+        $this->database->setQuery(
             "select id, name, code from #__facileforms_scripts " .
             "where published=1 " .
             "order by type, title, name, id desc"
         );
-        $rows = $database->loadObjectList();
+        $rows = $this->database->loadObjectList();
         $cnt = count($rows);
         for ($i = 0; $i < $cnt; $i++) {
             $row = $rows[$i];
@@ -2144,17 +2138,15 @@ class HTML_facileFormsProcessor
 
     function addFunction($cond, $id, $name, $code, &$library, &$linked, $type, $rowid, $pane)
     {
-        global $database;
-        $database = Factory::getContainer()->get(DatabaseInterface::class);
         if ($this->dying)
             return;
         switch ($cond) {
             case 1:
-                $database->setQuery(
+                $this->database->setQuery(
                     "select name, code from #__facileforms_scripts " .
-                    "where id=" . $database->Quote($id) . " and published=1"
+                    "where id=" . $this->database->Quote($id) . " and published=1"
                 );
-                $rows = $database->loadObjectList();
+                $rows = $this->database->loadObjectList();
                 if (count($rows) > 0) {
                     $row = $rows[0];
                     if ($this->trim($row->name) && $this->nonblank($row->code)) {
@@ -2259,7 +2251,7 @@ class HTML_facileFormsProcessor
         $path = str_replace('{field}', File::makeSafe(strtolower(trim($field_name))), $path);
 
         $tz = 'UTC';
-        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
+        $tz = new DateTimeZone($this->app->get('offset'));
 
         $date_stamp1 = date('Y_m_d');
         $date_stamp2 = date('H_i_s');
@@ -2316,14 +2308,14 @@ class HTML_facileFormsProcessor
 
         if (file_exists(JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_contentbuilder' . DS . 'contentbuilder.xml')) {
 
-            if (Factory::getApplication()->isClient('administrator')) {
+            if ($this->app->isClient('administrator')) {
                 $cbFrontend = false;
             }
 
             if ($cbFrontend) {
-                Factory::getApplication()->getLanguage()->load('com_contentbuilder');
+                $this->app->getLanguage()->load('com_contentbuilder');
             } else {
-                Factory::getApplication()->getLanguage()->load('com_contentbuilder', JPATH_SITE . DS . 'administrator');
+                $this->app->getLanguage()->load('com_contentbuilder', JPATH_SITE . DS . 'administrator');
             }
 
             $db = Factory::getContainer()->get(DatabaseInterface::class);
@@ -2390,7 +2382,7 @@ class HTML_facileFormsProcessor
 
     function view()
     {
-        global $ff_mospath, $ff_mossite, $database, $my;
+        global $ff_mospath, $ff_mossite, $my;
         global $ff_config, $ff_version, $ff_comsite, $ff_otherparams;
 
         $is_mobile_type = '';
@@ -2398,9 +2390,9 @@ class HTML_facileFormsProcessor
         if (trim($this->formrow->template_code_processed) == 'QuickMode') {
 
             if (isset($_GET['non_mobile']) && BFRequest::getBool('non_mobile', 0)) {
-                Factory::getApplication()->getSession()->clear('com_breezingforms.mobile');
+                $this->app->getSession()->clear('com_breezingforms.mobile');
             } else if (isset($_GET['mobile']) && BFRequest::getBool('mobile', 0)) {
-                Factory::getApplication()->getSession()->set('com_breezingforms.mobile', true);
+                $this->app->getSession()->set('com_breezingforms.mobile', true);
             }
 
             require_once(JPATH_SITE . '/administrator/components/com_breezingforms/libraries/Zend/Json/Decoder.php');
@@ -2419,7 +2411,7 @@ class HTML_facileFormsProcessor
 
             if (BFRequest::getVar('ff_applic', '') != 'mod_facileforms' && BFRequest::getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
                 $is_device = true;
-                $this->isMobile = isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile'] ? true : (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && Factory::getApplication()->getSession()->get('com_breezingforms.mobile', false) ? true : false);
+                $this->isMobile = isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile'] ? true : (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $this->app->getSession()->get('com_breezingforms.mobile', false) ? true : false);
             } else {
                 $this->isMobile = false;
 
@@ -2459,8 +2451,6 @@ class HTML_facileFormsProcessor
         $cbFull = $cbResult['full'];
         // CONTENTBUILDER END
 
-        $database = Factory::getContainer()->get(DatabaseInterface::class);
-        $mainframe = Factory::getApplication();
         if (!$this->okrun)
             return;
         set_error_handler('_ff_errorHandler');
@@ -2487,11 +2477,11 @@ class HTML_facileFormsProcessor
         $code = '';
         switch ($this->formrow->piece1cond) {
             case 1: // library
-                $database->setQuery(
+                $this->database->setQuery(
                     'select name, code from #__facileforms_pieces ' .
                     'where id=' . $this->formrow->piece1id . ' and published=1 '
                 );
-                $rows = $database->loadObjectList();
+                $rows = $this->database->loadObjectList();
                 if (count($rows))
                     echo $this->execPiece($rows[0]->code, BFText::_('COM_BREEZINGFORMS_PROCESS_BFPIECE') . " " . $rows[0]->name, 'p', $this->formrow->piece1id, null);
                 break;
@@ -2612,7 +2602,7 @@ class HTML_facileFormsProcessor
                                                                                     bf_restore_submitbutton();
                                                                                 }
                                                                                 
-                                                                                        document.getElementById(\'ff_capimgValue\').src = \'' . Uri::root(true) . (Factory::getApplication()->isClient('administrator') ? '/administrator' : '') . '/components/com_breezingforms/images/captcha/securimage_show.php?bfMathRandom=\' + Math.random();
+                                                                                        document.getElementById(\'ff_capimgValue\').src = \'' . Uri::root(true) . ($this->app->isClient('administrator') ? '/administrator' : '') . '/components/com_breezingforms/images/captcha/securimage_show.php?bfMathRandom=\' + Math.random();
                                                                                         document.getElementById(\'bfCaptchaEntry\').value = "";
                                                                                         if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
                                                                                         document.getElementById(\'bfCaptchaEntry\').focus();
@@ -2638,7 +2628,7 @@ class HTML_facileFormsProcessor
                                 function bfCheckCaptcha(){
                                         if(checkFileExtensions()){
                                                var ao = new bfAjaxObject101();
-                                               ao.sndReq("get","' . Uri::root(true) . (Factory::getApplication()->isClient('administrator') ? '/administrator' : '') . '/index.php?raw=true&option=com_breezingforms&checkCaptcha=true&Itemid=0&tmpl=component&value="+document.getElementById("bfCaptchaEntry").value,"");
+                                               ao.sndReq("get","' . Uri::root(true) . ($this->app->isClient('administrator') ? '/administrator' : '') . '/index.php?raw=true&option=com_breezingforms&checkCaptcha=true&Itemid=0&tmpl=component&value="+document.getElementById("bfCaptchaEntry").value,"");
                                         }
                                 }';
                 break;
@@ -2785,11 +2775,11 @@ class HTML_facileFormsProcessor
             $funcname = "";
             switch ($this->formrow->script2cond) {
                 case 1:
-                    $database->setQuery(
+                    $this->database->setQuery(
                         "select name from #__facileforms_scripts " .
                         "where id=" . $this->formrow->script2id . " and published=1 "
                     );
-                    $funcname = $database->loadResult();
+                    $funcname = $this->database->loadResult();
                     break;
                 case 2:
                     $funcname = "ff_" . $this->formrow->name . "_submitted";
@@ -3168,7 +3158,7 @@ class HTML_facileFormsProcessor
                     //$recordEntry->value = $this->removeDangerousHtml($recordEntry->value);
 
                     /*
-                      $input = Factory::getApplication()->input;
+                      $input = $this->app->input;
                       $input->set('cbCleanVar', $recordEntry->value);
                       $recordEntry->value = $input->getHtml('cbCleanVar'); */
 
@@ -3267,7 +3257,7 @@ class HTML_facileFormsProcessor
                     //$cbEntry->recValue = $this->removeDangerousHtml($cbEntry->recValue);
 
                     /*
-                      $input = Factory::getApplication()->input;
+                      $input = $this->app->input;
                       $input->set('cbCleanVar', $cbEntry->recValue);
                       $cbEntry->recValue = $input->getHtml('cbCleanVar'); */
 
@@ -3887,7 +3877,7 @@ class HTML_facileFormsProcessor
                         echo indentc(1) . '</div>' . nl();
                         break;
                     case 'Captcha':
-                        if (Factory::getApplication()->isClient('site')) {
+                        if ($this->app->isClient('site')) {
                             $captcha_url = Uri::root(true) . '/components/com_breezingforms/images/captcha/securimage_show.php';
                         } else {
                             $captcha_url = Uri::root(true) . '/administrator/components/com_breezingforms/images/captcha/securimage_show.php';
@@ -4415,11 +4405,11 @@ class HTML_facileFormsProcessor
 
         switch ($this->formrow->piece2cond) {
             case 1: // library
-                $database->setQuery(
+                $this->database->setQuery(
                     "select name, code from #__facileforms_pieces " .
                     "where id=" . intval($this->formrow->piece2id) . " and published=1 "
                 );
-                $rows = $database->loadObjectList();
+                $rows = $this->database->loadObjectList();
                 if (count($rows))
                     echo $this->execPiece(
                         $rows[0]->code,
@@ -4488,23 +4478,22 @@ class HTML_facileFormsProcessor
 
     function logToDatabase($cbResult = null)
     { // CONTENTBUILDER
-        global $database, $ff_config;
-        $database = Factory::getContainer()->get(DatabaseInterface::class);
+        global $ff_config;
         if ($this->dying)
             return;
 
         if (!is_object($cbResult['form']) && $this->editable && $this->editable_override) {
-            $database->setQuery("Select id From #__facileforms_records Where form = " . $database->Quote($this->form) . " And user_id = " . $database->Quote(Factory::getUser()->get('id', 0)) . " And user_id <> 0");
-            $records = $database->loadObjectList();
+            $this->database->setQuery("Select id From #__facileforms_records Where form = " . $this->database->Quote($this->form) . " And user_id = " . $this->database->Quote(Factory::getUser()->get('id', 0)) . " And user_id <> 0");
+            $records = $this->database->loadObjectList();
             foreach ($records as $record) {
-                $database->setQuery("Delete From #__facileforms_subrecords Where record = " . $record->id);
-                $database->execute();
-                $database->setQuery("Delete From #__facileforms_records Where id = " . $record->id);
-                $database->execute();
+                $this->database->setQuery("Delete From #__facileforms_subrecords Where record = " . $record->id);
+                $this->database->execute();
+                $this->database->setQuery("Delete From #__facileforms_records Where id = " . $record->id);
+                $this->database->execute();
             }
         }
 
-        $record = new facileFormsRecords($database);
+        $record = new facileFormsRecords($this->database);
         $record->submitted = $this->submitted;
         $record->form = $this->form;
         $record->title = $this->formrow->title;
@@ -4543,7 +4532,7 @@ class HTML_facileFormsProcessor
                 $db->setQuery("Select id From #__contentbuilder_records Where `type` = 'com_breezingforms' And `reference_id` = " . $db->Quote($this->form) . " And record_id = " . $db->Quote($record_return));
                 $res = $db->loadResult();
                 if (!$res) {
-                    $db->setQuery("Insert Into #__contentbuilder_records (session_id,`type`,last_update, published, record_id, reference_id) Values ('" . Factory::getApplication()->getSession()->getId() . "','com_breezingforms'," . $db->Quote($last_update) . ",0, " . $db->Quote($record_return) . ", " . $db->Quote($this->form) . ")");
+                    $db->setQuery("Insert Into #__contentbuilder_records (session_id,`type`,last_update, published, record_id, reference_id) Values ('" . $this->app->getSession()->getId() . "','com_breezingforms'," . $db->Quote($last_update) . ",0, " . $db->Quote($record_return) . ", " . $db->Quote($this->form) . ")");
                     $db->execute();
                 } else {
                     $db->setQuery("Update #__contentbuilder_records Set last_update = " . $db->Quote($last_update) . ",edited = edited + 1 Where `type` = 'com_breezingforms' And `reference_id` = " . $db->Quote($this->form) . " And record_id = " . $db->Quote($record_return));
@@ -4555,7 +4544,7 @@ class HTML_facileFormsProcessor
         $this->record_id = $record->id;
 
         $names = array();
-        $subrecord = new facileFormsSubrecords($database);
+        $subrecord = new facileFormsSubrecords($this->database);
         $subrecord->record = $record->id;
         if (count($this->savedata)) {
 
@@ -4715,7 +4704,7 @@ class HTML_facileFormsProcessor
                     }
                 }
 
-                $dispatcher = Factory::getApplication()->getDispatcher();
+                $dispatcher = $this->app->getDispatcher();
                 $dispatcher->dispatch('onBeforeSubmit', new Joomla\Event\Event('onBeforeSubmit', array(
                     BFRequest::getInt('cb_record_id', 0),
                     $cbResult['form'],
@@ -4726,7 +4715,6 @@ class HTML_facileFormsProcessor
                 $record_return = $cbResult['form']->saveRecord(BFRequest::getInt('cb_record_id', 0), $values);
 
                 $db = Factory::getContainer()->get(DatabaseInterface::class);
-
                 $db->setQuery('Select SQL_CALC_FOUND_ROWS * From #__contentbuilder_forms Where id = ' . BFRequest::getInt('cb_form_id', 0) . ' And published = 1');
                 $cbData = $db->loadObject();
 
@@ -4775,7 +4763,7 @@ class HTML_facileFormsProcessor
                             $created_down = $date->toSql();
                         }
 
-                        $db->setQuery("Insert Into #__contentbuilder_records (session_id,`type`,last_update,is_future,lang_code, sef, published, record_id, reference_id, publish_up, publish_down) Values ('" . Factory::getApplication()->getSession()->getId() . "','com_breezingforms'," . $db->Quote($last_update) . ",$is_future, " . $db->Quote($language) . "," . $db->Quote(trim($sef)) . "," . $db->Quote($cbData->auto_publish && !$is_future ? 1 : 0) . ", " . $db->Quote($record_return) . ", " . $db->Quote($cbResult['form']->getReferenceId()) . ", " . $db->Quote($created_up) . ", " . $db->Quote($created_down) . ")");
+                        $db->setQuery("Insert Into #__contentbuilder_records (session_id,`type`,last_update,is_future,lang_code, sef, published, record_id, reference_id, publish_up, publish_down) Values ('" . $this->app->getSession()->getId() . "','com_breezingforms'," . $db->Quote($last_update) . ",$is_future, " . $db->Quote($language) . "," . $db->Quote(trim($sef)) . "," . $db->Quote($cbData->auto_publish && !$is_future ? 1 : 0) . ", " . $db->Quote($record_return) . ", " . $db->Quote($cbResult['form']->getReferenceId()) . ", " . $db->Quote($created_up) . ", " . $db->Quote($created_down) . ")");
                         $db->execute();
 
                     } else {
@@ -4793,8 +4781,8 @@ class HTML_facileFormsProcessor
                     BFRequest::setVar('cb_category_id', null);
                     BFRequest::setVar('cb_controller', null);
 
-                    if (Factory::getApplication()->isClient('site') && BFRequest::getInt('Itemid', 0)) {
-                        $menu = Factory::getApplication()->getMenu();
+                    if ($this->app->isClient('site') && BFRequest::getInt('Itemid', 0)) {
+                        $menu = $this->app->getMenu();
                         $item = $menu->getActive();
                         if (is_object($item)) {
                             BFRequest::setVar('cb_category_id', $item->getParams()->get('cb_category_id', null));
@@ -4837,7 +4825,7 @@ class HTML_facileFormsProcessor
                     $cache->clean();
                 }
 
-                $dispatcher = Factory::getApplication()->getDispatcher();
+                $dispatcher = $this->app->getDispatcher();
                 $dispatcher->dispatch('onAfterSubmit', new Joomla\Event\Event('onAfterSubmit', 
                     array(
                         $record_return,
@@ -4934,7 +4922,7 @@ class HTML_facileFormsProcessor
             } // if
         } catch (Exception $e) {
 
-            Factory::getApplication()->enqueueMessage($e->getMessage(), 'error');
+            $this->app->enqueueMessage($e->getMessage(), 'error');
         }
     }
 
@@ -4950,7 +4938,7 @@ class HTML_facileFormsProcessor
         global $ff_compath;
 
         $tz = 'UTC';
-        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
+        $tz = new DateTimeZone($this->app->get('offset'));
 
         $file = JPATH_SITE . '/media/breezingforms/pdftpl/' . $this->formrow->name . '_pdf_attachment.php';
         if (!file_exists($file)) {
@@ -5160,7 +5148,7 @@ class HTML_facileFormsProcessor
         $inverted = isset($ff_config->csvinverted) ? $ff_config->csvinverted : false;
 
         $tz = 'UTC';
-        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
+        $tz = new DateTimeZone($this->app->get('offset'));
 
         $csvdelimiter = stripslashes($ff_config->csvdelimiter);
         $csvquote = stripslashes($ff_config->csvquote);
@@ -5269,7 +5257,7 @@ class HTML_facileFormsProcessor
         global $ff_compath, $ff_version, $mosConfig_fileperms;
 
         $tz = 'UTC';
-        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
+        $tz = new DateTimeZone($this->app->get('offset'));
 
         $date_stamp = date('YmdHis');
         $submitted = $this->submitted;
@@ -5355,14 +5343,12 @@ class HTML_facileFormsProcessor
     {
         global $ff_config;
 
-        $mainframe = Factory::getApplication();
-
         if ($this->dying)
             return;
 
 
-        $from = $this->formrow->alt_mailfrom != '' ? $this->formrow->alt_mailfrom : $mainframe->getCfg('mailfrom');
-        $fromname = $this->formrow->alt_fromname != '' ? $this->formrow->alt_fromname : $mainframe->getCfg('fromname');
+        $from = $this->formrow->alt_mailfrom != '' ? $this->formrow->alt_mailfrom : $this->app->getCfg('mailfrom');
+        $fromname = $this->formrow->alt_fromname != '' ? $this->formrow->alt_fromname : $this->app->getCfg('fromname');
         if ($this->formrow->emailntf == 2)
             $recipient = $this->formrow->emailadr;
         else
@@ -5522,7 +5508,7 @@ class HTML_facileFormsProcessor
                 $PROCESS_SUBMITTEDAT = BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTEDAT');
 
                 $tz = 'UTC';
-                $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
+                $tz = new DateTimeZone($this->app->get('offset'));
 
                 $SUBMITTED = $this->submitted;
                 $date_ = Factory::getDate($this->submitted, $tz);
@@ -5582,7 +5568,7 @@ class HTML_facileFormsProcessor
                 // fallback if no template exists
 
                 $tz = 'UTC';
-                $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
+                $tz = new DateTimeZone($this->app->get('offset'));
 
                 $submitted = $this->submitted;
                 $date_ = Factory::getDate($this->submitted, $tz);
@@ -5634,7 +5620,7 @@ class HTML_facileFormsProcessor
             $SUBMITTED = $this->submitted;
 
             $tz = 'UTC';
-            $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
+            $tz = new DateTimeZone($this->app->get('offset'));
 
             $date_ = Factory::getDate($this->submitted, $tz);
             $offset = $date_->getOffsetFromGMT();
@@ -5971,7 +5957,7 @@ class HTML_facileFormsProcessor
             $rootMdata = $dataObject['properties'];
 
             $default = ComponentHelper::getParams('com_languages')->get('site');
-            $language_tag = Factory::getApplication()->getLanguage()->getTag() != $default ? Factory::getApplication()->getLanguage()->getTag() : 'zz-ZZ';
+            $language_tag = $this->app->getLanguage()->getTag() != $default ? $this->app->getLanguage()->getTag() : 'zz-ZZ';
 
             /* translatables */
             if (isset($rootMdata['title_translation' . $language_tag]) && $rootMdata['title_translation' . $language_tag] != '') {
@@ -6001,7 +5987,7 @@ class HTML_facileFormsProcessor
                     $language_tag = '';
                     jimport('joomla.application.component.helper');
                     $default = ComponentHelper::getParams('com_languages')->get('site');
-                    $language_tag = Factory::getApplication()->getLanguage()->getTag() != $default ? Factory::getApplication()->getLanguage()->getTag() : 'zz-ZZ';
+                    $language_tag = $this->app->getLanguage()->getTag() != $default ? $this->app->getLanguage()->getTag() : 'zz-ZZ';
                     if (trim($name) == trim($dataObject['properties']['bfName']) && isset($dataObject['properties'][$field . '_translation' . $language_tag]) && $dataObject['properties'][$field . '_translation' . $language_tag] != '') {
                         $res = addslashes($dataObject['properties'][$field . '_translation' . $language_tag]);
                         return;
@@ -6023,12 +6009,10 @@ class HTML_facileFormsProcessor
 
         $signatures = array();
 
-        $mainframe = Factory::getApplication();
-
         if ($this->dying)
             return;
-        $from = $this->formrow->mb_alt_mailfrom != '' ? $this->formrow->mb_alt_mailfrom : $mainframe->getCfg('mailfrom');
-        $fromname = $this->formrow->mb_alt_fromname != '' ? $this->formrow->mb_alt_fromname : $mainframe->getCfg('fromname');
+        $from = $this->formrow->mb_alt_mailfrom != '' ? $this->formrow->mb_alt_mailfrom : $this->app->getCfg('mailfrom');
+        $fromname = $this->formrow->mb_alt_fromname != '' ? $this->formrow->mb_alt_fromname : $this->app->getCfg('fromname');
 
         $_senders = '';
         if ($this->formrow->emailntf == 2)
@@ -6285,7 +6269,7 @@ class HTML_facileFormsProcessor
                 $SUBMITTED = $this->submitted;
 
                 $tz = 'UTC';
-                $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
+                $tz = new DateTimeZone($this->app->get('offset'));
 
                 $date_ = Factory::getDate($this->submitted, $tz);
                 $offset = $date_->getOffsetFromGMT();
@@ -6359,7 +6343,7 @@ class HTML_facileFormsProcessor
                 $form_title_translated = $this->getFormTitleTranslated();
 
                 $tz = 'UTC';
-                $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
+                $tz = new DateTimeZone($this->app->get('offset'));
 
                 $submitted = $this->submitted;
                 $date_ = Factory::getDate($this->submitted, $tz);
@@ -6421,7 +6405,7 @@ class HTML_facileFormsProcessor
             $SUBMITTED = $this->submitted;
 
             $tz = 'UTC';
-            $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
+            $tz = new DateTimeZone($this->app->get('offset'));
 
             $submitted = $this->submitted;
             $date_ = Factory::getDate($this->submitted, $tz);
@@ -6717,8 +6701,6 @@ class HTML_facileFormsProcessor
     function sendMailChimpNotification()
     {
 
-        $mainframe = Factory::getApplication();
-
         // listSubscribe(string apikey, string id, string email_address, array merge_vars, string email_type, boolean double_optin, boolean update_existing, boolean replace_interests, boolean send_welcome)
 
         if (!class_exists('MailChimp')) {
@@ -6800,8 +6782,8 @@ class HTML_facileFormsProcessor
                     }
                 }
                 if (!($api->success()) && $this->formrow->mailchimp_send_errors) {
-                    $from = $this->formrow->alt_mailfrom != '' ? $this->formrow->alt_mailfrom : $mainframe->getCfg('mailfrom');
-                    $fromname = $this->formrow->alt_fromname != '' ? $this->formrow->alt_fromname : $mainframe->getCfg('fromname');
+                    $from = $this->formrow->alt_mailfrom != '' ? $this->formrow->alt_mailfrom : $this->app->getCfg('mailfrom');
+                    $fromname = $this->formrow->alt_fromname != '' ? $this->formrow->alt_fromname : $this->app->getCfg('fromname');
                     $this->sendMail($from, $fromname, $from, 'MailChimp API Error', 'Could not send data to MailChimp for email: ' . $email . "\n\nReason: " . $api->getLastError() . "\n" . implode('', $api->getLastResponse()) . "\n" . implode(' ', $api->getLastRequest()));
                 }
             }
@@ -6816,7 +6798,7 @@ class HTML_facileFormsProcessor
             return '';
 
         $tz = 'UTC';
-        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
+        $tz = new DateTimeZone($this->app->get('offset'));
 
         $date_stamp = date('Y_m_d_H_i_s');
         $date_ = Factory::getDate($this->submitted, $tz);
@@ -6885,7 +6867,7 @@ class HTML_facileFormsProcessor
         //	$userfile_name = $date_stamp . '_' . $userfile_name;
         $path = $baseDir . DS . $userfile_name;
         //if ($timestamp) $path .= '.'.date('YmdHis');
-        if (file_exists($path) && Factory::getApplication()->getSession()->get('bfFileUploadOverride', true)) {
+        if (file_exists($path) && $this->app->getSession()->get('bfFileUploadOverride', true)) {
             $rnd = md5(mt_rand(0, mt_getrandmax()));
             $path = $baseDir . DS . $rnd . '_' . $userfile_name;
             //if ($timestamp) $path .= '.'.date('YmdHis');
@@ -6894,7 +6876,7 @@ class HTML_facileFormsProcessor
                 $this->message = BFText::_('COM_BREEZINGFORMS_PROCESS_FILEEXISTS');
                 return '';
             }
-        } else if (file_exists($path) && !Factory::getApplication()->getSession()->get('bfFileUploadOverride', true)) {
+        } else if (file_exists($path) && !$this->app->getSession()->get('bfFileUploadOverride', true)) {
             unlink($path);
         }
 
@@ -7294,14 +7276,14 @@ class HTML_facileFormsProcessor
                                 } // for
                             } // if
                             if (BFRequest::getVar('bfFlashUploadTicket', '') != '') {
-                                $tickets = Factory::getApplication()->getSession()->get('bfFlashUploadTickets', array());
+                                $tickets = $this->app->getSession()->get('bfFlashUploadTickets', array());
                                 mt_srand();
                                 if (isset($tickets[BFRequest::getVar('bfFlashUploadTicket', mt_rand(0, mt_getrandmax()))])) {
                                     $sourcePath = JPATH_SITE . '/components/com_breezingforms/uploads/';
                                     if (@file_exists($sourcePath) && @is_readable($sourcePath) && @is_dir($sourcePath)) {
 
                                         $tz = 'UTC';
-                                        $tz = new DateTimeZone(Factory::getApplication()->get('offset'));
+                                        $tz = new DateTimeZone($this->app->get('offset'));
 
                                         $date_stamp = date('Y_m_d_H_i_s');
                                         $date_ = Factory::getDate($this->submitted, $tz);
@@ -7393,7 +7375,7 @@ class HTML_facileFormsProcessor
                                                                 //	$userfile_name = $date_stamp . '_' . $userfile_name;
                                                                 $path = $baseDir . DS . $userfile_name;
                                                                 //if ($row->flag1) $path .= '.'.date('YmdHis');
-                                                                if (file_exists($path) && Factory::getApplication()->getSession()->get('bfFileUploadOverride', true)) {
+                                                                if (file_exists($path) && $this->app->getSession()->get('bfFileUploadOverride', true)) {
                                                                     $rnd = md5(mt_rand(0, mt_getrandmax()));
                                                                     $path = $baseDir . DS . $rnd . '_' . $userfile_name;
                                                                     //if ($row->flag1) $path .= '.'.date('YmdHis');
@@ -7402,7 +7384,7 @@ class HTML_facileFormsProcessor
                                                                         $this->message = BFText::_('COM_BREEZINGFORMS_PROCESS_FILEEXISTS');
                                                                         return '';
                                                                     }
-                                                                } else if (file_exists($path) && !Factory::getApplication()->getSession()->get('bfFileUploadOverride', true)) {
+                                                                } else if (file_exists($path) && !$this->app->getSession()->get('bfFileUploadOverride', true)) {
                                                                     unlink($path);
                                                                 }
 
@@ -7588,7 +7570,7 @@ class HTML_facileFormsProcessor
                                                 //$values[$html_i] = $this->removeDangerousHtml($values[$html_i]);
 
                                                 /*
-                                                  $input = Factory::getApplication()->input;
+                                                  $input = $this->app->input;
                                                   $input->set('cbCleanVar', $values[$html_i]);
                                                   $values[$html_i] = $input->getHtml('cbCleanVar'); */
 
@@ -7759,7 +7741,7 @@ class HTML_facileFormsProcessor
 
     function submit()
     {
-        global $database, $ff_config, $ff_comsite, $ff_mossite, $ff_otherparams;
+        global $ff_config, $ff_comsite, $ff_mossite, $ff_otherparams;
 
         // CONTENTBUILDER BEGIN
         $cbRecordId = 0;
@@ -7785,8 +7767,6 @@ class HTML_facileFormsProcessor
             $cbEmailUpdateNotifications = true;
         }
         // CONTENTBUILDER END
-
-        $database = Factory::getContainer()->get(DatabaseInterface::class);
         if (!$this->okrun)
             return;
 
@@ -7816,7 +7796,7 @@ class HTML_facileFormsProcessor
 
             if (BFRequest::getVar('ff_applic', '') != 'mod_facileforms' && BFRequest::getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
                 $is_device = true;
-                $this->isMobile = isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile'] ? true : (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && Factory::getApplication()->getSession()->get('com_breezingforms.mobile', false) ? true : false);
+                $this->isMobile = isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile'] ? true : (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $this->app->getSession()->get('com_breezingforms.mobile', false) ? true : false);
             } else
                 $this->isMobile = false;
 
@@ -7906,11 +7886,11 @@ class HTML_facileFormsProcessor
 
             switch ($this->formrow->piece3cond) {
                 case 1: // library
-                    $database->setQuery(
+                    $this->database->setQuery(
                         "select name, code from #__facileforms_pieces " .
                         "where id=" . $this->formrow->piece3id . " and published=1 "
                     );
-                    $rows = $database->loadObjectList();
+                    $rows = $this->database->loadObjectList();
                     if (count($rows))
                         echo $this->execPiece(
                             $rows[0]->code,
@@ -8003,18 +7983,18 @@ class HTML_facileFormsProcessor
                             $this->sendSalesforceNotification();
 
                             PluginHelper::importPlugin('breezingforms_addons');
-                            $dispatcher = Factory::getApplication()->getDispatcher();
+                            $dispatcher = $this->app->getDispatcher();
                             $dispatcher->dispatch('onPropertiesExecute', new Joomla\Event\Event('onPropertiesExecute',
                                 array(
                                     $this
                                 )
                             ));
 
-                            $tickets = Factory::getApplication()->getSession()->get('bfFlashUploadTickets', array());
+                            $tickets = $this->app->getSession()->get('bfFlashUploadTickets', array());
                             mt_srand();
                             if (isset($tickets[BFRequest::getVar('bfFlashUploadTicket', mt_rand(0, mt_getrandmax()))])) {
                                 unset($tickets[BFRequest::getVar('bfFlashUploadTicket')]);
-                                Factory::getApplication()->getSession()->set('bfFlashUploadTickets', $tickets);
+                                $this->app->getSession()->set('bfFlashUploadTickets', $tickets);
                             }
                         }
                     } // if
@@ -8024,8 +8004,6 @@ class HTML_facileFormsProcessor
             // DOUBLE OPT-IN
 
             if ($this->formrow->double_opt) {
-
-
                 $uri = Uri::getInstance();
                 $domainAddress = $uri->toString(array('scheme', 'host', 'port', 'path'));
 
@@ -8046,8 +8024,8 @@ class HTML_facileFormsProcessor
 
                 if (bf_is_email($recipient)) {
 
-                    $database->setQuery("Select s.record From #__facileforms_subrecords As s, #__facileforms_records As r Where r.form = " . $database->quote($this->form) . " And r.id = s.record And s.`name` = " . $database->quote($email_field_name) . " And s.`value` = " . $database->quote($recipient) . " And r.`opted` = 1");
-                    $exists = $database->loadResult();
+                    $this->database->setQuery("Select s.record From #__facileforms_subrecords As s, #__facileforms_records As r Where r.form = " . $this->database->quote($this->form) . " And r.id = s.record And s.`name` = " . $this->database->quote($email_field_name) . " And s.`value` = " . $this->database->quote($recipient) . " And r.`opted` = 1");
+                    $exists = $this->database->loadResult();
 
                     if (!$exists) {
 
@@ -8059,9 +8037,8 @@ class HTML_facileFormsProcessor
 
                         $lastID = $this->record_id;
                         $token = $this->random_str(20);
-                        $database = Factory::getContainer()->get(DatabaseInterface::class);
-                        $database->setQuery("UPDATE #__facileforms_records SET opt_token=" . $database->quote(bf_b64enc($token)) . " WHERE id=" . $database->quote($lastID));
-                        $database->execute();
+                        $this->database->setQuery("UPDATE #__facileforms_records SET opt_token=" . $this->database->quote(bf_b64enc($token)) . " WHERE id=" . $this->database->quote($lastID));
+                        $this->database->execute();
 
                         $opt_in_link = $domainAddress . '?option=com_breezingforms&opt_in=true&id=' . $lastID . '&' . 'token=' . bf_b64enc($token);
                         $opt_out_link = $domainAddress . '?option=com_breezingforms&opt_out=true&id=' . $lastID . '&' . 'token=' . bf_b64enc($token);
@@ -8084,20 +8061,20 @@ class HTML_facileFormsProcessor
 
             // DOUBLE OPT-INT END
 
-            Factory::getContainer()->get(DatabaseInterface::class)->setQuery("SELECT MAX(id) FROM #__facileforms_records");
-            $lastid = Factory::getContainer()->get(DatabaseInterface::class)->loadResult();
+            $this->database->setQuery("SELECT MAX(id) FROM #__facileforms_records");
+            $lastid = $this->database->loadResult();
             $_SESSION['virtuemart_bf_id'] = $lastid;
-            $session = Factory::getApplication()->getSession;
+            $session = $this->app->getSession();
             $session->set('virtuemart_bf_id', $lastid);
 
             $code = '';
             switch ($this->formrow->piece4cond) {
                 case 1: // library
-                    $database->setQuery(
+                    $this->database->setQuery(
                         "select name, code from #__facileforms_pieces " .
                         "where id=" . $this->formrow->piece4id . " and published=1 "
                     );
-                    $rows = $database->loadObjectList();
+                    $rows = $this->database->loadObjectList();
                     if (count($rows))
                         echo $this->execPiece(
                             $rows[0]->code,
@@ -8198,7 +8175,7 @@ class HTML_facileFormsProcessor
 
                                 $options['amount'] = round(floatval($options['amount']), 2) * 100;
 
-                                Factory::getApplication()->getSession()->set('bf_stripe_last_payment_amount' . $this->record_id, $options['amount']);
+                                $this->app->getSession()->set('bf_stripe_last_payment_amount' . $this->record_id, $options['amount']);
 
                                 $html = '';
 
@@ -8267,7 +8244,7 @@ transition: box-shadow .15s linear;
                                 $returnurl = Uri::root() . "index.php?option=com_breezingforms&confirmStripe=true&form_id=" . $this->form . "&record_id=" . $this->record_id;
                                 if (isset($options['emailfield']) && $options['emailfield'] !== '') {
                                     $stripeemail = strtolower(BFRequest::getVar('ff_nm_' . $options['emailfield'], '')[0]);
-                                    Factory::getApplication()->getSession()->set('emailfield', $stripeemail);
+                                    $this->app->getSession()->set('emailfield', $stripeemail);
                                 }
 
                                 // XDA BEGIN
@@ -8321,7 +8298,7 @@ transition: box-shadow .15s linear;
                                 $html .= header("HTTP/1.1 303 See Other");
                                 $html .= header("Location: " . $checkout_session->url);
 
-                                $current_tag = Factory::getApplication()->getLanguage()->getTag();
+                                $current_tag = $this->app->getLanguage()->getTag();
                                 $exploded = explode('-', $current_tag);
 
                                 $locale = 'auto';
@@ -8334,7 +8311,7 @@ transition: box-shadow .15s linear;
                                 $returnurl = Uri::root() . "index.php?option=com_breezingforms&confirmStripe=true&form_id=" . $this->form . "&record_id=" . $this->record_id;
                                 if (isset($options['emailfield']) && $options['emailfield'] !== '') {
                                     $stripeemail = strtolower(BFRequest::getVar('ff_nm_' . $options['emailfield'], '')[0]);
-                                    Factory::getApplication()->getSession()->set('emailfield', $stripeemail);
+                                    $this->app->getSession()->set('emailfield', $stripeemail);
                                 }
 
                                 $html .= '
@@ -8355,7 +8332,7 @@ transition: box-shadow .15s linear;
                                                                 });
                             
                             var options = {
-                                        name: ' . json_encode(isset($head['properties']['title_translation' . Factory::getApplication()->getLanguage()->getTag()]) ? $head['properties']['title_translation' . Factory::getApplication()->getLanguage()->getTag()] : $this->formrow->title) . ',
+                                        name: ' . json_encode(isset($head['properties']['title_translation' . $this->app->getLanguage()->getTag()]) ? $head['properties']['title_translation' . $this->app->getLanguage()->getTag()] : $this->formrow->title) . ',
                                         description: ' . json_encode($options['itemname']) . ',
                                         currency: ' . json_encode(strtolower($options['currencyCode'])) . ',
                                         amount: ' . json_encode($options['amount']) . ',
@@ -8667,7 +8644,7 @@ transition: box-shadow .15s linear;
                 if ($return) {
                     $return = bf_b64dec($return);
                     if (Uri::isInternal($return)) {
-                        Factory::getApplication()->redirect($return);
+                        $this->app->redirect($return);
                     }
                 }
             }
@@ -8676,17 +8653,17 @@ transition: box-shadow .15s linear;
                 $is15 = false;
 
                 if (!Factory::getUser()->get('id', 0)) {
-                    Factory::getApplication()->redirect(Route::_('index.php?option=com_users&view=login&Itemid=' . BFRequest::getInt('Itemid', 0), false));
+                    $this->app->redirect(Route::_('index.php?option=com_users&view=login&Itemid=' . BFRequest::getInt('Itemid', 0), false));
                 } else {
 
-                    Factory::getApplication()->redirect(Route::_('index.php?option=com_users&view=profile&Itemid=' . BFRequest::getInt('Itemid', 0), false));
+                    $this->app->redirect(Route::_('index.php?option=com_users&view=profile&Itemid=' . BFRequest::getInt('Itemid', 0), false));
                 }
             } else if (trim($cbResult['data']['force_url'])) {
-                Factory::getApplication()->redirect(trim($cbResult['data']['force_url']));
+                $this->app->redirect(trim($cbResult['data']['force_url']));
             }
 
-            Factory::getApplication()->enqueueMessage(BFText::_('COM_CONTENTBUILDER_SAVED'), 'success');
-            Factory::getApplication()->redirect(Route::_('index.php?option=com_contentbuilder&controller=details&Itemid=' . BFRequest::getInt('Itemid', 0) . '&backtolist=' . BFRequest::getInt('backtolist', 0) . '&id=' . $cbResult['data']['id'] . '&record_id=' . $cbRecordId . '&limitstart=' . BFRequest::getInt('limitstart', 0) . '&filter_order=' . BFRequest::getCmd('filter_order'), false));
+            $this->app->enqueueMessage(BFText::_('COM_CONTENTBUILDER_SAVED'), 'success');
+            $this->app->redirect(Route::_('index.php?option=com_contentbuilder&controller=details&Itemid=' . BFRequest::getInt('Itemid', 0) . '&backtolist=' . BFRequest::getInt('backtolist', 0) . '&id=' . $cbResult['data']['id'] . '&record_id=' . $cbRecordId . '&limitstart=' . BFRequest::getInt('limitstart', 0) . '&filter_order=' . BFRequest::getCmd('filter_order'), false));
         }
 
         if (!$paymentAction) {
@@ -8820,8 +8797,8 @@ transition: box-shadow .15s linear;
 
         unset($_SESSION['ff_editable_overridePlg' . BFRequest::getInt('ff_contentid', 0) . $this->form_id]);
         unset($_SESSION['ff_editablePlg' . BFRequest::getInt('ff_contentid', 0) . $this->form_id]);
-        Factory::getApplication()->getSession()->set('ff_editableMod' . BFRequest::getInt('ff_module_id', 0) . $this->form_id, 0);
-        Factory::getApplication()->getSession()->set('ff_editable_overrideMod' . BFRequest::getInt('ff_module_id', 0) . $this->form_id, 0);
+        $this->app->getSession()->set('ff_editableMod' . BFRequest::getInt('ff_module_id', 0) . $this->form_id, 0);
+        $this->app->getSession()->set('ff_editable_overrideMod' . BFRequest::getInt('ff_module_id', 0) . $this->form_id, 0);
 
         if (!defined('VMBFCF_RUNNING')) {
             exit;

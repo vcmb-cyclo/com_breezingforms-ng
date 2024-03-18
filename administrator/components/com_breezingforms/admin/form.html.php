@@ -23,7 +23,7 @@ class HTML_facileFormsForm
     {
         global $ff_admsite, $ff_config;
 
-        //Factory::getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/codemirror/mode/htmlmixed/htmlmixed.js');
+        //Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/codemirror/mode/htmlmixed/htmlmixed.js');
 
         ToolbarHelper::custom('save', 'save.png', 'save_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_SAVE'), false);
         ToolbarHelper::custom('cancel', 'cancel.png', 'cancel_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_QUICKMODE_CLOSE'), false);
@@ -144,7 +144,7 @@ class HTML_facileFormsForm
     ";
 
     
-        Factory::getDocument()->addScriptDeclaration($jquery);
+        Factory::getApplication()->getDocument()->addScriptDeclaration($jquery);
         ?>
 
             function checkNumber(value, msg1, msg2) {
@@ -1981,7 +1981,7 @@ class HTML_facileFormsForm
             });
             ";
 
-                Factory::getDocument()->addScriptDeclaration($jquery);
+                Factory::getApplication()->getDocument()->addScriptDeclaration($jquery);
 
                 if ($ff_config->enable_classic == 1) {
                     ToolbarHelper::custom('quickmode', 'new.png', 'new_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_QUICKMODE'), false);

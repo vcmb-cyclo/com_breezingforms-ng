@@ -31,7 +31,7 @@ class BFIntegratorHtml{
         </script>
 
         <?php
-        Factory::getDocument()->addScriptDeclaration('
+        Factory::getApplication()->getDocument()->addScriptDeclaration('
             Joomla.listItemTask = listItemTask;
         ');
         ?>
@@ -262,7 +262,7 @@ class BFIntegratorHtml{
             </script>
 
             <?php
-            Factory::getDocument()->addScriptDeclaration('
+            Factory::getApplication()->getDocument()->addScriptDeclaration('
             Joomla.listItemTask = listItemTask;
             ');
             ?>

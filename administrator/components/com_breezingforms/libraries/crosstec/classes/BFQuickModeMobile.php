@@ -51,13 +51,13 @@ class BFQuickModeMobile
 		$default = ComponentHelper::getParams('com_languages')->get('site');
 		$this->language_tag = Factory::getApplication()->getLanguage()->getTag() != $default ? Factory::getApplication()->getLanguage()->getTag() : 'zz-ZZ';
 
-		$head = Factory::getDocument()->getHeadData();
+		$head = Factory::getApplication()->getDocument()->getHeadData();
 		$head['styleSheets'] = array();
 		$head['style'] = array();
 		$head['scripts'] = array();
 		$head['script'] = array();
 		$head['custom'] = array();
-		Factory::getDocument()->setHeadData($head);
+		Factory::getApplication()->getDocument()->setHeadData($head);
 
 		$this->p = $p;
 		$this->dataObject = Zend_Json::decode(bf_b64dec($this->p->formrow->template_code));
@@ -68,7 +68,7 @@ class BFQuickModeMobile
 			/* translatables */
 			if (isset($this->rootMdata['title_translation' . $this->language_tag]) && $this->rootMdata['title_translation' . $this->language_tag] != '') {
 				$this->rootMdata['title'] = $this->rootMdata['title_translation' . $this->language_tag];
-				Factory::getDocument()->setTitle($this->rootMdata['title']);
+				Factory::getApplication()->getDocument()->setTitle($this->rootMdata['title']);
 			}
 			/* translatables end */
 		}
@@ -133,8 +133,8 @@ class BFQuickModeMobile
 		$app = Factory::getApplication();
 
 		// Get line endings
-		$lnEnd = Factory::getDocument()->_getLineEnd();
-		$tab = Factory::getDocument()->_getTab();
+		$lnEnd = Factory::getApplication()->getDocument()->_getLineEnd();
+		$tab = Factory::getApplication()->getDocument()->_getTab();
 		$tagEnd = ' />';
 		$buffer = '';
 
@@ -1035,7 +1035,7 @@ function bfTriggerRules() {
 
 		//  data-position="fixed"
 		echo '<div data-role="header" class="ui-header ui-bar-inherit">';
-		echo '<h1>' . Factory::getDocument()->getTitle() . '</h1>';
+		echo '<h1>' . Factory::getApplication()->getDocument()->getTitle() . '</h1>';
 		$current_url = Uri::getInstance()->toString();
 
 		$return_url = $current_url;
@@ -1117,7 +1117,7 @@ function bfTriggerRules() {
 
 					preg_match_all($regex, $introtext, $matches, PREG_SET_ORDER);
 
-					$document = Factory::getDocument();
+					$document = Factory::getApplication()->getDocument();
 					$renderer = $document->loadRenderer('modules');
 					$options = array('style' => 'xhtml');
 
@@ -1177,7 +1177,7 @@ function bfTriggerRules() {
 
 					if ($matches) {
 
-						$document = Factory::getDocument();
+						$document = Factory::getApplication()->getDocument();
 						$renderer = $document->loadRenderer('modules');
 						$options = array('style' => 'xhtml');
 
@@ -2308,8 +2308,8 @@ function bfTriggerRules() {
 
 	public function calendar($value, $name, $id, $format = '%Y-%m-%d', $attribs = array())
 	{
-		$tag = Factory::getLanguage()->getTag();
-		$calendar = Factory::getLanguage()->getCalendar();
+		$tag = Factory::getApplication()->getLanguage()->getTag();
+		$calendar = Factory::getApplication()->getLanguage()->getCalendar();
 		$direction = strtolower(Factory::getApplication()->getDocument()->getDirection());
 
 		// Get the appropriate file for the current language date helper

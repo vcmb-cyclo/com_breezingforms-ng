@@ -27,9 +27,9 @@ class QuickModeHtml
         HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
         HTMLHelper::_('behavior.keepalive');
         $iconBase = '../administrator/components/com_breezingforms/libraries/jquery/themes/quickmode/i/';
-        Factory::getDocument()->addStyleSheet(Uri::root() . 'administrator/components/com_breezingforms/libraries/jquery/themes/quickmode/quickmode.all.css');
-        Factory::getDocument()->addStyleSheet(Uri::root() . 'administrator/components/com_breezingforms/libraries/jquery/jtree/tree_component.css');
-        Factory::getDocument()->addStyleSheet(Uri::root() . 'administrator/components/com_breezingforms/admin/style.css');
+        Factory::getApplication()->getDocument()->addStyleSheet(Uri::root() . 'administrator/components/com_breezingforms/libraries/jquery/themes/quickmode/quickmode.all.css');
+        Factory::getApplication()->getDocument()->addStyleSheet(Uri::root() . 'administrator/components/com_breezingforms/libraries/jquery/jtree/tree_component.css');
+        Factory::getApplication()->getDocument()->addStyleSheet(Uri::root() . 'administrator/components/com_breezingforms/admin/style.css');
         ?>
 
         <script type="text/javascript"
@@ -3462,14 +3462,14 @@ class QuickModeHtml
         jimport('joomla.application.component.helper');
         $default = ComponentHelper::getParams('com_languages')->get('site');
 
-        Factory::getDocument()->addScriptDeclaration('
+        Factory::getApplication()->getDocument()->addScriptDeclaration('
         jQuery(document).ready(function () {
             jQuery(\'.bfTrans\').css("display", "none");
         });
         ');
         if ($formId > 0 && count(LanguageHelper::getLanguages()) > 1) {
             if ($active_language_code != '' && $active_language_code != $default) {
-                Factory::getDocument()->addScriptDeclaration('
+                Factory::getApplication()->getDocument()->addScriptDeclaration('
                 jQuery(document).ready(function () {
                     jQuery(\'.bfTrans\').css("display", "block");
                 });

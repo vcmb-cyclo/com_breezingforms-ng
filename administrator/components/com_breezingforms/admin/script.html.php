@@ -54,7 +54,7 @@ class HTML_facileFormsScript
 			} // submitbutton
 
 			<?php
-			Factory::getDocument()->addScriptDeclaration('
+			Factory::getApplication()->getDocument()->addScriptDeclaration('
                     Joomla.submitbutton = submitbutton;  
                 ');
 			?>
@@ -341,7 +341,7 @@ class HTML_facileFormsScript
 							} // submitbutton
 
 			<?php
-			Factory::getDocument()->addScriptDeclaration('
+			Factory::getApplication()->getDocument()->addScriptDeclaration('
             
                 Joomla.submitbutton = submitbutton;
             ');

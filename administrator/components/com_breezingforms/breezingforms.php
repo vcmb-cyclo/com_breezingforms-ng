@@ -23,10 +23,10 @@ $controller->redirect();
 
 require_once(JPATH_SITE . DS . 'administrator' . DS . 'components' . DS . 'com_breezingforms' . DS . 'admin.breezingforms.php');
 
-Factory::getDocument()->addScript(Uri::root(true) . '/administrator/components/com_breezingforms/assets/js/custom.js');
-Factory::getDocument()->addStyleSheet(Uri::root(true) . '/administrator/components/com_breezingforms/assets/css/custom.css');
+Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/administrator/components/com_breezingforms/assets/js/custom.js');
+Factory::getApplication()->getDocument()->addStyleSheet(Uri::root(true) . '/administrator/components/com_breezingforms/assets/css/custom.css');
 
-Factory::getDocument()->addStyleSheet(Uri::root(true) . '/administrator/components/com_breezingforms/assets/font-awesome/css/font-awesome.css');
+Factory::getApplication()->getDocument()->addStyleSheet(Uri::root(true) . '/administrator/components/com_breezingforms/assets/font-awesome/css/font-awesome.css');
 
 
 $recs = BFRequest::getVar('act', '') == 'managerecs' || BFRequest::getVar('act', '') == 'recordmanagement' || BFRequest::getVar('act', '') == '';

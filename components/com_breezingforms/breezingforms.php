@@ -213,15 +213,15 @@ if (
                     $menu_item_robots = $params->get('robots', '');
 
                     if ($menu_item_meta_description) {
-                        Factory::getDocument()->setMetaData('description', $menu_item_meta_description);
+                        Factory::getApplication()->getDocument()->setMetaData('description', $menu_item_meta_description);
                     }
 
                     if ($menu_item_meta_keywords) {
-                        Factory::getDocument()->setMetaData('keywords', $menu_item_meta_keywords);
+                        Factory::getApplication()->getDocument()->setMetaData('keywords', $menu_item_meta_keywords);
                     }
 
                     if ($menu_item_robots) {
-                        Factory::getDocument()->setMetaData('robots', $menu_item_robots);
+                        Factory::getApplication()->getDocument()->setMetaData('robots', $menu_item_robots);
                     }
 
                     $formname = $params->get('ff_com_name');
@@ -336,9 +336,9 @@ if (
 
         if ((!isset($ff_applic) || $ff_applic != 'plg_facileforms') && $pagetitle && $form->title != '' && !(BFRequest::getInt('cb_form_id', 0) || BFRequest::getCmd('cb_record_id', ''))) {
             if ($menu_item_title != '') {
-                Factory::getDocument()->setTitle($menu_item_title);
+                Factory::getApplication()->getDocument()->setTitle($menu_item_title);
             } else if ($pagetitle) { // being set by module, false implies no change at all
-                Factory::getDocument()->setTitle($form->title);
+                Factory::getApplication()->getDocument()->setTitle($form->title);
             }
         }
 
@@ -411,9 +411,9 @@ if (
                 'allowtransparency="true" ' .
                 'scrolling="no" ';
             if ($form->autoheight == 1) {
-                Factory::getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/jq.min.js');
-                Factory::getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/jq.iframeautoheight.js');
-                Factory::getDocument()->addScriptDeclaration("<!--
+                Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/jq.min.js');
+                Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/jq.iframeautoheight.js');
+                Factory::getApplication()->getDocument()->addScriptDeclaration("<!--
                             JQuery(document).ready(function() {
                                 //JQuery(\".breezingforms_iframe\").css(\"width\",\"100%\");
                                 JQuery(\".breezingforms_iframe\").iframeAutoHeight({heightOffset: 15, debug: false, diagnostics: false});

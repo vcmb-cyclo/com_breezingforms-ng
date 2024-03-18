@@ -3447,7 +3447,7 @@ class HTML_facileFormsProcessor
             require_once(JPATH_ADMINISTRATOR . DS . 'components' . DS . 'com_contentbuilder' . DS . 'classes' . DS . 'contentbuilder.php');
             $cbNonEditableFields = contentbuilder::getListNonEditableElements($cbResult['data']['id']);
             if (count($cbNonEditableFields)) {
-                Factory::getDocument()->addScriptDeclaration('<!--' . nl() . 'var bfDeactivateField = new Array();' . nl() . '//-->');
+                Factory::getApplication()->getDocument()->addScriptDeclaration('<!--' . nl() . 'var bfDeactivateField = new Array();' . nl() . '//-->');
                 echo '<script type="text/javascript">' . nl();
                 echo '<!--' . nl();
                 echo 'function bfDisableContentBuilderFields(){' . nl();
@@ -3483,7 +3483,7 @@ class HTML_facileFormsProcessor
         if (trim($this->formrow->template_code_processed) == '') {
 
             // fixing J3 css
-            Factory::getDocument()->addStyleDeclaration(
+            Factory::getApplication()->getDocument()->addStyleDeclaration(
                 '
              .bfFormDiv input[type=checkbox][id^="ff_elem"], input[type=radio][id^="ff_elem"]{
                 vertical-align: text-bottom;
@@ -4460,11 +4460,11 @@ class HTML_facileFormsProcessor
             echo '<!DOCTYPE html> 
 <html> 
 <head> 
-<title>' . Factory::getDocument()->getTitle() . '</title>
+<title>' . Factory::getApplication()->getDocument()->getTitle() . '</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1">';
             echo $quickMode->headers();
-            echo $quickMode->fetchHead(Factory::getDocument()->getHeadData());
+            echo $quickMode->fetchHead(Factory::getApplication()->getDocument()->getHeadData());
             echo '</head>' . "\n";
             echo '<body>' . "\n";
             echo $contents;

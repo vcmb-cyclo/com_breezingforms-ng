@@ -70,7 +70,7 @@ class BFBehaviorTabs
 						});
 					});';
 
-			$document = Factory::getDocument();
+			$document = Factory::getApplication()->getDocument();
 			$document->addScriptDeclaration($js);
 			HTMLHelper::_('script', 'system/tabs.js', false, true);
 

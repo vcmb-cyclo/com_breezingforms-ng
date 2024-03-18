@@ -46,7 +46,7 @@ class BFQuickMode {
 
 	function headers() {
 
-	    Factory::getDocument()->addScriptDeclaration('
+	    Factory::getApplication()->getDocument()->addScriptDeclaration('
 	    
 	        JQuery(document).ready(function(){
 	            JQuery(".ff_elem").closest(".input-group").removeClass("input-group");
@@ -66,15 +66,15 @@ class BFQuickMode {
 
 		// keep IE8 compatbility
 		if (preg_match('/(?i)msie [1-8]/', $_SERVER['HTTP_USER_AGENT'])) {
-			Factory::getDocument()->addScript('https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js');
+			Factory::getApplication()->getDocument()->addScript('https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js');
 		}
 
 		if ($this->hasFlashUpload) {
-			Factory::getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/plupload/moxie.js');
-			Factory::getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/plupload/plupload.js');
+			Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/plupload/moxie.js');
+			Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/plupload/plupload.js');
 		}
         HTMLHelper::_('jquery.framework');
-		Factory::getDocument()->addStyleDeclaration('
+		Factory::getApplication()->getDocument()->addStyleDeclaration('
 
 .bfClearfix:after {
 content: ".";
@@ -93,19 +93,19 @@ display:none;
 		if (isset($this->rootMdata['disableJQuery']) && $this->rootMdata['disableJQuery']) {
 			$jQuery = "\n" . 'var JQuery = jQuery;' . "\n";
 		} else {
-			Factory::getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/jq.min.js');
+			Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/jq.min.js');
 		}
 		if (!isset($this->rootMdata['joomlaHint']) || !$this->rootMdata['joomlaHint']) {
-			Factory::getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/tooltip.css');
-			Factory::getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/tooltip.js');
+			Factory::getApplication()->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/tooltip.css');
+			Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/tooltip.js');
 		}
 		if($this->useErrorAlerts) {
-			Factory::getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/js/sweetalert.min.js');
+			Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/js/sweetalert.min.js');
 		}
 		if ($this->useBalloonErrors) {
-			Factory::getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/validationEngine.jquery.css');
-			Factory::getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/jquery.validationEngine-en.js');
-			Factory::getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/jquery.validationEngine.js');
+			Factory::getApplication()->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/validationEngine.jquery.css');
+			Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/jquery.validationEngine-en.js');
+			Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/jquery.validationEngine.js');
 		}
 		$toggleCode = '';
 		if ($this->toggleFields != '[]') {
@@ -497,7 +497,7 @@ function bfTriggerRules() {
          ';
 		}
 
-		Factory::getDocument()->addScriptDeclaration(
+		Factory::getApplication()->getDocument()->addScriptDeclaration(
 				$jQuery . '
 			var inlineErrorElements = new Array();
 			var bfSummarizers = new Array();
@@ -680,8 +680,8 @@ function bfTriggerRules() {
 					JQuery(".bfErrorMessage").html(allErrors);
 					JQuery(".bfErrorMessage").css("display","");';
 				}
-				Factory::getDocument()->addScriptDeclaration('var bfUseErrorAlerts = false;' . "\n");
-				Factory::getDocument()->addScriptDeclaration('
+				Factory::getApplication()->getDocument()->addScriptDeclaration('var bfUseErrorAlerts = false;' . "\n");
+				Factory::getApplication()->getDocument()->addScriptDeclaration('
 				function bfShowErrors(error){
                                         ' . $defaultErrors . '
 
@@ -758,7 +758,7 @@ function bfTriggerRules() {
 			if ($this->fading) {
 				$this->fadingClass = ' bfFadingClass';
 				$this->fadingCall = 'bfFade();';
-				Factory::getDocument()->addScriptDeclaration('
+				Factory::getApplication()->getDocument()->addScriptDeclaration('
 					function bfFade(){
 						JQuery(".bfPageIntro").fadeIn(1000);
 						var size = 0;
@@ -776,7 +776,7 @@ function bfTriggerRules() {
 			}
 
 			if ($this->rollover && trim($this->rolloverColor) != '') {
-				Factory::getDocument()->addScriptDeclaration('
+				Factory::getApplication()->getDocument()->addScriptDeclaration('
 					var bfElemWrapBg = "";
 					function bfSetElemWrapBg(){
 						bfElemWrapBg = JQuery(".bfElemWrap").css("background-color");
@@ -818,7 +818,7 @@ function bfTriggerRules() {
 				');
 			}
 		}
-		Factory::getDocument()->addScriptDeclaration('
+		Factory::getApplication()->getDocument()->addScriptDeclaration('
 		    bfToggleFieldsLoaded = false;
 		    bfSectionFieldsDeactivated = false;
 			JQuery(document).ready(function() {
@@ -855,30 +855,30 @@ function bfTriggerRules() {
 			});
 		');
 		// loading system css
-		if (method_exists($obj = Factory::getDocument(), 'addCustomTag')) {
+		if (method_exists($obj = Factory::getApplication()->getDocument(), 'addCustomTag')) {
 
 			$stylelink = '<link rel="stylesheet" href="' . Uri::root(true) . '/components/com_breezingforms/themes/quickmode/system.css" />' . "\n";
-			Factory::getDocument()->addCustomTag($stylelink);
+			Factory::getApplication()->getDocument()->addCustomTag($stylelink);
 
 			$stylelink = '<!--[if IE 7]>' . "\n";
 			$stylelink .= '<link rel="stylesheet" href="' . Uri::root(true) . '/components/com_breezingforms/themes/quickmode/system.ie7.css" />' . "\n";
 			$stylelink .= '<![endif]-->' . "\n";
-			Factory::getDocument()->addCustomTag($stylelink);
+			Factory::getApplication()->getDocument()->addCustomTag($stylelink);
 
 			$stylelink = '<!--[if IE 6]>' . "\n";
 			$stylelink .= '<link rel="stylesheet" href="' . Uri::root(true) . '/components/com_breezingforms/themes/quickmode/system.ie6.css" />' . "\n";
 			$stylelink .= '<![endif]-->' . "\n";
-			Factory::getDocument()->addCustomTag($stylelink);
+			Factory::getApplication()->getDocument()->addCustomTag($stylelink);
 
 			$stylelink = '<!--[if IE]>' . "\n";
 			$stylelink .= '<link rel="stylesheet" href="' . Uri::root(true) . '/components/com_breezingforms/themes/quickmode/system.ie.css" />' . "\n";
 			$stylelink .= '<![endif]-->' . "\n";
-			Factory::getDocument()->addCustomTag($stylelink);
+			Factory::getApplication()->getDocument()->addCustomTag($stylelink);
 
 			// loading theme
 			if ($this->rootMdata['theme'] != 'none' && @file_exists(JPATH_SITE . '/media/breezingforms/themes/' . $this->rootMdata['theme'] . '/theme.css')) {
 				$stylelink = '<link rel="stylesheet" href="' . Uri::root(true) . '/media/breezingforms/themes/' . $this->rootMdata['theme'] . '/theme.css" />' . "\n";
-				Factory::getDocument()->addCustomTag($stylelink);
+				Factory::getApplication()->getDocument()->addCustomTag($stylelink);
 			}
 		}
 	}
@@ -889,7 +889,7 @@ function bfTriggerRules() {
         $default = ComponentHelper::getParams( 'com_languages' )->get( 'site' );
         $this->language_tag = Factory::getApplication()->getLanguage()->getTag() != $default ? Factory->getLanguage()->getTag() : 'zz-ZZ';
 
-		Factory::getDocument()->addScriptDeclaration('<!--');
+		Factory::getApplication()->getDocument()->addScriptDeclaration('<!--');
 
 		$this->p = $p;
 		$this->dataObject = Zend_Json::decode(bf_b64dec($this->p->formrow->template_code));
@@ -899,7 +899,7 @@ function bfTriggerRules() {
 			/* translatables */
 			if (isset($this->rootMdata['title_translation' . $this->language_tag]) && $this->rootMdata['title_translation' . $this->language_tag] != '') {
 				$this->rootMdata['title'] = $this->rootMdata['title_translation' . $this->language_tag];
-				Factory::getDocument()->setTitle($this->rootMdata['title']);
+				Factory::getApplication()->getDocument()->setTitle($this->rootMdata['title']);
 			}
 			/* translatables end */
 		}
@@ -975,7 +975,7 @@ function bfTriggerRules() {
 
 					preg_match_all($regex, $introtext, $matches, PREG_SET_ORDER);
 
-						$document = Factory::getDocument();
+						$document = Factory::getApplication()->getDocument();
 						$renderer = $document->loadRenderer('modules');
 						$options = array('style' => 'xhtml');
 
@@ -1032,7 +1032,7 @@ function bfTriggerRules() {
 
 					preg_match_all($regex, $introtext, $matches, PREG_SET_ORDER);
 
-					$document = Factory::getDocument();
+					$document = Factory::getApplication()->getDocument();
 					$renderer = $document->loadRenderer('modules');
 					$options = array('style' => 'xhtml');
 
@@ -1762,7 +1762,7 @@ function bfTriggerRules() {
                                     $size = json_encode($normal);
 
                                 }
-								Factory::getDocument()->addScript($http.'://www.google.com/recaptcha/api.js?'.$reCaptchaLang.'&onload=onloadBFNewRecaptchaCallback&render=explicit', $type = "text/javascript", array('data-usercentrics' => 'reCAPTCHA'));
+								Factory::getApplication()->getDocument()->addScript($http.'://www.google.com/recaptcha/api.js?'.$reCaptchaLang.'&onload=onloadBFNewRecaptchaCallback&render=explicit', $type = "text/javascript", array('data-usercentrics' => 'reCAPTCHA'));
 
 								echo '
                                                     <div style="display: inline-block !important; vertical-align: middle;">
@@ -2043,8 +2043,8 @@ function bfTriggerRules() {
 
 						$base = 'ba'.'se'.'64';
 
-						Factory::getDocument()->addScript(Uri::root(true).'/components/com_breezingforms/libraries/js/signature.js');
-						Factory::getDocument()->addScriptDeclaration('
+						Factory::getApplication()->getDocument()->addScript(Uri::root(true).'/components/com_breezingforms/libraries/js/signature.js');
+						Factory::getApplication()->getDocument()->addScriptDeclaration('
 						var bf_signaturePad' . $mdata['dbId'] . ' = null;
 						var bf_canvas' . $mdata['dbId'] . ' = null;
 
@@ -2295,26 +2295,26 @@ function bfTriggerRules() {
 		$this->headers();
 
 		if ($this->hasResponsiveDatePicker) {
-			Factory::getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/pickadate/picker.js');
-			Factory::getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/pickadate/picker.date.js');
+			Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/pickadate/picker.js');
+			Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/pickadate/picker.date.js');
 
 			$lang = Factory::getApplication()->getLanguage()->getTag();
 			$lang = explode('-', $lang);
 			$lang = strtolower($lang[0]);
 			if (file_exists(JPATH_SITE . '/components/com_breezingforms/libraries/jquery/pickadate/translations/' . $lang . '.js')) {
-				Factory::getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/pickadate/translations/' . $lang . '.js');
+				Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/pickadate/translations/' . $lang . '.js');
 			}
 
-			Factory::getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/pickadate/themes/default.css');
-			Factory::getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/pickadate/themes/default.date.css');
+			Factory::getApplication()->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/pickadate/themes/default.css');
+			Factory::getApplication()->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/pickadate/themes/default.date.css');
 		}
 
 		// we must make sure that everything mootools related is included after moxie and plupload
-		if (isset(Factory::getDocument()->_scripts)) {
-			foreach (Factory::getDocument()->_scripts As $script_name => $script_value) {
+		if (isset(Factory::getApplication()->getDocument()->_scripts)) {
+			foreach (Factory::getApplication()->getDocument()->_scripts As $script_name => $script_value) {
 				if (basename($script_name) != 'moxie.js' && basename($script_name) != 'plupload.js' && basename($script_name) != 'calendar.js' && basename($script_name) != 'calendar-setup.js') {
-					unset(Factory::getDocument()->_scripts[$script_name]);
-					Factory::getDocument()->_scripts[$script_name] = $script_value;
+					unset(Factory::getApplication()->getDocument()->_scripts[$script_name]);
+					Factory::getApplication()->getDocument()->_scripts[$script_name] = $script_value;
 				}
 			}
 		}
@@ -2345,8 +2345,8 @@ function bfTriggerRules() {
 			$tickets[$this->flashUploadTicket] = array(); // stores file info for later processing
 			Factory::getApplication()->getSession()->set('bfFlashUploadTickets', $tickets);
 			echo '<input type="hidden" name="bfFlashUploadTicket" value="' . $this->flashUploadTicket . '"/>' . "\n";
-			Factory::getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/center.js');
-			Factory::getDocument()->addScriptDeclaration('
+			Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingforms/libraries/jquery/center.js');
+			Factory::getApplication()->getDocument()->addScriptDeclaration('
                         var bfUploaders = [];
                         var bfUploaderErrorElements = [];
 			var bfFlashUploadInterval = null;
@@ -2417,7 +2417,7 @@ function bfTriggerRules() {
 			echo "<div style=\"visibility:hidden;display:none;\" id=\"bfSubmitMessage\">" . BFText::_('COM_BREEZINGFORMS_SUBMIT_MESSAGE') . "</div>";
 		}
 		echo '<noscript>Please turn on javascript to submit your data. Thank you!</noscript>' . "\n";
-		Factory::getDocument()->addScriptDeclaration('//-->');
+		Factory::getApplication()->getDocument()->addScriptDeclaration('//-->');
 	}
 
 	public function parseToggleFields($code) {

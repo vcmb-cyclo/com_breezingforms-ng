@@ -477,7 +477,7 @@ function _ff_query($sql, $insert = 0)
     $id = null;
     $database->setQuery($sql);
 
-    $database->query();
+    $database->execute();
 
     try {
         $database->execute();

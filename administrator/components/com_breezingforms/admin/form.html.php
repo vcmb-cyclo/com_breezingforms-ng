@@ -1030,7 +1030,7 @@ class HTML_facileFormsForm
                                                     Code in Editor</p>
                                                 <?php
                                                 $editor = Editor::getInstance(Factory::getApplication()->get('editor'));
-                                                echo $editor->display('mb_email_custom_template', htmlentities($row->mb_email_custom_template, ENT_QUOTES, 'UTF-8'), '100%', '500px', '20', '20', true, 'mb_email_custom_template', null, null, array());
+                                                echo $editor->display('mb_email_custom_template', htmlentities($row->mb_email_custom_template ?? '', ENT_QUOTES, 'UTF-8'), '100%', '500px', '20', '20', true, 'mb_email_custom_template', null, null, array());
                                                 ?>
                                             </div>
                                         </td>

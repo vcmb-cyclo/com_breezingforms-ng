@@ -1313,8 +1313,12 @@ class HTML_facileFormsProcessor
         $ret = '';
         if ($this->prepareEvalCode($code, $name, $type, $id, $pane)) {
             $this->traceEval($name);
-
-            $ret = eval($code);
+            try {
+                $ret = eval($code);
+            } catch (ParseError $e) {
+                $this->app->enqueueMessage($e->getMessage() + "in $name.", 'error');
+                // Report error somehow
+            }
         } // if
         return $ret;
     }

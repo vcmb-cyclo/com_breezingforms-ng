@@ -13,6 +13,7 @@ The Joomla aliases have been removed to prepare Joomla 6.
 | JFactory::getDbo() | Factory::getContainer()->get(DatabaseInterface::class) |
 | ->query();     | ->execute(); |
 | JFactory::getUser() | Factory::getApplication()->getIdentity() |
+| JFactory::getUser($id) | Factory::getContainer()->get(UserFactoryInterface::class)->loadUserById($id)|
 | | Factory::getApplication()->getSession()|
 
 

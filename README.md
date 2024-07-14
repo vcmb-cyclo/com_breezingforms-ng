@@ -1,7 +1,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-Joomla 5 + BreezingForms V5 for Joomla 5.0 + ContentBuilder V5.
+Component BreezingForms V5 for Joomla 5.0.
 
 ## Getting Started
 
@@ -21,7 +21,7 @@ The Joomla aliases have been removed to prepare Joomla 6.
 
     Clone the repo
 
-    git clone https://github.com/vcmb-cyclo/breezingforms.git
+    git clone https://github.com/vcmb-cyclo/com_breezingforms.git
     
 ## Download plugin
 

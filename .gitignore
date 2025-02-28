@@ -21,4 +21,4 @@ administrator/error_log
 
 # Directories
 cache/
-libraries/ 
+#libraries/ 

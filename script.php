@@ -269,7 +269,7 @@ class BFDbo
 
     public function getConnection()
     {
-        return $this->dbo->getConnection();
+        return $this->dbo;
     }
 
     public function getAffectedRows()
@@ -440,6 +440,7 @@ class com_breezingformsInstallerScript
         $db = BFFactory::getDbo();
         $plugins = $this->getPlugins();
         $installer = new Installer();
+        $installer->setDatabase($db->getConnection());
 
         foreach ($plugins as $folder => $subplugs) {
             if (is_array($subplugs)) {
@@ -484,6 +485,7 @@ class com_breezingformsInstallerScript
 
             if (count($folders) != 0) {
                 $installer = new Installer();
+                $installer->setDatabase($db->getConnection());
                 foreach ($folders as $folder) {
                     $installer->install($base_path . DS . $folder);
                 }

@@ -482,7 +482,7 @@ class com_breezingformsInstallerScript
                 $installer = new Installer();
                 $installer->setDatabase($db->getConnection());
                 foreach ($folders as $folder) {
-                    $installer->install($base_path . /' . . $folder);
+                    $installer->install($base_path . '/' .$folder);
                 }
 
                 foreach ($plugins as $folder => $subplugs) {

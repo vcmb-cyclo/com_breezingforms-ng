@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package     BreezingForms
  * @version     5.0.0
@@ -14,415 +15,202 @@ use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 use Joomla\CMS\Installer\Installer;
 use Joomla\Filesystem\Folder;
-
-class BFFactory
-{
-    private static $dbo = null;
-
-    public static function getDbo()
-    {
-        if (static::$dbo == null) {
-            static::$dbo = new BFDbo();
-        }
-        return static::$dbo;
-    }
-
-}
-
-class BFFile extends File
-{
-
-    public static function read($file)
-    {
-
-        return file_get_contents($file);
-    }
-}
-
-class BFDbo
-{
-    private $errNo = 0;
-    private $errMsg = '';
-    private $dbo = null;
-    private $last_query = true;
-    private $last_failed_query = '';
-
-    function __construct()
-    {
-        $this->dbo = Factory::getContainer()->get(DatabaseInterface::class);
-    }
-
-    public function setQuery($query, $offset = 0, $limit = 0)
-    {
-        try {
-            $this->dbo->setQuery($query, $offset, $limit);
-        } catch (Exception $e) {
-            $this->last_query = false;
-            $this->last_failed_query = $query;
-            $this->errNo = $e->getCode();
-            $this->errMsg = $e->getMessage();
-        }
-    }
-
-    public function loadObjectList()
-    {
-        if (!$this->last_query)
-            return array();
-
-        $this->errNo = 0;
-        $this->errMsg = '';
-
-        try {
-            return $this->dbo->loadObjectList();
-        } catch (Exception $e) {
-            $this->errNo = $e->getCode();
-            $this->errMsg = $e->getMessage();
-        } catch (Error $e) {
-            $this->errNo = $e->getCode();
-            $this->errMsg = $e->getMessage();
-        }
-
-        return array();
-    }
-
-    public function loadObject($class = 'stdClass')
-    {
-        if (!$this->last_query)
-            return null;
-
-        $this->errNo = 0;
-        $this->errMsg = '';
-
-        try {
-            return $this->dbo->loadObject($class);
-
-        } catch (Exception $e) {
-            $this->errNo = $e->getCode();
-            $this->errMsg = $e->getMessage();
-        } catch (Error $e) {
-            $this->errNo = $e->getCode();
-            $this->errMsg = $e->getMessage();
-        }
-
-        return null;
-    }
-
-    public function loadColumn($offset = 0)
-    {
-        if (!$this->last_query)
-            return null;
-
-        $this->errNo = 0;
-        $this->errMsg = '';
-
-        try {
-            return $this->dbo->loadColumn($offset);
-        } catch (Exception $e) {
-            $this->errNo = $e->getCode();
-            $this->errMsg = $e->getMessage();
-        } catch (Error $e) {
-            $this->errNo = $e->getCode();
-            $this->errMsg = $e->getMessage();
-        }
-
-        return null;
-    }
-
-    public function loadAssocList($key = null, $column = null)
-    {
-        if (!$this->last_query)
-            return array();
-
-        $this->errNo = 0;
-        $this->errMsg = '';
-
-        try {
-            return $this->dbo->loadAssocList($key, $column);
-        } catch (Exception $e) {
-            $this->errNo = $e->getCode();
-            $this->errMsg = $e->getMessage();
-        } catch (Error $e) {
-            $this->errNo = $e->getCode();
-            $this->errMsg = $e->getMessage();
-        }
-
-        return array();
-    }
-
-    public function loadAssoc()
-    {
-        if (!$this->last_query)
-            return null;
-
-        $this->errNo = 0;
-        $this->errMsg = '';
-
-        try {
-            return $this->dbo->loadAssoc();
-        } catch (Exception $e) {
-            $this->errNo = $e->getCode();
-            $this->errMsg = $e->getMessage();
-        } catch (Error $e) {
-            $this->errNo = $e->getCode();
-            $this->errMsg = $e->getMessage();
-        }
-
-        return null;
-    }
-
-    public function query()
-    {
-        return $this->execute();
-    }
-
-    public function execute()
-    {
-        $this->errNo = 0;
-        $this->errMsg = '';
-
-        try {
-            return $this->dbo->execute();
-        } catch (Exception $e) {
-            $this->errNo = $e->getCode();
-            $this->errMsg = $e->getMessage();
-        } catch (Error $e) {
-            $this->errNo = $e->getCode();
-            $this->errMsg = $e->getMessage();
-        }
-
-        return false;
-    }
-
-    public function updateObject($table, &$object, $key, $nulls = false)
-    {
-        $this->errNo = 0;
-        $this->errMsg = '';
-
-        try {
-            return $this->dbo->updateObject($table, $object, $key, $nulls);
-        } catch (Exception $e) {
-            $this->errNo = $e->getCode();
-            $this->errMsg = $e->getMessage();
-        } catch (Error $e) {
-            $this->errNo = $e->getCode();
-            $this->errMsg = $e->getMessage();
-        }
-
-        return false;
-    }
-
-    public function insertObject($table, &$object, $key = null)
-    {
-        $this->errNo = 0;
-        $this->errMsg = '';
-
-        try {
-            return $this->dbo->insertObject($table, $object, $key);
-        } catch (Exception $e) {
-            $this->errNo = $e->getCode();
-            $this->errMsg = $e->getMessage();
-
-        } catch (Error $e) {
-            $this->errNo = $e->getCode();
-            $this->errMsg = $e->getMessage();
-        }
-
-        return false;
-    }
-
-    public function quote($query, $esc = true)
-    {
-        return $this->dbo->quote($query, $esc);
-    }
-
-    public function getQuery($new = false)
-    {
-        if (!$this->last_query)
-            return $this->last_failed_query;
-
-        return $this->dbo->getQuery($new);
-    }
-
-    public function getPrefix()
-    {
-        return $this->dbo->getPrefix();
-    }
-
-    public function getNullDate()
-    {
-        return $this->dbo->getNullDate();
-    }
-
-    public function getNumRows()
-    {
-        if (!$this->last_query)
-            return 0;
-        return $this->dbo->getNumRows();
-    }
-
-    public function getCount()
-    {
-        if (!$this->last_query)
-            return 0;
-        return $this->dbo->getCount();
-    }
-
-    public function getConnection()
-    {
-        return $this->dbo;
-    }
-
-    public function getAffectedRows()
-    {
-        if (!$this->last_query)
-            return array();
-        return $this->dbo->getAffectedRows();
-    }
-
-    public function getTableColumns($table, $typeOnly = true)
-    {
-        $this->errNo = 0;
-        $this->errMsg = '';
-
-        try {
-            return $this->dbo->getTableColumns($table, $typeOnly);
-        } catch (Exception $e) {
-            $this->errNo = $e->getCode();
-            $this->errMsg = $e->getMessage();
-        } catch (Error $e) {
-            $this->errNo = $e->getCode();
-            $this->errMsg = $e->getMessage();
-        }
-
-        return array();
-    }
-
-    public function getTableList()
-    {
-        $this->errNo = 0;
-        $this->errMsg = '';
-
-        try {
-            return $this->dbo->getTableList();
-        } catch (Exception $e) {
-            $this->errNo = $e->getCode();
-            $this->errMsg = $e->getMessage();
-        } catch (Error $e) {
-            $this->errNo = $e->getCode();
-            $this->errMsg = $e->getMessage();
-        }
-
-        return array();
-    }
-
-    public function loadResult()
-    {
-        if (!$this->last_query)
-            return null;
-
-        $this->errNo = 0;
-        $this->errMsg = '';
-
-        try {
-            return $this->dbo->loadResult();
-        } catch (Exception $e) {
-            $this->errNo = $e->getCode();
-            $this->errMsg = $e->getMessage();
-        } catch (Error $e) {
-            $this->errNo = $e->getCode();
-            $this->errMsg = $e->getMessage();
-        }
-
-        return null;
-    }
-
-    public function getErrorNum()
-    {
-        return $this->errNo;
-    }
-
-    public function getErrorMsg()
-    {
-        return $this->errMsg;
-    }
-
-    public function stderr()
-    {
-        return $this->errMsg;
-    }
-
-    public function insertid()
-    {
-        if (!$this->last_query)
-            return 0;
-        return $this->dbo->insertid();
-    }
-}
-
-
+use Joomla\CMS\Log\Log;
+
+Log::addLogger(
+    [
+        'text_file' => 'breezingforms_install.log',
+        'text_entry_format' => '{DATETIME}\t{PRIORITY}\t{MESSAGE}',
+        'text_file_path'     => JPATH_ADMINISTRATOR . '/logs'
+    ],
+    Log::ALL,
+    ['com_breezingforms.install']
+);
+
+
+// Logs de démarrage
+Log::add('[OK] Breezingforms installation/update started.', Log::INFO, 'com_breezingforms.install');
+Log::add('PHP Version: ' . PHP_VERSION . '.', Log::INFO, 'com_breezingforms.install');
+Log::add('Joomla Version : ' . JVERSION . '.', Log::INFO, 'com_breezingforms.install');
+Log::add('User Agent: ' . ($_SERVER['HTTP_USER_AGENT'] ?? 'CLI') . '.', Log::INFO, 'com_breezingforms.install');
 
 class com_breezingformsInstallerScript
 {
+    private function log(string $message, int $priority = Log::INFO): void
+    {
+        Log::add($message, $priority, 'com_breezingforms.install');
+
+        $logPath = JPATH_ADMINISTRATOR . '/logs/breezingforms_install2.log';
+
+        if (!Folder::exists(dirname($logPath))) {
+            Folder::create(dirname($logPath));
+        }
+
+        $timestamp = date('Y-m-d H:i:s');
+        $line = "[{$timestamp}] [] {$message}" . PHP_EOL;
+
+        file_put_contents($logPath, $line, FILE_APPEND | LOCK_EX);
+    }
+
+    private function getCurrentInstalledVersion()
+    {
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $query = $db->getQuery(true)
+            ->select($db->quoteName('manifest_cache'))
+            ->from($db->quoteName('#__extensions'))
+            ->where($db->quoteName('element') . ' = ' . $db->quote('com_breezingforms'));
+
+        $db->setQuery($query);
+        $manifest = $db->loadResult();
+
+        if ($manifest) {
+            $manifest = json_decode($manifest, true);
+            $version = $manifest['version'] ?? '0.0.0';
+        } else {
+            $version = '0.0.0';
+        }
+
+        $this->log('Detected current version : ' . $version . '.');
+        return $version;
+    }
+
+    private function installPlugins(): void
+    {
+        $basePath = JPATH_ADMINISTRATOR . '/components/com_breezingforms/plugins';
+
+        if (!Folder::exists($basePath)) {
+            $this->log('Plugins directory not found – skipping plugin installation.', Log::WARNING);
+            return;
+        }
+
+        $folders = Folder::folders($basePath);
+        if (empty($folders)) {
+            return;
+        }
+
+        foreach ($folders as $folder) {
+            $this->log("Installing plugin from folder: {$folder}");
+
+            $installer = new Installer();
+            $installer->setDatabase(Factory::getContainer()->get(DatabaseInterface::class));
+
+            if ($installer->install($basePath . '/' . $folder)) {
+                $this->log("Plugin {$folder} installed successfully.", Log::INFO);
+            } else {
+                $this->log("Failed to install plugin {$folder}.", Log::ERROR);
+                Factory::getApplication()->enqueueMessage("Failed to install BreezingForms plugin: {$folder}", 'error');
+            }
+        }
+
+        // Activation avec driver standard (safe)
+        $standardDb = Factory::getContainer()->get(DatabaseInterface::class);
+
+        foreach ($this->getPlugins() as $folder => $plugins) {
+            foreach ($plugins as $plugin) {
+                $query = $standardDb->getQuery(true)
+                    ->update('#__extensions')
+                    ->set('enabled = 1')
+                    ->where('type = ' . $standardDb->quote('plugin'))
+                    ->where('element = ' . $standardDb->quote($plugin))
+                    ->where('folder = ' . $standardDb->quote($folder));
+
+                $standardDb->setQuery($query)->execute();
+                $this->log("Plugin {$plugin} enabled.");
+            }
+        }
+    }
+
+    private function removeOldUpdateSite(): void
+    {
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+
+        $query = $db->getQuery(true)
+            ->select('update_site_id')
+            ->from('#__update_sites')
+            ->where('name = ' . $db->quote('BreezingForms Free'))
+            ->where('type = ' . $db->quote('extension'));
+
+        $db->setQuery($query);
+        $siteId = $db->loadResult();
+
+        if ($siteId) {
+            $db->setQuery('DELETE FROM #__update_sites WHERE update_site_id = ' . (int)$siteId)->execute();
+            $db->setQuery('DELETE FROM #__update_sites_extensions WHERE update_site_id = ' . (int)$siteId)->execute();
+            $db->setQuery('DELETE FROM #__updates WHERE update_site_id = ' . (int)$siteId)->execute();
+
+            $this->log('Old BreezingForms Free update site removed.');
+        }
+    }
+
+    private function cleanupOldConfig(): void
+    {
+        $oldConfig = JPATH_SITE . '/media/breezingforms/facileforms.config.php';
+        if (File::exists($oldConfig) && File::delete($oldConfig)) {
+            $this->log('Old config file removed: facileforms.config.php');
+        }
+    }
+
+
     /**
      * method to install the component
      *
      * @return void
      */
-    function install($parent)
+    public function install($parent): void
     {
+        $this->log('Fresh installation of BreezingForms.');
     }
-
     /**
      * method to update the component
      *
      * @return void
      */
-    function update($parent)
+    public function update($parent): void
     {
-        $db = BFFactory::getDbo();
-        $tables = self::getTableFields(BFFactory::getDbo()->getTableList());
+        $this->log('Updating BreezingForms from version ' . $this->getCurrentInstalledVersion());
 
-        if (isset($tables[BFFactory::getDbo()->getPrefix() . 'facileforms_records'])) {
-            if (!isset($tables[BFFactory::getDbo()->getPrefix() . 'facileforms_records']['opted'])) {
-                $db->setQuery("ALTER TABLE `#__facileforms_records` ADD `opted` TINYINT(1) NOT NULL DEFAULT '0' AFTER `paypal_download_tries`, ADD INDEX (`opted`)");
-                $db->execute();
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $tables = self::getTableFields($db->getTableList());
+        $prefix = $db->getPrefix();
+
+        $recordsTable = $prefix . 'facileforms_records';
+        $formsTable   = $prefix . 'facileforms_forms';
+
+        if (isset($tables[$recordsTable])) {
+            $columns = $tables[$recordsTable];
+
+            $newColumns = [
+                'opted'     => "TINYINT(1) NOT NULL DEFAULT '0' AFTER `paypal_download_tries`",
+                'opt_ip'    => "VARCHAR(255) NOT NULL DEFAULT '' AFTER `opted`",
+                'opt_date'  => "DATETIME NOT NULL DEFAULT NULL AFTER `opt_ip`",
+                'opt_token' => "VARCHAR(255) NOT NULL DEFAULT '' AFTER `opt_date`",
+            ];
+
+            foreach ($newColumns as $col => $def) {
+                if (!isset($columns[$col])) {
+                    $db->setQuery("ALTER TABLE `{$recordsTable}` ADD `{$col}` {$def}, ADD INDEX (`{$col}`)")->execute();
+                    $this->log("Added column {$col} to facileforms_records.");
+                }
             }
         }
 
-        if (isset($tables[BFFactory::getDbo()->getPrefix() . 'facileforms_records'])) {
-            if (!isset($tables[BFFactory::getDbo()->getPrefix() . 'facileforms_records']['opt_ip'])) {
-                $db->setQuery("ALTER TABLE `#__facileforms_records` ADD `opt_ip` VARCHAR(255) NOT NULL DEFAULT '' AFTER `opted`, ADD INDEX (`opt_ip`)");
-                $db->execute();
+        if (isset($tables[$formsTable])) {
+            $columns = $tables[$formsTable];
+
+            $newFormColumns = [
+                'double_opt' => "TINYINT(1) NOT NULL DEFAULT '0' AFTER `filter_state`",
+                'opt_mail'   => "VARCHAR(128) NOT NULL DEFAULT '' AFTER `double_opt`",
+            ];
+
+            foreach ($newFormColumns as $col => $def) {
+                if (!isset($columns[$col])) {
+                    $db->setQuery("ALTER TABLE `{$formsTable}` ADD `{$col}` {$def}, ADD INDEX (`{$col}`)")->execute();
+                    $this->log("Added column {$col} to facileforms_forms.");
+                }
             }
         }
 
-        if (isset($tables[BFFactory::getDbo()->getPrefix() . 'facileforms_records'])) {
-            if (!isset($tables[BFFactory::getDbo()->getPrefix() . 'facileforms_records']['opt_date'])) {
-                $db->setQuery("ALTER TABLE `#__facileforms_records` ADD `opt_date` DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00' AFTER `opt_ip`, ADD INDEX (`opt_date`)");
-                $db->execute();
-            }
-        }
-
-        if (isset($tables[BFFactory::getDbo()->getPrefix() . 'facileforms_records'])) {
-            if (!isset($tables[BFFactory::getDbo()->getPrefix() . 'facileforms_records']['opt_token'])) {
-                $db->setQuery("ALTER TABLE `#__facileforms_records` ADD `opt_token` VARCHAR(255) NOT NULL DEFAULT '' AFTER `opt_date`, ADD INDEX (`opt_token`)");
-                $db->execute();
-            }
-        }
-
-        if (isset($tables[BFFactory::getDbo()->getPrefix() . 'facileforms_forms'])) {
-            if (!isset($tables[BFFactory::getDbo()->getPrefix() . 'facileforms_forms']['double_opt'])) {
-                $db->setQuery("ALTER TABLE `#__facileforms_forms` ADD `double_opt` TINYINT(1) NOT NULL DEFAULT '0' AFTER `filter_state`, ADD INDEX (`double_opt`)");
-                $db->execute();
-            }
-        }
-
-        if (isset($tables[BFFactory::getDbo()->getPrefix() . 'facileforms_forms'])) {
-            if (!isset($tables[BFFactory::getDbo()->getPrefix() . 'facileforms_forms']['opt_mail'])) {
-                $db->setQuery("ALTER TABLE `#__facileforms_forms` ADD `opt_mail` VARCHAR(128) NOT NULL DEFAULT '' AFTER `double_opt`, ADD INDEX (`opt_mail`)");
-                $db->execute();
-            }
-        }
+        $this->log('BreezingForms database update completed.');
     }
 
     /**
@@ -432,10 +220,10 @@ class com_breezingformsInstallerScript
      */
     function uninstall($parent)
     {
-        $db = BFFactory::getDbo();
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
         $plugins = $this->getPlugins();
         $installer = new Installer();
-        $installer->setDatabase($db->getConnection());
+        $installer->setDatabase($db);
 
         foreach ($plugins as $folder => $subplugs) {
             if (is_array($subplugs)) {
@@ -449,9 +237,8 @@ class com_breezingformsInstallerScript
             }
         }
 
-        if (BFFile::exists(JPATH_SITE . '/media/breezingforms/facileforms.config.php')) {
-            BFFile::delete(JPATH_SITE . '/media/breezingforms/facileforms.config.php');
-        }
+        $this->cleanupOldConfig();
+        $this->log('BreezingForms uninstallation completed.');
     }
 
     /**
@@ -459,11 +246,11 @@ class com_breezingformsInstallerScript
      *
      * @return void
      */
-    function preflight($type, $parent)
+
+    public function preflight(string $type, $parent): void
     {
-
+        $this->log("Preflight executed for action: {$type}");
     }
-
     /**
      * method to run after an install/update/uninstall method
      *
@@ -471,41 +258,15 @@ class com_breezingformsInstallerScript
      */
     function postflight($type, $parent)
     {
-        $db = BFFactory::getDbo();
-        $plugins = $this->getPlugins();
-        $base_path = JPATH_SITE . '/administrator/components/com_breezingforms/plugins';
 
-        if (file_exists($base_path)) {
-            $folders = @Folder::folders($base_path);
+        // === LOG POUR DÉBOGAGE ===
+        $this->log('Postflight installation method call, parameter : ' . $type . '.');
+        $this->log('Current version in manifest_cache : ' . $this->getCurrentInstalledVersion() . '.');
 
-            if (count($folders) != 0) {
-                $installer = new Installer();
-                $installer->setDatabase($db->getConnection());
-                foreach ($folders as $folder) {
-                    $installer->install($base_path . '/' .$folder);
-                }
+        $this->installPlugins();
+        $this->removeOldUpdateSite();
 
-                foreach ($plugins as $folder => $subplugs) {
-                    foreach ($subplugs as $plugin) {
-                        $db->setQuery('Update #__extensions Set `enabled` = 1 WHERE `type` = "plugin" AND `element` = "' . $plugin . '" AND `folder` = "' . $folder . '"');
-                        $db->execute();
-                    }
-                }
-
-            }
-        }
-
-        $db->setQuery("Select update_site_id From #__update_sites Where `name` = 'BreezingForms Free' And `type` = 'extension'");
-        $site_id = $db->loadResult();
-
-        if ($site_id) {
-            $db->setQuery("Delete From #__update_sites Where update_site_id = " . $db->quote($site_id));
-            $db->execute();
-            $db->setQuery("Delete From #__update_sites_extensions Where update_site_id = " . $db->quote($site_id));
-            $db->execute();
-            $db->setQuery("Delete From #__updates Where update_site_id = " . $db->quote($site_id));
-            $db->execute();
-        }
+        $this->log('BreezingForms installation/update process finished successfully.');
     }
 
     function getPlugins()
@@ -521,11 +282,12 @@ class com_breezingformsInstallerScript
         $results = array();
         settype($tables, 'array');
 
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+
         foreach ($tables as $table) {
-            $results[$table] = BFFactory::getDbo()->getTableColumns($table, $typeOnly);
+            $results[$table] = $db->getTableColumns($table, $typeOnly);
         }
 
         return $results;
     }
 }
-

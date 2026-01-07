@@ -88,11 +88,11 @@ class com_breezingformsInstallerScript
             return;
         }
 
+        $installer = new Installer();
+        $installer->setDatabase(Factory::getContainer()->get(DatabaseInterface::class));
+
         foreach ($folders as $folder) {
             $this->log("Installing plugin from folder: {$folder}");
-
-            $installer = new Installer();
-            $installer->setDatabase(Factory::getContainer()->get(DatabaseInterface::class));
 
             if ($installer->install($basePath . '/' . $folder)) {
                 $this->log("Plugin {$folder} installed successfully.", Log::INFO);
@@ -222,6 +222,7 @@ class com_breezingformsInstallerScript
     {
         $db = Factory::getContainer()->get(DatabaseInterface::class);
         $plugins = $this->getPlugins();
+
         $installer = new Installer();
         $installer->setDatabase($db);
 

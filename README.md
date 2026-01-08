@@ -1,30 +1,69 @@
 <!-- ABOUT THE PROJECT -->
-## About The Project
+## About the Project
 
-Component BreezingForms for Joomla 6.
+This repository provides **community-maintained updates and fixes for BreezingForms (BF)**,  
+a Joomla extension originally developed by **Crosstec**.
 
-## Getting Started
+The original Crosstec project is no longer actively maintained and does not support
+recent Joomla versions (Joomla 6 / 5).
 
-## Migration
-The Joomla aliases have been removed to prepare Joomla 6.
+This initiative aims to keep the extension usable on modern Joomla installations by:
+- fixing compatibility issues
+- removing deprecated APIs
+- adapting the codebase to Joomla 6.x and 5.x
 
-| Before      | After     |
-| ------------- | ------------- |
-| JFactory::getDbo() | Joomla\CMS\Factory::getContainer()->get(DatabaseInterface::class) |
-| ->query();     | ->execute(); |
-| JFactory::getUser() | Joomla\CMS\Factory::getApplication()->getIdentity() |
-| JFactory::getUser($id) | Joomla\CMS\Factory::getContainer()->get(UserFactoryInterface::class)->loadUserById($id)|
-| | Factory::getApplication()->getSession()|
-| See more | https://manual.joomla.org/migrations/44-50/compat-plugin/ |
+⚠️ **This is NOT an official Crosstec project.**  
+All trademarks and original copyrights remain the property of their respective owners.
 
+---
 
-## Installation
+## Compatibility
 
-    Clone the repo
+- ✅ Joomla 6.x (tested **with** the Backward Compatibility plugin)
+- ✅ PHP 8.3
 
-    git clone https://github.com/vcmb-cyclo/com_breezingforms.git
-    
-## Download plugin
+⚠️ **This is NOT an official BreezingForms repository.**  
+This project is maintained by volunteers and provided *as-is*.
+Same teams has migrated ContentBuilder extension used to displays form records
 
-    Click on tag label.
-    Download "Source code (zip)" file.
+---
+
+## Project Status
+
+🚧 This project is developed on a **best-effort basis**.  
+Only **GitHub Releases** should be considered stable and suitable for production use.
+
+---
+
+## Migration Notes
+
+To prepare for Joomla 6 compatibility:
+- Joomla alias classes have been removed
+- Deprecated APIs are progressively being cleaned up
+- BreezingForms Scripts and Pieces Librairies updated
+  
+These changes may impact older custom integrations.
+
+---
+
+## Download
+
+For stable versions:
+1. Go to the **Tags** or **Releases** section
+2. Select the latest version
+3. Download **Source code (zip)**
+4. Install via the Joomla Extension Manager
+
+---
+
+## Disclaimer
+
+This software is provided **"as is"**, without warranty of any kind, express or implied.
+
+The maintainers provide this code on a **best-effort basis** and make no guarantees
+regarding correctness, stability, security, or fitness for any particular purpose.
+
+In no event shall the maintainers be held liable for any damages, data loss, or other
+issues arising from the use of this software.
+
+Use this code **at your own risk**.

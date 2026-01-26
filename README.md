@@ -1,16 +1,17 @@
 <!-- ABOUT THE PROJECT -->
 ## About the Project
 
-This repository provides **community-maintained updates and fixes for BreezingForms (BF)**,  
-a Joomla extension originally developed by **Crosstec**.
+This repository provides **community-maintained updates and fixes for BreezingForms**, 
+a Joomla extension originally developed by **Crosstec**. The original Crosstec project 
+is no longer maintained or supported since 2022.
 
-The original Crosstec project is no longer actively maintained and does not support
-recent Joomla versions (Joomla 6 / 5).
+This BreezingForms-ng (new gen) has been highly refactored for Joomla 6 native support. 
+New Gen releases releases will be named: " breezingForms-ng-6.1.xx.zip " and above.
 
 This initiative aims to keep the extension usable on modern Joomla installations by:
 - fixing compatibility issues
 - removing deprecated APIs
-- adapting the codebase to Joomla 6.x and 5.x
+- adapting the codebase to Joomla 5.x and 6.x
 
 ⚠️ **This is NOT an official Crosstec project.**  
 All trademarks and original copyrights remain the property of their respective owners.
@@ -19,12 +20,12 @@ All trademarks and original copyrights remain the property of their respective o
 
 ## Compatibility
 
-- ✅ Joomla 6.x (tested **with** the Backward Compatibility plugin)
-- ✅ PHP 8.3
+- ✅ Joomla 5.4.x (not tested, shoudl be OK **without** the Backward Compatibility plugin)
+- ✅ Joomla 6.x. (tested **with and witout** the Backward Compatibility plugin)
+- ✅ PHP 8.3 
 
-⚠️ **This is NOT an official BreezingForms repository.**  
+⚠️ **This is NOT an official ContentBuilder repository.**  
 This project is maintained by volunteers and provided *as-is*.
-Same teams has migrated ContentBuilder extension used to displays form records
 
 ---
 
@@ -40,8 +41,7 @@ Only **GitHub Releases** should be considered stable and suitable for production
 To prepare for Joomla 6 compatibility:
 - Joomla alias classes have been removed
 - Deprecated APIs are progressively being cleaned up
-- BreezingForms Scripts and Pieces Librairies updated
-  
+
 These changes may impact older custom integrations.
 
 ---

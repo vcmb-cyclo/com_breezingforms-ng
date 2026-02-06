@@ -239,6 +239,29 @@ class com_breezingformsInstallerScript
                     $this->log("Added column {$col} to facileforms_forms.");
                 }
             }
+
+            $auditFormColumns = [
+                'created'     => "DATETIME NULL DEFAULT CURRENT_TIMESTAMP AFTER `filter_state`",
+                'modified'    => "DATETIME NULL DEFAULT NULL AFTER `created`",
+                'created_by'  => "VARCHAR(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' AFTER `modified`",
+                'modified_by' => "VARCHAR(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' AFTER `created_by`"
+            ];
+
+            foreach ($auditFormColumns as $col => $def) {
+                if (!isset($columns[$col])) {
+                    $db->setQuery("ALTER TABLE `{$formsTable}` ADD `{$col}` {$def}")->execute();
+                    $this->log("Added column {$col} to facileforms_forms.");
+                }
+            }
+
+            if (isset($columns['created_by'])) {
+                $db->setQuery("ALTER TABLE `{$formsTable}` MODIFY `created_by` VARCHAR(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT ''")->execute();
+                $this->log("Updated created_by column definition in facileforms_forms.");
+            }
+            if (isset($columns['modified_by'])) {
+                $db->setQuery("ALTER TABLE `{$formsTable}` MODIFY `modified_by` VARCHAR(255) COLLATE utf8mb4_general_ci NOT NULL DEFAULT ''")->execute();
+                $this->log("Updated modified_by column definition in facileforms_forms.");
+            }
         }
 
         $auditColumns = [

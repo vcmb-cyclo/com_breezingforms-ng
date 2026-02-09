@@ -223,6 +223,22 @@ class com_breezingformsInstallerScript
                 $db->setQuery("ALTER TABLE `{$recordsTable}` MODIFY `opt_date` DATETIME NULL DEFAULT NULL")->execute();
                 $this->log('Updated opt_date column definition in facileforms_records.');
             }
+
+            if (isset($columns['ip'])) {
+                $ipType = strtolower((string) $columns['ip']);
+                if ($ipType !== 'varchar(45)') {
+                    $db->setQuery("ALTER TABLE `{$recordsTable}` MODIFY `ip` VARCHAR(45) NOT NULL DEFAULT ''")->execute();
+                    $this->log('Updated ip column definition in facileforms_records.');
+                }
+            }
+
+            if (isset($columns['browser'])) {
+                $browserType = strtolower((string) $columns['browser']);
+                if (strpos($browserType, 'text') === false) {
+                    $db->setQuery("ALTER TABLE `{$recordsTable}` MODIFY `browser` TEXT NOT NULL DEFAULT ''")->execute();
+                    $this->log('Updated browser column definition in facileforms_records.');
+                }
+            }
         }
 
         if (isset($tables[$formsTable])) {

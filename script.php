@@ -235,7 +235,7 @@ class com_breezingformsInstallerScript
             if (isset($columns['browser'])) {
                 $browserType = strtolower((string) $columns['browser']);
                 if (strpos($browserType, 'text') === false) {
-                    $db->setQuery("ALTER TABLE `{$recordsTable}` MODIFY `browser` TEXT NOT NULL DEFAULT ''")->execute();
+                    $db->setQuery("ALTER TABLE `{$recordsTable}` MODIFY `browser` TEXT NOT NULL")->execute();
                     $this->log('Updated browser column definition in facileforms_records.');
                 }
             }

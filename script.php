@@ -14,6 +14,7 @@ use Joomla\Filesystem\File;
 use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 use Joomla\CMS\Installer\Installer;
+use Joomla\CMS\Language\Text;
 use Joomla\Filesystem\Folder;
 use Joomla\CMS\Log\Log;
 
@@ -414,6 +415,62 @@ class com_breezingformsInstallerScript
             count($importer->pieces) . ' piece(s), ' .
             count($importer->forms) . ' form(s).'
         );
+
+        $this->announceImportedLibraryChanges($importer);
+    }
+
+    private function announceImportedLibraryChanges(object $importer): void
+    {
+        $updatedScripts = $this->normalizeImportedItemNames($importer->updatedScripts ?? []);
+        $updatedPieces = $this->normalizeImportedItemNames($importer->updatedPieces ?? []);
+
+        if (empty($updatedScripts) && empty($updatedPieces)) {
+            return;
+        }
+
+        $parts = [];
+
+        if (!empty($updatedScripts)) {
+            $parts[] = Text::sprintf(
+                'COM_BREEZINGFORMS_INSTALL_STANDARD_LIBRARY_UPDATED_SCRIPTS',
+                count($updatedScripts),
+                implode(', ', $updatedScripts)
+            );
+        }
+
+        if (!empty($updatedPieces)) {
+            $parts[] = Text::sprintf(
+                'COM_BREEZINGFORMS_INSTALL_STANDARD_LIBRARY_UPDATED_PIECES',
+                count($updatedPieces),
+                implode(', ', $updatedPieces)
+            );
+        }
+
+        $this->announce(
+            Text::sprintf(
+                'COM_BREEZINGFORMS_INSTALL_STANDARD_LIBRARY_UPDATED',
+                implode(' | ', $parts)
+            ),
+            'warning',
+            Log::INFO
+        );
+    }
+
+    private function normalizeImportedItemNames($items): array
+    {
+        if (!is_array($items)) {
+            return [];
+        }
+
+        $items = array_map(
+            static fn($item): string => trim((string) $item),
+            $items
+        );
+        $items = array_values(array_filter($items, static fn(string $item): bool => $item !== ''));
+        $items = array_values(array_unique($items));
+        sort($items, SORT_NATURAL | SORT_FLAG_CASE);
+
+        return $items;
     }
 
     private function getIncomingVersion($parent): string

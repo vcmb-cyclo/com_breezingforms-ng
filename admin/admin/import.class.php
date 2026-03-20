@@ -53,6 +53,8 @@ class ff_importPackage extends ff_xmlPackage
 	public $oldpieces = NULL;     	// old pieces relink xref
 	public $scripts = NULL;     	// ids of scripts imported
 	public $pieces = NULL;     		// ids of pieces imported
+	public $updatedScripts = NULL;   // names of scripts updated
+	public $updatedPieces = NULL;    // names of pieces updated
 	public $forms = NULL;     		// ids of forms imported
 	public $elements = NULL;     	// ids of elements imported
 	public $menus = NULL;     		// ids of menus imported
@@ -287,6 +289,8 @@ class ff_importPackage extends ff_xmlPackage
 			// insert trace
 			$this->scripts =
 			$this->pieces =
+			$this->updatedScripts =
+			$this->updatedPieces =
 			$this->forms =
 			$this->elements =
 			$this->menus =
@@ -511,6 +515,10 @@ class ff_importPackage extends ff_xmlPackage
 			return;
 		} // if
 
+		if (!empty($id) && !in_array($name, $this->updatedScripts, true)) {
+			$this->updatedScripts[] = $name;
+		}
+
 		// remember me
 		$this->scripts[] = $row->id;
 		
@@ -594,6 +602,10 @@ class ff_importPackage extends ff_xmlPackage
 			$this->setError($row->getError(), true);
 			return;
 		} // if
+
+		if (!empty($id) && !in_array($name, $this->updatedPieces, true)) {
+			$this->updatedPieces[] = $name;
+		}
 
 		// Remember me
 		$this->pieces[] = $row->id;

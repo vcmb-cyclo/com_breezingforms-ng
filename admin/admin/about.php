@@ -157,10 +157,19 @@ if (!function_exists('bf_about_get_log_report')) {
             }
         }
 
+        $loadedAt = '';
+
+        if ($latestMtime > 0) {
+            $timezone = new DateTimeZone((string) Factory::getApplication()->get('offset', 'UTC'));
+            $loadedAt = Factory::getDate('@' . $latestMtime)
+                ->setTimezone($timezone)
+                ->format('Y-m-d H:i:s', true);
+        }
+
         return array(
             'file' => basename($latestPath),
             'size' => $size,
-            'loaded_at' => $latestMtime > 0 ? date('Y-m-d H:i:s', $latestMtime) : '',
+            'loaded_at' => $loadedAt,
             'content' => $content,
             'truncated' => $truncated ? 1 : 0,
             'tail_bytes' => $tailBytes,

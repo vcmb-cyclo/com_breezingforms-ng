@@ -801,17 +801,113 @@ class facileFormsConfig extends facileFormsConf
 		return '';
 	} // uploadfile
 
+	private function buildUninstallNamesSuffix(array $names): string
+	{
+		$names = array_values(array_filter(array_map('trim', $names), static fn($name) => $name !== ''));
+
+		if (!$names) {
+			return '';
+		}
+
+		$visibleNames = array_slice($names, 0, 3);
+		$suffix = ' (' . implode(', ', $visibleNames);
+		$remaining = count($names) - count($visibleNames);
+
+		if ($remaining > 0) {
+			$suffix .= ', ' . sprintf(BFText::_('COM_BREEZINGFORMS_INSTALLER_UNINST_MORE'), $remaining);
+		}
+
+		return $suffix . ')';
+	}
+
+	private function collectPackageUninstallReport(string $packageId): array
+	{
+		$db = Factory::getContainer()->get(DatabaseInterface::class);
+		$quotedPackageId = $db->Quote($packageId);
+
+		$formRows = _ff_select(
+			"select id, name from #__facileforms_forms where package = {$quotedPackageId} order by id"
+		);
+		$scriptRows = _ff_select(
+			"select id, name from #__facileforms_scripts where package = {$quotedPackageId} order by id"
+		);
+		$pieceRows = _ff_select(
+			"select id, name from #__facileforms_pieces where package = {$quotedPackageId} order by id"
+		);
+		$menuRows = _ff_select(
+			"select id, title from #__facileforms_compmenus where package = {$quotedPackageId} and parent = 0 order by id"
+		);
+
+		$formIds = array_map(static fn($row) => (int) $row->id, $formRows);
+		$elementCount = 0;
+
+		if ($formIds) {
+			$quotedFormIds = array_map([$db, 'Quote'], $formIds);
+			$elementCount = (int) _ff_selectValue(
+				"select count(*) from #__facileforms_elements where form in (" . implode(',', $quotedFormIds) . ")"
+			);
+		}
+
+		return [
+			'package' => $packageId,
+			'forms_count' => count($formRows),
+			'forms_names' => array_map(static fn($row) => (string) $row->name, $formRows),
+			'elements_count' => $elementCount,
+			'scripts_count' => count($scriptRows),
+			'scripts_names' => array_map(static fn($row) => (string) $row->name, $scriptRows),
+			'pieces_count' => count($pieceRows),
+			'pieces_names' => array_map(static fn($row) => (string) $row->name, $pieceRows),
+			'menus_count' => count($menuRows),
+			'menus_names' => array_map(static fn($row) => (string) $row->title, $menuRows),
+		];
+	}
+
+	private function formatPackageUninstallReport(array $report): string
+	{
+		return sprintf(
+			BFText::_('COM_BREEZINGFORMS_INSTALLER_UNINST_PACKAGE_DETAIL'),
+			$report['package'],
+			BFText::_('COM_BREEZINGFORMS_INSTALLER_FORMSIMP'),
+			$report['forms_count'],
+			$this->buildUninstallNamesSuffix($report['forms_names']),
+			BFText::_('COM_BREEZINGFORMS_INSTALLER_ELEMSIMP'),
+			$report['elements_count'],
+			BFText::_('COM_BREEZINGFORMS_INSTALLER_SCRIPTSIMP'),
+			$report['scripts_count'],
+			$this->buildUninstallNamesSuffix($report['scripts_names']),
+			BFText::_('COM_BREEZINGFORMS_INSTALLER_PIECESIMP'),
+			$report['pieces_count'],
+			$this->buildUninstallNamesSuffix($report['pieces_names']),
+			BFText::_('COM_BREEZINGFORMS_INSTALLER_MENUSIMP'),
+			$report['menus_count'],
+			$this->buildUninstallNamesSuffix($report['menus_names'])
+		);
+	}
+
 	function uninstPackages($option, $caller, $pkg, $ids)
 	{
-		if (count($ids))
-			foreach ($ids as $id)
+		$message = count($ids) . ' ' . BFText::_('COM_BREEZINGFORMS_INSTALLER_PKGSUNINST');
+
+		if (count($ids)) {
+			$details = [];
+
+			foreach ($ids as $id) {
+				$details[] = $this->formatPackageUninstallReport(
+					$this->collectPackageUninstallReport((string) $id)
+				);
 				dropPackage($id);
+			}
+
+			if ($details) {
+				$message .= ' ' . implode(' ', $details);
+			}
+		}
 
 		HTML_facileFormsConf::message(
 			$option,
 			$caller,
 			$pkg,
-			count($ids) . ' ' . BFText::_('COM_BREEZINGFORMS_INSTALLER_PKGSUNINST'),
+			$message,
 			'instpackage'
 		);
 	} // uninstPackages

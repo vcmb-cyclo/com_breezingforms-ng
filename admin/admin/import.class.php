@@ -380,7 +380,7 @@ class ff_importPackage extends ff_xmlPackage
 					}
 				}
 			} else {
-				$this->warnings[] = 'No forms imported, QuickMode templates were not processed.';
+				$this->warnings[] = BFText::_('COM_BREEZINGFORMS_INSTALLER_WARN_NOFORMS_QUICKMODE');
 			}
 		} // if
 		return $ok;

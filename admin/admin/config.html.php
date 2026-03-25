@@ -944,213 +944,117 @@ class HTML_facileFormsConf
 	{
 		ToolBarHelper::custom('instpackage', 'cancel.png', 'cancel_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_QUICKMODE_CLOSE'), false);
 
+		$pkgid = array_key_exists('pkgid', $inst->params[0]) ? (string) $inst->params[0]['pkgid'] : '';
+		$packageInfo = [
+			BFText::_('COM_BREEZINGFORMS_INSTALLER_ID') => $pkgid,
+			BFText::_('COM_BREEZINGFORMS_INSTALLER_INSTTYPE') => (string) ($inst->params[0]['pkgtype'] ?? ''),
+			BFText::_('COM_BREEZINGFORMS_INSTALLER_FFVERSION') => (string) ($inst->params[0]['pkgversion'] ?? ''),
+			BFText::_('COM_BREEZINGFORMS_INSTALLER_PACKAGE') . ' ' . BFText::_('COM_BREEZINGFORMS_INSTALLER_NAME') => (string) ($inst->params[0]['name'] ?? ''),
+			BFText::_('COM_BREEZINGFORMS_INSTALLER_PACKAGE') . ' ' . BFText::_('COM_BREEZINGFORMS_INSTALLER_TITLE') => (string) ($inst->params[0]['title'] ?? ''),
+			BFText::_('COM_BREEZINGFORMS_INSTALLER_PACKAGE') . ' ' . BFText::_('COM_BREEZINGFORMS_INSTALLER_VERS') => (string) ($inst->params[0]['version'] ?? ''),
+			BFText::_('COM_BREEZINGFORMS_INSTALLER_DESC') => (string) ($inst->params[0]['description'] ?? ''),
+			BFText::_('COM_BREEZINGFORMS_INSTALLER_CPYRT') => (string) ($inst->params[0]['copyright'] ?? ''),
+			BFText::_('COM_BREEZINGFORMS_INSTALLER_CREATEDATE') => (string) ($inst->params[0]['creationDate'] ?? ''),
+			BFText::_('COM_BREEZINGFORMS_INSTALLER_AUTHOR') . ' ' . BFText::_('COM_BREEZINGFORMS_INSTALLER_NAME') => (string) ($inst->params[0]['author'] ?? ''),
+			BFText::_('COM_BREEZINGFORMS_INSTALLER_AUTHOR') . ' ' . BFText::_('COM_BREEZINGFORMS_INSTALLER_EMAIL') => (string) ($inst->params[0]['authorEmail'] ?? ''),
+			BFText::_('COM_BREEZINGFORMS_INSTALLER_AUTHOR') . ' ' . BFText::_('COM_BREEZINGFORMS_INSTALLER_URL') => (string) ($inst->params[0]['authorUrl'] ?? ''),
+		];
+		$importResults = [
+			BFText::_('COM_BREEZINGFORMS_INSTALLER_SCRIPTSIMP') => count($inst->scripts),
+			BFText::_('COM_BREEZINGFORMS_INSTALLER_PIECESIMP') => count($inst->pieces),
+			BFText::_('COM_BREEZINGFORMS_INSTALLER_FORMSIMP') => count($inst->forms),
+			BFText::_('COM_BREEZINGFORMS_INSTALLER_ELEMSIMP') => count($inst->elements),
+			BFText::_('COM_BREEZINGFORMS_INSTALLER_MENUSIMP') => count($inst->menus),
+		];
+		$warningCount = count($inst->warnings);
+		$hasWarnings = $warningCount > 0;
+		$statusAlertClass = $hasWarnings ? 'alert-warning' : 'alert-success';
+		$statusBadgeClass = $hasWarnings ? 'bg-warning text-dark' : 'bg-success';
+		$statusIconClass = $hasWarnings ? 'icon-warning text-warning' : 'icon-check text-success';
+		$statusText = $hasWarnings ? BFText::_('COM_BREEZINGFORMS_INSTALLER_REPORT_STATUS_WARNING') : BFText::_('COM_BREEZINGFORMS_INSTALLER_REPORT_STATUS_SUCCESS');
+
 		?>
 		<form action="index.php" method="post" id="adminForm" name="adminForm">
-			<table cellpadding="0" cellspacing="0" border="0" class="adminform">
-				<tr>
-					<th colspan="4" class="title">
-						<h2>BreezingForms -
-							<?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_PKGREPORT'); ?>
-						</h2>
-					</th>
-				</tr>
-				<?php
-				if (array_key_exists('pkgid', $inst->params[0])) {
-					$pkgid = $inst->params[0]['pkgid'];
-					?>
-					<tr>
-						<td></td>
-						<td nowrap>
-							<?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_ID'); ?>:
-						</td>
-						<td nowrap>
-							<?php echo $pkgid; ?>
-						</td>
-						<td></td>
-					</tr>
-					<?php
-				} else
-					$pkgid = '';
-				?>
-				<tr>
-					<td></td>
-					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_INSTTYPE'); ?>:
-					</td>
-					<td nowrap width="100%">
-						<?php HTML_facileFormsConf::showParam($inst, 'pkgtype'); ?>
-					</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td></td>
-					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_FFVERSION'); ?>:
-					</td>
-					<td nowrap>
-						<?php HTML_facileFormsConf::showParam($inst, 'pkgversion'); ?>
-					</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td></td>
-					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_PACKAGE') . ' ' . BFText::_('COM_BREEZINGFORMS_INSTALLER_NAME'); ?>:
-					</td>
-					<td nowrap>
-						<?php HTML_facileFormsConf::showParam($inst, 'name'); ?>
-					</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td></td>
-					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_PACKAGE') . ' ' . BFText::_('COM_BREEZINGFORMS_INSTALLER_TITLE'); ?>:
-					</td>
-					<td nowrap>
-						<?php HTML_facileFormsConf::showParam($inst, 'title'); ?>
-					</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td></td>
-					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_PACKAGE') . ' ' . BFText::_('COM_BREEZINGFORMS_INSTALLER_VERS'); ?>:
-					</td>
-					<td nowrap>
-						<?php HTML_facileFormsConf::showParam($inst, 'version'); ?>
-					</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td></td>
-					<td nowrap valign="top">
-						<?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_DESC'); ?>:
-					</td>
-					<td nowrap>
-						<?php HTML_facileFormsConf::showParam($inst, 'description'); ?>
-					</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td></td>
-					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_CPYRT'); ?>:
-					</td>
-					<td nowrap>
-						<?php HTML_facileFormsConf::showParam($inst, 'copyright'); ?>
-					</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td></td>
-					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_CREATEDATE'); ?>:
-					</td>
-					<td nowrap>
-						<?php HTML_facileFormsConf::showParam($inst, 'creationDate'); ?>
-					</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td></td>
-					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_AUTHOR') . ' ' . BFText::_('COM_BREEZINGFORMS_INSTALLER_NAME'); ?>:
-					</td>
-					<td nowrap>
-						<?php HTML_facileFormsConf::showParam($inst, 'author'); ?>
-					</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td></td>
-					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_AUTHOR') . ' ' . BFText::_('COM_BREEZINGFORMS_INSTALLER_EMAIL'); ?>:
-					</td>
-					<td nowrap>
-						<?php HTML_facileFormsConf::showParam($inst, 'authorEmail'); ?>
-					</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td></td>
-					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_AUTHOR') . ' ' . BFText::_('COM_BREEZINGFORMS_INSTALLER_URL'); ?>:
-					</td>
-					<td nowrap>
-						<?php HTML_facileFormsConf::showParam($inst, 'authorUrl'); ?>
-					</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td></td>
-					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_SCRIPTSIMP'); ?>:
-					</td>
-					<td nowrap>
-						<?php echo count($inst->scripts); ?>
-					</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td></td>
-					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_PIECESIMP'); ?>:
-					</td>
-					<td nowrap>
-						<?php echo count($inst->pieces); ?>
-					</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td></td>
-					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_FORMSIMP'); ?>:
-					</td>
-					<td nowrap>
-						<?php echo count($inst->forms); ?>
-					</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td></td>
-					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_ELEMSIMP'); ?>:
-					</td>
-					<td nowrap>
-						<?php echo count($inst->elements); ?>
-					</td>
-					<td></td>
-				</tr>
-				<tr>
-					<td></td>
-					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_MENUSIMP'); ?>:
-					</td>
-					<td nowrap>
-						<?php echo count($inst->menus); ?>
-					</td>
-					<td></td>
-				</tr>
-				<?php
-				if (count($inst->warnings)) {
-					?>
-					<tr>
-						<td></td>
-						<td nowrap colspan="2">
-							<hr /><br />
-							<?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_WARNINGS'); ?>:<br /><br />
-							<?php
-							foreach ($inst->warnings as $warn)
-								echo $warn . '<br/>';
-							?>
-						</td>
-						<td></td>
-					</tr>
-					<?php
-				} // if
-				?>
-			</table>
+			<div class="container-fluid">
+				<div class="card">
+					<div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+						<h2 class="mb-0">BreezingForms - <?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_PKGREPORT'); ?></h2>
+						<span class="badge <?php echo $statusBadgeClass; ?>"><?php echo htmlspecialchars($statusText, ENT_QUOTES); ?></span>
+					</div>
+					<div class="card-body">
+						<div class="alert <?php echo $statusAlertClass; ?> d-flex align-items-start gap-3" role="status">
+							<span class="<?php echo $statusIconClass; ?>" aria-hidden="true"></span>
+							<div>
+								<div class="fw-bold"><?php echo htmlspecialchars($statusText, ENT_QUOTES); ?></div>
+								<div>
+									<?php
+									echo $hasWarnings
+										? htmlspecialchars(BFText::_('COM_BREEZINGFORMS_INSTALLER_REPORT_SUMMARY_WARNING'), ENT_QUOTES)
+										: htmlspecialchars(BFText::_('COM_BREEZINGFORMS_INSTALLER_REPORT_SUMMARY_SUCCESS'), ENT_QUOTES);
+									?>
+								</div>
+							</div>
+						</div>
+
+						<div class="row g-3">
+							<div class="col-12 col-lg-7">
+								<div class="card h-100">
+									<div class="card-header">
+										<strong><?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_REPORT_PACKAGEINFO'); ?></strong>
+									</div>
+									<div class="card-body">
+										<dl class="row mb-0">
+											<?php foreach ($packageInfo as $label => $value) {
+												if ($value === '') {
+													continue;
+												}
+												?>
+												<dt class="col-sm-5"><?php echo htmlspecialchars($label, ENT_QUOTES); ?></dt>
+												<dd class="col-sm-7"><?php echo nl2br(htmlspecialchars($value, ENT_QUOTES)); ?></dd>
+											<?php } ?>
+										</dl>
+									</div>
+								</div>
+							</div>
+							<div class="col-12 col-lg-5">
+								<div class="card h-100">
+									<div class="card-header">
+										<strong><?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_REPORT_RESULTS'); ?></strong>
+									</div>
+									<div class="list-group list-group-flush">
+										<?php foreach ($importResults as $label => $count) { ?>
+											<div class="list-group-item d-flex justify-content-between align-items-center">
+												<span class="d-inline-flex align-items-center gap-2">
+													<span class="<?php echo $count > 0 ? 'icon-check text-success' : 'icon-minus text-muted'; ?>" aria-hidden="true"></span>
+													<span><?php echo htmlspecialchars($label, ENT_QUOTES); ?></span>
+												</span>
+												<span class="badge bg-secondary rounded-pill"><?php echo (int) $count; ?></span>
+											</div>
+										<?php } ?>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<?php if ($hasWarnings) { ?>
+							<div class="card border-warning-subtle mt-3">
+								<div class="card-header bg-warning-subtle text-warning-emphasis">
+									<span class="icon-warning text-warning" aria-hidden="true"></span>
+									<strong><?php echo BFText::_('COM_BREEZINGFORMS_INSTALLER_WARNINGS'); ?></strong>
+								</div>
+								<ul class="list-group list-group-flush">
+									<?php foreach ($inst->warnings as $warn) { ?>
+										<li class="list-group-item d-flex align-items-start gap-2">
+											<span class="icon-warning text-warning mt-1" aria-hidden="true"></span>
+											<span><?php echo htmlspecialchars($warn, ENT_QUOTES); ?></span>
+										</li>
+									<?php } ?>
+								</ul>
+							</div>
+						<?php } ?>
+					</div>
+				</div>
+			</div>
 			<input type="hidden" name="option" value="<?php echo $option; ?>" />
 			<input type="hidden" name="act" value="configuration" />
 			<input type="hidden" name="task" value="" />

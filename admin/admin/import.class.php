@@ -91,15 +91,16 @@ class ff_importPackage extends ff_xmlPackage
 							'attr' => array(
 								'id' => '$pkg->saveParams(1, $key, $value);'
 							),
-							'elem' => array(
-								'published' => '$pkg->saveParams(1, $key, $value);',
-								'package' => '$pkg->saveParams(1, $key, $value);',
-								'name' => '$pkg->saveParams(1, $key, $value);',
-								'title' => '$pkg->saveParams(1, $key, $value);',
-								'description' => '$pkg->saveParams(1, $key, $value);',
-								'type' => '$pkg->saveParams(1, $key, $value);',
-								'code' => '$pkg->saveParams(1, $key, $value);'
-							),
+								'elem' => array(
+									'published' => '$pkg->saveParams(1, $key, $value);',
+									'package' => '$pkg->saveParams(1, $key, $value);',
+									'name' => '$pkg->saveParams(1, $key, $value);',
+									'title' => '$pkg->saveParams(1, $key, $value);',
+									'description' => '$pkg->saveParams(1, $key, $value);',
+									'type' => '$pkg->saveParams(1, $key, $value);',
+									'code' => '$pkg->saveParams(1, $key, $value);',
+									'unit_tests' => '$pkg->saveParams(1, $key, $value);'
+								),
 							'end' => '$pkg->emitScript();'
 						), // script
 						'piece' => array(
@@ -107,15 +108,16 @@ class ff_importPackage extends ff_xmlPackage
 							'attr' => array(
 								'id' => '$pkg->saveParams(1, $key, $value);'
 							),
-							'elem' => array(
-								'published' => '$pkg->saveParams(1, $key, $value);',
-								'package' => '$pkg->saveParams(1, $key, $value);',
-								'name' => '$pkg->saveParams(1, $key, $value);',
-								'title' => '$pkg->saveParams(1, $key, $value);',
-								'description' => '$pkg->saveParams(1, $key, $value);',
-								'type' => '$pkg->saveParams(1, $key, $value);',
-								'code' => '$pkg->saveParams(1, $key, $value);'
-							),
+								'elem' => array(
+									'published' => '$pkg->saveParams(1, $key, $value);',
+									'package' => '$pkg->saveParams(1, $key, $value);',
+									'name' => '$pkg->saveParams(1, $key, $value);',
+									'title' => '$pkg->saveParams(1, $key, $value);',
+									'description' => '$pkg->saveParams(1, $key, $value);',
+									'type' => '$pkg->saveParams(1, $key, $value);',
+									'code' => '$pkg->saveParams(1, $key, $value);',
+									'unit_tests' => '$pkg->saveParams(1, $key, $value);'
+								),
 							'end' => '$pkg->emitPiece();'
 						), // piece
 						'form' => array(

@@ -542,6 +542,10 @@ class facileFormsPiece
 
 		$testMode = BFRequest::getCmd('test_mode', '');
 		$autoOpened = BFRequest::getInt('auto_open_tests', 0);
+		$result = null;
+		$output = '';
+		$error = '';
+		$errorDetails = array();
 		if ($testMode !== 'unit') {
 			$execution = self::executePieceCode($row, $functionName, $args, $database);
 			$result = $execution['result'];

@@ -421,14 +421,32 @@ class com_breezingformsInstallerScript
 
     private function announceImportedLibraryChanges(object $importer): void
     {
+        $createdScripts = $this->normalizeImportedItemNames($importer->createdScripts ?? []);
+        $createdPieces = $this->normalizeImportedItemNames($importer->createdPieces ?? []);
         $updatedScripts = $this->normalizeImportedItemNames($importer->updatedScripts ?? []);
         $updatedPieces = $this->normalizeImportedItemNames($importer->updatedPieces ?? []);
 
-        if (empty($updatedScripts) && empty($updatedPieces)) {
+        if (empty($createdScripts) && empty($createdPieces) && empty($updatedScripts) && empty($updatedPieces)) {
             return;
         }
 
         $parts = [];
+
+        if (!empty($createdScripts)) {
+            $parts[] = Text::sprintf(
+                'COM_BREEZINGFORMS_INSTALL_STANDARD_LIBRARY_CREATED_SCRIPTS',
+                count($createdScripts),
+                implode(', ', $createdScripts)
+            );
+        }
+
+        if (!empty($createdPieces)) {
+            $parts[] = Text::sprintf(
+                'COM_BREEZINGFORMS_INSTALL_STANDARD_LIBRARY_CREATED_PIECES',
+                count($createdPieces),
+                implode(', ', $createdPieces)
+            );
+        }
 
         if (!empty($updatedScripts)) {
             $parts[] = Text::sprintf(
@@ -448,7 +466,7 @@ class com_breezingformsInstallerScript
 
         $this->announce(
             Text::sprintf(
-                'COM_BREEZINGFORMS_INSTALL_STANDARD_LIBRARY_UPDATED',
+                'COM_BREEZINGFORMS_INSTALL_STANDARD_LIBRARY_CHANGES',
                 implode(' | ', $parts)
             ),
             'warning',

@@ -59,7 +59,7 @@ switch ($task) {
 				require_once (JPATH_SITE . '/administrator/components/com_contentbuilder/classes/contentbuilder.php');
 				$cbForm = contentbuilder::getForm('com_breezingforms', $formId);
 				$db = Factory::getContainer()->get(DatabaseInterface::class);
-				$db->setQuery("Select id From #__contentbuilder_forms Where `type` = 'com_breezingforms' And `reference_id` = " . intval($formId));
+				$db->setQuery("Select id From #__contentbuilderng_forms Where `type` = 'com_breezingforms' And `reference_id` = " . intval($formId));
 				$cbForms = $db->loadColumn();
 				if (is_object($cbForm) && count($cbForms)) {
 					require_once (JPATH_SITE . '/administrator/components/com_contentbuilder/tables/elements.php');

@@ -2346,7 +2346,7 @@ class HTML_facileFormsProcessor
 
             require_once(JPATH_ADMINISTRATOR . '/components/com_contentbuilder/classes/contentbuilder.php');
 
-            $db->setQuery("Select `id` From #__contentbuilder_forms Where `type` = 'com_breezingforms' And `reference_id` = " . intval($this->form) . " And published = 1");
+            $db->setQuery("Select `id` From #__contentbuilderng_forms Where `type` = 'com_breezingforms' And `reference_id` = " . intval($this->form) . " And published = 1");
 
             $cbForms = $db->loadColumn();
 
@@ -2376,6 +2376,11 @@ class HTML_facileFormsProcessor
                 }
             }
 
+            if (!BFRequest::getInt('cb_form_id', 0) && !BFRequest::getInt('cb_record_id', 0) && count($cbForms) === 1) {
+                BFRequest::setVar('cb_form_id', (int) $cbForms[0]);
+                BFRequest::setVar('cbIsNew', 1);
+            }
+
             if (BFRequest::getInt('cb_form_id', 0)) {
 
                 // test the permissions of given record
@@ -2387,7 +2392,7 @@ class HTML_facileFormsProcessor
                     contentbuilder::checkPermissions('new', Text::_('COM_CONTENTBUILDER_PERMISSIONS_NEW_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
                 }
 
-                $db->setQuery("Select * From #__contentbuilder_forms Where id = " . BFRequest::getInt('cb_form_id', 0) . " And published = 1");
+                $db->setQuery("Select * From #__contentbuilderng_forms Where id = " . BFRequest::getInt('cb_form_id', 0) . " And published = 1");
                 $cbData = $db->loadAssoc();
                 if (is_array($cbData)) {
                     $cbFull = $cbFrontend ? contentbuilder::authorizeFe('fullarticle') : contentbuilder::authorize('fullarticle');
@@ -4355,9 +4360,16 @@ class HTML_facileFormsProcessor
                 foreach ($ff_otherparams as $prop => $val) {
                     echo indentc(1) . '<input type="hidden" name="' . htmlentities($prop, ENT_QUOTES, 'UTF-8') . '" value="' . htmlentities(urlencode($val), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                 }
-                if (isset($_REQUEST['cb_form_id']) && isset($_REQUEST['cb_record_id'])) {
+                if (BFRequest::getInt('cb_form_id', 0)) {
                     echo '<input type="hidden" name="cb_form_id" value="' . BFRequest::getInt('cb_form_id', 0) . '"/>' . nl();
-                    echo '<input type="hidden" name="cb_record_id" value="' . BFRequest::getInt('cb_record_id', 0) . '"/>' . nl();
+                    if (BFRequest::getInt('cb_record_id', 0)) {
+                        echo '<input type="hidden" name="cb_record_id" value="' . BFRequest::getInt('cb_record_id', 0) . '"/>' . nl();
+                    }
+                    if (BFRequest::getBool('cbIsNew')) {
+                        echo '<input type="hidden" name="cbIsNew" value="1"/>' . nl();
+                    }
+                }
+                if (BFRequest::getVar('return', '') !== '') {
                     echo '<input type="hidden" name="return" value="' . htmlentities(BFRequest::getVar('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                 }
                 if (BFRequest::getVar('tmpl') == 'component') {
@@ -4388,9 +4400,16 @@ class HTML_facileFormsProcessor
                     echo indentc(1) . '<input type="hidden" name="ff_align" value="' . htmlentities($this->align, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                 if ($this->top != 0)
                     echo indentc(1) . '<input type="hidden" name="ff_top" value="' . htmlentities($this->top, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if (isset($_REQUEST['cb_form_id']) && isset($_REQUEST['cb_record_id'])) {
+                if (BFRequest::getInt('cb_form_id', 0)) {
                     echo '<input type="hidden" name="cb_form_id" value="' . BFRequest::getInt('cb_form_id', 0) . '"/>' . nl();
-                    echo '<input type="hidden" name="cb_record_id" value="' . BFRequest::getInt('cb_record_id', 0) . '"/>' . nl();
+                    if (BFRequest::getInt('cb_record_id', 0)) {
+                        echo '<input type="hidden" name="cb_record_id" value="' . BFRequest::getInt('cb_record_id', 0) . '"/>' . nl();
+                    }
+                    if (BFRequest::getBool('cbIsNew')) {
+                        echo '<input type="hidden" name="cbIsNew" value="1"/>' . nl();
+                    }
+                }
+                if (BFRequest::getVar('return', '') !== '') {
                     echo '<input type="hidden" name="return" value="' . htmlentities(BFRequest::getVar('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                 }
                 //echo '<input type="hidden" name="tmpl" value="' . BFRequest::getCmd('tmpl', '') . '"/>' . nl();
@@ -4413,9 +4432,16 @@ class HTML_facileFormsProcessor
                         indentc(1) . '<input type="hidden" name="ff_runmode" value="' . htmlentities($this->runmode, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                     if ($this->page != 1)
                         echo indentc(1) . '<input type="hidden" name="ff_page" value="' . htmlentities($this->page, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                    if (isset($_REQUEST['cb_form_id']) && isset($_REQUEST['cb_record_id'])) {
+                    if (BFRequest::getInt('cb_form_id', 0)) {
                         echo '<input type="hidden" name="cb_form_id" value="' . BFRequest::getInt('cb_form_id', 0) . '"/>' . nl();
-                        echo '<input type="hidden" name="cb_record_id" value="' . BFRequest::getInt('cb_record_id', 0) . '"/>' . nl();
+                        if (BFRequest::getInt('cb_record_id', 0)) {
+                            echo '<input type="hidden" name="cb_record_id" value="' . BFRequest::getInt('cb_record_id', 0) . '"/>' . nl();
+                        }
+                        if (BFRequest::getBool('cbIsNew')) {
+                            echo '<input type="hidden" name="cbIsNew" value="1"/>' . nl();
+                        }
+                    }
+                    if (BFRequest::getVar('return', '') !== '') {
                         echo '<input type="hidden" name="return" value="' . htmlentities(BFRequest::getVar('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                     }
                     if (BFRequest::getVar('tmpl') == 'component') {
@@ -4553,13 +4579,13 @@ class HTML_facileFormsProcessor
                 $last_update = Factory::getDate();
                 $last_update = $last_update->toSql();
                 $db = Factory::getContainer()->get(DatabaseInterface::class);
-                $db->setQuery("Select id From #__contentbuilder_records Where `type` = 'com_breezingforms' And `reference_id` = " . $db->Quote($this->form) . " And record_id = " . $db->Quote($record_return));
+                $db->setQuery("Select id From #__contentbuilderng_records Where `type` = 'com_breezingforms' And `reference_id` = " . $db->Quote($this->form) . " And record_id = " . $db->Quote($record_return));
                 $res = $db->loadResult();
                 if (!$res) {
-                    $db->setQuery("Insert Into #__contentbuilder_records (session_id,`type`,last_update, published, record_id, reference_id) Values ('" . $this->app->getSession()->getId() . "','com_breezingforms'," . $db->Quote($last_update) . ",0, " . $db->Quote($record_return) . ", " . $db->Quote($this->form) . ")");
+                    $db->setQuery("Insert Into #__contentbuilderng_records (session_id,`type`,last_update, published, record_id, reference_id) Values ('" . $this->app->getSession()->getId() . "','com_breezingforms'," . $db->Quote($last_update) . ",0, " . $db->Quote($record_return) . ", " . $db->Quote($this->form) . ")");
                     $db->execute();
                 } else {
-                    $db->setQuery("Update #__contentbuilder_records Set last_update = " . $db->Quote($last_update) . ",edited = edited + 1 Where `type` = 'com_breezingforms' And `reference_id` = " . $db->Quote($this->form) . " And record_id = " . $db->Quote($record_return));
+                    $db->setQuery("Update #__contentbuilderng_records Set last_update = " . $db->Quote($last_update) . ",edited = edited + 1 Where `type` = 'com_breezingforms' And `reference_id` = " . $db->Quote($this->form) . " And record_id = " . $db->Quote($record_return));
                     $db->execute();
                 }
             }
@@ -4578,7 +4604,7 @@ class HTML_facileFormsProcessor
             if (is_object($cbResult['form'])) {
 
                 $db = Factory::getContainer()->get(DatabaseInterface::class);
-                $db->setQuery('Select SQL_CALC_FOUND_ROWS * From #__contentbuilder_forms Where id = ' . BFRequest::getInt('cb_form_id', 0) . ' And published = 1');
+                $db->setQuery('Select SQL_CALC_FOUND_ROWS * From #__contentbuilderng_forms Where id = ' . BFRequest::getInt('cb_form_id', 0) . ' And published = 1');
                 $_settings = $db->loadObject();
 
                 $_record = $cbResult['form']->getRecord(BFRequest::getInt('record_id', 0), $_settings->published_only, $cbResult['frontend'] ? ($_settings->own_only_fe ? Factory::getUser()->get('id', 0) : -1) : ($_settings->own_only ? Factory::getUser()->get('id', 0) : -1), true);
@@ -4739,7 +4765,7 @@ class HTML_facileFormsProcessor
                 $record_return = $cbResult['form']->saveRecord(BFRequest::getInt('cb_record_id', 0), $values);
 
                 $db = Factory::getContainer()->get(DatabaseInterface::class);
-                $db->setQuery('Select SQL_CALC_FOUND_ROWS * From #__contentbuilder_forms Where id = ' . BFRequest::getInt('cb_form_id', 0) . ' And published = 1');
+                $db->setQuery('Select SQL_CALC_FOUND_ROWS * From #__contentbuilderng_forms Where id = ' . BFRequest::getInt('cb_form_id', 0) . ' And published = 1');
                 $cbData = $db->loadObject();
 
                 if ($record_return) {
@@ -4787,12 +4813,12 @@ class HTML_facileFormsProcessor
                             $created_down = $date->toSql();
                         }
 
-                        $db->setQuery("Insert Into #__contentbuilder_records (session_id,`type`,last_update,is_future,lang_code, sef, published, record_id, reference_id, publish_up, publish_down) Values ('" . $this->app->getSession()->getId() . "','com_breezingforms'," . $db->Quote($last_update) . ",$is_future, " . $db->Quote($language) . "," . $db->Quote(trim($sef)) . "," . $db->Quote($cbData->auto_publish && !$is_future ? 1 : 0) . ", " . $db->Quote($record_return) . ", " . $db->Quote($cbResult['form']->getReferenceId()) . ", " . $db->Quote($created_up) . ", " . $db->Quote($created_down) . ")");
+                        $db->setQuery("Insert Into #__contentbuilderng_records (session_id,`type`,last_update,is_future,lang_code, sef, published, record_id, reference_id, publish_up, publish_down) Values ('" . $this->app->getSession()->getId() . "','com_breezingforms'," . $db->Quote($last_update) . ",$is_future, " . $db->Quote($language) . "," . $db->Quote(trim($sef)) . "," . $db->Quote($cbData->auto_publish && !$is_future ? 1 : 0) . ", " . $db->Quote($record_return) . ", " . $db->Quote($cbResult['form']->getReferenceId()) . ", " . $db->Quote($created_up) . ", " . $db->Quote($created_down) . ")");
                         $db->execute();
 
                     } else {
 
-                        $db->setQuery("Update #__contentbuilder_records Set last_update = " . $db->Quote($last_update) . ",lang_code = " . $db->Quote($language) . ", sef = " . $db->Quote(trim($sef)) . ", edited = edited + 1 Where `type` = 'com_breezingforms' And `reference_id` = " . $db->Quote($cbResult['form']->getReferenceId()) . " And record_id = " . $db->Quote($record_return));
+                        $db->setQuery("Update #__contentbuilderng_records Set last_update = " . $db->Quote($last_update) . ",lang_code = " . $db->Quote($language) . ", sef = " . $db->Quote(trim($sef)) . ", edited = edited + 1 Where `type` = 'com_breezingforms' And `reference_id` = " . $db->Quote($cbResult['form']->getReferenceId()) . " And record_id = " . $db->Quote($record_return));
                         $db->execute();
                     }
                 }
@@ -4822,7 +4848,7 @@ class HTML_facileFormsProcessor
                     }
                     $cbData->labels = array();
                     if (count($ids)) {
-                        $db->setQuery("Select Distinct `label`, reference_id From #__contentbuilder_elements Where form_id = " . BFRequest::getInt('cb_form_id', 0) . " And reference_id In (" . implode(',', $ids) . ") And published = 1 Order By ordering");
+                        $db->setQuery("Select Distinct `label`, reference_id From #__contentbuilderng_elements Where form_id = " . BFRequest::getInt('cb_form_id', 0) . " And reference_id In (" . implode(',', $ids) . ") And published = 1 Order By ordering");
                         $rows = $db->loadAssocList();
                         $ids = array();
                         foreach ($rows as $row) {
@@ -8781,9 +8807,16 @@ transition: box-shadow .15s linear;
             if (BFRequest::getVar('tmpl') == 'component') {
                 echo indentc(1) . '<input type="hidden" name="tmpl" value="component"/>' . nl();
             }
-            if (isset($_REQUEST['cb_form_id']) && isset($_REQUEST['cb_record_id'])) {
+            if (BFRequest::getInt('cb_form_id', 0)) {
                 echo indentc(1) . '<input type="hidden" name="cb_form_id" value="' . BFRequest::getInt('cb_form_id', 0) . '"/>' . nl();
-                echo indentc(1) . '<input type="hidden" name="cb_record_id" value="' . BFRequest::getInt('cb_record_id', 0) . '"/>' . nl();
+                if (BFRequest::getInt('cb_record_id', 0)) {
+                    echo indentc(1) . '<input type="hidden" name="cb_record_id" value="' . BFRequest::getInt('cb_record_id', 0) . '"/>' . nl();
+                }
+                if (BFRequest::getBool('cbIsNew')) {
+                    echo indentc(1) . '<input type="hidden" name="cbIsNew" value="1"/>' . nl();
+                }
+            }
+            if (BFRequest::getVar('return', '') !== '') {
                 echo indentc(1) . '<input type="hidden" name="return" value="' . htmlentities(BFRequest::getVar('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
             }
             // TODO: turn off tracing in the options

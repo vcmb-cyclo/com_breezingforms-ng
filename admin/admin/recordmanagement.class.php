@@ -2094,15 +2094,15 @@ class bfRecordManagement
         $is15 = false;
 
         if ($isContentBuilder) {
-            $db->setQuery("Select `form`.id As form_id, `form`.reference_id, `form`.delete_articles From #__facileforms_records As r, #__contentbuilder_forms As form Where form.reference_id = r.form And r.id =  " . $db->Quote(BFRequest::getInt('bfrecord_id')));
+            $db->setQuery("Select `form`.id As form_id, `form`.reference_id, `form`.delete_articles From #__facileforms_records As r, #__contentbuilderng_forms As form Where form.reference_id = r.form And r.id =  " . $db->Quote(BFRequest::getInt('bfrecord_id')));
             $cbRecords = $db->loadAssocList();
             foreach ($cbRecords as $cbRecord) {
-                $db->setQuery("Delete From #__contentbuilder_list_records Where form_id = " . intval($cbRecord['form_id']) . " And record_id = " . $db->Quote(BFRequest::getInt('bfrecord_id')));
+                $db->setQuery("Delete From #__contentbuilderng_list_records Where form_id = " . intval($cbRecord['form_id']) . " And record_id = " . $db->Quote(BFRequest::getInt('bfrecord_id')));
                 $db->execute();
-                $db->setQuery("Delete From #__contentbuilder_records Where `type` = 'com_breezingforms' And `reference_id` = " . $db->Quote($cbRecord['reference_id']) . " And record_id = " . $db->Quote(BFRequest::getInt('bfrecord_id')));
+                $db->setQuery("Delete From #__contentbuilderng_records Where `type` = 'com_breezingforms' And `reference_id` = " . $db->Quote($cbRecord['reference_id']) . " And record_id = " . $db->Quote(BFRequest::getInt('bfrecord_id')));
                 $db->execute();
                 if ($cbRecord['delete_articles']) {
-                    $db->setQuery("Select article_id From #__contentbuilder_articles Where form_id = " . intval($cbRecord['form_id']) . " And record_id = " . $db->Quote(BFRequest::getInt('bfrecord_id')));
+                    $db->setQuery("Select article_id From #__contentbuilderng_articles Where form_id = " . intval($cbRecord['form_id']) . " And record_id = " . $db->Quote(BFRequest::getInt('bfrecord_id')));
                     $articles = $db->loadColumn();
                     if (count($articles)) {
                         $article_items = array();
@@ -2130,7 +2130,7 @@ class bfRecordManagement
                     }
                 }
 
-                $db->setQuery("Delete From #__contentbuilder_articles Where form_id = " . intval($cbRecord['form_id']) . " And record_id = " . $db->Quote(BFRequest::getInt('bfrecord_id')));
+                $db->setQuery("Delete From #__contentbuilderng_articles Where form_id = " . intval($cbRecord['form_id']) . " And record_id = " . $db->Quote(BFRequest::getInt('bfrecord_id')));
                 $db->execute();
             }
         }

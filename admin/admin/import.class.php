@@ -505,7 +505,15 @@ class ff_importPackage extends ff_xmlPackage
 
 		$now = Factory::getDate()->toSql();
 		$userName = (string) Factory::getApplication()->getIdentity()->username;
+		$preferredId = 0;
 		if (empty($row->id)) {
+			$incomingId = isset($this->params[1]['id']) ? (int) $this->params[1]['id'] : 0;
+			if ($incomingId > 0) {
+				$existingId = _ff_selectValue("select id from #__facileforms_scripts where id = " . $incomingId);
+				if (empty($existingId)) {
+					$preferredId = $incomingId;
+				}
+			}
 			if (empty($row->created)) {
 				$row->created = $now;
 			}
@@ -520,6 +528,11 @@ class ff_importPackage extends ff_xmlPackage
 			$this->setError($row->getError(), true);
 			return;
 		} // if
+
+		if ($preferredId > 0 && (int) $row->id !== $preferredId) {
+			_ff_query("update #__facileforms_scripts set id = " . $preferredId . " where id = " . (int) $row->id);
+			$row->id = $preferredId;
+		}
 
 		if (empty($id)) {
 			if (!in_array($name, $this->createdScripts, true)) {
@@ -597,7 +610,15 @@ class ff_importPackage extends ff_xmlPackage
 
 		$now = Factory::getDate()->toSql();
 		$userName = (string) Factory::getApplication()->getIdentity()->username;
+		$preferredId = 0;
 		if (empty($row->id)) {
+			$incomingId = isset($this->params[1]['id']) ? (int) $this->params[1]['id'] : 0;
+			if ($incomingId > 0) {
+				$existingId = _ff_selectValue("select id from #__facileforms_pieces where id = " . $incomingId);
+				if (empty($existingId)) {
+					$preferredId = $incomingId;
+				}
+			}
 			if (empty($row->created)) {
 				$row->created = $now;
 			}
@@ -612,6 +633,11 @@ class ff_importPackage extends ff_xmlPackage
 			$this->setError($row->getError(), true);
 			return;
 		} // if
+
+		if ($preferredId > 0 && (int) $row->id !== $preferredId) {
+			_ff_query("update #__facileforms_pieces set id = " . $preferredId . " where id = " . (int) $row->id);
+			$row->id = $preferredId;
+		}
 
 		if (empty($id)) {
 			if (!in_array($name, $this->createdPieces, true)) {

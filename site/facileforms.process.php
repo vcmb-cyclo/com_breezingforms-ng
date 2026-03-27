@@ -26,6 +26,11 @@ use Joomla\CMS\Environment\Browser;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Log\Log;
+use CB\Component\Contentbuilderng\Administrator\Helper\ContentbuilderngHelper;
+use CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory;
+use CB\Component\Contentbuilderng\Administrator\Service\ArticleService;
+use CB\Component\Contentbuilderng\Administrator\Service\ListSupportService;
+use CB\Component\Contentbuilderng\Administrator\Service\PermissionService;
 
 class bfMobile
 {
@@ -79,6 +84,15 @@ define('_FF_DEBUG_ENTER', 2);
 define('_FF_DEBUG_EXIT', 4);
 define('_FF_DEBUG_DIRECTIVE', 8);
 define('_FF_DEBUG', 0);
+
+$cbngBasePath = JPATH_ADMINISTRATOR . '/components/com_contentbuilderng';
+if (is_file($cbngBasePath . '/com_contentbuilderng.xml')) {
+    require_once $cbngBasePath . '/src/Helper/ContentbuilderngHelper.php';
+    require_once $cbngBasePath . '/src/Helper/FormSourceFactory.php';
+    require_once $cbngBasePath . '/src/Service/ArticleService.php';
+    require_once $cbngBasePath . '/src/Service/ListSupportService.php';
+    require_once $cbngBasePath . '/src/Service/PermissionService.php';
+}
 
 function ff_trace($msg = null)
 {
@@ -2330,21 +2344,19 @@ class HTML_facileFormsProcessor
         $cbFrontend = true;
         $cbFull = false;
 
-        if (file_exists(JPATH_ADMINISTRATOR . '/components/com_contentbuilder/contentbuilder.xml')) {
+        if (file_exists(JPATH_ADMINISTRATOR . '/components/com_contentbuilderng/com_contentbuilderng.xml')) {
 
             if ($this->app->isClient('administrator')) {
                 $cbFrontend = false;
             }
 
             if ($cbFrontend) {
-                $this->app->getLanguage()->load('com_contentbuilder');
+                $this->app->getLanguage()->load('com_contentbuilderng');
             } else {
-                $this->app->getLanguage()->load('com_contentbuilder', JPATH_SITE . '/administrator');
+                $this->app->getLanguage()->load('com_contentbuilderng', JPATH_SITE . '/administrator');
             }
 
             $db = Factory::getContainer()->get(DatabaseInterface::class);
-
-            require_once(JPATH_ADMINISTRATOR . '/components/com_contentbuilder/classes/contentbuilder.php');
 
             $db->setQuery("Select `id` From #__contentbuilderng_forms Where `type` = 'com_breezingforms' And `reference_id` = " . intval($this->form) . " And published = 1");
 
@@ -2355,24 +2367,23 @@ class HTML_facileFormsProcessor
                 return array('form' => $cbForm, 'record' => $cbRecord, 'frontend' => $cbFrontend, 'data' => $cbData, 'full' => $cbFull);
             }
 
-            // test if there is any published contentbuilder view that allows to create new submissions
+            // test if all published contentbuilder views allow creating new submissions
             if (!BFRequest::getInt('cb_record_id', 0) || !BFRequest::getInt('cb_form_id', 0)) {
 
-                $cbAuth = false;
+                $permissionService = new PermissionService();
+                $cbAuth = true;
                 foreach ($cbForms as $cbFormId) {
-                    contentbuilder::setPermissions($cbFormId, 0, $cbFrontend ? '_fe' : '');
-                    if ($cbFrontend) {
-                        $cbAuth = contentbuilder::authorizeFe('new');
-                    } else {
-                        $cbAuth = contentbuilder::authorize('new');
-                    }
-                    if ($cbAuth) {
+                    $permissionService->setPermissions($cbFormId, 0, $cbFrontend ? '_fe' : '');
+                    $cbAuth = $cbFrontend
+                        ? $permissionService->authorizeFe('new')
+                        : $permissionService->authorize('new');
+                    if (!$cbAuth) {
                         break;
                     }
                 }
 
                 if (count($cbForms) && !$cbAuth) {
-                    throw new Exception(Text::_('COM_CONTENTBUILDER_PERMISSIONS_NEW_NOT_ALLOWED'), 403);
+                    throw new Exception(Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_NEW_NOT_ALLOWED'), 403);
                 }
             }
 
@@ -2385,22 +2396,23 @@ class HTML_facileFormsProcessor
 
                 // test the permissions of given record
                 if (BFRequest::getInt('cb_record_id', 0)) {
-                    contentbuilder::setPermissions(BFRequest::getInt('cb_form_id', 0), BFRequest::getInt('cb_record_id', 0), $cbFrontend ? '_fe' : '');
-                    contentbuilder::checkPermissions('edit', Text::_('COM_CONTENTBUILDER_PERMISSIONS_EDIT_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
+                    (new PermissionService())->setPermissions(BFRequest::getInt('cb_form_id', 0), BFRequest::getInt('cb_record_id', 0), $cbFrontend ? '_fe' : '');
+                    (new PermissionService())->checkPermissions('edit', Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_EDIT_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
                 } else {
-                    contentbuilder::setPermissions(BFRequest::getInt('cb_form_id', 0), 0, $cbFrontend ? '_fe' : '');
-                    contentbuilder::checkPermissions('new', Text::_('COM_CONTENTBUILDER_PERMISSIONS_NEW_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
+                    (new PermissionService())->setPermissions(BFRequest::getInt('cb_form_id', 0), 0, $cbFrontend ? '_fe' : '');
+                    (new PermissionService())->checkPermissions('new', Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_NEW_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
                 }
 
                 $db->setQuery("Select * From #__contentbuilderng_forms Where id = " . BFRequest::getInt('cb_form_id', 0) . " And published = 1");
                 $cbData = $db->loadAssoc();
                 if (is_array($cbData)) {
-                    $cbFull = $cbFrontend ? contentbuilder::authorizeFe('fullarticle') : contentbuilder::authorize('fullarticle');
-                    $cbForm = contentbuilder::getForm('com_breezingforms', $cbData['reference_id']);
+                    $permissionService = new PermissionService();
+                    $cbFull = $cbFrontend ? $permissionService->authorizeFe('fullarticle') : $permissionService->authorize('fullarticle');
+                    $cbForm = FormSourceFactory::getForm('com_breezingforms', $cbData['reference_id']);
                     $cbRecord = $cbForm->getRecord(BFRequest::getInt('cb_record_id', 0), $cbData['published_only'], $cbFrontend ? ($cbData['own_only_fe'] ? Factory::getUser()->get('id', 0) : -1) : ($cbData['own_only'] ? Factory::getUser()->get('id', 0) : -1), $cbFrontend ? $cbData['show_all_languages_fe'] : true);
 
                     if (!count($cbRecord) && !BFRequest::getBool('cbIsNew')) {
-                        throw new Exception(Text::_('COM_CONTENTBUILDER_RECORD_NOT_FOUND'), 404);
+                        throw new Exception(Text::_('COM_CONTENTBUILDERNG_RECORD_NOT_FOUND'), 404);
                     }
                 }
             }
@@ -3277,8 +3289,7 @@ class HTML_facileFormsProcessor
 
         if ($cbRecord !== null) {
 
-            require_once(JPATH_ADMINISTRATOR . '/components/com_contentbuilder/classes/contentbuilder.php');
-            $cbNonEditableFields = contentbuilder::getListNonEditableElements($cbResult['data']['id']);
+            $cbNonEditableFields = (new ListSupportService())->getListNonEditableElements($cbResult['data']['id']);
             $cbFlashUploadValidationOverride = '';
             foreach ($cbRecord as $cbEntry) {
                 if (!in_array($cbEntry->recElementId, $cbNonEditableFields)) {
@@ -3310,7 +3321,6 @@ class HTML_facileFormsProcessor
                                             ';
                                 }
 
-                                require_once(JPATH_SITE . '/administrator/components/com_contentbuilder/classes/contentbuilder_helpers.php');
                                 $cbOut = '';
                                 $cbFiles = explode("\n", str_replace("\r", "", $cbEntry->recValue));
                                 $i = 0;
@@ -3321,7 +3331,7 @@ class HTML_facileFormsProcessor
                                 $cbDeac = '';
                                 foreach ($cbFiles as $cbFile) {
                                     if (trim($cbFile)) {
-                                        $cbOut .= '<div><input type=\"checkbox\" onchange=\"bfCheckUploadValidation(\'ff_elem' . $cbEntry->recElementId . '\', this, \'ff_nm_' . $cbEntry->recName . '[]\')\" value=\"1\" name=\"cb_delete_' . $cbEntry->recElementId . '[' . $i . ']\" id=\"cb_delete_' . $cbEntry->recElementId . '_' . $i . '\"/> <label style=\"margin-left: 5px; float: none !important; display: inline !important;\" for=\"cb_delete_' . $cbEntry->recElementId . '_' . $i . '\">' . addslashes(basename(contentbuilder_wordwrap($cbFile->recValue, 150, "<br>", true))) . '</label></div>';
+                                        $cbOut .= '<div><input type=\"checkbox\" onchange=\"bfCheckUploadValidation(\'ff_elem' . $cbEntry->recElementId . '\', this, \'ff_nm_' . $cbEntry->recName . '[]\')\" value=\"1\" name=\"cb_delete_' . $cbEntry->recElementId . '[' . $i . ']\" id=\"cb_delete_' . $cbEntry->recElementId . '_' . $i . '\"/> <label style=\"margin-left: 5px; float: none !important; display: inline !important;\" for=\"cb_delete_' . $cbEntry->recElementId . '_' . $i . '\">' . addslashes(basename(ContentbuilderngHelper::contentbuilderng_wordwrap($cbFile->recValue, 150, "<br>", true))) . '</label></div>';
                                         if ($cbDeac == '') {
                                             $cbDeac = 'bfDeactivateField["ff_nm_' . $cbEntry->recName . '[]"]=true;' . nl();
                                         }
@@ -3473,8 +3483,7 @@ class HTML_facileFormsProcessor
 
         $cbNonEditableFields = array();
         if ($cbForm !== null) {
-            require_once(JPATH_ADMINISTRATOR . '/components/com_contentbuilder/classes/contentbuilder.php');
-            $cbNonEditableFields = contentbuilder::getListNonEditableElements($cbResult['data']['id']);
+            $cbNonEditableFields = (new ListSupportService())->getListNonEditableElements($cbResult['data']['id']);
             if (count($cbNonEditableFields)) {
                 Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('<!--' . nl() . 'var bfDeactivateField = new Array();' . nl() . '//-->');
                 echo '<script type="text/javascript">' . nl();
@@ -4575,7 +4584,7 @@ class HTML_facileFormsProcessor
 
             $record_return = $record->id;
 
-            if ($record_return && file_exists(JPATH_ADMINISTRATOR . '/components/com_contentbuilder/contentbuilder.xml')) {
+            if ($record_return && file_exists(JPATH_ADMINISTRATOR . '/components/com_contentbuilderng/com_contentbuilderng.xml')) {
                 $last_update = Factory::getDate();
                 $last_update = $last_update->toSql();
                 $db = Factory::getContainer()->get(DatabaseInterface::class);
@@ -4703,8 +4712,7 @@ class HTML_facileFormsProcessor
                     }
                 } else {
 
-                    require_once(JPATH_ADMINISTRATOR . '/components/com_contentbuilder/classes/contentbuilder.php');
-                    $cbNonEditableFields = contentbuilder::getListNonEditableElements($cbResult['data']['id']);
+                    $cbNonEditableFields = (new ListSupportService())->getListNonEditableElements($cbResult['data']['id']);
 
                     if (!in_array($data[_FF_DATA_ID], $cbNonEditableFields)) {
 
@@ -4735,7 +4743,7 @@ class HTML_facileFormsProcessor
             // CONTENTBUILDER BEGIN
             if (is_object($cbResult['form'])) {
 
-                PluginHelper::importPlugin('contentbuilder_submit');
+                PluginHelper::importPlugin('contentbuilderng_submit');
 
                 $is15 = false;
 
@@ -4857,7 +4865,7 @@ class HTML_facileFormsProcessor
                     }
                     $cbData->items = $cbResult['form']->getRecord($record_return, $cbData->published_only, $cbResult['frontend'] ? ($cbData->own_only_fe ? Factory::getUser()->get('id', 0) : -1) : ($cbData->own_only ? Factory::getUser()->get('id', 0) : -1), true);
                     if (!count($cbData->items)) {
-                        throw new Exception(Text::_('COM_CONTENTBUILDER_RECORD_NOT_FOUND'), 404);
+                        throw new Exception(Text::_('COM_CONTENTBUILDERNG_RECORD_NOT_FOUND'), 404);
                     }
                     $config = array();
                     foreach ($this->savedata as $data) {
@@ -4867,11 +4875,11 @@ class HTML_facileFormsProcessor
                         }
                     }
                     $full = false;
-                    $article_id = contentbuilder::createArticle(BFRequest::getInt('cb_form_id', 0), $record_return, $cbData->items, $ids, $cbData->title_field, $cbResult['form']->getRecordMetadata($record_return), $config, $full, true, BFRequest::getVar('cb_category_id', null));
+                    $article_id = (new ArticleService())->createArticle(BFRequest::getInt('cb_form_id', 0), $record_return, $cbData->items, $ids, $cbData->title_field, $cbResult['form']->getRecordMetadata($record_return), $config, $full, true, BFRequest::getVar('cb_category_id', null));
 
                     $cache = Factory::getCache('com_content');
                     $cache->clean();
-                    $cache = Factory::getCache('com_contentbuilder');
+                    $cache = Factory::getCache('com_contentbuilderng');
                     $cache->clean();
                 }
 
@@ -8710,8 +8718,8 @@ transition: box-shadow .15s linear;
                 $this->app->redirect(trim($cbResult['data']['force_url']));
             }
 
-            $this->app->enqueueMessage(BFText::_('COM_CONTENTBUILDER_SAVED'), 'success');
-            $this->app->redirect(Route::_('index.php?option=com_contentbuilder&controller=details&Itemid=' . BFRequest::getInt('Itemid', 0) . '&backtolist=' . BFRequest::getInt('backtolist', 0) . '&id=' . $cbResult['data']['id'] . '&record_id=' . $cbRecordId . '&limitstart=' . BFRequest::getInt('limitstart', 0) . '&filter_order=' . BFRequest::getCmd('filter_order'), false));
+            $this->app->enqueueMessage(BFText::_('COM_CONTENTBUILDERNG_SAVED'), 'success');
+            $this->app->redirect(Route::_('index.php?option=com_contentbuilderng&task=details.display&Itemid=' . BFRequest::getInt('Itemid', 0) . '&backtolist=' . BFRequest::getInt('backtolist', 0) . '&id=' . $cbResult['data']['id'] . '&record_id=' . $cbRecordId . '&limitstart=' . BFRequest::getInt('limitstart', 0) . '&filter_order=' . BFRequest::getCmd('filter_order'), false));
         }
 
         if (!$paymentAction) {

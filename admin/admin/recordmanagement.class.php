@@ -2086,7 +2086,7 @@ class bfRecordManagement
         // CONTENTBUILDER
         $isContentBuilder = false;
 
-        if (file_exists(JPATH_SITE . '/administrator/components/com_contentbuilder/classes/contentbuilder.php')) {
+        if (file_exists(JPATH_SITE . '/administrator/components/com_contentbuilderng/com_contentbuilderng.xml')) {
             $isContentBuilder = true;
         }
 

@@ -17,6 +17,12 @@ require_once ($ff_admpath . '/admin/easymode.class.php');
 require_once ($ff_admpath . '/libraries/Zend/Json/Decoder.php');
 require_once ($ff_admpath . '/libraries/Zend/Json/Encoder.php');
 
+$cbngBasePath = JPATH_SITE . '/administrator/components/com_contentbuilderng';
+if (is_file($cbngBasePath . '/com_contentbuilderng.xml')) {
+	require_once $cbngBasePath . '/src/Helper/FormSourceFactory.php';
+	require_once $cbngBasePath . '/src/Service/FormSupportService.php';
+}
+
 $easyMode = new EasyMode();
 
 if ($easyMode->getUserBrowser() == 'firefox' || $easyMode->getUserBrowser() == 'chrome' || $easyMode->getUserBrowser() == 'safari') {
@@ -56,23 +62,20 @@ if ($easyMode->getUserBrowser() == 'firefox' || $easyMode->getUserBrowser() == '
 			);
 
 
-			// CONTENTBUILDER
-			if (file_exists(JPATH_SITE . '/administrator/components/com_contentbuilder/classes/contentbuilder.php')) {
-				require_once (JPATH_SITE . '/administrator/components/com_contentbuilder/classes/contentbuilder.php');
-				$cbForm = contentbuilder::getForm('com_breezingforms', $formId);
+			// CONTENTBUILDERNG
+			if (file_exists(JPATH_SITE . '/administrator/components/com_contentbuilderng/com_contentbuilderng.xml')) {
+				$cbForm = \CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory::getForm('com_breezingforms', $formId);
 				$db = Factory::getContainer()->get(DatabaseInterface::class);
 				$db->setQuery("Select id From #__contentbuilderng_forms Where `type` = 'com_breezingforms' And `reference_id` = " . intval($formId));
 				$cbForms = $db->loadColumn();
 				if (is_object($cbForm) && count($cbForms)) {
-					require_once (JPATH_SITE . '/administrator/components/com_contentbuilder/tables/elements.php');
+					$formSupportService = new \CB\Component\Contentbuilderng\Administrator\Service\FormSupportService();
 					foreach ($cbForms as $dataId) {
-						contentbuilder::synchElements($dataId, $cbForm);
-						$elements_table = new TableElements($db);
-						$elements_table->reorder('form_id=' . $dataId);
+						$formSupportService->synchElements($dataId, $cbForm);
 					}
 				}
 			}
-			// CONTENTBUILDER END
+			// CONTENTBUILDERNG END
 
 			echo EasyModeHtml::showApplication(
 				$formId,

@@ -2387,11 +2387,6 @@ class HTML_facileFormsProcessor
                 }
             }
 
-            if (!BFRequest::getInt('cb_form_id', 0) && !BFRequest::getInt('cb_record_id', 0) && count($cbForms) === 1) {
-                BFRequest::setVar('cb_form_id', (int) $cbForms[0]);
-                BFRequest::setVar('cbIsNew', 1);
-            }
-
             if (BFRequest::getInt('cb_form_id', 0)) {
 
                 // test the permissions of given record
@@ -3488,24 +3483,35 @@ class HTML_facileFormsProcessor
                 Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('<!--' . nl() . 'var bfDeactivateField = new Array();' . nl() . '//-->');
                 echo '<script type="text/javascript">' . nl();
                 echo '<!--' . nl();
+                echo 'function bfContentBuilderFieldHasVisibleControl(fieldId){' . nl();
+                echo 'var wrap = JQuery("#bfElemWrap" + fieldId);' . nl();
+                echo 'if(!wrap.length){ return false; }' . nl();
+                echo 'var hasVisibleControl = false;' . nl();
+                echo 'wrap.find(".ff_elem").each(function(){' . nl();
+                echo 'if(typeof this.type != "undefined" && this.type != "hidden"){ hasVisibleControl = true; return false; }' . nl();
+                echo '});' . nl();
+                echo 'return hasVisibleControl;' . nl();
+                echo '}' . nl();
                 echo 'function bfDisableContentBuilderFields(){' . nl();
             }
             foreach ($cbNonEditableFields as $cbNonEditableField) {
                 echo 'if(typeof document.getElementById("ff_elem' . $cbNonEditableField . '").disabled != "undefined"){' . nl();
+                echo 'bfCbMainElement = document.getElementById("ff_elem' . $cbNonEditableField . '");' . nl();
+                echo 'bfCbRespectReadonly = (bfCbMainElement && typeof bfCbMainElement.readOnly != "undefined" && bfCbMainElement.readOnly);' . nl();
                 echo 'bfCbName = document.getElementById("ff_elem' . $cbNonEditableField . '").name;' . nl();
                 echo 'if(typeof document.getElementsByName != "undefined"){' . nl();
                 echo 'bfCbElements = document.getElementsByName(bfCbName);' . nl();
                 echo 'for(var i = 0; i < bfCbElements.length; i++){' . nl();
-                echo 'if(typeof bfCbElements[i].disabled != "undefined"){' . nl();
+                echo 'if(typeof bfCbElements[i].disabled != "undefined" && !bfCbRespectReadonly){' . nl();
                 echo 'bfCbElements[i].disabled = true;' . nl();
                 echo '}' . nl();
                 echo 'bfDeactivateField[bfCbName]=true;' . nl();
-                echo 'if(typeof JQuery != "undefined"){ JQuery("#bfElemWrap' . $cbNonEditableField . '").css("display", "none"); }' . nl();
+                echo 'if(typeof JQuery != "undefined" && !bfContentBuilderFieldHasVisibleControl("' . $cbNonEditableField . '")){ JQuery("#bfElemWrap' . $cbNonEditableField . '").css("display", "none"); }' . nl();
                 echo '}' . nl();
                 echo '}else{' . nl();
-                echo 'document.getElementById("ff_elem' . $cbNonEditableField . '").disabled = true;' . nl();
+                echo 'if(!bfCbRespectReadonly){ document.getElementById("ff_elem' . $cbNonEditableField . '").disabled = true; }' . nl();
                 echo 'bfDeactivateField[bfCbName]=true;' . nl();
-                echo 'if(typeof JQuery != "undefined"){ JQuery("#bfElemWrap' . $cbNonEditableField . '").css("display", "none"); }' . nl();
+                echo 'if(typeof JQuery != "undefined" && !bfContentBuilderFieldHasVisibleControl("' . $cbNonEditableField . '")){ JQuery("#bfElemWrap' . $cbNonEditableField . '").css("display", "none"); }' . nl();
                 echo '}' . nl();
                 echo '}' . nl();
             }

@@ -544,7 +544,7 @@ class HTML_facileFormsConf
 					$selpkg = $pkg;
 			} // foreach
 
-		ToolBarHelper::custom('mkpackage', 'save.png', 'save_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_CONTINUE'), false);
+		ToolBarHelper::custom('mkpackage', 'save.png', 'save_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_SAVE_PACKAGE'), false);
 		ToolBarHelper::custom('edit', 'cancel.png', 'cancel_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_CLOSE'), false);
 
 		?>

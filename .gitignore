@@ -11,6 +11,7 @@ administrator/cache/
 configuration.php
 facileforms.config.php
 .htaccess
+.codex
 
 administrator/.htaccess
 

@@ -257,10 +257,10 @@ if (!function_exists('bf_about_get_php_libraries')) {
     {
         $indexedLibraries = array();
 
-        $stripeInstalled = JPATH_ADMINISTRATOR . '/components/com_breezingforms/admin/libraries/stripe/vendor/composer/installed.json';
-        $dropboxInstalled = JPATH_ADMINISTRATOR . '/components/com_breezingforms/admin/libraries/dropbox/v2/composer/installed.json';
-        $tcpdfComposer = JPATH_ADMINISTRATOR . '/components/com_breezingforms/admin/libraries/tcpdf/composer.json';
-        $vendorComposer = JPATH_ADMINISTRATOR . '/components/com_breezingforms/admin/libraries/vendor/composer.json';
+        $stripeInstalled = JPATH_ADMINISTRATOR . '/components/com_breezingforms/administrator/libraries/stripe/vendor/composer/installed.json';
+        $dropboxInstalled = JPATH_ADMINISTRATOR . '/components/com_breezingforms/administrator/libraries/dropbox/v2/composer/installed.json';
+        $tcpdfComposer = JPATH_ADMINISTRATOR . '/components/com_breezingforms/administrator/libraries/tcpdf/composer.json';
+        $vendorComposer = JPATH_ADMINISTRATOR . '/components/com_breezingforms/administrator/libraries/vendor/composer.json';
 
         bf_about_collect_php_libraries_from_installed_json($indexedLibraries, $stripeInstalled);
         bf_about_collect_php_libraries_from_installed_json($indexedLibraries, $dropboxInstalled);
@@ -315,7 +315,7 @@ if (!function_exists('bf_about_get_javascript_libraries')) {
     {
         $notAvailable = BFText::_('COM_BREEZINGFORMS_NOT_AVAILABLE');
         $bundledSource = BFText::_('COM_BREEZINGFORMS_JS_LIBRARY_SOURCE_BUNDLED');
-        $basePath = JPATH_ADMINISTRATOR . '/components/com_breezingforms/admin/libraries/jquery/';
+        $basePath = JPATH_ADMINISTRATOR . '/components/com_breezingforms/administrator/libraries/jquery/';
         $libraries = array();
 
         $candidates = array(

@@ -665,6 +665,23 @@ class com_breezingformsInstallerScript
         }
     }
 
+    private function cleanupComponentLogFile(): void
+    {
+        $logFile = JPATH_ADMINISTRATOR . '/logs/com_breezingformsng.log';
+
+        if (!is_file($logFile)) {
+            return;
+        }
+
+        try {
+            if (File::delete($logFile)) {
+                $this->log('Component log file removed: com_contentbuilderng.log');
+            }
+        } catch (\Throwable $e) {
+            $this->log('Unable to remove component log file during uninstall: ' . $e->getMessage(), Log::WARNING);
+        }
+    }
+
     private function copyComponentImageAssets(): void
     {
         $sourceImages = JPATH_SITE . '/components/com_breezingforms/images';
@@ -904,6 +921,7 @@ class com_breezingformsInstallerScript
         }
 
         $this->cleanupOldConfig();
+        $this->cleanupComponentLogFile();
         $this->log('BreezingForms uninstallation completed.');
     }
 

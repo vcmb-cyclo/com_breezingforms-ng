@@ -18,8 +18,6 @@
 	<version>6.0.8-RC5</version>
 	<description>Installation successful. Next find BreezingForms in the Components menu, and finish the installation process.</description>
 
-	<installfile>install.php</installfile>
-	<uninstallfile>uninstall.php</uninstallfile>
 	<scriptfile>script.php</scriptfile>
 
 	<updateservers>
@@ -65,10 +63,9 @@
 
 	<!-- =========================================================
 	     ADMINISTRATION
-	     folder="admin" => chemins relatifs au dossier /admin du ZIP
+	     folder="administrator" => chemins relatifs au dossier /administrator du ZIP
 	     ========================================================= -->
 	<administration>
-
 		<menu>COM_BREEZINGFORMS</menu>
 
 		<submenu>
@@ -114,7 +111,7 @@
 			<menu option="com_breezingforms" act="about" alt="BreezingForms/About">COM_BREEZINGFORMS_ABOUT</menu>
 		</submenu>
 
-		<files folder="admin">
+		<files folder="administrator">
 			<filename>index.html</filename>
 			<filename>access.xml</filename>
 			<filename>config.xml</filename>
@@ -141,7 +138,7 @@
 			<folder>assets</folder>
 		</files>
 
-		<languages folder="admin">
+		<languages folder="administrator">
 			<language tag="de-DE">languages/de-DE/de-DE.com_breezingforms.ini</language>
 			<language tag="de-DE">languages/de-DE/de-DE.com_breezingforms.sys.ini</language>
 

@@ -949,8 +949,13 @@
 		<package>GN</package>
 		<name>gn_get_vcmb_nb_inscrits</name>
 		<title>VCMB -\x3E Nb Inscrits</title>
-		<description>Compte le nombre de records du formulaire\r\nRetourne un nombre de records.\r\n\r\n// Gilles — 24/03/2026\r\n// Count BreezingForms records for current form (by form ID\x2C rename-proof)\r\n// Table : #__facileforms_records\r\n// Joomla 6 / PHP 8.x / BreezingForms safe\r\n// ------------------------------------------------------------</description>
-		<code>use Joomla\x5CCMS\x5CFactory\x3B\r\nuse Joomla\x5CDatabase\x5CParameterType\x3B\r\n\r\nfunction gn_get_vcmb_nb_inscrits(int $formId): int\r\n{\r\n    // ------------------------------------------------\r\n    // GN - Compte le nombre d\x27inscrits d\x27un formulaire BF\r\n    // Version 1.1 - 24/03/2026\r\n    // Retourne 0 si formId invalide ou erreur SQL\r\n    // ------------------------------------------------\r\n\r\n    if ($formId \x3C= 0) {\r\n        return 0\x3B\r\n    }\r\n\r\n    try {\r\n        $db = Factory::getDbo()\x3B\r\n\r\n        $query = $db-\x3EgetQuery(true)\r\n            -\x3Eselect(\x27COUNT(*)\x27)\r\n            -\x3Efrom($db-\x3EquoteName(\x27#__facileforms_records\x27))\r\n            -\x3Ewhere($db-\x3EquoteName(\x27form\x27) . \x27 = :formid\x27)\r\n            -\x3Ebind(\x27:formid\x27\x2C $formId\x2C ParameterType::INTEGER)\x3B\r\n\r\n        $db-\x3EsetQuery($query)\x3B\r\n\r\n        return (int) $db-\x3EloadResult()\x3B\r\n\r\n    } catch (\x5CThrowable $e) {\r\n        return 0\x3B\r\n    }\r\n\r\n} // gn_get_vcmb_nb_inscrits</code>
+		<description>
+			Compte le nombre de records du formulaire\r\nRetourne un nombre de records.\r\n\r\n// Gilles — 24/03/2026\r\n// Count BreezingForms records for current form (by form ID\x2C rename-proof)\r\n// Table : #__facileforms_records\r\n// Joomla 6 / PHP 8.x / BreezingForms safe\r\n// ------------------------------------------------------------
+		</description>
+		<code>
+			use Joomla\x5CCMS\x5CFactory\x3B\r\nuse Joomla\x5CDatabase\x5CParameterType\x3B\r\nuse Joomla\x5CDatabase\x5CDatabaseInterface\x3B\r\n\r\nfunction gn_get_vcmb_nb_inscrits(int $formId): int\r\n{\r\n // ------------------------------------------------\r\n // GN - Compte le nombre d\x27inscrits d\x27un formulaire BF\r\n // Version 1.1 - 24/03/2026\r\n // Retourne 0 si formId invalide ou erreur SQL\r\n // ------------------------------------------------\r\n\r\n if ($formId \x3C= 0) {\r\n return 0\x3B\r\n }\r\n\r\n try {\r\n $db = Factory::getContainer()-\x3Eget(DatabaseInterface::class)\x3B\r\n\r\n $query = $db-\x3EgetQuery(true)\r\n -\x3Eselect(\x27COUNT(*)\x27)\r\n -\x3Efrom($db-\x3EquoteName(\x27#__facileforms_records\x27))\r\n -\x3Ewhere($db-\x3EquoteName(\x27form\x27) . \x27 = :formid\x27)\r\n -\x3Ebind(\x27:formid\x27\x2C $formId\x2C ParameterType::INTEGER)\x3B\r\n\r\n $db-\x3EsetQuery($query)\x3B\r\n\r\n return (int) $db-\x3EloadResult()\x3B\r\n\r\n } catch (\x5CThrowable $e) {\r\n return 0\x3B\r\n }\r\n\r\n} // gn_get_vcmb_nb_inscrits
+		</code>
+		<unit_tests>// Test_Joomla_6 = id (4)\r\n\x274\x27 -\x3E 31</unit_tests>
 	</piece>
 	<piece id="121">
 		<package>GN</package>

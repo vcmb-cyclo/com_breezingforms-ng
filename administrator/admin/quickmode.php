@@ -21,6 +21,8 @@ require_once ($ff_admpath . '/libraries/Zend/Json/Encoder.php');
 $cbngBasePath = JPATH_SITE . '/administrator/components/com_contentbuilderng';
 if (is_file($cbngBasePath . '/com_contentbuilderng.xml')) {
 	require_once $cbngBasePath . '/src/Helper/FormSourceFactory.php';
+	require_once $cbngBasePath . '/src/Service/PathService.php';
+	require_once $cbngBasePath . '/src/Service/TemplateSampleService.php';
 	require_once $cbngBasePath . '/src/Service/FormSupportService.php';
 }
 
@@ -68,7 +70,11 @@ switch ($task) {
 				$db->setQuery("Select id From #__contentbuilderng_forms Where `type` = 'com_breezingforms' And `reference_id` = " . intval($formId));
 				$cbForms = $db->loadColumn();
 				if (is_object($cbForm) && count($cbForms)) {
-					$formSupportService = new \CB\Component\Contentbuilderng\Administrator\Service\FormSupportService();
+					$formSupportService = new \CB\Component\Contentbuilderng\Administrator\Service\FormSupportService(
+						new \CB\Component\Contentbuilderng\Administrator\Service\PathService(),
+						$db,
+						new \CB\Component\Contentbuilderng\Administrator\Service\TemplateSampleService(Factory::getApplication(), $db)
+					);
 					foreach ($cbForms as $dataId) {
 						$formSupportService->synchElements($dataId, $cbForm);
 					}

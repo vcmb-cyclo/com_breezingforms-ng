@@ -54,10 +54,10 @@ class facileFormsConfig extends facileFormsConf
 		$this->bindRequest($_REQUEST);
 		$this->store();
 		if ($pkg != '') {
-			Factory::getApplication()->enqueueMessage(BFText::_('COM_BREEZINGFORMS_CONFIG_SAVED'));
+			Factory::getApplication()->enqueueMessage(BFText::_('COM_BREEZINGFORMSNG_CONFIG_SAVED'));
 			Factory::getApplication()->redirect($caller . "&pkg=$pkg");
 		}
-		Factory::getApplication()->enqueueMessage(BFText::_('COM_BREEZINGFORMS_CONFIG_SAVED'));
+		Factory::getApplication()->enqueueMessage(BFText::_('COM_BREEZINGFORMSNG_CONFIG_SAVED'));
 		Factory::getApplication()->redirect('index.php?option=com_breezingformsng&act=configuration');
 	} // save
 
@@ -747,7 +747,7 @@ class facileFormsConfig extends facileFormsConf
 				$option,
 				$caller,
 				$pkg,
-				BFText::_('COM_BREEZINGFORMS_INSTALLER_NOUPLOADFILE'),
+				BFText::_('COM_BREEZINGFORMSNG_INSTALLER_NOUPLOADFILE'),
 				'instpackage'
 			);
 			return;
@@ -778,14 +778,14 @@ class facileFormsConfig extends facileFormsConf
 		$baseDir = Path::clean($ff_admpath . '/packages');
 
 		if (!file_exists($baseDir))
-			return BFText::_('COM_BREEZINGFORMS_INSTALLER_UPLOADNODIR');
+			return BFText::_('COM_BREEZINGFORMSNG_INSTALLER_UPLOADNODIR');
 
 		if (!is_writable($baseDir))
-			return BFText::_('COM_BREEZINGFORMS_INSTALLER_UPLOADDIRNOTWRT') .' ' .$baseDir;
+			return BFText::_('COM_BREEZINGFORMSNG_INSTALLER_UPLOADDIRNOTWRT') .' ' .$baseDir;
 
 		$path = $baseDir . '/' . $userfile_name;
 		if (!move_uploaded_file($filename, $path))
-			return BFText::_('COM_BREEZINGFORMS_INSTALLER_MOVEFAILED');
+			return BFText::_('COM_BREEZINGFORMSNG_INSTALLER_MOVEFAILED');
 
 		$filemode = NULL;
 		if (isset($mosConfig_fileperms)) {
@@ -796,7 +796,7 @@ class facileFormsConfig extends facileFormsConf
 
 		if (isset($filemode))
 			if (!@chmod($path, $filemode))
-				return BFText::_('COM_BREEZINGFORMS_INSTALLER_CHMODFAILED');
+				return BFText::_('COM_BREEZINGFORMSNG_INSTALLER_CHMODFAILED');
 			
 		return '';
 	} // uploadfile
@@ -814,7 +814,7 @@ class facileFormsConfig extends facileFormsConf
 		$remaining = count($names) - count($visibleNames);
 
 		if ($remaining > 0) {
-			$suffix .= ', ' . sprintf(BFText::_('COM_BREEZINGFORMS_INSTALLER_UNINST_MORE'), $remaining);
+			$suffix .= ', ' . sprintf(BFText::_('COM_BREEZINGFORMSNG_INSTALLER_UNINST_MORE'), $remaining);
 		}
 
 		return $suffix . ')';
@@ -865,20 +865,20 @@ class facileFormsConfig extends facileFormsConf
 	private function formatPackageUninstallReport(array $report): string
 	{
 		return sprintf(
-			BFText::_('COM_BREEZINGFORMS_INSTALLER_UNINST_PACKAGE_DETAIL'),
+			BFText::_('COM_BREEZINGFORMSNG_INSTALLER_UNINST_PACKAGE_DETAIL'),
 			$report['package'],
-			BFText::_('COM_BREEZINGFORMS_INSTALLER_FORMSIMP'),
+			BFText::_('COM_BREEZINGFORMSNG_INSTALLER_FORMSIMP'),
 			$report['forms_count'],
 			$this->buildUninstallNamesSuffix($report['forms_names']),
-			BFText::_('COM_BREEZINGFORMS_INSTALLER_ELEMSIMP'),
+			BFText::_('COM_BREEZINGFORMSNG_INSTALLER_ELEMSIMP'),
 			$report['elements_count'],
-			BFText::_('COM_BREEZINGFORMS_INSTALLER_SCRIPTSIMP'),
+			BFText::_('COM_BREEZINGFORMSNG_INSTALLER_SCRIPTSIMP'),
 			$report['scripts_count'],
 			$this->buildUninstallNamesSuffix($report['scripts_names']),
-			BFText::_('COM_BREEZINGFORMS_INSTALLER_PIECESIMP'),
+			BFText::_('COM_BREEZINGFORMSNG_INSTALLER_PIECESIMP'),
 			$report['pieces_count'],
 			$this->buildUninstallNamesSuffix($report['pieces_names']),
-			BFText::_('COM_BREEZINGFORMS_INSTALLER_MENUSIMP'),
+			BFText::_('COM_BREEZINGFORMSNG_INSTALLER_MENUSIMP'),
 			$report['menus_count'],
 			$this->buildUninstallNamesSuffix($report['menus_names'])
 		);
@@ -886,7 +886,7 @@ class facileFormsConfig extends facileFormsConf
 
 	function uninstPackages($option, $caller, $pkg, $ids)
 	{
-		$message = count($ids) . ' ' . BFText::_('COM_BREEZINGFORMS_INSTALLER_PKGSUNINST');
+		$message = count($ids) . ' ' . BFText::_('COM_BREEZINGFORMSNG_INSTALLER_PKGSUNINST');
 
 		if (count($ids)) {
 			$details = [];

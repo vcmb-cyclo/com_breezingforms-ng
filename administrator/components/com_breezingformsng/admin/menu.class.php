@@ -31,7 +31,7 @@ class facileFormsMenu
 		$lists['forms'] = $database->loadObjectList();
 
 		$parents = array();
-		$parents[] = HTMLHelper::_('select.option', 0, BFText::_('COM_BREEZINGFORMS_MENUS_TOP'));
+		$parents[] = HTMLHelper::_('select.option', 0, BFText::_('COM_BREEZINGFORMSNG_MENUS_TOP'));
 		$database->setQuery(
 			"select id as value, title as text " .
 			"from #__facileforms_compmenus " .
@@ -82,7 +82,7 @@ class facileFormsMenu
 		$lists = array();
 
 		$parents = array();
-		$parents[] = HTMLHelper::_('select.option', 0, BFText::_('COM_BREEZINGFORMS_MENUS_TOP'));
+		$parents[] = HTMLHelper::_('select.option', 0, BFText::_('COM_BREEZINGFORMSNG_MENUS_TOP'));
 		$database->setQuery(
 			"select id as value, title as text " .
 			"from #__facileforms_compmenus " .
@@ -195,7 +195,7 @@ class facileFormsMenu
 		$row->reorder('parent=' . $row->parent);
 		$result = updateComponentMenus();
 		$type = 'message';
-		$msg = BFText::_('COM_BREEZINGFORMS_MENUS_SAVED');
+		$msg = BFText::_('COM_BREEZINGFORMSNG_MENUS_SAVED');
 		if ($result != '') {
 			$msg = $result;
 			$type = 'error';
@@ -232,7 +232,7 @@ class facileFormsMenu
 					$child->store();
 				} // for
 			} // foreach
-		$msg = $total . ' ' . BFText::_('COM_BREEZINGFORMS_MENUS_SUCOPIED');
+		$msg = $total . ' ' . BFText::_('COM_BREEZINGFORMSNG_MENUS_SUCOPIED');
 		$result = updateComponentMenus(true);
 		if ($result != '') {
 			$msg = $result;

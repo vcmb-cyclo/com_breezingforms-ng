@@ -102,7 +102,7 @@ class bfRecordManagement
 
         $out = '<form onsubmit="return false;" style="display: inline;">';
         $out .= '<select name="form_selection" id="bfFormSelection">' . "\n";
-        $out .= '<option value="0">' . htmlentities(BFText::_('COM_BREEZINGFORMS_ALL'), ENT_QUOTES, 'UTF-8') . '</option>' . "\n";
+        $out .= '<option value="0">' . htmlentities(BFText::_('COM_BREEZINGFORMSNG_ALL'), ENT_QUOTES, 'UTF-8') . '</option>' . "\n";
         foreach ($forms as $form) {
             $out .= '<option value="' . $form['id'] . '">' . htmlentities($form['title'], ENT_QUOTES, 'UTF-8') . ' (' . htmlentities($form['name'], ENT_QUOTES, 'UTF-8') . ')</option>' . "\n";
         }
@@ -113,12 +113,12 @@ class bfRecordManagement
         // text search
         $out .= '<form onsubmit="return false;">';
         $out .= '<div id="bfSearchMenu">';
-        $out .= '<div id="bfSearchWrapper"><div id="bfSearchOpen">' . htmlentities(BFText::_('COM_BREEZINGFORMS_SEARCHRECORDS'), ENT_QUOTES, 'UTF-8') . '</div>';
+        $out .= '<div id="bfSearchWrapper"><div id="bfSearchOpen">' . htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHRECORDS'), ENT_QUOTES, 'UTF-8') . '</div>';
         $out .= '<div id="bfSearch">' . "\n";
-        $out .= '<label for="bfrecordsearch">' . htmlentities(BFText::_('COM_BREEZINGFORMS_SEARCHTEXT'), ENT_QUOTES, 'UTF-8') . '</label>';
+        $out .= '<label for="bfrecordsearch">' . htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHTEXT'), ENT_QUOTES, 'UTF-8') . '</label>';
         $out .= '<input type="text" value="" name="bfrecordsearch" id="bfrecordsearch"/>';
 
-        $out .= '<label for="bfrecordsearchintext">' . htmlentities(BFText::_('COM_BREEZINGFORMS_SEARCHFILTERIN'), ENT_QUOTES, 'UTF-8') . '</label>';
+        $out .= '<label for="bfrecordsearchintext">' . htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHFILTERIN'), ENT_QUOTES, 'UTF-8') . '</label>';
 
         $out .= '<br/>';
 
@@ -126,51 +126,51 @@ class bfRecordManagement
         $out .= '<tr>';
         $out .= '<td>';
 
-        $out .= '<input type="checkbox" value="1" name="bfrecordsearchinuserid" id="bfrecordsearchinuserid" /> <label for="bfrecordsearchinuserid">' . htmlentities(BFText::_('COM_BREEZINGFORMS_SEARCHFILTERINUSERID'), ENT_QUOTES, 'UTF-8') . '</label> ';
+        $out .= '<input type="checkbox" value="1" name="bfrecordsearchinuserid" id="bfrecordsearchinuserid" /> <label for="bfrecordsearchinuserid">' . htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHFILTERINUSERID'), ENT_QUOTES, 'UTF-8') . '</label> ';
 
         $out .= '</td>';
         $out .= '<td>';
 
-        $out .= '<input type="checkbox" value="1" name="bfrecordsearchinusername" id="bfrecordsearchinusername" /> <label for="bfrecordsearchinusername">' . htmlentities(BFText::_('COM_BREEZINGFORMS_SEARCHFILTERINUSERNAME'), ENT_QUOTES, 'UTF-8') . '</label> ';
+        $out .= '<input type="checkbox" value="1" name="bfrecordsearchinusername" id="bfrecordsearchinusername" /> <label for="bfrecordsearchinusername">' . htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHFILTERINUSERNAME'), ENT_QUOTES, 'UTF-8') . '</label> ';
 
         $out .= '</td>';
         $out .= '<td>';
 
-        $out .= '<input type="checkbox" value="1" name="bfrecordsearchinuserfullname" id="bfrecordsearchinuserfullname" /> <label for="bfrecordsearchinuserfullname">' . htmlentities(BFText::_('COM_BREEZINGFORMS_SEARCHFILTERINUSERFULLNAME'), ENT_QUOTES, 'UTF-8') . '</label> ';
-
-        $out .= '</td>';
-        $out .= '</tr>';
-        $out .= '<tr>';
-        $out .= '<td>';
-
-        $out .= '<input type="checkbox" value="1" name="bfrecordsearchinid" id="bfrecordsearchinid" /> <label for="bfrecordsearchinid">' . htmlentities(BFText::_('COM_BREEZINGFORMS_SEARCHFILTERINID'), ENT_QUOTES, 'UTF-8') . '</label> ';
-
-        $out .= '</td>';
-        $out .= '<td>';
-
-        $out .= '<input type="checkbox" value="1" name="bfrecordsearchinip" id="bfrecordsearchinip" /> <label for="bfrecordsearchinip">' . htmlentities(BFText::_('COM_BREEZINGFORMS_SEARCHFILTERINIP'), ENT_QUOTES, 'UTF-8') . '</label> ';
-
-        $out .= '</td>';
-        $out .= '<td>';
-
-        $out .= '<input type="checkbox" value="1" name="bfrecordsearchinviewed" id="bfrecordsearchinviewed" /> <label for="bfrecordsearchinviewed">' . htmlentities(BFText::_('COM_BREEZINGFORMS_SEARCHFILTERINVIEWED'), ENT_QUOTES, 'UTF-8') . '</label> ';
+        $out .= '<input type="checkbox" value="1" name="bfrecordsearchinuserfullname" id="bfrecordsearchinuserfullname" /> <label for="bfrecordsearchinuserfullname">' . htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHFILTERINUSERFULLNAME'), ENT_QUOTES, 'UTF-8') . '</label> ';
 
         $out .= '</td>';
         $out .= '</tr>';
         $out .= '<tr>';
         $out .= '<td>';
 
-        $out .= '<input type="checkbox" value="1" name="bfrecordsearchinexported" id="bfrecordsearchinexported" /> <label for="bfrecordsearchinexported">' . htmlentities(BFText::_('COM_BREEZINGFORMS_SEARCHFILTERINEXPORTED'), ENT_QUOTES, 'UTF-8') . '</label> ';
+        $out .= '<input type="checkbox" value="1" name="bfrecordsearchinid" id="bfrecordsearchinid" /> <label for="bfrecordsearchinid">' . htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHFILTERINID'), ENT_QUOTES, 'UTF-8') . '</label> ';
 
         $out .= '</td>';
         $out .= '<td>';
 
-        $out .= '<input type="checkbox" value="1" name="bfrecordsearchinarchived" id="bfrecordsearchinarchived" /> <label for="bfrecordsearchinarchived">' . htmlentities(BFText::_('COM_BREEZINGFORMS_SEARCHFILTERINARCHIVED'), ENT_QUOTES, 'UTF-8') . '</label> ';
+        $out .= '<input type="checkbox" value="1" name="bfrecordsearchinip" id="bfrecordsearchinip" /> <label for="bfrecordsearchinip">' . htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHFILTERINIP'), ENT_QUOTES, 'UTF-8') . '</label> ';
 
         $out .= '</td>';
         $out .= '<td>';
 
-        $out .= '<input type="checkbox" value="1" name="bfrecordsearchinpayment" id="bfrecordsearchinpayment" /> <label for="bfrecordsearchinpayment">' . htmlentities(BFText::_('COM_BREEZINGFORMS_SEARCHFILTERINPAYMENT'), ENT_QUOTES, 'UTF-8') . '</label> ';
+        $out .= '<input type="checkbox" value="1" name="bfrecordsearchinviewed" id="bfrecordsearchinviewed" /> <label for="bfrecordsearchinviewed">' . htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHFILTERINVIEWED'), ENT_QUOTES, 'UTF-8') . '</label> ';
+
+        $out .= '</td>';
+        $out .= '</tr>';
+        $out .= '<tr>';
+        $out .= '<td>';
+
+        $out .= '<input type="checkbox" value="1" name="bfrecordsearchinexported" id="bfrecordsearchinexported" /> <label for="bfrecordsearchinexported">' . htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHFILTERINEXPORTED'), ENT_QUOTES, 'UTF-8') . '</label> ';
+
+        $out .= '</td>';
+        $out .= '<td>';
+
+        $out .= '<input type="checkbox" value="1" name="bfrecordsearchinarchived" id="bfrecordsearchinarchived" /> <label for="bfrecordsearchinarchived">' . htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHFILTERINARCHIVED'), ENT_QUOTES, 'UTF-8') . '</label> ';
+
+        $out .= '</td>';
+        $out .= '<td>';
+
+        $out .= '<input type="checkbox" value="1" name="bfrecordsearchinpayment" id="bfrecordsearchinpayment" /> <label for="bfrecordsearchinpayment">' . htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHFILTERINPAYMENT'), ENT_QUOTES, 'UTF-8') . '</label> ';
 
         $out .= '</td>';
         $out .= '</tr>';
@@ -178,7 +178,7 @@ class bfRecordManagement
 
         $out .= '<td>';
 
-        $out .= '<input type="checkbox" value="1" name="bfrecordsearchinopted" id="bfrecordsearchinopted" /> <label for="bfrecordsearchinopted">' . htmlentities(BFText::_('COM_BREEZINGFORMS_SEARCHFILTERINOPTED'), ENT_QUOTES, 'UTF-8') . '</label> ';
+        $out .= '<input type="checkbox" value="1" name="bfrecordsearchinopted" id="bfrecordsearchinopted" /> <label for="bfrecordsearchinopted">' . htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHFILTERINOPTED'), ENT_QUOTES, 'UTF-8') . '</label> ';
 
         $out .= '</td>';
 
@@ -191,7 +191,7 @@ class bfRecordManagement
         $out .= '<td>';
 
         $out .= '<span id="bfrecordsearchintextspan">';
-        $out .= '<input type="checkbox" checked="checked" value="1" name="bfrecordsearchintext" id="bfrecordsearchintext" /> <label for="bfrecordsearchintext">' . htmlentities(BFText::_('COM_BREEZINGFORMS_SEARCHFILTERINTEXT'), ENT_QUOTES, 'UTF-8') . '</label> ';
+        $out .= '<input type="checkbox" checked="checked" value="1" name="bfrecordsearchintext" id="bfrecordsearchintext" /> <label for="bfrecordsearchintext">' . htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHFILTERINTEXT'), ENT_QUOTES, 'UTF-8') . '</label> ';
         $out .= '</span>';
 
         $out .= '</td>';
@@ -207,13 +207,13 @@ class bfRecordManagement
         $out .= '<div id="bfrecordsearchdatefromtowrap">';
 
         $out .= '<div id="bfrecordsearchdatefromwrap">';
-        $out .= '<label for="bfrecordsearchdatefrom">' . htmlentities(BFText::_('COM_BREEZINGFORMS_SEARCHDATEFROM'), ENT_QUOTES, 'UTF-8') . '</label>';
+        $out .= '<label for="bfrecordsearchdatefrom">' . htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHDATEFROM'), ENT_QUOTES, 'UTF-8') . '</label>';
         $out .= '<br/>';
         $out .= '<input type="text" value="" name="bfrecordsearchdatefrom" id="bfrecordsearchdatefrom"/>';
         $out .= '</div>';
 
         $out .= '<div id="bfrecordsearchtimefromwrap">';
-        $out .= '<label for="bfrecordsearchtimefrom">' . htmlentities(BFText::_('COM_BREEZINGFORMS_SEARCHTIMEFROM'), ENT_QUOTES, 'UTF-8') . '</label>';
+        $out .= '<label for="bfrecordsearchtimefrom">' . htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHTIMEFROM'), ENT_QUOTES, 'UTF-8') . '</label>';
         $out .= '<br/>';
         $out .= '<input type="text" value="" name="bfrecordsearchtimefrom" id="bfrecordsearchtimefrom"/>';
         $out .= '</div>';
@@ -225,13 +225,13 @@ class bfRecordManagement
         $out .= '<div id="bfrecordsearchtimefromtowrap">';
 
         $out .= '<div id="bfrecordsearchdatetowrap">';
-        $out .= '<label for="bfrecordsearchdateto">' . htmlentities(BFText::_('COM_BREEZINGFORMS_SEARCHDATETO'), ENT_QUOTES, 'UTF-8') . '</label>';
+        $out .= '<label for="bfrecordsearchdateto">' . htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHDATETO'), ENT_QUOTES, 'UTF-8') . '</label>';
         $out .= '<br/>';
         $out .= '<input type="text" value="" name="bfrecordsearchdateto" id="bfrecordsearchdateto"/>';
         $out .= '</div>';
 
         $out .= '<div id="bfrecordsearchtimetowrap">';
-        $out .= '<label for="bfrecordsearchtimeto">' . htmlentities(BFText::_('COM_BREEZINGFORMS_SEARCHTIMETO'), ENT_QUOTES, 'UTF-8') . '</label>';
+        $out .= '<label for="bfrecordsearchtimeto">' . htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHTIMETO'), ENT_QUOTES, 'UTF-8') . '</label>';
         $out .= '<br/>';
         $out .= '<input type="text" value="" name="bfrecordsearchtimeto" id="bfrecordsearchtimeto"/>';
         $out .= '</div>';
@@ -240,14 +240,14 @@ class bfRecordManagement
 
         $out .= '<div style="clear: both;"></div>';
 
-        $out .= '<button class="btn btn-primary button bfFilterTriggerer">' . htmlentities(BFText::_('COM_BREEZINGFORMS_BUTTONFILTER'), ENT_QUOTES, 'UTF-8') . '</button> ';
-        $out .= '<input type="reset" class="btn btn-secondary" value="' . htmlentities(BFText::_('COM_BREEZINGFORMS_BUTTONFILTERRESET'), ENT_QUOTES, 'UTF-8') . '"/se> ';
+        $out .= '<button class="btn btn-primary button bfFilterTriggerer">' . htmlentities(BFText::_('COM_BREEZINGFORMSNG_BUTTONFILTER'), ENT_QUOTES, 'UTF-8') . '</button> ';
+        $out .= '<input type="reset" class="btn btn-secondary" value="' . htmlentities(BFText::_('COM_BREEZINGFORMSNG_BUTTONFILTERRESET'), ENT_QUOTES, 'UTF-8') . '"/se> ';
         $out .= '</div>';
         $out .= '</div>';
         $out .= '</div>';
 
         $out .= '<div id="bfAvailableFieldsMenu">';
-        $out .= '<div id="bfAvailableFieldsWrapper"><div id="bfAvailableFieldsOpen">' . htmlentities(BFText::_('COM_BREEZINGFORMS_OPENFIELDS'), ENT_QUOTES, 'UTF-8') . '</div>';
+        $out .= '<div id="bfAvailableFieldsWrapper"><div id="bfAvailableFieldsOpen">' . htmlentities(BFText::_('COM_BREEZINGFORMSNG_OPENFIELDS'), ENT_QUOTES, 'UTF-8') . '</div>';
         $out .= '<div id="bfAvailableFields"></div>' . "\n";
         $out .= '</div>';
         $out .= '</div>';
@@ -276,7 +276,7 @@ class bfRecordManagement
         $form = BFRequest::getInt('form_selection');
         Factory::getApplication()->getSession()->set('form', $form);
         if ($form == 0) {
-            echo BFText::_('COM_BREEZINGFORMS_IMPORT_CSV_MSG');
+            echo BFText::_('COM_BREEZINGFORMSNG_IMPORT_CSV_MSG');
             return;
         }
         ?>
@@ -328,10 +328,10 @@ class bfRecordManagement
                 <option value="KOI8-RU">KOI8-RU</option>
                 <option value="EUC-JP">EUC-JP</option>
             </select><br>
-            <?php echo BFText::_('COM_BREEZINGFORMS_CSV_ENCODING_MSG') . '<br><br>'; ?>
+            <?php echo BFText::_('COM_BREEZINGFORMSNG_CSV_ENCODING_MSG') . '<br><br>'; ?>
             <input type="hidden" name="form_id" value="<?php echo BFRequest::getInt('form_selection', 0); ?>" />
-            <?php echo BFText::_('COM_BREEZINGFORMS_UPLOAD_MSG'); ?> <input type="file" name="csv_file" accept=".csv" />
-            <input type="submit" value="<?php echo BFText::_('COM_BREEZINGFORMS_UPLOAD_FILE_MSG'); ?>" />
+            <?php echo BFText::_('COM_BREEZINGFORMSNG_UPLOAD_MSG'); ?> <input type="file" name="csv_file" accept=".csv" />
+            <input type="submit" value="<?php echo BFText::_('COM_BREEZINGFORMSNG_UPLOAD_FILE_MSG'); ?>" />
         </form>
         <?php
     }
@@ -364,13 +364,13 @@ class bfRecordManagement
         $file = $_FILES['csv_file']['tmp_name'];
 
         if (!@fopen($file, 'r')) {
-            echo BFText::_('COM_BREEZINGFORMS_FILE_ERROR_MSG');
+            echo BFText::_('COM_BREEZINGFORMSNG_FILE_ERROR_MSG');
             return;
         }
 
         if ($encoding != '0') {
             if (!function_exists('iconv')) {
-                echo BFText::_('COM_BREEZINGFORMS_NO_ICONV_MSG');
+                echo BFText::_('COM_BREEZINGFORMSNG_NO_ICONV_MSG');
                 return;
             }
             $handle = $this->utf8_fopen_read("$file", $encoding);
@@ -385,7 +385,7 @@ class bfRecordManagement
         }
 
         if ($lines[0] == '') {
-            echo BFText::_('COM_BREEZINGFORMS_EMPTY_FILE_MSG');
+            echo BFText::_('COM_BREEZINGFORMSNG_EMPTY_FILE_MSG');
             return;
         }
 
@@ -411,7 +411,7 @@ class bfRecordManagement
         }
 
         if (count($title) == 1) {
-            echo BFText::_('COM_BREEZINGFORMS_EMPTY_FILE_MSG');
+            echo BFText::_('COM_BREEZINGFORMSNG_EMPTY_FILE_MSG');
             return;
         }
 
@@ -575,14 +575,14 @@ class bfRecordManagement
         HTMLHelper::_('behavior.keepalive');
 
 
-        ToolBarHelper::custom('exportPdf', 'download', 'download', BFText::_('COM_BREEZINGFORMS_PDF'), false);
-        ToolBarHelper::custom('exportCsv', 'download', 'download', BFText::_('COM_BREEZINGFORMS_CSV'), false);
-        ToolBarHelper::custom('exportXml', 'download', 'download', BFText::_('COM_BREEZINGFORMS_XML'), false);
-        ToolBarHelper::custom('csvimport', 'upload', 'upload', BFText::_('COM_BREEZINGFORMS_CSV'), false);
-        ToolBarHelper::custom('viewed', 'eye-open', 'eye-open', BFText::_('COM_BREEZINGFORMS_TOOLBAR_VIEW'), false);
-        ToolBarHelper::custom('exported', 'share', 'share', BFText::_('COM_BREEZINGFORMS_TOOLBAR_EXPORT'), false);
-        ToolBarHelper::custom('archived', 'archive', 'archive', BFText::_('COM_BREEZINGFORMS_TOOLBAR_ARCHIVE'), false);
-        ToolBarHelper::custom('remove', 'delete.png', 'delete_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_DELETE'), false);
+        ToolBarHelper::custom('exportPdf', 'download', 'download', BFText::_('COM_BREEZINGFORMSNG_PDF'), false);
+        ToolBarHelper::custom('exportCsv', 'download', 'download', BFText::_('COM_BREEZINGFORMSNG_CSV'), false);
+        ToolBarHelper::custom('exportXml', 'download', 'download', BFText::_('COM_BREEZINGFORMSNG_XML'), false);
+        ToolBarHelper::custom('csvimport', 'upload', 'upload', BFText::_('COM_BREEZINGFORMSNG_CSV'), false);
+        ToolBarHelper::custom('viewed', 'eye-open', 'eye-open', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_VIEW'), false);
+        ToolBarHelper::custom('exported', 'share', 'share', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_EXPORT'), false);
+        ToolBarHelper::custom('archived', 'archive', 'archive', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_ARCHIVE'), false);
+        ToolBarHelper::custom('remove', 'delete.png', 'delete_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_DELETE'), false);
 
         //Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jq.migrate.js');
         //Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jq.min.js');
@@ -699,7 +699,7 @@ class bfRecordManagement
                             break;
                         case "remove":
                                 jQuery("#adminForm").get(0).onsubmit = function(){ return false; };
-                                if (confirm(' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_ASKDELETE')) . ')) {
+                                if (confirm(' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_ASKDELETE')) . ')) {
                                     var selectedRows = jQuery("#bfRecordsTableContainer").jtable("selectedRows");
                                     jQuery("#bfRecordsTableContainer").jtable("deleteRows", selectedRows);
                                 };
@@ -834,30 +834,30 @@ class bfRecordManagement
 
                 var default_fields = {
                     bfrecord_id: {
-                        title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_ID')) . ',
+                        title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_ID')) . ',
                         key: true,
                         edit: false,
                         create: false,
                     },
                     bfrecord_submitted: {
-                        title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_SUBMITTED')) . ',
+                        title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_SUBMITTED')) . ',
                         type: "date",
                         create: false,
                         edit: false,
                         type: "text"
                     },
                     bfrecord_ip: {
-                        title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_IP')) . ',
+                        title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_IP')) . ',
                         create: false,
                         edit: false
                     },
                     bfrecord_title: {
-                        title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_TITLE')) . ',
+                        title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_TITLE')) . ',
                         create: false,
                         edit: false
                     },
                     bfrecord_name: {
-                        title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_NAME')) . ',
+                        title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_NAME')) . ',
                         create: false,
                         edit: false
                     },
@@ -901,7 +901,7 @@ class bfRecordManagement
                                         
                                         var detail_fields = {
                                             bfrecord_id: {
-                                                title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_ID')) . ',
+                                                title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_ID')) . ',
                                                 key: true,
                                                 edit: false,
                                                 create: false,
@@ -924,9 +924,9 @@ class bfRecordManagement
                                                             var the_value = data.record["bfrecord_custom_"+the_name] !== null ? data.record["bfrecord_custom_"+the_name] : "";
                                                             
                                                             out += "<td class=\"bfDetailsTableLabelCol\"><strong>"+jQuery("<div/>").text(the_title).text()+"</strong>";
-                                                            out += "<br /><small>' . addslashes(BFText::_('COM_BREEZINGFORMS_ELEMENT_NAME')) . ': "+the_name+"</small>";
-                                                            out += "<br /><small>' . addslashes(BFText::_('COM_BREEZINGFORMS_RECORDS_ELEMENTID')) . ': "+data.record["bfrecord_custom_element_id_"+the_name]+"</small>";
-                                                            out += "<br /><small>' . addslashes(BFText::_('COM_BREEZINGFORMS_RECORDS_TYPE')) . ': "+data.record["bfrecord_custom_element_type_"+the_name]+"</small></td>";
+                                                            out += "<br /><small>' . addslashes(BFText::_('COM_BREEZINGFORMSNG_ELEMENT_NAME')) . ': "+the_name+"</small>";
+                                                            out += "<br /><small>' . addslashes(BFText::_('COM_BREEZINGFORMSNG_RECORDS_ELEMENTID')) . ': "+data.record["bfrecord_custom_element_id_"+the_name]+"</small>";
+                                                            out += "<br /><small>' . addslashes(BFText::_('COM_BREEZINGFORMSNG_RECORDS_TYPE')) . ': "+data.record["bfrecord_custom_element_type_"+the_name]+"</small></td>";
                                                             out += "<td class=\"bfDetailsTableValueCol\">";
                                                             
                                                             if(typeof data.record["bfrecord_custom_element_type_"+the_name] != "undefined" && data.record["bfrecord_custom_element_type_"+the_name] != "File Upload" && data.record["bfrecord_custom_element_type_"+the_name] != "Signature" && data.record["bfrecord_custom_element_type_"+the_name] !== null){
@@ -942,13 +942,13 @@ class bfRecordManagement
                                                     
                                                     out += "<tr>";
                                                     out += "<td colspan=\"2\" class=\"bfDetailsTableHead\">";
-                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_SUBMINFO')) . ';
+                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_SUBMINFO')) . ';
                                                     out += "</td>";
                                                     out += "</tr>";
                                                     
                                                     // submitted;
                                                     out += "<td class=\"bfDetailsTableLabelCol\"><strong>";
-                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_SUBMITTED')) . ';
+                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_SUBMITTED')) . ';
                                                     out += "</strong></td>";
                                                     out += "<td class=\"bfDetailsTableValueCol\">";
                                                     out += data.record["bfrecord_submitted"];
@@ -957,7 +957,7 @@ class bfRecordManagement
                                                     
                                                     // ip;
                                                     out += "<td class=\"bfDetailsTableLabelCol\"><strong>";
-                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMS_IP')) . ';
+                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_IP')) . ';
                                                     out += "</strong></td>";
                                                     out += "<td class=\"bfDetailsTableValueCol\">";
                                                     out += data.record["bfrecord_ip"];
@@ -966,7 +966,7 @@ class bfRecordManagement
                                                     
                                                     // browser;
                                                     out += "<td class=\"bfDetailsTableLabelCol\"><strong>";
-                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_BROWSER')) . ';
+                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_BROWSER')) . ';
                                                     out += "</strong></td>";
                                                     out += "<td class=\"bfDetailsTableValueCol\">";
                                                     out += data.record["bfrecord_browser"];
@@ -975,7 +975,7 @@ class bfRecordManagement
 
                                                     // opsys;
                                                     out += "<td class=\"bfDetailsTableLabelCol\"><strong>";
-                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_OPSYS')) . ';
+                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_OPSYS')) . ';
                                                     out += "</strong></td>";
                                                     out += "<td class=\"bfDetailsTableValueCol\">";
                                                     out += data.record["bfrecord_opsys"];
@@ -985,7 +985,7 @@ class bfRecordManagement
                                                     // user id
                                                     out += "<tr>";
                                                     out += "<td class=\"bfDetailsTableLabelCol\"><strong>";
-                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERID')) . ';
+                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID')) . ';
                                                     out += "</strong></td>";
                                                     out += "<td class=\"bfDetailsTableValueCol\">";
                                                     out += data.record["bfrecord_user_id"];
@@ -995,7 +995,7 @@ class bfRecordManagement
                                                     // user name
                                                     out += "<tr>";
                                                     out += "<td class=\"bfDetailsTableLabelCol\"><strong>";
-                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERUSERNAME')) . ';
+                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME')) . ';
                                                     out += "</strong></td>";
                                                     out += "<td class=\"bfDetailsTableValueCol\">";
                                                     out += data.record["bfrecord_username"];
@@ -1005,7 +1005,7 @@ class bfRecordManagement
                                                     // user full name
                                                     out += "<tr>";
                                                     out += "<td class=\"bfDetailsTableLabelCol\"><strong>";
-                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERFULLNAME')) . ';
+                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME')) . ';
                                                     out += "</strong></td>";
                                                     out += "<td class=\"bfDetailsTableValueCol\">";
                                                     out += data.record["bfrecord_user_full_name"];
@@ -1017,13 +1017,13 @@ class bfRecordManagement
 
                                                     out += "<tr>";
                                                     out += "<td colspan=\"2\" class=\"bfDetailsTableHead\">";
-                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_RECORDINFO')) . ';
+                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_RECORDINFO')) . ';
                                                     out += "</td>";
                                                     out += "</tr>";
 
                                                     // record id;
                                                     out += "<td class=\"bfDetailsTableLabelCol\"><strong>";
-                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_RECORDID')) . ';
+                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_RECORDID')) . ';
                                                     out += "</strong></td>";
                                                     out += "<td class=\"bfDetailsTableValueCol\">";
                                                     out += data.record["bfrecord_id"];
@@ -1032,37 +1032,37 @@ class bfRecordManagement
                                                     
                                                     // viewed;
                                                     out += "<td class=\"bfDetailsTableLabelCol\"><strong>";
-                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_VIEWED')) . ';
+                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_VIEWED')) . ';
                                                     out += "</strong></td>";
                                                     out += "<td class=\"bfDetailsTableValueCol\">";
-                                                    out += data.record["bfrecord_viewed"] == 1 ? ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_YES')) . ' : ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_NO')) . ' ;
+                                                    out += data.record["bfrecord_viewed"] == 1 ? ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_YES')) . ' : ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_NO')) . ' ;
                                                     out += "</td>";
                                                     out += "</tr>";
                                                     
                                                     // exported;
                                                     out += "<td class=\"bfDetailsTableLabelCol\"><strong>";
-                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_EXPORTED')) . ';
+                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_EXPORTED')) . ';
                                                     out += "</strong></td>";
                                                     out += "<td class=\"bfDetailsTableValueCol\">";
-                                                    out += data.record["bfrecord_exported"] == 1 ? ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_YES')) . ' : ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_NO')) . ' ;
+                                                    out += data.record["bfrecord_exported"] == 1 ? ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_YES')) . ' : ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_NO')) . ' ;
                                                     out += "</td>";
                                                     out += "</tr>";
                                                     
                                                     // archived;
                                                     out += "<td class=\"bfDetailsTableLabelCol\"><strong>";
-                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_ARCHIVED')) . ';
+                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_ARCHIVED')) . ';
                                                     out += "</strong></td>";
                                                     out += "<td class=\"bfDetailsTableValueCol\">";
-                                                    out += data.record["bfrecord_archived"] == 1 ? ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_YES')) . ' : ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_NO')) . ' ;
+                                                    out += data.record["bfrecord_archived"] == 1 ? ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_YES')) . ' : ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_NO')) . ' ;
                                                     out += "</td>";
                                                     out += "</tr>";
                                                     
                                                     // opted;
                                                     out += "<td class=\"bfDetailsTableLabelCol\"><strong>";
-                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_OPTED')) . ';
+                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_OPTED')) . ';
                                                     out += "</strong></td>";
                                                     out += "<td class=\"bfDetailsTableValueCol\">";
-                                                    out += data.record["bfrecord_opted"] == 1 ? ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_YES')) . ' : ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_NO')) . ' ;
+                                                    out += data.record["bfrecord_opted"] == 1 ? ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_YES')) . ' : ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_NO')) . ' ;
                                                     out += "</td>";
                                                     out += "</tr>";
                                                     
@@ -1070,12 +1070,12 @@ class bfRecordManagement
 
                                                     out += "<tr>";
                                                     out += "<td colspan=\"2\" class=\"bfDetailsTableHead\">";
-                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMS_PAYMENT_INFORMATION')) . ';
+                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_PAYMENT_INFORMATION')) . ';
                                                     out += "</td>";
                                                     out += "</tr>";
                                                     
                                                     out += "<td class=\"bfDetailsTableLabelCol\"><strong>";
-                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMS_TRANSACTION_ID')) . ';
+                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_TRANSACTION_ID')) . ';
                                                     out += "</strong></td>";
                                                     out += "<td class=\"bfDetailsTableValueCol\">";
                                                     out += data.record["bfrecord_payment_tx_id"];
@@ -1083,7 +1083,7 @@ class bfRecordManagement
                                                     out += "</tr>";
                                                     
                                                     out += "<td class=\"bfDetailsTableLabelCol\"><strong>";
-                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMS_TRANSACTION_DATE')) . ';
+                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_TRANSACTION_DATE')) . ';
                                                     out += "</strong></td>";
                                                     out += "<td class=\"bfDetailsTableValueCol\">";
                                                     out += data.record["bfrecord_payment_date"];
@@ -1091,15 +1091,15 @@ class bfRecordManagement
                                                     out += "</tr>";
                                                     
                                                     out += "<td class=\"bfDetailsTableLabelCol\"><strong>";
-                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMS_TESTACCOUNT')) . ';
+                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_TESTACCOUNT')) . ';
                                                     out += "</strong></td>";
                                                     out += "<td class=\"bfDetailsTableValueCol\">";
-                                                    out += data.record["bfrecord_payment_test"] == 1 ? ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_YES')) . ' : ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_NO')) . ' ;
+                                                    out += data.record["bfrecord_payment_test"] == 1 ? ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_YES')) . ' : ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_NO')) . ' ;
                                                     out += "</td>";
                                                     out += "</tr>";
                                                     
                                                     out += "<td class=\"bfDetailsTableLabelCol\"><strong>";
-                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMS_DOWNLOAD_TRIES')) . ';
+                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_DOWNLOAD_TRIES')) . ';
                                                     out += "</strong></td>";
                                                     out += "<td class=\"bfDetailsTableValueCol\">";
                                                     out += data.record["bfrecord_payment_download_tries"];
@@ -1110,13 +1110,13 @@ class bfRecordManagement
 
                                                     out += "<tr>";
                                                     out += "<td colspan=\"2\" class=\"bfDetailsTableHead\">";
-                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_FORMINFO')) . ';
+                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_FORMINFO')) . ';
                                                     out += "</td>";
                                                     out += "</tr>";
                                                     
                                                      // form id;
                                                     out += "<td class=\"bfDetailsTableLabelCol\"><strong>";
-                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMS_ID')) . ';
+                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_ID')) . ';
                                                     out += "</strong></td>";
                                                     out += "<td class=\"bfDetailsTableValueCol\">";
                                                     out += data.record["bfrecord_form_id"];
@@ -1125,7 +1125,7 @@ class bfRecordManagement
                                                     
                                                     // form title;
                                                     out += "<td class=\"bfDetailsTableLabelCol\"><strong>";
-                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_TITLE')) . ';
+                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_TITLE')) . ';
                                                     out += "</strong></td>";
                                                     out += "<td class=\"bfDetailsTableValueCol\">";
                                                     out += jQuery("<div/>").text(data.record["bfrecord_title"]).html();
@@ -1134,7 +1134,7 @@ class bfRecordManagement
                                                     
                                                     // form name;
                                                     out += "<td class=\"bfDetailsTableLabelCol\"><strong>";
-                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_NAME')) . ';
+                                                    out += ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_NAME')) . ';
                                                     out += "</strong></td>";
                                                     out += "<td class=\"bfDetailsTableValueCol\">";
                                                     out += data.record["bfrecord_name"];
@@ -1180,7 +1180,7 @@ class bfRecordManagement
                                         jQuery("#bfRecordsTableContainer").jtable("openChildTable",
                                             $img.closest("tr"), //Parent row
                                             {
-                                                title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_VIEWRECORD')) . ',
+                                                title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_VIEWRECORD')) . ',
                                                 actions: {
                                                     listAction: "index.php?option=com_breezingformsng&act=recordmanagement&task=getListRecords&form_selection="+detail_data.record.bfrecord_form_id+"&record_id=" + detail_data.record.bfrecord_id,
                                                     updateAction: "index.php?option=com_breezingformsng&act=recordmanagement&task=getListRecords&update=1&form_selection="+detail_data.record.bfrecord_form_id+"&record_id=" + detail_data.record.bfrecord_id
@@ -1293,22 +1293,22 @@ class bfRecordManagement
                             var html = "<table style=\"width:100%;border:0;\">";
                             
                             // default fields
-                            var field1 = {id: "bfDisplayFieldIDbfrecord_id", title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_ID')) . ', name: "bfrecord_id"};
-                            var field2 = {id: "bfDisplayFieldIDbfrecord_submitted", title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_SUBMITTED')) . ', name: "bfrecord_submitted"};
-                            var field3 = {id: "bfDisplayFieldIDbfrecord_user_id", title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERID')) . ', name: "bfrecord_user_id"};
-                            var field4 = {id: "bfDisplayFieldIDbfrecord_username", title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERUSERNAME')) . ', name: "bfrecord_username"};
-                            var field5 = {id: "bfDisplayFieldIDbfrecord_user_full_name", title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERFULLNAME')) . ', name: "bfrecord_user_full_name"};
-                            var field6 = {id: "bfDisplayFieldIDbfrecord_ip", title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_IP')) . ', name: "bfrecord_ip"};
-                            var field7 = {id: "bfDisplayFieldIDbfrecord_title", title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_TITLE')) . ', name: "bfrecord_title"};
-                            var field8 = {id: "bfDisplayFieldIDbfrecord_name", title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_NAME')) . ', name: "bfrecord_name"};
-                            var field9 = {id: "bfDisplayFieldIDbfrecord_payment_tx_id", title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_TRANSACTION_ID')) . ', name: "bfrecord_payment_tx_id"};
-                            var field10 = {id: "bfDisplayFieldIDbfrecord_payment_date", title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_TRANSACTION_DATE')) . ', name: "bfrecord_payment_date"};
-                            var field11 = {id: "bfDisplayFieldIDbfrecord_payment_test", title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_TESTACCOUNT')) . ', name: "bfrecord_payment_test"};
-                            var field12 = {id: "bfDisplayFieldIDbfrecord_payment_download_tries", title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_DOWNLOAD_TRIES')) . ', name: "bfrecord_payment_download_tries"};
-                            var field13 = {id: "bfDisplayFieldIDbfrecord_viewed", title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_VIEWED')) . ', name: "bfrecord_viewed"};
-                            var field14 = {id: "bfDisplayFieldIDbfrecord_exported", title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_EXPORTED')) . ', name: "bfrecord_exported"};
-                            var field15 = {id: "bfDisplayFieldIDbfrecord_archived", title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_ARCHIVED')) . ', name: "bfrecord_archived"};
-                            var field16 = {id: "bfDisplayFieldIDbfrecord_opted", title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_RECORDS_OPTED')) . ', name: "bfrecord_opted"};
+                            var field1 = {id: "bfDisplayFieldIDbfrecord_id", title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_ID')) . ', name: "bfrecord_id"};
+                            var field2 = {id: "bfDisplayFieldIDbfrecord_submitted", title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_SUBMITTED')) . ', name: "bfrecord_submitted"};
+                            var field3 = {id: "bfDisplayFieldIDbfrecord_user_id", title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID')) . ', name: "bfrecord_user_id"};
+                            var field4 = {id: "bfDisplayFieldIDbfrecord_username", title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME')) . ', name: "bfrecord_username"};
+                            var field5 = {id: "bfDisplayFieldIDbfrecord_user_full_name", title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME')) . ', name: "bfrecord_user_full_name"};
+                            var field6 = {id: "bfDisplayFieldIDbfrecord_ip", title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_IP')) . ', name: "bfrecord_ip"};
+                            var field7 = {id: "bfDisplayFieldIDbfrecord_title", title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_TITLE')) . ', name: "bfrecord_title"};
+                            var field8 = {id: "bfDisplayFieldIDbfrecord_name", title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_NAME')) . ', name: "bfrecord_name"};
+                            var field9 = {id: "bfDisplayFieldIDbfrecord_payment_tx_id", title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_TRANSACTION_ID')) . ', name: "bfrecord_payment_tx_id"};
+                            var field10 = {id: "bfDisplayFieldIDbfrecord_payment_date", title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_TRANSACTION_DATE')) . ', name: "bfrecord_payment_date"};
+                            var field11 = {id: "bfDisplayFieldIDbfrecord_payment_test", title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_TESTACCOUNT')) . ', name: "bfrecord_payment_test"};
+                            var field12 = {id: "bfDisplayFieldIDbfrecord_payment_download_tries", title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_DOWNLOAD_TRIES')) . ', name: "bfrecord_payment_download_tries"};
+                            var field13 = {id: "bfDisplayFieldIDbfrecord_viewed", title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_VIEWED')) . ', name: "bfrecord_viewed"};
+                            var field14 = {id: "bfDisplayFieldIDbfrecord_exported", title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_EXPORTED')) . ', name: "bfrecord_exported"};
+                            var field15 = {id: "bfDisplayFieldIDbfrecord_archived", title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_ARCHIVED')) . ', name: "bfrecord_archived"};
+                            var field16 = {id: "bfDisplayFieldIDbfrecord_opted", title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_OPTED')) . ', name: "bfrecord_opted"};
 
                             var jsondata = jQuery.parseJSON(data);
                             var fields = jsondata.fields;
@@ -1640,7 +1640,7 @@ class bfRecordManagement
 
                     if(!hasID){
                         custom_object["fields"]["bfrecord_id"] = {
-                            title: ' . json_encode(BFText::_('COM_BREEZINGFORMS_ID')) . ',
+                            title: ' . json_encode(BFText::_('COM_BREEZINGFORMSNG_ID')) . ',
                             edit: false,
                             key: true,
                             create: false,
@@ -2857,7 +2857,7 @@ class bfRecordManagement
         File::makeSafe($csvname);
 
         //if (!File::write($csvname,$headout = $head.$out)) {
-        //	echo "<script> alert('".addslashes(BFText::_('COM_BREEZINGFORMS_RECORDS_XMLNORWRTBL'))."'); window.history.go(-1);</script>\n";
+        //	echo "<script> alert('".addslashes(BFText::_('COM_BREEZINGFORMSNG_RECORDS_XMLNORWRTBL'))."'); window.history.go(-1);</script>\n";
         //	exit();
         //} // if
 
@@ -3041,7 +3041,7 @@ class bfRecordManagement
 
         //$xmlname = File::makeSafe($xmlname);
         //if (!File::write($xmlname,$xml)) {
-        //	echo "<script> alert('".addslashes(BFText::_('COM_BREEZINGFORMS_RECORDS_XMLNORWRTBL'))."'); window.history.go(-1);</script>\n";
+        //	echo "<script> alert('".addslashes(BFText::_('COM_BREEZINGFORMSNG_RECORDS_XMLNORWRTBL'))."'); window.history.go(-1);</script>\n";
         //	exit();
         //} // if
 

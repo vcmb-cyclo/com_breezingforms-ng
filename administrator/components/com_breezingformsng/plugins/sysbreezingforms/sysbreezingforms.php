@@ -25,7 +25,7 @@ class PlgSystemSysbreezingforms extends CMSPlugin
     public function onBeforeRender()
     {
 
-        if (!file_exists(JPATH_ADMINISTRATOR . '/components/com_breezingformsng/breezingforms.php')) {
+        if (!file_exists(JPATH_ADMINISTRATOR . '/components/com_breezingformsng/admin.breezingforms.php')) {
             return;
         }
 
@@ -103,7 +103,7 @@ class PlgSystemSysbreezingforms extends CMSPlugin
     public function onAfterRender()
     {
 
-        if (!file_exists(JPATH_ADMINISTRATOR . '/components/com_breezingformsng/breezingforms.php')) {
+        if (!file_exists(JPATH_ADMINISTRATOR . '/components/com_breezingformsng/admin.breezingforms.php')) {
             return;
         }
 

@@ -140,15 +140,15 @@ class EasyModeHtml
 		<?php require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/admin/easymode-js.php'); ?>
 
 		<div>
-			<?php echo ToolBarHelper::custom('save', 'save.png', 'save_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_EASYMODE_SAVE'), false); ?>
+			<?php echo ToolBarHelper::custom('save', 'save.png', 'save_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_EASYMODE_SAVE'), false); ?>
 			<?php
 			if ($formId != 0) {
-				ToolBarHelper::custom('editform', 'edit.png', 'save_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_EASYMODE_FORM_EDIT'), false);
-				ToolBarHelper::custom('preview', 'publish.png', 'save_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_EASYMODE_PREVIEW'), false);
-				ToolBarHelper::custom('preview_site', 'publish.png', 'save_f2.png', BFText::_('COM_BREEZINGFORMS_SITE_PREVIEW'), false);
+				ToolBarHelper::custom('editform', 'edit.png', 'save_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_EASYMODE_FORM_EDIT'), false);
+				ToolBarHelper::custom('preview', 'publish.png', 'save_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_EASYMODE_PREVIEW'), false);
+				ToolBarHelper::custom('preview_site', 'publish.png', 'save_f2.png', BFText::_('COM_BREEZINGFORMSNG_SITE_PREVIEW'), false);
 			}
 			?>
-			<?php ToolBarHelper::custom('close', 'cancel.png', 'cancel_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_QUICKMODE_CLOSE'), false); ?>
+			<?php ToolBarHelper::custom('close', 'cancel.png', 'cancel_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_QUICKMODE_CLOSE'), false); ?>
 			<form action="index.php" method="post" id="adminForm" name="adminForm">
 				<input type="hidden" name="option" value="com_breezingformsng" />
 				<input type="hidden" name="act" value="easymode" />
@@ -174,17 +174,17 @@ class EasyModeHtml
 					<ul>
 						<li><a href="#fragment-1" onclick="app.refreshTemplateBox();app.refreshBatchOptions();"><span>
 									<div class="tab-items">
-										<?php echo BFText::_('COM_BREEZINGFORMS_ITEMS') ?>
+										<?php echo BFText::_('COM_BREEZINGFORMSNG_ITEMS') ?>
 									</div>
 								</span></a></li>
 						<li><a href="#fragment-2" onclick="app.refreshTemplateBox();app.refreshBatchOptions();"><span>
 									<div class="tab-element">
-										<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENT') ?>
+										<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENT') ?>
 									</div>
 								</span></a></li>
 						<li><a href="#fragment-3" onclick="app.refreshTemplateBox();app.refreshBatchOptions();"><span>
 									<div class="tab-form">
-										<?php echo BFText::_('COM_BREEZINGFORMS_FORM') ?>
+										<?php echo BFText::_('COM_BREEZINGFORMSNG_FORM') ?>
 									</div>
 								</span></a></li>
 					</ul>
@@ -205,7 +205,7 @@ class EasyModeHtml
 									<li>
 										<a href='#'>
 											<div class="ui-accordion-left"></div>
-											<?php echo BFText::_('COM_BREEZINGFORMS_BASIC') ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_BASIC') ?>
 											<div class="ui-accordion-right"></div>
 										</a>
 										<div>
@@ -215,7 +215,7 @@ class EasyModeHtml
 												onMouseover="this.style.backgroundColor='#eaf3fa';"
 												onMouseout="this.style.backgroundColor='white';">
 												<span class="icon-statictext" style="width: 100px !important;">
-													<?php echo BFText::_('COM_BREEZINGFORMS_STATIC_TEXT') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_STATIC_TEXT') ?>
 												</span>
 											</div>
 
@@ -223,7 +223,7 @@ class EasyModeHtml
 												onMouseover="this.style.backgroundColor='#eaf3fa';"
 												onMouseout="this.style.backgroundColor='white';">
 												<span class="icon-textfield" style="width: 100px !important;">
-													<?php echo BFText::_('COM_BREEZINGFORMS_TEXTFIELD') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TEXTFIELD') ?>
 												</span>
 
 											</div>
@@ -232,7 +232,7 @@ class EasyModeHtml
 												onMouseover="this.style.backgroundColor='#eaf3fa';"
 												onMouseout="this.style.backgroundColor='white';">
 												<span class="icon-textarea" style="width: 100px !important;">
-													<?php echo BFText::_('COM_BREEZINGFORMS_TEXTAREA') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TEXTAREA') ?>
 												</span>
 											</div>
 
@@ -240,7 +240,7 @@ class EasyModeHtml
 												onMouseover="this.style.backgroundColor='#eaf3fa';"
 												onMouseout="this.style.backgroundColor='white';">
 												<span class="icon-checkboxx" style="width: 100px !important;">
-													<?php echo BFText::_('COM_BREEZINGFORMS_CHECKBOX') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_CHECKBOX') ?>
 												</span>
 											</div>
 
@@ -248,7 +248,7 @@ class EasyModeHtml
 												onMouseover="this.style.backgroundColor='#eaf3fa';"
 												onMouseout="this.style.backgroundColor='white';">
 												<span class="icon-radio" style="width: 100px !important;">
-													<?php echo BFText::_('COM_BREEZINGFORMS_RADIO') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_RADIO') ?>
 												</span>
 
 											</div>
@@ -257,7 +257,7 @@ class EasyModeHtml
 												onMouseover="this.style.backgroundColor='#eaf3fa';"
 												onMouseout="this.style.backgroundColor='white';">
 												<span class="icon-select" style="width: 100px !important;">
-													<?php echo BFText::_('COM_BREEZINGFORMS_SELECT') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_SELECT') ?>
 												</span>
 											</div>
 
@@ -265,7 +265,7 @@ class EasyModeHtml
 												onMouseover="this.style.backgroundColor='#eaf3fa';"
 												onMouseout="this.style.backgroundColor='white';">
 												<span class="icon-filee" style="width: 100px !important;">
-													<?php echo BFText::_('COM_BREEZINGFORMS_FILE') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_FILE') ?>
 												</span>
 											</div>
 
@@ -273,7 +273,7 @@ class EasyModeHtml
 												onMouseover="this.style.backgroundColor='#eaf3fa';"
 												onMouseout="this.style.backgroundColor='white';">
 												<span class="icon-tooltip" style="width: 100px !important;">
-													<?php echo BFText::_('COM_BREEZINGFORMS_TOOLTIP') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TOOLTIP') ?>
 												</span>
 
 											</div>
@@ -282,7 +282,7 @@ class EasyModeHtml
 												onMouseover="this.style.backgroundColor='#eaf3fa';"
 												onMouseout="this.style.backgroundColor='white';">
 												<span class="icon-icon" style="width: 100px !important;">
-													<?php echo BFText::_('COM_BREEZINGFORMS_ICON') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ICON') ?>
 												</span>
 											</div>
 
@@ -290,7 +290,7 @@ class EasyModeHtml
 												onMouseover="this.style.backgroundColor='#eaf3fa';"
 												onMouseout="this.style.backgroundColor='white';">
 												<span class="icon-submitbutton" style="width: 100px !important;">
-													<?php echo BFText::_('COM_BREEZINGFORMS_SUBMITBUTTON') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_SUBMITBUTTON') ?>
 												</span>
 											</div>
 
@@ -298,7 +298,7 @@ class EasyModeHtml
 												onMouseover="this.style.backgroundColor='#eaf3fa';"
 												onMouseout="this.style.backgroundColor='white';">
 												<span class="icon-imagebutton" style="width: 100px !important;">
-													<?php echo BFText::_('COM_BREEZINGFORMS_IMAGE_BUTTON') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_IMAGE_BUTTON') ?>
 												</span>
 
 											</div>
@@ -307,7 +307,7 @@ class EasyModeHtml
 												onMouseover="this.style.backgroundColor='#eaf3fa';"
 												onMouseout="this.style.backgroundColor='white';">
 												<span class="icon-hiddeninput" style="width: 100px !important;">
-													<?php echo BFText::_('COM_BREEZINGFORMS_HIDDEN_INPUT') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_HIDDEN_INPUT') ?>
 												</span>
 											</div>
 
@@ -317,7 +317,7 @@ class EasyModeHtml
 									<li>
 										<a href='#'>
 											<div class="ui-accordion-left"></div>
-											<?php echo BFText::_('COM_BREEZINGFORMS_SPECIAL') ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_SPECIAL') ?>
 											<div class="ui-accordion-right"></div>
 										</a>
 										<div>
@@ -327,7 +327,7 @@ class EasyModeHtml
 												onMouseover="this.style.backgroundColor='#eaf3fa';"
 												onMouseout="this.style.backgroundColor='white';">
 												<span class="icon-captcha" style="width: 100px !important;">
-													<?php echo BFText::_('COM_BREEZINGFORMS_CAPTCHA') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_CAPTCHA') ?>
 												</span>
 											</div>
 
@@ -335,7 +335,7 @@ class EasyModeHtml
 												onMouseover="this.style.backgroundColor='#eaf3fa';"
 												onMouseout="this.style.backgroundColor='white';">
 												<span class="icon-calendarr" style="width: 100px !important;">
-													<?php echo BFText::_('COM_BREEZINGFORMS_CALENDAR') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_CALENDAR') ?>
 												</span>
 											</div>
 
@@ -343,7 +343,7 @@ class EasyModeHtml
 												onMouseover="this.style.backgroundColor='#eaf3fa';"
 												onMouseout="this.style.backgroundColor='white';">
 												<span class="icon-paypal" style="width: 100px !important;">
-													<?php echo BFText::_('COM_BREEZINGFORMS_PAYPAL') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_PAYPAL') ?>
 												</span>
 											</div>
 
@@ -352,7 +352,7 @@ class EasyModeHtml
 												onMouseover="this.style.backgroundColor='#eaf3fa';"
 												onMouseout="this.style.backgroundColor='white';">
 												<span class="icon-sofort" style="width: 100px !important;">
-													<?php echo BFText::_('COM_BREEZINGFORMS_SOFORTUEBERWEISUNG') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_SOFORTUEBERWEISUNG') ?>
 												</span>
 											</div>
 
@@ -368,7 +368,7 @@ class EasyModeHtml
 									<li>
 										<a href='#'>
 											<div class="ui-accordion-left"></div>
-											<?php echo BFText::_('COM_BREEZINGFORMS_OPTIONS') ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_OPTIONS') ?>
 											<div class="ui-accordion-right"></div>
 										</a>
 										<div>
@@ -379,17 +379,17 @@ class EasyModeHtml
 
 												<div id="bfCalendarOptions" class="bfOptions"
 													style="visibility:hidden;display:none">
-													<?php echo BFText::_('COM_BREEZINGFORMS_LINKTEXT_MAY_CONTAIN_HTML') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_LINKTEXT_MAY_CONTAIN_HTML') ?>:
 													<br />
 													<textarea class="bfOptionsTextInput" id="bfCalendarText"></textarea>
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_FORMAT') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_FORMAT') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfCalendarFormat"
 														value="" />
 													<br />
 
-													<?php echo BFText::_('COM_BREEZINGFORMS_CONNECT_WITH_FIELD_NAME') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_CONNECT_WITH_FIELD_NAME') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfCalendarConnectWith"
 														value="" />
@@ -397,13 +397,13 @@ class EasyModeHtml
 												<!-- Captcha -->
 												<div id="bfCaptchaOptions" class="bfOptions"
 													style="visibility:hidden;display:none">
-													<?php echo BFText::_('COM_BREEZINGFORMS_WIDTH') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_WIDTH') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfCaptchaWidth"
 														value="" />
 													<br />
 
-													<?php echo BFText::_('COM_BREEZINGFORMS_HEIGHT') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_HEIGHT') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfCaptchaHeight"
 														value="" />
@@ -411,21 +411,21 @@ class EasyModeHtml
 												<!-- Label -->
 												<div id="bfLabelOptions" class="bfOptions"
 													style="visibility:hidden;display:none">
-													<?php echo BFText::_('COM_BREEZINGFORMS_CONTENT_MAY_CONTAIN_HTML') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_CONTENT_MAY_CONTAIN_HTML') ?>:
 													<br />
 													<textarea class="bfOptionsTextInput" id="bfLabelContent"
 														rows="10"></textarea>
 
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_WIDTH') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_WIDTH') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfLabelWidth" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_HEIGHT') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_HEIGHT') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfLabelHeight" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_ON_TOP') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ON_TOP') ?>
 
 													<br />
 													<input type="checkbox" id="bfLabelOnTop" value="" />
@@ -433,23 +433,23 @@ class EasyModeHtml
 												<!-- Static Text -->
 												<div id="bfStaticTextOptions" class="bfOptions"
 													style="visibility:hidden;display:none">
-													<?php echo BFText::_('COM_BREEZINGFORMS_TITLE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfStaticTextTitle"
 														value="" />
 													<br />
 
-													<?php echo BFText::_('COM_BREEZINGFORMS_CONTENT_MAY_CONTAIN_HTML') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_CONTENT_MAY_CONTAIN_HTML') ?>:
 													<br />
 													<textarea class="bfOptionsTextInput" id="bfStaticTextContent"
 														rows="10"></textarea>
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_WIDTH') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_WIDTH') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfStaticTextWidth"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_HEIGHT') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_HEIGHT') ?>:
 													<br />
 
 													<input type="text" class="bfOptionsTextInput" id="bfStaticTextHeight"
@@ -458,95 +458,95 @@ class EasyModeHtml
 												<!-- Text -->
 												<div id="bfTextfieldOptions" class="bfOptions"
 													style="visibility:hidden;display:none">
-													<?php echo BFText::_('COM_BREEZINGFORMS_TITLE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfTextfieldTitle"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_NAME') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_NAME') ?>:
 													<br />
 
 													<input type="text" class="bfOptionsTextInput" id="bfTextfieldName"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_VALUE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_VALUE') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfTextfieldValue"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_PASSWORD') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_PASSWORD') ?>
 													<br />
 													<input type="checkbox" id="bfTextfieldPassword" value="" />
 
 													<br />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_MAILBACK') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_MAILBACK') ?>
 													<br />
 													<input type="checkbox" id="bfTextfieldMailback" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_MAILBACK_AS_SENDER') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_MAILBACK_AS_SENDER') ?>
 													<br />
 													<input type="checkbox" id="bfTextfieldMailbackAsSender" value="" />
 
 													<br />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_MAILBACKFILE_IF_IS_MAILBACK_A_FILE_FROM_THIS_SERVER_PATH_IS_SENT_TO_THE_MAILBACK_ADDRESS') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_MAILBACKFILE_IF_IS_MAILBACK_A_FILE_FROM_THIS_SERVER_PATH_IS_SENT_TO_THE_MAILBACK_ADDRESS') ?>
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfTextfieldMailbackfile"
 														style="width:100%" />
 													<br />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_WIDTH') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_WIDTH') ?>:
 													<br />
 
 													<input type="text" class="bfOptionsTextInput" id="bfTextfieldWidth"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_HEIGHT') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_HEIGHT') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfTextfieldHeight"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_MAXLENGTH') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_MAXLENGTH') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfTextfieldMaxlength"
 														value="" />
 													<br />
 
-													<?php echo BFText::_('COM_BREEZINGFORMS_DISABLE') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_DISABLE') ?>
 													<br />
 													<input type="checkbox" id="bfTextfieldDisable" value="disable" />
 												</div>
 												<!-- Textarea -->
 												<div id="bfTextareaOptions" class="bfOptions"
 													style="visibility:hidden;display:none">
-													<?php echo BFText::_('COM_BREEZINGFORMS_TITLE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfTextareaTitle"
 														value="" />
 
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_NAME') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_NAME') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfTextareaName"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_VALUE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_VALUE') ?>:
 													<br />
 													<textarea class="bfOptionsTextInput" id="bfTextareaValue"></textarea>
 													<br />
 
-													<?php echo BFText::_('COM_BREEZINGFORMS_WIDTH') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_WIDTH') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfTextareaWidth"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_HEIGHT') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_HEIGHT') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfTextareaHeight"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_DISABLE') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_DISABLE') ?>
 													<br />
 
 													<input type="checkbox" id="bfTextareaDisable" value="disable" />
@@ -554,49 +554,49 @@ class EasyModeHtml
 												<!-- Checkbox -->
 												<div id="bfCheckboxOptions" class="bfOptions"
 													style="visibility:hidden;display:none">
-													<?php echo BFText::_('COM_BREEZINGFORMS_TITLE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfCheckboxTitle"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_NAME') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_NAME') ?>:
 													<br />
 
 													<input type="text" class="bfOptionsTextInput" id="bfCheckboxName"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_CHECKED') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_CHECKED') ?>:
 													<br />
 													<input type="checkbox" id="bfCheckboxChecked" value="" />
 													<br />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_MAILBACK_ACCEPT') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_MAILBACK_ACCEPT') ?>:
 													<br />
 													<input type="checkbox" id="bfCheckboxMailbackAccept" value="" />
 
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_MAILBACK_ACCEPT__CONNECT_WITH_NAME') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_MAILBACK_ACCEPT__CONNECT_WITH_NAME') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput"
 														id="bfCheckboxMailbackAcceptConnectWith" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_VALUE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_VALUE') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfCheckboxValue"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_WIDTH') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_WIDTH') ?>:
 													<br />
 
 													<input type="text" class="bfOptionsTextInput" id="bfCheckboxWidth"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_HEIGHT') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_HEIGHT') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfCheckboxHeight"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_DISABLE') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_DISABLE') ?>
 													<br />
 													<input type="checkbox" id="bfCheckboxDisable" value="disable" />
 
@@ -604,33 +604,33 @@ class EasyModeHtml
 												<!-- Radio -->
 												<div id="bfRadioOptions" class="bfOptions"
 													style="visibility:hidden;display:none">
-													<?php echo BFText::_('COM_BREEZINGFORMS_TITLE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfRadioTitle" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_NAME') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_NAME') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfRadioName" value="" />
 
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_CHECKED') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_CHECKED') ?>:
 													<br />
 													<input type="checkbox" id="bfRadioChecked" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_VALUE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_VALUE') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfRadioValue" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_WIDTH') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_WIDTH') ?>:
 													<br />
 
 													<input type="text" class="bfOptionsTextInput" id="bfRadioWidth" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_HEIGHT') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_HEIGHT') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfRadioHeight" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_DISABLE') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_DISABLE') ?>
 													<br />
 													<input type="checkbox" id="bfRadioDisable" value="disable" />
 
@@ -638,45 +638,45 @@ class EasyModeHtml
 												<!-- Select -->
 												<div id="bfSelectOptions" class="bfOptions"
 													style="visibility:hidden;display:none">
-													<?php echo BFText::_('COM_BREEZINGFORMS_TITLE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfSelectTitle" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_NAME') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_NAME') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfSelectName" value="" />
 
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_MULTIPLE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_MULTIPLE') ?>:
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_YES') ?> <input type="radio"
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_YES') ?> <input type="radio"
 														name="bfSelectMultiple" id="bfSelectMultipleYes" value="1" />
-													<?php echo BFText::_('COM_BREEZINGFORMS_NO') ?> <input type="radio"
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_NO') ?> <input type="radio"
 														name="bfSelectMultiple" id="bfSelectMultipleNo" value="0" />
 													<br />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_OPTIONS') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_OPTIONS') ?>:
 													<br />
 
 													<textarea class="bfOptionsTextInput" id="bfSelectOpts" rows="10"></textarea>
 													<br />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_MAILBACK') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_MAILBACK') ?>
 													<br />
 													<input type="checkbox" id="bfSelectMailback" value="" />
 													<br />
 													<br />
 
-													<?php echo BFText::_('COM_BREEZINGFORMS_WIDTH') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_WIDTH') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfSelectWidth" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_HEIGHT') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_HEIGHT') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfSelectHeight"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_DISABLE') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_DISABLE') ?>
 													<br />
 
 													<input type="checkbox" id="bfSelectDisable" value="disable" />
@@ -684,53 +684,53 @@ class EasyModeHtml
 												<!-- File -->
 												<div id="bfFileOptions" class="bfOptions"
 													style="visibility:hidden;display:none">
-													<?php echo BFText::_('COM_BREEZINGFORMS_TITLE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfFileTitle" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_NAME') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_NAME') ?>:
 													<br />
 
 													<input type="text" class="bfOptionsTextInput" id="bfFileName" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_ADD_TIMESTAMP_TO_FILENAME') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ADD_TIMESTAMP_TO_FILENAME') ?>
 													<br />
 													<input type="checkbox" id="bfFileTimestamp" value="1" />
 													<br />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_UPLOAD_DIRECTORY') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_UPLOAD_DIRECTORY') ?>:
 													<br />
 
 													<input type="text" class="bfOptionsTextInput" id="bfFileUploadDirectory"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_ALLOWED_FILE_EXTENSIONS') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ALLOWED_FILE_EXTENSIONS') ?>
 													<br />
 													<input type="text" class="bfOptionsTextInput"
 														id="bfFileAllowedFileExtensions" value="" />
 													<br />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_ATTACH_FILE_TO_ADMIN_MAILS') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ATTACH_FILE_TO_ADMIN_MAILS') ?>
 													<br />
 
 													<input type="checkbox" id="bfFileAttachToAdminMail" value="0" />
 													<br />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_ATTACH_FILE_TO_USER_MAILS') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ATTACH_FILE_TO_USER_MAILS') ?>
 													<br />
 													<input type="checkbox" id="bfFileAttachToUserMail" value="0" />
 													<br />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_WIDTH') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_WIDTH') ?>:
 													<br />
 
 													<input type="text" class="bfOptionsTextInput" id="bfFileWidth" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_HEIGHT') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_HEIGHT') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfFileHeight" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_DISABLE') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_DISABLE') ?>
 													<br />
 													<input type="checkbox" id="bfFileDisable" value="disable" />
 
@@ -738,25 +738,25 @@ class EasyModeHtml
 												<!-- Icon -->
 												<div id="bfIconOptions" class="bfOptions"
 													style="visibility:hidden;display:none">
-													<?php echo BFText::_('COM_BREEZINGFORMS_CAPTION_MAY_CONTAIN_HTML') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_CAPTION_MAY_CONTAIN_HTML') ?>:
 													<br />
 													<textarea class="bfOptionsTextInput" id="bfIconCaption"></textarea>
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_WIDTH') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_WIDTH') ?>:
 													<br />
 
 													<input type="text" class="bfOptionsTextInput" id="bfIconWidth" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_HEIGHT') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_HEIGHT') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfIconHeight" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_ICON_IMAGE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ICON_IMAGE') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfIconImage" value="" />
 													<br />
 
-													<?php echo BFText::_('COM_BREEZINGFORMS_ICON_IMAGE_OVER') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ICON_IMAGE_OVER') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfIconImageOver"
 														value="" />
@@ -764,74 +764,74 @@ class EasyModeHtml
 												<!-- Image Button -->
 												<div id="bfImageButtonOptions" class="bfOptions"
 													style="visibility:hidden;display:none">
-													<?php echo BFText::_('COM_BREEZINGFORMS_TITLE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfImageButtonTitle"
 														value="" />
 													<br />
 
-													<?php echo BFText::_('COM_BREEZINGFORMS_NAME') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_NAME') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfImageButtonName"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_WIDTH') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_WIDTH') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfImageButtonWidth"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_HEIGHT') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_HEIGHT') ?>:
 													<br />
 
 													<input type="text" class="bfOptionsTextInput" id="bfImageButtonHeight"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_VALUE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_VALUE') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfImageButtonValue"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_IMAGE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_IMAGE') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfImageButtonImage"
 														value="" />
 													<br />
 
-													<?php echo BFText::_('COM_BREEZINGFORMS_DISABLE') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_DISABLE') ?>
 													<br />
 													<input type="checkbox" id="bfImageButtonDisable" value="disable" />
 												</div>
 												<!-- Submit Button -->
 												<div id="bfSubmitButtonOptions" class="bfOptions"
 													style="visibility:hidden;display:none">
-													<?php echo BFText::_('COM_BREEZINGFORMS_TITLE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfSubmitButtonTitle"
 														value="" />
 
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_NAME') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_NAME') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfSubmitButtonName"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_WIDTH') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_WIDTH') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfSubmitButtonWidth"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_HEIGHT') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_HEIGHT') ?>:
 													<br />
 
 													<input type="text" class="bfOptionsTextInput" id="bfSubmitButtonHeight"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_VALUE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_VALUE') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfSubmitButtonValue"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_DISABLE') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_DISABLE') ?>
 													<br />
 													<input type="checkbox" id="bfSubmitButtonDisable" value="disable" />
 
@@ -839,17 +839,17 @@ class EasyModeHtml
 												<!-- Tooltip -->
 												<div id="bfTooltipOptions" class="bfOptions"
 													style="visibility:hidden;display:none">
-													<?php echo BFText::_('COM_BREEZINGFORMS_TITLE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfTooltipTitle"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_NAME') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_NAME') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfTooltipName" value="" />
 
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_TYPE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TYPE') ?>:
 													<br />
 													<input type="radio" name="bfTooltipType" id="bfTooltipTypeInfo"
 														value="info" /> <img
@@ -859,25 +859,25 @@ class EasyModeHtml
 														src="<?php echo Uri::root(); ?>includes/js/ThemeOffice/warning.png" />
 													<input type="radio" name="bfTooltipType" id="bfTooltipTypeCustom"
 														value="warning" />
-													<?php echo BFText::_('COM_BREEZINGFORMS_CUSTOM') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_CUSTOM') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfTooltipCustomImage"
 														value="" />
 
 													<br />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_TEXT') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TEXT') ?>:
 													<br />
 													<textarea class="bfOptionsTextInput" id="bfTooltipText"></textarea>
 													<br />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_WIDTH') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_WIDTH') ?>:
 													<br />
 
 													<input type="text" class="bfOptionsTextInput" id="bfTooltipWidth"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_HEIGHT') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_HEIGHT') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfTooltipHeight"
 														value="" />
@@ -887,124 +887,124 @@ class EasyModeHtml
 												<div id="bfPayPalOptions" class="bfOptions"
 													style="visibility:hidden;display:none">
 
-													<?php echo BFText::_('COM_BREEZINGFORMS_TITLE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfPayPalTitle" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_NAME') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_NAME') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfPayPalName" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_TESTACCOUNT') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TESTACCOUNT') ?>:
 													<br />
 
-													<?php echo BFText::_('COM_BREEZINGFORMS_YES') ?><input type="radio"
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_YES') ?><input type="radio"
 														id="bfPayPalTestaccountYes" name="bfPayPalTestaccount" value="1" />
-													<?php echo BFText::_('COM_BREEZINGFORMS_NO') ?><input type="radio"
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_NO') ?><input type="radio"
 														id="bfPayPalTestaccountNo" name="bfPayPalTestaccount" value="0"
 														checked="checked" />
 													<br />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_ACCOUNT') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ACCOUNT') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfPayPalBusiness"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_ACCOUNTTOKEN_GET_IT_FROM_PAYPAL') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ACCOUNTTOKEN_GET_IT_FROM_PAYPAL') ?>:
 													<br />
 
 													<input type="text" class="bfOptionsTextInput" id="bfPayPalToken" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_TESTACCOUNT') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TESTACCOUNT') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfPayPalTestBusiness"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_TESTACCOUNTTOKEN_GET_IT_FROM_PAYPAL_SANDBOX') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TESTACCOUNTTOKEN_GET_IT_FROM_PAYPAL_SANDBOX') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfPayPalTestToken"
 														value="" />
 													<br />
 
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_USE_IPN') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_USE_IPN') ?>:
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_YES') ?><input type="radio"
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_YES') ?><input type="radio"
 														id="bfPayPalUseIpnYes" name="bfPayPalUseIpn" value="1" />
-													<?php echo BFText::_('COM_BREEZINGFORMS_NO') ?><input type="radio"
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_NO') ?><input type="radio"
 														id="bfPayPalUseIpnNo" name="bfPayPalUseIpn" value="0"
 														checked="checked" />
 													<br />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_DOWNLOADABLEFILE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_DOWNLOADABLEFILE') ?>:
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_YES') ?><input type="radio"
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_YES') ?><input type="radio"
 														id="bfPayPalDownloadableFileYes" name="bfPayPalDownloadableFile"
 														value="1" />
 
-													<?php echo BFText::_('COM_BREEZINGFORMS_NO') ?><input type="radio"
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_NO') ?><input type="radio"
 														id="bfPayPalDownloadableFileNo" name="bfPayPalDownloadableFile"
 														value="0" checked="checked" />
 													<br />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_FILEPATH_PLEASE_CHMOD_700_THE_FILE_USING_YOUR_FTP_CLIENT_OR_PUT_IT_OUTSIDE_OF_YOUR_WEBFOLDER') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_FILEPATH_PLEASE_CHMOD_700_THE_FILE_USING_YOUR_FTP_CLIENT_OR_PUT_IT_OUTSIDE_OF_YOUR_WEBFOLDER') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfPayPalFilepath"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_FILE_DOWNLOAD_TRIES') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_FILE_DOWNLOAD_TRIES') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfPayPalFileDownloadTries"
 														value="1" />
 
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_ITEMNAME') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ITEMNAME') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfPayPalItemname"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_ITEMNUMBER') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ITEMNUMBER') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfPayPalItemnumber"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_AMOUNT') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_AMOUNT') ?>:
 													<br />
 
 													<input type="text" class="bfOptionsTextInput" id="bfPayPalAmount"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_TAX') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TAX') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfPayPalTax" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_THANKYOUPAGE_IF_NOT_DOWNLOADABLE_FILE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_THANKYOUPAGE_IF_NOT_DOWNLOADABLE_FILE') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfPayPalThankYouPage"
 														value="<?php echo Uri::root() ?>" />
 													<br />
 
-													<?php echo BFText::_('COM_BREEZINGFORMS_LOCALE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_LOCALE') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfPayPalLocale"
 														value="us" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_CURRENCYCODE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_CURRENCYCODE') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfPayPalCurrencyCode"
 														value="USD" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_PAYPALIMAGE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_PAYPALIMAGE') ?>:
 													<br />
 
 													<input type="text" class="bfOptionsTextInput" id="bfPayPalImage"
 														value="http://www.paypal.com/en_US/i/btn/btn_paynowCC_LG.gif" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_WIDTH') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_WIDTH') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfPayPalWidth" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_HEIGHT') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_HEIGHT') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfPayPalHeight"
 														value="" />
@@ -1015,111 +1015,111 @@ class EasyModeHtml
 												<!-- SofortÃ¼berweisung -->
 												<div id="bfSofortueberweisungOptions" class="bfOptions"
 													style="visibility:hidden;display:none">
-													<?php echo BFText::_('COM_BREEZINGFORMS_TITLE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfSofortueberweisungTitle"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_NAME') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_NAME') ?>:
 													<br />
 
 													<input type="text" class="bfOptionsTextInput" id="bfSofortueberweisungName"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_USERID') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_USERID') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput"
 														id="bfSofortueberweisungUserId" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_PROJECTID') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_PROJECTID') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput"
 														id="bfSofortueberweisungProjectId" value="" />
 													<br />
 
-													<?php echo BFText::_('COM_BREEZINGFORMS_PROJECTPASSWORD') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_PROJECTPASSWORD') ?>:
 													<br />
 													<input type="password" class="bfOptionsTextInput"
 														id="bfSofortueberweisungProjectPassword" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_SEND_PAYMENT_SUCCESS_MESSAGE_TO_MAILBACK_ADDRESSES') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_SEND_PAYMENT_SUCCESS_MESSAGE_TO_MAILBACK_ADDRESSES') ?>:
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_YES') ?><input type="radio"
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_YES') ?><input type="radio"
 														id="bfSofortueberweisungMailbackYes" name="bfSofortueberweisungMailback"
 														value="1" />
-													<?php echo BFText::_('COM_BREEZINGFORMS_NO') ?><input type="radio"
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_NO') ?><input type="radio"
 														id="bfSofortueberweisungMailbackNo" name="bfSofortueberweisungMailback"
 														value="0" checked="checked" />
 													<br />
 													<br />
 
-													<?php echo BFText::_('COM_BREEZINGFORMS_DOWNLOADABLEFILE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_DOWNLOADABLEFILE') ?>:
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_YES') ?><input type="radio"
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_YES') ?><input type="radio"
 														id="bfSofortueberweisungDownloadableFileYes"
 														name="bfSofortueberweisungDownloadableFile" value="1" />
-													<?php echo BFText::_('COM_BREEZINGFORMS_NO') ?><input type="radio"
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_NO') ?><input type="radio"
 														id="bfSofortueberweisungDownloadableFileNo"
 														name="bfSofortueberweisungDownloadableFile" value="0"
 														checked="checked" />
 													<br />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_FILEPATH_PLEASE_CHMOD_700_THE_FILE_USING_YOUR_FTP_CLIENT_OR_PUT_IT_OUTSIDE_OF_YOUR_WEBFOLDER') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_FILEPATH_PLEASE_CHMOD_700_THE_FILE_USING_YOUR_FTP_CLIENT_OR_PUT_IT_OUTSIDE_OF_YOUR_WEBFOLDER') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput"
 														id="bfSofortueberweisungFilepath" value="" />
 													<br />
 
-													<?php echo BFText::_('COM_BREEZINGFORMS_FILE_DOWNLOAD_TRIES') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_FILE_DOWNLOAD_TRIES') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput"
 														id="bfSofortueberweisungFileDownloadTries" value="1" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_REASON_1') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_REASON_1') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput"
 														id="bfSofortueberweisungReason1" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_REASON_2') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_REASON_2') ?>:
 													<br />
 
 													<input type="text" class="bfOptionsTextInput"
 														id="bfSofortueberweisungReason2" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_AMOUNT') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_AMOUNT') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput"
 														id="bfSofortueberweisungAmount" value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_THANKYOUPAGE_IF_NOT_DOWNLOADABLE_FILE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_THANKYOUPAGE_IF_NOT_DOWNLOADABLE_FILE') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput"
 														id="bfSofortueberweisungThankYouPage"
 														value="<?php echo Uri::root() ?>" />
 													<br />
 
-													<?php echo BFText::_('COM_BREEZINGFORMS_LANGUAGE_ID') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_LANGUAGE_ID') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput"
 														id="bfSofortueberweisungLanguageId" value="DE" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_CURRENCY_ID') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_CURRENCY_ID') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput"
 														id="bfSofortueberweisungCurrencyId" value="EUR" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_SOFORTUEBERWEISUNGIMAGE') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_SOFORTUEBERWEISUNGIMAGE') ?>:
 													<br />
 
 													<input type="text" class="bfOptionsTextInput" id="bfSofortueberweisungImage"
 														value="<?php echo Uri::root() ?>media/com_breezingformsng/images/site/200x65px.png" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_WIDTH') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_WIDTH') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfSofortueberweisungWidth"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_HEIGHT') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_HEIGHT') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput"
 														id="bfSofortueberweisungHeight" value="" />
@@ -1128,35 +1128,35 @@ class EasyModeHtml
 												</div>
 												<br />
 												<div id="bfGlobalOptions" style="display:none">
-													<?php echo BFText::_('COM_BREEZINGFORMS_PADDING') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_PADDING') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfOptionsPadding"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_MARGIN') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_MARGIN') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfOptionsMargin"
 														value="" />
 
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_ORDER_NUMBER') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ORDER_NUMBER') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfOptionsOrder"
 														value="" />
 													<br />
-													<?php echo BFText::_('COM_BREEZINGFORMS_TABINDEX_NUMBER') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TABINDEX_NUMBER') ?>:
 													<br />
 													<input type="text" class="bfOptionsTextInput" id="bfOptionsTabIndex"
 														value="" />
 													<br />
 												</div>
 
-												<input type="submit" value="<?php echo BFText::_('COM_BREEZINGFORMS_UPDATE') ?>"
+												<input type="submit" value="<?php echo BFText::_('COM_BREEZINGFORMSNG_UPDATE') ?>"
 													id="bfSaveOptionsButton"
 													style="visibility:hidden;display:none;width:100%;" />
 												<br />
 												<br />
-												<input type="submit" value="<?php echo BFText::_('COM_BREEZINGFORMS_REMOVE') ?>"
+												<input type="submit" value="<?php echo BFText::_('COM_BREEZINGFORMSNG_REMOVE') ?>"
 													id="bfRemoveLabelButton"
 													style="visibility:hidden;display:none;width:100%;" />
 												<br />
@@ -1168,7 +1168,7 @@ class EasyModeHtml
 									<li>
 										<a href='#'>
 											<div class="ui-accordion-left"></div>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ACTIONS') ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ACTIONS') ?>
 											<div class="ui-accordion-right"></div>
 										</a>
 										<div id="bfActions" style="display:none">
@@ -1176,72 +1176,72 @@ class EasyModeHtml
 											<select id="bfBesideCreationButton" style="width:100%"
 												onchange="app.createElementBesideByType(app.optionElement, this)">
 												<option value="">
-													<?php echo BFText::_('COM_BREEZINGFORMS_CREATE_ELEMENT_BESIDE') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_CREATE_ELEMENT_BESIDE') ?>
 												</option>
 												<option value="bfStaticText">
-													<?php echo BFText::_('COM_BREEZINGFORMS_STATIC_TEXT') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_STATIC_TEXT') ?>
 												</option>
 												<option value="bfTextfield">
-													<?php echo BFText::_('COM_BREEZINGFORMS_TEXTFIELD') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TEXTFIELD') ?>
 												</option>
 												<option value="bfTextarea">
-													<?php echo BFText::_('COM_BREEZINGFORMS_TEXTAREA') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TEXTAREA') ?>
 												</option>
 
 												<option value="bfCheckbox">
-													<?php echo BFText::_('COM_BREEZINGFORMS_CHECKBOX') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_CHECKBOX') ?>
 												</option>
 												<option value="bfRadio">
-													<?php echo BFText::_('COM_BREEZINGFORMS_RADIO') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_RADIO') ?>
 												</option>
 												<option value="bfSelect">
-													<?php echo BFText::_('COM_BREEZINGFORMS_SELECT') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_SELECT') ?>
 												</option>
 												<option value="bfFile">
-													<?php echo BFText::_('COM_BREEZINGFORMS_FILE') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_FILE') ?>
 												</option>
 												<option value="bfTooltip">
-													<?php echo BFText::_('COM_BREEZINGFORMS_TOOLTIP') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_TOOLTIP') ?>
 												</option>
 												<option value="bfIcon">
-													<?php echo BFText::_('COM_BREEZINGFORMS_ICON') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ICON') ?>
 												</option>
 												<option value="bfSubmitButton">
-													<?php echo BFText::_('COM_BREEZINGFORMS_SUBMIT_BUTTON') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_SUBMIT_BUTTON') ?>
 												</option>
 												<option value="bfImageButton">
-													<?php echo BFText::_('COM_BREEZINGFORMS_IMAGE_BUTTON') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_IMAGE_BUTTON') ?>
 												</option>
 												<option value="bfCaptcha">
-													<?php echo BFText::_('COM_BREEZINGFORMS_CAPTCHA') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_CAPTCHA') ?>
 												</option>
 
 												<option value="bfCalendar">
-													<?php echo BFText::_('COM_BREEZINGFORMS_CALENDAR') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_CALENDAR') ?>
 												</option>
 												<option value="bfPayPal">
-													<?php echo BFText::_('COM_BREEZINGFORMS_PAYPAL') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_PAYPAL') ?>
 												</option>
 												<option value="bfSofortueberweisung">
-													<?php echo BFText::_('COM_BREEZINGFORMS_SOFORTUEBERWEISUNG') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_SOFORTUEBERWEISUNG') ?>
 												</option>
 											</select>
 											<br />
 											<br />
 											<input type="submit" id="bfElementRemoveButton"
 												onclick="app.removeElement(app.optionElement)"
-												value="<?php echo BFText::_('COM_BREEZINGFORMS_REMOVE_ELEMENT') ?>"
+												value="<?php echo BFText::_('COM_BREEZINGFORMSNG_REMOVE_ELEMENT') ?>"
 												style="visibility:hidden;display:none;width:100%;">
 											<br />
 											<br />
 
 											<input type="submit" id="bfElementMoveLeft"
 												onclick="app.moveElement(app.optionElement, 'prev')"
-												value="<?php echo BFText::_('COM_BREEZINGFORMS_MOVE_LEFT') ?>"
+												value="<?php echo BFText::_('COM_BREEZINGFORMSNG_MOVE_LEFT') ?>"
 												style="width:49%;visibility:hidden;display:none">
 											<input type="submit" id="bfElementMoveRight"
 												onclick="app.moveElement(app.optionElement, 'next')"
-												value="<?php echo BFText::_('COM_BREEZINGFORMS_MOVE_RIGHT') ?>"
+												value="<?php echo BFText::_('COM_BREEZINGFORMSNG_MOVE_RIGHT') ?>"
 												style="width:49%;visibility:hidden;display:none">
 											<br />
 											<br />
@@ -1250,7 +1250,7 @@ class EasyModeHtml
 									<li>
 										<a href='#'>
 											<div class="ui-accordion-left"></div>
-											<?php echo BFText::_('COM_BREEZINGFORMS_INIT_SCRIPT') ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_INIT_SCRIPT') ?>
 											<div class="ui-accordion-right"></div>
 										</a>
 										<div>
@@ -1258,16 +1258,16 @@ class EasyModeHtml
 											<div id="bfInitScript" style="display:none">
 												<br />
 												<span class="bfScriptsSaveMessage" style="display:none"></span>
-												<?php echo BFText::_('COM_BREEZINGFORMS_TYPE') ?>:
-												<?php echo BFText::_('COM_BREEZINGFORMS_NONE') ?> <input
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_TYPE') ?>:
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_NONE') ?> <input
 													onclick="JQuery('#bfInitScriptFlags').css('display','none');JQuery('#bfInitScriptLibrary').css('display','none');JQuery('#bfInitScriptCustom').css('display','none');"
 													type="radio" name="initType" id="bfInitTypeNone" class="bfInitType"
 													value="0" />
-												<?php echo BFText::_('COM_BREEZINGFORMS_LIBRARY') ?> <input
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_LIBRARY') ?> <input
 													onclick="JQuery('#bfInitScriptFlags').css('display','');JQuery('#bfInitScriptLibrary').css('display','');JQuery('#bfInitScriptCustom').css('display','none');"
 													type="radio" name="initType" id="bfInitTypeLibrary" class="bfInitType"
 													value="1" />
-												<?php echo BFText::_('COM_BREEZINGFORMS_CUSTOM') ?> <input
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_CUSTOM') ?> <input
 													onclick="JQuery('#bfInitScriptFlags').css('display','');JQuery('#bfInitScriptLibrary').css('display','none');JQuery('#bfInitScriptCustom').css('display','');"
 													type="radio" name="initType" id="bfInitTypeCustom" class="bfInitType"
 													value="2" />
@@ -1278,17 +1278,17 @@ class EasyModeHtml
 
 													<input type="checkbox" id="script1flag1" class="script1flag"
 														name="script1flag1" value="1" /><label for="script1flag1">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_FORMENTRY'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_FORMENTRY'); ?>
 													</label>
 													<input type="checkbox" id="script1flag2" class="script1flag"
 														name="script1flag2" value="1" /><label for="script1flag2">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_PAGEENTRY'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_PAGEENTRY'); ?>
 													</label>
 												</div>
 
 												<div id="bfInitScriptLibrary" style="display:none">
 													<hr />
-													<?php echo BFText::_('COM_BREEZINGFORMS_SCRIPT') ?>: <select
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPT') ?>: <select
 														id="bfInitScriptSelection"></select>
 
 												</div>
@@ -1297,7 +1297,7 @@ class EasyModeHtml
 													<hr />
 													<div class="btn" style="cursor: pointer;"
 														onclick="createInitCode(app.optionElement)">
-														<?php echo BFText::_('COM_BREEZINGFORMS_CREATE_CODE_FRAMEWORK') ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_CREATE_CODE_FRAMEWORK') ?>
 													</div>
 													<textarea name="script1code" id="script1code" rows="10" style="width:100%"
 														wrap="off"></textarea>
@@ -1316,57 +1316,57 @@ class EasyModeHtml
 									<li>
 										<a href='#'>
 											<div class="ui-accordion-left"></div>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ACTION_SCRIPT') ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ACTION_SCRIPT') ?>
 											<div class="ui-accordion-right"></div>
 										</a>
 										<div>
 											<span class="bfScriptsSaveMessage" style="display:none"></span>
 
 											<div id="bfActionScript" style="display:none">
-												<?php echo BFText::_('COM_BREEZINGFORMS_TYPE') ?>:
-												<?php echo BFText::_('COM_BREEZINGFORMS_NONE') ?> <input
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_TYPE') ?>:
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_NONE') ?> <input
 													onclick="JQuery('#bfActionScriptFlags').css('display','none');JQuery('#bfActionScriptLibrary').css('display','none');JQuery('#bfActionScriptCustom').css('display','none');"
 													type="radio" name="actionType" name="actionType" id="bfActionTypeNone"
 													class="bfActionType" value="0" />
-												<?php echo BFText::_('COM_BREEZINGFORMS_LIBRARY') ?> <input
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_LIBRARY') ?> <input
 													onclick="JQuery('#bfActionScriptFlags').css('display','');JQuery('#bfActionScriptLibrary').css('display','');JQuery('#bfActionScriptCustom').css('display','none');"
 													type="radio" name="actionType" id="bfActionTypeLibrary" class="bfActionType"
 													value="1" />
-												<?php echo BFText::_('COM_BREEZINGFORMS_CUSTOM') ?> <input
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_CUSTOM') ?> <input
 													onclick="JQuery('#bfActionScriptFlags').css('display','');JQuery('#bfActionScriptLibrary').css('display','none');JQuery('#bfActionScriptCustom').css('display','');"
 													type="radio" name="actionType" id="bfActionTypeCustom" class="bfActionType"
 													value="2" />
 
 												<div id="bfActionScriptFlags" style="display:none">
 													<hr />
-													<?php echo BFText::_('COM_BREEZINGFORMS_ACTIONS') ?>:
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ACTIONS') ?>:
 													<br />
 													<input style="display:none" type="checkbox" class="script2flag"
 														id="script2flag1" name="script2flag1" value="1" /><label
 														style="display:none" class="script2flagLabel" id="script2flag1Label"
 														for="script2flag1">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CLICK'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CLICK'); ?>
 													</label>
 
 													<input style="display:none" type="checkbox" class="script2flag"
 														id="script2flag2" name="script2flag2" value="1" /><label
 														style="display:none" class="script2flagLabel" id="script2flag2Label">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_BLUR'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_BLUR'); ?>
 													</label>
 													<input style="display:none" type="checkbox" class="script2flag"
 														id="script2flag3" name="script2flag3" value="1" /><label
 														style="display:none" class="script2flagLabel" id="script2flag3Label">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CHANGE'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CHANGE'); ?>
 													</label>
 													<input style="display:none" type="checkbox" class="script2flag"
 														id="script2flag4" name="script2flag4" value="1" /><label
 														style="display:none" class="script2flagLabel" id="script2flag4Label">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_FOCUS'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_FOCUS'); ?>
 													</label>
 													<input style="display:none" type="checkbox" class="script2flag"
 														id="script2flag5" name="script2flag5" value="1" /><label
 														style="display:none" class="script2flagLabel" id="script2flag5Label">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_SELECTION'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SELECTION'); ?>
 													</label>
 
 												</div>
@@ -1374,7 +1374,7 @@ class EasyModeHtml
 												<div id="bfActionScriptLibrary" style="display:none">
 													<hr />
 
-													<?php echo BFText::_('COM_BREEZINGFORMS_SCRIPT') ?>: <select
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPT') ?>: <select
 														id="bfActionsScriptSelection"></select>
 												</div>
 
@@ -1382,7 +1382,7 @@ class EasyModeHtml
 													<hr />
 													<div class="btn" style="cursor: pointer;"
 														onclick="createActionCode(app.optionElement)">
-														<?php echo BFText::_('COM_BREEZINGFORMS_CREATE_CODE_FRAMEWORK') ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_CREATE_CODE_FRAMEWORK') ?>
 													</div>
 													<textarea name="script2code" id="script2code" rows="10" style="width:100%"
 														wrap="off"></textarea>
@@ -1392,7 +1392,7 @@ class EasyModeHtml
 
 
 												<input id="bfActionButton" type="submit"
-													value="<?php echo BFText::_('COM_BREEZINGFORMS_UPDATE') ?>"
+													value="<?php echo BFText::_('COM_BREEZINGFORMSNG_UPDATE') ?>"
 													style="width:100%" />
 
 												<br />
@@ -1403,7 +1403,7 @@ class EasyModeHtml
 									<li>
 										<a href='#'>
 											<div class="ui-accordion-left"></div>
-											<?php echo BFText::_('COM_BREEZINGFORMS_VALIDATION_SCRIPT') ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_VALIDATION_SCRIPT') ?>
 											<div class="ui-accordion-right"></div>
 										</a>
 										<div>
@@ -1411,16 +1411,16 @@ class EasyModeHtml
 											<span class="bfScriptsSaveMessage" style="display:none"></span>
 											<div id="bfValidationScript" style="display:none">
 
-												<?php echo BFText::_('COM_BREEZINGFORMS_TYPE') ?>:
-												<?php echo BFText::_('COM_BREEZINGFORMS_NONE') ?> <input
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_TYPE') ?>:
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_NONE') ?> <input
 													onclick="JQuery('#bfValidationScriptFlags').css('display','none');JQuery('#bfValidationScriptLibrary').css('display','none');JQuery('#bfValidationScriptCustom').css('display','none');"
 													type="radio" name="validationType" id="bfValidationTypeNone"
 													class="bfValidationType" value="0" />
-												<?php echo BFText::_('COM_BREEZINGFORMS_LIBRARY') ?> <input
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_LIBRARY') ?> <input
 													onclick="JQuery('#bfValidationScriptFlags').css('display','');JQuery('#bfValidationScriptLibrary').css('display','');JQuery('#bfValidationScriptCustom').css('display','none');"
 													type="radio" name="validationType" id="bfValidationTypeLibrary"
 													class="bfValidationType" value="1" />
-												<?php echo BFText::_('COM_BREEZINGFORMS_CUSTOM') ?> <input
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_CUSTOM') ?> <input
 													onclick="JQuery('#bfValidationScriptFlags').css('display','');JQuery('#bfValidationScriptLibrary').css('display','none');JQuery('#bfValidationScriptCustom').css('display','');"
 													type="radio" name="validationType" id="bfValidationTypeCustom"
 													class="bfValidationType" value="2" />
@@ -1428,14 +1428,14 @@ class EasyModeHtml
 												<div id="bfValidationScriptFlags" style="display:none">
 													<hr />
 
-													<?php echo BFText::_('COM_BREEZINGFORMS_ERROR_MESSAGE') ?>: <input
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ERROR_MESSAGE') ?>: <input
 														type="text" style="width:100%" maxlength="255" class="script3msg"
 														id="script3msg" name="script3msg" value="" class="inputbox" />
 												</div>
 
 												<div id="bfValidationScriptLibrary" style="display:none">
 													<hr />
-													<?php echo BFText::_('COM_BREEZINGFORMS_SCRIPT') ?>: <select
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPT') ?>: <select
 														id="bfValidationScriptSelection"></select>
 												</div>
 
@@ -1444,7 +1444,7 @@ class EasyModeHtml
 
 													<div class="btn" style="cursor: pointer;"
 														onclick="createValidationCode(app.optionElement)">
-														<?php echo BFText::_('COM_BREEZINGFORMS_CREATE_CODE_FRAMEWORK') ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_CREATE_CODE_FRAMEWORK') ?>
 													</div>
 													<textarea name="script3code" id="script3code" rows="10" style="width:100%"
 														wrap="off"></textarea>
@@ -1453,7 +1453,7 @@ class EasyModeHtml
 												<hr />
 
 												<input id="bfValidationButton" type="submit"
-													value="<?php echo BFText::_('COM_BREEZINGFORMS_UPDATE') ?>"
+													value="<?php echo BFText::_('COM_BREEZINGFORMSNG_UPDATE') ?>"
 													style="width:100%" />
 
 												<br />
@@ -1475,38 +1475,38 @@ class EasyModeHtml
 
 										<a href='#'>
 											<div class="ui-accordion-left"></div>
-											<?php echo BFText::_('COM_BREEZINGFORMS_PAGES') ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_PAGES') ?>
 											<div class="ui-accordion-right"></div>
 										</a>
 										<div>
 											<br />
-											<?php echo BFText::_('COM_BREEZINGFORMS_CURRENT_PAGE') ?>: <span
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_CURRENT_PAGE') ?>: <span
 												id="bfCurrentPage"></span>
 											<br />
 											<br />
 											<input type="submit"
-												value="<?php echo BFText::_('COM_BREEZINGFORMS_CREATE_NEW_PAGE') ?>"
+												value="<?php echo BFText::_('COM_BREEZINGFORMSNG_CREATE_NEW_PAGE') ?>"
 												id="bfCreatePage" style="width:100%" />
 											<br />
 
 											<br />
 											<select id="bfGoToPage" style="width:100%">
 												<option value="-1">
-													<?php echo BFText::_('COM_BREEZINGFORMS_GO_TO_PAGE') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_GO_TO_PAGE') ?>
 												</option>
 											</select>
 											<br />
 											<br />
 											<select id="bfMoveThisPageTo" style="width:100%">
 												<option value="-1">
-													<?php echo BFText::_('COM_BREEZINGFORMS_MOVE_THIS_PAGE_TO') ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_MOVE_THIS_PAGE_TO') ?>
 												</option>
 											</select>
 
 											<br />
 											<br />
 											<input type="submit"
-												value="<?php echo BFText::_('COM_BREEZINGFORMS_DELETE_THIS_PAGE') ?>"
+												value="<?php echo BFText::_('COM_BREEZINGFORMSNG_DELETE_THIS_PAGE') ?>"
 												id="bfDeleteThisPage" style="width:100%" />
 											<br />
 											<br />
@@ -1516,7 +1516,7 @@ class EasyModeHtml
 									<li>
 										<a href='#'>
 											<div class="ui-accordion-left"></div>
-											<?php echo BFText::_('COM_BREEZINGFORMS_HIDDEN_FIELDS') ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_HIDDEN_FIELDS') ?>
 											<div class="ui-accordion-right"></div>
 										</a>
 
@@ -1530,18 +1530,18 @@ class EasyModeHtml
 									<li>
 										<a href='#'>
 											<div class="ui-accordion-left"></div>
-											<?php echo BFText::_('COM_BREEZINGFORMS_CODE') ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_CODE') ?>
 											<div class="ui-accordion-right"></div>
 										</a>
 										<div>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ATTENTION_CHANGE_THE_GENERATED_TEMPLATE_CODE_ON_YOUR_OWN_RISK_BEST_IS_TO_KEEP_THE_UL_TAGS_AND_THEIR_CONTENTS_AS_IS_AND_CHANGE_ONLY_THE_LAYOUT_AROUND_IF_NECESSARY_AND_NEVER_UPDATE_WHEN_YOU_HAVE_UNSAVED_ELEMENTS_IN_THE_EDITOR') ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ATTENTION_CHANGE_THE_GENERATED_TEMPLATE_CODE_ON_YOUR_OWN_RISK_BEST_IS_TO_KEEP_THE_UL_TAGS_AND_THEIR_CONTENTS_AS_IS_AND_CHANGE_ONLY_THE_LAYOUT_AROUND_IF_NECESSARY_AND_NEVER_UPDATE_WHEN_YOU_HAVE_UNSAVED_ELEMENTS_IN_THE_EDITOR') ?>
 
 											<br />
 											<br />
 											<textarea rows="10" style="width:100%;" id="bfTemplateBox" wrap="off"></textarea>
 											<br />
 											<input type="submit" id="bfUpdateTemplateButton"
-												value="<?php echo BFText::_('COM_BREEZINGFORMS_UPDATE') ?>"
+												value="<?php echo BFText::_('COM_BREEZINGFORMSNG_UPDATE') ?>"
 												style="width:100%" />
 											<br />
 											<br />
@@ -1552,42 +1552,42 @@ class EasyModeHtml
 									<li>
 										<a href='#'>
 											<div class="ui-accordion-left"></div>
-											<?php echo BFText::_('COM_BREEZINGFORMS_BATCH_OPTIONS') ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_BATCH_OPTIONS') ?>
 											<div class="ui-accordion-right"></div>
 										</a>
 										<div>
 											<br />
-											<?php echo BFText::_('COM_BREEZINGFORMS_LABELS') ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_LABELS') ?>
 											<br />
 											<select id="bfBatchLabels" multiple="multiple"
 												style="width:100%;height:100px;"></select>
 											<br />
 
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS') ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS') ?>
 											<br />
 											<select id="bfBatchElements" multiple="multiple"
 												style="width:100%;height:100px;"></select>
 											<br />
-											<?php echo BFText::_('COM_BREEZINGFORMS_WIDTH') ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_WIDTH') ?>
 											<br />
 											<input type="text" id="bfBatchWidth" value="" style="width:100%" />
 											<br />
-											<?php echo BFText::_('COM_BREEZINGFORMS_HEIGHT') ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_HEIGHT') ?>
 
 											<br />
 											<input type="text" id="bfBatchHeight" value="" style="width:100%" />
 											<br />
-											<?php echo BFText::_('COM_BREEZINGFORMS_PADDING') ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_PADDING') ?>
 											<br />
 											<input type="text" id="bfBatchPadding" value="" style="width:100%" />
 											<br />
-											<?php echo BFText::_('COM_BREEZINGFORMS_MARGIN') ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_MARGIN') ?>
 											<br />
 
 											<input type="text" id="bfBatchMargin" value="" style="width:100%" />
 											<br />
 											<input type="submit" id="bfBatchButton"
-												value="<?php echo BFText::_('COM_BREEZINGFORMS_UPDATE') ?>"
+												value="<?php echo BFText::_('COM_BREEZINGFORMSNG_UPDATE') ?>"
 												style="width:100%" />
 											<br />
 											<br />
@@ -1597,13 +1597,13 @@ class EasyModeHtml
 									<li>
 										<a href='#'>
 											<div class="ui-accordion-left"></div>
-											<?php echo BFText::_('COM_BREEZINGFORMS_MISC') ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_MISC') ?>
 											<div class="ui-accordion-right"></div>
 										</a>
 
 										<div>
 											<br />
-											<?php echo BFText::_('COM_BREEZINGFORMS_PIXEL_RASTER') ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_PIXEL_RASTER') ?>
 											<br />
 											<input type="text" id="bfPixelRaster" value="1" style="width:100%" />
 											<br />
@@ -1632,7 +1632,7 @@ class EasyModeHtml
 					<div id="easymode-trashcan">
 
 						<span class="icon-trashcan">
-							<?php echo BFText::_('COM_BREEZINGFORMS_TRASH_CAN') ?>
+							<?php echo BFText::_('COM_BREEZINGFORMSNG_TRASH_CAN') ?>
 						</span>
 
 						<div id="trashcan-box">

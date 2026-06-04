@@ -35,54 +35,54 @@ class HtmlView extends BaseHtmlView
 
         Sidebar::addEntry(
             '<i class="fa fa-folder-open" aria-hidden="true"></i> ' . '<m>' .
-            BFText::_('COM_BREEZINGFORMS_MANAGERECS') . '</m>',
+            BFText::_('COM_BREEZINGFORMSNG_MANAGERECS') . '</m>',
             'index.php?option=com_breezingformsng&act=managerecs',
             BFRequest::getVar('act', '') == 'managerecs' || BFRequest::getVar('act', '') == 'recordmanagement' || BFRequest::getVar('act', '') == ''
         );
 
         Sidebar::addEntry(
             '<i class="fa fa-pencil-square-o" aria-hidden="true"></i> ' . '<m>' .
-            BFText::_('COM_BREEZINGFORMS_MANAGEFORMS') . '</m>',
+            BFText::_('COM_BREEZINGFORMSNG_MANAGEFORMS') . '</m>',
             'index.php?option=com_breezingformsng&act=manageforms',
             BFRequest::getVar('act', '') == 'manageforms' || BFRequest::getVar('act', '') == 'easymode' || BFRequest::getVar('act', '') == 'quickmode'
         );
 
         Sidebar::addEntry(
             '<i class="fa fa-code" aria-hidden="true"></i> ' . '<m>' .
-            BFText::_('COM_BREEZINGFORMS_MANAGESCRIPTS') . '</m>',
+            BFText::_('COM_BREEZINGFORMSNG_MANAGESCRIPTS') . '</m>',
             'index.php?option=com_breezingformsng&act=managescripts',
             BFRequest::getVar('act', '') == 'managescripts'
         );
 
         Sidebar::addEntry(
             '<i class="fa fa-puzzle-piece" aria-hidden="true"></i> ' . '<m>' .
-            BFText::_('COM_BREEZINGFORMS_MANAGEPIECES') . '</m>',
+            BFText::_('COM_BREEZINGFORMSNG_MANAGEPIECES') . '</m>',
             'index.php?option=com_breezingformsng&act=managepieces',
             BFRequest::getVar('act', '') == 'managepieces'
         );
 
         Sidebar::addEntry(
             '<i class="fa fa-link" aria-hidden="true"></i> ' . '<m>' .
-            BFText::_('COM_BREEZINGFORMS_INTEGRATOR') . '</m>',
+            BFText::_('COM_BREEZINGFORMSNG_INTEGRATOR') . '</m>',
             'index.php?option=com_breezingformsng&act=integrate',
             BFRequest::getVar('act', '') == 'integrate'
         );
 
         /*
         Sidebar::addEntry('<i class="fa fa-bars" aria-hidden="true"></i> '  .'<m>'.
-            BFText::_('COM_BREEZINGFORMS_MANAGEMENUS') .'</m>',
+            BFText::_('COM_BREEZINGFORMSNG_MANAGEMENUS') .'</m>',
             'index.php?option=com_breezingformsng&act=managemenus', BFRequest::getVar('act','') == 'managemenus');*/
 
         Sidebar::addEntry(
             '<i class="fa fa-cog" aria-hidden="true"></i> ' . '<m>' .
-            BFText::_('COM_BREEZINGFORMS_CONFIG') . '</m>',
+            BFText::_('COM_BREEZINGFORMSNG_CONFIG') . '</m>',
             'index.php?option=com_breezingformsng&act=configuration',
             BFRequest::getVar('act', '') == 'configuration'
         );
 
         Sidebar::addEntry(
             '<i class="fa fa-info-circle" aria-hidden="true"></i> ' . '<m>' .
-            BFText::_('COM_BREEZINGFORMS_ABOUT') . '</m>',
+            BFText::_('COM_BREEZINGFORMSNG_ABOUT') . '</m>',
             'index.php?option=com_breezingformsng&act=about',
             BFRequest::getVar('act', '') == 'about'
         );

@@ -255,7 +255,7 @@ HTMLHelper::_('bootstrap.modal');
 
 				// element name header
 				element = document.createElement('span');
-				element.innerHTML = '<?php echo BFText::_('COM_BREEZINGFORMS_NAME') ?>:';
+				element.innerHTML = '<?php echo BFText::_('COM_BREEZINGFORMSNG_NAME') ?>:';
 				JQuery('#bfHiddenFieldsOptions').append(element);
 				br = document.createElement('br');
 				JQuery('#bfHiddenFieldsOptions').append(br);
@@ -376,7 +376,7 @@ HTMLHelper::_('bootstrap.modal');
 
 						appScope.populateHiddenFieldsOptions();
 
-						JQuery('#bfHiddenFieldsOptions').get(0).innerHTML = '<?php echo BFText::_('COM_BREEZINGFORMS_OPTIONS_SAVED_TO_FINALLY_SAVE_YOUR_FORM_CLICK_SAVE_ON_THE_TOP_RIGHT_BUTTON') ?><br/><br/>' + JQuery('#bfHiddenFieldsOptions').get(0).innerHTML;
+						JQuery('#bfHiddenFieldsOptions').get(0).innerHTML = '<?php echo BFText::_('COM_BREEZINGFORMSNG_OPTIONS_SAVED_TO_FINALLY_SAVE_YOUR_FORM_CLICK_SAVE_ON_THE_TOP_RIGHT_BUTTON') ?><br/><br/>' + JQuery('#bfHiddenFieldsOptions').get(0).innerHTML;
 					}
 				);
 
@@ -463,7 +463,7 @@ HTMLHelper::_('bootstrap.modal');
 		this.prepareForSave = function () {
 
 			if (appScope.captchaAdded > 1) {
-				alert('<?php echo BFText::_('COM_BREEZINGFORMS_ADDED_MORE_THAN_ONE_CAPTCHA') ?>');
+				alert('<?php echo BFText::_('COM_BREEZINGFORMSNG_ADDED_MORE_THAN_ONE_CAPTCHA') ?>');
 				return;
 			}
 
@@ -2316,7 +2316,7 @@ HTMLHelper::_('bootstrap.modal');
 		JQuery('#bfDeleteThisPage').click(
 			function () {
 
-				if (!confirm('<?php echo BFText::_('COM_BREEZINGFORMS_ARE_YOU_SURE_TO_DELETE_THIS_PAGE') ?>')) {
+				if (!confirm('<?php echo BFText::_('COM_BREEZINGFORMSNG_ARE_YOU_SURE_TO_DELETE_THIS_PAGE') ?>')) {
 					return;
 				}
 
@@ -2474,7 +2474,7 @@ HTMLHelper::_('bootstrap.modal');
 				}
 
 				JQuery('.bfScriptsSaveMessage').css('display', '');
-				JQuery('.bfScriptsSaveMessage').empty().append('<?php echo BFText::_('COM_BREEZINGFORMS_SCRIPT_SAVED_TO_FINALLY_SAVE_YOUR_FORM_CLICK_SAVE_ON_THE_TOP_RIGHT_BUTTON') ?><br/><br/>');
+				JQuery('.bfScriptsSaveMessage').empty().append('<?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPT_SAVED_TO_FINALLY_SAVE_YOUR_FORM_CLICK_SAVE_ON_THE_TOP_RIGHT_BUTTON') ?><br/><br/>');
 			}
 		);
 
@@ -2530,7 +2530,7 @@ HTMLHelper::_('bootstrap.modal');
 				}
 
 				JQuery('.bfScriptsSaveMessage').css('display', '');
-				JQuery('.bfScriptsSaveMessage').empty().append('<?php echo BFText::_('COM_BREEZINGFORMS_SCRIPT_SAVED_TO_FINALLY_SAVE_YOUR_FORM_CLICK_SAVE_ON_THE_TOP_RIGHT_BUTTON') ?><br/><br/>');
+				JQuery('.bfScriptsSaveMessage').empty().append('<?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPT_SAVED_TO_FINALLY_SAVE_YOUR_FORM_CLICK_SAVE_ON_THE_TOP_RIGHT_BUTTON') ?><br/><br/>');
 			}
 		);
 
@@ -2557,7 +2557,7 @@ HTMLHelper::_('bootstrap.modal');
 				}
 
 				JQuery('.bfScriptsSaveMessage').css('display', '');
-				JQuery('.bfScriptsSaveMessage').empty().append('<?php echo BFText::_('COM_BREEZINGFORMS_SCRIPT_SAVED_TO_FINALLY_SAVE_YOUR_FORM_CLICK_SAVE_ON_THE_TOP_RIGHT_BUTTON') ?><br/><br/>');
+				JQuery('.bfScriptsSaveMessage').empty().append('<?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPT_SAVED_TO_FINALLY_SAVE_YOUR_FORM_CLICK_SAVE_ON_THE_TOP_RIGHT_BUTTON') ?><br/><br/>');
 			}
 		);
 
@@ -2581,7 +2581,7 @@ HTMLHelper::_('bootstrap.modal');
 							break;
 						case 'bfStaticText':
 							if (JQuery.trim(JQuery('#bfStaticTextTitle').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_TITLE_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (JQuery.trim(JQuery('#bfStaticTextContent').get(0).value) == '') {
 								error = 'Content must not be empty!';
@@ -2597,13 +2597,13 @@ HTMLHelper::_('bootstrap.modal');
 							break;
 						case 'bfIcon':
 							if (JQuery.trim(JQuery('#bfIconCaption').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_CAPTION_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_CAPTION_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (JQuery.trim(JQuery('#bfIconImage').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_ICON_IMAGE_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_ICON_IMAGE_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (JQuery.trim(JQuery('#bfIconImageOver').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_ICON_IMAGE_OVER_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_ICON_IMAGE_OVER_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (error == '') {
 								appScope.optionElement.title = JQuery.trim(JQuery('#bfIconCaption').get(0).value);
@@ -2616,10 +2616,10 @@ HTMLHelper::_('bootstrap.modal');
 							break;
 						case 'bfTextfield':
 							if (JQuery.trim(JQuery('#bfTextfieldTitle').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_TITLE_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (JQuery.trim(JQuery('#bfTextfieldName').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_NAME_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_NAME_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (error == '') {
 								appScope.optionElement.title = JQuery.trim(JQuery('#bfTextfieldTitle').get(0).value);
@@ -2674,10 +2674,10 @@ HTMLHelper::_('bootstrap.modal');
 							break;
 						case 'bfTextarea':
 							if (JQuery.trim(JQuery('#bfTextareaTitle').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_TITLE_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (JQuery.trim(JQuery('#bfTextareaName').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_NAME_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_NAME_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (error == '') {
 								appScope.optionElement.title = JQuery.trim(JQuery('#bfTextareaTitle').get(0).value);
@@ -2702,10 +2702,10 @@ HTMLHelper::_('bootstrap.modal');
 							break;
 						case 'bfCheckbox':
 							if (JQuery.trim(JQuery('#bfCheckboxTitle').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_TITLE_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (JQuery.trim(JQuery('#bfCheckboxName').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_NAME_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_NAME_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (error == '') {
 								appScope.optionElement.title = JQuery.trim(JQuery('#bfCheckboxTitle').get(0).value);
@@ -2748,10 +2748,10 @@ HTMLHelper::_('bootstrap.modal');
 							break;
 						case 'bfRadio':
 							if (JQuery.trim(JQuery('#bfRadioTitle').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_TITLE_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (JQuery.trim(JQuery('#bfRadioName').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_NAME_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_NAME_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (error == '') {
 								appScope.optionElement.title = JQuery.trim(JQuery('#bfRadioTitle').get(0).value);
@@ -2785,10 +2785,10 @@ HTMLHelper::_('bootstrap.modal');
 							break;
 						case 'bfSelect':
 							if (JQuery.trim(JQuery('#bfSelectTitle').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_TITLE_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (JQuery.trim(JQuery('#bfSelectName').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_NAME_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_NAME_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (error == '') {
 								appScope.optionElement.title = JQuery.trim(JQuery('#bfSelectTitle').get(0).value);
@@ -2854,10 +2854,10 @@ HTMLHelper::_('bootstrap.modal');
 							break;
 						case 'bfFile':
 							if (JQuery.trim(JQuery('#bfFileTitle').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_TITLE_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (JQuery.trim(JQuery('#bfFileName').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_NAME_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_NAME_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (error == '') {
 								appScope.optionElement.title = JQuery.trim(JQuery('#bfFileTitle').get(0).value);
@@ -2901,10 +2901,10 @@ HTMLHelper::_('bootstrap.modal');
 							break;
 						case 'bfImageButton':
 							if (JQuery.trim(JQuery('#bfImageButtonTitle').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_TITLE_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (JQuery.trim(JQuery('#bfImageButtonName').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_NAME_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_NAME_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (error == '') {
 								appScope.optionElement.title = JQuery.trim(JQuery('#bfImageButtonTitle').get(0).value);
@@ -2930,10 +2930,10 @@ HTMLHelper::_('bootstrap.modal');
 							break;
 						case 'bfSubmitButton':
 							if (JQuery.trim(JQuery('#bfSubmitButtonTitle').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_TITLE_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (JQuery.trim(JQuery('#bfSubmitButtonName').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_NAME_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_NAME_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (error == '') {
 								appScope.optionElement.title = JQuery.trim(JQuery('#bfSubmitButtonTitle').get(0).value);
@@ -2958,10 +2958,10 @@ HTMLHelper::_('bootstrap.modal');
 							break;
 						case 'bfTooltip':
 							if (JQuery.trim(JQuery('#bfTooltipTitle').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_TITLE_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (JQuery.trim(JQuery('#bfTooltipName').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_NAME_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_NAME_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (error == '') {
 								appScope.optionElement.title = JQuery.trim(JQuery('#bfTooltipTitle').get(0).value);
@@ -2990,10 +2990,10 @@ HTMLHelper::_('bootstrap.modal');
 						case 'bfPayPal':
 
 							if (JQuery.trim(JQuery('#bfPayPalTitle').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_TITLE_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (JQuery.trim(JQuery('#bfPayPalName').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_NAME_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_NAME_MUST_NOT_BE_EMPTY') ?>';
 							}
 
 							if (error == '') {
@@ -3047,10 +3047,10 @@ HTMLHelper::_('bootstrap.modal');
 						case 'bfSofortueberweisung':
 
 							if (JQuery.trim(JQuery('#bfSofortueberweisungTitle').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_TITLE_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_TITLE_MUST_NOT_BE_EMPTY') ?>';
 							}
 							if (JQuery.trim(JQuery('#bfSofortueberweisungName').get(0).value) == '') {
-								error = '<?php echo BFText::_('COM_BREEZINGFORMS_NAME_MUST_NOT_BE_EMPTY') ?>';
+								error = '<?php echo BFText::_('COM_BREEZINGFORMSNG_NAME_MUST_NOT_BE_EMPTY') ?>';
 							}
 
 							if (error == '') {
@@ -3125,7 +3125,7 @@ HTMLHelper::_('bootstrap.modal');
 				appScope.optionElement.tabIndex = JQuery.trim(JQuery('#bfOptionsTabIndex').get(0).value);
 
 				if (error == '') {
-					JQuery('#bfOptionsSaveMessage').get(0).innerHTML = '<?php echo BFText::_('COM_BREEZINGFORMS_OPTIONS_SAVED_TO_FINALLY_SAVE_YOUR_FORM_CLICK_SAVE_ON_THE_TOP_RIGHT_BUTTON') ?><br/><br/>';
+					JQuery('#bfOptionsSaveMessage').get(0).innerHTML = '<?php echo BFText::_('COM_BREEZINGFORMSNG_OPTIONS_SAVED_TO_FINALLY_SAVE_YOUR_FORM_CLICK_SAVE_ON_THE_TOP_RIGHT_BUTTON') ?><br/><br/>';
 				} else {
 					JQuery('#bfOptionsSaveMessage').get(0).innerHTML = error + '<br/><br/>';
 				}
@@ -3529,7 +3529,7 @@ HTMLHelper::_('bootstrap.modal');
 			alert('Please enter the element name first.');
 			return;
 		} // if
-		if (!confirm("<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CREAACTION'); ?>\n<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_EXISTAPP'); ?>")) return;
+		if (!confirm("<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CREAACTION'); ?>\n<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_EXISTAPP'); ?>")) return;
 		code =
 			"function ff_" + name + "_action(element, action)\n" +
 			"{\n" +
@@ -3568,7 +3568,7 @@ HTMLHelper::_('bootstrap.modal');
 		if (oldcode != '')
 			form.script2code.value =
 				code +
-				"\n// -------------- <?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_OLDBELOW'); ?> --------------\n\n" +
+				"\n// -------------- <?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_OLDBELOW'); ?> --------------\n\n" +
 				oldcode;
 		else
 			form.script2code.value = code;
@@ -3581,7 +3581,7 @@ HTMLHelper::_('bootstrap.modal');
 			alert('Please enter the element name first.');
 			return;
 		} // if
-		if (!confirm("<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CREAINIT'); ?>\n<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_EXISTAPP'); ?>")) return;
+		if (!confirm("<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CREAINIT'); ?>\n<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_EXISTAPP'); ?>")) return;
 		code =
 			"function ff_" + name + "_init(element, condition)\n" +
 			"{\n" +
@@ -3602,7 +3602,7 @@ HTMLHelper::_('bootstrap.modal');
 		if (oldcode != '')
 			form.script1code.value =
 				code +
-				"\n// -------------- <?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_OLDBELOW'); ?> --------------\n\n" +
+				"\n// -------------- <?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_OLDBELOW'); ?> --------------\n\n" +
 				oldcode;
 		else
 			form.script1code.value = code;
@@ -3615,7 +3615,7 @@ HTMLHelper::_('bootstrap.modal');
 			alert('Please enter the element name first.');
 			return;
 		} // if
-		if (!confirm("<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CREAVALID'); ?>\n<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_EXISTAPP'); ?>")) return;
+		if (!confirm("<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CREAVALID'); ?>\n<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_EXISTAPP'); ?>")) return;
 		code =
 			"function ff_" + name + "_validation(element, message)\n" +
 			"{\n" +
@@ -3630,7 +3630,7 @@ HTMLHelper::_('bootstrap.modal');
 		if (oldcode != '')
 			form.script3code.value =
 				code +
-				"\n// -------------- <?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_OLDBELOW'); ?> --------------\n\n" +
+				"\n// -------------- <?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_OLDBELOW'); ?> --------------\n\n" +
 				oldcode;
 		else
 			form.script3code.value = code;

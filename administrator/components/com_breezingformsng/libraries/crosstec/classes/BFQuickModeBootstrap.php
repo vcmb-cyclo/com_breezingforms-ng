@@ -377,7 +377,7 @@ class BFQuickModeBootstrap
 			}
 			');
             echo "<div style=\"visibility:hidden;\" id=\"bfFileQueue\"></div>";
-            echo "<div style=\"visibility:hidden;display:none;\" id=\"bfSubmitMessage\">" . BFText::_('COM_BREEZINGFORMS_SUBMIT_MESSAGE') . "</div>";
+            echo "<div style=\"visibility:hidden;display:none;\" id=\"bfSubmitMessage\">" . BFText::_('COM_BREEZINGFORMSNG_SUBMIT_MESSAGE') . "</div>";
         }
         echo '<noscript>Please turn on javascript to submit your data. Thank you!</noscript>' . "\n";
         Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('//-->');
@@ -601,7 +601,7 @@ class BFQuickModeBootstrap
 
                         $maxlengthCounter = '';
                         if ($mdata['bfType'] == 'bfTextarea' && isset($mdata['maxlength']) && $mdata['maxlength'] > 0 && isset($mdata['showMaxlengthCounter']) && $mdata['showMaxlengthCounter']) {
-                            $maxlengthCounter = ' <span class=***bfMaxLengthCounter*** id=***bfMaxLengthCounter' . $mdata['dbId'] . '***>(' . $mdata['maxlength'] . ' ' . BFText::_('COM_BREEZINGFORMS_CHARS_LEFT') . ')</span>';
+                            $maxlengthCounter = ' <span class=***bfMaxLengthCounter*** id=***bfMaxLengthCounter' . $mdata['dbId'] . '***>(' . $mdata['maxlength'] . ' ' . BFText::_('COM_BREEZINGFORMSNG_CHARS_LEFT') . ')</span>';
                         }
 
                         /* translatables */
@@ -1147,7 +1147,7 @@ class BFQuickModeBootstrap
                                                                         url : '" . $base . (BFJoomlaConfig::get('config.sef') && !BFJoomlaConfig::get('config.sef_rewrite') ? 'index.php/' : '') . (BFRequest::getCmd('lang', '') && BFJoomlaConfig::get('config.sef') ? (BFJoomlaConfig::get('config.sef_rewrite') ? 'index.php' : '') : 'index.php') . "',
                                                                         flash_swf_url : '" . $base . "components/com_breezingformsng/libraries/jquery/plupload/Moxie.swf',
                                                                         filters : [
-                                                                                {title : '" . addslashes(BFText::_('COM_BREEZINGFORMS_CHOOSE_FILE')) . "', extensions : '" . $exts . "'}
+                                                                                {title : '" . addslashes(BFText::_('COM_BREEZINGFORMSNG_CHOOSE_FILE')) . "', extensions : '" . $exts . "'}
                                                                         ]
                                                                 });
                                                                 uploader.bind('FilesAdded', function(up, files) {
@@ -1200,7 +1200,7 @@ class BFQuickModeBootstrap
                                                                                 );
                                                                                 var thebytes = " . (isset($mdata['flashUploaderBytes']) && is_numeric($mdata['flashUploaderBytes']) && $mdata['flashUploaderBytes'] > 0 ? intval($mdata['flashUploaderBytes']) : '0') . ";
                                                                                 if(thebytes > 0 && typeof files[i].size != 'undefined' && files[i].size > thebytes){
-                                                                                     alert(' " . addslashes(BFText::_('COM_BREEZINGFORMS_FLASH_UPLOADER_TOO_LARGE')) . "');
+                                                                                     alert(' " . addslashes(BFText::_('COM_BREEZINGFORMSNG_FLASH_UPLOADER_TOO_LARGE')) . "');
                                                                                      error = true;
                                                                                 }
                                                                                 var ext = files[i].name.replace(/[/\\?%*:|\"<>]/g, '').split('.').pop().toLowerCase();
@@ -1212,7 +1212,7 @@ class BFQuickModeBootstrap
                                                                                     }
                                                                                 }
                                                                                 if(found == 0){
-                                                                                    alert( ' " . addslashes(BFText::_('COM_BREEZINGFORMS_FILE_EXTENSION_NOT_ALLOWED')) . "' );
+                                                                                    alert( ' " . addslashes(BFText::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED')) . "' );
                                                                                     error = true;
                                                                                 }
                                                                                 if(error){
@@ -1771,7 +1771,7 @@ class BFQuickModeBootstrap
                         echo '<span class="' . $this->bsClass('nonform-control') . '">';
 
                         echo '<div class="bfSignature" id="bfSignature' . $mdata['dbId'] . '"><div class="bfSignatureCanvasBorder"><canvas></canvas></div>' . "\n";
-                        echo '<button onclick="bf_Signature' . $mdata['dbId'] . 'Reset(bf_signaturePad' . $mdata['dbId'] . ');" class="bfSignatureResetButton button ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . '"><span>' . Text::_('COM_BREEZINGFORMS_SIGNATURE_RESET_BUTTON') . '</span></button>' . "\n";
+                        echo '<button onclick="bf_Signature' . $mdata['dbId'] . 'Reset(bf_signaturePad' . $mdata['dbId'] . ');" class="bfSignatureResetButton button ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . '"><span>' . Text::_('COM_BREEZINGFORMSNG_SIGNATURE_RESET_BUTTON') . '</span></button>' . "\n";
                         echo '</div>';
                         echo '</span>';
                         echo '</div>';
@@ -2489,7 +2489,7 @@ function bfTriggerRules() {
 					JQuery("#ff_elem"+id).val( JQuery("#ff_elem"+id).val().substring(0, maxlength) );
 				}
 				if(showMaxlength){
-					JQuery("#bfMaxLengthCounter"+id).text( "(" + (maxlength - JQuery("#ff_elem"+id).val().length) + " ' . BFText::_('COM_BREEZINGFORMS_CHARS_LEFT') . ')" );
+					JQuery("#bfMaxLengthCounter"+id).text( "(" + (maxlength - JQuery("#ff_elem"+id).val().length) + " ' . BFText::_('COM_BREEZINGFORMSNG_CHARS_LEFT') . ')" );
 				}
 			}
 			function bfRegisterSummarize(id, connectWith, type, emptyMessage, hideIfEmpty){

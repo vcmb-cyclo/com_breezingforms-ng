@@ -69,10 +69,10 @@ switch ($task) {
         $rule = $integrator->getRule(BFRequest::getInt('id', -1));
 
         if ($rule == null) {
-            ToolBarHelper::save('save', 'COM_BREEZINGFORMS_TOOLBAR_SAVE');
+            ToolBarHelper::save('save', 'COM_BREEZINGFORMSNG_TOOLBAR_SAVE');
         }
 
-        ToolBarHelper::custom('cancel', 'cancel.png', 'cancel_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_QUICKMODE_CLOSE'), false);
+        ToolBarHelper::custom('cancel', 'cancel.png', 'cancel_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_QUICKMODE_CLOSE'), false);
 
 
         // CUSTOM

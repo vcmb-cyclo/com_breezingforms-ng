@@ -371,7 +371,7 @@ $errmode = 'die';   // die or log
 
 // compatibility check
 if (!$ff_compatible) {
-    echo '<h1>' . BFText::_('COM_BREEZINGFORMS_INCOMPATIBLE') . '</h1>';
+    echo '<h1>' . BFText::_('COM_BREEZINGFORMSNG_INCOMPATIBLE') . '</h1>';
     exit;
 } // if
 
@@ -681,7 +681,7 @@ function updateComponentMenus($copy = false)
             Factory::getContainer()->get(DatabaseInterface::class)->setQuery("Select id From #__menu Where `alias` = " . Factory::getContainer()->get(DatabaseInterface::class)->Quote($row->title));
 
             if (Factory::getContainer()->get(DatabaseInterface::class)->loadResult()) {
-                return BFText::_('COM_BREEZINGFORMS_MENU_ITEM_EXISTS');
+                return BFText::_('COM_BREEZINGFORMSNG_MENU_ITEM_EXISTS');
             }
 
             if ($row->parent == 0 || $row->parent == 1) {

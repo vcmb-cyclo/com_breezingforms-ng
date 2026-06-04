@@ -129,11 +129,11 @@ class facileFormsPiece
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
 		ArrayHelper::toInteger($ids);
 		$typelist = array();
-		$typelist[] = array('Untyped', BFText::_('COM_BREEZINGFORMS_PIECES_UNTYPED'));
-		$typelist[] = array('Before Form', BFText::_('COM_BREEZINGFORMS_PIECES_BEFOREFORM'));
-		$typelist[] = array('After Form', BFText::_('COM_BREEZINGFORMS_PIECES_AFTERFORM'));
-		$typelist[] = array('Begin Submit', BFText::_('COM_BREEZINGFORMS_PIECES_BEGINSUBMIT'));
-		$typelist[] = array('End Submit', BFText::_('COM_BREEZINGFORMS_PIECES_ENDSUBMIT'));
+		$typelist[] = array('Untyped', BFText::_('COM_BREEZINGFORMSNG_PIECES_UNTYPED'));
+		$typelist[] = array('Before Form', BFText::_('COM_BREEZINGFORMSNG_PIECES_BEFOREFORM'));
+		$typelist[] = array('After Form', BFText::_('COM_BREEZINGFORMSNG_PIECES_AFTERFORM'));
+		$typelist[] = array('Begin Submit', BFText::_('COM_BREEZINGFORMSNG_PIECES_BEGINSUBMIT'));
+		$typelist[] = array('End Submit', BFText::_('COM_BREEZINGFORMSNG_PIECES_ENDSUBMIT'));
 		$row = new facileFormsPieces($database);
 		if (count($ids)) {
 			$row->load($ids[0]);
@@ -196,7 +196,7 @@ class facileFormsPiece
 			exit();
 		}
 
-		$app->enqueueMessage(BFText::_('COM_BREEZINGFORMS_PIECES_SAVED'));
+		$app->enqueueMessage(BFText::_('COM_BREEZINGFORMSNG_PIECES_SAVED'));
 		$app->redirect("index.php?option=$option&act=managepieces&task=edit&pkg=$pkg&ids[]=" . (int) $row->id);
 	}
 
@@ -222,7 +222,7 @@ class facileFormsPiece
 				$row->modified_by = $row->created_by;
 				$row->store();
 			} // foreach
-		$msg = $total . ' ' . BFText::_('COM_BREEZINGFORMS_PIECES_SUCCOPIED');
+		$msg = $total . ' ' . BFText::_('COM_BREEZINGFORMSNG_PIECES_SUCCOPIED');
 		Factory::getApplication()->enqueueMessage($msg);
 		Factory::getApplication()->redirect("index.php?option=$option&act=managepieces&pkg=$pkg");
 	} // copy
@@ -243,7 +243,7 @@ class facileFormsPiece
 			}
 		} // if
 		if ($total) {
-			$msg = $total . ' ' . BFText::_('COM_BREEZINGFORMS_PIECES_SUCCDELETED');
+			$msg = $total . ' ' . BFText::_('COM_BREEZINGFORMSNG_PIECES_SUCCDELETED');
 			Factory::getApplication()->enqueueMessage($msg);
 			Factory::getApplication()->redirect("index.php?option=$option&act=managepieces&pkg=$pkg");
 			return;

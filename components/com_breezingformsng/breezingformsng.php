@@ -884,7 +884,7 @@ if (
     $list = $db->loadObjectList();
 
     if (count($list) == 0) {
-        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_FORM_DOES_NOT_EXIST'));
+        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
         exit;
     }
 
@@ -893,7 +893,7 @@ if (
     $areas = Zend_Json::decode($form->template_areas);
 
     if (!is_array($areas)) {
-        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_COULD_NOT_FIND_STRIPE_DATA'));
+        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_STRIPE_DATA'));
         exit;
     }
 
@@ -932,7 +932,7 @@ if (
 
                         /* XDA if( Factory::getApplication()->getSession()->get('bf_stripe_last_payment_amount'.$record_id, null) == null ){
 
-            BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_COULD_NOT_FIND_STRIPE_AMOUNT'));
+            BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_STRIPE_AMOUNT'));
             exit;
                                 } XDA */
 
@@ -985,7 +985,7 @@ if (
                     if ($session->payment_status != 'paid') {
 
                         //echo $_GET['session_id'].'<br>bf dont understand new stripe and says it was diclined lol: <br>'.var_dump($session);
-                        $msg = Text::_("COM_BREEZINGFORMS_STRIPE_DECLINED");
+                        $msg = Text::_("COM_BREEZINGFORMSNG_STRIPE_DECLINED");
 
                         require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
                     } else {
@@ -1036,13 +1036,13 @@ if (
                             if ($options['thankYouPage'] != '') {
                                 BFRedirect($options['thankYouPage']);
                             } else {
-                                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_THANK_YOU_FOR_PAYING_WITH_STRIPE'));
+                                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_PAYING_WITH_STRIPE'));
                             }
                         }
                     }
                 } catch (\Stripe\Error\Card $e) {
 
-                    $msg = Text::_("COM_BREEZINGFORMS_STRIPE_DECLINED");
+                    $msg = Text::_("COM_BREEZINGFORMSNG_STRIPE_DECLINED");
                     require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
                 }
 
@@ -1060,7 +1060,7 @@ if (
     $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote(BFRequest::getInt('form', -1)));
     $list = $db->loadObjectList();
     if (count($list) == 0) {
-        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_FORM_DOES_NOT_EXIST'));
+        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
         exit;
     }
 
@@ -1068,7 +1068,7 @@ if (
 
     $areas = Zend_Json::decode($form->template_areas);
     if (!is_array($areas)) {
-        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_COULD_NOT_FIND_PAYMENT_DATA'));
+        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYMENT_DATA'));
     }
 
     foreach ($areas as $area) {
@@ -1110,7 +1110,7 @@ if (
                             $db->execute();
 
                             if (!file_exists($file)) {
-                                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_COULD_NOT_FIND_DOWNLOAD_FILE'));
+                                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_DOWNLOAD_FILE'));
                             }
 
                             header('Content-Description: File Transfer');
@@ -1127,15 +1127,15 @@ if (
                             exit;
                         } else {
 
-                            BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_MAX_DOWNLOAD_TRIES_REACHED'));
+                            BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_MAX_DOWNLOAD_TRIES_REACHED'));
                         }
                     } else {
 
-                        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_DOWNLOAD_NOT_POSSIBLE'));
+                        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_DOWNLOAD_NOT_POSSIBLE'));
                     }
                 } else {
 
-                    BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_NO_DOWNLOADABLE_PRODUCT'));
+                    BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_NO_DOWNLOADABLE_PRODUCT'));
                 }
 
                 break;
@@ -1152,7 +1152,7 @@ if (
     $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote(BFRequest::getInt('form_id', -1)));
     $list = $db->loadObjectList();
     if (count($list) == 0) {
-        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_FORM_DOES_NOT_EXIST'));
+        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
         exit;
     }
 
@@ -1160,7 +1160,7 @@ if (
 
     $areas = Zend_Json::decode($form->template_areas);
     if (!is_array($areas)) {
-        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_COULD_NOT_FIND_PAYPAL_DATA'));
+        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYPAL_DATA'));
         exit;
     }
 
@@ -1286,7 +1286,7 @@ if (
                                     if ($options['thankYouPage'] != '') {
                                         BFRedirect($options['thankYouPage']);
                                     } else {
-                                        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_THANK_YOU_FOR_PAYING_WITH_PAYPAL'));
+                                        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_PAYING_WITH_PAYPAL'));
                                     }
                                 }
 
@@ -1303,7 +1303,7 @@ if (
                                         if ($options['thankYouPage'] != '') {
                                             BFRedirect($options['thankYouPage']);
                                         } else {
-                                            BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_THANK_YOU_FOR_PAYING_WITH_PAYPAL'));
+                                            BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_PAYING_WITH_PAYPAL'));
                                         }
                                     } else {
                                         $success = false;
@@ -1342,7 +1342,7 @@ if (
     $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote(BFRequest::getInt('form', -1)));
     $list = $db->loadObjectList();
     if (count($list) == 0) {
-        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_FORM_DOES_NOT_EXIST'));
+        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
         exit;
     }
 
@@ -1350,7 +1350,7 @@ if (
 
     $areas = Zend_Json::decode($form->template_areas);
     if (!is_array($areas)) {
-        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_COULD_NOT_FIND_PAYPAL_DATA'));
+        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYPAL_DATA'));
     }
 
     foreach ($areas as $area) {
@@ -1400,7 +1400,7 @@ if (
                             $db->execute();
 
                             if (!file_exists($file)) {
-                                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_COULD_NOT_FIND_DOWNLOAD_FILE'));
+                                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_DOWNLOAD_FILE'));
                             }
 
                             header('Content-Description: File Transfer');
@@ -1417,15 +1417,15 @@ if (
                             exit;
                         } else {
 
-                            BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_MAX_DOWNLOAD_TRIES_REACHED'));
+                            BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_MAX_DOWNLOAD_TRIES_REACHED'));
                         }
                     } else {
 
-                        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_DOWNLOAD_NOT_POSSIBLE'));
+                        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_DOWNLOAD_NOT_POSSIBLE'));
                     }
                 } else {
 
-                    BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_NO_DOWNLOADABLE_PRODUCT'));
+                    BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_NO_DOWNLOADABLE_PRODUCT'));
                 }
 
                 break;
@@ -1443,7 +1443,7 @@ if (
 <head>' . $style . '</head>
 <div class="payPalConnectMsg">
 <div class="paymentConnectMsg">
-' . BFText::_('COM_BREEZINGFORMS_PLEASE_WAIT_REQUEST') . '
+' . BFText::_('COM_BREEZINGFORMSNG_PLEASE_WAIT_REQUEST') . '
 </div>
 </div>
 </body>';
@@ -1468,7 +1468,7 @@ if (
             $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($formId));
             $list = $db->loadObjectList();
             if (count($list) == 0) {
-                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_FORM_DOES_NOT_EXIST'));
+                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
                 exit;
             }
 
@@ -1476,7 +1476,7 @@ if (
 
             $areas = Zend_Json::decode($form->template_areas);
             if (!is_array($areas)) {
-                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_COULD_NOT_FIND_SU_DATA'));
+                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_SU_DATA'));
             }
 
             foreach ($areas as $area) {
@@ -1508,7 +1508,7 @@ if (
                             if ($options['thankYouPage'] != '') {
                                 BFRedirect($options['thankYouPage']);
                             } else {
-                                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_THANK_YOU_FOR_PAYING_WITH_SU'));
+                                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_PAYING_WITH_SU'));
                             }
                         }
 
@@ -1517,8 +1517,8 @@ if (
                 }
             }
         } else {
-            $msg = Text::_("COM_BREEZINGFORMS_MISSING_PAYMENT_INFORMATION");
-            $tx_token = Text::_("COM_BREEZINGFORMS_NOT_AVAILABLE");
+            $msg = Text::_("COM_BREEZINGFORMSNG_MISSING_PAYMENT_INFORMATION");
+            $tx_token = Text::_("COM_BREEZINGFORMSNG_NOT_AVAILABLE");
             if (BFRequest::getVar('tx', '') != '') {
                 $tx_token = BFRequest::getVar('tx', '');
             }
@@ -1618,36 +1618,36 @@ if (
                             $recipients = explode('###', BFRequest::getVar('user_variable_2', ''));
                             $recipientsSize = count($recipients);
                             $mailer = Factory::getMailer();
-                            $mailer->Subject = BFText::_('COM_BREEZINGFORMS_YOUR_PAYMENT_AT_SU');
-                            $mailer->Body = BFText::_('COM_BREEZINGFORMS_HALLO') . "\n\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMS_YOUR_PAYMENT_SUCCEEDED') . "\n\n";
+                            $mailer->Subject = BFText::_('COM_BREEZINGFORMSNG_YOUR_PAYMENT_AT_SU');
+                            $mailer->Body = BFText::_('COM_BREEZINGFORMSNG_HALLO') . "\n\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_YOUR_PAYMENT_SUCCEEDED') . "\n\n";
                             $mailer->Body .= '--------------------------------------' . "\n\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMS_REASON1') . ': ' . BFRequest::getVar('reason_1', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMS_REASON2') . ': ' . BFRequest::getVar('reason_2', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMS_AMOUNT') . ': ' . str_replace('.', ',', BFRequest::getVar('amount', '')) . ' ' . BFRequest::getVar('currency_id', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMS_TRANSACTION') . ': ' . BFRequest::getVar('transaction', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMS_ACCOUNT_HOLDER') . ': ' . BFRequest::getVar('sender_holder', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMS_ACCOUNT_NUMBER') . ': ' . BFRequest::getVar('sender_account_number', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMS_BANK_CODE') . ': ' . BFRequest::getVar('recipient_bank_code', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMS_BANK_NAME') . ': ' . BFRequest::getVar('sender_bank_name', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMS_BIC') . ': ' . BFRequest::getVar('sender_bank_bic', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMS_IBAN') . ': ' . BFRequest::getVar('sender_iban', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMS_PAYMENT_DATE') . ': ' . BFRequest::getVar('created', '') . "\n\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_REASON1') . ': ' . BFRequest::getVar('reason_1', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_REASON2') . ': ' . BFRequest::getVar('reason_2', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_AMOUNT') . ': ' . str_replace('.', ',', BFRequest::getVar('amount', '')) . ' ' . BFRequest::getVar('currency_id', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_TRANSACTION') . ': ' . BFRequest::getVar('transaction', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_ACCOUNT_HOLDER') . ': ' . BFRequest::getVar('sender_holder', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_ACCOUNT_NUMBER') . ': ' . BFRequest::getVar('sender_account_number', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_BANK_CODE') . ': ' . BFRequest::getVar('recipient_bank_code', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_BANK_NAME') . ': ' . BFRequest::getVar('sender_bank_name', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_BIC') . ': ' . BFRequest::getVar('sender_bank_bic', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_IBAN') . ': ' . BFRequest::getVar('sender_iban', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_PAYMENT_DATE') . ': ' . BFRequest::getVar('created', '') . "\n\n";
 
                             $mailer->Body .= '--------------------------------------' . "\n\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMS_RECEIPT_FOR_YOUR_PAYMENT') . "\n\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_RECEIPT_FOR_YOUR_PAYMENT') . "\n\n";
                             $mailer->Body .= '--------------------------------------' . "\n\n";
 
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMS_ACCOUNT_HOLDER') . ': ' . BFRequest::getVar('recipient_holder', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMS_ACCOUNT_NUMBER') . ': ' . BFRequest::getVar('recipient_account_number', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMS_BANK_CODE') . ': ' . BFRequest::getVar('recipient_bank_code', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMS_BANK_NAME') . ': ' . BFRequest::getVar('recipient_bank_name', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMS_BIC') . ': ' . BFRequest::getVar('recipient_bank_bic', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMS_IBAN') . ': ' . BFRequest::getVar('recipient_iban', '') . "\n\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_ACCOUNT_HOLDER') . ': ' . BFRequest::getVar('recipient_holder', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_ACCOUNT_NUMBER') . ': ' . BFRequest::getVar('recipient_account_number', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_BANK_CODE') . ': ' . BFRequest::getVar('recipient_bank_code', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_BANK_NAME') . ': ' . BFRequest::getVar('recipient_bank_name', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_BIC') . ': ' . BFRequest::getVar('recipient_bank_bic', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_IBAN') . ': ' . BFRequest::getVar('recipient_iban', '') . "\n\n";
 
                             $mailer->Body .= '--------------------------------------' . "\n\n";
 
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMS_PAYMENT_GATEWAY_SU');
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_PAYMENT_GATEWAY_SU');
 
                             for ($i = 0; $i < $recipientsSize; $i++) {
                                 if (bf_is_email($recipients[$i])) {
@@ -1684,7 +1684,7 @@ if (
     $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote(BFRequest::getInt('form', -1)));
     $list = $db->loadObjectList();
     if (count($list) == 0) {
-        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_FORM_DOES_NOT_EXIST'));
+        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
         exit;
     }
 
@@ -1692,7 +1692,7 @@ if (
 
     $areas = Zend_Json::decode($form->template_areas);
     if (!is_array($areas)) {
-        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_COULD_NOT_FIND_PAYMENT_DATA'));
+        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYMENT_DATA'));
     }
 
     foreach ($areas as $area) {
@@ -1734,7 +1734,7 @@ if (
                             $db->execute();
 
                             if (!file_exists($file)) {
-                                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_COULD_NOT_FIND_DOWNLOAD_FILE'));
+                                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_DOWNLOAD_FILE'));
                             }
 
                             header('Content-Description: File Transfer');
@@ -1751,15 +1751,15 @@ if (
                             exit;
                         } else {
 
-                            BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_MAX_DOWNLOAD_TRIES_REACHED'));
+                            BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_MAX_DOWNLOAD_TRIES_REACHED'));
                         }
                     } else {
 
-                        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_DOWNLOAD_NOT_POSSIBLE'));
+                        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_DOWNLOAD_NOT_POSSIBLE'));
                     }
                 } else {
 
-                    BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMS_NO_DOWNLOADABLE_PRODUCT'));
+                    BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_NO_DOWNLOADABLE_PRODUCT'));
                 }
 
                 break;
@@ -1777,7 +1777,7 @@ if (
                     if (isset($mdata['flashUploaderBytes']) && intval($mdata['flashUploaderBytes']) > 0 && isset($mdata['bfName']) && trim($mdata['bfName']) == trim(BFRequest::getVar('itemName', ''))) {
                         if (file_exists($finaltargetFile) && @filesize($finaltargetFile) > intval($mdata['flashUploaderBytes'])) {
                             @File::delete($finaltargetFile);
-                            echo trim($mdata['label']) . ': ' . BFText::_('COM_BREEZINGFORMS_FLASH_UPLOADER_TOO_LARGE');
+                            echo trim($mdata['label']) . ': ' . BFText::_('COM_BREEZINGFORMSNG_FLASH_UPLOADER_TOO_LARGE');
                             exit;
                         }
                         break;
@@ -1866,7 +1866,7 @@ if (
     $database->setQuery("UPDATE #__facileforms_records SET opted=1, opt_ip = " . $database->quote($ip) . ", opt_date = " . $database->quote(HTMLHelper::date('now', 'Y-m-d H:i:s')) . " WHERE opt_token = " . $database->quote($token) . " And id=" . $database->quote($userSubmitedID) . " And opted = 0");
     $database->execute();
 
-    echo Text::_("COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_EMAIL_THANK_YOU");
+    echo Text::_("COM_BREEZINGFORMSNG_FORMS_DOUBLE_OPT_EMAIL_THANK_YOU");
 
     // DOUBLE OPT IN END
 } else if (BFRequest::getVar('opt_out') == 'true') {
@@ -1879,7 +1879,7 @@ if (
     $database->setQuery("UPDATE #__facileforms_records SET opted=0, opt_ip = " . $database->quote($ip) . ", opt_date = " . $database->quote(HTMLHelper::date('now', 'Y-m-d H:i:s')) . " WHERE opt_token = " . $database->quote($token) . " And id=" . $database->quote($userSubmitedID) . " And opted = 1");
     $database->execute();
 
-    echo Text::_("COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_OUT_EMAIL_THANK_YOU");
+    echo Text::_("COM_BREEZINGFORMSNG_FORMS_DOUBLE_OPT_OUT_EMAIL_THANK_YOU");
 }
 
 if (BFRequest::getBool('raw', false)) {

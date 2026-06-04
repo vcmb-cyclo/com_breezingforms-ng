@@ -31,12 +31,12 @@ class menuFacileForms
 	function buttons($action)
 	{
 		echo '<span style="background-color:#f4f4f4;font-weight:bold;">';
-		menuFacileForms::button(BFText::_('COM_BREEZINGFORMS_TOOLBAR_MANAGERECS'), $action, 'managerecs');
-		menuFacileForms::button(BFText::_('COM_BREEZINGFORMS_TOOLBAR_MANAGEMENUS'), $action, 'managemenus');
-		menuFacileForms::button(BFText::_('COM_BREEZINGFORMS_TOOLBAR_MANAGEFORMS'), $action, 'manageforms');
-		menuFacileForms::button(BFText::_('COM_BREEZINGFORMS_TOOLBAR_MANAGESCRIPTS'), $action, 'managescripts');
-		menuFacileForms::button(BFText::_('COM_BREEZINGFORMS_TOOLBAR_MANAGEPIECES'), $action, 'managepieces');
-		menuFacileForms::button(BFText::_('COM_BREEZINGFORMS_TOOLBAR_CONFIGURATION'), $action, '', 'config');
+		menuFacileForms::button(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_MANAGERECS'), $action, 'managerecs');
+		menuFacileForms::button(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_MANAGEMENUS'), $action, 'managemenus');
+		menuFacileForms::button(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_MANAGEFORMS'), $action, 'manageforms');
+		menuFacileForms::button(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_MANAGESCRIPTS'), $action, 'managescripts');
+		menuFacileForms::button(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_MANAGEPIECES'), $action, 'managepieces');
+		menuFacileForms::button(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_CONFIGURATION'), $action, '', 'config');
 		echo '</span>';
 	} // buttons
 
@@ -73,9 +73,9 @@ class menuFacileForms
 	static function INSTPACKAGE_MENU()
 	{
 
-		ToolBarHelper::custom('uploadpackage', 'upload.png', 'upload_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_INSTPKG'), false);
-		ToolBarHelper::custom('delpkgs', 'delete.png', 'delete_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_UINSTPKGS'), false);
-		ToolBarHelper::custom('edit', 'cancel.png', 'cancel_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_CLOSE'), false);
+		ToolBarHelper::custom('uploadpackage', 'upload.png', 'upload_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_INSTPKG'), false);
+		ToolBarHelper::custom('delpkgs', 'delete.png', 'delete_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_UINSTPKGS'), false);
+		ToolBarHelper::custom('edit', 'cancel.png', 'cancel_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_CLOSE'), false);
 
 	}
 } // menuFacileForms

@@ -18,7 +18,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 	</tr>
 	<tr>
 		<td>
-			<strong><?php echo BFText::_('COM_BREEZINGFORMS_ID') ?>:</strong>
+			<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_ID') ?>:</strong>
 		</td>
 		<td>
 			<?php echo $this->form; ?>
@@ -26,7 +26,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 	</tr>
 	<tr>
 		<td>
-			<strong><?php echo BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTEDAT') ?>:</strong>
+			<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT') ?>:</strong>
 		</td>
 		<td>
 			<?php echo $this->submitted; ?>
@@ -34,7 +34,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 	</tr>
 	<tr>
 		<td>
-			<strong><?php echo BFText::_('COM_BREEZINGFORMS_IP') ?>:</strong>
+			<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_IP') ?>:</strong>
 		</td>
 		<td>
 			<?php echo $this->ip; ?>
@@ -42,7 +42,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 	</tr>
 	<tr>
 		<td>
-			<strong><?php echo BFText::_('COM_BREEZINGFORMS_BROWSER') ?>:</strong>
+			<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_BROWSER') ?>:</strong>
 		</td>
 		<td>
 			<?php echo htmlentities($this->browser, ENT_QUOTES, 'UTF-8');  ?>
@@ -50,7 +50,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 	</tr>
 	<tr>
         <td>
-            <strong><?php echo BFText::_('COM_BREEZINGFORMS_PROCESS_OPSYS') ?>:</strong>
+            <strong><?php echo BFText::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS') ?>:</strong>
         </td>
         <td>
             <?php echo htmlentities($this->opsys, ENT_QUOTES, 'UTF-8');  ?>
@@ -58,7 +58,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
     </tr>
 	<tr>
 		<td colspan="2" bgcolor="#cccccc">
-			<strong><?php echo BFText::_('COM_BREEZINGFORMS_DATA') ?>:</strong>
+			<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_DATA') ?>:</strong>
 		</td>
 	</tr>
 	<?php

@@ -15,14 +15,14 @@ use Joomla\CMS\MVC\Controller\BaseController;
 
 class DisplayController extends BaseController
 {
-    protected $default_view = 'breezingforms';
-
     public function display($cachable = false, $urlparams = [])
     {
         if (!Factory::getApplication()->getIdentity()->authorise('core.manage', 'com_breezingformsng')) {
             throw new \Exception(Text::_('JERROR_ALERTNOAUTHOR'), 403);
         }
 
-        return parent::display($cachable, $urlparams);
+        require JPATH_ADMINISTRATOR . '/components/com_breezingformsng/admin.breezingforms.php';
+
+        return $this;
     }
 }

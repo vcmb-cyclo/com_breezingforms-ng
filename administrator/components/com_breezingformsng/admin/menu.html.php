@@ -32,13 +32,13 @@ class HTML_facileFormsMenu
 			<table cellpadding="4" cellspacing="1" border="0" class="adminform" style="width:300px;">
 				<tr>
 					<th colspan="4" class="title">BreezingForms -
-						<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_ADD'); ?>
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_ADD'); ?>
 					</th>
 				</tr>
 				<tr>
 					<td></td>
 					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_PARENT'); ?>:
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_PARENT'); ?>:
 					</td>
 					<td nowrap>
 						<?php echo $lists['parents']; ?>
@@ -50,7 +50,7 @@ class HTML_facileFormsMenu
 					<td colspan="2" valign="top">
 						<select name="formid" size="20" class="inputbox">
 							<option value="0" selected="selected">
-								<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_NOFORM'); ?>
+								<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_NOFORM'); ?>
 							</option>
 							<?php
 							if (count($lists['forms']))
@@ -65,10 +65,10 @@ class HTML_facileFormsMenu
 					<td></td>
 					<td nowrap colspan="2" style="text-align:right">
 						<input class="btn btn-primary" onclick="submitbutton('newedit');" type="submit"
-							value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMS_TOOLBAR_SAVE'), ENT_QUOTES, 'UTF-8'); ?>" />
+							value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_SAVE'), ENT_QUOTES, 'UTF-8'); ?>" />
 						&nbsp;&nbsp;
 						<input class="btn btn-primary" onclick="submitbutton('cancel');" type="submit"
-							value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMS_TOOLBAR_CANCEL'), ENT_QUOTES, 'UTF-8'); ?>" />
+							value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_CANCEL'), ENT_QUOTES, 'UTF-8'); ?>" />
 
 					</td>
 					<td></td>
@@ -85,7 +85,7 @@ class HTML_facileFormsMenu
 	static function edit($option, $pkg, &$row, &$lists)
 	{
 		global $ff_mossite, $ff_config;
-		$action = $row->id ? BFText::_('COM_BREEZINGFORMS_MENUS_EDIT') : BFText::_('COM_BREEZINGFORMS_MENUS_ADD');
+		$action = $row->id ? BFText::_('COM_BREEZINGFORMSNG_MENUS_EDIT') : BFText::_('COM_BREEZINGFORMSNG_MENUS_ADD');
 		if (!$row->id)
 			$row->package = $pkg;
 		?>
@@ -110,16 +110,16 @@ class HTML_facileFormsMenu
 					var error = '';
 					if (pressbutton != 'cancel') {
 						if (form.title.value == '')
-							error += "<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_TITLEEMPTY'); ?>\n";
+							error += "<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_TITLEEMPTY'); ?>\n";
 			if (form.name.value != '') {
 				var invalidChars = /\W/;
 				if (invalidChars.test(form.name.value))
-					error += "<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_NAMEIDENT'); ?>\n";
+					error += "<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_NAMEIDENT'); ?>\n";
 			} // if
 			error += checkNumber(
 				form.page.value,
-				"<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_PAGEEMPTY'); ?>\n",
-				"<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_PAGENUMBER'); ?>\n"
+				"<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_PAGEEMPTY'); ?>\n",
+				"<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_PAGENUMBER'); ?>\n"
 			);
 					} // if
 			if (error != '')
@@ -149,7 +149,7 @@ class HTML_facileFormsMenu
 				<tr>
 					<td></td>
 					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_PARENT'); ?>:
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_PARENT'); ?>:
 					</td>
 					<td nowrap>
 						<?php echo $lists['parents']; ?>
@@ -159,13 +159,13 @@ class HTML_facileFormsMenu
 				<tr>
 					<td></td>
 					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_TITLE'); ?>:
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_TITLE'); ?>:
 					</td>
 					<td nowrap>
 						<input type="text" size="50" maxlength="50" name="title" value="<?php echo $row->title; ?>"
 							class="inputbox" />
 						<?php
-						echo bf_ToolTip(BFText::_('COM_BREEZINGFORMS_MENUS_TIPTITLE'));
+						echo bf_ToolTip(BFText::_('COM_BREEZINGFORMSNG_MENUS_TIPTITLE'));
 						?>
 					</td>
 					<td></td>
@@ -173,7 +173,7 @@ class HTML_facileFormsMenu
 				<tr>
 					<td></td>
 					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_PACKAGE'); ?>:
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_PACKAGE'); ?>:
 					</td>
 					<td nowrap>
 						<input type="text" size="30" maxlength="30" id="package" name="package"
@@ -184,7 +184,7 @@ class HTML_facileFormsMenu
 				<tr>
 					<td></td>
 					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_IMAGE'); ?>:
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_IMAGE'); ?>:
 					</td>
 					<td nowrap>
 						<?php
@@ -220,7 +220,7 @@ class HTML_facileFormsMenu
 						echo
 							'<input type="radio" id="img' . $cnt . '" name="img" value=""' . $opt . '/>' .
 							'&nbsp;<label for="img' . $cnt . '">' .
-							BFText::_('COM_BREEZINGFORMS_MENUS_NONE') .
+							BFText::_('COM_BREEZINGFORMSNG_MENUS_NONE') .
 							'</label>';
 						?>
 					<td></td>
@@ -228,7 +228,7 @@ class HTML_facileFormsMenu
 				<tr>
 					<td></td>
 					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_ORDERING'); ?>:
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_ORDERING'); ?>:
 					</td>
 					<td nowrap>
 						<?php echo $lists['ordering']; ?>
@@ -238,7 +238,7 @@ class HTML_facileFormsMenu
 				<tr>
 					<td></td>
 					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_PUBLISHED'); ?>:
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_PUBLISHED'); ?>:
 					</td>
 					<td nowrap>
 						<?php echo HTMLHelper::_('select.booleanlist', "published", "", $row->published); ?>
@@ -248,13 +248,13 @@ class HTML_facileFormsMenu
 				<tr>
 					<td></td>
 					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_NAME'); ?>:
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_NAME'); ?>:
 					</td>
 					<td nowrap>
 						<input type="text" size="30" maxlength="30" name="name" value="<?php echo $row->name; ?>"
 							class="inputbox" />
 						<?php
-						echo bf_ToolTip(BFText::_('COM_BREEZINGFORMS_MENUS_TIPNAME'));
+						echo bf_ToolTip(BFText::_('COM_BREEZINGFORMSNG_MENUS_TIPNAME'));
 						?>
 					</td>
 					<td></td>
@@ -262,7 +262,7 @@ class HTML_facileFormsMenu
 				<tr>
 					<td></td>
 					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_PAGE'); ?>:
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_PAGE'); ?>:
 					</td>
 					<td nowrap>
 						<input type="text" size="11" maxlength="11" name="page" value="<?php echo $row->page; ?>"
@@ -273,7 +273,7 @@ class HTML_facileFormsMenu
 				<tr>
 					<td></td>
 					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_FRAME'); ?>:
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_FRAME'); ?>:
 					</td>
 					<td nowrap>
 						<?php echo HTMLHelper::_('select.booleanlist', "frame", "", $row->frame); ?>
@@ -283,7 +283,7 @@ class HTML_facileFormsMenu
 				<tr>
 					<td></td>
 					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_BORDER'); ?>:
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_BORDER'); ?>:
 					</td>
 					<td nowrap>
 						<?php echo HTMLHelper::_('select.booleanlist', "border", "", $row->border); ?>
@@ -293,13 +293,13 @@ class HTML_facileFormsMenu
 				<tr>
 					<td></td>
 					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_PARAMS'); ?>:
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_PARAMS'); ?>:
 					</td>
 					<td nowrap>
 						<input type="text" size="80" maxlength="255" name="params" value="<?php echo $row->params; ?>"
 							class="inputbox" />
 						<?php
-						echo bf_ToolTip(BFText::_('COM_BREEZINGFORMS_MENUS_TIPPARAMS'));
+						echo bf_ToolTip(BFText::_('COM_BREEZINGFORMSNG_MENUS_TIPPARAMS'));
 						?>
 					</td>
 					<td></td>
@@ -308,10 +308,10 @@ class HTML_facileFormsMenu
 					<td></td>
 					<td colspan="2" nowrap style="text-align:right">
 						<input class="btn btn-primary" onclick="submitbutton('save');" type="submit"
-							value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMS_TOOLBAR_SAVE'), ENT_QUOTES, 'UTF-8'); ?>" />
+							value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_SAVE'), ENT_QUOTES, 'UTF-8'); ?>" />
 						&nbsp;&nbsp;
 						<input class="btn btn-primary" onclick="submitbutton('cancel');" type="submit"
-							value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMS_TOOLBAR_CANCEL'), ENT_QUOTES, 'UTF-8'); ?>" />
+							value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_CANCEL'), ENT_QUOTES, 'UTF-8'); ?>" />
 					</td>
 					<td></td>
 				</tr>
@@ -340,7 +340,7 @@ class HTML_facileFormsMenu
 							case 'unpublish':
 							case 'remove':
 								if (form.boxchecked.value==0) {
-									alert("<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_SELMENUSFIRST'); ?>");
+									alert("<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_SELMENUSFIRST'); ?>");
 			return;
 								} // if
 			break;
@@ -348,7 +348,7 @@ class HTML_facileFormsMenu
 			break;
 						} // switch
 			if (pressbutton == 'remove')
-				if (!confirm("<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_ASKDEL'); ?>")) return;
+				if (!confirm("<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_ASKDEL'); ?>")) return;
 			if (pressbutton == '' && form.pkgsel.value == '')
 				form.pkg.value = '- blank -';
 			else
@@ -389,14 +389,14 @@ class HTML_facileFormsMenu
 							<tr>
 								<th nowrap class="edit">BreezingForms
 									<?php echo $ff_version; ?><br /><span class="componentheading">
-										<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_MANAGEMENUS'); ?>
+										<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_MANAGEMENUS'); ?>
 									</span>
 								</th>
 							</tr>
 						</table>
 					</td>
 					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_PACKAGE'); ?>:
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_PACKAGE'); ?>:
 						<select id="pkgsel" name="pkgsel" class="inputbox" size="1" onchange="submitbutton('');">
 							<?php
 							if (count($pkglist))
@@ -411,11 +411,11 @@ class HTML_facileFormsMenu
 					</td>
 					<td align="right" width="50%" nowrap>
 						<?php
-						ToolBarHelper::custom('new', 'new.png', 'new_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_NEW'), false);
-						ToolBarHelper::custom('copy', 'copy.png', 'copy_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_COPY'), false);
-						ToolBarHelper::custom('publish', 'publish.png', 'publish_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_PUBLISH'), false);
-						ToolBarHelper::custom('unpublish', 'unpublish.png', 'unpublish_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_UNPUBLISH'), false);
-						ToolBarHelper::custom('remove', 'delete.png', 'delete_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_DELETE'), false);
+						ToolBarHelper::custom('new', 'new.png', 'new_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_NEW'), false);
+						ToolBarHelper::custom('copy', 'copy.png', 'copy_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_COPY'), false);
+						ToolBarHelper::custom('publish', 'publish.png', 'publish_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_PUBLISH'), false);
+						ToolBarHelper::custom('unpublish', 'unpublish.png', 'unpublish_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_UNPUBLISH'), false);
+						ToolBarHelper::custom('remove', 'delete.png', 'delete_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_DELETE'), false);
 						?>
 					</td>
 				</tr>
@@ -425,28 +425,28 @@ class HTML_facileFormsMenu
 					<th nowrap align="center"><input type="checkbox" name="toggle" value="" onclick="Joomla.checkAll(this);" />
 					</th>
 					<th nowrap align="left">
-						<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_MENUITEM'); ?>
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_MENUITEM'); ?>
 					</th>
 					<th nowrap align="center">
-						<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_IMAGE'); ?>
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_IMAGE'); ?>
 					</th>
 					<th nowrap align="center">
-						<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_PUBLISHED'); ?>
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_PUBLISHED'); ?>
 					</th>
 					<th nowrap align="center" colspan="2">
-						<?php echo BFText::_('COM_BREEZINGFORMS_FORMS_REORDER'); ?>
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_FORMS_REORDER'); ?>
 					</th>
 					<th nowrap align="left">
-						<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_NAME'); ?>
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_NAME'); ?>
 					</th>
 					<th nowrap align="left">
-						<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_FRAME'); ?>
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_FRAME'); ?>
 					</th>
 					<th nowrap align="left">
-						<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_BORDER'); ?>
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_BORDER'); ?>
 					</th>
 					<th align="left" width="100%">
-						<?php echo BFText::_('COM_BREEZINGFORMS_MENUS_PARAMS'); ?>
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_MENUS_PARAMS'); ?>
 					</th>
 				</tr>
 				<?php

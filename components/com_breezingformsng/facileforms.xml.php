@@ -40,13 +40,13 @@ class ff_xmlPackage
 		$this->params = array();
 
 		if (!$filename) {
-			$this->setError(BFText::_('COM_BREEZINGFORMS_XML_MISSFNAME'));
+			$this->setError(BFText::_('COM_BREEZINGFORMSNG_XML_MISSFNAME'));
 			return false;
 		} // if
 
 		$this->filename = $filename;
 		if (!($fp = fopen($this->filename, "r"))) {
-			$this->setError(BFText::_('COM_BREEZINGFORMS_XML_ERROPENF') . ' ' . $this->filename);
+			$this->setError(BFText::_('COM_BREEZINGFORMSNG_XML_ERROPENF') . ' ' . $this->filename);
 			return false;
 		} // if
 
@@ -95,9 +95,9 @@ class ff_xmlPackage
 		$this->error = '';
 		$level = count($this->element);
 		if ($level > 0)
-			$this->error .= BFText::_('COM_BREEZINGFORMS_XML_ELEMENT') . " '" . $this->element[$level - 1] . "' ";
+			$this->error .= BFText::_('COM_BREEZINGFORMSNG_XML_ELEMENT') . " '" . $this->element[$level - 1] . "' ";
 		if ($inparse)
-			$this->error .= BFText::_('COM_BREEZINGFORMS_XML_ATLINE') . ' ' . xml_get_current_line_number($this->parser) . ' ';
+			$this->error .= BFText::_('COM_BREEZINGFORMSNG_XML_ATLINE') . ' ' . xml_get_current_line_number($this->parser) . ' ';
 		if ($this->error != '')
 			$this->error .= ': ';
 		$this->error .= $message;
@@ -140,7 +140,7 @@ function &_ff_xmlGetPackage($parser)
 	for ($x = 0; $x < $n; $x++)
 		if ($_ff_xmlPackage[$x]->parser == $parser)
 			return $_ff_xmlPackage[$x];
-	die(BFText::_('COM_BREEZINGFORMS_XML_REFMISSED') . " (" . __FUNCTION__ . ")");
+	die(BFText::_('COM_BREEZINGFORMSNG_XML_REFMISSED') . " (" . __FUNCTION__ . ")");
 } // _ff_xmlGetPackage
 
 
@@ -160,7 +160,7 @@ function _ff_xmlStartElement($parser, $key, $attr)
 		!array_key_exists('elem', $curr) ||
 		!array_key_exists($key, $curr['elem'])
 	) {
-		$pkg->setError(BFText::_('COM_BREEZINGFORMS_XML_UNEXPELEM') . " '$key'", true);
+		$pkg->setError(BFText::_('COM_BREEZINGFORMSNG_XML_UNEXPELEM') . " '$key'", true);
 		return;
 	} // if
 
@@ -177,7 +177,7 @@ function _ff_xmlStartElement($parser, $key, $attr)
 		
 		foreach ($attr as $key => $value) {
 			if (!array_key_exists($key, $a)) {
-				$pkg->setError(BFText::_('COM_BREEZINGFORMS_XML_UNEXPATTR') . " '$key'", true);
+				$pkg->setError(BFText::_('COM_BREEZINGFORMSNG_XML_UNEXPATTR') . " '$key'", true);
 				return;
 			} // if
 			$value = trim($value);
@@ -212,7 +212,7 @@ function _ff_xmlCharData($parser, $value)
 			// dont complain about whitespace
 			$value = trim($value);
 			if ($value != '')
-				$pkg->setError(BFText::_('COM_BREEZINGFORMS_XML_UNEXPDATA') . ": " . $value, true);
+				$pkg->setError(BFText::_('COM_BREEZINGFORMSNG_XML_UNEXPDATA') . ": " . $value, true);
 		} // if
 	} // if
 } // _ff_xmlCharData
@@ -233,7 +233,7 @@ function _ff_xmlEndElement($parser, $key)
 
 	// check if expected
 	if ($tag != $key) {
-		$pkg->setError(BFText::_('COM_BREEZINGFORMS_XML_UNEXPCLOS') . " '$key'", true);
+		$pkg->setError(BFText::_('COM_BREEZINGFORMSNG_XML_UNEXPCLOS') . " '$key'", true);
 		return;
 	} // if
 

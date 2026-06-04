@@ -22,12 +22,12 @@ class facileFormsScript
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
 		ArrayHelper::toInteger($ids);
 		$typelist = array();
-		$typelist[] = array('Untyped', BFText::_('COM_BREEZINGFORMS_SCRIPTS_UNTYPED'));
-		$typelist[] = array('Element Init', BFText::_('COM_BREEZINGFORMS_SCRIPTS_ELEMENTINIT'));
-		$typelist[] = array('Element Action', BFText::_('COM_BREEZINGFORMS_SCRIPTS_ELEMENTACTION'));
-		$typelist[] = array('Element Validation', BFText::_('COM_BREEZINGFORMS_SCRIPTS_ELEMENTVALID'));
-		$typelist[] = array('Form Init', BFText::_('COM_BREEZINGFORMS_SCRIPTS_FORMINIT'));
-		$typelist[] = array('Form Submitted', BFText::_('COM_BREEZINGFORMS_SCRIPTS_FORMSUBMIT'));
+		$typelist[] = array('Untyped', BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_UNTYPED'));
+		$typelist[] = array('Element Init', BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_ELEMENTINIT'));
+		$typelist[] = array('Element Action', BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_ELEMENTACTION'));
+		$typelist[] = array('Element Validation', BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_ELEMENTVALID'));
+		$typelist[] = array('Form Init', BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_FORMINIT'));
+		$typelist[] = array('Form Submitted', BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_FORMSUBMIT'));
 		$row = new facileFormsScripts($database);
 		if (count($ids)) {
 			$row->load($ids[0]);
@@ -89,7 +89,7 @@ class facileFormsScript
 			exit();
 		}
 
-		$app->enqueueMessage(BFText::_('COM_BREEZINGFORMS_SCRIPTS_SAVED'));
+		$app->enqueueMessage(BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_SAVED'));
 		$app->redirect("index.php?option=$option&act=managescripts&task=edit&pkg=$pkg&ids[]=" . (int) $row->id);
 	}
 
@@ -113,7 +113,7 @@ class facileFormsScript
 			$row->modified_by = $row->created_by;
 			$row->store();
 		} // foreach
-		$msg = $total . ' ' . BFText::_('COM_BREEZINGFORMS_SCRIPTS_SUCCOPIED');
+		$msg = $total . ' ' . BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_SUCCOPIED');
 		Factory::getApplication()->enqueueMessage($msg);
 		Factory::getApplication()->redirect("index.php?option=$option&act=managescripts&pkg=$pkg");
 	} // copy
@@ -133,7 +133,7 @@ class facileFormsScript
 		} // if
 		if ($total) {
 			Factory::getApplication()->enqueueMessage(
-				$total . ' ' . BFText::_('COM_BREEZINGFORMS_SCRIPTS_SUCCDELETED'),
+				$total . ' ' . BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_SUCCDELETED'),
 				'message'
 			);
 		}

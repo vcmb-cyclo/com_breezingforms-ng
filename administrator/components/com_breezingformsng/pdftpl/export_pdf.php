@@ -23,7 +23,7 @@ for($r = 0; $r < $recsSize; $r++) {
 </tr>
 <tr>
 <td>
-	<strong><?php echo BFText::_('COM_BREEZINGFORMS_ID') ?>:</strong>
+	<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_ID') ?>:</strong>
 </td>
 <td>
 	<?php echo $rec->id; ?> 
@@ -31,7 +31,7 @@ for($r = 0; $r < $recsSize; $r++) {
 </tr>
 <tr>
 <td>
-	<strong><?php echo BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTEDAT') ?>:</strong>
+	<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT') ?>:</strong>
 </td>
 <td>
 	<?php echo $rec->submitted; ?> 
@@ -39,7 +39,7 @@ for($r = 0; $r < $recsSize; $r++) {
 </tr>
 <tr>
 <td>
-	<strong><?php echo BFText::_('COM_BREEZINGFORMS_IP') ?>:</strong>
+	<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_IP') ?>:</strong>
 </td>
 <td>
 	<?php echo $rec->ip; ?> 
@@ -47,7 +47,7 @@ for($r = 0; $r < $recsSize; $r++) {
 </tr>
 <tr>
 <td>
-	<strong><?php echo BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERUSERNAME') ?>:</strong>
+	<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME') ?>:</strong>
 </td>
 <td>
 	<?php echo htmlentities($rec->username, ENT_QUOTES, 'UTF-8');  ?> 
@@ -55,7 +55,7 @@ for($r = 0; $r < $recsSize; $r++) {
 </tr>
 <tr>
 <td>
-	<strong><?php echo BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERFULLNAME') ?>:</strong>
+	<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME') ?>:</strong>
 </td>
 <td>
 	<?php echo htmlentities($rec->user_full_name, ENT_QUOTES, 'UTF-8'); ?> 
@@ -63,7 +63,7 @@ for($r = 0; $r < $recsSize; $r++) {
 </tr>
 <tr>
 <td>
-	<strong><?php echo BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERID') ?>:</strong>
+	<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID') ?>:</strong>
 </td>
 <td>
 	<?php echo $rec->user_id; ?> 
@@ -71,7 +71,7 @@ for($r = 0; $r < $recsSize; $r++) {
 </tr>
 <tr>
 <td>
-	<strong><?php echo BFText::_('COM_BREEZINGFORMS_BROWSER') ?>:</strong>
+	<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_BROWSER') ?>:</strong>
 </td>
 <td>
 	<?php echo htmlentities($rec->browser, ENT_QUOTES, 'UTF-8');  ?> 
@@ -79,7 +79,7 @@ for($r = 0; $r < $recsSize; $r++) {
 </tr>
 <tr>
 <td>
-	<strong><?php echo BFText::_('COM_BREEZINGFORMS_PROCESS_OPSYS') ?>:</strong>
+	<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS') ?>:</strong>
 </td>
 <td>
 	<?php echo htmlentities($rec->opsys, ENT_QUOTES, 'UTF-8');  ?> 
@@ -87,7 +87,7 @@ for($r = 0; $r < $recsSize; $r++) {
 </tr>
 <tr>
 <td>
-	<strong><?php echo BFText::_('COM_BREEZINGFORMS_PAYMENT_TRANSACTION_ID') ?>:</strong>
+	<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_PAYMENT_TRANSACTION_ID') ?>:</strong>
 </td>
 <td>
 	<?php echo $rec->paypal_tx_id; ?> 
@@ -95,7 +95,7 @@ for($r = 0; $r < $recsSize; $r++) {
 </tr>
 <tr>
 <td>
-	<strong><?php echo BFText::_('COM_BREEZINGFORMS_PAYMENT_TRANSACTION_DATE') ?>:</strong>
+	<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_PAYMENT_TRANSACTION_DATE') ?>:</strong>
 </td>
 <td>
 	<?php echo $rec->paypal_payment_date; ?> 
@@ -103,15 +103,15 @@ for($r = 0; $r < $recsSize; $r++) {
 </tr>
 <tr>
 <td>
-	<strong><?php echo BFText::_('COM_BREEZINGFORMS_PAYMENT_TESTACCOUNT') ?>:</strong>
+	<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_PAYMENT_TESTACCOUNT') ?>:</strong>
 </td>
 <td>
-	<?php echo $rec->paypal_testaccount == 1 ? BFText::_('COM_BREEZINGFORMS_YES') : BFText::_('COM_BREEZINGFORMS_NO'); ?>
+	<?php echo $rec->paypal_testaccount == 1 ? BFText::_('COM_BREEZINGFORMSNG_YES') : BFText::_('COM_BREEZINGFORMSNG_NO'); ?>
 </td>
 </tr>
 <tr>
 <td>
-	<strong><?php echo BFText::_('COM_BREEZINGFORMS_PAYMENT_DOWNLOAD_TRIES') ?>:</strong>
+	<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_PAYMENT_DOWNLOAD_TRIES') ?>:</strong>
 </td>
 <td>
 	<?php echo $rec->paypal_download_tries; ?>
@@ -119,7 +119,7 @@ for($r = 0; $r < $recsSize; $r++) {
 </tr>
 <tr>
 <td>
-    <strong><?php echo BFText::_('COM_BREEZINGFORMS_RECORDS_OPTED') ?>:</strong>
+    <strong><?php echo BFText::_('COM_BREEZINGFORMSNG_RECORDS_OPTED') ?>:</strong>
 </td>
 <td>
     <?php echo $rec->opted; ?>
@@ -127,7 +127,7 @@ for($r = 0; $r < $recsSize; $r++) {
 </tr>
 <tr>
 <td colspan="2" bgcolor="#cccccc">
-	<strong><?php echo BFText::_('COM_BREEZINGFORMS_DATA') ?>:</strong>
+	<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_DATA') ?>:</strong>
 </td>
 </tr>
 <?php

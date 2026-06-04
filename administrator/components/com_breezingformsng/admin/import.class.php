@@ -317,7 +317,7 @@ class ff_importPackage extends ff_xmlPackage
 			if ($errmode == 'log') {
 				if (count($this->saveErrors))
 					$errors = array_merge($this->saveErrors, $errors);
-				$errors[] = BFText::_('COM_BREEZINGFORMS_INSTALLER') . ': ' . $this->error;
+				$errors[] = BFText::_('COM_BREEZINGFORMSNG_INSTALLER') . ': ' . $this->error;
 			} // if
 		} else {
 			// Success case
@@ -384,7 +384,7 @@ class ff_importPackage extends ff_xmlPackage
 					}
 				}
 			} else {
-				$this->warnings[] = BFText::_('COM_BREEZINGFORMS_INSTALLER_WARN_NOFORMS_QUICKMODE');
+				$this->warnings[] = BFText::_('COM_BREEZINGFORMSNG_INSTALLER_WARN_NOFORMS_QUICKMODE');
 			}
 		} // if
 		return $ok;
@@ -457,7 +457,7 @@ class ff_importPackage extends ff_xmlPackage
 		// save new row
 		$row = new facileFormsScripts($database);
 		$package = $this->getText(1, 'package');
-		$name = $this->getText(1, 'name', BFText::_('COM_BREEZINGFORMS_INSTALLER_UNKNOWN'));
+		$name = $this->getText(1, 'name', BFText::_('COM_BREEZINGFORMSNG_INSTALLER_UNKNOWN'));
 
 		// Find previous piece version.
 		$id = _ff_selectValue("select id from #__facileforms_scripts where name = " .$database->Quote($name) ." and package = " .$database->Quote($package));
@@ -467,7 +467,7 @@ class ff_importPackage extends ff_xmlPackage
 		}
 
 			$incomingPublished = $this->getInt(1, 'published', 1);
-			$incomingTitle = $this->getText(1, 'title', BFText::_('COM_BREEZINGFORMS_INSTALLER_UNKNOWN'));
+			$incomingTitle = $this->getText(1, 'title', BFText::_('COM_BREEZINGFORMSNG_INSTALLER_UNKNOWN'));
 			$incomingDescription = $this->getText(1, 'description');
 			$incomingType = $this->getText(1, 'type', 'Untyped');
 			$incomingCode = $this->getText(1, 'code');
@@ -562,7 +562,7 @@ class ff_importPackage extends ff_xmlPackage
 
 		$row = new facileFormsPieces($database);
 		$package = $this->getText(1, 'package');
-		$name = $this->getText(1, 'name', BFText::_('COM_BREEZINGFORMS_INSTALLER_UNKNOWN'));
+		$name = $this->getText(1, 'name', BFText::_('COM_BREEZINGFORMSNG_INSTALLER_UNKNOWN'));
 
 		// Find previous piece version.
 		$id = _ff_selectValue("select id from #__facileforms_pieces where name = " .$database->Quote($name) ." and package = " .$database->Quote($package));
@@ -572,7 +572,7 @@ class ff_importPackage extends ff_xmlPackage
 		}
 
 			$incomingPublished = $this->getInt(1, 'published', 1);
-			$incomingTitle = $this->getText(1, 'title', BFText::_('COM_BREEZINGFORMS_INSTALLER_UNKNOWN'));
+			$incomingTitle = $this->getText(1, 'title', BFText::_('COM_BREEZINGFORMSNG_INSTALLER_UNKNOWN'));
 			$incomingDescription = $this->getText(1, 'description');
 			$incomingType = $this->getText(1, 'type', 'Untyped');
 			$incomingCode = $this->getText(1, 'code');
@@ -672,8 +672,8 @@ class ff_importPackage extends ff_xmlPackage
 			$row->published = $this->getInt(1, 'published', 1);
 			$row->runmode = $this->getInt(1, 'runmode');
 			$row->package = $this->getText(1, 'package');
-			$row->name = $this->getText(1, 'name', BFText::_('COM_BREEZINGFORMS_INSTALLER_UNKNOWN'));
-			$row->title = $this->getText(1, 'title', BFText::_('COM_BREEZINGFORMS_INSTALLER_UNKNOWN'));
+			$row->name = $this->getText(1, 'name', BFText::_('COM_BREEZINGFORMSNG_INSTALLER_UNKNOWN'));
+			$row->title = $this->getText(1, 'title', BFText::_('COM_BREEZINGFORMSNG_INSTALLER_UNKNOWN'));
 			$row->description = $this->getText(1, 'description');
 
 			$row->template_code = '';
@@ -851,9 +851,9 @@ class ff_importPackage extends ff_xmlPackage
 						if ($id == NULL) {
 							// finally change to type 2 and emit warning
 							$cond = 2;
-							$code = '// ' . $tag . ' ' . $idx . '/' . $name . ' ' . BFText::_('COM_BREEZINGFORMS_INSTALLER_TAGNOTFOUND');
+							$code = '// ' . $tag . ' ' . $idx . '/' . $name . ' ' . BFText::_('COM_BREEZINGFORMSNG_INSTALLER_TAGNOTFOUND');
 							$nm = $this->getText($pid, 'name');
-							$this->warnings[] = $nm . ': ' . $tag . ' ' . $idx . '/' . $name . ' ' . BFText::_('COM_BREEZINGFORMS_INSTALLER_TAGNOTFOUND');
+							$this->warnings[] = $nm . ': ' . $tag . ' ' . $idx . '/' . $name . ' ' . BFText::_('COM_BREEZINGFORMSNG_INSTALLER_TAGNOTFOUND');
 						} // if
 					} // if
 				} // if
@@ -885,8 +885,8 @@ class ff_importPackage extends ff_xmlPackage
 		$row->ordering = ++$this->params[1]['elem_ord'];
 		$row->page = $this->getInt(2, 'page', 1);
 		$row->published = $this->getInt(2, 'published', 1);
-		$row->title = $this->getText(2, 'title', BFText::_('COM_BREEZINGFORMS_INSTALLER_UNKNOWN'));
-		$row->name = $this->getText(2, 'name', BFText::_('COM_BREEZINGFORMS_INSTALLER_UNKNOWN'));
+		$row->title = $this->getText(2, 'title', BFText::_('COM_BREEZINGFORMSNG_INSTALLER_UNKNOWN'));
+		$row->name = $this->getText(2, 'name', BFText::_('COM_BREEZINGFORMSNG_INSTALLER_UNKNOWN'));
 		$row->type = $this->getText(2, 'type', 'Static Text/HTML');
 		$row->class1 = $this->getText(2, 'class1');
 		$row->class2 = $this->getText(2, 'class2');
@@ -946,7 +946,7 @@ class ff_importPackage extends ff_xmlPackage
 		$row->published = $this->getInt(2, 'published', 1);
 		$row->package = $this->getText(2, 'package');
 		$row->img = $this->getText(2, 'img');
-		$row->title = $this->getText(2, 'title', BFText::_('COM_BREEZINGFORMS_INSTALLER_UNKNOWN'));
+		$row->title = $this->getText(2, 'title', BFText::_('COM_BREEZINGFORMSNG_INSTALLER_UNKNOWN'));
 		$row->name = $this->getText(2, 'name');
 		$row->page = $this->getInt(2, 'page', 1);
 		$row->frame = $this->getInt(2, 'frame');
@@ -974,7 +974,7 @@ class ff_importPackage extends ff_xmlPackage
 			$row->published = $this->getInt(1, 'published', 1);
 			$row->package = $this->getText(1, 'package');
 			$row->img = $this->getText(1, 'img');
-			$row->title = $this->getText(1, 'title', BFText::_('COM_BREEZINGFORMS_INSTALLER_UNKNOWN'));
+			$row->title = $this->getText(1, 'title', BFText::_('COM_BREEZINGFORMSNG_INSTALLER_UNKNOWN'));
 			$row->name = $this->getText(1, 'name');
 			$row->page = $this->getInt(1, 'page', 1);
 			$row->frame = $this->getInt(1, 'frame');

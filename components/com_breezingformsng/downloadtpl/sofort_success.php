@@ -9,7 +9,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 **/
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 ?>
-<?php echo BFText::_('COM_BREEZINGFORMS_THANK_YOU_FOR_BUYING_SU'); ?>
+<?php echo BFText::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_BUYING_SU'); ?>
 <br/>
 <br/>
-<?php echo BFText::_('COM_BREEZINGFORMS_YOUR_TRANSACTION_ID')  ?>: <?php echo htmlentities($tx_token); ?>
+<?php echo BFText::_('COM_BREEZINGFORMSNG_YOUR_TRANSACTION_ID')  ?>: <?php echo htmlentities($tx_token); ?>

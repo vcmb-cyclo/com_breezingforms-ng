@@ -4,7 +4,7 @@
 	<update>
 		<name>COM_BREEZINGFORMS</name>
 		<description>BreezingForms-ng Update</description>
-		<element>com_breezingforms</element>
+		<element>com_breezingformsng</element>
 		<type>component</type>
 		<client>1</client>
 		<version>6.0.8-RC6</version>

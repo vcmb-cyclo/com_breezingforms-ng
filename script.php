@@ -129,18 +129,25 @@ Log::addLogger(
         'text_file_path'     => JPATH_ADMINISTRATOR . '/logs'
     ],
     Log::ALL,
-    ['com_breezingforms.install']
+    ['com_breezingformsng.install']
 );
 
 
 // Logs de démarrage
-Log::add('[OK] BreezingformsNG installation/update started.', Log::INFO, 'com_breezingforms.install');
-Log::add('PHP Version: ' . PHP_VERSION . '.', Log::INFO, 'com_breezingforms.install');
-Log::add('Joomla Version : ' . JVERSION . '.', Log::INFO, 'com_breezingforms.install');
-Log::add('User Agent: ' . ($_SERVER['HTTP_USER_AGENT'] ?? 'CLI') . '.', Log::INFO, 'com_breezingforms.install');
+Log::add('[OK] BreezingformsNG installation/update started.', Log::INFO, 'com_breezingformsng.install');
+Log::add('PHP Version: ' . PHP_VERSION . '.', Log::INFO, 'com_breezingformsng.install');
+Log::add('Joomla Version : ' . JVERSION . '.', Log::INFO, 'com_breezingformsng.install');
+Log::add('User Agent: ' . ($_SERVER['HTTP_USER_AGENT'] ?? 'CLI') . '.', Log::INFO, 'com_breezingformsng.install');
 
-class com_breezingformsInstallerScript
+class com_breezingformsngInstallerScript
 {
+    private const TARGET_COMPONENT = 'com_breezingformsng';
+    private const LEGACY_COMPONENT_ALIASES = [
+        'breezingforms',
+        'com_breezingforms',
+        'com_breezingformsng',
+    ];
+
     private $installStartedAt = 0.0;
     private $incomingPackageVersion = '';
     private $currentInstalledVersion = '0.0.0';
@@ -375,8 +382,8 @@ class com_breezingformsInstallerScript
     {
         global $ff_admpath, $ff_compath, $errors, $errmode;
 
-        $ff_admpath = str_replace('\\', '/', JPATH_ADMINISTRATOR . '/components/com_breezingforms');
-        $ff_compath = str_replace('\\', '/', JPATH_SITE . '/components/com_breezingforms');
+        $ff_admpath = str_replace('\\', '/', JPATH_ADMINISTRATOR . '/components/com_breezingformsng');
+        $ff_compath = str_replace('\\', '/', JPATH_SITE . '/components/com_breezingformsng');
         $xmlFile = $ff_admpath . '/packages/stdlib.english.xml';
 
         if (!File::exists($xmlFile)) {
@@ -506,7 +513,7 @@ class com_breezingformsInstallerScript
     private function log(string $message, int $priority = Log::INFO): void
     {
         $message = $this->prefixMessage($message, $priority);
-        Log::add($message, $priority, 'com_breezingforms.install');
+        Log::add($message, $priority, 'com_breezingformsng.install');
 
         $logPath = JPATH_ADMINISTRATOR . '/logs/breezingforms_install2.log';
 
@@ -574,7 +581,7 @@ class com_breezingformsInstallerScript
         $query = $db->getQuery(true)
             ->select($db->quoteName('manifest_cache'))
             ->from($db->quoteName('#__extensions'))
-            ->where($db->quoteName('element') . ' = ' . $db->quote('com_breezingforms'));
+            ->where($db->quoteName('element') . ' = ' . $db->quote('com_breezingformsng'));
 
         $db->setQuery($query);
         $manifest = $db->loadResult();
@@ -592,7 +599,7 @@ class com_breezingformsInstallerScript
 
     private function installPlugins(): void
     {
-        $basePath = JPATH_ADMINISTRATOR . '/components/com_breezingforms/plugins';
+        $basePath = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/plugins';
 
         if (!Folder::exists($basePath)) {
             $this->log('Plugins directory not found – skipping plugin installation.', Log::WARNING);
@@ -684,7 +691,7 @@ class com_breezingformsInstallerScript
 
     private function copyComponentImageAssets(): void
     {
-        $sourceImages = JPATH_SITE . '/media/com_breezingforms/images/site';
+        $sourceImages = JPATH_SITE . '/media/com_breezingformsng/images/site';
         $targetRoot = JPATH_SITE . '/images';
         $directories = ['icons', 'galerie/breezingforms'];
 
@@ -734,6 +741,344 @@ class com_breezingformsInstallerScript
                 $this->log("Copied {$relativeCounter} file(s) from '{$directory}' into /images.");
             }
         }
+    }
+
+    private function buildMenuLinkOptionWhereClauses(DatabaseInterface $db, string $option): array
+    {
+        $quotedOption = $db->quote('%option=' . $option . '%');
+
+        return [
+            $db->quoteName('link') . ' LIKE ' . $quotedOption,
+            $db->quoteName('params') . ' LIKE ' . $db->quote('%"option":"' . $option . '"%'),
+        ];
+    }
+
+    private function removeBreezingFormsMenuEntries(): void
+    {
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $conditions = [];
+
+        foreach (self::LEGACY_COMPONENT_ALIASES as $alias) {
+            $conditions = array_merge($conditions, $this->buildMenuLinkOptionWhereClauses($db, $alias));
+        }
+
+        if ($conditions === []) {
+            return;
+        }
+
+        try {
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->delete($db->quoteName('#__menu'))
+                    ->where($db->quoteName('client_id') . ' = 1')
+                    ->where('(' . implode(' OR ', $conditions) . ')')
+            );
+            $db->execute();
+            $this->log('BreezingForms admin menu entries removed (best-effort).');
+        } catch (\Throwable $e) {
+            $this->log('Unable to remove BreezingForms admin menu entries: ' . $e->getMessage(), Log::WARNING);
+        }
+    }
+
+    private function cleanupExtensionReferences(array $extensionIds): void
+    {
+        $extensionIds = array_values(array_filter(array_map('intval', $extensionIds), static fn(int $id): bool => $id > 0));
+
+        if ($extensionIds === []) {
+            return;
+        }
+
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $ids = implode(',', $extensionIds);
+
+        foreach (['#__schemas', '#__update_sites_extensions'] as $table) {
+            try {
+                $db->setQuery(
+                    $db->getQuery(true)
+                        ->delete($db->quoteName($table))
+                        ->where($db->quoteName('extension_id') . ' IN (' . $ids . ')')
+                );
+                $db->execute();
+            } catch (\Throwable $e) {
+                $this->log("Unable to clean {$table} for BreezingForms legacy extension rows: " . $e->getMessage(), Log::WARNING);
+            }
+        }
+    }
+
+    private function getComponentExtensionId(string $element): int
+    {
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+
+        try {
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->select($db->quoteName('extension_id'))
+                    ->from($db->quoteName('#__extensions'))
+                    ->where($db->quoteName('type') . ' = ' . $db->quote('component'))
+                    ->where($db->quoteName('element') . ' = ' . $db->quote($element))
+                    ->where($db->quoteName('client_id') . ' = 1')
+            );
+
+            return (int) $db->loadResult();
+        } catch (\Throwable $e) {
+            $this->log("Unable to inspect component extension row {$element}: " . $e->getMessage(), Log::WARNING);
+            return 0;
+        }
+    }
+
+    private function normalizeJoomlaComponentReferences(): void
+    {
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $targetElement = self::TARGET_COMPONENT;
+        $targetId = $this->getComponentExtensionId($targetElement);
+
+        if ($targetId <= 0) {
+            $this->log('BFNG component row not found; Joomla component reference normalization skipped.', Log::WARNING);
+            return;
+        }
+
+        foreach (['breezingforms', 'com_breezingforms'] as $legacyElement) {
+            $legacyId = $this->getComponentExtensionId($legacyElement);
+
+            try {
+                $query = $db->getQuery(true)
+                    ->update($db->quoteName('#__menu'))
+                    ->set($db->quoteName('component_id') . ' = ' . (int) $targetId)
+                    ->set($db->quoteName('link') . ' = REPLACE(' . $db->quoteName('link') . ', ' . $db->quote('option=' . $legacyElement) . ', ' . $db->quote('option=' . $targetElement) . ')')
+                    ->set($db->quoteName('params') . ' = REPLACE(' . $db->quoteName('params') . ', ' . $db->quote('"option":"' . $legacyElement . '"') . ', ' . $db->quote('"option":"' . $targetElement . '"') . ')')
+                    ->where(
+                        '('
+                        . $db->quoteName('link') . ' LIKE ' . $db->quote('%option=' . $legacyElement . '%')
+                        . ' OR ' . $db->quoteName('params') . ' LIKE ' . $db->quote('%"option":"' . $legacyElement . '"%')
+                        . ')'
+                    );
+
+                $db->setQuery($query);
+                $db->execute();
+
+                $updated = (int) $db->getAffectedRows();
+                if ($updated > 0) {
+                    $this->log("Normalized {$updated} Joomla menu row(s) from {$legacyElement} to {$targetElement}.");
+                }
+            } catch (\Throwable $e) {
+                $this->log("Unable to normalize Joomla menu links for {$legacyElement}: " . $e->getMessage(), Log::WARNING);
+            }
+
+            if ($legacyId > 0) {
+                try {
+                    $db->setQuery(
+                        $db->getQuery(true)
+                            ->update($db->quoteName('#__menu'))
+                            ->set($db->quoteName('component_id') . ' = ' . (int) $targetId)
+                            ->where($db->quoteName('component_id') . ' = ' . (int) $legacyId)
+                    );
+                    $db->execute();
+                } catch (\Throwable $e) {
+                    $this->log("Unable to remap Joomla menu component_id for {$legacyElement}: " . $e->getMessage(), Log::WARNING);
+                }
+            }
+
+            $this->normalizeComponentAssetName($legacyElement, $targetElement);
+        }
+    }
+
+    private function normalizeComponentAssetName(string $legacyElement, string $targetElement): void
+    {
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+
+        try {
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->select('COUNT(*)')
+                    ->from($db->quoteName('#__assets'))
+                    ->where($db->quoteName('name') . ' = ' . $db->quote($targetElement))
+            );
+            $targetExists = (int) $db->loadResult() > 0;
+
+            if ($targetExists) {
+                return;
+            }
+
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->update($db->quoteName('#__assets'))
+                    ->set($db->quoteName('name') . ' = ' . $db->quote($targetElement))
+                    ->set($db->quoteName('title') . ' = ' . $db->quote('COM_BREEZINGFORMS'))
+                    ->where($db->quoteName('name') . ' = ' . $db->quote($legacyElement))
+            );
+            $db->execute();
+
+            if ((int) $db->getAffectedRows() > 0) {
+                $this->log("Normalized Joomla asset from {$legacyElement} to {$targetElement}.");
+            }
+        } catch (\Throwable $e) {
+            $this->log("Unable to normalize Joomla asset {$legacyElement}: " . $e->getMessage(), Log::WARNING);
+        }
+    }
+
+    private function deduplicateBreezingFormsComponentRows(): void
+    {
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+
+        try {
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->select($db->quoteName(['extension_id', 'enabled', 'manifest_cache']))
+                    ->from($db->quoteName('#__extensions'))
+                    ->where($db->quoteName('type') . ' = ' . $db->quote('component'))
+                    ->where($db->quoteName('element') . ' = ' . $db->quote(self::TARGET_COMPONENT))
+                    ->where($db->quoteName('client_id') . ' = 1')
+                    ->order($db->quoteName('extension_id') . ' DESC')
+            );
+            $rows = $db->loadAssocList() ?: [];
+        } catch (\Throwable $e) {
+            $this->log('Unable to inspect BreezingForms component extension rows: ' . $e->getMessage(), Log::WARNING);
+            return;
+        }
+
+        if (count($rows) <= 1) {
+            return;
+        }
+
+        $ids = array_values(array_filter(
+            array_map(static fn(array $row): int => (int) ($row['extension_id'] ?? 0), $rows),
+            static fn(int $id): bool => $id > 0
+        ));
+
+        if (count($ids) <= 1) {
+            return;
+        }
+
+        $menuRefs = array_fill_keys($ids, 0);
+
+        try {
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->select([$db->quoteName('component_id'), 'COUNT(1) AS refs'])
+                    ->from($db->quoteName('#__menu'))
+                    ->where($db->quoteName('client_id') . ' = 1')
+                    ->where($db->quoteName('component_id') . ' IN (' . implode(',', $ids) . ')')
+                    ->group($db->quoteName('component_id'))
+            );
+            foreach (($db->loadAssocList() ?: []) as $row) {
+                $componentId = (int) ($row['component_id'] ?? 0);
+                if ($componentId > 0) {
+                    $menuRefs[$componentId] = (int) ($row['refs'] ?? 0);
+                }
+            }
+        } catch (\Throwable $e) {
+            $this->log('Unable to inspect BreezingForms menu references: ' . $e->getMessage(), Log::WARNING);
+        }
+
+        $keepId = 0;
+        $bestScore = [-1, -1, -1, -1];
+
+        foreach ($rows as $row) {
+            $id = (int) ($row['extension_id'] ?? 0);
+            if ($id <= 0) {
+                continue;
+            }
+
+            $manifest = json_decode((string) ($row['manifest_cache'] ?? ''), true);
+            $isNg = is_array($manifest) && stripos((string) ($manifest['authorUrl'] ?? '') . ' ' . (string) ($manifest['name'] ?? ''), 'breezingforms-ng') !== false ? 1 : 0;
+            $enabled = (int) ($row['enabled'] ?? 0);
+            $refs = (int) ($menuRefs[$id] ?? 0);
+            $score = [$isNg, $enabled, $refs, $id];
+
+            if ($keepId === 0 || $score > $bestScore) {
+                $keepId = $id;
+                $bestScore = $score;
+            }
+        }
+
+        if ($keepId <= 0) {
+            return;
+        }
+
+        $removeIds = array_values(array_filter($ids, static fn(int $id): bool => $id !== $keepId));
+        if ($removeIds === []) {
+            return;
+        }
+
+        try {
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->update($db->quoteName('#__menu'))
+                    ->set($db->quoteName('component_id') . ' = ' . (int) $keepId)
+                    ->where($db->quoteName('component_id') . ' IN (' . implode(',', $removeIds) . ')')
+            );
+            $db->execute();
+        } catch (\Throwable $e) {
+            $this->log('Unable to remap BreezingForms menu entries to BFNG component row: ' . $e->getMessage(), Log::WARNING);
+        }
+
+        $this->cleanupExtensionReferences($removeIds);
+
+        try {
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->delete($db->quoteName('#__extensions'))
+                    ->where($db->quoteName('extension_id') . ' IN (' . implode(',', $removeIds) . ')')
+            );
+            $db->execute();
+            $this->log('Deduplicated BreezingForms component rows: kept extension_id ' . $keepId . ', removed ' . count($removeIds) . ' stale row(s).');
+        } catch (\Throwable $e) {
+            $this->log('Unable to remove stale BreezingForms component extension rows: ' . $e->getMessage(), Log::WARNING);
+        }
+    }
+
+    private function removeLegacyBreezingFormsComponentRows(): void
+    {
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $targetId = $this->getComponentExtensionId(self::TARGET_COMPONENT);
+
+        if ($targetId <= 0) {
+            $this->log('BFNG component row not found; legacy BreezingForms cleanup skipped.', Log::WARNING);
+            return;
+        }
+
+        foreach (['breezingforms', 'com_breezingforms'] as $legacyElement) {
+            $legacyId = $this->getComponentExtensionId($legacyElement);
+
+            if ($legacyId <= 0) {
+                continue;
+            }
+
+            try {
+                $db->setQuery(
+                    $db->getQuery(true)
+                        ->update($db->quoteName('#__menu'))
+                        ->set($db->quoteName('component_id') . ' = ' . (int) $targetId)
+                        ->set($db->quoteName('link') . ' = REPLACE(' . $db->quoteName('link') . ', ' . $db->quote('option=' . $legacyElement) . ', ' . $db->quote('option=' . self::TARGET_COMPONENT) . ')')
+                        ->where($db->quoteName('component_id') . ' = ' . (int) $legacyId)
+                );
+                $db->execute();
+            } catch (\Throwable $e) {
+                $this->log("Unable to remap legacy BreezingForms menus for {$legacyElement}: " . $e->getMessage(), Log::WARNING);
+            }
+
+            $this->cleanupExtensionReferences([$legacyId]);
+
+            try {
+                $db->setQuery(
+                    $db->getQuery(true)
+                        ->delete($db->quoteName('#__extensions'))
+                        ->where($db->quoteName('extension_id') . ' = ' . (int) $legacyId)
+                );
+                $db->execute();
+                $this->log("Legacy BreezingForms component row removed safely: {$legacyElement} (id {$legacyId}).");
+            } catch (\Throwable $e) {
+                $this->log("Unable to remove legacy BreezingForms component row {$legacyElement}: " . $e->getMessage(), Log::WARNING);
+            }
+        }
+    }
+
+    private function cleanupLegacyBreezingFormsAfterInstall(): void
+    {
+        $this->normalizeJoomlaComponentReferences();
+        $this->deduplicateBreezingFormsComponentRows();
+        $this->removeLegacyBreezingFormsComponentRows();
+        $this->log('Legacy BreezingForms component cleanup completed in safe mode; uninstall hooks intentionally skipped.');
     }
 
 
@@ -922,6 +1267,7 @@ class com_breezingformsInstallerScript
 
         $this->cleanupOldConfig();
         $this->cleanupComponentLogFile();
+        $this->removeBreezingFormsMenuEntries();
         $this->log('BreezingForms uninstallation completed.');
     }
 
@@ -964,6 +1310,7 @@ class com_breezingformsInstallerScript
      */
     function postflight($type, $parent)
     {
+        $type = strtolower((string) $type);
 
         // === LOG POUR DÉBOGAGE ===
         $this->log('Postflight installation method call, parameter : ' . $type . '.');
@@ -973,11 +1320,15 @@ class com_breezingformsInstallerScript
             $this->ensureUtf8mb4Columns();
             $this->importStandardLibrary();
             $this->copyComponentImageAssets();
+            $this->installPlugins();
+            $this->cleanupLegacyBreezingFormsAfterInstall();
+            $this->removeOldUpdateSite();
+            $this->cleanupOldConfig();
+        } elseif ($type === 'uninstall') {
+            $this->removeBreezingFormsMenuEntries();
+            $this->cleanupOldConfig();
+            $this->cleanupComponentLogFile();
         }
-
-        $this->installPlugins();
-        $this->removeOldUpdateSite();
-        $this->cleanupOldConfig();
 
         $durationSeconds = max(0.0, microtime(true) - $this->installStartedAt);
         $actionLabel = strtoupper((string) $type);

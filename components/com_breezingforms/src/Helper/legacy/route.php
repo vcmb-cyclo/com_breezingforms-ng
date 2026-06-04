@@ -13,7 +13,7 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 
-abstract class BreezingformsHelperRoute
+abstract class BreezingformsNGHelperRoute
 {
     protected static $lookup = array();
 

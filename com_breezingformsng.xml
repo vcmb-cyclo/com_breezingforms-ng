@@ -18,6 +18,8 @@
 	<version>6.0.8-RC6</version>
 	<description>Installation successful. Next find BreezingForms in the Components menu, and finish the installation process.</description>
 
+	<namespace path="src">Vcmb\Component\BreezingformsNG</namespace>
+
 	<scriptfile>script.php</scriptfile>
 
 	<updateservers>
@@ -28,30 +30,22 @@
 		<platform name="joomla" version="6.*" />
 	</targetplatform>
 
-	<!-- =========================================================
-	     SITE
-	     folder="site" => les chemins ci-dessous sont relatifs au dossier /site du ZIP
-	     ========================================================= -->
-	<files folder="site">
+	<files folder="components/com_breezingforms">
 		<filename>index.html</filename>
 		<filename>breezingforms.php</filename>
 		<filename>facileforms.class.php</filename>
-		<filename>facileforms.js</filename>
 		<filename>facileforms.process.php</filename>
 		<filename>facileforms.xml.php</filename>
 		<filename>router.php</filename>
 		<folder>downloadtpl</folder>
-		<folder>helpers</folder>
 		<folder>exports</folder>
-		<folder>images</folder>
 		<folder>libraries</folder>
+		<folder>src</folder>
 		<folder>themes</folder>
 		<folder>uploads</folder>
-		<folder>views</folder>
 	</files>
 
-	<!-- Langues FRONTEND (site) - sans /public/ -->
-	<languages folder="site">
+	<languages folder="components/com_breezingforms">
 		<language tag="de-DE">languages/de-DE/de-DE.com_breezingforms.ini</language>
 		<language tag="en-GB">languages/en-GB/en-GB.com_breezingforms.ini</language>
 		<language tag="es-ES">languages/es-ES/es-ES.com_breezingforms.ini</language>
@@ -61,10 +55,6 @@
 		<language tag="tr-TR">languages/tr-TR/tr-TR.com_breezingforms.ini</language>
 	</languages>
 
-	<!-- =========================================================
-	     ADMINISTRATION
-	     folder="administrator" => chemins relatifs au dossier /administrator du ZIP
-	     ========================================================= -->
 	<administration>
 		<menu>COM_BREEZINGFORMS</menu>
 
@@ -111,13 +101,11 @@
 			<menu option="com_breezingforms" act="about" alt="BreezingForms/About">COM_BREEZINGFORMS_ABOUT</menu>
 		</submenu>
 
-		<files folder="administrator">
+		<files folder="administrator/components/com_breezingforms">
 			<filename>index.html</filename>
 			<filename>access.xml</filename>
 			<filename>config.xml</filename>
 			<filename>admin.breezingforms.php</filename>
-			<filename>breezingforms.php</filename>
-			<filename>controller.php</filename>
 			<filename>toolbar.facileforms.html.php</filename>
 			<filename>toolbar.facileforms.php</filename>
 
@@ -130,13 +118,13 @@
 			<folder>packages</folder>
 			<folder>payment_cache</folder>
 			<folder>pdftpl</folder>
+			<folder>services</folder>
 			<folder>sql</folder>
-			<folder>views</folder>
+			<folder>src</folder>
 			<folder>plugins</folder>
-			<folder>assets</folder>
 		</files>
 
-		<languages folder="administrator">
+		<languages folder="administrator/components/com_breezingforms">
 			<language tag="de-DE">languages/de-DE/de-DE.com_breezingforms.ini</language>
 			<language tag="de-DE">languages/de-DE/de-DE.com_breezingforms.sys.ini</language>
 
@@ -160,5 +148,12 @@
 		</languages>
 
 	</administration>
+
+	<media folder="media/com_breezingforms" destination="com_breezingforms">
+		<folder>css</folder>
+		<folder>font-awesome</folder>
+		<folder>images</folder>
+		<folder>js</folder>
+	</media>
 
 </extension>

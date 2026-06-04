@@ -1720,7 +1720,53 @@ class com_breezingformsngInstallerScript
             }
         }
 
+        $this->migrateElementData1FunctionNames();
+
         $this->log('BreezingForms database update completed.');
+    }
+
+    private function migrateElementData1FunctionNames(): void
+    {
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $elementsTable = $db->getPrefix() . 'facileforms_elements';
+
+        if (!in_array($elementsTable, $db->getTableList(), true)) {
+            return;
+        }
+
+        $columns = ['data1', 'data2', 'data3', 'data4', 'data5',
+                    'data6', 'data7', 'data8', 'data9', 'data10'];
+
+        $totalUpdated = 0;
+
+        foreach ($columns as $col) {
+            try {
+                $db->setQuery(
+                    "UPDATE `{$elementsTable}`" .
+                    " SET `{$col}` = REPLACE(`{$col}`, 'gn_vcmb_', 'gn_get_vcmb_')" .
+                    " WHERE `{$col}` LIKE '%gn\\_vcmb\\_%'"
+                )->execute();
+
+                $updated = (int) $db->getAffectedRows();
+                $totalUpdated += $updated;
+
+                if ($updated > 0) {
+                    $this->log("Migrated gn_vcmb_ → gn_get_vcmb_ in {$col}: {$updated} element(s) updated.");
+                }
+            } catch (\Throwable $e) {
+                $this->log("Unable to migrate gn_vcmb_ function names in {$col}: " . $e->getMessage(), Log::WARNING);
+            }
+        }
+
+        if ($totalUpdated > 0) {
+            $this->announce(
+                "[OK] Migrated {$totalUpdated} element field(s): gn_vcmb_* → gn_get_vcmb_*.",
+                'message',
+                Log::INFO
+            );
+        } else {
+            $this->log('No gn_vcmb_ function references found in element fields – migration skipped.');
+        }
     }
 
     /**

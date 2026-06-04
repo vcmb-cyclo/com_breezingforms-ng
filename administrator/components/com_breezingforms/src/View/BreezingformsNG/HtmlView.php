@@ -7,7 +7,7 @@
  * @license     GNU/GPL
  */
 
-namespace Vcmb\Component\BreezingformsNG\Administrator\View\Breezingforms;
+namespace Vcmb\Component\BreezingformsNG\Administrator\View\BreezingformsNG;
 
 \defined('_JEXEC') or die;
 

@@ -7,7 +7,7 @@
 
 \defined('_JEXEC') or die;
 
-use Vcmb\Component\BreezingformsNG\Administrator\Extension\BreezingformsComponent;
+use Vcmb\Component\BreezingformsNG\Administrator\Extension\BreezingformsNGComponent;
 use Joomla\CMS\Dispatcher\ComponentDispatcherFactoryInterface;
 use Joomla\CMS\Extension\ComponentInterface;
 use Joomla\CMS\Extension\Service\Provider\ComponentDispatcherFactory;
@@ -28,7 +28,7 @@ return new class implements ServiceProviderInterface
         $container->set(
             ComponentInterface::class,
             static function (Container $container): ComponentInterface {
-                $component = new BreezingformsComponent(
+                $component = new BreezingformsNGComponent(
                     $container->get(ComponentDispatcherFactoryInterface::class)
                 );
 

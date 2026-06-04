@@ -8,7 +8,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
  * @license     GNU/GPL
  */
 
-function BreezingformsBuildRoute(&$query)
+function BreezingformsNGBuildRoute(&$query)
 {
 
     $segments = array();
@@ -31,7 +31,7 @@ function BreezingformsBuildRoute(&$query)
     return $segments;
 }
 
-function BreezingformsParseRoute($segments)
+function BreezingformsNGParseRoute($segments)
 {
 
     $vars = array();

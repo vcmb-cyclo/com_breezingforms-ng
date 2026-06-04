@@ -134,7 +134,7 @@ Log::addLogger(
 
 
 // Logs de démarrage
-Log::add('[OK] Breezingforms installation/update started.', Log::INFO, 'com_breezingforms.install');
+Log::add('[OK] BreezingformsNG installation/update started.', Log::INFO, 'com_breezingforms.install');
 Log::add('PHP Version: ' . PHP_VERSION . '.', Log::INFO, 'com_breezingforms.install');
 Log::add('Joomla Version : ' . JVERSION . '.', Log::INFO, 'com_breezingforms.install');
 Log::add('User Agent: ' . ($_SERVER['HTTP_USER_AGENT'] ?? 'CLI') . '.', Log::INFO, 'com_breezingforms.install');

@@ -584,31 +584,30 @@ class bfRecordManagement
         ToolBarHelper::custom('archived', 'archive', 'archive', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_ARCHIVE'), false);
         ToolBarHelper::custom('remove', 'delete.png', 'delete_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_DELETE'), false);
 
-        //Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jq.migrate.js');
-        //Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jq.min.js');
-        //Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('jQuery.noConflict();' . "\n");
-        Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jq-ui.min.js');
-        Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jtable/jq.jtable.js');
+        $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+        $wa->useStyle('com_breezingformsng.jtable-style');
+        $wa->useStyle('com_breezingformsng.admin-style');
+        $wa->useStyle('com_breezingformsng.picker-style');
+        $wa->useStyle('com_breezingformsng.picker.date-style');
+        $wa->useStyle('com_breezingformsng.picker.time-style');
+        $wa->useScript('com_breezingformsng.jq-ui');
+        $wa->useScript('com_breezingformsng.jtable');
+        $wa->useScript('com_breezingformsng.picker.date');
+        $wa->useScript('com_breezingformsng.picker.time');
+        $wa->useScript('com_breezingformsng.json-plugin');
 
-        $lang = Factory::getApplication()->getLanguage()->getTag();
-        $lang = explode('-', $lang);
-        $lang = strtolower($lang[0]);
-        if (file_exists(JPATH_SITE . '/components/com_breezingformsng/libraries/jquery/jtable/localization/jquery.jtable.' . $lang . '.js')) {
-            Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jtable/localization/jquery.jtable.' . $lang . '.js');
+        $lang = strtolower(explode('-', Factory::getApplication()->getLanguage()->getTag())[0]);
+        $langFile = 'components/com_breezingformsng/libraries/jquery/jtable/localization/jquery.jtable.' . $lang . '.js';
+        if (file_exists(JPATH_ROOT . '/' . $langFile)) {
+            $wa->getRegistry()->add('com_breezingformsng.jtable-lang', [
+                'name'         => 'com_breezingformsng.jtable-lang',
+                'type'         => 'script',
+                'uri'          => $langFile,
+                'dependencies' => ['com_breezingformsng.jtable'],
+                'version'      => 'auto',
+            ]);
+            $wa->useScript('com_breezingformsng.jtable-lang');
         }
-
-        Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/picker.js');
-        Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/picker.date.js');
-        Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/picker.time.js');
-        Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/administrator/components/com_breezingformsng/libraries/jquery/plugins/json.js');
-
-        Factory::getApplication()->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jtable/themes/metro/jq.ui.css');
-        Factory::getApplication()->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jtable/themes/metro/blue/jtable.css');
-        Factory::getApplication()->getDocument()->addStyleSheet(Uri::root() . 'administrator/components/com_breezingformsng/admin/style.css');
-
-        Factory::getApplication()->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/themes/default.css');
-        Factory::getApplication()->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/themes/default.date.css');
-        Factory::getApplication()->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/themes/default.time.css');
         ?>
         <script type="text/javascript">
             function ct_quote(str) {

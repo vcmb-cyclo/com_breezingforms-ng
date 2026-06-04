@@ -300,8 +300,9 @@ $mainframe = Factory::getApplication();
 $cache = Factory::getCache('com_content');
 $cache->clean();
 
-// force jquery to be loaded after mootools but before any other js (since J! 3.4)
 HTMLHelper::_('jquery.framework');
+Factory::getApplication()->getDocument()->getWebAssetManager()
+    ->getRegistry()->addRegistryFile('administrator/components/com_breezingformsng/joomla.asset.json');
 
 // purge ajax save
 $sourcePath = JPATH_SITE . '/media/breezingforms/ajax_cache/';

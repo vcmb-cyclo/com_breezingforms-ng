@@ -44,7 +44,7 @@ class HTML_facileFormsScript
 		ToolBarHelper::custom('save', 'save.png', 'save_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_SAVE'), false);
 		ToolBarHelper::custom('cancel', 'cancel.png', 'cancel_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_QUICKMODE_CLOSE'), false);
 		?>
-		<script type="text/javascript" src="<?php echo $ff_admsite; ?>/admin/areautils.js"></script>
+		<?php Factory::getApplication()->getDocument()->getWebAssetManager()->useScript('com_breezingformsng.areautils'); ?>
 		<script type="text/javascript">
 						<!--
 						function checkIdentifier(value, name)

@@ -38,30 +38,19 @@ class QuickModeHtml
             && is_array($decodedThemeObject['properties'])
             && (($decodedThemeObject['properties']['themebootstrapThemeEngine'] ?? '') === 'bootstrap')
             && (($decodedThemeObject['properties']['themebootstrap'] ?? '') === 'Azure');
-        Factory::getApplication()->getDocument()->addStyleSheet(Uri::root() . 'administrator/components/com_breezingformsng/libraries/jquery/themes/quickmode/quickmode.all.css');
-        Factory::getApplication()->getDocument()->addStyleSheet(Uri::root() . 'administrator/components/com_breezingformsng/libraries/jquery/jtree/tree_component.css');
-        Factory::getApplication()->getDocument()->addStyleSheet(Uri::root() . 'administrator/components/com_breezingformsng/admin/style.css');
+        $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+        $wa->useStyle('com_breezingformsng.quickmode-style');
+        $wa->useStyle('com_breezingformsng.jtree-style');
+        $wa->useStyle('com_breezingformsng.admin-style');
+        $wa->useScript('com_breezingformsng.jquery-alias');
+        $wa->useScript('com_breezingformsng.jtree');
+        $wa->useScript('com_breezingformsng.jq-ui');
+        $wa->useScript('com_breezingformsng.base64');
+        $wa->useScript('com_breezingformsng.json-plugin');
+        $wa->useScript('com_breezingformsng.md5');
+        $wa->useScript('com_breezingformsng.center');
+        $wa->useScript('com_breezingformsng.scroll');
         ?>
-
-        <script type="text/javascript"
-            src="<?php echo Uri::root() . 'administrator/components/com_breezingformsng/libraries/jquery/jtree/'; ?>_lib.js"></script>
-        <script type="text/javascript"
-            src="<?php echo Uri::root() . 'administrator/components/com_breezingformsng/libraries/jquery/jtree/'; ?>tree_component.min.js"></script>
-        <script type="text/javascript"
-            src="<?php echo Uri::root() . 'administrator/components/com_breezingformsng/libraries/jquery/'; ?>jq-ui.min.js"></script>
-        <script type="text/javascript"
-            src="<?php echo Uri::root() . 'administrator/components/com_breezingformsng/libraries/jquery/plugins/bas'; ?>e64.js"></script>
-        <script type="text/javascript"
-            src="<?php echo Uri::root() . 'administrator/components/com_breezingformsng/libraries/jquery/plugins/'; ?>json.js"></script>
-        <script type="text/javascript"
-            src="<?php echo Uri::root() . 'administrator/components/com_breezingformsng/libraries/jquery/plugins/'; ?>md5.js"></script>
-        <script type="text/javascript"
-            src="<?php echo Uri::root() ?>components/com_breezingformsng/libraries/jquery/center.js"></script>
-
-        <script type="text/javascript"
-            src="<?php echo Uri::root() . 'administrator/components/com_breezingformsng/libraries/jquery/'; ?>jquery.scroll.js"></script>
-
-
 
         <script type="text/javascript">
 

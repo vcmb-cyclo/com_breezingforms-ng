@@ -1,0 +1,14 @@
+/*
+ ########## BreezingForms 1.7.1 QuickMode ##########
+ @autor crosstec.de
+ @copyright Copyright (C) 2010 crosstec.de. All rights reserved.
+ ########################################
+*/
+
+.bfQuickMode fieldset.bfInline {
+    width: 44%;
+}
+
+.bfQuickMode p {
+width: 100%;
+}

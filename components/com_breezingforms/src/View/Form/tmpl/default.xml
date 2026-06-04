@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<metadata>
+    <!-- Joomla! 1.6 compatibility -->
+    <layout title="COM_BREEZINGFORMS_SELECT_FORM">
+        <message>COM_BREEZINGFORMS_SELECT_FORM_MESSAGE</message>
+        <config>
+            <fields name="params">
+                <fieldset name="settings" group="settings" label="COM_BREEZINGFORMS_ADD_FORM_LABEL">
+                    <field name="ff_com_name" type="text" default="" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_FORM_NAME" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_ENTER_NAME_DESC" />
+                    <field name="ff_com_page" type="text" default="1" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_PAGE_NUMBER" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_PAGE_NUMBER_DESC" />
+                    <field name="ff_com_editable" type="radio" default="0" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_EDITABLE" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_EDITABLE_DESC">
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </field>
+                    <field name="ff_com_editable_override" type="radio" default="0" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_REMOVE_EXISTING" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_REMOVE_EXISTING_DESC">
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </field>
+                    <field name="ff_com_frame" type="radio" default="0" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_IFRAME" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_IFRAME_DESC">
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </field>
+                    <field name="ff_com_border" type="radio" default="0" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_BORDER" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_BORDER_DESC">
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </field>
+                    <field name="ff_com_align" type="list" default="1" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_HORIZONTAL_ALIGN" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_HORIZONTAL_ALIGN_DESC">
+                        <option value="0">Left</option>
+                        <option value="1">Center</option>
+                        <option value="2">Right</option>
+                        <option value="3">Position</option>
+                    </field>
+                    <field name="ff_com_left" type="text" default="0" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_LEFT_POSITION_PIXELS" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_LEFT_POSITION_PIXELS_DESC" />
+                    <field name="ff_com_top" type="text" default="0" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_TOP_POSITION_PIXELS" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_TOP_POSITION_PIXELS_DESC" />
+                    <field name="ff_com_parprv" type="text" default="" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_PRIVATE_PARAMS" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_PRIVATE_PARAMS_DESC" />
+                    <field name="ff_com_parpub" type="text" default="" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_PUBLIC_PARAMS" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_PUBLIC_PARAMS_DESC" />
+                    <field name="ff_com_suffix" type="text" default="" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_CSS_CLASS_SUFFIX" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_CSS_CLASS_SUFFIX_DESC" />
+                </fieldset>
+            </fields>
+        </config>
+    </layout>
+    <!-- Joomla! 1.5 compatibility -->
+    <state>
+        <name>COM_BREEZINGFORMS_MENU_ITEM</name>
+        <description>COM_BREEZINGFORMS_SELECT_FORM_MESSAGE</description>
+        <params name="ff_com_params" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS">
+            <param name="ff_com_name" type="text" default="" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_FORM_NAME" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_ENTER_NAME_DESC" />
+            <param name="ff_com_page" type="text" default="1" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_PAGE_NUMBER" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_PAGE_NUMBER_DESC" />
+            <param name="ff_com_editable" type="radio" default="0" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_EDITABLE" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_EDITABLE_DESC">
+                <option value="0">No</option>
+                <option value="1">Yes</option>
+            </param>
+            <param name="ff_com_editable_override" type="radio" default="0" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_REMOVE_EXISTING" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_REMOVE_EXISTING_DESC">
+                <option value="0">No</option>
+                <option value="1">Yes</option>
+            </param>
+            <param name="ff_com_frame" type="radio" default="0" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_IFRAME" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_IFRAME_DESC">
+                <option value="0">No</option>
+                <option value="1">Yes</option>
+            </param>
+            <param name="ff_com_border" type="radio" default="0" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_BORDER" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_BORDER_DESC">
+                <option value="0">No</option>
+                <option value="1">Yes</option>
+            </param>
+            <param name="ff_com_align" type="list" default="1" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_HORIZONTAL_ALIGN" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_HORIZONTAL_ALIGN_DESC">
+                <option value="0">Left</option>
+                <option value="1">Center</option>
+                <option value="2">Right</option>
+                <option value="3">Position</option>
+            </param>
+            <param name="ff_com_left" type="text" default="0" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_LEFT_POSITION_PIXELS" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_LEFT_POSITION_PIXELS_DESC" />
+            <param name="ff_com_top" type="text" default="0" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_TOP_POSITION_PIXELS" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_TOP_POSITION_PIXELS_DESC" />
+            <param name="ff_com_parprv" type="text" default="" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_PRIVATE_PARAMS" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_PRIVATE_PARAMS_DESC" />
+            <param name="ff_com_parpub" type="text" default="" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_PUBLIC_PARAMS" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_PUBLIC_PARAMS_DESC" />
+            <param name="ff_com_suffix" type="text" default="" label="COM_BREEZINGFORMS_PARAMETER_SETTINGS_CSS_CLASS_SUFFIX" description="COM_BREEZINGFORMS_PARAMETER_SETTINGS_CSS_CLASS_SUFFIX_DESC" />
+        </params>
+    </state>
+</metadata>

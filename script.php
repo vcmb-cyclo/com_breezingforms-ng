@@ -684,7 +684,7 @@ class com_breezingformsInstallerScript
 
     private function copyComponentImageAssets(): void
     {
-        $sourceImages = JPATH_SITE . '/components/com_breezingforms/images';
+        $sourceImages = JPATH_SITE . '/media/com_breezingforms/images/site';
         $targetRoot = JPATH_SITE . '/images';
         $directories = ['icons', 'galerie/breezingforms'];
 

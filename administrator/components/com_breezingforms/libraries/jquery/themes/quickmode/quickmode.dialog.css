@@ -1,0 +1,100 @@
+/* This file skins dialog */
+
+.flora .ui-dialog,
+.flora.ui-dialog {
+	background-color: #e6f7d4 !important;
+}
+
+.flora .ui-dialog .ui-dialog-titlebar,
+.flora.ui-dialog .ui-dialog-titlebar {
+	border-bottom: 1px solid #d8d2aa !important;
+	background: #ff9900 url(i/dialog-title.gif) repeat-x !important;
+	padding: 0px !important;
+	height: 28px !important;
+	_height: 29px !important;
+}
+
+.flora .ui-draggable .ui-dialog-titlebar,
+.flora.ui-draggable .ui-dialog-titlebar {
+	cursor: move !important;
+}
+
+.flora .ui-draggable-disabled .ui-dialog-titlebar,
+.flora.ui-draggable-disabled .ui-dialog-titlebar {
+	cursor: default !important;
+}
+
+.flora .ui-dialog .ui-dialog-titlebar-close,
+.flora.ui-dialog .ui-dialog-titlebar-close {
+	width: 16px !important;
+	height: 16px !important;
+	background: url(i/dialog-titlebar-close.png) no-repeat !important;
+	position:absolute !important;
+	top: 6px !important;
+	right: 7px !important;
+	cursor: default !important;
+}
+
+.flora .ui-dialog .ui-dialog-titlebar-close span,
+.flora.ui-dialog .ui-dialog-titlebar-close span {
+	display: none !important;
+}
+
+.flora .ui-dialog .ui-dialog-titlebar-close-hover,
+.flora.ui-dialog .ui-dialog-titlebar-close-hover {
+	background: url(i/dialog-titlebar-close-hover.png) no-repeat !important;
+}
+
+.flora .ui-dialog .ui-dialog-title,
+.flora.ui-dialog .ui-dialog-title {
+	margin-left: 5px !important;
+	color: white !important;
+	font-weight: bold !important;
+	position: relative !important;
+	top: 7px !important;
+	left: 4px !important;
+}
+
+.flora .ui-dialog .ui-dialog-content,
+.flora.ui-dialog .ui-dialog-content {
+	margin: 1.2em !important;
+}
+
+.flora .ui-dialog .ui-dialog-buttonpane,
+.flora.ui-dialog .ui-dialog-buttonpane {
+	position: absolute !important;
+	bottom: 8px !important;
+	right: 12px !important;
+	width: 100% !important;
+	text-align: right !important;
+}
+
+.flora .ui-dialog .ui-dialog-buttonpane button,
+.flora.ui-dialog .ui-dialog-buttonpane button {
+	margin: 6px !important;
+}
+
+/* Dialog handle styles */
+.flora .ui-dialog .ui-resizable-n,
+.flora.ui-dialog .ui-resizable-n { cursor: n-resize !important; height: 6px !important; width: 100% !important; top: 0px !important; left: 0px !important; background: transparent url(i/dialog-n.gif) repeat scroll center top !important; }
+
+.flora .ui-dialog .ui-resizable-s,
+.flora.ui-dialog .ui-resizable-s { cursor: s-resize !important; height: 8px !important; width: 100% !important; bottom: 0px !important; left: 0px !important; background: transparent url(i/dialog-s.gif) repeat scroll center top !important; }
+
+.flora .ui-dialog .ui-resizable-e,
+.flora.ui-dialog .ui-resizable-e { cursor: e-resize !important; width: 7px !important; right: 0px !important; top: 0px !important; height: 100% !important; background: transparent url(i/dialog-e.gif) repeat scroll right center !important; }
+
+.flora .ui-dialog .ui-resizable-w,
+.flora.ui-dialog .ui-resizable-w { cursor: w-resize !important; width: 7px !important; left: 0px !important; top: 0px !important; height: 100% !important; background: transparent url(i/dialog-w.gif) repeat scroll right center !important; }
+
+.flora .ui-dialog .ui-resizable-se,
+.flora.ui-dialog .ui-resizable-se { cursor: se-resize !important; width: 9px !important; height: 9px !important; right: 0px !important; bottom: 0px !important; background: transparent url(i/dialog-se.gif) !important; }
+
+.flora .ui-dialog .ui-resizable-sw,
+.flora.ui-dialog .ui-resizable-sw { cursor: sw-resize !important; width: 9px !important; height: 9px !important; left: 0px !important; bottom: 0px !important; background: transparent url(i/dialog-sw.gif) !important; }
+
+.flora .ui-dialog .ui-resizable-nw,
+.flora.ui-dialog .ui-resizable-nw { cursor: nw-resize !important; width: 9px !important; height: 29px !important; left: 0px !important; top: 0px !important; background: transparent url(i/dialog-nw.gif) !important; }
+
+.flora .ui-dialog .ui-resizable-ne,
+.flora.ui-dialog .ui-resizable-ne { cursor: ne-resize !important; width: 9px !important; height: 29px !important; right: 0px !important; top: 0px !important; background: transparent url(i/dialog-ne.gif) !important; }

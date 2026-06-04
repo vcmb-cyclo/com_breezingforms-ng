@@ -30,7 +30,7 @@
 		<platform name="joomla" version="6.*" />
 	</targetplatform>
 
-	<files folder="components/com_breezingforms">
+	<files folder="components/com_breezingformsng">
 		<filename>index.html</filename>
 		<filename>breezingforms.php</filename>
 		<filename>facileforms.class.php</filename>
@@ -45,63 +45,63 @@
 		<folder>uploads</folder>
 	</files>
 
-	<languages folder="components/com_breezingforms">
-		<language tag="de-DE">languages/de-DE/de-DE.com_breezingforms.ini</language>
-		<language tag="en-GB">languages/en-GB/en-GB.com_breezingforms.ini</language>
-		<language tag="es-ES">languages/es-ES/es-ES.com_breezingforms.ini</language>
-		<language tag="fr-FR">languages/fr-FR/fr-FR.com_breezingforms.ini</language>
-		<language tag="hu-HU">languages/hu-HU/hu-HU.com_breezingforms.ini</language>
-		<language tag="nl-NL">languages/nl-NL/nl-NL.com_breezingforms.ini</language>
-		<language tag="tr-TR">languages/tr-TR/tr-TR.com_breezingforms.ini</language>
+	<languages folder="components/com_breezingformsng">
+		<language tag="de-DE">languages/de-DE/de-DE.com_breezingformsng.ini</language>
+		<language tag="en-GB">languages/en-GB/en-GB.com_breezingformsng.ini</language>
+		<language tag="es-ES">languages/es-ES/es-ES.com_breezingformsng.ini</language>
+		<language tag="fr-FR">languages/fr-FR/fr-FR.com_breezingformsng.ini</language>
+		<language tag="hu-HU">languages/hu-HU/hu-HU.com_breezingformsng.ini</language>
+		<language tag="nl-NL">languages/nl-NL/nl-NL.com_breezingformsng.ini</language>
+		<language tag="tr-TR">languages/tr-TR/tr-TR.com_breezingformsng.ini</language>
 	</languages>
 
 	<administration>
 		<menu>COM_BREEZINGFORMS</menu>
 
 		<submenu>
-			<menu option="com_breezingforms" act="managerecs" alt="BreezingForms/Manage Records">COM_BREEZINGFORMS_MANAGE_RECORDS</menu>
+			<menu option="com_breezingformsng" act="managerecs" alt="BreezingForms/Manage Records">COM_BREEZINGFORMS_MANAGE_RECORDS</menu>
 
-			<menu option="com_breezingforms" act="manageforms" alt="BreezingForms/Manage Forms">
+			<menu option="com_breezingformsng" act="manageforms" alt="BreezingForms/Manage Forms">
 				COM_BREEZINGFORMS_MANAGE_FORMS
 				<params>
-					<menu-quicktask>index.php?option=com_breezingforms&amp;act=manageforms&amp;task=quickmode</menu-quicktask>
+					<menu-quicktask>index.php?option=com_breezingformsng&amp;act=manageforms&amp;task=quickmode</menu-quicktask>
 					<menu-quicktask-title>COM_BREEZINGFORMS_MENUS_NEW_FORM</menu-quicktask-title>
 					<menu-quicktask-icon>plus</menu-quicktask-icon>
 				</params>
 			</menu>
 
-			<menu option="com_breezingforms" act="managescripts" alt="BreezingForms/Manage Scripts">
+			<menu option="com_breezingformsng" act="managescripts" alt="BreezingForms/Manage Scripts">
 				COM_BREEZINGFORMS_MANAGE_SCRIPTS
 				<params>
-					<menu-quicktask>index.php?option=com_breezingforms&amp;act=managescripts&amp;task=new</menu-quicktask>
+					<menu-quicktask>index.php?option=com_breezingformsng&amp;act=managescripts&amp;task=new</menu-quicktask>
 					<menu-quicktask-title>COM_BREEZINGFORMS_MENUS_NEW_SCRIPT</menu-quicktask-title>
 					<menu-quicktask-icon>plus</menu-quicktask-icon>
 				</params>
 			</menu>
 
-			<menu option="com_breezingforms" act="managepieces" alt="BreezingForms/Manage Pieces">
+			<menu option="com_breezingformsng" act="managepieces" alt="BreezingForms/Manage Pieces">
 				COM_BREEZINGFORMS_MANAGE_PIECES
 				<params>
-					<menu-quicktask>index.php?option=com_breezingforms&amp;act=managepieces&amp;task=new</menu-quicktask>
+					<menu-quicktask>index.php?option=com_breezingformsng&amp;act=managepieces&amp;task=new</menu-quicktask>
 					<menu-quicktask-title>COM_BREEZINGFORMS_MENUS_NEW_PIECE</menu-quicktask-title>
 					<menu-quicktask-icon>plus</menu-quicktask-icon>
 				</params>
 			</menu>
 
-			<menu option="com_breezingforms" act="integrate" alt="BreezingForms/Integrator">
+			<menu option="com_breezingformsng" act="integrate" alt="BreezingForms/Integrator">
 				COM_BREEZINGFORMS_INTEGRATOR
 				<params>
-					<menu-quicktask>index.php?option=com_breezingforms&amp;act=integrate&amp;task=add</menu-quicktask>
+					<menu-quicktask>index.php?option=com_breezingformsng&amp;act=integrate&amp;task=add</menu-quicktask>
 					<menu-quicktask-title>COM_BREEZINGFORMS_MENUS_NEW_INTEGRATION</menu-quicktask-title>
 					<menu-quicktask-icon>plus</menu-quicktask-icon>
 				</params>
 			</menu>
 
-			<menu option="com_breezingforms" act="configuration" alt="BreezingForms/Configuration">COM_BREEZINGFORMS_CONFIGURATION</menu>
-			<menu option="com_breezingforms" act="about" alt="BreezingForms/About">COM_BREEZINGFORMS_ABOUT</menu>
+			<menu option="com_breezingformsng" act="configuration" alt="BreezingForms/Configuration">COM_BREEZINGFORMS_CONFIGURATION</menu>
+			<menu option="com_breezingformsng" act="about" alt="BreezingForms/About">COM_BREEZINGFORMS_ABOUT</menu>
 		</submenu>
 
-		<files folder="administrator/components/com_breezingforms">
+		<files folder="administrator/components/com_breezingformsng">
 			<filename>index.html</filename>
 			<filename>access.xml</filename>
 			<filename>config.xml</filename>
@@ -124,32 +124,32 @@
 			<folder>plugins</folder>
 		</files>
 
-		<languages folder="administrator/components/com_breezingforms">
-			<language tag="de-DE">languages/de-DE/de-DE.com_breezingforms.ini</language>
-			<language tag="de-DE">languages/de-DE/de-DE.com_breezingforms.sys.ini</language>
+		<languages folder="administrator/components/com_breezingformsng">
+			<language tag="de-DE">languages/de-DE/de-DE.com_breezingformsng.ini</language>
+			<language tag="de-DE">languages/de-DE/de-DE.com_breezingformsng.sys.ini</language>
 
-			<language tag="en-GB">languages/en-GB/en-GB.com_breezingforms.ini</language>
-			<language tag="en-GB">languages/en-GB/en-GB.com_breezingforms.sys.ini</language>
+			<language tag="en-GB">languages/en-GB/en-GB.com_breezingformsng.ini</language>
+			<language tag="en-GB">languages/en-GB/en-GB.com_breezingformsng.sys.ini</language>
 
-			<language tag="es-ES">languages/es-ES/es-ES.com_breezingforms.ini</language>
-			<language tag="es-ES">languages/es-ES/es-ES.com_breezingforms.sys.ini</language>
+			<language tag="es-ES">languages/es-ES/es-ES.com_breezingformsng.ini</language>
+			<language tag="es-ES">languages/es-ES/es-ES.com_breezingformsng.sys.ini</language>
 
-			<language tag="fr-FR">languages/fr-FR/fr-FR.com_breezingforms.ini</language>
-			<language tag="fr-FR">languages/fr-FR/fr-FR.com_breezingforms.sys.ini</language>
+			<language tag="fr-FR">languages/fr-FR/fr-FR.com_breezingformsng.ini</language>
+			<language tag="fr-FR">languages/fr-FR/fr-FR.com_breezingformsng.sys.ini</language>
 
-			<language tag="hu-HU">languages/hu-HU/hu-HU.com_breezingforms.ini</language>
-			<language tag="hu-HU">languages/hu-HU/hu-HU.com_breezingforms.sys.ini</language>
+			<language tag="hu-HU">languages/hu-HU/hu-HU.com_breezingformsng.ini</language>
+			<language tag="hu-HU">languages/hu-HU/hu-HU.com_breezingformsng.sys.ini</language>
 
-			<language tag="nl-NL">languages/nl-NL/nl-NL.com_breezingforms.ini</language>
-			<language tag="nl-NL">languages/nl-NL/nl-NL.com_breezingforms.sys.ini</language>
+			<language tag="nl-NL">languages/nl-NL/nl-NL.com_breezingformsng.ini</language>
+			<language tag="nl-NL">languages/nl-NL/nl-NL.com_breezingformsng.sys.ini</language>
 
-			<language tag="tr-TR">languages/tr-TR/tr-TR.com_breezingforms.ini</language>
-			<language tag="tr-TR">languages/tr-TR/tr-TR.com_breezingforms.sys.ini</language>
+			<language tag="tr-TR">languages/tr-TR/tr-TR.com_breezingformsng.ini</language>
+			<language tag="tr-TR">languages/tr-TR/tr-TR.com_breezingformsng.sys.ini</language>
 		</languages>
 
 	</administration>
 
-	<media folder="media/com_breezingforms" destination="com_breezingforms">
+	<media folder="media/com_breezingformsng" destination="com_breezingformsng">
 		<folder>css</folder>
 		<folder>font-awesome</folder>
 		<folder>images</folder>

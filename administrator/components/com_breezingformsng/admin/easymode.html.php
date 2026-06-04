@@ -9,6 +9,7 @@
  **/
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Toolbar\ToolbarHelper;
@@ -134,10 +135,11 @@ class EasyModeHtml
 			-->
 		</style>
 
-		<link rel="stylesheet"
-			href="<?php echo Uri::root() . 'administrator/components/com_breezingformsng/libraries/jquery/themes/easymode/easymode.all.css'; ?>"
-			type="text/css" media="screen" title="Flora (Default)">
-		<?php require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/admin/easymode-js.php'); ?>
+		<?php
+		Factory::getApplication()->getDocument()->getWebAssetManager()
+		    ->useStyle('com_breezingformsng.easymode');
+		require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/admin/easymode-js.php');
+		?>
 
 		<div>
 			<?php echo ToolBarHelper::custom('save', 'save.png', 'save_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_EASYMODE_SAVE'), false); ?>

@@ -26,9 +26,8 @@ class HTML_facileFormsElement
 		$ff_mossite = Uri::base();
 		?>
 
+		<?php Factory::getApplication()->getDocument()->getWebAssetManager()->useScript('com_breezingformsng.overlib'); ?>
 		<div id="overDiv" style="position:absolute; visibility:hidden; z-index:10000;"></div>
-		<script type="text/javascript"
-			src="<?php echo $ff_mossite; ?>/components/com_breezingformsng/libraries/js/overlib_mini.js"></script>
 		<form action="index.php" method="post" name="adminForm" id="adminForm" class="adminForm">
 			<table cellpadding="4" cellspacing="1" border="0" class="adminform" style="width:300px;">
 				<tr>
@@ -291,7 +290,7 @@ class HTML_facileFormsElement
 				$hasValidation = true;
 		} // switch
 		?>
-		<script type="text/javascript" src="<?php echo $ff_admsite; ?>/admin/areautils.js"></script>
+		<?php Factory::getApplication()->getDocument()->getWebAssetManager()->useScript('com_breezingformsng.areautils'); ?>
 		<script type="text/javascript">
 				<!--
 				function checkIdentifier(value, name)
@@ -3676,8 +3675,7 @@ class HTML_facileFormsElement
 					<?php
 				} else {
 					?>
-					<script type="text/javascript"
-						src="<?php echo Uri::root() . 'administrator/components/com_breezingformsng/libraries/wz_dragdrop/wz_dragdrop.js' ?>"></script>
+					<?php Factory::getApplication()->getDocument()->getWebAssetManager()->useScript('com_breezingformsng.wz-dragdrop'); ?>
 					<!-- BEGIN OF SURFACE -->
 					<div id="SelectOptionDialog" style="background-color: #cccccc;position:absolute;top:233px;right:15px;z-index:100;">
 						<?php

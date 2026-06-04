@@ -1734,8 +1734,14 @@ class com_breezingformsngInstallerScript
             return;
         }
 
-        $columns = ['data1', 'data2', 'data3', 'data4', 'data5',
-                    'data6', 'data7', 'data8', 'data9', 'data10'];
+        $existingColumns = array_keys($db->getTableColumns($elementsTable, true));
+        $candidates = ['data1', 'data2', 'data3', 'data4', 'data5',
+                       'data6', 'data7', 'data8', 'data9', 'data10'];
+        $columns = array_intersect($candidates, $existingColumns);
+
+        if (empty($columns)) {
+            return;
+        }
 
         $totalUpdated = 0;
 

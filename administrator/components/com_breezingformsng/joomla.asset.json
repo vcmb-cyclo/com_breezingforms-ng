@@ -1,0 +1,225 @@
+{
+  "$schema": "https://developer.joomla.org/schemas/json-schema/web_assets.json",
+  "name": "com_breezingformsng",
+  "version": "6.0.8",
+  "description": "BreezingForms NG Web Assets",
+  "license": "GPL-2.0-or-later",
+  "assets": [
+
+    {
+      "name": "com_breezingformsng.jquery-alias",
+      "type": "script",
+      "uri": "administrator/components/com_breezingformsng/admin/jquery-alias.js",
+      "dependencies": ["jquery"],
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.jq-ui",
+      "type": "script",
+      "uri": "administrator/components/com_breezingformsng/libraries/jquery/jq-ui.min.js",
+      "dependencies": ["com_breezingformsng.jquery-alias"],
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.base64",
+      "type": "script",
+      "uri": "administrator/components/com_breezingformsng/libraries/jquery/plugins/base64.js",
+      "dependencies": ["com_breezingformsng.jquery-alias"],
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.json-plugin",
+      "type": "script",
+      "uri": "administrator/components/com_breezingformsng/libraries/jquery/plugins/json.js",
+      "dependencies": ["com_breezingformsng.jquery-alias"],
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.md5",
+      "type": "script",
+      "uri": "administrator/components/com_breezingformsng/libraries/jquery/plugins/md5.js",
+      "dependencies": ["com_breezingformsng.jquery-alias"],
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.jtree-lib",
+      "type": "script",
+      "uri": "administrator/components/com_breezingformsng/libraries/jquery/jtree/_lib.js",
+      "dependencies": ["com_breezingformsng.jquery-alias"],
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.jtree",
+      "type": "script",
+      "uri": "administrator/components/com_breezingformsng/libraries/jquery/jtree/tree_component.min.js",
+      "dependencies": ["com_breezingformsng.jtree-lib"],
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.center",
+      "type": "script",
+      "uri": "components/com_breezingformsng/libraries/jquery/center.js",
+      "dependencies": ["com_breezingformsng.jquery-alias"],
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.scroll",
+      "type": "script",
+      "uri": "administrator/components/com_breezingformsng/libraries/jquery/jquery.scroll.js",
+      "dependencies": ["com_breezingformsng.jquery-alias"],
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.areautils",
+      "type": "script",
+      "uri": "administrator/components/com_breezingformsng/admin/areautils.js",
+      "dependencies": ["com_breezingformsng.jquery-alias"],
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.overlib",
+      "type": "script",
+      "uri": "components/com_breezingformsng/libraries/js/overlib_mini.js",
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.wz-dragdrop",
+      "type": "script",
+      "uri": "administrator/components/com_breezingformsng/libraries/wz_dragdrop/wz_dragdrop.js",
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.jtable",
+      "type": "script",
+      "uri": "components/com_breezingformsng/libraries/jquery/jtable/jq.jtable.js",
+      "dependencies": ["com_breezingformsng.jq-ui"],
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.picker",
+      "type": "script",
+      "uri": "components/com_breezingformsng/libraries/jquery/pickadate/picker.js",
+      "dependencies": ["com_breezingformsng.jquery-alias"],
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.picker.date",
+      "type": "script",
+      "uri": "components/com_breezingformsng/libraries/jquery/pickadate/picker.date.js",
+      "dependencies": ["com_breezingformsng.picker"],
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.picker.time",
+      "type": "script",
+      "uri": "components/com_breezingformsng/libraries/jquery/pickadate/picker.time.js",
+      "dependencies": ["com_breezingformsng.picker"],
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.facileforms",
+      "type": "script",
+      "uri": "media/com_breezingformsng/js/facileforms.js",
+      "dependencies": ["com_breezingformsng.jquery-alias"],
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.custom-js",
+      "type": "script",
+      "uri": "media/com_breezingformsng/js/custom.js",
+      "dependencies": ["com_breezingformsng.jquery-alias"],
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.admin-style",
+      "type": "style",
+      "uri": "administrator/components/com_breezingformsng/admin/style.css",
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.easymode",
+      "type": "style",
+      "uri": "administrator/components/com_breezingformsng/libraries/jquery/themes/easymode/easymode.all.css",
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.quickmode-style",
+      "type": "style",
+      "uri": "administrator/components/com_breezingformsng/libraries/jquery/themes/quickmode/quickmode.all.css",
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.jtree-style",
+      "type": "style",
+      "uri": "administrator/components/com_breezingformsng/libraries/jquery/jtree/tree_component.css",
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.jq-ui-css",
+      "type": "style",
+      "uri": "components/com_breezingformsng/libraries/jquery/jtable/themes/metro/jq.ui.css",
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.jtable-style",
+      "type": "style",
+      "uri": "components/com_breezingformsng/libraries/jquery/jtable/themes/metro/blue/jtable.css",
+      "dependencies": ["com_breezingformsng.jq-ui-css"],
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.picker-style",
+      "type": "style",
+      "uri": "components/com_breezingformsng/libraries/jquery/pickadate/themes/default.css",
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.picker.date-style",
+      "type": "style",
+      "uri": "components/com_breezingformsng/libraries/jquery/pickadate/themes/default.date.css",
+      "dependencies": ["com_breezingformsng.picker-style"],
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.picker.time-style",
+      "type": "style",
+      "uri": "components/com_breezingformsng/libraries/jquery/pickadate/themes/default.time.css",
+      "dependencies": ["com_breezingformsng.picker-style"],
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.custom-style",
+      "type": "style",
+      "uri": "media/com_breezingformsng/css/custom.css",
+      "version": "auto"
+    }
+
+  ]
+}

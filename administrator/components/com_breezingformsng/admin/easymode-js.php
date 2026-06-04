@@ -10,31 +10,20 @@
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 
-use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Uri\Uri;
 
 HTMLHelper::_('bootstrap.modal');
 
+$wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+$wa->useScript('com_breezingformsng.jquery-alias');
+$wa->useScript('com_breezingformsng.jq-ui');
+$wa->useScript('com_breezingformsng.base64');
+$wa->useScript('com_breezingformsng.json-plugin');
+$wa->useScript('com_breezingformsng.md5');
 
 ?>
-
-<script>var moobackup = $;</script>
-<script>var moobackup2 = $$;</script>
-
-<script type="text/javascript"
-	src="<?php echo Uri::root() . 'administrator/components/com_breezingformsng/libraries/jquery/'; ?>jq.js"></script>
-<script type="text/javascript"
-	src="<?php echo Uri::root() . 'administrator/components/com_breezingformsng/libraries/jquery/'; ?>jq-ui.min.js"></script>
-<script type="text/javascript"
-	src="<?php echo Uri::root() . 'administrator/components/com_breezingformsng/libraries/jquery/plugins/bas'; ?>e64.js"></script>
-<script type="text/javascript"
-	src="<?php echo Uri::root() . 'administrator/components/com_breezingformsng/libraries/jquery/plugins/'; ?>json.js"></script>
-<script type="text/javascript"
-	src="<?php echo Uri::root() . 'administrator/components/com_breezingformsng/libraries/jquery/plugins/'; ?>md5.js"></script>
-
-<script>$ = moobackup;</script>
-<script>$$ = moobackup2;</script>
-
 <script type="text/javascript">
 	var app = null;
 

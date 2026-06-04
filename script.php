@@ -17,6 +17,7 @@ use Joomla\CMS\Installer\Installer;
 use Joomla\CMS\Language\Text;
 use Joomla\Filesystem\Folder;
 use Joomla\CMS\Log\Log;
+use Joomla\CMS\Table\Menu;
 
 if (!function_exists('_ff_query')) {
     function _ff_query($sql, $insert = 0)
@@ -441,7 +442,7 @@ class com_breezingformsngInstallerScript
 
         if (!empty($createdScripts)) {
             $parts[] = Text::sprintf(
-                'COM_BREEZINGFORMS_INSTALL_STANDARD_LIBRARY_CREATED_SCRIPTS',
+                'COM_BREEZINGFORMSNG_INSTALL_STANDARD_LIBRARY_CREATED_SCRIPTS',
                 count($createdScripts),
                 implode(', ', $createdScripts)
             );
@@ -449,7 +450,7 @@ class com_breezingformsngInstallerScript
 
         if (!empty($createdPieces)) {
             $parts[] = Text::sprintf(
-                'COM_BREEZINGFORMS_INSTALL_STANDARD_LIBRARY_CREATED_PIECES',
+                'COM_BREEZINGFORMSNG_INSTALL_STANDARD_LIBRARY_CREATED_PIECES',
                 count($createdPieces),
                 implode(', ', $createdPieces)
             );
@@ -457,7 +458,7 @@ class com_breezingformsngInstallerScript
 
         if (!empty($updatedScripts)) {
             $parts[] = Text::sprintf(
-                'COM_BREEZINGFORMS_INSTALL_STANDARD_LIBRARY_UPDATED_SCRIPTS',
+                'COM_BREEZINGFORMSNG_INSTALL_STANDARD_LIBRARY_UPDATED_SCRIPTS',
                 count($updatedScripts),
                 implode(', ', $updatedScripts)
             );
@@ -465,7 +466,7 @@ class com_breezingformsngInstallerScript
 
         if (!empty($updatedPieces)) {
             $parts[] = Text::sprintf(
-                'COM_BREEZINGFORMS_INSTALL_STANDARD_LIBRARY_UPDATED_PIECES',
+                'COM_BREEZINGFORMSNG_INSTALL_STANDARD_LIBRARY_UPDATED_PIECES',
                 count($updatedPieces),
                 implode(', ', $updatedPieces)
             );
@@ -473,7 +474,7 @@ class com_breezingformsngInstallerScript
 
         $this->announce(
             Text::sprintf(
-                'COM_BREEZINGFORMS_INSTALL_STANDARD_LIBRARY_CHANGES',
+                'COM_BREEZINGFORMSNG_INSTALL_STANDARD_LIBRARY_CHANGES',
                 implode(' | ', $parts)
             ),
             'warning',
@@ -525,12 +526,22 @@ class com_breezingformsngInstallerScript
         $line = "[{$timestamp}] [] {$message}" . PHP_EOL;
 
         file_put_contents($logPath, $line, FILE_APPEND | LOCK_EX);
+
+        try {
+            $type = match ($priority) {
+                Log::ERROR => 'error',
+                Log::WARNING => 'warning',
+                default => 'message',
+            };
+
+            Factory::getApplication()->enqueueMessage($this->formatInstallMessageForDisplay($message), $type);
+        } catch (\Throwable) {
+        }
     }
 
     private function announce(string $message, string $type = 'message', int $priority = Log::INFO): void
     {
         $this->log($message, $priority);
-        Factory::getApplication()->enqueueMessage($this->formatInstallMessageForDisplay($this->prefixMessage($message, $priority)), $type);
     }
 
     private function prefixMessage(string $message, int $priority = Log::INFO): string
@@ -853,6 +864,11 @@ class com_breezingformsngInstallerScript
                         . ')'
                     );
 
+                if ($legacyElement === 'com_breezingforms') {
+                    $query->where($db->quoteName('link') . ' NOT LIKE ' . $db->quote('%option=' . $targetElement . '%'));
+                    $query->where($db->quoteName('params') . ' NOT LIKE ' . $db->quote('%"option":"' . $targetElement . '"%'));
+                }
+
                 $db->setQuery($query);
                 $db->execute();
 
@@ -880,6 +896,80 @@ class com_breezingformsngInstallerScript
 
             $this->normalizeComponentAssetName($legacyElement, $targetElement);
         }
+
+        $this->normalizeJoomlaMenuIdentity($targetId);
+    }
+
+    private function normalizeJoomlaMenuIdentity(int $targetId): void
+    {
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $oldTitleBase = 'COM_' . 'BREEZINGFORMS';
+        $newTitleBase = 'COM_BREEZINGFORMSNG';
+        $oldAliasBase = 'com-breezingforms';
+        $newAliasBase = 'com-breezingformsng';
+
+        try {
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->select($db->quoteName(['id', 'title', 'alias', 'path', 'link', 'params']))
+                    ->from($db->quoteName('#__menu'))
+                    ->where($db->quoteName('client_id') . ' = 1')
+                    ->where(
+                        '('
+                        . $db->quoteName('title') . ' LIKE ' . $db->quote($oldTitleBase . '%')
+                        . ' OR ' . $db->quoteName('alias') . ' LIKE ' . $db->quote('%' . $oldAliasBase . '%')
+                        . ' OR ' . $db->quoteName('path') . ' LIKE ' . $db->quote('%' . $oldAliasBase . '%')
+                        . ' OR ' . $db->quoteName('link') . ' LIKE ' . $db->quote('%option=breezingforms%')
+                        . ' OR ' . $db->quoteName('link') . ' LIKE ' . $db->quote('%option=com_breezingforms%')
+                        . ' OR ' . $db->quoteName('link') . ' LIKE ' . $db->quote('%option=' . self::TARGET_COMPONENT . '%')
+                        . ')'
+                    )
+            );
+
+            $rows = $db->loadObjectList() ?: [];
+            $updated = 0;
+
+            foreach ($rows as $row) {
+                $title = (string) ($row->title ?? '');
+                $alias = (string) ($row->alias ?? '');
+                $path = (string) ($row->path ?? '');
+                $link = (string) ($row->link ?? '');
+                $params = (string) ($row->params ?? '');
+
+                if ($title === $oldTitleBase) {
+                    $title = $newTitleBase;
+                } elseif (str_starts_with($title, $oldTitleBase . '_')) {
+                    $title = $newTitleBase . substr($title, strlen($oldTitleBase));
+                }
+
+                $alias = preg_replace('/com-breezingforms(?:ng)*/', $newAliasBase, $alias) ?? $alias;
+                $path = preg_replace('/com-breezingforms(?:ng)*/', $newAliasBase, $path) ?? $path;
+                $link = preg_replace('/option=com_breezingforms(?:ng)*/', 'option=' . self::TARGET_COMPONENT, $link) ?? $link;
+                $link = str_replace('option=breezingforms', 'option=' . self::TARGET_COMPONENT, $link);
+                $params = preg_replace('/"option":"com_breezingforms(?:ng)*"/', '"option":"' . self::TARGET_COMPONENT . '"', $params) ?? $params;
+                $params = str_replace('"option":"breezingforms"', '"option":"' . self::TARGET_COMPONENT . '"', $params);
+
+                $db->setQuery(
+                    $db->getQuery(true)
+                        ->update($db->quoteName('#__menu'))
+                        ->set($db->quoteName('component_id') . ' = ' . (int) $targetId)
+                        ->set($db->quoteName('title') . ' = ' . $db->quote($title))
+                        ->set($db->quoteName('alias') . ' = ' . $db->quote($alias))
+                        ->set($db->quoteName('path') . ' = ' . $db->quote($path))
+                        ->set($db->quoteName('link') . ' = ' . $db->quote($link))
+                        ->set($db->quoteName('params') . ' = ' . $db->quote($params))
+                        ->where($db->quoteName('id') . ' = ' . (int) $row->id)
+                );
+                $db->execute();
+                $updated += (int) $db->getAffectedRows();
+            }
+
+            if ($updated > 0) {
+                $this->log("Normalized {$updated} Joomla administration menu identity row(s) for " . self::TARGET_COMPONENT . '.');
+            }
+        } catch (\Throwable $e) {
+            $this->log('Unable to normalize Joomla administration menu identity: ' . $e->getMessage(), Log::WARNING);
+        }
     }
 
     private function normalizeComponentAssetName(string $legacyElement, string $targetElement): void
@@ -903,7 +993,7 @@ class com_breezingformsngInstallerScript
                 $db->getQuery(true)
                     ->update($db->quoteName('#__assets'))
                     ->set($db->quoteName('name') . ' = ' . $db->quote($targetElement))
-                    ->set($db->quoteName('title') . ' = ' . $db->quote('COM_BREEZINGFORMS'))
+                    ->set($db->quoteName('title') . ' = ' . $db->quote('COM_BREEZINGFORMSNG'))
                     ->where($db->quoteName('name') . ' = ' . $db->quote($legacyElement))
             );
             $db->execute();
@@ -913,6 +1003,373 @@ class com_breezingformsngInstallerScript
             }
         } catch (\Throwable $e) {
             $this->log("Unable to normalize Joomla asset {$legacyElement}: " . $e->getMessage(), Log::WARNING);
+        }
+    }
+
+    private function resolveMenuAlias(int $parentId, string $preferredAlias): string
+    {
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $alias = $preferredAlias;
+        $suffix = 2;
+
+        while (true) {
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->select('COUNT(*)')
+                    ->from($db->quoteName('#__menu'))
+                    ->where($db->quoteName('client_id') . ' = 1')
+                    ->where($db->quoteName('parent_id') . ' = ' . (int) $parentId)
+                    ->where($db->quoteName('alias') . ' = ' . $db->quote($alias))
+            );
+
+            if ((int) $db->loadResult() === 0) {
+                return $alias;
+            }
+
+            $alias = $preferredAlias . '-' . $suffix;
+            $suffix++;
+        }
+    }
+
+    private function ensureAdministrationMainMenuEntry(): void
+    {
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $componentId = $this->getComponentExtensionId(self::TARGET_COMPONENT);
+
+        if ($componentId <= 0) {
+            $this->log('Cannot ensure BFNG admin menu entry: component row is missing.', Log::WARNING);
+            return;
+        }
+
+        try {
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->select($db->quoteName(['id', 'alias', 'path']))
+                    ->from($db->quoteName('#__menu'))
+                    ->where($db->quoteName('client_id') . ' = 1')
+                    ->where($db->quoteName('parent_id') . ' = 1')
+                    ->where($db->quoteName('type') . ' = ' . $db->quote('component'))
+                    ->where(
+                        '('
+                        . $db->quoteName('component_id') . ' = ' . (int) $componentId
+                        . ' OR ' . $db->quoteName('link') . ' LIKE ' . $db->quote('index.php?option=' . self::TARGET_COMPONENT . '%')
+                        . ')'
+                    )
+                    ->order($db->quoteName('id') . ' ASC')
+            );
+            $mainRows = $db->loadAssocList() ?: [];
+
+            if ($mainRows !== []) {
+                $mainId = (int) $mainRows[0]['id'];
+                $alias = trim((string) ($mainRows[0]['alias'] ?? ''));
+                $path = trim((string) ($mainRows[0]['path'] ?? ''));
+
+                if ($alias === '') {
+                    $alias = $this->resolveMenuAlias(1, 'breezingformsng');
+                }
+
+                if ($path === '') {
+                    $path = $alias;
+                }
+
+                $db->setQuery(
+                    $db->getQuery(true)
+                        ->update($db->quoteName('#__menu'))
+                        ->set($db->quoteName('title') . ' = ' . $db->quote('COM_BREEZINGFORMSNG'))
+                        ->set($db->quoteName('alias') . ' = ' . $db->quote($alias))
+                        ->set($db->quoteName('path') . ' = ' . $db->quote($path))
+                        ->set($db->quoteName('link') . ' = ' . $db->quote('index.php?option=' . self::TARGET_COMPONENT))
+                        ->set($db->quoteName('type') . ' = ' . $db->quote('component'))
+                        ->set($db->quoteName('published') . ' = 1')
+                        ->set($db->quoteName('component_id') . ' = ' . (int) $componentId)
+                        ->set($db->quoteName('client_id') . ' = 1')
+                        ->where($db->quoteName('id') . ' = ' . (int) $mainId)
+                );
+                $db->execute();
+                $this->log('BFNG administration component menu entry checked and updated.');
+                return;
+            }
+
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->select($db->quoteName(['id', 'rgt']))
+                    ->from($db->quoteName('#__menu'))
+                    ->where($db->quoteName('id') . ' = 1')
+            );
+            $root = $db->loadAssoc() ?: [];
+            $rootId = (int) ($root['id'] ?? 1);
+            $rootRgt = (int) ($root['rgt'] ?? 0);
+
+            if ($rootRgt <= 0) {
+                $this->log('Cannot recreate BFNG admin menu entry: invalid root menu boundary.', Log::WARNING);
+                return;
+            }
+
+            $alias = $this->resolveMenuAlias($rootId, 'breezingformsng');
+
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->update($db->quoteName('#__menu'))
+                    ->set($db->quoteName('rgt') . ' = ' . $db->quoteName('rgt') . ' + 2')
+                    ->where($db->quoteName('rgt') . ' >= ' . (int) $rootRgt)
+            );
+            $db->execute();
+
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->update($db->quoteName('#__menu'))
+                    ->set($db->quoteName('lft') . ' = ' . $db->quoteName('lft') . ' + 2')
+                    ->where($db->quoteName('lft') . ' > ' . (int) $rootRgt)
+            );
+            $db->execute();
+
+            $columns = [
+                'menutype',
+                'title',
+                'alias',
+                'note',
+                'path',
+                'link',
+                'type',
+                'published',
+                'parent_id',
+                'level',
+                'component_id',
+                'checked_out',
+                'checked_out_time',
+                'browserNav',
+                'access',
+                'img',
+                'template_style_id',
+                'params',
+                'lft',
+                'rgt',
+                'home',
+                'language',
+                'client_id',
+            ];
+
+            $values = [
+                $db->quote('main'),
+                $db->quote('COM_BREEZINGFORMSNG'),
+                $db->quote($alias),
+                $db->quote(''),
+                $db->quote($alias),
+                $db->quote('index.php?option=' . self::TARGET_COMPONENT),
+                $db->quote('component'),
+                1,
+                $rootId,
+                1,
+                $componentId,
+                0,
+                'NULL',
+                0,
+                1,
+                $db->quote('class:component'),
+                0,
+                $db->quote(''),
+                $rootRgt,
+                $rootRgt + 1,
+                0,
+                $db->quote('*'),
+                1,
+            ];
+
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->insert($db->quoteName('#__menu'))
+                    ->columns($db->quoteName($columns))
+                    ->values(implode(', ', $values))
+            );
+            $db->execute();
+
+            $this->log('BFNG administration component menu entry recreated.');
+        } catch (\Throwable $e) {
+            $this->log('Unable to ensure BFNG administration menu entry: ' . $e->getMessage(), Log::WARNING);
+        }
+    }
+
+    private function ensureAdministrationSubmenuEntries(): void
+    {
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $componentId = $this->getComponentExtensionId(self::TARGET_COMPONENT);
+
+        if ($componentId <= 0) {
+            $this->log('Cannot ensure BFNG admin submenu entries: component row is missing.', Log::WARNING);
+            return;
+        }
+
+        try {
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->select($db->quoteName(['id', 'alias', 'path']))
+                    ->from($db->quoteName('#__menu'))
+                    ->where($db->quoteName('client_id') . ' = 1')
+                    ->where($db->quoteName('parent_id') . ' = 1')
+                    ->where($db->quoteName('link') . ' = ' . $db->quote('index.php?option=' . self::TARGET_COMPONENT))
+                    ->where($db->quoteName('type') . ' = ' . $db->quote('component'))
+                    ->order($db->quoteName('id') . ' ASC')
+            );
+            $parent = $db->loadAssoc() ?: [];
+            $parentId = (int) ($parent['id'] ?? 0);
+
+            if ($parentId <= 0) {
+                $this->log('Cannot ensure BFNG admin submenu entries: parent menu entry is missing.', Log::WARNING);
+                return;
+            }
+
+            $parentPath = trim((string) ($parent['path'] ?? ''));
+
+            if ($parentPath === '') {
+                $parentPath = trim((string) ($parent['alias'] ?? 'breezingformsng'));
+            }
+
+            $items = [
+                ['COM_BREEZINGFORMSNG_MANAGE_RECORDS', 'breezingformsng-records', 'managerecs', []],
+                [
+                    'COM_BREEZINGFORMSNG_MANAGE_FORMS',
+                    'breezingformsng-forms',
+                    'manageforms',
+                    [
+                        'menu-quicktask' => 'index.php?option=' . self::TARGET_COMPONENT . '&act=manageforms&task=quickmode',
+                        'menu-quicktask-title' => 'COM_BREEZINGFORMSNG_MENUS_NEW_FORM',
+                        'menu-quicktask-icon' => 'plus',
+                    ],
+                ],
+                [
+                    'COM_BREEZINGFORMSNG_MANAGE_SCRIPTS',
+                    'breezingformsng-scripts',
+                    'managescripts',
+                    [
+                        'menu-quicktask' => 'index.php?option=' . self::TARGET_COMPONENT . '&act=managescripts&task=new',
+                        'menu-quicktask-title' => 'COM_BREEZINGFORMSNG_MENUS_NEW_SCRIPT',
+                        'menu-quicktask-icon' => 'plus',
+                    ],
+                ],
+                [
+                    'COM_BREEZINGFORMSNG_MANAGE_PIECES',
+                    'breezingformsng-pieces',
+                    'managepieces',
+                    [
+                        'menu-quicktask' => 'index.php?option=' . self::TARGET_COMPONENT . '&act=managepieces&task=new',
+                        'menu-quicktask-title' => 'COM_BREEZINGFORMSNG_MENUS_NEW_PIECE',
+                        'menu-quicktask-icon' => 'plus',
+                    ],
+                ],
+                [
+                    'COM_BREEZINGFORMSNG_INTEGRATOR',
+                    'breezingformsng-integrator',
+                    'integrate',
+                    [
+                        'menu-quicktask' => 'index.php?option=' . self::TARGET_COMPONENT . '&act=integrate&task=add',
+                        'menu-quicktask-title' => 'COM_BREEZINGFORMSNG_MENUS_NEW_INTEGRATION',
+                        'menu-quicktask-icon' => 'plus',
+                    ],
+                ],
+                ['COM_BREEZINGFORMSNG_CONFIGURATION', 'breezingformsng-configuration', 'configuration', []],
+                ['COM_BREEZINGFORMSNG_ABOUT', 'breezingformsng-about', 'about', []],
+            ];
+
+            $checked = 0;
+
+            foreach ($items as [$title, $alias, $act, $params]) {
+                $link = 'index.php?option=' . self::TARGET_COMPONENT . '&act=' . $act;
+
+                $db->setQuery(
+                    $db->getQuery(true)
+                        ->select($db->quoteName('id'))
+                        ->from($db->quoteName('#__menu'))
+                        ->where($db->quoteName('client_id') . ' = 1')
+                        ->where(
+                            '('
+                            . $db->quoteName('link') . ' = ' . $db->quote($link)
+                            . ' OR ' . $db->quoteName('title') . ' = ' . $db->quote($title)
+                            . ')'
+                        )
+                        ->order($db->quoteName('id') . ' ASC')
+                );
+                $menuId = (int) $db->loadResult();
+
+                $menu = new Menu($db);
+
+                if ($menuId > 0) {
+                    $menu->load($menuId);
+                }
+
+                $menu->setLocation($parentId, 'last-child');
+
+                $data = [
+                    'menutype' => 'main',
+                    'title' => $title,
+                    'alias' => $alias,
+                    'note' => '',
+                    'path' => $parentPath . '/' . $alias,
+                    'link' => $link,
+                    'type' => 'component',
+                    'published' => 1,
+                    'parent_id' => $parentId,
+                    'level' => 2,
+                    'component_id' => $componentId,
+                    'checked_out' => 0,
+                    'checked_out_time' => null,
+                    'browserNav' => 0,
+                    'access' => 1,
+                    'img' => 'class:component',
+                    'template_style_id' => 0,
+                    'params' => $params,
+                    'home' => 0,
+                    'language' => '*',
+                    'client_id' => 1,
+                ];
+
+                if (!$menu->bind($data) || !$menu->check() || !$menu->store()) {
+                    $this->log('Unable to ensure BFNG admin submenu entry ' . $title . ': ' . $menu->getError(), Log::WARNING);
+                    continue;
+                }
+
+                $checked++;
+            }
+
+            $this->log('BFNG administration submenu entries checked: ' . $checked . ' item(s).');
+        } catch (\Throwable $e) {
+            $this->log('Unable to ensure BFNG administration submenu entries: ' . $e->getMessage(), Log::WARNING);
+        }
+    }
+
+    private function migrateLegacyBreezingFormsName(): void
+    {
+        if ($this->getComponentExtensionId(self::TARGET_COMPONENT) > 0) {
+            $this->normalizeJoomlaComponentReferences();
+            return;
+        }
+
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+
+        foreach (['com_breezingforms', 'breezingforms'] as $legacyElement) {
+            $legacyId = $this->getComponentExtensionId($legacyElement);
+
+            if ($legacyId <= 0) {
+                continue;
+            }
+
+            try {
+                $db->setQuery(
+                    $db->getQuery(true)
+                        ->update($db->quoteName('#__extensions'))
+                        ->set($db->quoteName('element') . ' = ' . $db->quote(self::TARGET_COMPONENT))
+                        ->set($db->quoteName('name') . ' = ' . $db->quote(self::TARGET_COMPONENT))
+                        ->where($db->quoteName('extension_id') . ' = ' . (int) $legacyId)
+                );
+                $db->execute();
+                $this->log("Migrated legacy BreezingForms extension row from {$legacyElement} to " . self::TARGET_COMPONENT . '.');
+            } catch (\Throwable $e) {
+                $this->log("Unable to migrate legacy BreezingForms extension row {$legacyElement}: " . $e->getMessage(), Log::WARNING);
+                continue;
+            }
+
+            $this->normalizeComponentAssetName($legacyElement, self::TARGET_COMPONENT);
+            $this->normalizeJoomlaComponentReferences();
+            return;
         }
     }
 
@@ -1073,11 +1530,37 @@ class com_breezingformsngInstallerScript
         }
     }
 
+    private function removeLegacyBreezingFormsComponentDirectories(): void
+    {
+        $directories = [
+            JPATH_ADMINISTRATOR . '/components/com_breezingforms',
+            JPATH_SITE . '/components/com_breezingforms',
+            JPATH_SITE . '/media/com_breezingforms',
+        ];
+
+        foreach ($directories as $directory) {
+            if (!Folder::exists($directory)) {
+                continue;
+            }
+
+            try {
+                if (Folder::delete($directory)) {
+                    $this->log('Removed legacy BreezingForms directory: ' . $directory);
+                }
+            } catch (\Throwable $e) {
+                $this->log('Unable to remove legacy BreezingForms directory ' . $directory . ': ' . $e->getMessage(), Log::WARNING);
+            }
+        }
+    }
+
     private function cleanupLegacyBreezingFormsAfterInstall(): void
     {
         $this->normalizeJoomlaComponentReferences();
+        $this->ensureAdministrationMainMenuEntry();
+        $this->ensureAdministrationSubmenuEntries();
         $this->deduplicateBreezingFormsComponentRows();
         $this->removeLegacyBreezingFormsComponentRows();
+        $this->removeLegacyBreezingFormsComponentDirectories();
         $this->log('Legacy BreezingForms component cleanup completed in safe mode; uninstall hooks intentionally skipped.');
     }
 
@@ -1279,7 +1762,13 @@ class com_breezingformsngInstallerScript
 
     public function preflight(string $type, $parent): void
     {
+        $type = strtolower((string) $type);
         $this->incomingPackageVersion = $this->getIncomingVersion($parent);
+
+        if (in_array($type, ['install', 'update', 'discover_install'], true)) {
+            $this->migrateLegacyBreezingFormsName();
+        }
+
         $this->currentInstalledVersion = $this->getCurrentInstalledVersion();
 
         $this->announce(

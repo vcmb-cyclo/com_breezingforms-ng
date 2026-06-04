@@ -33,7 +33,7 @@ class HTML_facileFormsElement
 			<table cellpadding="4" cellspacing="1" border="0" class="adminform" style="width:300px;">
 				<tr>
 					<th colspan="5" class="title">BreezingForms -
-						<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_NEWTYPE'); ?>
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_NEWTYPE'); ?>
 					</th>
 				</tr>
 				<tr>
@@ -41,62 +41,62 @@ class HTML_facileFormsElement
 					<td valign="top">
 						<fieldset>
 							<legend><strong>
-									<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_STATICS'); ?>
+									<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_STATICS'); ?>
 								</strong></legend>
 							<table cellpadding="4" cellspacing="1" border="0" class="adminform">
 								<tr>
 									<td nowrap><input type="radio" id="newtype1" name="newtype" value='Static Text/HTML'
 											checked="checked" /><label for="newtype1">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_STATICTEXT'); ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_STATICTEXT'); ?>
 										</label></td>
 								</tr>
 								<tr>
 									<td nowrap><input type="radio" id="newtype2" name="newtype" value='Rectangle' /><label
 											for="newtype2">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_RECTANGLE'); ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_RECTANGLE'); ?>
 										</label></td>
 								</tr>
 								<tr>
 									<td nowrap><input type="radio" id="newtype3" name="newtype" value='Image' /><label
 											for="newtype3">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_IMAGE'); ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_IMAGE'); ?>
 										</label></td>
 								</tr>
 								<tr>
 									<td nowrap><input type="radio" id="newtype4" name="newtype" value='Tooltip' /><label
 											for="newtype4">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TOOLTIP'); ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TOOLTIP'); ?>
 										</label></td>
 								</tr>
 								<tr>
 									<td nowrap><input type="radio" id="newtype5" name="newtype" value='Captcha' /><label
 											for="newtype4">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CAPTCHA'); ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CAPTCHA'); ?>
 										</label></td>
 								</tr>
 							</table>
 						</fieldset>
 						<fieldset>
 							<legend><strong>
-									<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_BUTTONS'); ?>
+									<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_BUTTONS'); ?>
 								</strong></legend>
 							<table cellpadding="4" cellspacing="1" border="0" class="adminform">
 								<tr>
 									<td nowrap><input type="radio" id="newtype10" name="newtype" value='Regular Button' /><label
 											for="newtype10">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_REGBUTTON'); ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_REGBUTTON'); ?>
 										</label></td>
 								</tr>
 								<tr>
 									<td nowrap><input type="radio" id="newtype11" name="newtype" value='Graphic Button' /><label
 											for="newtype11">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_GRAPHBUTTON'); ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_GRAPHBUTTON'); ?>
 										</label></td>
 								</tr>
 								<tr>
 									<td nowrap><input type="radio" id="newtype12" name="newtype" value='Icon' /><label
 											for="newtype12">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_ICON'); ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ICON'); ?>
 										</label></td>
 								</tr>
 							</table>
@@ -105,55 +105,55 @@ class HTML_facileFormsElement
 					<td valign="top">
 						<fieldset>
 							<legend><strong>
-									<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_INPUTS'); ?>
+									<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_INPUTS'); ?>
 								</strong></legend>
 							<table cellpadding="4" cellspacing="1" border="0" class="adminform">
 								<tr>
 									<td nowrap><input type="radio" id="newtype20" name="newtype" value='Checkbox' /><label
 											for="newtype20">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CHECKBOX'); ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CHECKBOX'); ?>
 										</label></td>
 								</tr>
 								<tr>
 									<td nowrap><input type="radio" id="newtype21" name="newtype" value='Radio Button' /><label
 											for="newtype21">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_RADIO'); ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_RADIO'); ?>
 										</label></td>
 								</tr>
 								<tr>
 									<td nowrap><input type="radio" id="newtype22" name="newtype" value='Text' /><label
 											for="newtype22">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TEXT'); ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TEXT'); ?>
 										</label></td>
 								</tr>
 								<tr>
 									<td nowrap><input type="radio" id="newtype23" name="newtype" value='Textarea' /><label
 											for="newtype23">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TEXTAREA'); ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TEXTAREA'); ?>
 										</label></td>
 								</tr>
 								<tr>
 									<td nowrap><input type="radio" id="newtype24" name="newtype" value='Select List' /><label
 											for="newtype24">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_SELECT'); ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SELECT'); ?>
 										</label></td>
 								</tr>
 								<tr>
 									<td nowrap><input type="radio" id="newtype25" name="newtype" value='Query List' /><label
 											for="newtype25">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_QUERYLIST'); ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_QUERYLIST'); ?>
 										</label></td>
 								</tr>
 								<tr>
 									<td nowrap><input type="radio" id="newtype26" name="newtype" value='File Upload' /><label
 											for="newtype26">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_UPLOAD'); ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_UPLOAD'); ?>
 										</label></td>
 								</tr>
 								<tr>
 									<td nowrap><input type="radio" id="newtype27" name="newtype" value='Hidden Input' /><label
 											for="newtype27">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_HIDDEN'); ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_HIDDEN'); ?>
 										</label></td>
 								</tr>
 							</table>
@@ -165,10 +165,10 @@ class HTML_facileFormsElement
 					<td></td>
 					<td nowrap colspan="3" style="text-align:right">
 						<input class="btn btn-primary" onclick="submitbutton('newedit');" type="submit"
-							value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMS_TOOLBAR_CONTINUE'), ENT_QUOTES, 'UTF-8'); ?>" />
+							value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_CONTINUE'), ENT_QUOTES, 'UTF-8'); ?>" />
 						&nbsp;&nbsp;
 						<input class="btn btn-primary" onclick="submitbutton('cancel');" type="submit"
-							value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMS_TOOLBAR_CANCEL'), ENT_QUOTES, 'UTF-8'); ?>" />
+							value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_CANCEL'), ENT_QUOTES, 'UTF-8'); ?>" />
 					</td>
 					<td></td>
 				</tr>
@@ -187,49 +187,49 @@ class HTML_facileFormsElement
 	{
 		switch ($type) {
 			case 'Static Text/HTML':
-				$disptype = BFText::_('COM_BREEZINGFORMS_ELEMENTS_STATICTEXT');
+				$disptype = BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_STATICTEXT');
 				break;
 			case 'Rectangle':
-				$disptype = BFText::_('COM_BREEZINGFORMS_ELEMENTS_RECTANGLE');
+				$disptype = BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_RECTANGLE');
 				break;
 			case 'Image':
-				$disptype = BFText::_('COM_BREEZINGFORMS_ELEMENTS_IMAGE');
+				$disptype = BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_IMAGE');
 				break;
 			case 'Tooltip':
-				$disptype = BFText::_('COM_BREEZINGFORMS_ELEMENTS_TOOLTIP');
+				$disptype = BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TOOLTIP');
 				break;
 			case 'Query List':
-				$disptype = BFText::_('COM_BREEZINGFORMS_ELEMENTS_QUERYLIST');
+				$disptype = BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_QUERYLIST');
 				break;
 			case 'Regular Button':
-				$disptype = BFText::_('COM_BREEZINGFORMS_ELEMENTS_REGBUTTON');
+				$disptype = BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_REGBUTTON');
 				break;
 			case 'Graphic Button':
-				$disptype = BFText::_('COM_BREEZINGFORMS_ELEMENTS_GRAPHBUTTON');
+				$disptype = BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_GRAPHBUTTON');
 				break;
 			case 'Icon':
-				$disptype = BFText::_('COM_BREEZINGFORMS_ELEMENTS_ICON');
+				$disptype = BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ICON');
 				break;
 			case 'Checkbox':
-				$disptype = BFText::_('COM_BREEZINGFORMS_ELEMENTS_CHECKBOX');
+				$disptype = BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CHECKBOX');
 				break;
 			case 'Radio Button':
-				$disptype = BFText::_('COM_BREEZINGFORMS_ELEMENTS_RADIO');
+				$disptype = BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_RADIO');
 				break;
 			case 'Select List':
-				$disptype = BFText::_('COM_BREEZINGFORMS_ELEMENTS_SELECT');
+				$disptype = BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SELECT');
 				break;
 			case 'Text':
-				$disptype = BFText::_('COM_BREEZINGFORMS_ELEMENTS_TEXT');
+				$disptype = BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TEXT');
 				break;
 			case 'Textarea':
-				$disptype = BFText::_('COM_BREEZINGFORMS_ELEMENTS_TEXTAREA');
+				$disptype = BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TEXTAREA');
 				break;
 			case 'File Upload':
-				$disptype = BFText::_('COM_BREEZINGFORMS_ELEMENTS_UPLOAD');
+				$disptype = BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_UPLOAD');
 				break;
 			case 'Hidden Input':
-				$disptype = BFText::_('COM_BREEZINGFORMS_ELEMENTS_HIDDEN');
+				$disptype = BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_HIDDEN');
 				break;
 			default:
 				$disptype = $type;
@@ -243,7 +243,7 @@ class HTML_facileFormsElement
 		global $ff_mossite, $ff_admsite, $ff_config;
 		$mainframe = Factory::getApplication();
 		$ff_mossite = Uri::base();
-		$action = $row->id ? BFText::_('COM_BREEZINGFORMS_ELEMENTS_EDIT') : BFText::_('COM_BREEZINGFORMS_ELEMENTS_ADD');
+		$action = $row->id ? BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_EDIT') : BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ADD');
 
 		$hasInit = false;
 		switch ($row->type) {
@@ -299,10 +299,10 @@ class HTML_facileFormsElement
 					var invalidChars = /\W/;
 					var error = '';
 					if (value == '')
-						error += "<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_ENTNAME'); ?>\n";
+						error += "<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ENTNAME'); ?>\n";
 					else
 			if (invalidChars.test(value))
-				error += "<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_ENTIDENT'); ?>\n";
+				error += "<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ENTIDENT'); ?>\n";
 			return error;
 				} // checkIdentifier
 
@@ -311,7 +311,7 @@ class HTML_facileFormsElement
 				var error = '';
 				if (pressbutton != 'cancel') {
 					if (form.title.value == '')
-						error += "<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TITLEEMPTY'); ?>\n";
+						error += "<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TITLEEMPTY'); ?>\n";
 					error += checkIdentifier(form.name.value, 'name');
 				} // if
 
@@ -422,7 +422,7 @@ class HTML_facileFormsElement
 						alert('Please enter the element name first.');
 						return;
 					} // if
-					if (!confirm("<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_ASKCREATEQUERY'); ?>\n<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_EXISTAPP'); ?>")) return;
+					if (!confirm("<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ASKCREATEQUERY'); ?>\n<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_EXISTAPP'); ?>")) return;
 					code =
 						"global $database;\n" +
 						"\n" +
@@ -436,7 +436,7 @@ class HTML_facileFormsElement
 					if (oldcode != '')
 						form.data2.value =
 							code +
-							"\n// -------------- <?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_OLDBELOW'); ?> --------------\n\n" +
+							"\n// -------------- <?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_OLDBELOW'); ?> --------------\n\n" +
 							oldcode;
 					else
 						form.data2.value = code;
@@ -640,25 +640,25 @@ class HTML_facileFormsElement
 							skip--;
 						} else {
 							if (span > 1) {
-								attr += '<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_SPAN'); ?>(' + span + ') ';
+								attr += '<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SPAN'); ?>(' + span + ') ';
 								skip = span - 1;
 							} // if
 							switch (data[qcolThalign]) {
-								case '1': attr += '<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_LEFT'); ?> '; break;
-								case '2': attr += '<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CENTER'); ?> '; break;
-								case '3': attr += '<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_RIGHT'); ?> '; break;
-								case '4': attr += '<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_JUSTIFY'); ?> '; break;
+								case '1': attr += '<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_LEFT'); ?> '; break;
+								case '2': attr += '<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CENTER'); ?> '; break;
+								case '3': attr += '<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_RIGHT'); ?> '; break;
+								case '4': attr += '<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_JUSTIFY'); ?> '; break;
 								default: ;
 							} // switch
 							switch (data[qcolThvalign]) {
-								case '1': attr += '<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TOP'); ?> '; break;
-								case '2': attr += '<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_MIDDLE'); ?> '; break;
-								case '3': attr += '<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_BOTTOM'); ?> '; break;
-								case '4': attr += '<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_BASELINE'); ?> '; break;
+								case '1': attr += '<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TOP'); ?> '; break;
+								case '2': attr += '<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_MIDDLE'); ?> '; break;
+								case '3': attr += '<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_BOTTOM'); ?> '; break;
+								case '4': attr += '<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_BASELINE'); ?> '; break;
 								default: ;
 							} // switch
 							switch (data[qcolThwrap]) {
-								case '1': attr += '<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_NOWRAP'); ?>'; break;
+								case '1': attr += '<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_NOWRAP'); ?>'; break;
 								default: ;
 							} // switch
 						} // if
@@ -671,21 +671,21 @@ class HTML_facileFormsElement
 							skip--;
 						} else {
 							switch (data[qcolAlign]) {
-								case '1': attr += '<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_LEFT'); ?> '; break;
-								case '2': attr += '<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CENTER'); ?> '; break;
-								case '3': attr += '<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_RIGHT'); ?> '; break;
-								case '4': attr += '<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_JUSTIFY'); ?> '; break;
+								case '1': attr += '<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_LEFT'); ?> '; break;
+								case '2': attr += '<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CENTER'); ?> '; break;
+								case '3': attr += '<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_RIGHT'); ?> '; break;
+								case '4': attr += '<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_JUSTIFY'); ?> '; break;
 								default: ;
 							} // switch
 							switch (data[qcolValign]) {
-								case '1': attr += '<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TOP'); ?> '; break;
-								case '2': attr += '<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_MIDDLE'); ?> '; break;
-								case '3': attr += '<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_BOTTOM'); ?> '; break;
-								case '4': attr += '<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_BASELINE'); ?> '; break;
+								case '1': attr += '<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TOP'); ?> '; break;
+								case '2': attr += '<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_MIDDLE'); ?> '; break;
+								case '3': attr += '<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_BOTTOM'); ?> '; break;
+								case '4': attr += '<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_BASELINE'); ?> '; break;
 								default: ;
 							} // switch
 							switch (data[qcolWrap]) {
-								case '1': attr += '<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_NOWRAP'); ?>'; break;
+								case '1': attr += '<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_NOWRAP'); ?>'; break;
 								default: ;
 							} // switch
 						} // if
@@ -769,7 +769,7 @@ class HTML_facileFormsElement
 
 				function qcolCopy() {
 					if (!qcolSelects()) {
-						alert('<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_SELECTCOLUMNS'); ?>');
+						alert('<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SELECTCOLUMNS'); ?>');
 						return;
 					} // if
 					var r;
@@ -789,10 +789,10 @@ class HTML_facileFormsElement
 
 				function qcolDelete() {
 					if (!qcolSelects()) {
-						alert('<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_SELECTCOLUMNS'); ?>');
+						alert('<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SELECTCOLUMNS'); ?>');
 						return;
 					} // if
-					if (!confirm('<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_ASKDELCOLUMNS'); ?>')) return;
+					if (!confirm('<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ASKDELCOLUMNS'); ?>')) return;
 					var r;
 					for (r = qcolRowCnt - 1; r >= 0; r--) {
 						if (document.getElementById('cb' + r).checked) {
@@ -822,7 +822,7 @@ class HTML_facileFormsElement
 					var form = document.QueryColForm;
 					var error = '';
 					if (form.colTitle.value == '')
-						error += "<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TITLEEMPTY'); ?>\n";
+						error += "<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TITLEEMPTY'); ?>\n";
 					error += checkIdentifier(form.colName.value, 'name');
 					if (error != '') {
 						alert(error);
@@ -906,7 +906,7 @@ class HTML_facileFormsElement
 						alert('Please enter the element name first.');
 						return;
 					} // if
-					if (!confirm("<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CREAINIT'); ?>\n<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_EXISTAPP'); ?>")) return;
+					if (!confirm("<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CREAINIT'); ?>\n<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_EXISTAPP'); ?>")) return;
 					code =
 						"function ff_" + name + "_init(element, condition)\n" +
 						"{\n" +
@@ -927,7 +927,7 @@ class HTML_facileFormsElement
 					if (oldcode != '')
 						form.script1code.value =
 							code +
-							"\n// -------------- <?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_OLDBELOW'); ?> --------------\n\n" +
+							"\n// -------------- <?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_OLDBELOW'); ?> --------------\n\n" +
 							oldcode;
 					else
 						form.script1code.value = code;
@@ -967,7 +967,7 @@ class HTML_facileFormsElement
 						alert('Please enter the element name first.');
 						return;
 					} // if
-					if (!confirm("<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CREAACTION'); ?>\n<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_EXISTAPP'); ?>")) return;
+					if (!confirm("<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CREAACTION'); ?>\n<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_EXISTAPP'); ?>")) return;
 					code =
 						"function ff_" + name + "_action(element, action)\n" +
 						"{\n" +
@@ -1005,7 +1005,7 @@ class HTML_facileFormsElement
 					if (oldcode != '')
 						form.script2code.value =
 							code +
-							"\n// -------------- <?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_OLDBELOW'); ?> --------------\n\n" +
+							"\n// -------------- <?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_OLDBELOW'); ?> --------------\n\n" +
 							oldcode;
 					else
 						form.script2code.value = code;
@@ -1045,7 +1045,7 @@ class HTML_facileFormsElement
 						alert('Please enter the element name first.');
 						return;
 					} // if
-					if (!confirm("<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CREAVALID'); ?>\n<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_EXISTAPP'); ?>")) return;
+					if (!confirm("<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CREAVALID'); ?>\n<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_EXISTAPP'); ?>")) return;
 					code =
 						"function ff_" + name + "_validation(element, message)\n" +
 						"{\n" +
@@ -1060,7 +1060,7 @@ class HTML_facileFormsElement
 					if (oldcode != '')
 						form.script3code.value =
 							code +
-							"\n// -------------- <?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_OLDBELOW'); ?> --------------\n\n" +
+							"\n// -------------- <?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_OLDBELOW'); ?> --------------\n\n" +
 							oldcode;
 					else
 						form.script3code.value = code;
@@ -1177,13 +1177,13 @@ class HTML_facileFormsElement
 					<form name='SelectOptionForm' onsubmit='okOption();return false;'>
 						<tr>
 							<th colspan="4" class="title">BreezingForms -
-								<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_NEWSELOPT'); ?>
+								<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_NEWSELOPT'); ?>
 							</th>
 						</tr>
 						<tr>
 							<td></td>
 							<td>
-								<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TEXT'); ?>:
+								<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TEXT'); ?>:
 							</td>
 							<td><input type="text" size="50" value="" name="optionText" class="inputbox" /></td>
 							<td></td>
@@ -1191,7 +1191,7 @@ class HTML_facileFormsElement
 						<tr>
 							<td></td>
 							<td>
-								<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_VALUE'); ?>:
+								<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_VALUE'); ?>:
 							</td>
 							<td><input type="text" size="50" value="" name="optionValue" class="inputbox" /></td>
 							<td></td>
@@ -1199,7 +1199,7 @@ class HTML_facileFormsElement
 						<tr>
 							<td></td>
 							<td>
-								<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_SELECTED'); ?>:
+								<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SELECTED'); ?>:
 							</td>
 							<td>
 								<?php echo HTMLHelper::_('select.booleanlist', "optionSelected", "", 0); ?>
@@ -1209,10 +1209,10 @@ class HTML_facileFormsElement
 						<tr>
 							<td></td>
 							<td colspan="2" style="text-align:right">
-								<input type="button" value="<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_OKBUTTON'); ?>"
+								<input type="button" value="<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_OKBUTTON'); ?>"
 									onclick="okOption()" class="button btn btn-primary">
 								&nbsp;&nbsp;
-								<input type="button" value="<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_ABORTBUTT'); ?>"
+								<input type="button" value="<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ABORTBUTT'); ?>"
 									onclick="quitOption()" class="button btn btn-primary">
 							</td>
 							<td></td>
@@ -1231,7 +1231,7 @@ class HTML_facileFormsElement
 					<table cellpadding="4" cellspacing="1" border="0" class="adminform" style="width:550px">
 						<tr>
 							<th colspan="4" class="title">BreezingForms -
-								<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_EDITQUERYCOL'); ?>
+								<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_EDITQUERYCOL'); ?>
 							</th>
 						</tr>
 						<tr>
@@ -1239,23 +1239,23 @@ class HTML_facileFormsElement
 							<td>
 								<fieldset>
 									<legend>
-										<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_HEADER'); ?>
+										<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_HEADER'); ?>
 									</legend>
 									<table class="adminform">
 										<tr>
 											<td nowrap>
-												<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TITLE'); ?>:
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TITLE'); ?>:
 											</td>
 											<td nowrap>
 												<input type="text" size="50" maxlength="500" name="colTitle" class="inputbox" />
 												<?php
-												echo bf_ToolTip(BFText::_('COM_BREEZINGFORMS_ELEMENTS_QCOLTIPTITLE'));
+												echo bf_ToolTip(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_QCOLTIPTITLE'));
 												?>
 											</td>
 										</tr>
 										<tr>
 											<td nowrap>
-												<?php echo BFText::_('COM_BREEZINGFORMS_FORMS_CLASSFOR'); ?> &lt;th&gt;:
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_FORMS_CLASSFOR'); ?> &lt;th&gt;:
 											</td>
 											<td nowrap>
 												<input type="text" size="30" maxlength="30" name="colClass1" class="inputbox" />
@@ -1263,7 +1263,7 @@ class HTML_facileFormsElement
 										</tr>
 										<tr>
 											<td nowrap>&lt;th&gt;
-												<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_SPAN'); ?>:
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SPAN'); ?>:
 											</td>
 											<td nowrap>
 												<input type="text" size="6" maxlength="6" name="colThspan" class="inputbox" />
@@ -1271,49 +1271,49 @@ class HTML_facileFormsElement
 										</tr>
 										<tr>
 											<td nowrap>
-												<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_ATTRIBUTES'); ?>:
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ATTRIBUTES'); ?>:
 											</td>
 											<td nowrap>
 												<select name="colThalign" size="1" class="inputbox">
 													<option value="0" selected="selected">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_NONE'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_NONE'); ?>
 													</option>
 													<option value="1">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_LEFT'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_LEFT'); ?>
 													</option>
 													<option value="2">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CENTER'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CENTER'); ?>
 													</option>
 													<option value="3">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_RIGHT'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_RIGHT'); ?>
 													</option>
 													<option value="4">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_JUSTIFY'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_JUSTIFY'); ?>
 													</option>
 												</select>
 												<select name="colThvalign" size="1" class="inputbox">
 													<option value="0" selected="selected">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_NONE'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_NONE'); ?>
 													</option>
 													<option value="1">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TOP'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TOP'); ?>
 													</option>
 													<option value="2">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_MIDDLE'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_MIDDLE'); ?>
 													</option>
 													<option value="3">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_BOTTOM'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_BOTTOM'); ?>
 													</option>
 													<option value="4">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_BASELINE'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_BASELINE'); ?>
 													</option>
 												</select>
 												<select name="colThwrap" size="1" class="inputbox">
 													<option value="0" selected="selected">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_NONE'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_NONE'); ?>
 													</option>
 													<option value="1">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_NOWRAP'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_NOWRAP'); ?>
 													</option>
 												</select>
 											</td>
@@ -1328,23 +1328,23 @@ class HTML_facileFormsElement
 							<td>
 								<fieldset>
 									<legend>
-										<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_DATA'); ?>
+										<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_DATA'); ?>
 									</legend>
 									<table class="adminform">
 										<tr>
 											<td nowrap>
-												<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_NAME'); ?>:
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_NAME'); ?>:
 											</td>
 											<td nowrap>
 												<input type="text" size="30" maxlength="30" name="colName" class="inputbox" />
 												<?php
-												echo bf_ToolTip(BFText::_('COM_BREEZINGFORMS_ELEMENTS_QCOLTIPNAME'));
+												echo bf_ToolTip(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_QCOLTIPNAME'));
 												?>
 											</td>
 										</tr>
 										<tr>
 											<td nowrap>
-												<?php echo BFText::_('COM_BREEZINGFORMS_FORMS_CLASSFOR'); ?> &lt;td(1)&gt;:
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_FORMS_CLASSFOR'); ?> &lt;td(1)&gt;:
 											</td>
 											<td nowrap>
 												<input type="text" size="30" maxlength="30" name="colClass2" class="inputbox" />
@@ -1352,7 +1352,7 @@ class HTML_facileFormsElement
 										</tr>
 										<tr>
 											<td nowrap>
-												<?php echo BFText::_('COM_BREEZINGFORMS_FORMS_CLASSFOR'); ?> &lt;td(2)&gt;:
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_FORMS_CLASSFOR'); ?> &lt;td(2)&gt;:
 											</td>
 											<td nowrap>
 												<input type="text" size="30" maxlength="30" name="colClass3" class="inputbox" />
@@ -1360,7 +1360,7 @@ class HTML_facileFormsElement
 										</tr>
 										<tr>
 											<td valign="top" nowrap>
-												<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_WIDTH'); ?>:
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_WIDTH'); ?>:
 											</td>
 											<td nowrap>
 												<input type="text" size="6" maxlength="6" name="colWidth" class="inputbox" />
@@ -1373,56 +1373,56 @@ class HTML_facileFormsElement
 										</tr>
 										<tr>
 											<td nowrap>
-												<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_ATTRIBUTES'); ?>:
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ATTRIBUTES'); ?>:
 											</td>
 											<td nowrap>
 												<select name="colAlign" size="1" class="inputbox">
 													<option value="0" selected="selected">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_NONE'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_NONE'); ?>
 													</option>
 													<option value="1">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_LEFT'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_LEFT'); ?>
 													</option>
 													<option value="2">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CENTER'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CENTER'); ?>
 													</option>
 													<option value="3">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_RIGHT'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_RIGHT'); ?>
 													</option>
 													<option value="4">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_JUSTIFY'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_JUSTIFY'); ?>
 													</option>
 												</select>
 												<select name="colValign" size="1" class="inputbox">
 													<option value="0" selected="selected">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_NONE'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_NONE'); ?>
 													</option>
 													<option value="1">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TOP'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TOP'); ?>
 													</option>
 													<option value="2">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_MIDDLE'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_MIDDLE'); ?>
 													</option>
 													<option value="3">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_BOTTOM'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_BOTTOM'); ?>
 													</option>
 													<option value="4">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_BASELINE'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_BASELINE'); ?>
 													</option>
 												</select>
 												<select name="colWrap" size="1" class="inputbox">
 													<option value="0" selected="selected">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_NONE'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_NONE'); ?>
 													</option>
 													<option value="1">
-														<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_NOWRAP'); ?>
+														<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_NOWRAP'); ?>
 													</option>
 												</select>
 											</td>
 										</tr>
 										<tr>
 											<td nowrap colspan="2">
-												<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_VALUE'); ?>:
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_VALUE'); ?>:
 												<a href="#"
 													onClick="document.QueryColForm.colValue.rows=<?php echo $ff_config->areasmall; ?>;">[
 													<?php echo $ff_config->areasmall; ?>]
@@ -1450,10 +1450,10 @@ class HTML_facileFormsElement
 							<td nowrap colspan="2" style="text-align:right">
 
 								<input class="btn btn-primary" onclick="qcolOk();" type="submit"
-									value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMS_TOOLBAR_SAVE'), ENT_QUOTES, 'UTF-8'); ?>" />
+									value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_SAVE'), ENT_QUOTES, 'UTF-8'); ?>" />
 								&nbsp;&nbsp;
 								<input class="btn btn-primary" onclick="qcolCancel();" type="submit"
-									value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMS_TOOLBAR_CANCEL'), ENT_QUOTES, 'UTF-8'); ?>" />
+									value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_CANCEL'), ENT_QUOTES, 'UTF-8'); ?>" />
 
 							</td>
 							<td>&nbsp;</td>
@@ -1481,20 +1481,20 @@ class HTML_facileFormsElement
 						<?php
 						$tabs = new BFTabs(0);
 						$tabs->startPane("editPane");
-						$tabs->startTab(BFText::_('COM_BREEZINGFORMS_ELEMENTS_SETTINGS'), "tab_settings");
+						$tabs->startTab(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SETTINGS'), "tab_settings");
 						?>
 						<table cellpadding="0" cellspacing="0" border="0" class="adminform">
 
 							<tr>
 								<td></td>
 								<td nowrap>
-									<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TITLE'); ?>:
+									<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TITLE'); ?>:
 								</td>
 								<td nowrap>
 									<input type="text" size="50" maxlength="50" name="title" value="<?php echo $row->title; ?>"
 										class="inputbox" />
 									<?php
-									echo bf_ToolTip(BFText::_('COM_BREEZINGFORMS_ELEMENTS_TIPTITLE'));
+									echo bf_ToolTip(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TIPTITLE'));
 									?>
 								</td>
 								<td></td>
@@ -1502,13 +1502,13 @@ class HTML_facileFormsElement
 							<tr>
 								<td></td>
 								<td nowrap>
-									<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_NAME'); ?>:
+									<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_NAME'); ?>:
 								</td>
 								<td nowrap>
 									<input type="text" size="30" maxlength="30" name="name" value="<?php echo $row->name ?>"
 										class="inputbox" />
 									<?php
-									echo bf_ToolTip(BFText::_('COM_BREEZINGFORMS_ELEMENTS_TIPNAME'));
+									echo bf_ToolTip(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TIPNAME'));
 									?>
 								</td>
 								<td></td>
@@ -1523,7 +1523,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_FORMS_CLASSFOR'); ?> &lt;div&gt;:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_FORMS_CLASSFOR'); ?> &lt;div&gt;:
 										</td>
 										<td nowrap>
 											<input type="text" size="30" maxlength="30" name="class1"
@@ -1569,7 +1569,7 @@ class HTML_facileFormsElement
 								<tr>
 									<td></td>
 									<td nowrap>
-										<?php echo BFText::_('COM_BREEZINGFORMS_FORMS_CLASSFOR'); ?> &lt;
+										<?php echo BFText::_('COM_BREEZINGFORMSNG_FORMS_CLASSFOR'); ?> &lt;
 										<?php echo $elemname; ?>&gt;:
 									</td>
 									<td nowrap>
@@ -1587,7 +1587,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_FORMS_CLASSFOR'); ?> &lt;tr(header)&gt;:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_FORMS_CLASSFOR'); ?> &lt;tr(header)&gt;:
 										</td>
 										<td nowrap>
 											<input type="text" size="30" maxlength="30" name="trhclass" class="inputbox" />
@@ -1597,7 +1597,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_FORMS_CLASSFOR'); ?> &lt;tr(data1)&gt;:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_FORMS_CLASSFOR'); ?> &lt;tr(data1)&gt;:
 										</td>
 										<td nowrap>
 											<input type="text" size="30" maxlength="30" name="tr1class" class="inputbox" />
@@ -1607,7 +1607,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_FORMS_CLASSFOR'); ?> &lt;tr(data2)&gt;:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_FORMS_CLASSFOR'); ?> &lt;tr(data2)&gt;:
 										</td>
 										<td nowrap>
 											<input type="text" size="30" maxlength="30" name="tr2class" class="inputbox" />
@@ -1617,7 +1617,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_FORMS_CLASSFOR'); ?> &lt;tr(footer)&gt;:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_FORMS_CLASSFOR'); ?> &lt;tr(footer)&gt;:
 										</td>
 										<td nowrap>
 											<input type="text" size="30" maxlength="30" name="trfclass" class="inputbox" />
@@ -1627,7 +1627,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_FORMS_CLASSFOR'); ?> &lt;td(footer)&gt;:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_FORMS_CLASSFOR'); ?> &lt;td(footer)&gt;:
 										</td>
 										<td nowrap>
 											<input type="text" size="30" maxlength="30" name="tdfclass" class="inputbox" />
@@ -1642,7 +1642,7 @@ class HTML_facileFormsElement
 							<tr>
 								<td></td>
 								<td nowrap>
-									<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_ORDERING'); ?>:
+									<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ORDERING'); ?>:
 								</td>
 								<td nowrap>
 									<?php echo $lists['ordering']; ?>
@@ -1653,7 +1653,7 @@ class HTML_facileFormsElement
 							<tr>
 								<td></td>
 								<td nowrap>
-									<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_PUBLISHED'); ?>:
+									<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_PUBLISHED'); ?>:
 								</td>
 								<td nowrap>
 									<?php echo HTMLHelper::_('select.booleanlist', "published", "", $row->published); ?>
@@ -1674,7 +1674,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_INCINLOG'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_INCINLOG'); ?>:
 										</td>
 										<td nowrap>
 											<?php echo HTMLHelper::_('select.booleanlist', "logging", "", $row->logging); ?>
@@ -1695,7 +1695,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td valign="top" nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_POSITION'); ?> X:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_POSITION'); ?> X:
 										</td>
 										<td nowrap>
 											<input type="text" size="6" maxlength="6" name="posx" value="<?php echo $row->posx; ?>"
@@ -1716,7 +1716,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td valign="top" nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_POSITION'); ?> Y:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_POSITION'); ?> Y:
 										</td>
 										<td nowrap>
 											<input type="text" size="6" maxlength="6" name="posy" value="<?php echo $row->posy; ?>"
@@ -1745,7 +1745,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td valign="top" nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_WIDTH'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_WIDTH'); ?>:
 										</td>
 										<td nowrap>
 											<input type="text" size="6" maxlength="6" name="width" value="<?php echo $row->width; ?>"
@@ -1754,7 +1754,7 @@ class HTML_facileFormsElement
 											<select name="widthmode" size="1" class="inputbox">
 												<option value="0" <?php if ($row->widthmode == 0)
 													echo ' selected="selected"'; ?>>
-													<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_COLUMNS'); ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_COLUMNS'); ?>
 												</option>
 												<option value="1" <?php if ($row->widthmode == 1)
 													echo ' selected="selected"'; ?>>px
@@ -1767,7 +1767,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td valign="top" nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_HEIGHT'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_HEIGHT'); ?>:
 										</td>
 										<td nowrap>
 											<input type="text" size="6" maxlength="6" name="height" value="<?php echo $row->height; ?>"
@@ -1776,7 +1776,7 @@ class HTML_facileFormsElement
 											<select name="heightmode" size="1" class="inputbox">
 												<option value="0" <?php if ($row->heightmode == 0)
 													echo ' selected="selected"'; ?>>
-													<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_ROWS'); ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ROWS'); ?>
 												</option>
 												<option value="1" <?php if ($row->heightmode == 1)
 													echo ' selected="selected"'; ?>>px
@@ -1792,7 +1792,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_WIDTH'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_WIDTH'); ?>:
 										</td>
 										<td nowrap>
 											<input type="text" size="6" maxlength="6" name="width" value="<?php echo $row->width; ?>"
@@ -1804,7 +1804,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_HEIGHT'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_HEIGHT'); ?>:
 										</td>
 										<td nowrap>
 											<input type="text" size="6" maxlength="6" name="height" value="<?php echo $row->height; ?>"
@@ -1819,7 +1819,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_WIDTH'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_WIDTH'); ?>:
 										</td>
 										<td nowrap>
 											<input type="text" size="6" maxlength="6" name="width" value="<?php echo $row->width; ?>"
@@ -1828,7 +1828,7 @@ class HTML_facileFormsElement
 											<select name="widthmode" size="1" class="inputbox">
 												<option value="0" <?php if ($row->widthmode == 0)
 													echo ' selected="selected"'; ?>>
-													<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_COLUMNS'); ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_COLUMNS'); ?>
 												</option>
 												<option value="1" <?php if ($row->widthmode == 1)
 													echo ' selected="selected"'; ?>>px
@@ -1840,19 +1840,19 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_MAXLENGTH'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_MAXLENGTH'); ?>:
 										</td>
 										<td nowrap>
 											<input type="text" size="6" maxlength="6" name="height" value="<?php echo $row->height; ?>"
 												class="inputbox" />
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_COLUMNS'); ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_COLUMNS'); ?>
 										</td>
 										<td></td>
 									</tr>
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_MAILBACK'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_MAILBACK'); ?>:
 										</td>
 										<td nowrap>
 											<?php echo HTMLHelper::_('select.booleanlist', "mailback", "", $row->mailback); ?>
@@ -1866,7 +1866,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_WIDTH'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_WIDTH'); ?>:
 										</td>
 										<td nowrap>
 											<input type="text" size="6" maxlength="6" name="width" value="<?php echo $row->width; ?>"
@@ -1878,7 +1878,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_HEIGHT'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_HEIGHT'); ?>:
 										</td>
 										<td nowrap>
 											<input type="text" size="6" maxlength="6" name="height" value="<?php echo $row->height; ?>"
@@ -1893,7 +1893,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_FIELDSZ'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_FIELDSZ'); ?>:
 										</td>
 										<td nowrap>
 											<input type="text" size="6" maxlength="6" name="width" value="<?php echo $row->width; ?>"
@@ -1905,7 +1905,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_MAXFILESIZE'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_MAXFILESIZE'); ?>:
 										</td>
 										<td nowrap>
 											<input type="text" size="8" maxlength="8" name="height" value="<?php echo $row->height; ?>"
@@ -1922,7 +1922,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td valign="top" nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_WIDTH'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_WIDTH'); ?>:
 										</td>
 										<td nowrap>
 											<input type="text" size="6" maxlength="6" name="width" value="<?php echo $row->width; ?>"
@@ -1942,7 +1942,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td valign="top" nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_HEIGHT'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_HEIGHT'); ?>:
 										</td>
 										<td nowrap>
 											<input type="text" size="6" maxlength="6" name="height" value="<?php echo $row->height; ?>"
@@ -1958,9 +1958,9 @@ class HTML_facileFormsElement
 											</select>
 											<?php
 											if ($row->type == 'Image')
-												echo bf_ToolTip(BFText::_('COM_BREEZINGFORMS_ELEMENTS_IMAGE0'));
+												echo bf_ToolTip(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_IMAGE0'));
 											else
-												echo bf_ToolTip(BFText::_('COM_BREEZINGFORMS_ELEMENTS_OTHER0'));
+												echo bf_ToolTip(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_OTHER0'));
 											?>
 										</td>
 										<td></td>
@@ -1972,7 +1972,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td valign="top" nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_WIDTH'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_WIDTH'); ?>:
 										</td>
 										<td nowrap>
 											<input type="text" size="6" maxlength="6" name="width" value="<?php echo $row->width; ?>"
@@ -1992,7 +1992,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_ROWSPERPAGE'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ROWSPERPAGE'); ?>:
 										</td>
 										<td nowrap>
 											<input type="text" size="6" maxlength="6" name="height" value="<?php echo $row->height; ?>"
@@ -2004,22 +2004,22 @@ class HTML_facileFormsElement
 										echo ' style="display:none"'; ?>>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_PAGENAV'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_PAGENAV'); ?>:
 										</td>
 										<td nowrap>
 											<select name="pagenav" size="1" class="inputbox">
 												<option value="0">none</option>
 												<option value="1" selected="selected">&lt;&lt;
-													<?php echo BFText::_('COM_BREEZINGFORMS_PROCESS_PAGESTART'); ?> &lt;
-													<?php echo BFText::_('COM_BREEZINGFORMS_PROCESS_PAGEPREV'); ?> 1 2 3
-													<?php BFText::_('COM_BREEZINGFORMS_PROCESS_PAGENEXT'); ?> &gt;
-													<?php BFText::_('COM_BREEZINGFORMS_PROCESS_PAGEEND'); ?> &gt;&gt;
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGESTART'); ?> &lt;
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV'); ?> 1 2 3
+													<?php BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT'); ?> &gt;
+													<?php BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGEEND'); ?> &gt;&gt;
 												</option>
 												<option value="2">&lt;&lt;
-													<?php echo BFText::_('COM_BREEZINGFORMS_PROCESS_PAGESTART'); ?> &lt;
-													<?php echo BFText::_('COM_BREEZINGFORMS_PROCESS_PAGEPREV'); ?>
-													<?php echo BFText::_('COM_BREEZINGFORMS_PROCESS_PAGENEXT'); ?> &gt;
-													<?php echo BFText::_('COM_BREEZINGFORMS_PROCESS_PAGEEND'); ?> &gt;&gt;
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGESTART'); ?> &lt;
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV'); ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT'); ?> &gt;
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGEEND'); ?> &gt;&gt;
 												</option>
 												<option value="3">&lt;&lt; &lt; 1 2 3 &gt; &gt;&gt;</option>
 												<option value="4">&lt;&lt; &lt; &gt; &gt;&gt;</option>
@@ -2041,7 +2041,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CHECKED'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CHECKED'); ?>:
 										</td>
 										<td nowrap>
 											<?php echo HTMLHelper::_('select.booleanlist', "flag1", "", $row->flag1); ?>
@@ -2055,7 +2055,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_MULTIPLE'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_MULTIPLE'); ?>:
 										</td>
 										<td nowrap>
 											<?php echo HTMLHelper::_('select.booleanlist', "flag1", "", $row->flag1); ?>
@@ -2069,7 +2069,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_SHOWHEADER'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SHOWHEADER'); ?>:
 										</td>
 										<td nowrap>
 											<?php echo HTMLHelper::_('select.booleanlist', "flag1", "", $row->flag1); ?>
@@ -2083,7 +2083,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_PASSWORD'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_PASSWORD'); ?>:
 										</td>
 										<td nowrap>
 											<?php echo HTMLHelper::_('select.booleanlist', "flag1", "", $row->flag1); ?>
@@ -2097,7 +2097,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_UPLDTIMESTAMP'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_UPLDTIMESTAMP'); ?>:
 										</td>
 										<td nowrap>
 											<?php echo HTMLHelper::_('select.booleanlist', "flag1", "", $row->flag1); ?>
@@ -2111,7 +2111,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TYPE'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TYPE'); ?>:
 										</td>
 										<td nowrap>
 											<input type="radio" id="flag10" name="flag1" value="0" <?php if ($row->flag1 == 0)
@@ -2124,7 +2124,7 @@ class HTML_facileFormsElement
 													alt="" border="0" /></label>&nbsp;&nbsp;&nbsp;&nbsp;
 											<input type="radio" id="flag12" name="flag1" value="2" <?php if ($row->flag1 == 2)
 												echo ' checked="checked"'; ?> onclick="disptooltipurl(this.value)" /><label for="flag12">
-												<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CUSTOM'); ?>
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CUSTOM'); ?>
 											</label>
 										<td></td>
 									</tr>
@@ -2144,17 +2144,17 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TYPE'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TYPE'); ?>:
 										</td>
 										<td nowrap>
 											<select name="flag2" size="1" class="inputbox">
 												<option value="0" <?php if ($row->flag2 == 0)
 													echo ' selected="selected"'; ?>>
-													<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_ENABLED'); ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ENABLED'); ?>
 												</option>
 												<option value="1" <?php if ($row->flag2 == 1)
 													echo ' selected="selected"'; ?>>
-													<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_DISABLED'); ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_DISABLED'); ?>
 												</option>
 											</select>
 										<td></td>
@@ -2167,7 +2167,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_BORDER'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_BORDER'); ?>:
 										</td>
 										<td nowrap>
 											<?php echo HTMLHelper::_('select.booleanlist', "flag2", "", $row->flag2); ?>
@@ -2183,21 +2183,21 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TYPE'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TYPE'); ?>:
 										</td>
 										<td nowrap>
 											<select name="flag2" size="1" class="inputbox">
 												<option value="0" <?php if ($row->flag2 == 0)
 													echo ' selected="selected"'; ?>>
-													<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_ENABLED'); ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ENABLED'); ?>
 												</option>
 												<option value="1" <?php if ($row->flag2 == 1)
 													echo ' selected="selected"'; ?>>
-													<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_DISABLED'); ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_DISABLED'); ?>
 												</option>
 												<option value="2" <?php if ($row->flag2 == 2)
 													echo ' selected="selected"'; ?>>
-													<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_READONLY'); ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_READONLY'); ?>
 												</option>
 											</select>
 										<td></td>
@@ -2209,21 +2209,21 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_FIRSTCOLUMN'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_FIRSTCOLUMN'); ?>:
 										</td>
 										<td nowrap>
 											<select name="flag2" size="1" class="inputbox">
 												<option value="0" <?php if ($row->flag2 == 0)
 													echo ' selected="selected"'; ?>>
-													<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_NORMAL'); ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_NORMAL'); ?>
 												</option>
 												<option value="1" <?php if ($row->flag2 == 1)
 													echo ' selected="selected"'; ?>>
-													<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CHECKBOXES'); ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CHECKBOXES'); ?>
 												</option>
 												<option value="2" <?php if ($row->flag2 == 2)
 													echo ' selected="selected"'; ?>>
-													<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_RADIOBUTTONS'); ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_RADIOBUTTONS'); ?>
 												</option>
 											</select>
 										</td>
@@ -2241,7 +2241,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap colspan="2">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_UPLDIR'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_UPLDIR'); ?>:
 											<a href="#" onClick="textAreaResize('data1',<?php echo $ff_config->areasmall; ?>);">[
 												<?php echo $ff_config->areasmall; ?>]
 											</a>
@@ -2265,7 +2265,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap colspan="2">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TEXTHTML'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TEXTHTML'); ?>:
 											<?php
 											if ($ff_config->wysiwyg) {
 												echo '<br/>';
@@ -2289,7 +2289,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap colspan="2">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_VALUE'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_VALUE'); ?>:
 											<a href="#" onClick="textAreaResize('data1',<?php echo $ff_config->areasmall; ?>);">[
 												<?php echo $ff_config->areasmall; ?>]
 											</a>
@@ -2316,7 +2316,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap colspan="2">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_VALUE'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_VALUE'); ?>:
 											<a href="#" onClick="textAreaResize('data1',<?php echo $ff_config->areasmall; ?>);">[
 												<?php echo $ff_config->areasmall; ?>]
 											</a>
@@ -2340,7 +2340,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap colspan="2">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_BORDER'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_BORDER'); ?>:
 											<a href="#" onClick="textAreaResize('data1',<?php echo $ff_config->areasmall; ?>);">[
 												<?php echo $ff_config->areasmall; ?>]
 											</a>
@@ -2366,7 +2366,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap colspan="2">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_IMGURL'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_IMGURL'); ?>:
 											<a href="#" onClick="textAreaResize('data1',<?php echo $ff_config->areasmall; ?>);">[
 												<?php echo $ff_config->areasmall; ?>]
 											</a>
@@ -2390,7 +2390,7 @@ class HTML_facileFormsElement
 									<tr id="tooltipurl" style="display:none;">
 										<td></td>
 										<td nowrap colspan="2">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_IMGURL'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_IMGURL'); ?>:
 											<a href="#" onClick="textAreaResize('data1',<?php echo $ff_config->areasmall; ?>);">[
 												<?php echo $ff_config->areasmall; ?>]
 											</a>
@@ -2414,7 +2414,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap colspan="2">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_SIZE'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SIZE'); ?>:
 											<a href="#" onClick="textAreaResize('data1',<?php echo $ff_config->areasmall; ?>);">[
 												<?php echo $ff_config->areasmall; ?>]
 											</a>
@@ -2438,7 +2438,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_BORDERWIDTH'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_BORDERWIDTH'); ?>:
 										</td>
 										<td nowrap>
 											<input type="text" size="3" maxlength="2" name="border" class="inputbox" />
@@ -2449,7 +2449,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CELLSPACING'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CELLSPACING'); ?>:
 										</td>
 										<td nowrap>
 											<input type="text" size="3" maxlength="2" name="cellspacing" class="inputbox" />
@@ -2460,7 +2460,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CELLPADDING'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CELLPADDING'); ?>:
 										</td>
 										<td nowrap>
 											<input type="text" size="3" maxlength="2" name="cellpadding" class="inputbox" />
@@ -2479,7 +2479,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap colspan="2">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_IMGURLF2'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_IMGURLF2'); ?>:
 											<a href="#" onClick="textAreaResize('data3',<?php echo $ff_config->areasmall; ?>);">[
 												<?php echo $ff_config->areasmall; ?>]
 											</a>
@@ -2508,7 +2508,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap colspan="2">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_MIMETYPES'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_MIMETYPES'); ?>:
 											<a href="#" onClick="textAreaResize('data2',<?php echo $ff_config->areasmall; ?>);">[
 												<?php echo $ff_config->areasmall; ?>]
 											</a>
@@ -2535,44 +2535,44 @@ class HTML_facileFormsElement
 										<td colspan="2">
 											<fieldset>
 												<legend>
-													<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CAPTION'); ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CAPTION'); ?>
 												</legend>
 												<table cellpadding="4" cellspacing="1" border="0">
 													<tr>
 														<td nowrap>
-															<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TYPE'); ?>:
+															<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TYPE'); ?>:
 														</td>
 														<td nowrap>
 															<input type="radio" id="flag10" name="flag1" value="0" <?php if ($row->flag1 == 0)
 																echo ' checked="checked"'; ?>
 																onclick="dispcaptiontext(this.value)" /><label for="flag10">
-																<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_NONE'); ?>
+																<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_NONE'); ?>
 															</label>
 															<input type="radio" id="flag11" name="flag1" value="1" <?php if ($row->flag1 == 1)
 																echo ' checked="checked"'; ?>
 																onclick="dispcaptiontext(this.value)" /><label for="flag11">
-																<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_BELOW'); ?>
+																<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_BELOW'); ?>
 															</label>
 															<input type="radio" id="flag12" name="flag1" value="2" <?php if ($row->flag1 == 2)
 																echo ' checked="checked"'; ?>
 																onclick="dispcaptiontext(this.value)" /><label for="flag12">
-																<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_ABOVE'); ?>
+																<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ABOVE'); ?>
 															</label>
 															<input type="radio" id="flag13" name="flag1" value="3" <?php if ($row->flag1 == 3)
 																echo ' checked="checked"'; ?>
 																onclick="dispcaptiontext(this.value)" /><label for="flag13">
-																<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_LEFT'); ?>
+																<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_LEFT'); ?>
 															</label>
 															<input type="radio" id="flag14" name="flag1" value="4" <?php if ($row->flag1 == 4)
 																echo ' checked="checked"'; ?>
 																onclick="dispcaptiontext(this.value)" /><label for="flag14">
-																<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_RIGHT'); ?>
+																<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_RIGHT'); ?>
 															</label>
 														</td>
 													</tr>
 													<tr id="captiontext" style="display:none;">
 														<td nowrap colspan="2">
-															<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TEXT'); ?>:
+															<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TEXT'); ?>:
 															<a href="#"
 																onClick="textAreaResize('data2',<?php echo $ff_config->areasmall; ?>);">[
 																<?php echo $ff_config->areasmall; ?>]
@@ -2603,7 +2603,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap colspan="2">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TEXT'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TEXT'); ?>:
 											<a href="#" onClick="textAreaResize('data2',<?php echo $ff_config->areasmall; ?>);">[
 												<?php echo $ff_config->areasmall; ?>]
 											</a>
@@ -2627,7 +2627,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap colspan="2">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CAPTION'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CAPTION'); ?>:
 											<a href="#" onClick="textAreaResize('data2',<?php echo $ff_config->areasmall; ?>);">[
 												<?php echo $ff_config->areasmall; ?>]
 											</a>
@@ -2652,7 +2652,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap colspan="2">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_LABEL'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_LABEL'); ?>:
 											<a href="#" onClick="textAreaResize('data2',<?php echo $ff_config->areasmall; ?>);">[
 												<?php echo $ff_config->areasmall; ?>]
 											</a>
@@ -2676,7 +2676,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap colspan="2">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_BKGCOLOR'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_BKGCOLOR'); ?>:
 											<a href="#" onClick="textAreaResize('data2',<?php echo $ff_config->areasmall; ?>);">[
 												<?php echo $ff_config->areasmall; ?>]
 											</a>
@@ -2700,7 +2700,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap colspan="2">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_ALTTEXT'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ALTTEXT'); ?>:
 											<a href="#" onClick="textAreaResize('data2',<?php echo $ff_config->areasmall; ?>);">[
 												<?php echo $ff_config->areasmall; ?>]
 											</a>
@@ -2724,7 +2724,7 @@ class HTML_facileFormsElement
 									<tr>
 										<td></td>
 										<td nowrap colspan="2">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_OPTIONS'); ?>:
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_OPTIONS'); ?>:
 											<a href="#" onClick="textAreaResize('data2',<?php echo $ff_config->areasmall; ?>);">[
 												<?php echo $ff_config->areasmall; ?>]
 											</a>
@@ -2735,14 +2735,14 @@ class HTML_facileFormsElement
 												<?php echo $ff_config->arealarge; ?>]
 											</a>
 											<a href="#" onClick="addOption();">
-												<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_ADDOPTIONS'); ?>
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ADDOPTIONS'); ?>
 											</a>
 											<br />
 											<textarea wrap="off" name="data2" style="width:700px;"
 												rows="<?php echo $ff_config->areasmall; ?>"
 												class="inputbox"><?php echo htmlspecialchars($row->data2, ENT_QUOTES); ?></textarea>
 											<?php
-											echo bf_ToolTip(BFText::_('COM_BREEZINGFORMS_ELEMENTS_OPTINFO'));
+											echo bf_ToolTip(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_OPTINFO'));
 											?>
 										</td>
 										<td></td>
@@ -2757,7 +2757,7 @@ class HTML_facileFormsElement
 						<?php
 						if ($row->type == 'Query List') {
 							$tabs->endTab();
-							$tabs->startTab(BFText::_('COM_BREEZINGFORMS_ELEMENTS_QUERY'), "tab_query");
+							$tabs->startTab(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_QUERY'), "tab_query");
 							?>
 							<table class="adminform">
 								<tr>
@@ -2773,9 +2773,9 @@ class HTML_facileFormsElement
 											<?php echo $ff_config->arealarge; ?>]
 										</a>
 										<a href="#" onClick="createQueryCode();">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CREATEQUERY'); ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CREATEQUERY'); ?>
 										</a>
-										<?php echo bf_ToolTip(BFText::_('COM_BREEZINGFORMS_ELEMENTS_TIPQUERY')); ?>
+										<?php echo bf_ToolTip(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TIPQUERY')); ?>
 										<br />
 										<textarea onFocus="codeAreaFocus(this);" readonly="readonly" wrap="off" name="data2lines"
 											style="width:60px;" rows="<?php echo $ff_config->areamedium; ?>"
@@ -2789,19 +2789,19 @@ class HTML_facileFormsElement
 							</table>
 							<?php
 							$tabs->endTab();
-							$tabs->startTab(BFText::_('COM_BREEZINGFORMS_ELEMENTS_QUERYCOLS'), "tab_querycols");
+							$tabs->startTab(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_QUERYCOLS'), "tab_querycols");
 							?>
 							<table width="100%" class="adminform">
 								<tr>
 									<td></td>
 									<td nowrap colspan="2">
 										<div style="text-align:right;">
-											<input type="button" value="<?php echo BFText::_('COM_BREEZINGFORMS_TOOLBAR_NEW'); ?>"
+											<input type="button" value="<?php echo BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_NEW'); ?>"
 												onclick="qcolAdd()" class="button btn btn-primary" />
-											<input type="button" value="<?php echo BFText::_('COM_BREEZINGFORMS_TOOLBAR_COPY'); ?>"
+											<input type="button" value="<?php echo BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_COPY'); ?>"
 												onclick="qcolCopy()" class="button btn btn-primary" />
 											<input type="button"
-												value="<?php echo BFText::_('COM_BREEZINGFORMS_TOOLBAR_DELETE'); ?>"
+												value="<?php echo BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_DELETE'); ?>"
 												onclick="qcolDelete()" class="button btn btn-primary" />
 										</div><br />
 										<table id="qcolTable" width="100%" class="adminlist table table-striped">
@@ -2809,22 +2809,22 @@ class HTML_facileFormsElement
 												<th nowrap valign="top" align="center"><input id="qcolCbAll" name="qcolCbAll"
 														type="checkbox" value="1" onclick="qcolCheckAll(this.checked);" /></th>
 												<th width="100%" valign="top" align="left">
-													<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TITLE'); ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TITLE'); ?>
 												</th>
 												<th nowrap valign="top" align="left">
-													<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_NAME'); ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_NAME'); ?>
 												</th>
 												<th nowrap valign="top" align="left">
-													<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_HEADER') . ' ' . BFText::_('COM_BREEZINGFORMS_ELEMENTS_ATTRIBUTES'); ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_HEADER') . ' ' . BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ATTRIBUTES'); ?>
 												</th>
 												<th nowrap valign="top" align="left">
-													<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_DATA') . ' ' . BFText::_('COM_BREEZINGFORMS_ELEMENTS_ATTRIBUTES'); ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_DATA') . ' ' . BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ATTRIBUTES'); ?>
 												</th>
 												<th nowrap valign="top" align="left">
-													<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_WIDTH'); ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_WIDTH'); ?>
 												</th>
 												<th nowrap valign="top" align="center" colspan="2">
-													<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_REORDER'); ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_REORDER'); ?>
 												</th>
 											</tr>
 										</table>
@@ -2837,7 +2837,7 @@ class HTML_facileFormsElement
 				
 						if ($hasInit || $hasAction || $hasValidation) {
 							$tabs->endTab();
-							$tabs->startTab(BFText::_('COM_BREEZINGFORMS_ELEMENTS_SCRIPTS'), "tab_scripts");
+							$tabs->startTab(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SCRIPTS'), "tab_scripts");
 							?>
 							<table class="adminform">
 								<?php
@@ -2848,53 +2848,53 @@ class HTML_facileFormsElement
 										<td colspan="2">
 											<fieldset>
 												<legend>
-													<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_INITSCRIPT'); ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_INITSCRIPT'); ?>
 												</legend>
 												<table cellpadding="4" cellspacing="1" border="0">
 													<tr>
 														<td nowrap>
-															<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TYPE'); ?>:
+															<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TYPE'); ?>:
 														</td>
 														<td nowrap>
 															<input type="radio" id="script1cond1" name="script1cond" value="0"
 																onclick="dispinit(this.value)" <?php if ($row->script1cond == 0)
 																	echo ' checked="checked"'; ?> /><label for="script1cond1">
-																<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_NONE'); ?>
+																<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_NONE'); ?>
 															</label>
 															<input type="radio" id="script1cond2" name="script1cond" value="1"
 																onclick="dispinit(this.value)" <?php if ($row->script1cond == 1)
 																	echo ' checked="checked"'; ?> /><label for="script1cond2">
-																<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_LIBRARY'); ?>
+																<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_LIBRARY'); ?>
 															</label>
 															<input type="radio" id="script1cond3" name="script1cond" value="2"
 																onclick="dispinit(this.value)" <?php if ($row->script1cond == 2)
 																	echo ' checked="checked"'; ?> /><label for="script1cond3">
-																<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CUSTOM'); ?>
+																<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CUSTOM'); ?>
 															</label>
 														</td>
 														<td></td>
 													</tr>
 													<tr id="initexec" style="display:none;">
 														<td nowrap>
-															<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CONDITIONS'); ?>:
+															<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CONDITIONS'); ?>:
 														</td>
 														<td nowrap>
 															<input type="checkbox" id="script1flag1" name="script1flag1" value="1" <?php if ($row->script1flag1 == 1)
 																echo ' checked="checked"'; ?> /><label
 																for="script1flag1">
-																<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_FORMENTRY'); ?>
+																<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_FORMENTRY'); ?>
 															</label>
 															<input type="checkbox" id="script1flag2" name="script1flag2" value="1" <?php if ($row->script1flag2 == 1)
 																echo ' checked="checked"'; ?> /><label
 																for="script1flag2">
-																<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_PAGEENTRY'); ?>
+																<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_PAGEENTRY'); ?>
 															</label>
 														</td>
 														<td></td>
 													</tr>
 													<tr id="initlib" style="display:none;">
 														<td nowrap>
-															<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_SCRIPT'); ?>:
+															<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SCRIPT'); ?>:
 														</td>
 														<td nowrap>
 															<select name="script1id" size="1" class="inputbox">
@@ -2927,10 +2927,10 @@ class HTML_facileFormsElement
 																<?php echo $ff_config->arealarge; ?>]
 															</a>
 															<a href="#" onClick="createInitCode();">
-																<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CREATECODE'); ?>
+																<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CREATECODE'); ?>
 															</a>
 															<?php
-															echo bf_ToolTip(BFText::_('COM_BREEZINGFORMS_ELEMENTS_TIPINIT')) . "\n";
+															echo bf_ToolTip(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TIPINIT')) . "\n";
 															?>
 															<br />
 															<textarea onFocus="codeAreaFocus(this);" readonly="readonly" wrap="off"
@@ -2958,35 +2958,35 @@ class HTML_facileFormsElement
 										<td colspan="2">
 											<fieldset>
 												<legend>
-													<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_ACTIONSCRIPT'); ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ACTIONSCRIPT'); ?>
 												</legend>
 												<table cellpadding="4" cellspacing="1" border="0">
 													<tr>
 														<td nowrap>
-															<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TYPE'); ?>:
+															<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TYPE'); ?>:
 														</td>
 														<td nowrap>
 															<input type="radio" id="script2cond1" name="script2cond" value="0"
 																onclick="dispaction(this.value)" <?php if ($row->script2cond == 0)
 																	echo ' checked="checked"'; ?> /><label for="script2cond1">
-																<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_NONE'); ?>
+																<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_NONE'); ?>
 															</label>
 															<input type="radio" id="script2cond2" name="script2cond" value="1"
 																onclick="dispaction(this.value)" <?php if ($row->script2cond == 1)
 																	echo ' checked="checked"'; ?> /><label for="script2cond2">
-																<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_LIBRARY'); ?>
+																<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_LIBRARY'); ?>
 															</label>
 															<input type="radio" id="script2cond3" name="script2cond" value="2"
 																onclick="dispaction(this.value)" <?php if ($row->script2cond == 2)
 																	echo ' checked="checked"'; ?> /><label for="script2cond3">
-																<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CUSTOM'); ?>
+																<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CUSTOM'); ?>
 															</label>
 														</td>
 														<td></td>
 													</tr>
 													<tr id="actionact" style="display:none;">
 														<td nowrap>
-															<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_ACTIONS'); ?>:
+															<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ACTIONS'); ?>:
 														</td>
 														<td nowrap>
 															<?php
@@ -2998,7 +2998,7 @@ class HTML_facileFormsElement
 																	<input type="checkbox" id="script2flag1" name="script2flag1" value="1" <?php if ($row->script2flag1 == 1)
 																		echo ' checked="checked"'; ?> /><label
 																		for="script2flag1">
-																		<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CLICK'); ?>
+																		<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CLICK'); ?>
 																	</label>
 																	<?php
 																	break;
@@ -3007,27 +3007,27 @@ class HTML_facileFormsElement
 																	<input type="checkbox" id="script2flag1" name="script2flag1" value="1" <?php if ($row->script2flag1 == 1)
 																		echo ' checked="checked"'; ?> /><label
 																		for="script2flag1">
-																		<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CLICK'); ?>
+																		<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CLICK'); ?>
 																	</label>
 																	<input type="checkbox" id="script2flag2" name="script2flag2" value="1" <?php if ($row->script2flag2 == 1)
 																		echo ' checked="checked"'; ?> /><label
 																		for="script2flag2">
-																		<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_BLUR'); ?>
+																		<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_BLUR'); ?>
 																	</label>
 																	<input type="checkbox" id="script2flag3" name="script2flag3" value="1" <?php if ($row->script2flag3 == 1)
 																		echo ' checked="checked"'; ?> /><label
 																		for="script2flag3">
-																		<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CHANGE'); ?>
+																		<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CHANGE'); ?>
 																	</label>
 																	<input type="checkbox" id="script2flag4" name="script2flag4" value="1" <?php if ($row->script2flag4 == 1)
 																		echo ' checked="checked"'; ?> /><label
 																		for="script2flag4">
-																		<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_FOCUS'); ?>
+																		<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_FOCUS'); ?>
 																	</label>
 																	<input type="checkbox" id="script2flag5" name="script2flag5" value="1" <?php if ($row->script2flag5 == 1)
 																		echo ' checked="checked"'; ?> /><label
 																		for="script2flag5">
-																		<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_SELECTION'); ?>
+																		<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SELECTION'); ?>
 																	</label>
 																	<?php
 																	break;
@@ -3038,7 +3038,7 @@ class HTML_facileFormsElement
 													</tr>
 													<tr id="actionlib" style="display:none;">
 														<td nowrap>
-															<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_SCRIPT'); ?>:
+															<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SCRIPT'); ?>:
 														</td>
 														<td nowrap>
 															<select name="script2id" size="1" class="inputbox">
@@ -3071,10 +3071,10 @@ class HTML_facileFormsElement
 																<?php echo $ff_config->arealarge; ?>]
 															</a>
 															<a href="#" onClick="createActionCode();">
-																<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CREATECODE'); ?>
+																<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CREATECODE'); ?>
 															</a>
 															<?php
-															echo bf_ToolTip(BFText::_('COM_BREEZINGFORMS_ELEMENTS_TIPACTION')) . "\n";
+															echo bf_ToolTip(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TIPACTION')) . "\n";
 															?>
 															<br />
 															<textarea onFocus="codeAreaFocus(this);" readonly="readonly" wrap="off"
@@ -3102,48 +3102,48 @@ class HTML_facileFormsElement
 										<td colspan="2">
 											<fieldset>
 												<legend>
-													<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_VALIDSCRIPT'); ?>
+													<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_VALIDSCRIPT'); ?>
 												</legend>
 												<table cellpadding="4" cellspacing="1" border="0">
 													<tr>
 														<td nowrap>
-															<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TYPE'); ?>:
+															<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TYPE'); ?>:
 														</td>
 														<td nowrap>
 															<input type="radio" id="script3cond1" name="script3cond" value="0"
 																onclick="dispvalidation(this.value)" <?php if ($row->script3cond == 0)
 																	echo ' checked="checked"'; ?> /><label for="script3cond1">
-																<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_NONE'); ?>
+																<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_NONE'); ?>
 															</label>
 															<input type="radio" id="script3cond2" name="script3cond" value="1"
 																onclick="dispvalidation(this.value)" <?php if ($row->script3cond == 1)
 																	echo ' checked="checked"'; ?> /><label for="script3cond2">
-																<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_LIBRARY'); ?>
+																<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_LIBRARY'); ?>
 															</label>
 															<input type="radio" id="script3cond3" name="script3cond" value="2"
 																onclick="dispvalidation(this.value)" <?php if ($row->script3cond == 2)
 																	echo ' checked="checked"'; ?> /><label for="script3cond3">
-																<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CUSTOM'); ?>
+																<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CUSTOM'); ?>
 															</label>
 														</td>
 														<td></td>
 													</tr>
 													<tr id="validationmsg" style="display:none;">
 														<td nowrap valign="top">
-															<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_MESSAGE'); ?>:
+															<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_MESSAGE'); ?>:
 														</td>
 														<td nowrap valign="top">
 															<input type="text" size="50" maxlength="255" name="script3msg"
 																value="<?php echo $row->script3msg; ?>" class="inputbox" />
 															<?php
-															echo bf_ToolTip(BFText::_('COM_BREEZINGFORMS_ELEMENTS_TIPMESSAGE')) . "\n";
+															echo bf_ToolTip(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TIPMESSAGE')) . "\n";
 															?>
 														</td>
 														<td></td>
 													</tr>
 													<tr id="validationlib" style="display:none;">
 														<td nowrap>
-															<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_SCRIPT'); ?>:
+															<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SCRIPT'); ?>:
 														</td>
 														<td nowrap>
 															<select name="script3id" size="1" class="inputbox">
@@ -3176,10 +3176,10 @@ class HTML_facileFormsElement
 																<?php echo $ff_config->arealarge; ?>]
 															</a>
 															<a href="#" onClick="createValidationCode();">
-																<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_CREATECODE'); ?>
+																<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_CREATECODE'); ?>
 															</a>
 															<?php
-															echo bf_ToolTip(BFText::_('COM_BREEZINGFORMS_ELEMENTS_TIPVALID')) . "\n";
+															echo bf_ToolTip(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TIPVALID')) . "\n";
 															?>
 															<br />
 															<textarea onFocus="codeAreaFocus(this);" readonly="readonly" wrap="off"
@@ -3221,9 +3221,9 @@ class HTML_facileFormsElement
 						<input class="btn btn-primary" type="submit"
 							onclick="<?php if ($row->type == 'Query List')
 								echo "\t\t\t\tsaveQueryList();" ?>document.getElementById('task').value='save';"
-								value="<?php echo BFText::_('COM_BREEZINGFORMS_TOOLBAR_SAVE'); ?>" />&nbsp;&nbsp;
+								value="<?php echo BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_SAVE'); ?>" />&nbsp;&nbsp;
 						<input class="btn btn-primary" type="submit" onclick="document.getElementById('task').value='cancel';"
-							value="<?php echo BFText::_('COM_BREEZINGFORMS_TOOLBAR_CANCEL'); ?>" />
+							value="<?php echo BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_CANCEL'); ?>" />
 					</td>
 					<td></td>
 				</tr>
@@ -3273,7 +3273,7 @@ class HTML_facileFormsElement
 							case 'unpublish':
 							case 'remove':
 								if (form.boxchecked.value==0) {
-									alert("<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_SELELEMENTS'); ?>");
+									alert("<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SELELEMENTS'); ?>");
 									return;
 								} // if
 							break;
@@ -3285,22 +3285,22 @@ class HTML_facileFormsElement
 					form.act.value = 'share';
 					break;
 				case 'sort':
-					if (!confirm("<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_ASKSORT'); ?>")) return;
+					if (!confirm("<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ASKSORT'); ?>")) return;
 					break;
 				case 'remove':
-					if (!confirm("<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_ASKDELELEMENTS'); ?>")) return;
+					if (!confirm("<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ASKDELELEMENTS'); ?>")) return;
 					break;
 				case 'delpage':
-					if (!confirm("<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_ASKDELPAGE'); ?>")) return;
+					if (!confirm("<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ASKDELPAGE'); ?>")) return;
 					break;
 				case 'movepos':
 					if (form.movepixels.value == '') {
-						alert("<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_ENTPIXMOVE'); ?>");
+						alert("<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ENTPIXMOVE'); ?>");
 						return;
 					} // if
 					var nonDigits = /\D/;
 					if (nonDigits.test(form.movepixels.value)) {
-						alert("<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_PIXMOVEINT'); ?>");
+						alert("<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_PIXMOVEINT'); ?>");
 						return;
 					} // if
 					break;
@@ -3545,7 +3545,7 @@ class HTML_facileFormsElement
 							<th class="edit" nowrap>BreezingForms
 								<?php echo $ff_version; ?><br /><span class="componentheading">
 									<?php echo $form->title; ?>
-									<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_PAGE'); ?>
+									<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_PAGE'); ?>
 									<?php echo $page; ?>
 								</span>
 							</th>
@@ -3554,14 +3554,14 @@ class HTML_facileFormsElement
 				</td>
 				<td width="100%" align="right" nowrap>
 					<?php
-					ToolBarHelper::custom('new', 'new.png', 'new_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_NEW'), false);
-					ToolBarHelper::custom('editform', 'edit.png', 'edit_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_EDITFORM'), false);
-					ToolBarHelper::custom('copy', 'copy.png', 'copy_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_COPY'), false);
-					ToolBarHelper::custom('move', 'move.png', 'move_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_MOVE'), false);
-					ToolBarHelper::custom('publish', 'publish.png', 'publish_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_PUBLISH'), false);
-					ToolBarHelper::custom('unpublish', 'unpublish.png', 'unpublish_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_UNPUBLISH'), false);
-					ToolBarHelper::custom('remove', 'delete.png', 'delete_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_DELETE'), false);
-					ToolBarHelper::custom('close', 'cancel.png', 'cancel_f2.png', BFText::_('COM_BREEZINGFORMS_TOOLBAR_QUICKMODE_CLOSE'), false);
+					ToolBarHelper::custom('new', 'new.png', 'new_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_NEW'), false);
+					ToolBarHelper::custom('editform', 'edit.png', 'edit_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_EDITFORM'), false);
+					ToolBarHelper::custom('copy', 'copy.png', 'copy_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_COPY'), false);
+					ToolBarHelper::custom('move', 'move.png', 'move_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_MOVE'), false);
+					ToolBarHelper::custom('publish', 'publish.png', 'publish_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_PUBLISH'), false);
+					ToolBarHelper::custom('unpublish', 'unpublish.png', 'unpublish_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_UNPUBLISH'), false);
+					ToolBarHelper::custom('remove', 'delete.png', 'delete_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_DELETE'), false);
+					ToolBarHelper::custom('close', 'cancel.png', 'cancel_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_QUICKMODE_CLOSE'), false);
 					?>
 				</td>
 			</tr>
@@ -3572,24 +3572,24 @@ class HTML_facileFormsElement
 					<th nowrap align="center"><input type="checkbox" name="toggle" value="" onclick="Joomla.checkAll(this);" />
 					</th>
 					<th nowrap align="left">
-						<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TITLE'); ?>
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TITLE'); ?>
 					</th>
 					<th nowrap align="left">
-						<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_NAME'); ?>
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_NAME'); ?>
 					</th>
 					<th nowrap align="left">
-						<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TYPE'); ?>
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TYPE'); ?>
 					</th>
 					<th nowrap align="center">
-						<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_PUBLISHED'); ?>
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_PUBLISHED'); ?>
 					</th>
 					<th nowrap align="center" colspan="2"><a href="#sort" onclick="submitbutton('sort')">
-							<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_REORDER'); ?>
+							<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_REORDER'); ?>
 						</a></th>
 					<th nowrap align="center">X</th>
 					<th nowrap align="center">Y</th>
 					<th nowrap align="center">
-						<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_SCRIPTID'); ?>
+						<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SCRIPTID'); ?>
 					</th>
 					<th width="100%"></th>
 				</tr>
@@ -3686,7 +3686,7 @@ class HTML_facileFormsElement
 					<table cellpadding="4" cellspacing="1" border="0" class="adminform" style="width:100%;">
 						<tr>
 							<th colspan="2" class="title">BreezingForms -
-								<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_PAGELAY'); ?>
+								<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_PAGELAY'); ?>
 							</th>
 						</tr>
 						<tr>
@@ -3697,19 +3697,19 @@ class HTML_facileFormsElement
 
 
 											<input class="btn btn-warning" onclick="submitbutton('addbefore');" type="submit"
-												value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMS_ELEMENTS_ADDPAGEBEFORE'), ENT_QUOTES, 'UTF-8'); ?>" />
+												value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ADDPAGEBEFORE'), ENT_QUOTES, 'UTF-8'); ?>" />
 											&nbsp;&nbsp;
 											<input class="btn btn-warning" onclick="submitbutton('addbehind');" type="submit"
-												value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMS_ELEMENTS_ADDPAGEBEHIND'), ENT_QUOTES, 'UTF-8'); ?>" />
+												value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ADDPAGEBEHIND'), ENT_QUOTES, 'UTF-8'); ?>" />
 											<?php
 											if ($form->pages > 1) {
 												?>
 												&nbsp;&nbsp;<input class="btn btn-primary" onclick="submitbutton('movepage');"
 													type="submit"
-													value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMS_ELEMENTS_MOVEPG'), ENT_QUOTES, 'UTF-8'); ?>" />
+													value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_MOVEPG'), ENT_QUOTES, 'UTF-8'); ?>" />
 												&nbsp;&nbsp;<input class="btn btn-primary" onclick="submitbutton('delpage');"
 													type="submit"
-													value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMS_ELEMENTS_DELPAGE'), ENT_QUOTES, 'UTF-8'); ?>" />
+													value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_DELPAGE'), ENT_QUOTES, 'UTF-8'); ?>" />
 
 												<?php
 											} // if
@@ -3727,11 +3727,11 @@ class HTML_facileFormsElement
 											<?php
 											if ($form->prevmode == 2) {
 												?>
-												<?php echo BFText::_('COM_BREEZINGFORMS_DRAGGING') ?> <br />
-												<?php echo BFText::_('COM_BREEZINGFORMS_DRAGGING_ON') ?> <input type="radio"
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_DRAGGING') ?> <br />
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_DRAGGING_ON') ?> <input type="radio"
 													id="draggingEnabled" name="dragToggle"
 													onclick="dd.elements.SelectOptionDialog.setDraggable(true);" />
-												<?php echo BFText::_('COM_BREEZINGFORMS_DRAGGING_OFF') ?> <input id="draggingDisabled"
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_DRAGGING_OFF') ?> <input id="draggingDisabled"
 													checked type="radio" name="dragToggle"
 													onclick="dd.elements.SelectOptionDialog.setDraggable(false);" />
 												<br />
@@ -3742,14 +3742,14 @@ class HTML_facileFormsElement
 												value="1" <?php if ($ff_config->gridshow == 1)
 													echo ' checked="checked"'; ?> /><label
 												for="gridshow">
-												<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_GRID'); ?>
+												<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_GRID'); ?>
 											</label>
 											<hr />
 										</td>
 									</tr>
 									<tr>
 										<td nowrap colspan="5" style="text-align:center">
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_MOVEPIX'); ?>:<br />
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_MOVEPIX'); ?>:<br />
 											<input type="text" size="6" maxlength="6" id="id_movepixels" name="movepixels"
 												value="<?php echo is_int($ff_config->movepixels) ? is_int($ff_config->movepixels) : 5; ?>"
 												class="inputbox" />
@@ -3802,11 +3802,11 @@ class HTML_facileFormsElement
 									<tr>
 										<td colspan="5" style="text-align:center">
 											<input class="btn btn-primary" id="savepos" type="button"
-												value="<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_SAVE'); ?>"
+												value="<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SAVE'); ?>"
 												onclick="savePositions();" disabled="disabled" /><br />
 											<hr />
 											<input class="btn btn-primary" id="restpos" type="button"
-												value="<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_RESTORE'); ?>"
+												value="<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_RESTORE'); ?>"
 												onclick="restorePositions();" disabled="disabled" />
 											<hr />
 										</td>
@@ -3818,7 +3818,7 @@ class HTML_facileFormsElement
 												$attribute = '';
 												if ($p == $page)
 													$attribute = 'disabled="disabled"';
-												echo '<input class="btn btn-primary" type="button" value="' . BFText::_('COM_BREEZINGFORMS_ELEMENTS_PAGE') . ' ' . $p . '" onclick="changepage(\'' . $p . '\');" ' . $attribute . '/><br/>';
+												echo '<input class="btn btn-primary" type="button" value="' . BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_PAGE') . ' ' . $p . '" onclick="changepage(\'' . $p . '\');" ' . $attribute . '/><br/>';
 											} // for
 											?>
 										</td>
@@ -3867,10 +3867,10 @@ class HTML_facileFormsElement
 									?>
 									<iframe <?php echo $params; ?>>
 										<p>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_BROWSER1'); ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_BROWSER1'); ?>
 										</p>
 										<p>
-											<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_BROWSER2'); ?>
+											<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_BROWSER2'); ?>
 										</p>
 									</iframe>
 									<?php
@@ -3954,9 +3954,9 @@ class HTML_facileFormsElement
 	static function getDestination($option, $pkg, $form, $page, &$ids, &$sellist, $action)
 	{
 		if ($action == 'copysave')
-			$title = BFText::_('COM_BREEZINGFORMS_ELEMENTS_COPY');
+			$title = BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_COPY');
 		else
-			$title = BFText::_('COM_BREEZINGFORMS_ELEMENTS_MOVE');
+			$title = BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_MOVE');
 		?>
 				<script type="text/javascript">
 				<!--
@@ -3968,7 +3968,7 @@ class HTML_facileFormsElement
 					} // if
 					// do field validation
 					if (!getSelectedValue('adminForm', 'destination')) {
-						alert( "<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_SELFORMPAGE'); ?>" );
+						alert( "<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SELFORMPAGE'); ?>" );
 					} else {
 						submitform( pressbutton );
 					} // if
@@ -3989,7 +3989,7 @@ class HTML_facileFormsElement
 					<tr>
 						<td></td>
 						<td style="text-align:center"  valign="top">
-							<strong><?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_TOFORMPAGE'); ?>:</strong>
+							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_TOFORMPAGE'); ?>:</strong>
 							<br/><br/><?php echo $sellist; ?><br /><br />
 						</td>
 						<td></td>
@@ -3997,9 +3997,9 @@ class HTML_facileFormsElement
 					<tr>
 						<td></td>
 						<td nowrap style="text-align:right">
-											<input class="btn btn-primary" onclick="submitbutton('<?php echo $action; ?>');" type="submit" value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMS_TOOLBAR_CONTINUE'), ENT_QUOTES, 'UTF-8'); ?>"/>
+											<input class="btn btn-primary" onclick="submitbutton('<?php echo $action; ?>');" type="submit" value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_CONTINUE'), ENT_QUOTES, 'UTF-8'); ?>"/>
 											&nbsp;&nbsp;
-											<input class="btn btn-primary" onclick="submitbutton('cancel');" type="submit" value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMS_TOOLBAR_CANCEL'), ENT_QUOTES, 'UTF-8'); ?>"/>
+											<input class="btn btn-primary" onclick="submitbutton('cancel');" type="submit" value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_CANCEL'), ENT_QUOTES, 'UTF-8'); ?>"/>
 						</td>
 						<td></td>
 					</tr>
@@ -4033,7 +4033,7 @@ class HTML_facileFormsElement
 					} // if
 					// do field validation
 					if (!getSelectedValue('adminForm', 'destination')) {
-						alert( "<?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_SELPAGEMOVE'); ?>" );
+						alert( "<?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SELPAGEMOVE'); ?>" );
 					} else {
 						submitform( pressbutton );
 					} // if
@@ -4042,11 +4042,11 @@ class HTML_facileFormsElement
 				</script>
 				<form action="index.php" method="post" name="adminForm" id="adminForm" class="adminForm">
 				<table cellpadding="4" cellspacing="1" border="0" class="adminform" style="width:300px;">
-					<tr><th colspan="3" class="title">BreezingForms - <?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_MOVEPAGE'); ?></th></tr>
+					<tr><th colspan="3" class="title">BreezingForms - <?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_MOVEPAGE'); ?></th></tr>
 					<tr>
 						<td></td>
 						<td style="text-align:center" valign="top">
-							<strong><?php echo BFText::_('COM_BREEZINGFORMS_ELEMENTS_SELNRPAGE'); ?>:</strong>
+							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SELNRPAGE'); ?>:</strong>
 							<br/><br/><?php echo $sellist; ?><br /><br />
 						</td>
 						<td></td>
@@ -4054,9 +4054,9 @@ class HTML_facileFormsElement
 					<tr>
 						<td></td>
 						<td nowrap style="text-align:right">
-												<input class="btn btn-primary" onclick="submitbutton('movepagesave');" type="submit" value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMS_TOOLBAR_CONTINUE'), ENT_QUOTES, 'UTF-8'); ?>"/>
+												<input class="btn btn-primary" onclick="submitbutton('movepagesave');" type="submit" value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_CONTINUE'), ENT_QUOTES, 'UTF-8'); ?>"/>
 												&nbsp;&nbsp;
-												<input class="btn btn-primary" onclick="submitbutton('cancel');" type="submit" value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMS_TOOLBAR_CANCEL'), ENT_QUOTES, 'UTF-8'); ?>"/>
+												<input class="btn btn-primary" onclick="submitbutton('cancel');" type="submit" value="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_CANCEL'), ENT_QUOTES, 'UTF-8'); ?>"/>
 						</td>
 						<td></td>
 					</tr>

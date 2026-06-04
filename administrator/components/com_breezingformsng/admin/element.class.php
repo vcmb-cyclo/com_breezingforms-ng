@@ -317,7 +317,7 @@ class facileFormsElement
 		}
 		// CONTENTBUILDERNG END
 
-		Factory::getApplication()->enqueueMessage(BFText::_('COM_BREEZINGFORMS_ELEMENTS_SAVED'));
+		Factory::getApplication()->enqueueMessage(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SAVED'));
 		Factory::getApplication()->redirect(
 			"index.php?option=$option&act=editpage&form=$form&page=$page&pkg=$pkg"
 		);
@@ -375,7 +375,7 @@ class facileFormsElement
 			foreach ($rows as $row) {
 				$package = $row->package;
 				for ($p = 1; $p <= $row->pages; $p++)
-					$fff[] = HTMLHelper::_('select.option', $row->id . ',' . $p, $row->package . '::' . $row->name . ' / ' . BFText::_('COM_BREEZINGFORMS_ELEMENTS_PAGE') . ' ' . $p);
+					$fff[] = HTMLHelper::_('select.option', $row->id . ',' . $p, $row->package . '::' . $row->name . ' / ' . BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_PAGE') . ' ' . $p);
 			} // for
 
 		$database->setQuery(
@@ -387,7 +387,7 @@ class facileFormsElement
 		if (count($rows))
 			foreach ($rows as $row)
 				for ($p = 1; $p <= $row->pages; $p++)
-					$fff[] = HTMLHelper::_('select.option', $row->id . ',' . $p, $row->package . '::' . $row->name . ' / ' . BFText::_('COM_BREEZINGFORMS_ELEMENTS_PAGE') . ' ' . $p);
+					$fff[] = HTMLHelper::_('select.option', $row->id . ',' . $p, $row->package . '::' . $row->name . ' / ' . BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_PAGE') . ' ' . $p);
 
 		$database->setQuery(
 			"select * from #__facileforms_forms " .
@@ -398,7 +398,7 @@ class facileFormsElement
 		if (count($rows))
 			foreach ($rows as $row)
 				for ($p = 1; $p <= $row->pages; $p++)
-					$fff[] = HTMLHelper::_('select.option', $row->id . ',' . $p, $row->package . '::' . $row->name . ' / ' . BFText::_('COM_BREEZINGFORMS_ELEMENTS_PAGE') . ' ' . $p);
+					$fff[] = HTMLHelper::_('select.option', $row->id . ',' . $p, $row->package . '::' . $row->name . ' / ' . BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_PAGE') . ' ' . $p);
 
 		$sellist =
 			HTMLHelper::_(
@@ -420,7 +420,7 @@ class facileFormsElement
 		$destination = explode(',', BFRequest::getVar('destination', ''));
 		list($newform, $newpage) = $destination;
 		if (!$newform && !$newpage) {
-			Factory::getApplication()->enqueueMessage(BFText::_('COM_BREEZINGFORMS_ELEMENTS_ANERROR'), 'error');
+			Factory::getApplication()->enqueueMessage(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ANERROR'), 'error');
 			Factory::getApplication()->redirect("index.php?option=$option&act=editpage&form=$form&page=$page&pkg=$pkg");
 		}
 		$total = count($ids);
@@ -435,7 +435,7 @@ class facileFormsElement
 				$row->store();
 				$row->reorder('form=' . $newform . ' and page = ' . $newpage);
 			} // foreach
-		$msg = $total . ' ' . BFText::_('COM_BREEZINGFORMS_ELEMENTS_COPIED') . $newform . ', ' . BFText::_('COM_BREEZINGFORMS_ELEMENTS_PAGE2') . $newpage;
+		$msg = $total . ' ' . BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_COPIED') . $newform . ', ' . BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_PAGE2') . $newpage;
 		Factory::getApplication()->enqueueMessage($msg);
 		Factory::getApplication()->redirect("index.php?option=$option&act=editpage&form=$form&page=$page&pkg=$pkg");
 	} // copy
@@ -447,7 +447,7 @@ class facileFormsElement
 		$destination = explode(',', BFRequest::getVar('destination', ''));
 		list($newform, $newpage) = $destination;
 		if (!$newform && !$newpage) {
-			Factory::getApplication()->enqueueMessage(BFText::_('COM_BREEZINGFORMS_ELEMENTS_ANERROR'), 'error');
+			Factory::getApplication()->enqueueMessage(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_ANERROR'), 'error');
 			Factory::getApplication()->redirect("index.php?option=$option&act=editpage&form=$form&page=$page&pkg=$pkg");
 		}
 		if ($newform != $form || $newpage != $page) {
@@ -462,10 +462,10 @@ class facileFormsElement
 					$row->store();
 					$row->reorder('form=' . $newform . ' and page = ' . $newpage);
 				} // foreach
-			$msg = $total . ' ' . BFText::_('COM_BREEZINGFORMS_ELEMENTS_MOVED') . $newform . ', ' . BFText::_('COM_BREEZINGFORMS_ELEMENTS_PAGE2') . $newpage;
+			$msg = $total . ' ' . BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_MOVED') . $newform . ', ' . BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_PAGE2') . $newpage;
 		} else
-			$msg = BFText::_('COM_BREEZINGFORMS_ELEMENTS_NOTMOVED');
-		Factory::getApplication()->enqueueMessage($msg, $msg === BFText::_('COM_BREEZINGFORMS_ELEMENTS_NOTMOVED') ? 'warning' : 'message');
+			$msg = BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_NOTMOVED');
+		Factory::getApplication()->enqueueMessage($msg, $msg === BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_NOTMOVED') ? 'warning' : 'message');
 		Factory::getApplication()->redirect("index.php?option=$option&act=editpage&form=$form&page=$page&pkg=$pkg");
 	} // move
 
@@ -503,7 +503,7 @@ class facileFormsElement
 				_ff_query("update `#__facileforms_elements` set ordering=$o where id=$row->id");
 				$o++;
 			} // foreach
-		Factory::getApplication()->enqueueMessage(BFText::_('COM_BREEZINGFORMS_ELEMENTS_SORTED'));
+		Factory::getApplication()->enqueueMessage(BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_SORTED'));
 		Factory::getApplication()->redirect(
 			"index.php?option=$option&act=editpage&form=$form&page=$page&pkg=$pkg"
 		);
@@ -697,7 +697,7 @@ class facileFormsElement
 		$row->load($form);
 		$lst = array();
 		for ($p = 1; $p <= $row->pages; $p++)
-			$lst[] = HTMLHelper::_('select.option', $p, BFText::_('COM_BREEZINGFORMS_ELEMENTS_PAGE') . ' ' . $p);
+			$lst[] = HTMLHelper::_('select.option', $p, BFText::_('COM_BREEZINGFORMSNG_ELEMENTS_PAGE') . ' ' . $p);
 		$sellist =
 			HTMLHelper::_(
 				'select.genericlist',

@@ -8,7 +8,8 @@
 
 <extension type="component" version="6.0" method="upgrade">
 
-	<name>COM_BREEZINGFORMS</name>
+	<name>COM_BREEZINGFORMSNG</name>
+	<element>com_breezingformsng</element>
 	<creationDate>2026-04-28</creationDate>
 	<author>XDA/GIL</author>
 	<copyright>Copyright 2004 - 2026 by XDA+GIL</copyright>
@@ -16,7 +17,7 @@
 	<authorEmail>bf@vcmb.fr</authorEmail>
 	<authorUrl>https://breezingforms-ng.vcmb.fr</authorUrl>
 	<version>6.0.8-RC6</version>
-	<description>Installation successful. Next find BreezingForms in the Components menu, and finish the installation process.</description>
+	<description>COM_BREEZINGFORMSNG_XML_DESCRIPTION</description>
 
 	<namespace path="src">Vcmb\Component\BreezingformsNG</namespace>
 
@@ -32,7 +33,7 @@
 
 	<files folder="components/com_breezingformsng">
 		<filename>index.html</filename>
-		<filename>breezingforms.php</filename>
+		<filename>breezingformsng.php</filename>
 		<filename>facileforms.class.php</filename>
 		<filename>facileforms.process.php</filename>
 		<filename>facileforms.xml.php</filename>
@@ -56,55 +57,56 @@
 	</languages>
 
 	<administration>
-		<menu>COM_BREEZINGFORMS</menu>
+		<menu>COM_BREEZINGFORMSNG</menu>
 
 		<submenu>
-			<menu option="com_breezingformsng" act="managerecs" alt="BreezingForms/Manage Records">COM_BREEZINGFORMS_MANAGE_RECORDS</menu>
+			<menu option="com_breezingformsng" act="managerecs" alt="BreezingForms/Manage Records">COM_BREEZINGFORMSNG_MANAGE_RECORDS</menu>
 
 			<menu option="com_breezingformsng" act="manageforms" alt="BreezingForms/Manage Forms">
-				COM_BREEZINGFORMS_MANAGE_FORMS
+				COM_BREEZINGFORMSNG_MANAGE_FORMS
 				<params>
 					<menu-quicktask>index.php?option=com_breezingformsng&amp;act=manageforms&amp;task=quickmode</menu-quicktask>
-					<menu-quicktask-title>COM_BREEZINGFORMS_MENUS_NEW_FORM</menu-quicktask-title>
+					<menu-quicktask-title>COM_BREEZINGFORMSNG_MENUS_NEW_FORM</menu-quicktask-title>
 					<menu-quicktask-icon>plus</menu-quicktask-icon>
 				</params>
 			</menu>
 
 			<menu option="com_breezingformsng" act="managescripts" alt="BreezingForms/Manage Scripts">
-				COM_BREEZINGFORMS_MANAGE_SCRIPTS
+				COM_BREEZINGFORMSNG_MANAGE_SCRIPTS
 				<params>
 					<menu-quicktask>index.php?option=com_breezingformsng&amp;act=managescripts&amp;task=new</menu-quicktask>
-					<menu-quicktask-title>COM_BREEZINGFORMS_MENUS_NEW_SCRIPT</menu-quicktask-title>
+					<menu-quicktask-title>COM_BREEZINGFORMSNG_MENUS_NEW_SCRIPT</menu-quicktask-title>
 					<menu-quicktask-icon>plus</menu-quicktask-icon>
 				</params>
 			</menu>
 
 			<menu option="com_breezingformsng" act="managepieces" alt="BreezingForms/Manage Pieces">
-				COM_BREEZINGFORMS_MANAGE_PIECES
+				COM_BREEZINGFORMSNG_MANAGE_PIECES
 				<params>
 					<menu-quicktask>index.php?option=com_breezingformsng&amp;act=managepieces&amp;task=new</menu-quicktask>
-					<menu-quicktask-title>COM_BREEZINGFORMS_MENUS_NEW_PIECE</menu-quicktask-title>
+					<menu-quicktask-title>COM_BREEZINGFORMSNG_MENUS_NEW_PIECE</menu-quicktask-title>
 					<menu-quicktask-icon>plus</menu-quicktask-icon>
 				</params>
 			</menu>
 
 			<menu option="com_breezingformsng" act="integrate" alt="BreezingForms/Integrator">
-				COM_BREEZINGFORMS_INTEGRATOR
+				COM_BREEZINGFORMSNG_INTEGRATOR
 				<params>
 					<menu-quicktask>index.php?option=com_breezingformsng&amp;act=integrate&amp;task=add</menu-quicktask>
-					<menu-quicktask-title>COM_BREEZINGFORMS_MENUS_NEW_INTEGRATION</menu-quicktask-title>
+					<menu-quicktask-title>COM_BREEZINGFORMSNG_MENUS_NEW_INTEGRATION</menu-quicktask-title>
 					<menu-quicktask-icon>plus</menu-quicktask-icon>
 				</params>
 			</menu>
 
-			<menu option="com_breezingformsng" act="configuration" alt="BreezingForms/Configuration">COM_BREEZINGFORMS_CONFIGURATION</menu>
-			<menu option="com_breezingformsng" act="about" alt="BreezingForms/About">COM_BREEZINGFORMS_ABOUT</menu>
+			<menu option="com_breezingformsng" act="configuration" alt="BreezingForms/Configuration">COM_BREEZINGFORMSNG_CONFIGURATION</menu>
+			<menu option="com_breezingformsng" act="about" alt="BreezingForms/About">COM_BREEZINGFORMSNG_ABOUT</menu>
 		</submenu>
 
 		<files folder="administrator/components/com_breezingformsng">
 			<filename>index.html</filename>
 			<filename>access.xml</filename>
 			<filename>config.xml</filename>
+			<filename>script.php</filename>
 			<filename>admin.breezingforms.php</filename>
 			<filename>toolbar.facileforms.html.php</filename>
 			<filename>toolbar.facileforms.php</filename>

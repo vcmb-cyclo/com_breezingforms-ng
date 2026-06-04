@@ -2,8 +2,8 @@
 <updates> 
 
 	<update>
-		<name>COM_BREEZINGFORMS</name>
-		<description>BreezingForms-ng Update</description>
+		<name>COM_BREEZINGFORMSNG</name>
+		<description>COM_BREEZINGFORMSNG_XML_DESCRIPTION</description>
 		<element>com_breezingformsng</element>
 		<type>component</type>
 		<client>1</client>

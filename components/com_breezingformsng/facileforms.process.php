@@ -108,7 +108,7 @@ function ff_trace($msg = null)
     $trc = '';
     for ($l = 0; $l < $level; $l++)
         $trc .= '  ';
-    $trc .= BFText::_('COM_BREEZINGFORMS_PROCESS_MSGUNKNOWN') . ": $msg\n";
+    $trc .= BFText::_('COM_BREEZINGFORMSNG_PROCESS_MSGUNKNOWN') . ": $msg\n";
     $ff_processor->traceBuffer .= htmlspecialchars($trc, ENT_QUOTES);
     if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
         $ff_processor->dumpTrace();
@@ -128,7 +128,7 @@ function _ff_trace($line, $msg = null)
         $trc = '';
         for ($l = 0; $l < $level; $l++)
             $trc .= '  ';
-        $trc .= BFText::_('COM_BREEZINGFORMS_PROCESS_LINE') . " $line: $msg\n";
+        $trc .= BFText::_('COM_BREEZINGFORMSNG_PROCESS_LINE') . " $line: $msg\n";
         $ff_processor->traceBuffer .= htmlspecialchars($trc, ENT_QUOTES);
         if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
             $ff_processor->dumpTrace();
@@ -188,7 +188,7 @@ function _ff_tracePiece($newmode, $name, $line, $type, $id, $pane)
         for ($l = 0; $l < $level; $l++)
             $ff_processor->traceBuffer .= '  ';
         $ff_processor->traceBuffer .= htmlspecialchars(
-            "+" . BFText::_('COM_BREEZINGFORMS_PROCESS_ENTER') . " $name " . BFText::_('COM_BREEZINGFORMS_PROCESS_ATLINE') . " $line\n",
+            "+" . BFText::_('COM_BREEZINGFORMSNG_PROCESS_ENTER') . " $name " . BFText::_('COM_BREEZINGFORMSNG_PROCESS_ATLINE') . " $line\n",
             ENT_QUOTES
         );
         if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
@@ -211,7 +211,7 @@ function _ff_traceFunction($newmode, $name, $line, $type, $id, $pane, &$args)
         $trc = '';
         for ($l = 0; $l < $level; $l++)
             $trc .= '  ';
-        $trc .= "+" . BFText::_('COM_BREEZINGFORMS_PROCESS_ENTER') . " $name(";
+        $trc .= "+" . BFText::_('COM_BREEZINGFORMSNG_PROCESS_ENTER') . " $name(";
         if ($args) {
             $next = false;
             foreach ($args as $arg) {
@@ -235,18 +235,18 @@ function _ff_traceFunction($newmode, $name, $line, $type, $id, $pane, &$args)
                                 $trc .= "'$arg'";
                             } else
                                 if (is_array($arg))
-                                    $trc .= BFText::_('COM_BREEZINGFORMS_PROCESS_ARRAY');
+                                    $trc .= BFText::_('COM_BREEZINGFORMSNG_PROCESS_ARRAY');
                                 else
                                     if (is_object($arg))
-                                        $trc .= BFText::_('COM_BREEZINGFORMS_PROCESS_OBJECT');
+                                        $trc .= BFText::_('COM_BREEZINGFORMSNG_PROCESS_OBJECT');
                                     else
                                         if (is_resource($arg))
-                                            $trc .= BFText::_('COM_BREEZINGFORMS_PROCESS_RESOURCE');
+                                            $trc .= BFText::_('COM_BREEZINGFORMSNG_PROCESS_RESOURCE');
                                         else
                                             $trc .= _FACILEFORMS_PROCESS_UNKTYPE;
             } // foreach
         } // if
-        $trc .= ") " . BFText::_('COM_BREEZINGFORMS_PROCESS_ATLINE') . " $line\n";
+        $trc .= ") " . BFText::_('COM_BREEZINGFORMSNG_PROCESS_ATLINE') . " $line\n";
         $ff_processor->traceBuffer .= htmlspecialchars($trc, ENT_QUOTES);
         if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
             $ff_processor->dumpTrace();
@@ -292,7 +292,7 @@ function _ff_traceExit($line, $retval = null)
             for ($l = 0; $l < $level; $l++)
                 $ff_processor->traceBuffer .= '  ';
             $ff_processor->traceBuffer .= htmlspecialchars(
-                "-" . BFText::_('COM_BREEZINGFORMS_PROCESS_LEAVE') . " $name " . BFText::_('COM_BREEZINGFORMS_PROCESS_ATLINE') . " $line\n",
+                "-" . BFText::_('COM_BREEZINGFORMSNG_PROCESS_LEAVE') . " $name " . BFText::_('COM_BREEZINGFORMSNG_PROCESS_ATLINE') . " $line\n",
                 ENT_QUOTES
             );
             if ($oldmode & _FF_TRACEMODE_DIRECT)
@@ -301,11 +301,11 @@ function _ff_traceExit($line, $retval = null)
         if ($oldmode != $newmode)
             $ff_processor->traceMode = ($oldmode & ~_FF_TRACEMODE_VARIABLE) | ($newmode & _FF_TRACEMODE_VARIABLE);
     } else {
-        $ff_processor->traceBuffer .= htmlspecialchars(BFText::_('COM_BREEZINGFORMS_PROCESS_WARNSTK') . "\n", ENT_QUOTES);
+        $ff_processor->traceBuffer .= htmlspecialchars(BFText::_('COM_BREEZINGFORMSNG_PROCESS_WARNSTK') . "\n", ENT_QUOTES);
         if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
             $ff_processor->dumpTrace();
         $type = $id = $pane = null;
-        $name = BFText::_('COM_BREEZINGFORMS_PROCESS_UNKNOWN');
+        $name = BFText::_('COM_BREEZINGFORMSNG_PROCESS_UNKNOWN');
     } // if
     return $retval;
 }
@@ -320,8 +320,8 @@ function _ff_errorHandler($errno, $errstr, $errfile, $errline)
     if (isset($ff_processor->dying) && $ff_processor->dying)
         return;
 
-    $msg = "\n<strong>*** " . htmlspecialchars(BFText::_('COM_BREEZINGFORMS_PROCESS_EXCAUGHT'), ENT_QUOTES) . " ***</strong>\n" .
-        htmlspecialchars(BFText::_('COM_BREEZINGFORMS_PROCESS_PHPLEVEL') . ' ', ENT_QUOTES);
+    $msg = "\n<strong>*** " . htmlspecialchars(BFText::_('COM_BREEZINGFORMSNG_PROCESS_EXCAUGHT'), ENT_QUOTES) . " ***</strong>\n" .
+        htmlspecialchars(BFText::_('COM_BREEZINGFORMSNG_PROCESS_PHPLEVEL') . ' ', ENT_QUOTES);
     $fail = false;
     if (!defined('E_DEPRECATED')) {
         define('E_DEPRECATED', 8192);
@@ -359,8 +359,8 @@ function _ff_errorHandler($errno, $errstr, $errfile, $errline)
             $fail = true;
     } // switch
     $msg .= htmlspecialchars(
-        "\n" . BFText::_('COM_BREEZINGFORMS_PROCESS_PHPFILE') . " $errfile\n" .
-        BFText::_('COM_BREEZINGFORMS_PROCESS_PHPLINE') . " $errline\n",
+        "\n" . BFText::_('COM_BREEZINGFORMSNG_PROCESS_PHPFILE') . " $errfile\n" .
+        BFText::_('COM_BREEZINGFORMSNG_PROCESS_PHPLINE') . " $errline\n",
         ENT_QUOTES
     );
 
@@ -371,7 +371,7 @@ function _ff_errorHandler($errno, $errstr, $errfile, $errline)
 
     if ($n) {
         $info = $ff_processor->traceStack[$n - 1];
-        $name = htmlspecialchars($info[2] . ' ' . BFText::_('COM_BREEZINGFORMS_PROCESS_ATLINE') . ' ' . $info[3], ENT_QUOTES);
+        $name = htmlspecialchars($info[2] . ' ' . BFText::_('COM_BREEZINGFORMSNG_PROCESS_ATLINE') . ' ' . $info[3], ENT_QUOTES);
         $type = $info[4];
         $id = $info[5];
         $pane = $info[6];
@@ -448,9 +448,9 @@ function _ff_errorHandler($errno, $errstr, $errfile, $errline)
                     'onClick="ff_redirectParent(\'' . htmlspecialchars($url, ENT_QUOTES) . '\');return true;"' .
                     '>' . $name . '</a>';
         } // if
-        $msg .= htmlspecialchars(BFText::_('COM_BREEZINGFORMS_PROCESS_LASTPOS'), ENT_QUOTES) . ' ' . $name . "\n";
+        $msg .= htmlspecialchars(BFText::_('COM_BREEZINGFORMSNG_PROCESS_LASTPOS'), ENT_QUOTES) . ' ' . $name . "\n";
     } // if
-    $msg .= htmlspecialchars(BFText::_('COM_BREEZINGFORMS_PROCESS_ERRMSG') . " $errstr\n\n", ENT_QUOTES);
+    $msg .= htmlspecialchars(BFText::_('COM_BREEZINGFORMSNG_PROCESS_ERRMSG') . " $errstr\n\n", ENT_QUOTES);
     if ($fail) {
         if (isset($ff_processor)) {
             $ff_processor->traceBuffer .= $msg;
@@ -577,7 +577,7 @@ class HTML_facileFormsProcessor
         $this->opsys = $jbrowserInstance->getPlatform();
 
         if ($ff_config->getprovider == 0)
-            $this->provider = BFText::_('COM_BREEZINGFORMS_PROCESS_UNKNOWN');
+            $this->provider = BFText::_('COM_BREEZINGFORMSNG_PROCESS_UNKNOWN');
         else {
             $host = @GetHostByAddr($this->ip);
             $this->provider = preg_replace('/^./', '', strchr($host, '.'));
@@ -824,9 +824,9 @@ class HTML_facileFormsProcessor
         } // if
         // not supported types
         if (is_resource($mixed))
-            return $indent . "'" . BFText::_('COM_BREEZINGFORMS_PROCESS_RESOURCE') . "'";
+            return $indent . "'" . BFText::_('COM_BREEZINGFORMSNG_PROCESS_RESOURCE') . "'";
 
-        return $indent . "'" . BFText::_('COM_BREEZINGFORMS_PROCESS_UNKNOWN') . "'";
+        return $indent . "'" . BFText::_('COM_BREEZINGFORMSNG_PROCESS_UNKNOWN') . "'";
     }
 
     // expJsValue
@@ -1348,7 +1348,7 @@ class HTML_facileFormsProcessor
     {
         $name = null;
         $code = $this->getPieceById($id, $name);
-        return $this->execPiece($code, BFText::_('COM_BREEZINGFORMS_PROCESS_PIECE') . " $name", 'p', $id, null);
+        return $this->execPiece($code, BFText::_('COM_BREEZINGFORMSNG_PROCESS_PIECE') . " $name", 'p', $id, null);
     }
 
     // execPieceById
@@ -1357,7 +1357,7 @@ class HTML_facileFormsProcessor
     {
         $id = null;
         $code = $this->getPieceByName($name, $id);
-        return $this->execPiece($code, BFText::_('COM_BREEZINGFORMS_PROCESS_PIECE') . " $name", 'p', $id, null);
+        return $this->execPiece($code, BFText::_('COM_BREEZINGFORMSNG_PROCESS_PIECE') . " $name", 'p', $id, null);
     }
 
     // execPieceByName
@@ -1424,7 +1424,7 @@ class HTML_facileFormsProcessor
                     if (
                         $this->prepareEvalCode(
                             $coldef->comp[$c][1],
-                            BFText::_('COM_BREEZINGFORMS_PROCESS_QVALUEOF') . " " . $elem->name . "::" . $coldef->name,
+                            BFText::_('COM_BREEZINGFORMSNG_PROCESS_QVALUEOF') . " " . $elem->name . "::" . $coldef->name,
                             'e',
                             $elem->id,
                             2
@@ -1443,7 +1443,7 @@ class HTML_facileFormsProcessor
 
     function execQueryValue($code, &$elem, &$row, &$coldef, $value)
     {
-        $this->traceEval(BFText::_('COM_BREEZINGFORMS_PROCESS_QVALUEOF') . " " . $elem->name . "::" . $coldef->name);
+        $this->traceEval(BFText::_('COM_BREEZINGFORMSNG_PROCESS_QVALUEOF') . " " . $elem->name . "::" . $coldef->name);
         try {
             return eval($code);
         } catch (Error $e) {
@@ -1460,9 +1460,9 @@ class HTML_facileFormsProcessor
     {
         $ret = null;
         $code = $elem->data2;
-        if ($this->prepareEvalCode($code, BFText::_('COM_BREEZINGFORMS_PROCESS_QPIECEOF') . " " . $elem->name, 'e', $elem->id, 1)) {
+        if ($this->prepareEvalCode($code, BFText::_('COM_BREEZINGFORMSNG_PROCESS_QPIECEOF') . " " . $elem->name, 'e', $elem->id, 1)) {
             $rows = array();
-            $this->traceEval(BFText::_('COM_BREEZINGFORMS_PROCESS_QPIECEOF') . " " . $elem->name);
+            $this->traceEval(BFText::_('COM_BREEZINGFORMSNG_PROCESS_QPIECEOF') . " " . $elem->name);
 
             try {
                 eval($code);
@@ -2166,10 +2166,10 @@ class HTML_facileFormsProcessor
             // emit the code
             if ($ff_config->compress)
                 echo $this->compressJavascript(
-                    $this->replaceCode($code, BFText::_('COM_BREEZINGFORMS_PROCESS_SCRIPT') . " $func", $type, $id, $pane)
+                    $this->replaceCode($code, BFText::_('COM_BREEZINGFORMSNG_PROCESS_SCRIPT') . " $func", $type, $id, $pane)
                 );
             else
-                echo $this->replaceCode($code, BFText::_('COM_BREEZINGFORMS_PROCESS_SCRIPT') . " $func", $type, $id, $pane) . nl() . nl();
+                echo $this->replaceCode($code, BFText::_('COM_BREEZINGFORMSNG_PROCESS_SCRIPT') . " $func", $type, $id, $pane) . nl() . nl();
         } // if
     }
 
@@ -2519,10 +2519,10 @@ class HTML_facileFormsProcessor
                 );
                 $rows = $this->database->loadObjectList();
                 if (count($rows))
-                    echo $this->execPiece($rows[0]->code, BFText::_('COM_BREEZINGFORMS_PROCESS_BFPIECE') . " " . $rows[0]->name, 'p', $this->formrow->piece1id, null);
+                    echo $this->execPiece($rows[0]->code, BFText::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECE') . " " . $rows[0]->name, 'p', $this->formrow->piece1id, null);
                 break;
             case 2: // custom code
-                echo $this->execPiece($this->formrow->piece1code, BFText::_('COM_BREEZINGFORMS_PROCESS_BFPIECEC'), 'f', $this->form, 2);
+                echo $this->execPiece($this->formrow->piece1code, BFText::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECEC'), 'f', $this->form, 2);
                 break;
             default:
                 break;
@@ -2550,9 +2550,9 @@ class HTML_facileFormsProcessor
                     $fileExtensionsCheck .= '
 					if(!ff_elem' . $row->id . 'Exts){
 						if(typeof bfUseErrorAlerts == "undefined"){
-							alert("' . addslashes(BFText::_('COM_BREEZINGFORMS_FILE_EXTENSION_NOT_ALLOWED')) . '");
+							alert("' . addslashes(BFText::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED')) . '");
 						} else {
-							bfShowErrors("' . addslashes(BFText::_('COM_BREEZINGFORMS_FILE_EXTENSION_NOT_ALLOWED')) . '");
+							bfShowErrors("' . addslashes(BFText::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED')) . '");
 						}
 						if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
                                                 if(document.getElementById("bfSubmitButton")){
@@ -2626,12 +2626,12 @@ class HTML_facileFormsProcessor
                                                                                     JQuery("#bfSubmitMessage").css("display","none");
 									        }
                                                                                 if(typeof bfUseErrorAlerts == "undefined"){
-                                                                                    alert("' . addslashes(BFText::_('COM_BREEZINGFORMS_CAPTCHA_MISSING_WRONG')) . '");
+                                                                                    alert("' . addslashes(BFText::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
 									        } else {
                                                                                    if(typeof inlineErrorElements != "undefined"){
-                                                                                     inlineErrorElements.push(["bfCaptchaEntry","' . addslashes(BFText::_('COM_BREEZINGFORMS_CAPTCHA_MISSING_WRONG')) . '"]);
+                                                                                     inlineErrorElements.push(["bfCaptchaEntry","' . addslashes(BFText::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '"]);
                                                                                    }
-									           bfShowErrors("' . addslashes(BFText::_('COM_BREEZINGFORMS_CAPTCHA_MISSING_WRONG')) . '");
+									           bfShowErrors("' . addslashes(BFText::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
 									        }
                                                                                 if(typeof ladda_button != "undefined"){
                                                                                     
@@ -2705,12 +2705,12 @@ class HTML_facileFormsProcessor
                                                         else
                                                         {
                                                                 if(typeof bfUseErrorAlerts == "undefined"){
-                                                                        alert("' . addslashes(BFText::_('COM_BREEZINGFORMS_CAPTCHA_MISSING_WRONG')) . '");
+                                                                        alert("' . addslashes(BFText::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
                                                                 } else {
                                                                     if(typeof inlineErrorElements != "undefined"){
-                                                                        inlineErrorElements.push(["bfReCaptchaEntry","' . addslashes(BFText::_('COM_BREEZINGFORMS_CAPTCHA_MISSING_WRONG')) . '"]);
+                                                                        inlineErrorElements.push(["bfReCaptchaEntry","' . addslashes(BFText::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '"]);
                                                                     }
-                                                                    bfShowErrors("' . addslashes(BFText::_('COM_BREEZINGFORMS_CAPTCHA_MISSING_WRONG')) . '");
+                                                                    bfShowErrors("' . addslashes(BFText::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
                                                                 }
 
                                                                 if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
@@ -2742,12 +2742,12 @@ class HTML_facileFormsProcessor
                                                             if(typeof bfInvisibleRecaptcha == "undefined"){
                                                             
 	                                                            if(typeof bfUseErrorAlerts == "undefined"){
-	                                                                    alert("' . addslashes(BFText::_('COM_BREEZINGFORMS_CAPTCHA_MISSING_WRONG')) . '");
+	                                                                    alert("' . addslashes(BFText::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
 	                                                            } else {
 	                                                                if(typeof inlineErrorElements != "undefined"){
-	                                                                    inlineErrorElements.push(["bfReCaptchaEntry","' . addslashes(BFText::_('COM_BREEZINGFORMS_CAPTCHA_MISSING_WRONG')) . '"]);
+	                                                                    inlineErrorElements.push(["bfReCaptchaEntry","' . addslashes(BFText::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '"]);
 	                                                                }
-	                                                                bfShowErrors("' . addslashes(BFText::_('COM_BREEZINGFORMS_CAPTCHA_MISSING_WRONG')) . '");
+	                                                                bfShowErrors("' . addslashes(BFText::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
 	                                                            }
                                                             
                                                             
@@ -3109,12 +3109,12 @@ class HTML_facileFormsProcessor
                 '        if (pagenav<=4) {' . nl() .
                 '            if (page>1) navi += \'<a href="javascript:ff_dispQueryPage(\'+id+\',1);">\';' . nl() .
                 '            navi += \'&lt;&lt;\';' . nl() .
-                '            if (pagenav<=2) navi += \' ' . BFText::_('COM_BREEZINGFORMS_PROCESS_PAGESTART') . '\';' . nl() .
+                '            if (pagenav<=2) navi += \' ' . BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGESTART') . '\';' . nl() .
                 '            if (page>1) navi += \'<\/a>\';' . nl() .
                 '            navi += \' \';' . nl() .
                 '            if (page>1) navi += \'<a href="javascript:ff_dispQueryPage(\'+id+\',\'+(page-1)+\');">\';' . nl() .
                 '            navi += \'&lt;\';' . nl() .
-                '            if (pagenav<=2) navi += \' ' . BFText::_('COM_BREEZINGFORMS_PROCESS_PAGEPREV') . '\';' . nl() .
+                '            if (pagenav<=2) navi += \' ' . BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV') . '\';' . nl() .
                 '            if (page>1) navi += \'<\/a>\';' . nl() .
                 '            navi += \' \';' . nl() .
                 '        } // if' . nl() .
@@ -3127,12 +3127,12 @@ class HTML_facileFormsProcessor
                 '        } // if' . nl() .
                 '        if (pagenav<=4) {' . nl() .
                 '            if (page<lastpage) navi += \'<a href="javascript:ff_dispQueryPage(\'+id+\',\'+(page+1)+\');">\';' . nl() .
-                '            if (pagenav<=2) navi += \'' . BFText::_('COM_BREEZINGFORMS_PROCESS_PAGENEXT') . ' \';' . nl() .
+                '            if (pagenav<=2) navi += \'' . BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT') . ' \';' . nl() .
                 '            navi += \'&gt;\';' . nl() .
                 '            if (page<lastpage) navi += \'<\/a>\';' . nl() .
                 '            navi += \' \';' . nl() .
                 '            if (page<lastpage) navi += \'<a href="javascript:ff_dispQueryPage(\'+id+\',\'+lastpage+\');">\';' . nl() .
-                '            if (pagenav<=2) navi += \'' . BFText::_('COM_BREEZINGFORMS_PROCESS_PAGEEND') . ' \';' . nl() .
+                '            if (pagenav<=2) navi += \'' . BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGEEND') . ' \';' . nl() .
                 '            navi += \'&gt;&gt;\';' . nl() .
                 '            if (page<lastpage) navi += \'<\/a>\';' . nl() .
                 '        } // if' . nl() .
@@ -4049,7 +4049,7 @@ class HTML_facileFormsProcessor
                                             else
                                                 echo indentc(4) . '<th' . $attribs . '></th>' . nlc();
                                         } else
-                                            echo indentc(4) . '<th' . $attribs . '>' . $this->replaceCode($col->title, BFText::_('COM_BREEZINGFORMS_PROCESS_QTITLEOF') . " $row->name::$col->name", 'e', $row->id, 2) . '</th>' . nlc();
+                                            echo indentc(4) . '<th' . $attribs . '>' . $this->replaceCode($col->title, BFText::_('COM_BREEZINGFORMSNG_PROCESS_QTITLEOF') . " $row->name::$col->name", 'e', $row->id, 2) . '</th>' . nlc();
                                     } // if
                                     unset($col);
                                 } // if
@@ -4163,11 +4163,11 @@ class HTML_facileFormsProcessor
                                 if ($pagenav <= 4)
                                     echo '&lt;&lt; ';
                                 if ($pagenav <= 2)
-                                    echo BFText::_('COM_BREEZINGFORMS_PROCESS_PAGESTART') . ' ';
+                                    echo BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGESTART') . ' ';
                                 if ($pagenav <= 4)
                                     echo '&lt; ';
                                 if ($pagenav <= 2)
-                                    echo BFText::_('COM_BREEZINGFORMS_PROCESS_PAGEPREV') . ' ';
+                                    echo BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV') . ' ';
                                 echo nlc();
                                 if ($pagenav % 2) {
                                     echo indentc(5);
@@ -4179,11 +4179,11 @@ class HTML_facileFormsProcessor
                                 if ($pagenav <= 4) {
                                     echo indentc(5) . '<a href="javascript:ff_dispQueryPage(' . $row->id . ',2);">';
                                     if ($pagenav <= 2)
-                                        echo BFText::_('COM_BREEZINGFORMS_PROCESS_PAGENEXT') . ' ';
+                                        echo BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT') . ' ';
                                     echo '&gt;</a> ' . nlc();
                                     echo indentc(5) . '<a href="javascript:ff_dispQueryPage(' . $row->id . ',' . $pages . ');">';
                                     if ($pagenav <= 2)
-                                        echo BFText::_('COM_BREEZINGFORMS_PROCESS_PAGEEND') . ' ';
+                                        echo BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGEEND') . ' ';
                                     echo '&gt;&gt;</a>' . nlc();
                                 } // if
                             } // if
@@ -4239,7 +4239,7 @@ class HTML_facileFormsProcessor
                 var bf_mobile_url = ' . json_encode($return_url) . ';
                 //-->
                 </script>';
-                echo '<div style="display: block; text-align: center;"><button class="ff_elem btn btn-primary" onclick="location.href=bf_mobile_url;"><span>' . Text::_('COM_BREEZINGFORMS_MOBILE_VERSION') . '</span></button></div><div></div>';
+                echo '<div style="display: block; text-align: center;"><button class="ff_elem btn btn-primary" onclick="location.href=bf_mobile_url;"><span>' . Text::_('COM_BREEZINGFORMSNG_MOBILE_VERSION') . '</span></button></div><div></div>';
             }
 
             $quickMode->render();
@@ -4478,7 +4478,7 @@ class HTML_facileFormsProcessor
                 if (count($rows))
                     echo $this->execPiece(
                         $rows[0]->code,
-                        BFText::_('COM_BREEZINGFORMS_PROCESS_AFPIECE') . " " . $rows[0]->name,
+                        BFText::_('COM_BREEZINGFORMSNG_PROCESS_AFPIECE') . " " . $rows[0]->name,
                         'p',
                         $this->formrow->piece2id,
                         null
@@ -4487,7 +4487,7 @@ class HTML_facileFormsProcessor
             case 2: // custom code
                 echo $this->execPiece(
                     $this->formrow->piece2code,
-                    BFText::_('COM_BREEZINGFORMS_PROCESS_AFPIECEC'),
+                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_AFPIECEC'),
                     'f',
                     $this->form,
                     2
@@ -5515,7 +5515,7 @@ class HTML_facileFormsProcessor
             $recipientsSize = count($recipients);
         }
 
-        $subject = BFText::_('COM_BREEZINGFORMS_PROCESS_FORMRECRECEIVED');
+        $subject = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMRECRECEIVED');
         if ($this->formrow->custom_mail_subject != '') {
             $subject = $this->formrow->custom_mail_subject;
         }
@@ -5555,20 +5555,20 @@ class HTML_facileFormsProcessor
                 $RECORD_ID = '';
 
                 if ($this->record_id != '') {
-                    $PROCESS_RECORDSAVEDID = BFText::_('COM_BREEZINGFORMS_PROCESS_RECORDSAVEDID');
+                    $PROCESS_RECORDSAVEDID = BFText::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID');
                     $RECORD_ID = $this->record_id;
                 }
 
-                $PROCESS_FORMID = BFText::_('COM_BREEZINGFORMS_PROCESS_FORMID');
+                $PROCESS_FORMID = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMID');
                 $FORM = $this->form;
 
-                $PROCESS_FORMTITLE = BFText::_('COM_BREEZINGFORMS_PROCESS_FORMTITLE');
+                $PROCESS_FORMTITLE = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMTITLE');
                 $TITLE = $this->formrow->title;
 
-                $PROCESS_FORMNAME = BFText::_('COM_BREEZINGFORMS_PROCESS_FORMNAME');
+                $PROCESS_FORMNAME = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMNAME');
                 $NAME = $this->formrow->name;
 
-                $PROCESS_SUBMITTEDAT = BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTEDAT');
+                $PROCESS_SUBMITTEDAT = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT');
 
                 $tz = 'UTC';
                 $tz = new DateTimeZone($this->app->get('offset'));
@@ -5585,25 +5585,25 @@ class HTML_facileFormsProcessor
 
                 $SUBMITTED = $date_->format('Y-m-d H:i:s', true);
 
-                $PROCESS_SUBMITTERIP = BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERIP');
+                $PROCESS_SUBMITTERIP = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP');
                 $IP = $this->ip;
 
-                $PROCESS_PROVIDER = BFText::_('COM_BREEZINGFORMS_PROCESS_PROVIDER');
+                $PROCESS_PROVIDER = BFText::_('COM_BREEZINGFORMSNG_PROCESS_PROVIDER');
                 $PROVIDER = $this->provider;
 
-                $PROCESS_BROWSER = BFText::_('COM_BREEZINGFORMS_PROCESS_BROWSER');
+                $PROCESS_BROWSER = BFText::_('COM_BREEZINGFORMSNG_PROCESS_BROWSER');
                 $BROWSER = $this->browser;
 
-                $PROCESS_OPSYS = BFText::_('COM_BREEZINGFORMS_PROCESS_OPSYS');
+                $PROCESS_OPSYS = BFText::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS');
                 $OPSYS = $this->opsys;
 
-                $PROCESS_SUBMITTERID = BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERID');
+                $PROCESS_SUBMITTERID = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID');
                 $SUBMITTERID = 0;
 
-                $PROCESS_SUBMITTERUSERNAME = BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERUSERNAME');
+                $PROCESS_SUBMITTERUSERNAME = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME');
                 $SUBMITTERUSERNAME = '-';
 
-                $PROCESS_SUBMITTERFULLNAME = BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERFULLNAME');
+                $PROCESS_SUBMITTERFULLNAME = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME');
                 $SUBMITTERFULLNAME = '-';
 
                 if (Factory::getUser()->get('id', 0) > 0) {
@@ -5646,18 +5646,18 @@ class HTML_facileFormsProcessor
                 $submitted = $date_->format('Y-m-d H:i:s', true);
 
                 if ($this->record_id != '')
-                    $body .= BFText::_('COM_BREEZINGFORMS_PROCESS_RECORDSAVEDID') . " " . $this->record_id . nl() . nl();
-                $body .= BFText::_('COM_BREEZINGFORMS_PROCESS_FORMID') . ": " . $this->form . nl() .
-                    BFText::_('COM_BREEZINGFORMS_PROCESS_FORMTITLE') . ": " . $this->formrow->title . nl() .
-                    BFText::_('COM_BREEZINGFORMS_PROCESS_FORMNAME') . ": " . $this->formrow->name . nl() . nl() .
-                    BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTEDAT') . ": " . $submitted . nl() .
-                    BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERIP') . ": " . $this->ip . nl() .
-                    BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERID') . ": " . Factory::getUser()->get('id', 0) . nl() .
-                    BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERUSERNAME') . ": " . Factory::getUser()->get('username', '') . nl() .
-                    BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERFULLNAME') . ": " . Factory::getUser()->get('name', '') . nl() .
-                    BFText::_('COM_BREEZINGFORMS_PROCESS_PROVIDER') . ": " . $this->provider . nl() .
-                    BFText::_('COM_BREEZINGFORMS_PROCESS_BROWSER') . ": " . $this->browser . nl() .
-                    BFText::_('COM_BREEZINGFORMS_PROCESS_OPSYS') . ": " . $this->opsys . nl() . nl();
+                    $body .= BFText::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID') . " " . $this->record_id . nl() . nl();
+                $body .= BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMID') . ": " . $this->form . nl() .
+                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMTITLE') . ": " . $this->formrow->title . nl() .
+                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMNAME') . ": " . $this->formrow->name . nl() . nl() .
+                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT') . ": " . $submitted . nl() .
+                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP') . ": " . $this->ip . nl() .
+                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID') . ": " . Factory::getUser()->get('id', 0) . nl() .
+                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME') . ": " . Factory::getUser()->get('username', '') . nl() .
+                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME') . ": " . Factory::getUser()->get('name', '') . nl() .
+                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_PROVIDER') . ": " . $this->provider . nl() .
+                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_BROWSER') . ": " . $this->browser . nl() .
+                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS') . ": " . $this->opsys . nl() . nl();
                 if (count($this->maildata)) {
                     foreach ($this->maildata as $data) {
                         $subject = str_replace('{' . $data[_FF_DATA_NAME] . ':label}', strip_tags($data[_FF_DATA_TITLE]), $subject);
@@ -5709,43 +5709,43 @@ class HTML_facileFormsProcessor
                 $SUBMITTERFULLNAME = Factory::getUser()->get('name', '');
             }
 
-            $body = str_replace('{BF_RECORD_ID:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_RECORDSAVEDID'), $body);
+            $body = str_replace('{BF_RECORD_ID:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID'), $body);
             $body = str_replace('{BF_RECORD_ID:value}', $RECORD_ID, $body);
 
             $body = str_replace('{BF_FORM_ID:label}', BFText::_('Form ID'), $body);
             $body = str_replace('{BF_FORM_ID:value}', $this->form_id, $body);
 
-            $body = str_replace('{BF_FORM:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_FORMID'), $body);
+            $body = str_replace('{BF_FORM:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMID'), $body);
             $body = str_replace('{BF_FORM:value}', $FORM, $body);
 
-            $body = str_replace('{BF_TITLE:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_FORMTITLE'), $body);
+            $body = str_replace('{BF_TITLE:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMTITLE'), $body);
             $body = str_replace('{BF_TITLE:value}', $TITLE, $body);
 
-            $body = str_replace('{BF_FORMNAME:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_FORMNAME'), $body);
+            $body = str_replace('{BF_FORMNAME:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMNAME'), $body);
             $body = str_replace('{BF_FORMNAME:value}', $FORMNAME, $body);
 
-            $body = str_replace('{BF_SUBMITTED:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTEDAT'), $body);
+            $body = str_replace('{BF_SUBMITTED:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT'), $body);
             $body = str_replace('{BF_SUBMITTED:value}', $SUBMITTED, $body);
 
-            $body = str_replace('{BF_IP:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERIP'), $body);
+            $body = str_replace('{BF_IP:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP'), $body);
             $body = str_replace('{BF_IP:value}', $IP, $body);
 
-            $body = str_replace('{BF_PROVIDER:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_PROVIDER'), $body);
+            $body = str_replace('{BF_PROVIDER:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_PROVIDER'), $body);
             $body = str_replace('{BF_PROVIDER:value}', $PROVIDER, $body);
 
-            $body = str_replace('{BF_BROWSER:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_BROWSER'), $body);
+            $body = str_replace('{BF_BROWSER:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_BROWSER'), $body);
             $body = str_replace('{BF_BROWSER:value}', $BROWSER, $body);
 
-            $body = str_replace('{BF_OPSYS:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_OPSYS'), $body);
+            $body = str_replace('{BF_OPSYS:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS'), $body);
             $body = str_replace('{BF_OPSYS:value}', $OPSYS, $body);
 
-            $body = str_replace('{BF_SUBMITTERID:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERID'), $body);
+            $body = str_replace('{BF_SUBMITTERID:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID'), $body);
             $body = str_replace('{BF_SUBMITTERID:value}', $SUBMITTERID, $body);
 
-            $body = str_replace('{BF_SUBMITTERUSERNAME:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERUSERNAME'), $body);
+            $body = str_replace('{BF_SUBMITTERUSERNAME:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME'), $body);
             $body = str_replace('{BF_SUBMITTERUSERNAME:value}', $SUBMITTERUSERNAME, $body);
 
-            $body = str_replace('{BF_SUBMITTERFULLNAME:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERFULLNAME'), $body);
+            $body = str_replace('{BF_SUBMITTERFULLNAME:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME'), $body);
             $body = str_replace('{BF_SUBMITTERFULLNAME:value}', $SUBMITTERFULLNAME, $body);
 
             if (count($this->savedata)) {
@@ -6168,7 +6168,7 @@ class HTML_facileFormsProcessor
 
         $recipientsSize = count($recipients);
 
-        $subject = BFText::_('COM_BREEZINGFORMS_PROCESS_FORMRECRECEIVED');
+        $subject = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMRECRECEIVED');
         if ($this->formrow->mb_custom_mail_subject != '') {
             $subject = $this->formrow->mb_custom_mail_subject;
         }
@@ -6312,22 +6312,22 @@ class HTML_facileFormsProcessor
                 $RECORD_ID = '';
 
                 if ($this->record_id != '') {
-                    $PROCESS_RECORDSAVEDID = BFText::_('COM_BREEZINGFORMS_PROCESS_RECORDSAVEDID');
+                    $PROCESS_RECORDSAVEDID = BFText::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID');
                     $RECORD_ID = $this->record_id;
                 }
 
-                $PROCESS_FORMID = BFText::_('COM_BREEZINGFORMS_PROCESS_FORMID');
+                $PROCESS_FORMID = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMID');
                 $FORM = $this->form;
 
-                $PROCESS_FORMTITLE = BFText::_('COM_BREEZINGFORMS_PROCESS_FORMTITLE');
+                $PROCESS_FORMTITLE = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMTITLE');
 
                 $form_title_translated = $this->getFormTitleTranslated();
                 $TITLE = $form_title_translated != '' ? $form_title_translated : $this->formrow->title;
 
-                $PROCESS_FORMNAME = BFText::_('COM_BREEZINGFORMS_PROCESS_FORMNAME');
+                $PROCESS_FORMNAME = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMNAME');
                 $NAME = $this->formrow->name;
 
-                $PROCESS_SUBMITTEDAT = BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTEDAT');
+                $PROCESS_SUBMITTEDAT = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT');
                 $SUBMITTED = $this->submitted;
 
                 $tz = 'UTC';
@@ -6344,25 +6344,25 @@ class HTML_facileFormsProcessor
 
                 $SUBMITTED = $date_->format('Y-m-d H:i:s', true);
 
-                $PROCESS_SUBMITTERIP = BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERIP');
+                $PROCESS_SUBMITTERIP = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP');
                 $IP = $this->ip;
 
-                $PROCESS_PROVIDER = BFText::_('COM_BREEZINGFORMS_PROCESS_PROVIDER');
+                $PROCESS_PROVIDER = BFText::_('COM_BREEZINGFORMSNG_PROCESS_PROVIDER');
                 $PROVIDER = $this->provider;
 
-                $PROCESS_BROWSER = BFText::_('COM_BREEZINGFORMS_PROCESS_BROWSER');
+                $PROCESS_BROWSER = BFText::_('COM_BREEZINGFORMSNG_PROCESS_BROWSER');
                 $BROWSER = $this->browser;
 
-                $PROCESS_OPSYS = BFText::_('COM_BREEZINGFORMS_PROCESS_OPSYS');
+                $PROCESS_OPSYS = BFText::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS');
                 $OPSYS = $this->opsys;
 
-                $PROCESS_SUBMITTERID = BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERID');
+                $PROCESS_SUBMITTERID = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID');
                 $SUBMITTERID = 0;
 
-                $PROCESS_SUBMITTERUSERNAME = BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERUSERNAME');
+                $PROCESS_SUBMITTERUSERNAME = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME');
                 $SUBMITTERUSERNAME = '-';
 
-                $PROCESS_SUBMITTERFULLNAME = BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERFULLNAME');
+                $PROCESS_SUBMITTERFULLNAME = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME');
                 $SUBMITTERFULLNAME = '-';
 
                 if (Factory::getUser()->get('id', 0) > 0) {
@@ -6400,7 +6400,7 @@ class HTML_facileFormsProcessor
                 // fallback if no template exists
 
                 if ($this->record_id != '')
-                    $body .= BFText::_('COM_BREEZINGFORMS_PROCESS_RECORDSAVEDID') . " " . $this->record_id . nl() . nl();
+                    $body .= BFText::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID') . " " . $this->record_id . nl() . nl();
 
                 $form_title_translated = $this->getFormTitleTranslated();
 
@@ -6419,17 +6419,17 @@ class HTML_facileFormsProcessor
 
                 $submitted = $date_->format('Y-m-d H:i:s', true);
 
-                $body .= BFText::_('COM_BREEZINGFORMS_PROCESS_FORMID') . ": " . $this->form . nl() .
-                    BFText::_('COM_BREEZINGFORMS_PROCESS_FORMTITLE') . ": " . ($form_title_translated != '' ? $form_title_translated : $this->formrow->title) . nl() .
-                    BFText::_('COM_BREEZINGFORMS_PROCESS_FORMNAME') . ": " . $this->formrow->name . nl() . nl() .
-                    BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTEDAT') . ": " . $submitted . nl() .
-                    BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERIP') . ": " . $this->ip . nl() .
-                    BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERID') . ": " . Factory::getUser()->get('id', 0) . nl() .
-                    BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERUSERNAME') . ": " . Factory::getUser()->get('username', '') . nl() .
-                    BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERFULLNAME') . ": " . Factory::getUser()->get('name', '') . nl() .
-                    BFText::_('COM_BREEZINGFORMS_PROCESS_PROVIDER') . ": " . $this->provider . nl() .
-                    BFText::_('COM_BREEZINGFORMS_PROCESS_BROWSER') . ": " . $this->browser . nl() .
-                    BFText::_('COM_BREEZINGFORMS_PROCESS_OPSYS') . ": " . $this->opsys . nl() . nl();
+                $body .= BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMID') . ": " . $this->form . nl() .
+                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMTITLE') . ": " . ($form_title_translated != '' ? $form_title_translated : $this->formrow->title) . nl() .
+                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMNAME') . ": " . $this->formrow->name . nl() . nl() .
+                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT') . ": " . $submitted . nl() .
+                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP') . ": " . $this->ip . nl() .
+                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID') . ": " . Factory::getUser()->get('id', 0) . nl() .
+                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME') . ": " . Factory::getUser()->get('username', '') . nl() .
+                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME') . ": " . Factory::getUser()->get('name', '') . nl() .
+                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_PROVIDER') . ": " . $this->provider . nl() .
+                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_BROWSER') . ": " . $this->browser . nl() .
+                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS') . ": " . $this->opsys . nl() . nl();
                 if (count($this->maildata)) {
                     foreach ($this->maildata as $data) {
                         $trans_title = '';
@@ -6494,43 +6494,43 @@ class HTML_facileFormsProcessor
                 $SUBMITTERFULLNAME = Factory::getUser()->get('name', '');
             }
 
-            $body = str_replace('{BF_RECORD_ID:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_RECORDSAVEDID'), $body);
+            $body = str_replace('{BF_RECORD_ID:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID'), $body);
             $body = str_replace('{BF_RECORD_ID:value}', $RECORD_ID, $body);
 
             $body = str_replace('{BF_FORM_ID:label}', BFText::_('Form ID'), $body);
             $body = str_replace('{BF_FORM_ID:value}', $this->form_id, $body);
 
-            $body = str_replace('{BF_FORM:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_FORMID'), $body);
+            $body = str_replace('{BF_FORM:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMID'), $body);
             $body = str_replace('{BF_FORM:value}', $FORM, $body);
 
-            $body = str_replace('{BF_TITLE:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_FORMTITLE'), $body);
+            $body = str_replace('{BF_TITLE:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMTITLE'), $body);
             $body = str_replace('{BF_TITLE:value}', $TITLE, $body);
 
-            $body = str_replace('{BF_FORMNAME:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_FORMNAME'), $body);
+            $body = str_replace('{BF_FORMNAME:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMNAME'), $body);
             $body = str_replace('{BF_FORMNAME:value}', $FORMNAME, $body);
 
-            $body = str_replace('{BF_SUBMITTED:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTEDAT'), $body);
+            $body = str_replace('{BF_SUBMITTED:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT'), $body);
             $body = str_replace('{BF_SUBMITTED:value}', $SUBMITTED, $body);
 
-            $body = str_replace('{BF_IP:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERIP'), $body);
+            $body = str_replace('{BF_IP:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP'), $body);
             $body = str_replace('{BF_IP:value}', $IP, $body);
 
-            $body = str_replace('{BF_PROVIDER:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_PROVIDER'), $body);
+            $body = str_replace('{BF_PROVIDER:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_PROVIDER'), $body);
             $body = str_replace('{BF_PROVIDER:value}', $PROVIDER, $body);
 
-            $body = str_replace('{BF_BROWSER:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_BROWSER'), $body);
+            $body = str_replace('{BF_BROWSER:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_BROWSER'), $body);
             $body = str_replace('{BF_BROWSER:value}', $BROWSER, $body);
 
-            $body = str_replace('{BF_OPSYS:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_OPSYS'), $body);
+            $body = str_replace('{BF_OPSYS:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS'), $body);
             $body = str_replace('{BF_OPSYS:value}', $OPSYS, $body);
 
-            $body = str_replace('{BF_SUBMITTERID:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERID'), $body);
+            $body = str_replace('{BF_SUBMITTERID:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID'), $body);
             $body = str_replace('{BF_SUBMITTERID:value}', $SUBMITTERID, $body);
 
-            $body = str_replace('{BF_SUBMITTERUSERNAME:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERUSERNAME'), $body);
+            $body = str_replace('{BF_SUBMITTERUSERNAME:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME'), $body);
             $body = str_replace('{BF_SUBMITTERUSERNAME:value}', $SUBMITTERUSERNAME, $body);
 
-            $body = str_replace('{BF_SUBMITTERFULLNAME:label}', BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITTERFULLNAME'), $body);
+            $body = str_replace('{BF_SUBMITTERFULLNAME:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME'), $body);
             $body = str_replace('{BF_SUBMITTERFULLNAME:value}', $SUBMITTERFULLNAME, $body);
 
             if (count($this->savedata)) {
@@ -6895,7 +6895,7 @@ class HTML_facileFormsProcessor
 
         if (!file_exists($baseDir)) {
             $this->status = _FF_STATUS_UPLOAD_FAILED;
-            $this->message = BFText::_('COM_BREEZINGFORMS_PROCESS_DIRNOTEXISTS');
+            $this->message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_DIRNOTEXISTS');
             return '';
         } // if
 
@@ -6935,7 +6935,7 @@ class HTML_facileFormsProcessor
             //if ($timestamp) $path .= '.'.date('YmdHis');
             if (file_exists($path)) {
                 $this->status = _FF_STATUS_UPLOAD_FAILED;
-                $this->message = BFText::_('COM_BREEZINGFORMS_PROCESS_FILEEXISTS');
+                $this->message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FILEEXISTS');
                 return '';
             }
         } else if (file_exists($path) && !$this->app->getSession()->get('bfFileUploadOverride', true)) {
@@ -6944,7 +6944,7 @@ class HTML_facileFormsProcessor
 
         if (!move_uploaded_file($filename, $path)) {
             $this->status = _FF_STATUS_UPLOAD_FAILED;
-            $this->message = BFText::_('COM_BREEZINGFORMS_PROCESS_FILEMOVEFAILED');
+            $this->message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FILEMOVEFAILED');
             return '';
         } // if
 
@@ -6957,7 +6957,7 @@ class HTML_facileFormsProcessor
         if (isset($filemode)) {
             if (!@chmod($path, $filemode)) {
                 $this->status = _FF_STATUS_UPLOAD_FAILED;
-                $this->message = BFText::_('COM_BREEZINGFORMS_PROCESS_FILECHMODFAILED');
+                $this->message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FILECHMODFAILED');
                 return '';
             } // if
         } // if
@@ -7443,7 +7443,7 @@ class HTML_facileFormsProcessor
                                                                     //if ($row->flag1) $path .= '.'.date('YmdHis');
                                                                     if (file_exists($path)) {
                                                                         $this->status = _FF_STATUS_UPLOAD_FAILED;
-                                                                        $this->message = BFText::_('COM_BREEZINGFORMS_PROCESS_FILEEXISTS');
+                                                                        $this->message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FILEEXISTS');
                                                                         return '';
                                                                     }
                                                                 } else if (file_exists($path) && !$this->app->getSession()->get('bfFileUploadOverride', true)) {
@@ -7464,7 +7464,7 @@ class HTML_facileFormsProcessor
                                                                     @File::copy($sourcePath . $file, $path);
                                                                 } else {
                                                                     $this->status = _FF_STATUS_UPLOAD_FAILED;
-                                                                    $this->message = BFText::_('COM_BREEZINGFORMS_PROCESS_FILEMOVEFAILED');
+                                                                    $this->message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FILEMOVEFAILED');
                                                                     return;
                                                                 }
                                                                 @File::delete($sourcePath . $file);
@@ -7956,7 +7956,7 @@ class HTML_facileFormsProcessor
                     if (count($rows))
                         echo $this->execPiece(
                             $rows[0]->code,
-                            BFText::_('COM_BREEZINGFORMS_PROCESS_BSPIECE') . " " . $rows[0]->name,
+                            BFText::_('COM_BREEZINGFORMSNG_PROCESS_BSPIECE') . " " . $rows[0]->name,
                             'p',
                             $this->formrow->piece3id,
                             null
@@ -7965,7 +7965,7 @@ class HTML_facileFormsProcessor
                 case 2: // custom code
                     echo $this->execPiece(
                         $this->formrow->piece3code,
-                        BFText::_('COM_BREEZINGFORMS_PROCESS_BSPIECEC'),
+                        BFText::_('COM_BREEZINGFORMSNG_PROCESS_BSPIECEC'),
                         'f',
                         $this->form,
                         3
@@ -8105,15 +8105,15 @@ class HTML_facileFormsProcessor
                         $opt_in_link = $domainAddress . '?option=com_breezingformsng&opt_in=true&id=' . $lastID . '&' . 'token=' . bf_b64enc($token);
                         $opt_out_link = $domainAddress . '?option=com_breezingformsng&opt_out=true&id=' . $lastID . '&' . 'token=' . bf_b64enc($token);
 
-                        $message = Text::_('COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_EMAIL_TEXT');
-                        $message .= '<a href="' . $opt_in_link . '">' . Text::_('COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_VERIFY_HERE') . '</a>';
-                        $message .= Text::_('COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_OUT_EMAIL_TEXT');
-                        $message .= '<a href="' . $opt_out_link . '">' . Text::_('COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_UNVERIFY_HERE') . '</a>';
-                        $message .= Text::_('COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_EMAIL_TEXT_FOOTER');
+                        $message = Text::_('COM_BREEZINGFORMSNG_FORMS_DOUBLE_OPT_EMAIL_TEXT');
+                        $message .= '<a href="' . $opt_in_link . '">' . Text::_('COM_BREEZINGFORMSNG_FORMS_DOUBLE_OPT_VERIFY_HERE') . '</a>';
+                        $message .= Text::_('COM_BREEZINGFORMSNG_FORMS_DOUBLE_OPT_OUT_EMAIL_TEXT');
+                        $message .= '<a href="' . $opt_out_link . '">' . Text::_('COM_BREEZINGFORMSNG_FORMS_DOUBLE_OPT_UNVERIFY_HERE') . '</a>';
+                        $message .= Text::_('COM_BREEZINGFORMSNG_FORMS_DOUBLE_OPT_EMAIL_TEXT_FOOTER');
 
                         $body = $message;
                         $mailer->isHtml(true);
-                        $mailer->setSubject(Text::_('COM_BREEZINGFORMS_FORMS_DOUBLE_OPT_EMAIL_SUBJECT'));
+                        $mailer->setSubject(Text::_('COM_BREEZINGFORMSNG_FORMS_DOUBLE_OPT_EMAIL_SUBJECT'));
                         $mailer->setBody($body);
                         $mailer->setSender($sender);
                         $mailer->Send();
@@ -8140,7 +8140,7 @@ class HTML_facileFormsProcessor
                     if (count($rows))
                         echo $this->execPiece(
                             $rows[0]->code,
-                            BFText::_('COM_BREEZINGFORMS_PROCESS_ESPIECE') . " " . $rows[0]->name,
+                            BFText::_('COM_BREEZINGFORMSNG_PROCESS_ESPIECE') . " " . $rows[0]->name,
                             'p',
                             $this->formrow->piece4id,
                             null
@@ -8149,7 +8149,7 @@ class HTML_facileFormsProcessor
                 case 2: // custom code
                     echo $this->execPiece(
                         $this->formrow->piece4code,
-                        BFText::_('COM_BREEZINGFORMS_PROCESS_ESPIECEC'),
+                        BFText::_('COM_BREEZINGFORMSNG_PROCESS_ESPIECEC'),
                         'f',
                         $this->form,
                         3
@@ -8165,31 +8165,31 @@ class HTML_facileFormsProcessor
 
         switch ($this->status) {
             case _FF_STATUS_OK:
-                $message = BFText::_('COM_BREEZINGFORMS_PROCESS_SUBMITSUCCESS');
+                $message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITSUCCESS');
                 break;
             case _FF_STATUS_UNPUBLISHED:
-                $message = BFText::_('COM_BREEZINGFORMS_PROCESS_UNPUBLISHED');
+                $message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_UNPUBLISHED');
                 break;
             case _FF_STATUS_SAVERECORD_FAILED:
-                $message = BFText::_('COM_BREEZINGFORMS_PROCESS_SAVERECFAILED');
+                $message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SAVERECFAILED');
                 break;
             case _FF_STATUS_SAVESUBRECORD_FAILED:
-                $message = BFText::_('COM_BREEZINGFORMS_PROCESS_SAVESUBFAILED');
+                $message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SAVESUBFAILED');
                 break;
             case _FF_STATUS_UPLOAD_FAILED:
-                $message = BFText::_('COM_BREEZINGFORMS_PROCESS_UPLOADFAILED');
+                $message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_UPLOADFAILED');
                 break;
             case _FF_STATUS_SENDMAIL_FAILED:
-                $message = BFText::_('COM_BREEZINGFORMS_PROCESS_SENDMAILFAILED');
+                $message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SENDMAILFAILED');
                 break;
             case _FF_STATUS_ATTACHMENT_FAILED:
-                $message = BFText::_('COM_BREEZINGFORMS_PROCESS_ATTACHMTFAILED');
+                $message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_ATTACHMTFAILED');
                 break;
             case _FF_STATUS_CAPTCHA_FAILED:
-                $message = BFText::_('COM_BREEZINGFORMS_CAPTCHA_ENTRY_FAILED');
+                $message = BFText::_('COM_BREEZINGFORMSNG_CAPTCHA_ENTRY_FAILED');
                 break;
             case _FF_STATUS_FILE_EXTENSION_NOT_ALLOWED:
-                $message = BFText::_('COM_BREEZINGFORMS_FILE_EXTENSION_NOT_ALLOWED');
+                $message = BFText::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED');
                 break;
             default:
                 $message = '';

@@ -453,7 +453,7 @@ class facileFormsForm
                 }
                 // reset end
             } // foreach
-        $msg = $total . ' ' . BFText::_('COM_BREEZINGFORMS_FORMS_SUCOPIED');
+        $msg = $total . ' ' . BFText::_('COM_BREEZINGFORMSNG_FORMS_SUCOPIED');
         Factory::getApplication()->enqueueMessage($msg);
         Factory::getApplication()->redirect("index.php?option=$option&act=manageforms&pkg=$pkg");
     }
@@ -483,7 +483,7 @@ class facileFormsForm
         } // if
         if ($total) {
             Factory::getApplication()->enqueueMessage(
-                $total . ' ' . BFText::_('COM_BREEZINGFORMS_FORMS_SUCCDELETED'),
+                $total . ' ' . BFText::_('COM_BREEZINGFORMSNG_FORMS_SUCCDELETED'),
                 'message'
             );
         }

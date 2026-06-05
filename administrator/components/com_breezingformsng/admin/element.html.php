@@ -1,11 +1,11 @@
 <?php
 /**
- * BreezingForms - A Joomla Forms Application
- * @version 5.0
- * @package BreezingForms
- * @copyright (C) 2008-2020 by Markus Bopp
- * @copyright Copyright (C) 2024 by XDA+GIL
- * @license Released under the terms of the GNU General Public License
+ * BreezingForms NG - A Joomla Forms Application
+ * @version 6.0.0
+ * @package BreezingForms NG
+ * @copyright Copyright (C) 2008-2020 by Markus Bopp
+ * @copyright Copyright (C) 2024-2006 by XDA+GIL
+ * @license GNU General Public License version 2 or later; see LICENSE.txt
  **/
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 

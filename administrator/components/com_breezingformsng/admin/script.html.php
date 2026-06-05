@@ -1,11 +1,11 @@
 <?php
 /**
- * BreezingForms - A Joomla Forms Application
+ * BreezingForms NG - A Joomla Forms Application
+ * 
  * @version 6.0
- * @package BreezingForms
- * @copyright (C) 2008-2020 by Markus Bopp
- * @copyright (C) 2024 by XDA+GIL
- * @license Released under the terms of the GNU General Public License
+ * @package BreezingForms NG
+ * @copyright Copyright (C) 2008-2020 by Markus Bopp
+ * @copyright Copyright (C) 2024-2026 XDA+GIL* @license GNU General Public License version 2 or later; see LICENSE.txt
  **/
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
@@ -828,7 +828,7 @@ class HTML_facileFormsScript
 		return '???';
 	} // typeName
 
-	static function listitems($option, &$rows, &$pkglist, $pkg, $search, $total, $limit, $limitstart, $pageSizes)
+	static function listitems($option, &$rows, &$pkglist, $pkg, $search, $total, $limit, $limitstart, $pageSizes, $pagination = null)
 	{
 		global $ff_config, $ff_version;
 		$sort = BFRequest::getCmd('sort', 'name');
@@ -1107,55 +1107,38 @@ class HTML_facileFormsScript
 					$k = 1 - $k;
 				} // for
 				?>
+				<tfoot>
+					<tr>
+						<td colspan="9">
+							<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+								<div class="d-flex flex-wrap align-items-center gap-2">
+									<?php echo $pagination ? $pagination->getPagesCounter() : ($total > 0 ? ('Showing ' . (int) $startNo . '-' . (int) $endNo . ' of ' . (int) $total) : ''); ?>
+									<span><?php echo BFText::_('COM_BREEZINGFORMSNG_DISPLAY_NUM'); ?></span>
+									<span class="d-inline-block">
+										<select name="list[limit]" class="form-select js-select-submit-on-change active" id="list_limit" onchange="document.adminForm.submit();">
+											<?php foreach ($pageSizes as $pageSize) { ?>
+												<option value="<?php echo (int) $pageSize; ?>"<?php echo (int) $pageSize === (int) $limit ? ' selected="selected"' : ''; ?>><?php echo (int) $pageSize; ?></option>
+											<?php } ?>
+										</select>
+									</span>
+									<span><?php echo BFText::_('COM_BREEZINGFORMSNG_OF'); ?></span>
+									<span><?php echo (int) $total; ?></span>
+								</div>
+								<div>
+									<?php echo $pagination ? $pagination->getPagesLinks() : ''; ?>
+								</div>
+							</div>
+						</td>
+					</tr>
+				</tfoot>
 				</table>
-				<div class="jtable-bottom-panel">
-					<div class="jtable-left-area">
-						<span class="jtable-page-list">
-							<?php
-							$firstDisabled = $currentPage <= 1;
-							$lastDisabled = $currentPage >= $pageCount;
-							?>
-							<span class="jtable-page-number-first<?php echo $firstDisabled ? ' jtable-page-number-disabled' : ''; ?>"<?php echo $firstDisabled ? '' : ' onclick="return bfScriptsGoToPage(1);"'; ?>>&lt;&lt;</span>
-							<span class="jtable-page-number-previous<?php echo $firstDisabled ? ' jtable-page-number-disabled' : ''; ?>"<?php echo $firstDisabled ? '' : ' onclick="return bfScriptsGoToPage(' . ($currentPage - 1) . ');"'; ?>>&lt;</span>
-							<?php
-							$previousPageNo = 0;
-							foreach ($shownPageNumbers as $pageNo) {
-								if (($pageNo - $previousPageNo) > 1) {
-									echo '<span class="jtable-page-number-space">...</span>';
-								}
-								$isActive = $pageNo === $currentPage;
-								echo '<span class="jtable-page-number' . ($isActive ? ' jtable-page-number-active jtable-page-number-disabled' : '') . '"' .
-									($isActive ? '' : ' onclick="return bfScriptsGoToPage(' . (int) $pageNo . ');"') . '>' . (int) $pageNo . '</span>';
-								$previousPageNo = $pageNo;
-							}
-							?>
-							<span class="jtable-page-number-next<?php echo $lastDisabled ? ' jtable-page-number-disabled' : ''; ?>"<?php echo $lastDisabled ? '' : ' onclick="return bfScriptsGoToPage(' . ($currentPage + 1) . ');"'; ?>>&gt;</span>
-							<span class="jtable-page-number-last<?php echo $lastDisabled ? ' jtable-page-number-disabled' : ''; ?>"<?php echo $lastDisabled ? '' : ' onclick="return bfScriptsGoToPage(' . $pageCount . ');"'; ?>>&gt;&gt;</span>
-						</span>
-						<span class="jtable-page-size-change">
-							<span>Row count: </span>
-							<select name="limit" onchange="return bfScriptsChangePageSize(this.value);">
-								<?php foreach ($pageSizes as $pageSize) { ?>
-									<option value="<?php echo (int) $pageSize; ?>"<?php echo (int) $pageSize === (int) $limit ? ' selected="selected"' : ''; ?>><?php echo (int) $pageSize; ?></option>
-								<?php } ?>
-							</select>
-						</span>
-						<span class="jtable-goto-page">
-							<span><?php echo htmlspecialchars($gotoLabel, ENT_QUOTES); ?>: </span>
-							<input type="text" id="bfScriptsGotoPage" maxlength="10" value="<?php echo (int) $currentPage; ?>"
-								onkeydown="if(event.key==='Enter'){event.preventDefault();bfScriptsGotoPageFromInput();}" />
-						</span>
-					</div>
-					<div class="jtable-right-area">
-						<span class="jtable-page-info"><?php echo $total > 0 ? ('Showing ' . (int) $startNo . '-' . (int) $endNo . ' of ' . (int) $total) : ''; ?></span>
-					</div>
-				</div>
 				</div>
 				<input type="hidden" name="boxchecked" value="0" />
 				<input type="hidden" name="option" value="<?php echo $option; ?>" />
 				<input type="hidden" name="act" value="managescripts" />
 				<input type="hidden" name="task" value="" />
 				<input type="hidden" name="limitstart" value="<?php echo (int) $limitstart; ?>" />
+				<input type="hidden" name="list[start]" value="<?php echo (int) $limitstart; ?>" />
 				<input type="hidden" name="pkg" value="<?php echo htmlspecialchars($pkg, ENT_QUOTES); ?>" />
 				<?php echo HTMLHelper::_('form.token'); ?>
 			</form>

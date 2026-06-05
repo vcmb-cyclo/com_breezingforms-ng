@@ -1,8 +1,8 @@
 <?php
 /**
  * @package     BreezingForms NG
- * @copyright   Copyright (C) 2024-2026 by XDA+GIL
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright  Copyright (C) 2024-2026 by XDA+GIL
+ * @license GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
@@ -69,7 +69,8 @@ class ScriptModel extends LegacyPackageModel
 
         $direction = $direction === 'DESC' ? 'DESC' : 'ASC';
         $pageSizes = [10, 25, 50, 100, 250, 500, 1000, 5000, 10000, 100000];
-        $limitRequest = $input->getInt('limit', -1);
+        $list = (array) $input->get('list', [], 'array');
+        $limitRequest = isset($list['limit']) ? (int) $list['limit'] : $input->getInt('limit', -1);
 
         if ($limitRequest > 0 && in_array($limitRequest, $pageSizes, true)) {
             $limit = $limitRequest;
@@ -82,7 +83,7 @@ class ScriptModel extends LegacyPackageModel
             }
         }
 
-        $limitStartRequest = $input->getInt('limitstart', -1);
+        $limitStartRequest = isset($list['start']) ? (int) $list['start'] : $input->getInt('limitstart', -1);
         $limitStart = $limitStartRequest >= 0 ? $limitStartRequest : (int) $session->get('bf.scripts_limitstart', 0);
         $limitStart = max(0, $limitStart);
 

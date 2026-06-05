@@ -16,7 +16,7 @@
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
 	<authorEmail>bf@vcmb.fr</authorEmail>
 	<authorUrl>https://breezingforms-ng.vcmb.fr</authorUrl>
-	<version>6.0.8-RC6</version>
+	<version>6.1.0-RC1</version>
 	<description>COM_BREEZINGFORMSNG_XML_DESCRIPTION</description>
 
 	<namespace path="src">Vcmb\Component\BreezingformsNG</namespace>
@@ -71,7 +71,7 @@
 				</params>
 			</menu>
 
-			<menu option="com_breezingformsng" act="managescripts" alt="BreezingForms/Manage Scripts">
+			<menu option="com_breezingformsng" view="scripts" alt="BreezingForms/Manage Scripts">
 				COM_BREEZINGFORMSNG_MANAGE_SCRIPTS
 				<params>
 					<menu-quicktask>index.php?option=com_breezingformsng&amp;act=managescripts&amp;task=new</menu-quicktask>
@@ -80,7 +80,7 @@
 				</params>
 			</menu>
 
-			<menu option="com_breezingformsng" act="managepieces" alt="BreezingForms/Manage Pieces">
+			<menu option="com_breezingformsng" view="pieces" alt="BreezingForms/Manage Pieces">
 				COM_BREEZINGFORMSNG_MANAGE_PIECES
 				<params>
 					<menu-quicktask>index.php?option=com_breezingformsng&amp;act=managepieces&amp;task=new</menu-quicktask>
@@ -123,6 +123,7 @@
 			<folder>services</folder>
 			<folder>sql</folder>
 			<folder>src</folder>
+			<folder>tmpl</folder>
 			<folder>plugins</folder>
 		</files>
 

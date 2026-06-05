@@ -3,8 +3,8 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 /**
  * @package     BreezingForms
  * @author      Markus Bopp
- * @link        http://www.crosstec.de
- * @copyright   Copyright (C) 2024 by XDA+GIL
+ * @link        https://breezingforms-ng.vcmb.fr
+ * @copyright  Copyright (C) 2024-2026 by XDA+GIL
  * @license     GNU/GPL
  */
 

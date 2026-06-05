@@ -1,8 +1,7 @@
 <?php
 /**
  *
- * @copyright   Copyright (C) 2024 by XDA+GIL
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright  Copyright (C) 2024-2026 by XDA+GIL * @license GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
@@ -11,11 +10,11 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 
 /**
- * BreezingForms - A Joomla Forms Application
- * @version 5.0.0
- * @package BreezingForms
- * @copyright Copyright (C) 2024 by XDA+GIL | Until 1.9 2008-2020 by Markus Bopp
- * @license Released under the terms of the GNU General Public License
+ * BreezingForms NG - A Joomla Forms Application
+ * @version 6.0.0
+ * @package BreezingForms NG
+ * @copyright Copyright (C) 2024-2006 by XDA+GIL | Until 1.9 2008-2020 by Markus Bopp
+ * @license GNU General Public License version 2 or later; see LICENSE.txt
  **/
 final class BFText
 {

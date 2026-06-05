@@ -1,17 +1,20 @@
 <?php
-if(!defined('_JEXEC')){
+
+/**
+ * BreezingForms NG - A Joomla Forms Application
+ * @version 6.0.0
+ * @package BreezingForms NG
+ * @copyright Copyright (C) 2004-2005 by Peter Koch
+ * @license GNU General Public License version 2 or later; see LICENSE.txt
+ **/
+
+if (!defined('_JEXEC')) {
     define('_JEXEC', 1);
 }
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
-/**
- * BreezingForms - A Joomla Forms Application
- * @version 1.4.4
- * @package BreezingForms
- * @copyright (C) 2004-2005 by Peter Koch
- * @license Released under the terms of the GNU General Public License
- **/
+
 ob_start();
 
 use Joomla\CMS\Factory;
@@ -20,7 +23,7 @@ use Joomla\CMS\Factory;
 require_once dirname(__FILE__) . '/../../../../includes/app.php';
 /* To use Joomla's Database Class */
 
-require_once( JPATH_SITE . '/libraries/src/Factory.php' );
+require_once(JPATH_SITE . '/libraries/src/Factory.php');
 
 // Instantiate the application.
 $app = Factory::getApplication('administrator');

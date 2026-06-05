@@ -1,12 +1,11 @@
 <?php
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 /**
- * BreezingForms - A Joomla Forms Application
- * @version 5.0
- * @package BreezingForms
- * @copyright (C) 2008-2020 by Markus Bopp
- * @copyright (C) 2024 by XDA+GIL
- * @license Released under the terms of the GNU General Public License
+ * BreezingForms NG - A Joomla Forms Application
+ * @version 6.0.0
+ * @package BreezingForms NG
+ * @copyright Copyright (C) 2008-2020 by Markus Bopp
+ * @copyright Copyright (C) 2024-2026 XDA+GIL* @license GNU General Public License version 2 or later; see LICENSE.txt
  **/
 
 require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFJNewTabs.php');

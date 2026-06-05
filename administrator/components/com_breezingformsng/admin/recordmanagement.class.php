@@ -584,6 +584,9 @@ class bfRecordManagement
         ToolBarHelper::custom('archived', 'archive', 'archive', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_ARCHIVE'), false);
         ToolBarHelper::custom('remove', 'delete.png', 'delete_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_DELETE'), false);
 
+        $this->renderNativeRecordsList();
+        return;
+
         $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
         $wa->useStyle('com_breezingformsng.jtable-style');
         $wa->useStyle('com_breezingformsng.admin-style');
@@ -1211,7 +1214,7 @@ class bfRecordManagement
                     pageSize: 10, //Set page size (default: 10)
                     pageSizes: [10, 25, 50, 100, 250, 500, 1000, 5000, 10000, 100000],
                     sorting: true, //Enable sorting
-                    defaultSorting: "id DESC", //Set default sorting,
+                    defaultSorting: "bfrecord_id DESC", //Set default sorting,
                     selecting: true, //Enable selecting
                     multiselect: true, //Allow multiple selecting
                     selectingCheckboxes: true,
@@ -1722,6 +1725,212 @@ class bfRecordManagement
 
     }
 
+    private function renderNativeRecordsList(): void
+    {
+        $app = Factory::getApplication();
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $wa = $app->getDocument()->getWebAssetManager();
+
+        $wa->useStyle('com_breezingformsng.admin-style');
+
+        $formSelection = BFRequest::getInt('form_selection', 0);
+        $searchTerm = trim((string) BFRequest::getVar('searchterm', ''));
+        $limit = max(1, BFRequest::getInt('limit', 20));
+        $limitStart = max(0, BFRequest::getInt('limitstart', 0));
+
+        $db->setQuery("Select id, title, name From #__facileforms_forms Order By `title`");
+        $forms = $db->loadAssocList();
+
+        $where = array();
+        if ($formSelection > 0) {
+            $where[] = 'records.form = ' . (int) $formSelection;
+        }
+
+        if ($searchTerm !== '') {
+            $quotedSearch = $db->quote('%' . $searchTerm . '%');
+            $exactSearch = $db->quote($searchTerm);
+            $where[] = '('
+                . 'records.id = ' . $exactSearch
+                . ' Or records.ip Like ' . $quotedSearch
+                . ' Or records.username Like ' . $quotedSearch
+                . ' Or records.user_full_name Like ' . $quotedSearch
+                . ' Or forms.title Like ' . $quotedSearch
+                . ' Or forms.name Like ' . $quotedSearch
+                . ' Or records.paypal_tx_id Like ' . $quotedSearch
+                . ')';
+        }
+
+        $whereSql = count($where) ? ' Where ' . implode(' And ', $where) : '';
+
+        $db->setQuery(
+            'Select Count(*)'
+            . ' From #__facileforms_records As records'
+            . ' Inner Join #__facileforms_forms As forms On forms.id = records.form'
+            . $whereSql
+        );
+        $total = (int) $db->loadResult();
+
+        $db->setQuery(
+            'Select records.id, records.submitted, records.ip, records.user_id, records.username, records.user_full_name,'
+            . ' records.viewed, records.exported, records.archived, records.paypal_tx_id,'
+            . ' forms.title As form_title, forms.name As form_name, forms.id As form_id'
+            . ' From #__facileforms_records As records'
+            . ' Inner Join #__facileforms_forms As forms On forms.id = records.form'
+            . $whereSql
+            . ' Order By records.submitted Desc, records.id Desc',
+            $limitStart,
+            $limit
+        );
+        $records = $db->loadAssocList();
+
+        $action = 'index.php?option=com_breezingformsng&act=managerecs';
+        ?>
+        <form action="<?php echo $action; ?>" method="post" name="adminForm" id="adminForm">
+            <div class="js-stools clearfix">
+                <div class="js-stools-container-bar">
+                    <div class="btn-toolbar">
+                        <div class="filter-search-bar btn-group">
+                            <label for="bfRecordSearch" class="visually-hidden"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHTEXT'), ENT_QUOTES, 'UTF-8'); ?></label>
+                            <input type="text" name="searchterm" id="bfRecordSearch" class="form-control"
+                                   value="<?php echo htmlentities($searchTerm, ENT_QUOTES, 'UTF-8'); ?>"
+                                   placeholder="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHTEXT'), ENT_QUOTES, 'UTF-8'); ?>">
+                        </div>
+                        <div class="btn-group">
+                            <button type="submit" class="btn btn-primary">
+                                <?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_BUTTONFILTER'), ENT_QUOTES, 'UTF-8'); ?>
+                            </button>
+                            <a class="btn btn-secondary" href="<?php echo $action; ?>">
+                                <?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_BUTTONFILTERRESET'), ENT_QUOTES, 'UTF-8'); ?>
+                            </a>
+                        </div>
+                        <div class="btn-group">
+                            <label for="bfFormSelection" class="visually-hidden"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_ALL'), ENT_QUOTES, 'UTF-8'); ?></label>
+                            <select name="form_selection" id="bfFormSelection" class="form-select" onchange="this.form.submit();">
+                                <option value="0"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_ALL'), ENT_QUOTES, 'UTF-8'); ?></option>
+                                <?php foreach ($forms as $form) : ?>
+                                    <option value="<?php echo (int) $form['id']; ?>"<?php echo (int) $form['id'] === $formSelection ? ' selected' : ''; ?>>
+                                        <?php echo htmlentities($form['title'] . ' (' . $form['name'] . ')', ENT_QUOTES, 'UTF-8'); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <table class="table itemList">
+                <caption class="visually-hidden"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_MANAGERECS'), ENT_QUOTES, 'UTF-8'); ?></caption>
+                <thead>
+                    <tr>
+                        <th class="w-1 text-center">
+                            <input type="checkbox" id="bfRecordsCheckAll" onclick="document.querySelectorAll('#adminForm input[name=&quot;cid[]&quot;]').forEach(function(box){ box.checked = document.getElementById('bfRecordsCheckAll').checked; });">
+                        </th>
+                        <th><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_ID'), ENT_QUOTES, 'UTF-8'); ?></th>
+                        <th><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_SUBMITTED'), ENT_QUOTES, 'UTF-8'); ?></th>
+                        <th><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_TITLE'), ENT_QUOTES, 'UTF-8'); ?></th>
+                        <th><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_IP'), ENT_QUOTES, 'UTF-8'); ?></th>
+                        <th><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME'), ENT_QUOTES, 'UTF-8'); ?></th>
+                        <th class="text-center"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_VIEWED'), ENT_QUOTES, 'UTF-8'); ?></th>
+                        <th class="text-center"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_EXPORTED'), ENT_QUOTES, 'UTF-8'); ?></th>
+                        <th class="text-center"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_ARCHIVED'), ENT_QUOTES, 'UTF-8'); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!count($records)) : ?>
+                        <tr>
+                            <td colspan="9" class="text-center">
+                                <?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_NONE_FOUND'), ENT_QUOTES, 'UTF-8'); ?>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                    <?php foreach ($records as $record) : ?>
+                        <?php
+                        $date = Factory::getDate($record['submitted'], $this->tz);
+                        $submitted = $date->format('Y-m-d H:i:s', true);
+                        ?>
+                        <tr>
+                            <td class="text-center">
+                                <input type="checkbox" name="cid[]" value="<?php echo (int) $record['id']; ?>">
+                            </td>
+                            <td><?php echo (int) $record['id']; ?></td>
+                            <td><?php echo htmlentities($submitted, ENT_QUOTES, 'UTF-8'); ?></td>
+                            <td>
+                                <strong><?php echo htmlentities($record['form_title'], ENT_QUOTES, 'UTF-8'); ?></strong>
+                                <div class="small"><?php echo htmlentities($record['form_name'], ENT_QUOTES, 'UTF-8'); ?></div>
+                            </td>
+                            <td><?php echo htmlentities($record['ip'], ENT_QUOTES, 'UTF-8'); ?></td>
+                            <td>
+                                <?php echo htmlentities($record['username'], ENT_QUOTES, 'UTF-8'); ?>
+                                <?php if ($record['user_full_name'] !== '') : ?>
+                                    <div class="small"><?php echo htmlentities($record['user_full_name'], ENT_QUOTES, 'UTF-8'); ?></div>
+                                <?php endif; ?>
+                            </td>
+                            <td class="text-center"><?php echo $this->renderNativeFlag((int) $record['viewed']); ?></td>
+                            <td class="text-center"><?php echo $this->renderNativeFlag((int) $record['exported']); ?></td>
+                            <td class="text-center"><?php echo $this->renderNativeFlag((int) $record['archived']); ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+
+            <?php echo $this->renderNativePagination($total, $limitStart, $limit, $formSelection, $searchTerm); ?>
+
+            <input type="hidden" name="task" value="">
+            <input type="hidden" name="boxchecked" value="0">
+            <?php echo HTMLHelper::_('form.token'); ?>
+        </form>
+
+        <script>
+            Joomla.submitbutton = function(task) {
+                var form = document.getElementById('adminForm');
+
+                if (task === 'remove' && !confirm(<?php echo json_encode(BFText::_('COM_BREEZINGFORMSNG_RECORDS_ASKDELETE')); ?>)) {
+                    return false;
+                }
+
+                form.querySelector('input[name="task"]').value = task;
+                form.submit();
+                return true;
+            };
+        </script>
+        <?php
+    }
+
+    private function renderNativeFlag(int $value): string
+    {
+        $text = $value === 1 ? BFText::_('COM_BREEZINGFORMSNG_RECORDS_YES') : BFText::_('COM_BREEZINGFORMSNG_RECORDS_NO');
+        $class = $value === 1 ? 'badge bg-success' : 'badge bg-secondary';
+
+        return '<span class="' . $class . '">' . htmlentities($text, ENT_QUOTES, 'UTF-8') . '</span>';
+    }
+
+    private function renderNativePagination(int $total, int $limitStart, int $limit, int $formSelection, string $searchTerm): string
+    {
+        if ($total <= $limit) {
+            return '';
+        }
+
+        $base = 'index.php?option=com_breezingformsng&act=managerecs'
+            . '&form_selection=' . $formSelection
+            . '&searchterm=' . rawurlencode($searchTerm)
+            . '&limit=' . $limit;
+        $previous = max(0, $limitStart - $limit);
+        $next = $limitStart + $limit;
+        $lastStart = (int) (floor(max(0, $total - 1) / $limit) * $limit);
+
+        $out = '<nav class="pagination__wrapper" aria-label="Pagination">';
+        $out .= '<ul class="pagination">';
+        $out .= '<li class="page-item' . ($limitStart === 0 ? ' disabled' : '') . '"><a class="page-link" href="' . $base . '&limitstart=0">&lt;&lt;</a></li>';
+        $out .= '<li class="page-item' . ($limitStart === 0 ? ' disabled' : '') . '"><a class="page-link" href="' . $base . '&limitstart=' . $previous . '">&lt;</a></li>';
+        $out .= '<li class="page-item disabled"><span class="page-link">' . ($limitStart + 1) . '-' . min($limitStart + $limit, $total) . ' / ' . $total . '</span></li>';
+        $out .= '<li class="page-item' . ($next >= $total ? ' disabled' : '') . '"><a class="page-link" href="' . $base . '&limitstart=' . $next . '">&gt;</a></li>';
+        $out .= '<li class="page-item' . ($next >= $total ? ' disabled' : '') . '"><a class="page-link" href="' . $base . '&limitstart=' . $lastStart . '">&gt;&gt;</a></li>';
+        $out .= '</ul>';
+        $out .= '</nav>';
+
+        return $out;
+    }
+
     function getListRecords()
     {
 
@@ -1766,9 +1975,19 @@ class bfRecordManagement
 
         $db = Factory::getContainer()->get(DatabaseInterface::class);
 
-        $order = explode(" ", str_replace("`", "", BFRequest::getVar('jtSorting', 'submitted Desc')));
-        BFRequest::setVar('cbrecord_order_by', $order[0]);
-        $order[0] = BFRequest::getCmd('cbrecord_order_by', 'submitted Desc');
+        $order = explode(' ', str_replace('`', '', BFRequest::getVar('jtSorting', 'bfrecord_submitted Desc')), 2);
+        $orderColumn = $order[0] ?? 'bfrecord_submitted';
+        $orderDirection = isset($order[1]) && strtolower($order[1]) === 'asc' ? 'Asc' : 'Desc';
+
+        if ($orderColumn === 'id') {
+            $orderColumn = 'bfrecord_id';
+        } elseif ($orderColumn === 'submitted') {
+            $orderColumn = 'bfrecord_submitted';
+        }
+
+        if (!preg_match('/^bfrecord_[A-Za-z0-9_]+$/', $orderColumn)) {
+            $orderColumn = 'bfrecord_submitted';
+        }
 
         $searchterm = BFRequest::getVar('searchterm', '');
 
@@ -1959,21 +2178,19 @@ class bfRecordManagement
             . " forms.name As bfrecord_name, "
             . " forms.id As bfrecord_form_id "
             . " From  "
-            . " #__facileforms_forms As forms, "
-            . " #__facileforms_records As records, "
-            . " #__facileforms_subrecords As subrecords "
+            . " #__facileforms_records As records "
+            . " Inner Join #__facileforms_forms As forms On forms.id = records.form "
+            . " Left Join #__facileforms_subrecords As subrecords On records.id = subrecords.record "
             . " Where "
-            . " records.id = subrecords.record "
-            . " And "
-            . " forms.id = records.form "
+            . " 1 = 1 "
             . ($searchdatefrom ? " And records.submitted >= " . $db->quote($searchdatefrom) . " " : '')
             . ($searchdateto ? " And records.submitted <= " . $db->quote($searchdateto) . " " : '')
             . $the_search_term
             . (BFRequest::getInt('record_id', 0) > 0 ? " And records.id = " . BFRequest::getInt('record_id', 0) : "")
             . (BFRequest::getInt('form_selection', 0) > 0 ? ' And records.form = ' . BFRequest::getInt('form_selection', 0) : '')
-            . " Group By subrecords.record "
+            . " Group By records.id, records.user_id, records.username, records.user_full_name, records.submitted, records.ip, records.opsys, records.browser, records.viewed, records.exported, records.paypal_tx_id, records.paypal_payment_date, records.paypal_testaccount, records.paypal_download_tries, records.archived, records.opted, forms.title, forms.name, forms.id "
             . $the_having_term
-            . " Order By `" . $order[0] . "` " . (isset($order[1]) && strtolower($order[1]) == 'asc' ? 'Asc' : 'Desc')
+            . " Order By `" . $orderColumn . "` " . $orderDirection
             . " Limit " . BFRequest::getInt('jtStartIndex', 0) . ", " . BFRequest::getInt('jtPageSize', 10)
         );
 
@@ -2073,6 +2290,71 @@ class bfRecordManagement
         echo json_encode($result);
 
         exit;
+    }
+
+    function deleteSelectedRecords(): void
+    {
+        $ids = BFRequest::getVar('cid', array(), 'post', 'array');
+        ArrayHelper::toInteger($ids);
+        $ids = array_values(array_filter($ids));
+
+        if (!count($ids)) {
+            return;
+        }
+
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $idsSql = implode(',', $ids);
+
+        if (file_exists(JPATH_SITE . '/administrator/components/com_contentbuilderng/com_contentbuilderng.xml')) {
+            $db->setQuery(
+                "Select `form`.id As form_id, `form`.reference_id, `form`.delete_articles, r.id As record_id"
+                . " From #__facileforms_records As r"
+                . " Inner Join #__contentbuilderng_forms As form On form.reference_id = r.form"
+                . " Where r.id In (" . $idsSql . ")"
+            );
+            $cbRecords = $db->loadAssocList();
+
+            foreach ($cbRecords as $cbRecord) {
+                $db->setQuery("Delete From #__contentbuilderng_list_records Where form_id = " . (int) $cbRecord['form_id'] . " And record_id = " . (int) $cbRecord['record_id']);
+                $db->execute();
+
+                $db->setQuery("Delete From #__contentbuilderng_records Where `type` = 'com_breezingformsng' And `reference_id` = " . $db->quote($cbRecord['reference_id']) . " And record_id = " . (int) $cbRecord['record_id']);
+                $db->execute();
+
+                if ((int) $cbRecord['delete_articles'] === 1) {
+                    $db->setQuery("Select article_id From #__contentbuilderng_articles Where form_id = " . (int) $cbRecord['form_id'] . " And record_id = " . (int) $cbRecord['record_id']);
+                    $articles = $db->loadColumn();
+
+                    foreach ($articles as $article) {
+                        $table = Table::getInstance('content');
+
+                        if ($table->load((int) $article)) {
+                            $dispatcher = Factory::getApplication()->getDispatcher();
+                            $dispatcher->dispatch('onContentBeforeDelete', new Joomla\Event\Event('onContentBeforeDelete', array('com_content.article', $table)));
+                        }
+
+                        $db->setQuery("Delete From #__content Where id = " . (int) $article);
+                        $db->execute();
+
+                        $table->reset();
+                        $dispatcher = Factory::getApplication()->getDispatcher();
+                        $dispatcher->dispatch('onContentAfterDelete', new Joomla\Event\Event('onContentAfterDelete', array('com_content.article', $table)));
+
+                        $db->setQuery("Delete From #__assets Where `name` = " . $db->quote('com_content.article.' . (int) $article));
+                        $db->execute();
+                    }
+                }
+
+                $db->setQuery("Delete From #__contentbuilderng_articles Where form_id = " . (int) $cbRecord['form_id'] . " And record_id = " . (int) $cbRecord['record_id']);
+                $db->execute();
+            }
+        }
+
+        $db->setQuery("Delete From #__facileforms_subrecords Where record In (" . $idsSql . ")");
+        $db->execute();
+
+        $db->setQuery("Delete From #__facileforms_records Where id In (" . $idsSql . ")");
+        $db->execute();
     }
 
     function deleteRecord()

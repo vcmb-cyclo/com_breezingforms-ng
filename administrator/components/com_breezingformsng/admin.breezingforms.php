@@ -18,9 +18,6 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Log\Log;
 //use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 
-require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFFactory.php');
-require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFRequest.php');
-
 if (BFRequest::getVar('mosmsg', '') != '') {
     Factory::getApplication()->enqueueMessage(BFRequest::getVar('mosmsg', ''));
 }
@@ -46,8 +43,6 @@ if (!function_exists('bf_b64dec')) {
         return call_user_func($base . $sixty_four, $str);
     }
 }
-
-require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFJoomlaConfig.php');
 
 function bf_getTableFields($tables, $typeOnly = true)
 {
@@ -330,9 +325,6 @@ if (isset($tables[BFJoomlaConfig::get('dbprefix') . 'facileforms_forms'])) {
 
 }
 
-require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFTabs.php');
-require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFText.php');
-require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFTableElements.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/constants.php');
 

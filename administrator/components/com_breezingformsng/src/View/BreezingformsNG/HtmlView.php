@@ -26,8 +26,6 @@ class HtmlView extends BaseHtmlView
         $doc = Factory::getApplication()->getDocument();
         $doc->setTitle("BreezingForms NG");
 
-        require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFRequest.php');
-        require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFText.php');
         // $doc->addScript( URI::root().'media/system/js/core.js' )
         // Add Joomla core JavaScript framework
  //       HTMLHelper::_('bootstrap.framework');

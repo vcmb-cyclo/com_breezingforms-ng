@@ -2,7 +2,7 @@
 
 /**
  * BreezingForms - A Joomla Forms Application
- * @version 1.9
+ * @version 6.0
  * @package BreezingForms
  * @copyright (C) 2008-2020 by Markus Bopp
  * @copyright Copyright (C) 2024 by XDA+GIL 
@@ -24,9 +24,6 @@ use Joomla\Filesystem\File;
 use Joomla\CMS\Language\Text;
 use Joomla\Database\DatabaseInterface;
 use Joomla\CMS\HTML\HTMLHelper;
-
-require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFFactory.php');
-require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFRequest.php');
 
 if (!function_exists('bf_b64enc')) {
 
@@ -50,15 +47,11 @@ if (!function_exists('bf_b64dec')) {
 
 }
 
-require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFJoomlaConfig.php');
-
 $mainframe = Factory::getApplication();
 
 $cache = Factory::getCache();
 $cache->setCaching(false);
 
-require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFText.php');
-require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFTableElements.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/constants.php');
 

@@ -56,9 +56,9 @@ $editor = Editor::getInstance(Factory::getApplication()->get('editor'));
 
 echo '<form action="index.php" method="post" name="adminForm" id="adminForm">';
 
-echo '<input type="submit" class="btn btn-primary" value="' . Text::_('SAVE') . '" onclick="saveText();"/><br/><br/>';
+echo '<input type="submit" class="btn btn-primary" value="' . Text::_('JSAVE') . '" onclick="saveText();"/><br/><br/>';
 echo '<div id="bfModalContainer" style="width:900px;">' . $editor->display("bfEditor", '', 900, 300, 40, 20, false) . '</div>';
-echo '<br/><input type="submit" class="btn btn-primary" value="' . Text::_('SAVE') . '" onclick="saveText();"/>';
+echo '<br/><input type="submit" class="btn btn-primary" value="' . Text::_('JSAVE') . '" onclick="saveText();"/>';
 
 echo '<script>
 function bfLoadText(){

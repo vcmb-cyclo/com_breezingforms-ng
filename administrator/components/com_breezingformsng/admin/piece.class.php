@@ -11,6 +11,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
+use Vcmb\Component\BreezingformsNG\Administrator\Model\PieceModel;
 
 require_once ($ff_admpath . '/admin/piece.html.php');
 
@@ -230,18 +231,15 @@ class facileFormsPiece
 
 	static function del($option, $pkg, $ids)
 	{
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
-		ArrayHelper::toInteger($ids);
-		$total = count($ids);
-		if ($total) {
-			$idsList = implode(',', $ids);
-			$database->setQuery("delete from #__facileforms_pieces where id in ($idsList)");
-			try {
-				$database->execute();
-			} catch (RuntimeException $e) {
-				echo "<script> alert('" . $e->getMessage() . "'); window.history.go(-1); </script>\n";
-			}
-		} // if
+		$model = PieceModel::create();
+
+		try {
+			$total = $model->deleteByIds($ids);
+		} catch (RuntimeException $e) {
+			echo "<script> alert('" . $e->getMessage() . "'); window.history.go(-1); </script>\n";
+			return;
+		}
+
 		if ($total) {
 			$msg = $total . ' ' . BFText::_('COM_BREEZINGFORMSNG_PIECES_SUCCDELETED');
 			Factory::getApplication()->enqueueMessage($msg);
@@ -254,14 +252,8 @@ class facileFormsPiece
 
 	static function publish($option, $pkg, $ids, $publish)
 	{
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
-		ArrayHelper::toInteger($ids);
-		$ids = implode(',', $ids);
-		$database->setQuery(
-			"update #__facileforms_pieces set published='$publish' where id in ($ids)"
-		);
 		try {
-			$database->execute();
+			PieceModel::create()->publishByIds($ids, (bool) $publish);
 		} catch (RuntimeException $e) {
 			echo "<script> alert('" . $e->getMessage() . "'); window.history.go(-1); </script>\n";
 			return;
@@ -273,18 +265,8 @@ class facileFormsPiece
 
 	static function listitems($option, $pkg)
 	{
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
-
-		$database->setQuery(
-			"select distinct  package as name " .
-			"from #__facileforms_pieces " .
-			"where package is not null and package != '' " .
-			"order by name"
-		);
-
-
 		try {
-			$pkgs = $database->loadObjectList();
+			$pkgs = PieceModel::create()->getPackages();
 		} catch (Exception $e) {
 			echo $e->getCode() . ' : ' . $e->getMessage();
 			return false;
@@ -323,22 +305,6 @@ class facileFormsPiece
 			$search = trim((string) $searchReq);
 			$session->set('bf.pieces_search', $search);
 		}
-		$conditions = array();
-		if ($pkg !== '') {
-			$conditions[] = "package = " . $database->Quote($pkg);
-		}
-		if (!$showInternal) {
-			$conditions[] = "name NOT LIKE '\\_%'";
-		}
-		if ($search !== '') {
-			$searchLike = $database->Quote('%' . $search . '%');
-			$conditions[] = "(" .
-				"title LIKE " . $searchLike . " or " .
-				"name LIKE " . $searchLike . " or " .
-				"description LIKE " . $searchLike .
-				")";
-		}
-		$whereClause = count($conditions) ? "where " . implode(' and ', $conditions) . " " : "";
 		$sortReq = BFRequest::getVar('sort', null);
 		$dirReq = BFRequest::getVar('dir', null);
 		if ($sortReq === null) {
@@ -353,19 +319,7 @@ class facileFormsPiece
 			$dir = strtoupper((string) $dirReq);
 			$session->set('bf.pieces_dir', $dir);
 		}
-		$allowedSorts = array(
-			'id' => 'id',
-			'package' => 'package',
-			'title' => 'title',
-			'name' => 'name',
-			'type' => 'type',
-			'description' => 'description',
-			'modified' => 'modified',
-			'published' => 'published',
-		);
-		$sortField = isset($allowedSorts[$sort]) ? $allowedSorts[$sort] : 'name';
 		$dir = $dir === 'DESC' ? 'DESC' : 'ASC';
-		$orderBy = "order by {$sortField} {$dir}, id desc";
 
 		$pageSizes = array(10, 25, 50, 100, 250, 500, 1000, 5000, 10000, 100000);
 		$limitReq = BFRequest::getInt('limit', -1);
@@ -389,37 +343,16 @@ class facileFormsPiece
 			$limitstart = 0;
 		}
 
-		$database->setQuery(
-			"select count(*) from #__facileforms_pieces " .
-			$whereClause
-		);
 		try {
-			$total = (int) $database->loadResult();
+			$listData = PieceModel::create()->getListData($pkg, $search, $sort, $dir, $limit, $limitstart, $showInternal);
 		} catch (Exception $e) {
 			echo $e->getCode() . ' : ' . $e->getMessage();
 			return false;
 		}
-
-		if ($total > 0 && $limitstart >= $total) {
-			$lastPage = (int) floor(($total - 1) / $limit);
-			$limitstart = $lastPage * $limit;
-		}
-		$limitstart = (int) floor($limitstart / $limit) * $limit;
+		$total = $listData['total'];
+		$limitstart = $listData['limitstart'];
 		$session->set('bf.pieces_limitstart', $limitstart);
-
-		$database->setQuery(
-			"select * from #__facileforms_pieces " .
-			$whereClause .
-			$orderBy,
-			$limitstart,
-			$limit
-		);
-		try {
-			$rows = $database->loadObjectList();
-		} catch (Exception $e) {
-			echo $e->getCode() . ' : ' . $e->getMessage();
-			return false;
-		}
+		$rows = $listData['rows'];
 
 		HTML_facileFormsPiece::listitems($option, $rows, $pkglist, $pkg, $showInternal, $search, $total, $limit, $limitstart, $pageSizes);
 	} // listitems

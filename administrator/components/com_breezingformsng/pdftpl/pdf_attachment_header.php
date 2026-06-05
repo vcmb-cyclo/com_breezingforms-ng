@@ -2,7 +2,7 @@
 /**
  * BreezingForms NG - A Joomla Forms Application
  * @version 1.8
- * @package BreezingForms NG
+ * @package BreezingFormsNG
  * @copyright Copyright (C) 2008-2012 by Markus Bopp
  * @license GNU General Public License version 2 or later; see LICENSE.txt
  * */

@@ -2,7 +2,7 @@
 /**
  * Based on Joomla 3 JPagination class
  * 
- * @package     BreezingForms
+ * @package BreezingFormsNG
  * @author      Markus Bopp
  * @link        https://breezingforms-ng.vcmb.fr
  * @copyright  Copyright (C) 2024-2026 by XDA+GIL 

@@ -1,8 +1,8 @@
 <?php
 /**
  * BreezingForms NG - A Joomla Forms Application
- * @version     5.0.0
- * @package     BreezingForms
+ * @version 6.0.0
+ * @package BreezingFormsNG
  * @copyright  Copyright (C) 2024-2026 by XDA+GIL | Until 1.9, 2008-2020 by Markus Bopp
  * @license     Released under the terms of the GNU General Public License
  **/

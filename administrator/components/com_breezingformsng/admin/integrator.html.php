@@ -51,19 +51,19 @@ class BFIntegratorHtml
                     <th style="width: 60px;" nowrap align="center"><input type="checkbox" name="toggle" value="" onclick="Joomla.checkAll(this);" /></th>
 
                     <th style="width: 20%;">
-                        <?php echo Text::_('Rulename'); ?>
+                        <?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_RULENAME'); ?>
                     </th>
                     <th style="width: 20%;">
-                        <?php echo Text::_('Type'); ?>
+                        <?php echo Text::_('COM_BREEZINGFORMSNG_TYPE'); ?>
                     </th>
                     <th style="width: 20%;">
-                        <?php echo Text::_('Form'); ?>
+                        <?php echo Text::_('COM_BREEZINGFORMSNG_FORM'); ?>
                     </th>
                     <th style="width: 20%;">
-                        <?php echo Text::_('Table'); ?>
+                        <?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_TABLE'); ?>
                     </th>
                     <th style="width: 20%;">
-                        <?php echo Text::_('published'); ?>
+                        <?php echo Text::_('JPUBLISHED'); ?>
                     </th>
 
                 </tr>
@@ -122,7 +122,7 @@ class BFIntegratorHtml
         $formSelector[$showType] = 'selected="selected"';
         ?>
 
-        <h3><?php echo Text::_('Base Data') ?></h3>
+        <h3><?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_BASE_DATA') ?></h3>
 
         <form action="index.php" method="post" name="adminForm" id="adminForm">
 
@@ -130,19 +130,19 @@ class BFIntegratorHtml
 
                 <tr>
                     <th width="300">
-                        <?php echo Text::_('Rulename'); ?>
+                        <?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_RULENAME'); ?>
                     </th>
                     <th width="200">
-                        <?php echo Text::_('Showing'); ?>
+                        <?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_SHOWING'); ?>
                     </th>
                     <th width="300">
-                        <?php echo Text::_('Form'); ?>
+                        <?php echo Text::_('COM_BREEZINGFORMSNG_FORM'); ?>
                     </th>
                     <th width="300">
-                        <?php echo Text::_('Table'); ?>
+                        <?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_TABLE'); ?>
                     </th>
                     <th>
-                        <?php echo Text::_('Type'); ?>
+                        <?php echo Text::_('COM_BREEZINGFORMSNG_TYPE'); ?>
                     </th>
                 </tr>
                 <tr class="row0">
@@ -227,7 +227,7 @@ class BFIntegratorHtml
                         if (isset($rule)) {
                             echo $rule->type;
                         } else {
-                            echo Text::_('Insert') . ' <input checked="checked" type="radio" name="type" value="insert"/> ' . Text::_('Update') . ' <input type="radio" name="type" value="update"/>';
+                            echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_INSERT') . ' <input checked="checked" type="radio" name="type" value="insert"/> ' . Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_UPDATE') . ' <input type="radio" name="type" value="update"/>';
                         }
                         ?>
                     </td>
@@ -249,7 +249,7 @@ class BFIntegratorHtml
         ?>
 
             <br />
-            <h3><?php echo Text::_('Data Integration') ?></h3>
+            <h3><?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_DATA_INTEGRATION') ?></h3>
 
             <script>
                 function listItemTask(id, task) {
@@ -284,19 +284,19 @@ class BFIntegratorHtml
 
                     <tr>
                         <th width="300">
-                            <?php echo Text::_('Form Element (incoming)'); ?>
+                            <?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_FORM_ELEMENT_INCOMING'); ?>
                         </th>
                         <th width="300">
-                            <?php echo Text::_('Copy To'); ?>
+                            <?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_COPY_TO'); ?>
                         </th>
                         <th width="300">
-                            <?php echo Text::_('Database Field (outgoing)'); ?>
+                            <?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_DB_FIELD_OUTGOING'); ?>
                         </th>
                         <th width="300">
-                            <?php echo Text::_(''); ?>
+                            <?php echo ''; ?>
                         </th>
                         <th>
-                            <?php echo Text::_('Publish'); ?>
+                            <?php echo Text::_('JPUBLISHED'); ?>
                         </th>
                     </tr>
 
@@ -326,7 +326,7 @@ class BFIntegratorHtml
                                 ?>
                             </select>
                         </td>
-                        <td colspan="2"><a style="display: block;" href="javascript:document.addItemForm.submit();"><?php echo Text::_('add') ?></a></td>
+                        <td colspan="2"><a style="display: block;" href="javascript:document.addItemForm.submit();"><?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_ADD') ?></a></td>
                     </tr>
 
                     <?php
@@ -352,11 +352,11 @@ class BFIntegratorHtml
                                     ?>
 
                                     <br />
-                                    <a style="display: block;" href="javascript:document.saveCodeForm.itemId.value=<?php echo $item->id ?>;document.saveCodeForm.code.value=Joomla.editors.instances['code<?php echo $item->id ?>'].getValue();document.saveCodeForm.submit();"><?php echo Text::_('Save') ?></a>
+                                    <a style="display: block;" href="javascript:document.saveCodeForm.itemId.value=<?php echo $item->id ?>;document.saveCodeForm.code.value=Joomla.editors.instances['code<?php echo $item->id ?>'].getValue();document.saveCodeForm.submit();"><?php echo Text::_('JSAVE') ?></a>
                                 </div>
-                                <a style="display: block;" href="javascript:showCode<?php echo $item->id ?>()"><?php echo Text::_('Code') ?></a>
+                                <a style="display: block;" href="javascript:showCode<?php echo $item->id ?>()"><?php echo Text::_('COM_BREEZINGFORMSNG_CODE') ?></a>
 
-                                <a style="display: block;" href="index.php?option=com_breezingformsng&act=integrate&task=removeItem&itemId=<?php echo $item->id ?>&id=<?php echo $rule->id ?>"><?php echo Text::_('Remove') ?></a>
+                                <a style="display: block;" href="index.php?option=com_breezingformsng&act=integrate&task=removeItem&itemId=<?php echo $item->id ?>&id=<?php echo $rule->id ?>"><?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_REMOVE') ?></a>
                             </td>
                             <td valign="top" align="center"><?php
                                                             if ($item->published == "1") {
@@ -398,7 +398,7 @@ class BFIntegratorHtml
             ?>
 
                 <br />
-                <h3><?php echo Text::_('Update Criteria - Form') ?></h3>
+                <h3><?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_UPDATE_CRITERIA_FORM') ?></h3>
 
                 <form action="index.php?option=com_breezingformsng&act=integrate" method="post" name="addCriteriaForm">
                     <input type="hidden" name="publish_id" value="-1" />
@@ -408,19 +408,19 @@ class BFIntegratorHtml
 
                         <tr>
                             <th width="300">
-                                <?php echo Text::_('Database Field Value'); ?>
+                                <?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_DB_FIELD_VALUE'); ?>
                             </th>
                             <th width="300">
-                                <?php echo Text::_('Operation'); ?>
+                                <?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_OPERATION'); ?>
                             </th>
                             <th width="300">
-                                <?php echo Text::_('Form Element Value'); ?>
+                                <?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_FORM_ELEMENT_VALUE'); ?>
                             </th>
                             <th width="100">
-                                <?php echo Text::_('And/Or'); ?>
+                                <?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_AND_OR'); ?>
                             </th>
                             <th>
-                                <?php echo Text::_(''); ?>
+                                <?php echo ''; ?>
                             </th>
                         </tr>
 
@@ -465,8 +465,8 @@ class BFIntegratorHtml
                                     ?>
                                 </select>
                             </td>
-                            <td><?php echo Text::_('A N D') ?> <input type="radio" name="andor" value="AND" checked="checked" /> <?php echo Text::_('O R') ?> <input type="radio" name="andor" value="OR" /></td>
-                            <td colspan="2"><a href="javascript:document.addCriteriaForm.submit();"><?php echo Text::_('add') ?></a></td>
+                            <td><?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_AND') ?> <input type="radio" name="andor" value="AND" checked="checked" /> <?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_OR') ?> <input type="radio" name="andor" value="OR" /></td>
+                            <td colspan="2"><a href="javascript:document.addCriteriaForm.submit();"><?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_ADD') ?></a></td>
                         </tr>
 
                         <?php
@@ -480,7 +480,7 @@ class BFIntegratorHtml
                                 <td align="center"><?php echo htmlentities($criteria->operator, ENT_COMPAT, 'UTF-8') ?></td>
                                 <td><?php echo htmlentities($criteria->element_name, ENT_COMPAT, 'UTF-8') ?> (<?php echo htmlentities($criteria->element_type, ENT_COMPAT, 'UTF-8') ?>)</td>
                                 <td><?php echo htmlentities($criteria->andor, ENT_COMPAT, 'UTF-8') ?> </td>
-                                <td><a href="index.php?option=com_breezingformsng&act=integrate&task=removeCriteria&criteriaId=<?php echo $criteria->id ?>&id=<?php echo $rule->id ?>"><?php echo Text::_('Remove') ?></a></td>
+                                <td><a href="index.php?option=com_breezingformsng&act=integrate&task=removeCriteria&criteriaId=<?php echo $criteria->id ?>&id=<?php echo $rule->id ?>"><?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_REMOVE') ?></a></td>
                             </tr>
                         <?php
                             $k = 1 - $k;
@@ -490,7 +490,7 @@ class BFIntegratorHtml
                 </form>
 
                 <br />
-                <h3><?php echo Text::_('Update Criteria - Joomla!') ?></h3>
+                <h3><?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_UPDATE_CRITERIA_JOOMLA') ?></h3>
 
                 <form action="index.php?option=com_breezingformsng&act=integrate" method="post" name="addCriteriaJoomlaForm">
                     <input type="hidden" name="publish_id" value="-1" />
@@ -500,19 +500,19 @@ class BFIntegratorHtml
 
                         <tr>
                             <th width="300">
-                                <?php echo Text::_('Database Field Value'); ?>
+                                <?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_DB_FIELD_VALUE'); ?>
                             </th>
                             <th width="300">
-                                <?php echo Text::_('Operation'); ?>
+                                <?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_OPERATION'); ?>
                             </th>
                             <th width="300">
-                                <?php echo Text::_('Joomla Object Value'); ?>
+                                <?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_JOOMLA_OBJECT_VALUE'); ?>
                             </th>
                             <th width="100">
-                                <?php echo Text::_('And/Or'); ?>
+                                <?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_AND_OR'); ?>
                             </th>
                             <th>
-                                <?php echo Text::_(''); ?>
+                                <?php echo ''; ?>
                             </th>
                         </tr>
 
@@ -547,15 +547,15 @@ class BFIntegratorHtml
                             <td>
                                 <select name="joomla_object">
 
-                                    <option value="Userid"><?php echo Text::_('Userid') ?></option>
-                                    <option value="Username"><?php echo Text::_('Username') ?></option>
-                                    <option value="Language"><?php echo Text::_('Language') ?></option>
-                                    <option value="Date"><?php echo Text::_('Date') ?></option>
+                                    <option value="Userid"><?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_USERID') ?></option>
+                                    <option value="Username"><?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_USERNAME') ?></option>
+                                    <option value="Language"><?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_LANGUAGE') ?></option>
+                                    <option value="Date"><?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_DATE') ?></option>
 
                                 </select>
                             </td>
-                            <td><?php echo Text::_('A N D') ?> <input type="radio" name="andor" value="AND" checked="checked" /> <?php echo Text::_('O R') ?> <input type="radio" name="andor" value="OR" /></td>
-                            <td colspan="2"><a href="javascript:document.addCriteriaJoomlaForm.submit();"><?php echo Text::_('add') ?></a></td>
+                            <td><?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_AND') ?> <input type="radio" name="andor" value="AND" checked="checked" /> <?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_OR') ?> <input type="radio" name="andor" value="OR" /></td>
+                            <td colspan="2"><a href="javascript:document.addCriteriaJoomlaForm.submit();"><?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_ADD') ?></a></td>
                         </tr>
 
                         <?php
@@ -569,7 +569,7 @@ class BFIntegratorHtml
                                 <td align="center"><?php echo htmlentities($criteria->operator, ENT_COMPAT, 'UTF-8') ?></td>
                                 <td><?php echo htmlentities($criteria->joomla_object, ENT_COMPAT, 'UTF-8') ?></td>
                                 <td><?php echo htmlentities($criteria->andor, ENT_COMPAT, 'UTF-8') ?> </td>
-                                <td><a href="index.php?option=com_breezingformsng&act=integrate&task=removeCriteriaJoomla&criteriaId=<?php echo $criteria->id ?>&id=<?php echo $rule->id ?>"><?php echo Text::_('Remove') ?></a></td>
+                                <td><a href="index.php?option=com_breezingformsng&act=integrate&task=removeCriteriaJoomla&criteriaId=<?php echo $criteria->id ?>&id=<?php echo $rule->id ?>"><?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_REMOVE') ?></a></td>
                             </tr>
                         <?php
                             $k = 1 - $k;
@@ -579,7 +579,7 @@ class BFIntegratorHtml
                 </form>
 
                 <br />
-                <h3><?php echo Text::_('Update Criteria - Fixed') ?></h3>
+                <h3><?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_UPDATE_CRITERIA_FIXED') ?></h3>
 
                 <form action="index.php?option=com_breezingformsng&act=integrate" method="post" name="addCriteriaFixedForm">
                     <input type="hidden" name="publish_id" value="-1" />
@@ -589,19 +589,19 @@ class BFIntegratorHtml
 
                         <tr>
                             <th width="300">
-                                <?php echo Text::_('Database Field Value'); ?>
+                                <?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_DB_FIELD_VALUE'); ?>
                             </th>
                             <th width="300">
-                                <?php echo Text::_('Operation'); ?>
+                                <?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_OPERATION'); ?>
                             </th>
                             <th width="300">
-                                <?php echo Text::_('Fixed Value'); ?>
+                                <?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_FIXED_VALUE'); ?>
                             </th>
                             <th width="100">
-                                <?php echo Text::_('And/Or'); ?>
+                                <?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_AND_OR'); ?>
                             </th>
                             <th>
-                                <?php echo Text::_(''); ?>
+                                <?php echo ''; ?>
                             </th>
                         </tr>
 
@@ -636,8 +636,8 @@ class BFIntegratorHtml
                             <td>
                                 <input style="width:100%" type="text" name="fixed_value" value="" />
                             </td>
-                            <td><?php echo Text::_('A N D') ?> <input type="radio" name="andor" value="AND" checked="checked" /> <?php echo Text::_('O R') ?> <input type="radio" name="andor" value="OR" /></td>
-                            <td colspan="2"><a href="javascript:document.addCriteriaFixedForm.submit();"><?php echo Text::_('add') ?></a></td>
+                            <td><?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_AND') ?> <input type="radio" name="andor" value="AND" checked="checked" /> <?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_OR') ?> <input type="radio" name="andor" value="OR" /></td>
+                            <td colspan="2"><a href="javascript:document.addCriteriaFixedForm.submit();"><?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_ADD') ?></a></td>
                         </tr>
 
                         <?php
@@ -651,7 +651,7 @@ class BFIntegratorHtml
                                 <td align="center"><?php echo htmlentities($criteria->operator, ENT_COMPAT, 'UTF-8') ?></td>
                                 <td><?php echo htmlentities($criteria->fixed_value, ENT_COMPAT, 'UTF-8') ?> </td>
                                 <td><?php echo htmlentities($criteria->andor, ENT_COMPAT, 'UTF-8') ?> </td>
-                                <td><a href="index.php?option=com_breezingformsng&act=integrate&task=removeCriteriaFixed&criteriaId=<?php echo $criteria->id ?>&id=<?php echo $rule->id ?>"><?php echo Text::_('Remove') ?></a></td>
+                                <td><a href="index.php?option=com_breezingformsng&act=integrate&task=removeCriteriaFixed&criteriaId=<?php echo $criteria->id ?>&id=<?php echo $rule->id ?>"><?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_REMOVE') ?></a></td>
                             </tr>
                         <?php
                             $k = 1 - $k;
@@ -667,7 +667,7 @@ class BFIntegratorHtml
             ?>
 
             <br />
-            <h3><?php echo Text::_('Finalize Code') ?></h3>
+            <h3><?php echo Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_FINALIZE_CODE') ?></h3>
 
             <form action="index.php?option=com_breezingformsng&act=integrate" method="post" name="saveFinalizeCodeForm">
                 <input type="hidden" name="publish_id" value="-1" />
@@ -684,7 +684,7 @@ class BFIntegratorHtml
 
                 <br />
                 <br />
-                <a href="javascript:document.saveFinalizeCodeForm.submit();"><?php echo Text::_('Save') ?></a>
+                <a href="javascript:document.saveFinalizeCodeForm.submit();"><?php echo Text::_('JSAVE') ?></a>
             </form>
 
 <?php

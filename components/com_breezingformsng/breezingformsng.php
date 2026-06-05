@@ -284,7 +284,7 @@ if (
         } else {
 
             if (BFRequest::getVar('option', '') != 'com_breezingformsng') {
-                throw new Exception(Text::_('No form id or name provided!'), 404);
+                throw new Exception(Text::_('COM_BREEZINGFORMSNG_NO_FORM_ID_PROVIDED'), 404);
             } else {
                 echo '[No form id or name provided!]';
             }

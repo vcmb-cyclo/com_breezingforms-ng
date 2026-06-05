@@ -3,10 +3,11 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 /**
 * BreezingForms - A Joomla Forms Application
 * @version 6.0
-* @package BreezingForms
+* @package BreezingFormsNG
 * @copyright (C) 2008-2020 by Markus Bopp
 * @license Released under the terms of the GNU General Public License
-**/
+ **/
+
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 ?>
 <?php echo BFText::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_BUYING_SU'); ?>

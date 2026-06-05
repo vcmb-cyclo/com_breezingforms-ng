@@ -1,4 +1,5 @@
 <?php
+
 /**
  * BreezingForms NG - A Joomla Forms Application
  * 
@@ -8,6 +9,7 @@
  * @copyright Copyright (C) 2024-2006 by XDA+GIL
  * @license GNU General Public License version 2 or later; see LICENSE.txt
  **/
+
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\Factory;
@@ -15,13 +17,15 @@ use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\HTML\HTMLHelper;
 
-class BFIntegratorHtml{
+class BFIntegratorHtml
+{
 
-    public static function listRules($rules){
+    public static function listRules($rules)
+    {
 
-        ?>
+?>
         <script>
-            function listItemTask( id, task ) {
+            function listItemTask(id, task) {
                 var f = document.adminForm;
                 id.split('cb');
                 f.task.value = task;
@@ -41,36 +45,36 @@ class BFIntegratorHtml{
 
         <form action="index.php" method="post" name="adminForm" id="adminForm">
 
-                <table cellpadding="4" cellspacing="0" border="0" width="100%"  class="adminlist table table-striped">
+            <table cellpadding="4" cellspacing="0" border="0" width="100%" class="adminlist table table-striped">
 
-                    <tr>
-                        <th style="width: 60px;" nowrap align="center"><input type="checkbox" name="toggle" value="" onclick="Joomla.checkAll(this);" /></th>
+                <tr>
+                    <th style="width: 60px;" nowrap align="center"><input type="checkbox" name="toggle" value="" onclick="Joomla.checkAll(this);" /></th>
 
-                        <th style="width: 20%;">
-                            <?php echo Text::_( 'Rulename' ); ?>
-                        </th>
-                        <th style="width: 20%;">
-                            <?php echo Text::_( 'Type' ); ?>
-                        </th>
-                        <th style="width: 20%;">
-                            <?php echo Text::_( 'Form' ); ?>
-                        </th>
-                        <th style="width: 20%;">
-                            <?php echo Text::_( 'Table' ); ?>
-                        </th>
-                        <th style="width: 20%;">
-                            <?php echo Text::_( 'published' ); ?>
-                        </th>
+                    <th style="width: 20%;">
+                        <?php echo Text::_('Rulename'); ?>
+                    </th>
+                    <th style="width: 20%;">
+                        <?php echo Text::_('Type'); ?>
+                    </th>
+                    <th style="width: 20%;">
+                        <?php echo Text::_('Form'); ?>
+                    </th>
+                    <th style="width: 20%;">
+                        <?php echo Text::_('Table'); ?>
+                    </th>
+                    <th style="width: 20%;">
+                        <?php echo Text::_('published'); ?>
+                    </th>
 
-                    </tr>
+                </tr>
 
-                    <?php
-                    $k = 0;
-                    $cnt = count( $rules );
-                    for($i=0; $i < $cnt; $i++){
+                <?php
+                $k = 0;
+                $cnt = count($rules);
+                for ($i = 0; $i < $cnt; $i++) {
                     $rule        = $rules[$i];
-                    $checked     = HTMLHelper::_( 'grid.id', $i, $rule->id );
-                    ?>
+                    $checked     = HTMLHelper::_('grid.id', $i, $rule->id);
+                ?>
 
                     <tr class="<?php echo "row$k"; ?>">
 
@@ -81,19 +85,19 @@ class BFIntegratorHtml{
                         <td><a href="index.php?option=com_breezingformsng&act=integrate&task=edit&id=<?php echo $rule->id; ?>"><?php echo htmlentities($rule->form_name, ENT_COMPAT, 'UTF-8') ?></a></td>
                         <td><a href="index.php?option=com_breezingformsng&act=integrate&task=edit&id=<?php echo $rule->id; ?>"><?php echo htmlentities($rule->reference_table, ENT_COMPAT, 'UTF-8') ?></a></td>
                         <td valign="top" align="center"><?php
-                        if ($rule->published) {
-                            ?><a class="tbody-icon active" href="javascript:void(0);" onClick="return listItemTask('cb<?php echo $rule->id; ?>','unpublish')"><span class="icon-publish" aria-hidden="true"></span></a><?php
-                        } else {
-                            ?><a class="tbody-icon" href="javascript:void(0);" onClick="return listItemTask('cb<?php echo $rule->id; ?>','publish')"><span class="icon-unpublish" aria-hidden="true"></span></a><?php
-                        } // if
-                        ?></td>
+                                                        if ($rule->published) {
+                                                        ?><a class="tbody-icon active" href="javascript:void(0);" onClick="return listItemTask('cb<?php echo $rule->id; ?>','unpublish')"><span class="icon-publish" aria-hidden="true"></span></a><?php
+                                                                                                                                                                                                                    } else {
+                                                                                                                                                                                                                        ?><a class="tbody-icon" href="javascript:void(0);" onClick="return listItemTask('cb<?php echo $rule->id; ?>','publish')"><span class="icon-unpublish" aria-hidden="true"></span></a><?php
+                                                                                                                                                                                                                    } // if
+                                                                                                                                                                                                                ?></td>
 
                     </tr>
-                    <?php
+                <?php
                     $k = 1 - $k;
-                    }
-                    ?>
-                </table>
+                }
+                ?>
+            </table>
 
             <input type="hidden" name="option" value="com_breezingformsng" />
             <input type="hidden" name="act" value="integrate" />
@@ -103,17 +107,18 @@ class BFIntegratorHtml{
 
         </form>
 
-        <?php
+    <?php
 
     }
 
-    public static function edit($rule, $items, $tables, $forms, $formElements, $criteriaForm, $criteriaJoomla, $criteriaFixed, $showType = 'all'){
-        ?>
+    public static function edit($rule, $items, $tables, $forms, $formElements, $criteriaForm, $criteriaJoomla, $criteriaFixed, $showType = 'all')
+    {
+    ?>
 
         <?php
 
         // Custom code added
-        $formSelector = array('all' => '', 'published' => '','unpublished' => '');
+        $formSelector = array('all' => '', 'published' => '', 'unpublished' => '');
         $formSelector[$showType] = 'selected="selected"';
         ?>
 
@@ -121,114 +126,114 @@ class BFIntegratorHtml{
 
         <form action="index.php" method="post" name="adminForm" id="adminForm">
 
-                <table class="adminlist table table-striped">
+            <table class="adminlist table table-striped">
 
-                    <tr>
-                        <th width="300">
-                            <?php echo Text::_( 'Rulename' ); ?>
-                        </th>
-                        <th width="200">
-                            <?php echo Text::_( 'Showing' ); ?>
-                        </th>
-                        <th width="300">
-                            <?php echo Text::_( 'Form' ); ?>
-                        </th>
-                        <th width="300">
-                            <?php echo Text::_( 'Table' ); ?>
-                        </th>
-                        <th>
-                            <?php echo Text::_( 'Type' ); ?>
-                        </th>
-                    </tr>
-                    <tr class="row0">
+                <tr>
+                    <th width="300">
+                        <?php echo Text::_('Rulename'); ?>
+                    </th>
+                    <th width="200">
+                        <?php echo Text::_('Showing'); ?>
+                    </th>
+                    <th width="300">
+                        <?php echo Text::_('Form'); ?>
+                    </th>
+                    <th width="300">
+                        <?php echo Text::_('Table'); ?>
+                    </th>
+                    <th>
+                        <?php echo Text::_('Type'); ?>
+                    </th>
+                </tr>
+                <tr class="row0">
 
-                        <td><input type="text" <?php echo $rule != null ? ' disabled="disabled" ' : '' ?> name="rule_name" value="<?php echo $rule != null ? htmlentities($rule->name, ENT_COMPAT, 'UTF-8') : '' ?>"/></td>
+                    <td><input type="text" <?php echo $rule != null ? ' disabled="disabled" ' : '' ?> name="rule_name" value="<?php echo $rule != null ? htmlentities($rule->name, ENT_COMPAT, 'UTF-8') : '' ?>" /></td>
 
-                        <td>
-                            <?php
-                            if(isset($rule)){
-                                echo $rule->type;
-                            } else {
-                                // Custom code added
-                                echo '
+                    <td>
+                        <?php
+                        if (isset($rule)) {
+                            echo $rule->type;
+                        } else {
+                            // Custom code added
+                            echo '
 							<select style="width: 120px" name="formSelector" onchange="Joomla.submitbutton(value)">
-								<option '.$formSelector['all'].' value="add" >All</option>
-								<option '.$formSelector['published'].' value="showPublished">Published</option>
-								<option '.$formSelector['unpublished'].' value="showUnpublished">Unpublished</option>
+								<option ' . $formSelector['all'] . ' value="add" >All</option>
+								<option ' . $formSelector['published'] . ' value="showPublished">Published</option>
+								<option ' . $formSelector['unpublished'] . ' value="showUnpublished">Unpublished</option>
 							</select>
 
 						';
-                                // END
-                            }
-                            ?>
-                        </td>
+                            // END
+                        }
+                        ?>
+                    </td>
 
-                        <td>
-                            <?php
-                            $disabled = '';
-                            foreach($forms As $form){
-                                if(isset($rule) && $form->id == $rule->form_id){
-                                    $disabled = ' disabled="disabled" ';
-                                    break;
-                                }
+                    <td>
+                        <?php
+                        $disabled = '';
+                        foreach ($forms as $form) {
+                            if (isset($rule) && $form->id == $rule->form_id) {
+                                $disabled = ' disabled="disabled" ';
+                                break;
                             }
-                            ?>
-                            <select name="form_id" <?php echo $disabled ?>>
-                                <?php
-                                foreach($forms As $form){
-                                    $selected = '';
-                                    if(isset($rule) && $form->id == $rule->form_id){
-                                        $selected = ' selected="selected"';
-                                    }
-                                    ?>
-
-                                    <option <?php echo $selected ?> value="<?php echo htmlentities($form->id, ENT_COMPAT, 'UTF-8') ?>" ><?php echo htmlentities($form->name, ENT_COMPAT, 'UTF-8') ?></option>
-                                    <?php
-                                }
-                                ?>
-                            </select>
-                        </td>
-                        <td>
+                        }
+                        ?>
+                        <select name="form_id" <?php echo $disabled ?>>
                             <?php
-                            $disabled = '';
-                            $settings = array();
-                            foreach($tables As $tableName => $tableSettings){
+                            foreach ($forms as $form) {
                                 $selected = '';
-                                if(isset($rule) && $tableName == $rule->reference_table){
-                                    $settings = $tableSettings;
-                                    $disabled = ' disabled="disabled" ';
-                                    break;
+                                if (isset($rule) && $form->id == $rule->form_id) {
+                                    $selected = ' selected="selected"';
                                 }
-                            }
                             ?>
-                            <select name="reference_table" <?php echo $disabled ?>>
-                                <?php
-                                $refTable = '';
-                                foreach($tables As $tableName => $tableSettings){
-                                    $selected = '';
-                                    if(isset($rule) && $tableName == $rule->reference_table){
-                                        $refTable = $tableName;
-                                        $selected = ' selected="selected"';
-                                    }
-                                    ?>
-                                    <option <?php echo $selected ?> value="<?php echo htmlentities($tableName, ENT_COMPAT, 'UTF-8') ?>"><?php echo htmlentities($tableName, ENT_COMPAT, 'UTF-8') ?></option>
-                                    <?php
-                                }
-                                ?>
-                            </select>
-                        </td>
-                        <td>
-                            <?php
-                            if(isset($rule)){
-                                echo $rule->type;
-                            } else {
-                                echo Text::_('Insert') . ' <input checked="checked" type="radio" name="type" value="insert"/> ' . Text::_('Update') . ' <input type="radio" name="type" value="update"/>';
-                            }
-                            ?>
-                        </td>
-                    </tr>
 
-                </table>
+                                <option <?php echo $selected ?> value="<?php echo htmlentities($form->id, ENT_COMPAT, 'UTF-8') ?>"><?php echo htmlentities($form->name, ENT_COMPAT, 'UTF-8') ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
+                    </td>
+                    <td>
+                        <?php
+                        $disabled = '';
+                        $settings = array();
+                        foreach ($tables as $tableName => $tableSettings) {
+                            $selected = '';
+                            if (isset($rule) && $tableName == $rule->reference_table) {
+                                $settings = $tableSettings;
+                                $disabled = ' disabled="disabled" ';
+                                break;
+                            }
+                        }
+                        ?>
+                        <select name="reference_table" <?php echo $disabled ?>>
+                            <?php
+                            $refTable = '';
+                            foreach ($tables as $tableName => $tableSettings) {
+                                $selected = '';
+                                if (isset($rule) && $tableName == $rule->reference_table) {
+                                    $refTable = $tableName;
+                                    $selected = ' selected="selected"';
+                                }
+                            ?>
+                                <option <?php echo $selected ?> value="<?php echo htmlentities($tableName, ENT_COMPAT, 'UTF-8') ?>"><?php echo htmlentities($tableName, ENT_COMPAT, 'UTF-8') ?></option>
+                            <?php
+                            }
+                            ?>
+                        </select>
+                    </td>
+                    <td>
+                        <?php
+                        if (isset($rule)) {
+                            echo $rule->type;
+                        } else {
+                            echo Text::_('Insert') . ' <input checked="checked" type="radio" name="type" value="insert"/> ' . Text::_('Update') . ' <input type="radio" name="type" value="update"/>';
+                        }
+                        ?>
+                    </td>
+                </tr>
+
+            </table>
 
 
             <input type="hidden" name="option" value="com_breezingformsng" />
@@ -239,20 +244,20 @@ class BFIntegratorHtml{
 
         <?php
 
-        if($rule != null){
+        if ($rule != null) {
 
-            ?>
+        ?>
 
-            <br/>
+            <br />
             <h3><?php echo Text::_('Data Integration') ?></h3>
 
             <script>
-                function listItemTask( id, task ) {
+                function listItemTask(id, task) {
                     var f = document.addItemForm;
                     id.split('cb');
                     f.publish_id.value = id.split('cb')[1];
 
-                    if(task == 'publish' || task== 'unpublish'){
+                    if (task == 'publish' || task == 'unpublish') {
                         f.task.value = 'pub';
                         f.pub.value = task;
                         task = 'edit';
@@ -279,19 +284,19 @@ class BFIntegratorHtml{
 
                     <tr>
                         <th width="300">
-                            <?php echo Text::_( 'Form Element (incoming)' ); ?>
+                            <?php echo Text::_('Form Element (incoming)'); ?>
                         </th>
                         <th width="300">
-                            <?php echo Text::_( 'Copy To' ); ?>
+                            <?php echo Text::_('Copy To'); ?>
                         </th>
                         <th width="300">
-                            <?php echo Text::_( 'Database Field (outgoing)' ); ?>
+                            <?php echo Text::_('Database Field (outgoing)'); ?>
                         </th>
                         <th width="300">
-                            <?php echo Text::_( '' ); ?>
+                            <?php echo Text::_(''); ?>
                         </th>
                         <th>
-                            <?php echo Text::_( 'Publish' ); ?>
+                            <?php echo Text::_('Publish'); ?>
                         </th>
                     </tr>
 
@@ -299,11 +304,11 @@ class BFIntegratorHtml{
                         <td>
                             <select name="element_id">
                                 <?php
-                                foreach($formElements As $formElement){
-                                    if($formElement->name != 'bfFakeName' && $formElement->name != 'bfFakeName2' && $formElement->name != 'bfFakeName3' && $formElement->name != 'bfFakeName4'){
-                                        ?>
+                                foreach ($formElements as $formElement) {
+                                    if ($formElement->name != 'bfFakeName' && $formElement->name != 'bfFakeName2' && $formElement->name != 'bfFakeName3' && $formElement->name != 'bfFakeName4') {
+                                ?>
                                         <option value="<?php echo $formElement->id ?>"><?php echo htmlentities($formElement->name, ENT_COMPAT, 'UTF-8') ?> (<?php echo htmlentities($formElement->type, ENT_COMPAT, 'UTF-8') ?>)</option>
-                                        <?php
+                                <?php
                                     }
                                 }
                                 ?>
@@ -313,10 +318,10 @@ class BFIntegratorHtml{
                         <td>
                             <select name="reference_column">
                                 <?php
-                                foreach($tables[$refTable] As $fieldName => $fieldSettings){
-                                    ?>
+                                foreach ($tables[$refTable] as $fieldName => $fieldSettings) {
+                                ?>
                                     <option value="<?php echo htmlentities($fieldName, ENT_COMPAT, 'UTF-8') ?>"><?php echo htmlentities($fieldName, ENT_COMPAT, 'UTF-8') ?> (<?php echo htmlentities($fieldSettings, ENT_COMPAT, 'UTF-8') ?>)</option>
-                                    <?php
+                                <?php
                                 }
                                 ?>
                             </select>
@@ -327,9 +332,9 @@ class BFIntegratorHtml{
                     <?php
                     $k = 1;
 
-                    foreach($items As $item){
-                        $published   = HTMLHelper::_('grid.published', $item, $item->id );
-                        ?>
+                    foreach ($items as $item) {
+                        $published   = HTMLHelper::_('grid.published', $item, $item->id);
+                    ?>
                         <tr class="<?php echo "row$k"; ?>">
 
                             <td><?php echo htmlentities($item->element_name, ENT_COMPAT, 'UTF-8') ?> (<?php echo htmlentities($item->element_type, ENT_COMPAT, 'UTF-8') ?>)</td>
@@ -343,37 +348,38 @@ class BFIntegratorHtml{
                                         'syntax'    => 'php',
                                     );
                                     $editor = Editor::getInstance('codemirror');
-                                    echo $editor->display('code'.$item->id, $item->code, '100%', 450, 40, 20, false, 'code'.$item->id, null, null, $params);
+                                    echo $editor->display('code' . $item->id, $item->code, '100%', 450, 40, 20, false, 'code' . $item->id, null, null, $params);
                                     ?>
 
-                                    <br/>
-                                    <a style="display: block;" href="javascript:document.saveCodeForm.itemId.value=<?php echo $item->id ?>;document.saveCodeForm.code.value=Joomla.editors.instances['code<?php echo $item->id?>'].getValue();document.saveCodeForm.submit();"><?php echo Text::_('Save') ?></a>
+                                    <br />
+                                    <a style="display: block;" href="javascript:document.saveCodeForm.itemId.value=<?php echo $item->id ?>;document.saveCodeForm.code.value=Joomla.editors.instances['code<?php echo $item->id ?>'].getValue();document.saveCodeForm.submit();"><?php echo Text::_('Save') ?></a>
                                 </div>
                                 <a style="display: block;" href="javascript:showCode<?php echo $item->id ?>()"><?php echo Text::_('Code') ?></a>
 
-                                <a style="display: block;" href="index.php?option=com_breezingformsng&act=integrate&task=removeItem&itemId=<?php echo $item->id ?>&id=<?php echo $rule->id ?>"><?php echo Text::_('Remove') ?></a></td>
-                                <td valign="top" align="center"><?php
-                                if ($item->published == "1") {
-                                    ?><a class="tbody-icon active" href="javascript:void(0);" onClick="return listItemTask('cb<?php echo $item->id; ?>','unpublish')"><span class="icon-publish" aria-hidden="true"></span></a><?php
-                                } else {
-                                    ?><a class="tbody-icon" href="javascript:void(0);" onClick="return listItemTask('cb<?php echo $item->id; ?>','publish')"><span class="icon-unpublish" aria-hidden="true"></span></a><?php
-                                } // if
-                                ?></td>
+                                <a style="display: block;" href="index.php?option=com_breezingformsng&act=integrate&task=removeItem&itemId=<?php echo $item->id ?>&id=<?php echo $rule->id ?>"><?php echo Text::_('Remove') ?></a>
+                            </td>
+                            <td valign="top" align="center"><?php
+                                                            if ($item->published == "1") {
+                                                            ?><a class="tbody-icon active" href="javascript:void(0);" onClick="return listItemTask('cb<?php echo $item->id; ?>','unpublish')"><span class="icon-publish" aria-hidden="true"></span></a><?php
+                                                                                                                                                                                                                            } else {
+                                                                                                                                                                                                                                ?><a class="tbody-icon" href="javascript:void(0);" onClick="return listItemTask('cb<?php echo $item->id; ?>','publish')"><span class="icon-unpublish" aria-hidden="true"></span></a><?php
+                                                                                                                                                                                                                            } // if
+                                                                                                                                                                                                                        ?></td>
                         </tr>
 
                         <script>
-                            function showCode<?php echo $item->id?>(){
-                                if(document.getElementById('code<?php echo $item->id?>').style.display == 'none') {
-                                    document.getElementById('code<?php echo $item->id?>').style.display = '';
+                            function showCode<?php echo $item->id ?>() {
+                                if (document.getElementById('code<?php echo $item->id ?>').style.display == 'none') {
+                                    document.getElementById('code<?php echo $item->id ?>').style.display = '';
                                     // XDA/GIL > 14012024 - Refresh doesn't exist in codemirror 6
-									//Joomla.editors.instances['code<?php echo $item->id?>'].refresh();
-                                }else {
-                                    document.getElementById('code<?php echo $item->id?>').style.display = 'none';
+                                    //Joomla.editors.instances['code<?php echo $item->id ?>'].refresh();
+                                } else {
+                                    document.getElementById('code<?php echo $item->id ?>').style.display = 'none';
                                 }
                             }
                         </script>
 
-                        <?php
+                    <?php
                         $k = 1 - $k;
                     }
                     ?>
@@ -388,10 +394,10 @@ class BFIntegratorHtml{
             </form>
 
             <?php
-            if($rule->type == 'update'){
-                ?>
+            if ($rule->type == 'update') {
+            ?>
 
-                <br/>
+                <br />
                 <h3><?php echo Text::_('Update Criteria - Form') ?></h3>
 
                 <form action="index.php?option=com_breezingformsng&act=integrate" method="post" name="addCriteriaForm">
@@ -402,19 +408,19 @@ class BFIntegratorHtml{
 
                         <tr>
                             <th width="300">
-                                <?php echo Text::_( 'Database Field Value' ); ?>
+                                <?php echo Text::_('Database Field Value'); ?>
                             </th>
                             <th width="300">
-                                <?php echo Text::_( 'Operation' ); ?>
+                                <?php echo Text::_('Operation'); ?>
                             </th>
                             <th width="300">
-                                <?php echo Text::_( 'Form Element Value' ); ?>
+                                <?php echo Text::_('Form Element Value'); ?>
                             </th>
                             <th width="100">
-                                <?php echo Text::_( 'And/Or' ); ?>
+                                <?php echo Text::_('And/Or'); ?>
                             </th>
                             <th>
-                                <?php echo Text::_( '' ); ?>
+                                <?php echo Text::_(''); ?>
                             </th>
                         </tr>
 
@@ -422,10 +428,10 @@ class BFIntegratorHtml{
                             <td>
                                 <select name="reference_column">
                                     <?php
-                                    foreach($tables[$refTable] As $fieldName => $fieldSettings){
-                                        ?>
+                                    foreach ($tables[$refTable] as $fieldName => $fieldSettings) {
+                                    ?>
                                         <option value="<?php echo htmlentities($fieldName, ENT_COMPAT, 'UTF-8') ?>"><?php echo htmlentities($fieldName, ENT_COMPAT, 'UTF-8') ?> (<?php echo htmlentities($fieldSettings, ENT_COMPAT, 'UTF-8') ?>)</option>
-                                        <?php
+                                    <?php
                                     }
                                     ?>
                                 </select>
@@ -449,11 +455,11 @@ class BFIntegratorHtml{
                             <td>
                                 <select name="element_id">
                                     <?php
-                                    foreach($formElements As $formElement){
-                                        if($formElement->name != 'bfFakeName' && $formElement->name != 'bfFakeName2' && $formElement->name != 'bfFakeName3' && $formElement->name != 'bfFakeName4'){
-                                            ?>
+                                    foreach ($formElements as $formElement) {
+                                        if ($formElement->name != 'bfFakeName' && $formElement->name != 'bfFakeName2' && $formElement->name != 'bfFakeName3' && $formElement->name != 'bfFakeName4') {
+                                    ?>
                                             <option value="<?php echo $formElement->id ?>"><?php echo htmlentities($formElement->name, ENT_COMPAT, 'UTF-8') ?> (<?php echo htmlentities($formElement->type, ENT_COMPAT, 'UTF-8') ?>)</option>
-                                            <?php
+                                    <?php
                                         }
                                     }
                                     ?>
@@ -466,8 +472,8 @@ class BFIntegratorHtml{
                         <?php
                         $k = 1;
 
-                        foreach($criteriaForm As $criteria){
-                            ?>
+                        foreach ($criteriaForm as $criteria) {
+                        ?>
                             <tr class="<?php echo "row$k"; ?>">
 
                                 <td><?php echo htmlentities($criteria->reference_column, ENT_COMPAT, 'UTF-8') ?> (<?php echo $settings[$criteria->reference_column] ?>)</td>
@@ -476,14 +482,14 @@ class BFIntegratorHtml{
                                 <td><?php echo htmlentities($criteria->andor, ENT_COMPAT, 'UTF-8') ?> </td>
                                 <td><a href="index.php?option=com_breezingformsng&act=integrate&task=removeCriteria&criteriaId=<?php echo $criteria->id ?>&id=<?php echo $rule->id ?>"><?php echo Text::_('Remove') ?></a></td>
                             </tr>
-                            <?php
+                        <?php
                             $k = 1 - $k;
                         }
                         ?>
                     </table>
                 </form>
 
-                <br/>
+                <br />
                 <h3><?php echo Text::_('Update Criteria - Joomla!') ?></h3>
 
                 <form action="index.php?option=com_breezingformsng&act=integrate" method="post" name="addCriteriaJoomlaForm">
@@ -494,19 +500,19 @@ class BFIntegratorHtml{
 
                         <tr>
                             <th width="300">
-                                <?php echo Text::_( 'Database Field Value' ); ?>
+                                <?php echo Text::_('Database Field Value'); ?>
                             </th>
                             <th width="300">
-                                <?php echo Text::_( 'Operation' ); ?>
+                                <?php echo Text::_('Operation'); ?>
                             </th>
                             <th width="300">
-                                <?php echo Text::_( 'Joomla Object Value' ); ?>
+                                <?php echo Text::_('Joomla Object Value'); ?>
                             </th>
                             <th width="100">
-                                <?php echo Text::_( 'And/Or' ); ?>
+                                <?php echo Text::_('And/Or'); ?>
                             </th>
                             <th>
-                                <?php echo Text::_( '' ); ?>
+                                <?php echo Text::_(''); ?>
                             </th>
                         </tr>
 
@@ -514,10 +520,10 @@ class BFIntegratorHtml{
                             <td>
                                 <select name="reference_column">
                                     <?php
-                                    foreach($tables[$refTable] As $fieldName => $fieldSettings){
-                                        ?>
+                                    foreach ($tables[$refTable] as $fieldName => $fieldSettings) {
+                                    ?>
                                         <option value="<?php echo htmlentities($fieldName, ENT_COMPAT, 'UTF-8') ?>"><?php echo htmlentities($fieldName, ENT_COMPAT, 'UTF-8') ?> (<?php echo htmlentities($fieldSettings, ENT_COMPAT, 'UTF-8') ?>)</option>
-                                        <?php
+                                    <?php
                                     }
                                     ?>
                                 </select>
@@ -555,8 +561,8 @@ class BFIntegratorHtml{
                         <?php
                         $k = 1;
 
-                        foreach($criteriaJoomla As $criteria){
-                            ?>
+                        foreach ($criteriaJoomla as $criteria) {
+                        ?>
                             <tr class="<?php echo "row$k"; ?>">
 
                                 <td><?php echo htmlentities($criteria->reference_column, ENT_COMPAT, 'UTF-8') ?> (<?php echo $settings[$criteria->reference_column] ?>)</td>
@@ -565,14 +571,14 @@ class BFIntegratorHtml{
                                 <td><?php echo htmlentities($criteria->andor, ENT_COMPAT, 'UTF-8') ?> </td>
                                 <td><a href="index.php?option=com_breezingformsng&act=integrate&task=removeCriteriaJoomla&criteriaId=<?php echo $criteria->id ?>&id=<?php echo $rule->id ?>"><?php echo Text::_('Remove') ?></a></td>
                             </tr>
-                            <?php
+                        <?php
                             $k = 1 - $k;
                         }
                         ?>
                     </table>
                 </form>
 
-                <br/>
+                <br />
                 <h3><?php echo Text::_('Update Criteria - Fixed') ?></h3>
 
                 <form action="index.php?option=com_breezingformsng&act=integrate" method="post" name="addCriteriaFixedForm">
@@ -583,19 +589,19 @@ class BFIntegratorHtml{
 
                         <tr>
                             <th width="300">
-                                <?php echo Text::_( 'Database Field Value' ); ?>
+                                <?php echo Text::_('Database Field Value'); ?>
                             </th>
                             <th width="300">
-                                <?php echo Text::_( 'Operation' ); ?>
+                                <?php echo Text::_('Operation'); ?>
                             </th>
                             <th width="300">
-                                <?php echo Text::_( 'Fixed Value' ); ?>
+                                <?php echo Text::_('Fixed Value'); ?>
                             </th>
                             <th width="100">
-                                <?php echo Text::_( 'And/Or' ); ?>
+                                <?php echo Text::_('And/Or'); ?>
                             </th>
                             <th>
-                                <?php echo Text::_( '' ); ?>
+                                <?php echo Text::_(''); ?>
                             </th>
                         </tr>
 
@@ -603,10 +609,10 @@ class BFIntegratorHtml{
                             <td>
                                 <select name="reference_column">
                                     <?php
-                                    foreach($tables[$refTable] As $fieldName => $fieldSettings){
-                                        ?>
+                                    foreach ($tables[$refTable] as $fieldName => $fieldSettings) {
+                                    ?>
                                         <option value="<?php echo htmlentities($fieldName, ENT_COMPAT, 'UTF-8') ?>"><?php echo htmlentities($fieldName, ENT_COMPAT, 'UTF-8') ?> (<?php echo htmlentities($fieldSettings, ENT_COMPAT, 'UTF-8') ?>)</option>
-                                        <?php
+                                    <?php
                                     }
                                     ?>
                                 </select>
@@ -628,7 +634,7 @@ class BFIntegratorHtml{
 
                             </td>
                             <td>
-                                <input style="width:100%" type="text" name="fixed_value" value=""/>
+                                <input style="width:100%" type="text" name="fixed_value" value="" />
                             </td>
                             <td><?php echo Text::_('A N D') ?> <input type="radio" name="andor" value="AND" checked="checked" /> <?php echo Text::_('O R') ?> <input type="radio" name="andor" value="OR" /></td>
                             <td colspan="2"><a href="javascript:document.addCriteriaFixedForm.submit();"><?php echo Text::_('add') ?></a></td>
@@ -637,8 +643,8 @@ class BFIntegratorHtml{
                         <?php
                         $k = 1;
 
-                        foreach($criteriaFixed As $criteria){
-                            ?>
+                        foreach ($criteriaFixed as $criteria) {
+                        ?>
                             <tr class="<?php echo "row$k"; ?>">
 
                                 <td><?php echo htmlentities($criteria->reference_column, ENT_COMPAT, 'UTF-8') ?> (<?php echo $settings[$criteria->reference_column] ?>)</td>
@@ -647,20 +653,20 @@ class BFIntegratorHtml{
                                 <td><?php echo htmlentities($criteria->andor, ENT_COMPAT, 'UTF-8') ?> </td>
                                 <td><a href="index.php?option=com_breezingformsng&act=integrate&task=removeCriteriaFixed&criteriaId=<?php echo $criteria->id ?>&id=<?php echo $rule->id ?>"><?php echo Text::_('Remove') ?></a></td>
                             </tr>
-                            <?php
+                        <?php
                             $k = 1 - $k;
                         }
                         ?>
                     </table>
                 </form>
 
-                <?php
+            <?php
             }
         }
-        if($rule != null){
+        if ($rule != null) {
             ?>
 
-            <br/>
+            <br />
             <h3><?php echo Text::_('Finalize Code') ?></h3>
 
             <form action="index.php?option=com_breezingformsng&act=integrate" method="post" name="saveFinalizeCodeForm">
@@ -676,12 +682,12 @@ class BFIntegratorHtml{
                 echo $editor->display('finalizeCode', $rule->finalize_code, '100%', 450, 40, 20, false, 'finalizeCode', null, null, $params);
                 ?>
 
-                <br/>
-                <br/>
+                <br />
+                <br />
                 <a href="javascript:document.saveFinalizeCodeForm.submit();"><?php echo Text::_('Save') ?></a>
             </form>
 
-            <?php
+<?php
         }
     }
 }

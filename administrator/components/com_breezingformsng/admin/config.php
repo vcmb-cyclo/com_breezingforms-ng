@@ -1,12 +1,15 @@
 <?php
+
 /**
  * BreezingForms NG - A Joomla Forms Application
  * 
  * @version 6.0.0
  * @package BreezingFormsNG
- * @copyright Copyright (C) 2024-2026 by XDA+GIL | until 1.4.4 2004 by Peter Koch
+ * @copyright Copyright (C) until 1.4.4 2004 by Peter Koch
+ * @copyright Copyright (C) 2024-2026 by XDA+GIL
  * @license GNU General Public License version 2 or later; see LICENSE.txt
  **/
+
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 $caller = BFRequest::getVar('caller_url', '');
@@ -43,4 +46,3 @@ switch ($task) {
 		$ff_config->edit($option, "index.php", $pkg);
 		break;
 } // switch
-?>

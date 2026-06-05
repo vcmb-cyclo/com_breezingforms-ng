@@ -11,6 +11,7 @@ use Joomla\CMS\Uri\Uri;
  * @copyright Copyright (C) 2008-2020 by Markus Bopp
  * @license GNU General Public License version 2 or later; see LICENSE.txt
  **/
+
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 ?>
 <?php echo BFText::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_BUYING'); ?>

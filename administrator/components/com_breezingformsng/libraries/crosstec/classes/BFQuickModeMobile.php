@@ -7,6 +7,7 @@
  * @copyright Copyright (C) 2024-2026 by XDA+GIL - EVH
  * @license     Released under the terms of the GNU General Public License
  **/
+
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\Factory;

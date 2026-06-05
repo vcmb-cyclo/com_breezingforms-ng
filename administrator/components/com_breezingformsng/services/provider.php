@@ -7,7 +7,6 @@
 
 \defined('_JEXEC') or die;
 
-use Vcmb\Component\BreezingformsNG\Administrator\Extension\BreezingformsNGComponent;
 use Joomla\CMS\Dispatcher\ComponentDispatcherFactoryInterface;
 use Joomla\CMS\Extension\ComponentInterface;
 use Joomla\CMS\Extension\Service\Provider\ComponentDispatcherFactory;
@@ -15,12 +14,16 @@ use Joomla\CMS\Extension\Service\Provider\MVCFactory;
 use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
+use Vcmb\Component\BreezingformsNG\Administrator\Extension\BreezingFormsNGComponent;
+use Vcmb\Component\BreezingformsNG\Administrator\Helper\LegacyClassLoader;
 
 return new class implements ServiceProviderInterface
 {
     public function register(Container $container): void
     {
-        $namespace = '\\Vcmb\\Component\\BreezingformsNG';
+        $namespace = 'Vcmb\\Component\\BreezingformsNG';
+
+        LegacyClassLoader::register();
 
         $container->registerServiceProvider(new MVCFactory($namespace));
         $container->registerServiceProvider(new ComponentDispatcherFactory($namespace));
@@ -28,7 +31,7 @@ return new class implements ServiceProviderInterface
         $container->set(
             ComponentInterface::class,
             static function (Container $container): ComponentInterface {
-                $component = new BreezingformsNGComponent(
+                $component = new BreezingFormsNGComponent(
                     $container->get(ComponentDispatcherFactoryInterface::class)
                 );
 

@@ -11,6 +11,6 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Extension;
 
 use Joomla\CMS\Extension\MVCComponent;
 
-class BreezingformsNGComponent extends MVCComponent
+class BreezingFormsNGComponent extends MVCComponent
 {
 }

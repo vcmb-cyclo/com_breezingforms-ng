@@ -1,7 +1,7 @@
 <?php
 /**
  * BreezingForms - A Joomla Forms Application
- * @version 1.9
+ * @version 6.0
  * @package BreezingForms
  * @copyright (C) 2008-2020 by Markus Bopp
  * @copyright (C) 2024 by XDA+GIL
@@ -1082,7 +1082,7 @@ class HTML_facileFormsScript
 						</td>
 						<td valign="top" align="left">
 							<?php
-							$lastModified = $row->modified ?: $row->created;
+							$lastModified = $row->modified ?? $row->created ?? '';
 							echo $lastModified ? HTMLHelper::date($lastModified, 'Y-m-d H:i') : '-';
 							?>
 						</td>
@@ -1675,16 +1675,16 @@ class HTML_facileFormsScript
 				<div class="card-body">
 					<div class="row">
 						<div class="col-sm-6 col-md-3">
-							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_CREATED'); ?>:</strong> <?php echo $row->created ? HTMLHelper::date($row->created, 'Y-m-d H:i', true) : '-'; ?>
+							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_CREATED'); ?>:</strong> <?php echo !empty($row->created) ? HTMLHelper::date($row->created, 'Y-m-d H:i', true) : '-'; ?>
 						</div>
 						<div class="col-sm-6 col-md-3">
-							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_CREATED_BY'); ?>:</strong> <?php echo htmlspecialchars((string) $row->created_by, ENT_QUOTES); ?>
+							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_CREATED_BY'); ?>:</strong> <?php echo htmlspecialchars((string) ($row->created_by ?? ''), ENT_QUOTES); ?>
 						</div>
 						<div class="col-sm-6 col-md-3">
-							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_MODIFIED'); ?>:</strong> <?php echo $row->modified ? HTMLHelper::date($row->modified, 'Y-m-d H:i', true) : '-'; ?>
+							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_MODIFIED'); ?>:</strong> <?php echo !empty($row->modified) ? HTMLHelper::date($row->modified, 'Y-m-d H:i', true) : '-'; ?>
 						</div>
 						<div class="col-sm-6 col-md-3">
-							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_MODIFIED_BY'); ?>:</strong> <?php echo htmlspecialchars((string) $row->modified_by, ENT_QUOTES); ?>
+							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_MODIFIED_BY'); ?>:</strong> <?php echo htmlspecialchars((string) ($row->modified_by ?? ''), ENT_QUOTES); ?>
 						</div>
 					</div>
 				</div>

@@ -2,7 +2,7 @@
 
 /**
  * BreezingForms - A Joomla Forms Application
- * @version 1.9
+ * @version 6.0
  * @package BreezingForms
  * @copyright (C) 2008-2020 by Markus Bopp
  * @copyright (C) 2024 by XDA+GIL

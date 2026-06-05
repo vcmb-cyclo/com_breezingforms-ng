@@ -5,12 +5,10 @@
  * @license GNU General Public License version 2 or later; see LICENSE.txt
  */
 
-namespace Vcmb\Component\BreezingformsNG\Administrator\Extension;
+namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Extension\MVCComponent;
-
-class BreezingFormsNGComponent extends MVCComponent
+class ScriptsModel extends ScriptModel
 {
 }

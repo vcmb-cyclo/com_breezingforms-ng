@@ -4,8 +4,7 @@
  * @subpackage  System.log
  *
  * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
- * @copyright   Copyright (C) 2024 by XDA+GIL
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright  Copyright (C) 2024-2026 by XDA+GIL * @license GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 defined('_JEXEC') or die;

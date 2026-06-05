@@ -1,8 +1,8 @@
 <?php
 /**
  * @package     BreezingForms NG
- * @copyright   Copyright (C) 2024-2026 by XDA+GIL
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright  Copyright (C) 2024-2026 by XDA+GIL
+ * @license GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 \defined('_JEXEC') or die;
@@ -18,5 +18,6 @@ HTML_facileFormsScript::listitems(
     $this->total,
     $this->limit,
     $this->limitStart,
-    $this->pageSizes
+    $this->pageSizes,
+    $this->pagination
 );

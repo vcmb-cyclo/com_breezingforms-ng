@@ -2,8 +2,8 @@
 /**
  *
  * @copyright   Copyright (C) 2005 - 2020 Open Source Matters, Inc. All rights reserved.
- * @copyright   (C) 2024 by XDA+GIL
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright Copyright (C) 2024-2026 XDA+GIL
+ * @license GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');

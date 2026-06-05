@@ -1,15 +1,15 @@
 <?php
 /**
  * @package     BreezingForms NG
- * @copyright   Copyright (C) 2024-2026 by XDA+GIL
- * @license     GNU General Public License version 2 or later; see LICENSE.txt
+ * @copyright  Copyright (C) 2024-2026 by XDA+GIL
+ * @license GNU General Public License version 2 or later; see LICENSE.txt
  */
 
 namespace Vcmb\Component\BreezingformsNG\Administrator\View\Pieces;
 
 \defined('_JEXEC') or die;
 
-use Vcmb\Component\BreezingformsNG\Administrator\Model\PieceModel;
+use Vcmb\Component\BreezingformsNG\Administrator\Model\PiecesModel;
 use Vcmb\Component\BreezingformsNG\Administrator\View\BreezingformsNG\HtmlView as BaseHtmlView;
 
 class HtmlView extends BaseHtmlView
@@ -34,13 +34,23 @@ class HtmlView extends BaseHtmlView
 
     public array $rows = [];
 
+    public $pagination = null;
+
     public function display($tpl = null)
     {
-        $model = $this->getModel();
+        $model = \Joomla\CMS\Factory::getApplication()
+            ->bootComponent('com_breezingformsng')
+            ->getMVCFactory()
+            ->createModel('Pieces', 'Administrator', ['ignore_request' => true]);
 
-        if (!$model instanceof PieceModel) {
-            $model = PieceModel::create();
-            $this->setModel($model, true);
+        if (!$model instanceof PiecesModel) {
+            throw new \RuntimeException('Unable to create BreezingForms NG pieces model.');
+        }
+
+        $this->setModel($model, true);
+
+        if ($this->package === '') {
+            $this->package = \Joomla\CMS\Factory::getApplication()->getInput()->getString('pkg', '');
         }
 
         $list = $model->prepareList($this->package);
@@ -54,8 +64,7 @@ class HtmlView extends BaseHtmlView
         $this->limitStart = $list['limitStart'];
         $this->pageSizes = $list['pageSizes'];
         $this->rows = $list['rows'];
-
-        $this->addTemplatePath(__DIR__ . '/tmpl');
+        $this->pagination = $list['pagination'];
 
         parent::display($tpl);
     }

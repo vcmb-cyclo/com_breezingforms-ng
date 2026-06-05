@@ -2,8 +2,8 @@
 /**
  * @package     BreezingForms
  * @author      Markus Bopp
- * @link        http://www.crosstec.de
- * @copyright   (C) 2024 by XDA+GIL
+ * @link        https://breezingforms-ng.vcmb.fr
+ * @copyright Copyright (C) 2024-2026 XDA+GIL
  * @license     GNU/GPL
  */
 
@@ -12,9 +12,11 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\BreezingformsNG;
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\HTML\Helpers\Sidebar;
+use Joomla\CMS\Uri\Uri;
 
 class HtmlView extends BaseHtmlView
 {
@@ -22,9 +24,22 @@ class HtmlView extends BaseHtmlView
 
     public function display($tpl = null)
     {
-        ToolbarHelper::title('BreezingForms NG', 'logo_left');
         $doc = Factory::getApplication()->getDocument();
-        $doc->setTitle("BreezingForms NG");
+        $doc->setTitle($this->getPageTitle());
+        $doc->getWebAssetManager()->addInlineStyle(
+            '.icon-logo_left{
+                background-image:url(' . Uri::root(true) . '/media/com_breezingformsng/images/logo_left.png);
+                background-size:contain;
+                background-repeat:no-repeat;
+                background-position:center;
+                display:inline-block;
+                width:48px;
+                height:48px;
+                vertical-align:middle;
+            }'
+        );
+
+        ToolbarHelper::title($this->getToolbarTitle(), 'logo_left');
 
         // $doc->addScript( URI::root().'media/system/js/core.js' )
         // Add Joomla core JavaScript framework
@@ -48,15 +63,15 @@ class HtmlView extends BaseHtmlView
         Sidebar::addEntry(
             '<i class="fa fa-code" aria-hidden="true"></i> ' . '<m>' .
             \BFText::_('COM_BREEZINGFORMSNG_MANAGESCRIPTS') . '</m>',
-            'index.php?option=com_breezingformsng&act=managescripts',
-            \BFRequest::getVar('act', '') == 'managescripts'
+            'index.php?option=com_breezingformsng&view=scripts',
+            \BFRequest::getVar('act', '') == 'managescripts' || \BFRequest::getVar('view', '') == 'scripts'
         );
 
         Sidebar::addEntry(
             '<i class="fa fa-puzzle-piece" aria-hidden="true"></i> ' . '<m>' .
             \BFText::_('COM_BREEZINGFORMSNG_MANAGEPIECES') . '</m>',
-            'index.php?option=com_breezingformsng&act=managepieces',
-            \BFRequest::getVar('act', '') == 'managepieces'
+            'index.php?option=com_breezingformsng&view=pieces',
+            \BFRequest::getVar('act', '') == 'managepieces' || \BFRequest::getVar('view', '') == 'pieces'
         );
 
         Sidebar::addEntry(
@@ -95,5 +110,39 @@ class HtmlView extends BaseHtmlView
             ');
 
         parent::display($tpl);
+    }
+
+    private function getPageTitle(): string
+    {
+        return trim(strip_tags($this->getToolbarTitle()));
+    }
+
+    private function getToolbarTitle(): string
+    {
+        $section = $this->getToolbarSectionTitle();
+
+        if ($section === '') {
+            return Text::_('COM_BREEZINGFORMSNG');
+        }
+
+        return Text::_('COM_BREEZINGFORMSNG') . ' / ' . $section;
+    }
+
+    private function getToolbarSectionTitle(): string
+    {
+        $input = Factory::getApplication()->getInput();
+        $view = $input->getCmd('view', '');
+        $act = $input->getCmd('act', '');
+
+        return match (true) {
+            $view === 'scripts', $act === 'managescripts' => \BFText::_('COM_BREEZINGFORMSNG_MANAGESCRIPTS'),
+            $view === 'pieces', $act === 'managepieces' => \BFText::_('COM_BREEZINGFORMSNG_MANAGEPIECES'),
+            $act === 'managerecs', $act === 'recordmanagement' => \BFText::_('COM_BREEZINGFORMSNG_MANAGERECS'),
+            $act === 'manageforms', $act === 'easymode', $act === 'quickmode' => \BFText::_('COM_BREEZINGFORMSNG_MANAGEFORMS'),
+            $act === 'integrate' => \BFText::_('COM_BREEZINGFORMSNG_INTEGRATOR'),
+            $act === 'configuration' => \BFText::_('COM_BREEZINGFORMSNG_CONFIG'),
+            $act === 'about' => \BFText::_('COM_BREEZINGFORMSNG_ABOUT'),
+            default => '',
+        };
     }
 }

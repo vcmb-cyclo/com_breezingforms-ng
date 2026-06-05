@@ -1,10 +1,10 @@
 <?php
 /**
- * BreezingForms - A Joomla Forms Application
+ * BreezingForms NG - A Joomla Forms Application
  * @version   1.9
  * @package   BreezingForms
- * @copyright (C) 2008-2020 by Markus Bopp
- * @copyright Copyright (C) 2024 by XDA+GIL
+ * @copyright Copyright (C) 2008-2020 by Markus Bopp
+ * @copyright Copyright (C) 2024-2006 by XDA+GIL
  * @license   Released under the terms of the GNU General Public License
  **/
 

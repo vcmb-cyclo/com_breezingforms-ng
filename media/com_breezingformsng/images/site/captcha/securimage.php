@@ -1,17 +1,19 @@
 <?php
+/**
+ * BreezingForms NG - A Joomla Forms Application
+ * @version 1.4.4
+ * @package BreezingForms NG
+ * @copyright Copyright (C) 2004-2005 by Peter Koch
+ * @license GNU General Public License version 2 or later; see LICENSE.txt
+ **/
+
 if(!defined('_JEXEC')){
     define('_JEXEC', 1);
 }
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
-/**
- * BreezingForms - A Joomla Forms Application
- * @version 1.4.4
- * @package BreezingForms
- * @copyright (C) 2004-2005 by Peter Koch
- * @license Released under the terms of the GNU General Public License
- **/
+
 
 // error_reporting(E_ALL); ini_set('display_errors', 1); // uncomment this line for debugging
 

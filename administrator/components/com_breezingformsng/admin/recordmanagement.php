@@ -57,6 +57,10 @@ switch($task)
 		$record->setFlags($task);
 		$record->listRecords();
 		break;
+	case 'remove':
+		$record->deleteSelectedRecords();
+		$record->listRecords();
+		break;
 	default:
 		$record->listRecords();
 }

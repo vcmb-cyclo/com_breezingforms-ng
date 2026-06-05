@@ -265,7 +265,331 @@ class bfRecordManagement
 
     function editRecord()
     {
+        $recordId = BFRequest::getInt('record_id', BFRequest::getInt('bfrecord_id', 0));
 
+        if ($recordId < 1) {
+            $this->listRecords();
+            return;
+        }
+
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+
+        $db->setQuery(
+            'Select records.*, forms.title As form_title, forms.name As form_name'
+            . ' From #__facileforms_records As records'
+            . ' Inner Join #__facileforms_forms As forms On forms.id = records.form'
+            . ' Where records.id = ' . (int) $recordId
+        );
+        $record = $db->loadObject();
+
+        if (!$record) {
+            $this->listRecords();
+            return;
+        }
+
+        HTMLHelper::_('behavior.keepalive');
+        ToolbarHelper::custom('saveRecord', 'save', 'save', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_SAVE'), false);
+        ToolbarHelper::cancel('cancel', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_CANCEL'));
+
+        $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+        $wa->useStyle('com_breezingformsng.admin-style');
+
+        $recordRows = $this->getEditableRecordRows((int) $record->id, (int) $record->form, (string) $record->name);
+        $submitted = Factory::getDate($record->submitted, $this->tz)->format('Y-m-d H:i:s', true);
+        $backUrl = 'index.php?option=com_breezingformsng&act=managerecs&form_selection=' . (int) $record->form;
+        ?>
+        <form action="index.php?option=com_breezingformsng&act=managerecs" method="post" name="adminForm" id="adminForm">
+            <div class="row">
+                <div class="col-12 col-lg-4">
+                    <table class="table">
+                        <caption class="visually-hidden"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_RECORDINFO'), ENT_QUOTES, 'UTF-8'); ?></caption>
+                        <tbody>
+                            <tr>
+                                <th scope="row"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_RECORDID'), ENT_QUOTES, 'UTF-8'); ?></th>
+                                <td><?php echo (int) $record->id; ?></td>
+                            </tr>
+                            <tr>
+                                <th scope="row"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_SUBMITTED'), ENT_QUOTES, 'UTF-8'); ?></th>
+                                <td><?php echo htmlentities($submitted, ENT_QUOTES, 'UTF-8'); ?></td>
+                            </tr>
+                            <tr>
+                                <th scope="row"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_TITLE'), ENT_QUOTES, 'UTF-8'); ?></th>
+                                <td>
+                                    <strong><?php echo htmlentities($record->form_title, ENT_QUOTES, 'UTF-8'); ?></strong>
+                                    <div class="small"><?php echo htmlentities($record->form_name, ENT_QUOTES, 'UTF-8'); ?></div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="row"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_IP'), ENT_QUOTES, 'UTF-8'); ?></th>
+                                <td><?php echo htmlentities($record->ip, ENT_QUOTES, 'UTF-8'); ?></td>
+                            </tr>
+                            <tr>
+                                <th scope="row"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME'), ENT_QUOTES, 'UTF-8'); ?></th>
+                                <td>
+                                    <?php echo htmlentities($record->username, ENT_QUOTES, 'UTF-8'); ?>
+                                    <?php if ((string) $record->user_full_name !== '') : ?>
+                                        <div class="small"><?php echo htmlentities((string) $record->user_full_name, ENT_QUOTES, 'UTF-8'); ?></div>
+                                    <?php endif; ?>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <a class="btn btn-secondary" href="<?php echo $backUrl; ?>">
+                        <?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_CANCEL'), ENT_QUOTES, 'UTF-8'); ?>
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_SAVE'), ENT_QUOTES, 'UTF-8'); ?>
+                    </button>
+                </div>
+                <div class="col-12 col-lg-8">
+                    <table class="table itemList">
+                        <caption><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_SUBMVALUES'), ENT_QUOTES, 'UTF-8'); ?></caption>
+                        <thead>
+                            <tr>
+                                <th><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_TITLE'), ENT_QUOTES, 'UTF-8'); ?></th>
+                                <th><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_NAME'), ENT_QUOTES, 'UTF-8'); ?></th>
+                                <th><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_TYPE'), ENT_QUOTES, 'UTF-8'); ?></th>
+                                <th><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_VALUE'), ENT_QUOTES, 'UTF-8'); ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (!count($recordRows)) : ?>
+                                <tr>
+                                    <td colspan="4" class="text-center">
+                                        <?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_NONE_FOUND'), ENT_QUOTES, 'UTF-8'); ?>
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
+                            <?php foreach ($recordRows as $row) : ?>
+                                <tr>
+                                    <td><?php echo htmlentities((string) $row['title'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                    <td><?php echo htmlentities((string) $row['name'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                    <td><?php echo htmlentities((string) $row['type'], ENT_QUOTES, 'UTF-8'); ?></td>
+                                    <td>
+                                        <textarea class="form-control" name="element[<?php echo (int) $row['element_id']; ?>]" rows="3"><?php echo htmlentities((string) $row['value'], ENT_QUOTES, 'UTF-8'); ?></textarea>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <input type="hidden" name="task" value="saveRecord">
+            <input type="hidden" name="record_id" value="<?php echo (int) $record->id; ?>">
+            <input type="hidden" name="form_selection" value="<?php echo (int) $record->form; ?>">
+            <?php echo HTMLHelper::_('form.token'); ?>
+        </form>
+        <?php
+    }
+
+    function saveRecord(): void
+    {
+        $recordId = BFRequest::getInt('record_id', 0);
+
+        if ($recordId < 1) {
+            Factory::getApplication()->redirect('index.php?option=com_breezingformsng&act=managerecs');
+            return;
+        }
+
+        $values = BFRequest::getVar('element', array(), 'post', 'array');
+
+        if (!is_array($values)) {
+            $values = array();
+        }
+
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+
+        $db->setQuery('Select form From #__facileforms_records Where id = ' . (int) $recordId);
+        $formId = (int) $db->loadResult();
+
+        if ($formId < 1) {
+            Factory::getApplication()->redirect('index.php?option=com_breezingformsng&act=managerecs');
+            return;
+        }
+
+        $elements = $this->getEditableRecordElements($formId);
+
+        foreach ($elements as $element) {
+            $elementId = (int) $element['id'];
+
+            if (!array_key_exists($elementId, $values)) {
+                continue;
+            }
+
+            $this->saveRecordElementValue($recordId, $element, (string) $values[$elementId]);
+        }
+
+        $identity = Factory::getApplication()->getIdentity();
+        $userId = (int) $identity->id;
+
+        $db->setQuery(
+            'Update #__facileforms_records'
+            . ' Set modified = ' . $db->quote(Factory::getDate()->toSql())
+            . ', modified_by = ' . $userId
+            . ', modified_user_id = ' . $userId
+            . ' Where id = ' . (int) $recordId
+        );
+        $db->execute();
+
+        Factory::getApplication()->redirect(
+            'index.php?option=com_breezingformsng&act=managerecs&task=edit&record_id=' . (int) $recordId
+        );
+    }
+
+    private function getEditableRecordElements(int $formId): array
+    {
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+
+        $db->setQuery(
+            "Select id, title, name, type"
+            . " From #__facileforms_elements"
+            . " Where published = 1"
+            . " And `name` <> 'bfFakeName'"
+            . " And `name` <> 'bfFakeName2'"
+            . " And `name` <> 'bfFakeName3'"
+            . " And `name` <> 'bfFakeName4'"
+            . " And `name` <> 'bfFakeName5'"
+            . " And form = " . (int) $formId
+            . " Order By ordering"
+        );
+
+        return $db->loadAssocList();
+    }
+
+    private function getEditableRecordRows(int $recordId, int $formId, string $recordName): array
+    {
+        $elements = $this->getEditableRecordElements($formId);
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+
+        $db->setQuery(
+            'Select id, record, element, title, name, type, value'
+            . ' From #__facileforms_subrecords'
+            . ' Where record = ' . (int) $recordId
+            . ' Order By id'
+        );
+        $subrecords = $db->loadAssocList();
+
+        $byElement = array();
+        $byName = array();
+
+        foreach ($subrecords as $subrecord) {
+            $byElement[(int) $subrecord['element']][] = $subrecord;
+            $byName[(string) $subrecord['name']][] = $subrecord;
+        }
+
+        $rows = array();
+
+        foreach ($elements as $element) {
+            $elementId = (int) $element['id'];
+            $name = (string) $element['name'];
+            $matches = $byElement[$elementId] ?? $byName[$name] ?? array();
+            $values = array();
+
+            foreach ($matches as $match) {
+                $values[] = (string) $match['value'];
+            }
+
+            if (!count($values) && $name === 'Formulaire') {
+                $values[] = $recordName;
+            }
+
+            $rows[] = array(
+                'element_id' => $elementId,
+                'title' => (string) $element['title'],
+                'name' => $name,
+                'type' => (string) $element['type'],
+                'value' => implode("\n", $values),
+            );
+        }
+
+        return $rows;
+    }
+
+    private function saveRecordElementValue(int $recordId, array $element, string $value): void
+    {
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $elementId = (int) $element['id'];
+        $name = (string) $element['name'];
+
+        $db->setQuery(
+            'Select id'
+            . ' From #__facileforms_subrecords'
+            . ' Where record = ' . (int) $recordId
+            . ' And (element = ' . $elementId . ' Or name = ' . $db->quote($name) . ')'
+            . ' Order By id'
+        );
+        $subrecordIds = array_map('intval', $db->loadColumn());
+
+        $values = $this->splitRecordElementValue($value, (string) $element['type']);
+
+        if (!count($values)) {
+            $values = array('');
+        }
+
+        foreach ($subrecordIds as $index => $subrecordId) {
+            if (!array_key_exists($index, $values)) {
+                break;
+            }
+
+            $db->setQuery(
+                'Update #__facileforms_subrecords'
+                . ' Set element = ' . $elementId
+                . ', title = ' . $db->quote((string) $element['title'])
+                . ', name = ' . $db->quote($name)
+                . ', type = ' . $db->quote((string) $element['type'])
+                . ', value = ' . $db->quote($values[$index])
+                . ' Where id = ' . (int) $subrecordId
+                . ' And record = ' . (int) $recordId
+            );
+            $db->execute();
+        }
+
+        if (count($subrecordIds) >= count($values)) {
+            return;
+        }
+
+        for ($index = count($subrecordIds); $index < count($values); $index++) {
+            if ($values[$index] === '') {
+                continue;
+            }
+
+            $db->setQuery(
+                'Insert Into #__facileforms_subrecords'
+                . ' (record, element, title, name, type, value)'
+                . ' Values ('
+                . (int) $recordId . ', '
+                . $elementId . ', '
+                . $db->quote((string) $element['title']) . ', '
+                . $db->quote($name) . ', '
+                . $db->quote((string) $element['type']) . ', '
+                . $db->quote($values[$index])
+                . ')'
+            );
+            $db->execute();
+        }
+    }
+
+    private function splitRecordElementValue(string $value, string $type): array
+    {
+        $value = str_replace("\r", '', $value);
+
+        if (!$this->isMultiValueRecordElement($type)) {
+            return array($value);
+        }
+
+        if (str_contains($value, "\n")) {
+            $values = explode("\n", $value);
+        } else {
+            $values = explode(', ', $value);
+        }
+
+        return array_values(array_map('trim', $values));
+    }
+
+    private function isMultiValueRecordElement(string $type): bool
+    {
+        return in_array($type, array('Checkbox', 'Checkbox Group', 'Select List'), true);
     }
 
     function getCsvImport()
@@ -1833,12 +2157,13 @@ class bfRecordManagement
                         <th class="text-center"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_VIEWED'), ENT_QUOTES, 'UTF-8'); ?></th>
                         <th class="text-center"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_EXPORTED'), ENT_QUOTES, 'UTF-8'); ?></th>
                         <th class="text-center"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_ARCHIVED'), ENT_QUOTES, 'UTF-8'); ?></th>
+                        <th class="text-center"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_EDIT'), ENT_QUOTES, 'UTF-8'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (!count($records)) : ?>
                         <tr>
-                            <td colspan="9" class="text-center">
+                            <td colspan="10" class="text-center">
                                 <?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_NONE_FOUND'), ENT_QUOTES, 'UTF-8'); ?>
                             </td>
                         </tr>
@@ -1868,6 +2193,11 @@ class bfRecordManagement
                             <td class="text-center"><?php echo $this->renderNativeFlag((int) $record['viewed']); ?></td>
                             <td class="text-center"><?php echo $this->renderNativeFlag((int) $record['exported']); ?></td>
                             <td class="text-center"><?php echo $this->renderNativeFlag((int) $record['archived']); ?></td>
+                            <td class="text-center">
+                                <a class="btn btn-sm btn-secondary" href="index.php?option=com_breezingformsng&act=managerecs&task=edit&record_id=<?php echo (int) $record['id']; ?>&form_selection=<?php echo (int) $formSelection; ?>">
+                                    <?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_EDIT'), ENT_QUOTES, 'UTF-8'); ?>
+                                </a>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

@@ -17,6 +17,9 @@ switch($task)
 	case 'edit':
 		$record->editRecord();
 		break;
+	case 'saveRecord':
+		$record->saveRecord();
+		break;
 	case 'csvimport':            
 		$record->getCsvImport();
 		break;

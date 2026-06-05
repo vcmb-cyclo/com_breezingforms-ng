@@ -2,10 +2,11 @@
 /**
 * BreezingForms - A Joomla Forms Application
 * @version 6.0
-* @package BreezingForms
+* @package BreezingFormsNG
 * @copyright (C) 2008-2020 by Markus Bopp
 * @license Released under the terms of the GNU General Public License
-**/
+ **/
+
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 // IMPORTANT!
 // Supported Tags: h1, h2, h3, h4, h5, h6, b, u, i, a, img, p, br, strong, em, font, blockquote, li, ul, ol, hr, td, th, tr, table, sup, sub, small

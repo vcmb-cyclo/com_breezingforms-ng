@@ -7,6 +7,7 @@
  * @copyright Copyright (C) 2008-2020 by Markus Bopp
  * @license GNU General Public License version 2 or later; see LICENSE.txt
  **/
+
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 // IMPORTANT!
 // Supported Tags: h1, h2, h3, h4, h5, h6, b, u, i, a, img, p, br, strong, em, font, blockquote, li, ul, ol, hr, td, th, tr, table, sup, sub, small

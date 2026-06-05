@@ -4,7 +4,7 @@
  * 
  * @version 6.0.0
  * @package BreezingFormsNG
- * @copyright  Copyright (C) 2024-2026 by XDA+GIL | until 1.4.4 2004 by Peter Koch
+ * @copyright Copyright (C) 2024-2026 by XDA+GIL | until 1.4.4 2004 by Peter Koch
  * @license GNU General Public License version 2 or later; see LICENSE.txt
  **/
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');

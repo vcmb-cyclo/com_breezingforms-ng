@@ -21,6 +21,8 @@ class DisplayController extends BaseController
             throw new \Exception(Text::_('JERROR_ALERTNOAUTHOR'), 403);
         }
 
+        (new LegacyTaskController())->assertRequestIsValid();
+
         require JPATH_ADMINISTRATOR . '/components/com_breezingformsng/admin.breezingforms.php';
 
         return $this;

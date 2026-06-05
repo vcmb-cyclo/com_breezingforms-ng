@@ -12,6 +12,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Session\Session;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 
 class HTML_facileFormsPiece
@@ -367,6 +368,7 @@ class HTML_facileFormsPiece
 				payload.set('code', document.getElementById('code').value || '');
 				payload.set('unit_tests', document.getElementById('unit_tests').value || '');
 				payload.set('test_function', document.getElementById('name').value || '');
+				payload.set('<?php echo Session::getFormToken(); ?>', '1');
 
 				resultBox.style.display = 'block';
 				resultBox.className = 'alert alert-info mt-3';
@@ -595,6 +597,7 @@ class HTML_facileFormsPiece
 			<input type="hidden" name="task" value="" />
 			<input type="hidden" name="test_mode" value="" />
 			<input type="hidden" name="act" value="managepieces" />
+			<?php echo HTMLHelper::_('form.token'); ?>
 		</form>
 		<?php
 	} // edit
@@ -958,6 +961,7 @@ class HTML_facileFormsPiece
 				<input type="hidden" name="task" value="" />
 				<input type="hidden" name="limitstart" value="<?php echo (int) $limitstart; ?>" />
 				<input type="hidden" name="pkg" value="<?php echo htmlspecialchars($pkg, ENT_QUOTES); ?>" />
+				<?php echo HTMLHelper::_('form.token'); ?>
 			</form>
 		<?php
 	} // listitems
@@ -1232,6 +1236,7 @@ class HTML_facileFormsPiece
 			<input type="hidden" name="test_context" value="1" />
 			<input type="hidden" name="test_mode" value="<?php echo htmlspecialchars((string) $testMode, ENT_QUOTES); ?>" />
 			<input type="hidden" name="auto_open_tests" value="0" />
+			<?php echo HTMLHelper::_('form.token'); ?>
 		</form>
 		<?php
 	} // test

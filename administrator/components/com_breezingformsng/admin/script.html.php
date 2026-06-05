@@ -802,6 +802,7 @@ class HTML_facileFormsScript
 			<input type="hidden" name="task" value="" />
 			<input type="hidden" name="test_mode" value="" />
 			<input type="hidden" name="act" value="managescripts" />
+			<?php echo HTMLHelper::_('form.token'); ?>
 		</form>
 		<?php
 	} // edit
@@ -1156,6 +1157,7 @@ class HTML_facileFormsScript
 				<input type="hidden" name="task" value="" />
 				<input type="hidden" name="limitstart" value="<?php echo (int) $limitstart; ?>" />
 				<input type="hidden" name="pkg" value="<?php echo htmlspecialchars($pkg, ENT_QUOTES); ?>" />
+				<?php echo HTMLHelper::_('form.token'); ?>
 			</form>
 		<?php
 	} // listitems
@@ -1836,6 +1838,7 @@ class HTML_facileFormsScript
 			<input type="hidden" name="ids[]" value="<?php echo (int) $row->id; ?>" />
 			<input type="hidden" name="test_context" value="1" />
 			<input type="hidden" name="test_mode" value="<?php echo htmlspecialchars((string) $testMode, ENT_QUOTES); ?>" />
+			<?php echo HTMLHelper::_('form.token'); ?>
 		</form>
 		<?php
 	} // test

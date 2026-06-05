@@ -5,6 +5,7 @@
  * @version 6.0
  * @package BreezingForms
  * @copyright (C) 2008-2020 by Markus Bopp
+ * @copyright (C) 2024 - 2026 by XDA+GIL
  * @license Released under the terms of the GNU General Public License
  **/
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
@@ -12,6 +13,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
+use Vcmb\Component\BreezingformsNG\Administrator\Model\ScriptModel;
 
 require_once($ff_admpath . '/admin/script.html.php');
 
@@ -120,17 +122,15 @@ class facileFormsScript
 
 	static function del($option, $pkg, $ids)
 	{
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
-		$total = count($ids);
-		if ($total) {
-			$ids = implode(',', $ids);
-			$database->setQuery("delete from #__facileforms_scripts where id in ($ids)");
-			try {
-				$database->execute();
-			} catch (RuntimeException $e) {
-				echo "<script> alert('" . $e->getMessage() . "'); window.history.go(-1); </script>\n";
-			}
-		} // if
+		$model = ScriptModel::create();
+
+		try {
+			$total = $model->deleteByIds($ids);
+		} catch (RuntimeException $e) {
+			echo "<script> alert('" . $e->getMessage() . "'); window.history.go(-1); </script>\n";
+			return;
+		}
+
 		if ($total) {
 			Factory::getApplication()->enqueueMessage(
 				$total . ' ' . BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_SUCCDELETED'),
@@ -142,14 +142,8 @@ class facileFormsScript
 
 	static function publish($option, $pkg, $ids, $publish)
 	{
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
-		ArrayHelper::toInteger($ids);
-		$ids = implode(',', $ids);
-		$database->setQuery(
-			"update #__facileforms_scripts set published=" . $database->Quote($publish) . " where id in ($ids)"
-		);
 		try {
-			$database->execute();
+			ScriptModel::create()->publishByIds($ids, (bool) $publish);
 		} catch (RuntimeException $e) {
 			echo "<script> alert('" . $e->getMessage() . "'); window.history.go(-1); </script>\n";
 			exit();
@@ -162,17 +156,9 @@ class facileFormsScript
 	{
 		$app = Factory::getApplication();
 		$session = $app->getSession();
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
-
-		$database->setQuery(
-			"select distinct  package as name " .
-				"from #__facileforms_scripts " .
-				"where package is not null and package!='' " .
-				"order by name"
-		);
 
 		try {
-			$pkgs = $database->loadObjectList();
+			$pkgs = ScriptModel::create()->getPackages();
 		} catch (\Exception $e) {
 			echo $e->getMessage();
 			return false;
@@ -197,101 +183,62 @@ class facileFormsScript
 
 		$sortReq = BFRequest::getVar('sort', null);
 		$dirReq = BFRequest::getVar('dir', null);
+
 		if ($sortReq === null) {
 			$sort = (string) $session->get('bf.scripts_sort', 'name');
 		} else {
 			$sort = (string) $sortReq;
 			$session->set('bf.scripts_sort', $sort);
 		}
+
 		if ($dirReq === null) {
 			$dir = strtoupper((string) $session->get('bf.scripts_dir', 'ASC'));
 		} else {
 			$dir = strtoupper((string) $dirReq);
 			$session->set('bf.scripts_dir', $dir);
 		}
-			$allowedSorts = array(
-				'id' => 'id',
-				'package' => 'package',
-				'title' => 'title',
-				'name' => 'name',
-				'type' => 'type',
-				'description' => 'description',
-				'modified' => 'modified',
-				'published' => 'published',
-			);
-			$sortField = isset($allowedSorts[$sort]) ? $allowedSorts[$sort] : 'name';
-			$dir = $dir === 'DESC' ? 'DESC' : 'ASC';
-			$orderBy = "order by {$sortField} {$dir}, id desc";
-			$pageSizes = array(10, 25, 50, 100, 250, 500, 1000, 5000, 10000, 100000);
-			$limitReq = BFRequest::getInt('limit', -1);
-			if ($limitReq > 0 && in_array($limitReq, $pageSizes, true)) {
-				$limit = $limitReq;
-				$session->set('bf.scripts_limit', $limit);
-			} else {
-				$limit = (int) $session->get('bf.scripts_limit', 10);
-				if (!in_array($limit, $pageSizes, true)) {
-					$limit = 10;
-				}
-			}
-			$limitstartReq = BFRequest::getInt('limitstart', -1);
-			if ($limitstartReq >= 0) {
-				$limitstart = $limitstartReq;
-			} else {
-				$limitstart = (int) $session->get('bf.scripts_limitstart', 0);
-			}
-			if ($limitstart < 0) {
-				$limitstart = 0;
-			}
-			$conditions = array();
-			if ($pkg !== '') {
-				$conditions[] = "package = " . $database->Quote($pkg);
-			}
-			if ($search !== '') {
-				$searchLike = $database->Quote('%' . $search . '%');
-				$conditions[] = "(" .
-					"title LIKE " . $searchLike . " or " .
-					"name LIKE " . $searchLike . " or " .
-					"description LIKE " . $searchLike .
-					")";
-			}
-			$whereClause = count($conditions) ? "where " . implode(' and ', $conditions) . " " : "";
 
-			$database->setQuery(
-				"select count(*) from #__facileforms_scripts " .
-					$whereClause
-			);
+		$dir = $dir === 'DESC' ? 'DESC' : 'ASC';
+		$pageSizes = array(10, 25, 50, 100, 250, 500, 1000, 5000, 10000, 100000);
+		$limitReq = BFRequest::getInt('limit', -1);
 
-			try {
-				$total = (int) $database->loadResult();
-			} catch (\Exception $e) {
-				echo $e->getMessage();
-				return false;
-			} // try
+		if ($limitReq > 0 && in_array($limitReq, $pageSizes, true)) {
+			$limit = $limitReq;
+			$session->set('bf.scripts_limit', $limit);
+		} else {
+			$limit = (int) $session->get('bf.scripts_limit', 10);
 
-			if ($total > 0 && $limitstart >= $total) {
-				$lastPage = (int) floor(($total - 1) / $limit);
-				$limitstart = $lastPage * $limit;
+			if (!in_array($limit, $pageSizes, true)) {
+				$limit = 10;
 			}
-			$limitstart = (int) floor($limitstart / $limit) * $limit;
-			$session->set('bf.scripts_limitstart', $limitstart);
+		}
 
-			$database->setQuery(
-				"select * from #__facileforms_scripts " .
-					$whereClause .
-					$orderBy,
-				$limitstart,
-				$limit
-			);
+		$limitstartReq = BFRequest::getInt('limitstart', -1);
 
-			try {
-				$rows = $database->loadObjectList();
-			} catch (\Exception $e) {
-				echo $e->getMessage();
-				return false;
-			} // try
+		if ($limitstartReq >= 0) {
+			$limitstart = $limitstartReq;
+		} else {
+			$limitstart = (int) $session->get('bf.scripts_limitstart', 0);
+		}
 
-			HTML_facileFormsScript::listitems($option, $rows, $pkglist, $pkg, $search, $total, $limit, $limitstart, $pageSizes);
-		} // listitems
+		if ($limitstart < 0) {
+			$limitstart = 0;
+		}
+
+		try {
+			$listData = ScriptModel::create()->getListData($pkg, $search, $sort, $dir, $limit, $limitstart);
+		} catch (\Exception $e) {
+			echo $e->getMessage();
+			return false;
+		} // try
+
+		$total = $listData['total'];
+		$limitstart = $listData['limitstart'];
+		$session->set('bf.scripts_limitstart', $limitstart);
+		$rows = $listData['rows'];
+
+		HTML_facileFormsScript::listitems($option, $rows, $pkglist, $pkg, $search, $total, $limit, $limitstart, $pageSizes);
+	} // listitems
 
 	static function test($option, $pkg, $ids)
 	{

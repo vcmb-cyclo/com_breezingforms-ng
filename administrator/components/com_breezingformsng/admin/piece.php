@@ -9,7 +9,8 @@
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\Factory;
-use Joomla\Database\DatabaseInterface;
+use Vcmb\Component\BreezingformsNG\Administrator\Model\PieceModel;
+use Vcmb\Component\BreezingformsNG\Administrator\View\Pieces\HtmlView as PiecesView;
 
 require_once ($ff_admpath . '/admin/piece.class.php');
 
@@ -63,7 +64,18 @@ switch ($task) {
 		);
 		break;
 	default:
-		facileFormsPiece::listitems($option, $pkg);
+		$factory = Factory::getApplication()->bootComponent($option)->getMVCFactory();
+		$model = createPieceModel();
+		$view = $factory->createView('Pieces', 'Administrator', 'Html');
+
+		if (!$model instanceof PieceModel || !$view instanceof PiecesView) {
+			throw new RuntimeException('Unable to create BreezingForms NG pieces MVC objects.');
+		}
+
+		$view->setModel($model, true);
+		$view->option = $option;
+		$view->package = $pkg;
+		$view->display();
 		break;
 } // switch
 
@@ -79,11 +91,7 @@ function getPiecePackage()
 		else if ($pkg == '- blank -')
 			$pkg = '';
 		else {
-			$ok = _ff_selectValue(
-				"select count(*) from `#__facileforms_pieces` " .
-				"where package =  " . Factory::getContainer()->get(DatabaseInterface::class)->Quote($pkg)
-			);
-			if (!$ok)
+			if (!createPieceModel()->packageExists($pkg))
 				$pkg = $ff_config->piecepkg;
 		} // if
 	if ($pkg != $ff_config->piecepkg) {
@@ -92,5 +100,19 @@ function getPiecePackage()
 	} // if
 	return $pkg;
 } // getPiecePackage
+
+function createPieceModel(): PieceModel
+{
+	$model = Factory::getApplication()
+		->bootComponent('com_breezingformsng')
+		->getMVCFactory()
+		->createModel('Piece', 'Administrator', ['ignore_request' => true]);
+
+	if (!$model instanceof PieceModel) {
+		throw new RuntimeException('Unable to create BreezingForms NG piece model.');
+	}
+
+	return $model;
+}
 
 ?>

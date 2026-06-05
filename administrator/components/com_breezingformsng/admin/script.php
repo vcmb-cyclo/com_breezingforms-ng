@@ -9,7 +9,8 @@
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\Factory;
-use Joomla\Database\DatabaseInterface;
+use Vcmb\Component\BreezingformsNG\Administrator\Model\ScriptModel;
+use Vcmb\Component\BreezingformsNG\Administrator\View\Scripts\HtmlView as ScriptsView;
 
 require_once($ff_admpath.'/admin/script.class.php');
 
@@ -57,7 +58,18 @@ switch ($task) {
 		);
 		break;
 	default:
-		facileFormsScript::listitems($option, $pkg);
+		$factory = Factory::getApplication()->bootComponent($option)->getMVCFactory();
+		$model = createScriptModel();
+		$view = $factory->createView('Scripts', 'Administrator', 'Html');
+
+		if (!$model instanceof ScriptModel || !$view instanceof ScriptsView) {
+			throw new RuntimeException('Unable to create BreezingForms NG scripts MVC objects.');
+		}
+
+		$view->setModel($model, true);
+		$view->option = $option;
+		$view->package = $pkg;
+		$view->display();
 		break;
 } // switch
 
@@ -73,11 +85,7 @@ function getScriptPackage()
 	else if ($pkg == '- blank -')
 		$pkg = '';
 	else {
-		$ok = _ff_selectValue(
-			"select count(*) from `#__facileforms_scripts` ".
-			"where package =  ".Factory::getContainer()->get(DatabaseInterface::class)->Quote($pkg)
-		);
-		if (!$ok) $pkg = $ff_config->scriptpkg;
+		if (!createScriptModel()->packageExists($pkg)) $pkg = $ff_config->scriptpkg;
 	} // if
 	if ($pkg != $ff_config->scriptpkg) {
 		$ff_config->scriptpkg = $pkg;
@@ -85,5 +93,19 @@ function getScriptPackage()
 	} // if
 	return $pkg;
 } // getScriptPackage
+
+function createScriptModel(): ScriptModel
+{
+	$model = Factory::getApplication()
+		->bootComponent('com_breezingformsng')
+		->getMVCFactory()
+		->createModel('Script', 'Administrator', ['ignore_request' => true]);
+
+	if (!$model instanceof ScriptModel) {
+		throw new RuntimeException('Unable to create BreezingForms NG script model.');
+	}
+
+	return $model;
+}
 
 ?>

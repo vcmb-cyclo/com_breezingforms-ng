@@ -11,6 +11,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\Filesystem\File;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Uri\Uri;
 use Joomla\Database\DatabaseInterface;
 
 require_once ($ff_admpath . '/admin/quickmode.html.php');
@@ -26,7 +27,7 @@ if (is_file($cbngBasePath . '/com_contentbuilderng.xml')) {
 	require_once $cbngBasePath . '/src/Service/FormSupportService.php';
 }
 
-$iconBase = '../administrator/components/com_breezingformsng/libraries/jquery/themes/quickmode/i/';
+$iconBase = Uri::root() . 'media/com_breezingformsng/images/quickmode/';
 
 $quickMode = new QuickMode();
 

@@ -37,7 +37,7 @@
 .ui-tabs-nav a, .ui-tabs-nav a span {
     float: left; /* fixes dir=ltr problem and other quirks IE */
     padding: 0 12px;
-    background: url(i/tabs.png) no-repeat;
+    background: url('/media/com_breezingformsng/images/quickmode/tabs.png') no-repeat;
 }
 .ui-tabs-nav a {
     margin: 5px 0 0 !important; /* position: relative makes opacity fail for disabled tab in IE */
@@ -101,27 +101,27 @@
 
 /* Icons */
 
-.tab-items { padding-right: 25px ; background: url('i/icon_items.png') right no-repeat ;}
-.tab-element { padding-right: 25px ; background: url('i/icon_elements.png') right no-repeat ;}
-.tab-form { padding-right: 25px ; background: url('i/icon_forms.png') right no-repeat ;}
+.tab-items { padding-right: 25px ; background: url('/media/com_breezingformsng/images/quickmode/icon_items.png') right no-repeat ;}
+.tab-element { padding-right: 25px ; background: url('/media/com_breezingformsng/images/quickmode/icon_elements.png') right no-repeat ;}
+.tab-form { padding-right: 25px ; background: url('/media/com_breezingformsng/images/quickmode/icon_forms.png') right no-repeat ;}
 
 .ui-accordion-content span { padding-left: 25px !important; }
 
-.icon-statictext { background: url('i/icon_static-text.png') left no-repeat !important; }
-.icon-textfield { background: url('i/icon_text-field.png') left no-repeat !important; }
-.icon-textarea { background: url('i/icon_text-area.png') left no-repeat !important; }
-.icon-checkbox { background: url('i/icon_check-box.png') left no-repeat !important; }
-.icon-radio { background: url('i/icon_radio.png') left no-repeat !important; }
-.icon-select { background: url('i/icon_select.png') left no-repeat !important; }
-.icon-file { background: url('i/icon_file.png') left no-repeat !important; }
-.icon-tooltip { background: url('i/icon_tooltip.png') left no-repeat !important; }
-.icon-icon { background: url('i/icon_icon.png') left no-repeat !important; }
-.icon-submitbutton { background: url('i/icon_submit-button.png') left no-repeat !important; }
-.icon-imagebutton { background: url('i/icon_image-button.png') left no-repeat !important; }
-.icon-hiddeninput { background: url('i/icon_hidden-input.png') left no-repeat !important; }
-.icon-captcha { background: url('i/icon_captcha.png') left no-repeat !important; }
-.icon-calendar { background: url('i/icon_calendar.png') left no-repeat !important; }
-.icon-paypal { background: url('i/icon_paypal.png') left no-repeat !important; }
-.icon-sofort { background: url('i/icon_sofort.png') left no-repeat !important; }
+.icon-statictext { background: url('/media/com_breezingformsng/images/quickmode/icon_static-text.png') left no-repeat !important; }
+.icon-textfield { background: url('/media/com_breezingformsng/images/quickmode/icon_text-field.png') left no-repeat !important; }
+.icon-textarea { background: url('/media/com_breezingformsng/images/quickmode/icon_text-area.png') left no-repeat !important; }
+.icon-checkbox { background: url('/media/com_breezingformsng/images/quickmode/icon_check-box.png') left no-repeat !important; }
+.icon-radio { background: url('/media/com_breezingformsng/images/quickmode/icon_radio.png') left no-repeat !important; }
+.icon-select { background: url('/media/com_breezingformsng/images/quickmode/icon_select.png') left no-repeat !important; }
+.icon-file { background: url('/media/com_breezingformsng/images/quickmode/icon_file.png') left no-repeat !important; }
+.icon-tooltip { background: url('/media/com_breezingformsng/images/quickmode/icon_tooltip.png') left no-repeat !important; }
+.icon-icon { background: url('/media/com_breezingformsng/images/quickmode/icon_icon.png') left no-repeat !important; }
+.icon-submitbutton { background: url('/media/com_breezingformsng/images/quickmode/icon_submit-button.png') left no-repeat !important; }
+.icon-imagebutton { background: url('/media/com_breezingformsng/images/quickmode/icon_image-button.png') left no-repeat !important; }
+.icon-hiddeninput { background: url('/media/com_breezingformsng/images/quickmode/icon_hidden-input.png') left no-repeat !important; }
+.icon-captcha { background: url('/media/com_breezingformsng/images/quickmode/icon_captcha.png') left no-repeat !important; }
+.icon-calendar { background: url('/media/com_breezingformsng/images/quickmode/icon_calendar.png') left no-repeat !important; }
+.icon-paypal { background: url('/media/com_breezingformsng/images/quickmode/icon_paypal.png') left no-repeat !important; }
+.icon-sofort { background: url('/media/com_breezingformsng/images/quickmode/icon_sofort.png') left no-repeat !important; }
 
-.icon-trashcan { padding: 10px 0px 15px 30px !important; background: url('i/trashcan.png') left no-repeat !important; display: block !important; color: #0b55c4 !important; font-weight: bold !important; }
+.icon-trashcan { padding: 10px 0px 15px 30px !important; background: url('/media/com_breezingformsng/images/quickmode/trashcan.png') left no-repeat !important; display: block !important; color: #0b55c4 !important; font-weight: bold !important; }

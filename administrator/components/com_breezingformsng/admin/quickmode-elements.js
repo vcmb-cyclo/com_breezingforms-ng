@@ -1,18 +1,9 @@
-<?php
-/**
-* BreezingForms - A Joomla Forms Application
-* @version 1.9
-* @package BreezingForms
-* @copyright (C) 2008-2020 by Markus Bopp
-* @license Released under the terms of the GNU General Public License
-**/
-defined('_JEXEC') or die('Direct Access to this location is not allowed.');
-
-use Joomla\CMS\Uri\Uri;
-
-$iconBase = '../administrator/components/com_breezingformsng/libraries/jquery/themes/quickmode/i/';
-?>
-this.createTextfield = function(id){
+// Generated from quickmode-elements-js.php — DO NOT EDIT MANUALLY
+// Element factory functions — require BFQMConfig to be defined before this file
+/* global BFQMConfig, JQuery */
+var BFQMElements = (function () {
+    var self = {};
+self.createTextfield = function(id){
 		return {
 				  attributes : {
 
@@ -26,7 +17,7 @@ this.createTextfield = function(id){
 						}
 					)
 				  },
-				  data: { title: "untitled element", icon: '<?php echo $iconBase . 'icon_text-field.png' ?>' },
+				  data: { title: "untitled element", icon: BFQMConfig.iconBase + 'icon_text-field.png' },
 				  properties : {
 						type : 'element',
 						bfType: 'bfTextfield',
@@ -77,7 +68,7 @@ this.createTextfield = function(id){
 		};
 };
 
-this.createNumberInput = function(id){
+self.createNumberInput = function(id){
 		return {
 				  attributes : {
 
@@ -91,7 +82,7 @@ this.createNumberInput = function(id){
 						}
 					)
 				  },
-				  data: { title: "untitled element", icon: '<?php echo $iconBase . 'icon_text-field.png' ?>' },
+				  data: { title: "untitled element", icon: BFQMConfig.iconBase + 'icon_text-field.png' },
 				  properties : {
 						type : 'element',
 						bfType: 'bfNumberInput',
@@ -142,7 +133,7 @@ this.createNumberInput = function(id){
 		};
 };
 
-this.createTextarea = function(id){
+self.createTextarea = function(id){
 		return {
 				  attributes : {
 					"class" : 'bfQuickModeElementClass',
@@ -154,7 +145,7 @@ this.createTextarea = function(id){
 						}
 					)
 				  },
-				  data: { title: "untitled element", icon: '<?php echo $iconBase . 'icon_text-area.png' ?>' },
+				  data: { title: "untitled element", icon: BFQMConfig.iconBase + 'icon_text-area.png' },
 				  properties : {
 						type : 'element',
 						bfType: 'bfTextarea',
@@ -204,7 +195,7 @@ this.createTextarea = function(id){
 		};
 };
 
-this.createRadioGroup = function(id){
+self.createRadioGroup = function(id){
 		return {
 				  attributes : {
 					"class" : 'bfQuickModeElementClass',
@@ -216,7 +207,7 @@ this.createRadioGroup = function(id){
 						}
 					)
 				  },
-				  data: { title: "untitled element", icon: '<?php echo $iconBase . 'icon_radio.png' ?>' },
+				  data: { title: "untitled element", icon: BFQMConfig.iconBase + 'icon_radio.png' },
 				  properties : {
 						type : 'element',
 						bfType: 'bfRadioGroup',
@@ -261,7 +252,7 @@ this.createRadioGroup = function(id){
 		};
 };
 
-this.createSignature = function(id){
+self.createSignature = function(id){
 		return {
 				  attributes : {
 					"class" : 'bfQuickModeElementClass',
@@ -273,7 +264,7 @@ this.createSignature = function(id){
 						}
 					)
 				  },
-				  data: { title: "untitled element", icon: '<?php echo $iconBase . 'icon_sign.png' ?>' },
+				  data: { title: "untitled element", icon: BFQMConfig.iconBase + 'icon_sign.png' },
 				  properties : {
 						type : 'element',
 						bfType: 'bfSignature',
@@ -316,7 +307,7 @@ this.createSignature = function(id){
 		};
 };
 
-this.createCheckboxGroup = function(id){
+self.createCheckboxGroup = function(id){
 		return {
 				  attributes : {
 					"class" : 'bfQuickModeElementClass',
@@ -328,7 +319,7 @@ this.createCheckboxGroup = function(id){
 						}
 					)
 				  },
-				  data: { title: "untitled element", icon: '<?php echo $iconBase . 'icon_check-box.png' ?>' },
+				  data: { title: "untitled element", icon: BFQMConfig.iconBase + 'icon_check-box.png' },
 				  properties : {
 						type : 'element',
 						bfType: 'bfCheckboxGroup',
@@ -374,7 +365,7 @@ this.createCheckboxGroup = function(id){
 		};
 };
 
-this.createCheckbox = function(id){
+self.createCheckbox = function(id){
 		return {
 				  attributes : {
 					"class" : 'bfQuickModeElementClass',
@@ -386,7 +377,7 @@ this.createCheckbox = function(id){
 						}
 					)
 				  },
-				  data: { title: "untitled element", icon: '<?php echo $iconBase . 'icon_check-box.png' ?>' },
+				  data: { title: "untitled element", icon: BFQMConfig.iconBase + 'icon_check-box.png' },
 				  properties : {
 						type : 'element',
 						bfType: 'bfCheckbox',
@@ -433,7 +424,7 @@ this.createCheckbox = function(id){
 		};
 };
 
-this.createSelect = function(id){
+self.createSelect = function(id){
 		return {
 				  attributes : {
 					"class" : 'bfQuickModeElementClass',
@@ -445,7 +436,7 @@ this.createSelect = function(id){
 						}
 					)
 				  },
-				  data: { title: "untitled element", icon: '<?php echo $iconBase . 'icon_select.png' ?>' },
+				  data: { title: "untitled element", icon: BFQMConfig.iconBase + 'icon_select.png' },
 				  properties : {
 						type : 'element',
 						bfType: 'bfSelect',
@@ -493,7 +484,7 @@ this.createSelect = function(id){
 		};
 };
 
-this.createFile = function(id){
+self.createFile = function(id){
 		return {
 				  attributes : {
 					"class" : 'bfQuickModeElementClass',
@@ -505,7 +496,7 @@ this.createFile = function(id){
 						}
 					)
 				  },
-				  data: { title: "untitled element", icon: '<?php echo $iconBase . 'icon_file.png' ?>' },
+				  data: { title: "untitled element", icon: BFQMConfig.iconBase + 'icon_file.png' },
 				  properties : {
 						type : 'element',
 						bfType: 'bfFile',
@@ -568,7 +559,7 @@ this.createFile = function(id){
 		};
 };
 
-this.createSubmitButton = function(id){
+self.createSubmitButton = function(id){
 		return {
 				  attributes : {
 					"class" : 'bfQuickModeElementClass',
@@ -580,7 +571,7 @@ this.createSubmitButton = function(id){
 						}
 					)
 				  },
-				  data: { title: "untitled element", icon: '<?php echo $iconBase . 'icon_submit-button.png' ?>' },
+				  data: { title: "untitled element", icon: BFQMConfig.iconBase + 'icon_submit-button.png' },
 				  properties : {
 						type : 'element',
 						bfType: 'bfSubmitButton',
@@ -625,7 +616,7 @@ this.createSubmitButton = function(id){
 		};
 };
 
-this.createHidden = function(id){
+self.createHidden = function(id){
 		return {
 				  attributes : {
 					"class" : 'bfQuickModeElementClass',
@@ -637,7 +628,7 @@ this.createHidden = function(id){
 						}
 					)
 				  },
-				  data: { title: "untitled element", icon: '<?php echo $iconBase . 'icon_hidden-input.png' ?>' },
+				  data: { title: "untitled element", icon: BFQMConfig.iconBase + 'icon_hidden-input.png' },
 				  properties : {
 						type : 'element',
 						bfType: 'bfHidden',
@@ -681,7 +672,7 @@ this.createHidden = function(id){
 		};
 };
 
-this.createCaptcha = function(id){
+self.createCaptcha = function(id){
 		return {
 				  attributes : {
 					"class" : 'bfQuickModeElementClass',
@@ -693,7 +684,7 @@ this.createCaptcha = function(id){
 						}
 					)
 				  },
-				  data: { title: "untitled element", icon: '<?php echo $iconBase . 'icon_captcha.png' ?>' },
+				  data: { title: "untitled element", icon: BFQMConfig.iconBase + 'icon_captcha.png' },
 				  properties : {
 						type : 'element',
 						bfType: 'bfCaptcha',
@@ -736,7 +727,7 @@ this.createCaptcha = function(id){
 		};
 };
 
-this.createReCaptcha = function(id){
+self.createReCaptcha = function(id){
 		return {
 				  attributes : {
 					"class" : 'bfQuickModeElementClass',
@@ -748,7 +739,7 @@ this.createReCaptcha = function(id){
 						}
 					)
 				  },
-				  data: { title: "untitled element", icon: '<?php echo $iconBase . 'icon_captcha.png' ?>' },
+				  data: { title: "untitled element", icon: BFQMConfig.iconBase + 'icon_captcha.png' },
 				  properties : {
 						type : 'element',
 						bfType: 'bfReCaptcha',
@@ -795,7 +786,7 @@ this.createReCaptcha = function(id){
 		};
 };
 
-this.createCalendar = function(id){
+self.createCalendar = function(id){
 		return {
 				  attributes : {
 					"class" : 'bfQuickModeElementClass',
@@ -807,7 +798,7 @@ this.createCalendar = function(id){
 						}
 					)
 				  },
-				  data: { title: "untitled element", icon: '<?php echo $iconBase . 'icon_calendar.png' ?>' },
+				  data: { title: "untitled element", icon: BFQMConfig.iconBase + 'icon_calendar.png' },
 				  properties : {
 						type : 'element',
 						bfType: 'bfCalendar',
@@ -861,7 +852,7 @@ this.createCalendar = function(id){
 		};
 };
 
-this.createCalendarResponsive = function(id){
+self.createCalendarResponsive = function(id){
 		return {
 				  attributes : {
 					"class" : 'bfQuickModeElementClass',
@@ -873,7 +864,7 @@ this.createCalendarResponsive = function(id){
 						}
 					)
 				  },
-				  data: { title: "untitled element", icon: '<?php echo $iconBase . 'icon_calendar.png' ?>' },
+				  data: { title: "untitled element", icon: BFQMConfig.iconBase + 'icon_calendar.png' },
 				  properties : {
 						type : 'element',
 						bfType: 'bfCalendarResponsive',
@@ -921,7 +912,7 @@ this.createCalendarResponsive = function(id){
 
 
 
-this.createPayPal = function(id){
+self.createPayPal = function(id){
 		return {
 				  attributes : {
 					"class" : 'bfQuickModeElementClass',
@@ -933,7 +924,7 @@ this.createPayPal = function(id){
 						}
 					)
 				  },
-				  data: { title: "untitled element", icon: '<?php echo $iconBase . 'icon_paypal.png' ?>' },
+				  data: { title: "untitled element", icon: BFQMConfig.iconBase + 'icon_paypal.png' },
 				  properties : {
 						type : 'element',
 						bfType: 'bfPayPal',
@@ -995,7 +986,7 @@ this.createPayPal = function(id){
 		};
 };
 
-this.createSofortueberweisung = function(id){
+self.createSofortueberweisung = function(id){
 		return {
 				  attributes : {
 					"class" : 'bfQuickModeElementClass',
@@ -1007,7 +998,7 @@ this.createSofortueberweisung = function(id){
 						}
 					)
 				  },
-				  data: { title: "untitled element", icon: '<?php echo $iconBase . 'icon_sofort.png' ?>' },
+				  data: { title: "untitled element", icon: BFQMConfig.iconBase + 'icon_sofort.png' },
 				  properties : {
 						type : 'element',
 						bfType: 'bfSofortueberweisung',
@@ -1036,7 +1027,7 @@ this.createSofortueberweisung = function(id){
 						thankYouPage: '',
 						language_id: 'DE',
 						currency_id: 'EUR',
-						image: '<?php echo Uri::root()?>media/com_breezingformsng/images/site/200x65px.png',
+						image: BFQMConfig.siteRoot + 'media/com_breezingformsng/images/site/200x65px.png',
 						mailback : false,
 						sendNotificationAfterPayment: false,
 
@@ -1065,7 +1056,7 @@ this.createSofortueberweisung = function(id){
 		};
 };
 
-this.createSummarize = function(id){
+self.createSummarize = function(id){
 		return {
 				  attributes : {
 					"class" : 'bfQuickModeElementClass',
@@ -1077,7 +1068,7 @@ this.createSummarize = function(id){
 						}
 					)
 				  },
-				  data: { title: "untitled element", icon: '<?php echo $iconBase . 'icon_summarize.png' ?>' },
+				  data: { title: "untitled element", icon: BFQMConfig.iconBase + 'icon_summarize.png' },
 				  properties : {
 						type : 'element',
 						bfType: 'bfSummarize',
@@ -1127,7 +1118,7 @@ this.createSummarize = function(id){
 };
 
 
-	this.createStripe = function(id){
+	self.createStripe = function(id){
 		return {
 			attributes : {
 				"class" : 'bfQuickModeElementClass',
@@ -1139,7 +1130,7 @@ this.createSummarize = function(id){
 					}
 				)
 			},
-			data: { title: "untitled element", icon: '<?php echo $iconBase . 'icon_stripe.png' ?>' },
+			data: { title: "untitled element", icon: BFQMConfig.iconBase + 'icon_stripe.png' },
 			properties : {
 				type : 'element',
 				bfType: 'bfStripe',
@@ -1165,7 +1156,7 @@ this.createSummarize = function(id){
 				amount: '',
 				thankYouPage: '',
 				currencyCode: 'USD',
-				image: '<?php echo Uri::root()?>media/com_breezingformsng/images/site/stripe.png',
+				image: BFQMConfig.siteRoot + 'media/com_breezingformsng/images/site/stripe.png',
 				sendNotificationAfterPayment: false,
 				emailfield: '',
 
@@ -1193,3 +1184,6 @@ this.createSummarize = function(id){
 			}
 		};
 	};
+
+    return self;
+}());

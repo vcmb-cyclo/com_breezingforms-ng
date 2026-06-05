@@ -10,7 +10,8 @@ use Joomla\Database\DatabaseInterface;
  * @version     1.9
  * @package BreezingFormsNG
  * @copyright Copyright (C) 2008-2020 by Markus Bopp
- * @copyright  Copyright (C) 2024-2026 by XDA+GIL * @license     Released under the terms of the GNU General Public License
+ * @copyright @copyright  Copyright (C) 2024-2026 by XDA+GIL
+ * @license GNU General Public License version 2 or later; see LICENSE.txt     Released under the terms of the GNU General Public License
  **/
 class BFIntegrate
 {

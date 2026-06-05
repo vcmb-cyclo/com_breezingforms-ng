@@ -1,11 +1,12 @@
 <?php
 
 /**
- * @package     BreezingForms
- * @version     5.0.0
+ * @package BreezingFormsNG
+ * @version 6.0.0
  * @author      Markus Bopp
  * @link        http://breezings.vcmb.fr
- * @copyright   Copyright (C) 2025 by XDA+GIL | Until 2020 - Markus Bopp
+ *  * @copyright Copyright (C) 2008-2020 Markus Bopp
+ * @copyright Copyright (C) 2025 XDA+GIL
  * @license     GNU/GPL
  */
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');

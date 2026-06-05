@@ -1,11 +1,12 @@
 <?php
 /**
  * BreezingForms NG - A Joomla Forms Application
+ * 
  * @version 6.0.0
- * @package BreezingForms NG
+ * @package BreezingFormsNG
   * @copyright Copyright (C) 2004-2005 Peter Koch
  * @copyright Copyright (C) 2008-2020 by Markus Bopp
- * @copyright Copyright (C) 2024-2026 XDA+GIL
+ * @copyright Copyright (C) 2024-2026 by XDA+GIL
  * @license GNU General Public License version 2 or later; see LICENSE.txt
  **/
 
@@ -38,11 +39,12 @@ if (isset($_POST['value']) && is_numeric($_POST['value'])) {
 
 /**
  * BreezingForms NG - A Joomla Forms Application
+ * 
  * @version 6.0.0
- * @package BreezingForms NG
+ * @package BreezingFormsNG
   * @copyright Copyright (C) 2004-2005 Peter Koch
  * @copyright Copyright (C) 2008-2020 by Markus Bopp
- * @copyright Copyright (C) 2024-2026 XDA+GIL
+ * @copyright Copyright (C) 2024-2026 by XDA+GIL
  * @license GNU General Public License version 2 or later; see LICENSE.txt
  **/
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');

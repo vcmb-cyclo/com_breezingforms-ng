@@ -71,8 +71,20 @@ class QuickModeHtml
             formEmailntf:  <?php echo (addslashes($formEmailntf) == 2 || addslashes($formEmailntf) == 1) ? 'true' : 'false'; ?>,
             elementScripts: <?php echo Zend_Json::encode($elementScripts); ?>,
             dataObject:    <?php echo str_replace(
-                ['..\\/administrator\\/components\\/com_facileforms', '..\\/administrator\\/components\\/com_breezingformsng'],
-                [Uri::root(true) . '\\/administrator\\/components\\/com_breezingformsng', Uri::root(true) . '\\/administrator\\/components\\/com_breezingformsng'],
+                [
+                    '..\\/administrator\\/components\\/com_facileforms',
+                    '..\\/administrator\\/components\\/com_breezingforms\\/libraries\\/jquery\\/themes\\/quickmode\\/i\\/',
+                    '..\\/administrator\\/components\\/com_breezingformsng\\/libraries\\/jquery\\/themes\\/quickmode\\/i\\/',
+                    '..\\/administrator\\/components\\/com_breezingforms',
+                    '..\\/administrator\\/components\\/com_breezingformsng',
+                ],
+                [
+                    Uri::root(true) . '\\/administrator\\/components\\/com_breezingformsng',
+                    Uri::root() . 'media\\/com_breezingformsng\\/images\\/quickmode\\/',
+                    Uri::root() . 'media\\/com_breezingformsng\\/images\\/quickmode\\/',
+                    Uri::root(true) . '\\/administrator\\/components\\/com_breezingformsng',
+                    Uri::root(true) . '\\/administrator\\/components\\/com_breezingformsng',
+                ],
                 $dataObjectString
             ); ?>,
             labels: {

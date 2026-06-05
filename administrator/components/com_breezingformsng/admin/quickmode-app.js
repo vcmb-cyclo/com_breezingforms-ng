@@ -85,7 +85,7 @@
                 var appScope = this;
                 this.elementScripts = BFQMConfig.elementScripts;
                 this.dataObject = BFQMConfig.dataObject;
-                this.quickModeIconBase = 'BFQMConfig.iconBase';
+                this.quickModeIconBase = BFQMConfig.iconBase;
 
                 this.normalizeQuickModeIcons = function (item) {
                     if (!item) {
@@ -95,21 +95,9 @@
                     if (item.data && item.data.icon) {
                         item.data.icon = item.data.icon.replace(/\\/g, '/');
 
-                        var legacyPrefixes = [
-                            '../administrator/components/com_facileforms/libraries/jquery/themes/quickmode/i/',
-                            '../administrator/components/com_breezingformsng/libraries/jquery/themes/quickmode/i/',
-                            '/administrator/components/com_breezingformsng/libraries/jquery/themes/quickmode/i/'
-                        ];
-                        var replaced = false;
-                        for (var p = 0; p < legacyPrefixes.length; p++) {
-                            if (item.data.icon.indexOf(legacyPrefixes[p]) === 0) {
-                                item.data.icon = appScope.quickModeIconBase + item.data.icon.substring(legacyPrefixes[p].length);
-                                replaced = true;
-                                break;
-                            }
-                        }
-                        if (!replaced && item.data.icon.indexOf('icon_') === 0) {
-                            item.data.icon = appScope.quickModeIconBase + item.data.icon;
+                        var iconFile = item.data.icon.match(/icon_[^/'"\\]+\.png$/);
+                        if (iconFile) {
+                            item.data.icon = appScope.quickModeIconBase + iconFile[0];
                         }
                     }
 
@@ -872,7 +860,7 @@
 
                     JQuery('#bfElementFileAdvancedHideLabel').attr('checked', mdata.hideLabel);
                     if (mdata.useUrl && mdata.useUrlDownloadDirectory == '') {
-                        mdata.useUrlDownloadDirectory = 'BFQMConfig.siteRoot + 'media/breezingforms/uploads'';
+                        mdata.useUrlDownloadDirectory = BFQMConfig.siteRoot + 'media/breezingforms/uploads';
                     }
 
                     JQuery('#bfElementFileAdvancedResizeTargetWidth').val(mdata.resize_target_width);
@@ -2600,7 +2588,7 @@
                     {
                         ui: {
                             theme_name: "apple",
-                            theme_path: "BFQMConfig.siteRootPath/administrator/components/com_breezingformsng/libraries/jquery/jtree/themes/",
+                            theme_path: BFQMConfig.siteRootPath + '/administrator/components/com_breezingformsng/libraries/jquery/jtree/themes/',
                             context: [
                                 {
                                     id: 'copy',
@@ -3119,11 +3107,11 @@
                 if (mdata) {
                     var item = app.findDataObjectItem('bfQuickModeRoot', app.dataObject);
                     if (item) {
-                        mdata.title = "BFQMConfig.formTitle";
-                        mdata.name = "BFQMConfig.formName";
-                        mdata.description = "BFQMConfig.formDesc";
-                        mdata.mailRecipient = "BFQMConfig.formEmailadr";
-                        mdata.mailNotification = "BFQMConfig.formEmailntf";
+                        mdata.title = BFQMConfig.formTitle;
+                        mdata.name = BFQMConfig.formName;
+                        mdata.description = BFQMConfig.formDesc;
+                        mdata.mailRecipient = BFQMConfig.formEmailadr;
+                        mdata.mailNotification = BFQMConfig.formEmailntf;
                         item.properties = mdata;
                     }
                 }
@@ -3138,7 +3126,7 @@
                         alert('Please enter the element name first.');
                         return;
                     } // if
-                    if (!confirm("BFQMConfig.labels['COM_BREEZINGFORMSNG_ELEMENTS_CREAINIT']\nBFQMConfig.labels['COM_BREEZINGFORMSNG_ELEMENTS_EXISTAPP']"))
+                    if (!confirm(BFQMConfig.labels['COM_BREEZINGFORMSNG_ELEMENTS_CREAINIT'] + "\n" + BFQMConfig.labels['COM_BREEZINGFORMSNG_ELEMENTS_EXISTAPP']))
                         return;
                     code =
                         "function ff_" + name + "_init(element, condition)\n" +
@@ -3160,7 +3148,7 @@
                     if (oldcode != '')
                         Joomla.editors.instances["bfInitCode"].setValue(
                             code +
-                            "\n// -------------- BFQMConfig.labels['COM_BREEZINGFORMSNG_ELEMENTS_OLDBELOW'] --------------\n\n" +
+                            "\n// -------------- " + BFQMConfig.labels['COM_BREEZINGFORMSNG_ELEMENTS_OLDBELOW'] + " --------------\n\n" +
                             oldcode);
                     else
                         Joomla.editors.instances["bfInitCode"].setValue(code);
@@ -3176,7 +3164,7 @@
                         alert('Please enter the element name first.');
                         return;
                     } // if
-                    if (!confirm("BFQMConfig.labels['COM_BREEZINGFORMSNG_ELEMENTS_CREAVALID']\nBFQMConfig.labels['COM_BREEZINGFORMSNG_ELEMENTS_EXISTAPP']"))
+                    if (!confirm(BFQMConfig.labels['COM_BREEZINGFORMSNG_ELEMENTS_CREAVALID'] + "\n" + BFQMConfig.labels['COM_BREEZINGFORMSNG_ELEMENTS_EXISTAPP']))
                         return;
                     code =
                         "function ff_" + name + "_validation(element, message)\n" +
@@ -3192,7 +3180,7 @@
                     if (oldcode != '')
                         Joomla.editors.instances["bfValidationCode"].setValue(
                             code +
-                            "\n// -------------- BFQMConfig.labels['COM_BREEZINGFORMSNG_ELEMENTS_OLDBELOW'] --------------\n\n" +
+                            "\n// -------------- " + BFQMConfig.labels['COM_BREEZINGFORMSNG_ELEMENTS_OLDBELOW'] + " --------------\n\n" +
                             oldcode);
                     else
                         Joomla.editors.instances["bfValidationCode"].setValue(code);
@@ -3208,7 +3196,7 @@
                         alert('Please enter the element name first.');
                         return;
                     } // if
-                    if (!confirm("BFQMConfig.labels['COM_BREEZINGFORMSNG_ELEMENTS_CREAACTION']\nBFQMConfig.labels['COM_BREEZINGFORMSNG_ELEMENTS_EXISTAPP']"))
+                    if (!confirm(BFQMConfig.labels['COM_BREEZINGFORMSNG_ELEMENTS_CREAACTION'] + "\n" + BFQMConfig.labels['COM_BREEZINGFORMSNG_ELEMENTS_EXISTAPP']))
                         return;
                     code =
                         "function ff_" + name + "_action(element, action)\n" +
@@ -3248,7 +3236,7 @@
                     if (oldcode != '')
                         Joomla.editors.instances["bfActionCode"].setValue(
                             code +
-                            "\n// -------------- BFQMConfig.labels['COM_BREEZINGFORMSNG_ELEMENTS_OLDBELOW'] --------------\n\n" +
+                            "\n// -------------- " + BFQMConfig.labels['COM_BREEZINGFORMSNG_ELEMENTS_OLDBELOW'] + " --------------\n\n" +
                             oldcode);
                     else
                         Joomla.editors.instances["bfActionCode"].setValue(code);

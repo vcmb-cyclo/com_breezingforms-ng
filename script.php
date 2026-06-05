@@ -1721,8 +1721,69 @@ class com_breezingformsngInstallerScript
         }
 
         $this->migrateElementData1FunctionNames();
+        $this->migrateQuickmodeIconPaths();
 
         $this->log('BreezingForms database update completed.');
+    }
+
+    private function migrateQuickmodeIconPaths(): void
+    {
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $formsTable = $db->getPrefix() . 'facileforms_forms';
+
+        if (!in_array($formsTable, $db->getTableList(), true)) {
+            return;
+        }
+
+        $db->setQuery(
+            "SELECT `id`, `template_code` FROM `{$formsTable}`" .
+            " WHERE `template_code` IS NOT NULL AND `template_code` != ''"
+        );
+        $rows = $db->loadObjectList();
+
+        if (empty($rows)) {
+            return;
+        }
+
+        $updated = 0;
+
+        foreach ($rows as $row) {
+            $json = base64_decode((string) $row->template_code, true);
+
+            if ($json === false || $json === '') {
+                continue;
+            }
+
+            // Replace any full path ending with /icon_*.png by just the filename.
+            // Works regardless of component name (com_breezingforms, com_facileforms, etc.)
+            // or URL format (absolute, relative, with or without protocol/host).
+            $fixed = preg_replace(
+                '/"icon":"[^"]*\/(icon_[^"\/]+\.png)"/',
+                '"icon":"$1"',
+                $json
+            );
+
+            if ($fixed === null || $fixed === $json) {
+                continue;
+            }
+
+            try {
+                $db->setQuery(
+                    "UPDATE `{$formsTable}` SET `template_code` = " .
+                    $db->quote(base64_encode($fixed)) .
+                    " WHERE `id` = " . (int) $row->id
+                )->execute();
+                $updated++;
+            } catch (\Throwable $e) {
+                $this->log("Unable to migrate quickmode icon paths for form {$row->id}: " . $e->getMessage(), Log::WARNING);
+            }
+        }
+
+        if ($updated > 0) {
+            $this->announce("[OK] Migrated quickmode icon paths in {$updated} form(s).", 'message', Log::INFO);
+        } else {
+            $this->log('Quickmode icon paths: no migration needed.');
+        }
     }
 
     private function migrateElementData1FunctionNames(): void

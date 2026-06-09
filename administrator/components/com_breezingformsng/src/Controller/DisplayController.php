@@ -25,8 +25,6 @@ class DisplayController extends BaseController
             throw new \Exception(Text::_('JERROR_ALERTNOAUTHOR'), 403);
         }
 
-        (new LegacyTaskController())->assertRequestIsValid();
-
         $input = Factory::getApplication()->getInput();
         $act = $input->getCmd('act', '');
         $task = $input->getCmd('task', '');
@@ -118,6 +116,7 @@ class DisplayController extends BaseController
 
     private function setLegacyPageHeader(string $act): void
     {
+        $input = Factory::getApplication()->getInput();
         $section = match ($act) {
             'managerecs', 'recordmanagement', '' => Text::_('COM_BREEZINGFORMSNG_MANAGERECS'),
             'manageforms', 'easymode', 'quickmode' => Text::_('COM_BREEZINGFORMSNG_MANAGEFORMS'),
@@ -125,9 +124,16 @@ class DisplayController extends BaseController
             'managepieces' => Text::_('COM_BREEZINGFORMSNG_MANAGEPIECES'),
             'integrate' => Text::_('COM_BREEZINGFORMSNG_INTEGRATOR'),
             'configuration' => Text::_('COM_BREEZINGFORMSNG_CONFIG'),
-            'about' => Text::_('COM_BREEZINGFORMSNG_ABOUT'),
             default => '',
         };
+
+        if (
+            in_array($act, ['managerecs', 'recordmanagement', ''], true)
+            && $input->getCmd('task') === 'edit'
+            && $input->getInt('record_id') > 0
+        ) {
+            $section .= ' / ' . $input->getInt('record_id');
+        }
 
         $title = Text::_('COM_BREEZINGFORMSNG') . ($section !== '' ? ' / ' . $section : '');
         $document = Factory::getApplication()->getDocument();

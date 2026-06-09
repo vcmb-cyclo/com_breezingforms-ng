@@ -9,14 +9,21 @@
  * @license GNU General Public License version 2 or later; see LICENSE.txt
  **/
 
+namespace Vcmb\Component\BreezingformsNG\Administrator\Service;
+
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
+use BFRequest;
+use BFText;
+use Exception;
+use facileFormsPieces;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
+use RuntimeException;
+use Throwable;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\PieceModel;
-
-require_once ($ff_admpath . '/admin/piece.html.php');
+use Vcmb\Component\BreezingformsNG\Administrator\View\Pieces\Renderer;
 
 class BFAdminPieceTestContext
 {
@@ -61,7 +68,7 @@ class BFAdminPieceTestContext
 	}
 }
 
-class facileFormsPiece
+class PieceManager
 {
 	private static function buildIsolatedNamespace()
 	{
@@ -146,7 +153,7 @@ class facileFormsPiece
 			$row->package = $pkg;
 			$row->published = 1;
 		} // if
-		HTML_facileFormsPiece::edit($option, $pkg, $row, $typelist);
+		Renderer::edit($option, $pkg, $row, $typelist);
 	} // edit
 
 
@@ -201,12 +208,12 @@ class facileFormsPiece
 		}
 
 		$app->enqueueMessage(BFText::_('COM_BREEZINGFORMSNG_PIECES_SAVED'));
-		$app->redirect("index.php?option=$option&act=managepieces&task=edit&pkg=$pkg&ids[]=" . (int) $row->id);
+		$app->redirect("index.php?option=$option&task=pieces.edit&pkg=$pkg&ids[]=" . (int) $row->id);
 	}
 
 	static function cancel($option, $pkg)
 	{
-		Factory::getApplication()->redirect("index.php?option=$option&act=managepieces&pkg=$pkg");
+		Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 	} // cancel
 
 
@@ -228,7 +235,7 @@ class facileFormsPiece
 			} // foreach
 		$msg = $total . ' ' . BFText::_('COM_BREEZINGFORMSNG_PIECES_SUCCOPIED');
 		Factory::getApplication()->enqueueMessage($msg);
-		Factory::getApplication()->redirect("index.php?option=$option&act=managepieces&pkg=$pkg");
+		Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 	} // copy
 
 
@@ -246,10 +253,10 @@ class facileFormsPiece
 		if ($total) {
 			$msg = $total . ' ' . BFText::_('COM_BREEZINGFORMSNG_PIECES_SUCCDELETED');
 			Factory::getApplication()->enqueueMessage($msg);
-			Factory::getApplication()->redirect("index.php?option=$option&act=managepieces&pkg=$pkg");
+			Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 			return;
 		}
-		Factory::getApplication()->redirect("index.php?option=$option&act=managepieces&pkg=$pkg");
+		Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 	} // del
 
 
@@ -262,7 +269,7 @@ class facileFormsPiece
 			return;
 		}
 
-		Factory::getApplication()->redirect("index.php?option=$option&act=managepieces&pkg=$pkg");
+		Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 	} // publish
 
 
@@ -357,7 +364,7 @@ class facileFormsPiece
 		$session->set('bf.pieces_limitstart', $limitstart);
 		$rows = $listData['rows'];
 
-		HTML_facileFormsPiece::listitems($option, $rows, $pkglist, $pkg, $showInternal, $search, $total, $limit, $limitstart, $pageSizes);
+		Renderer::listitems($option, $rows, $pkglist, $pkg, $showInternal, $search, $total, $limit, $limitstart, $pageSizes);
 	} // listitems
 
 	static function test($option, $pkg, $ids)
@@ -371,7 +378,7 @@ class facileFormsPiece
 			}
 		}
 		if (!count($ids)) {
-			Factory::getApplication()->redirect("index.php?option=$option&act=managepieces&pkg=$pkg");
+			Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 			return;
 		}
 
@@ -410,7 +417,7 @@ class facileFormsPiece
 			$autoRun = $allDefaults;
 		}
 		$testMode = BFRequest::getCmd('test_mode', '');
-		HTML_facileFormsPiece::test($option, $pkg, $row, $functionName, $params, $paramDefaults, array(), null, '', '', 0, $autoRun, array(), $testMode, array());
+		Renderer::test($option, $pkg, $row, $functionName, $params, $paramDefaults, array(), null, '', '', 0, $autoRun, array(), $testMode, array());
 	}
 
 	static function testrun($option, $pkg, $ids)
@@ -425,7 +432,7 @@ class facileFormsPiece
 			}
 		}
 		if (!count($ids)) {
-			$app->redirect("index.php?option=$option&act=managepieces&pkg=$pkg");
+			$app->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 			return;
 		}
 
@@ -494,7 +501,7 @@ class facileFormsPiece
 		if ($testMode === 'unit' || trim((string) $row->unit_tests) !== '') {
 			$unitTestResult = self::runUnitTests($row, $functionName, $database);
 		}
-		HTML_facileFormsPiece::test($option, $pkg, $row, $functionName, $paramNames, $paramDefaults, $paramValues, $result, $output, $error, $safeMode, false, $errorDetails, $testMode, $unitTestResult, $autoOpened);
+		Renderer::test($option, $pkg, $row, $functionName, $paramNames, $paramDefaults, $paramValues, $result, $output, $error, $safeMode, false, $errorDetails, $testMode, $unitTestResult, $autoOpened);
 	}
 
 	static function testrunajax($option, $pkg, $ids)
@@ -540,7 +547,7 @@ class facileFormsPiece
 			}
 		}
 		if (!count($ids)) {
-			$app->redirect("index.php?option=$option&act=managepieces&pkg=$pkg");
+			$app->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 			return;
 		}
 
@@ -580,9 +587,9 @@ class facileFormsPiece
 		$testMode = BFRequest::getCmd('test_mode', '');
 		if ($testContext) {
 			$testModeQuery = $testMode !== '' ? '&test_mode=' . urlencode($testMode) : '';
-			$app->redirect("index.php?option=$option&act=managepieces&task=test&pkg=$pkg&ids[]=" . $targetId . $testModeQuery);
+			$app->redirect("index.php?option=$option&task=pieces.test&pkg=$pkg&ids[]=" . $targetId . $testModeQuery);
 		} else {
-			$app->redirect("index.php?option=$option&act=managepieces&task=edit&pkg=$pkg&ids[]=" . $targetId);
+			$app->redirect("index.php?option=$option&task=pieces.edit&pkg=$pkg&ids[]=" . $targetId);
 		}
 	}
 
@@ -697,5 +704,5 @@ class facileFormsPiece
 		);
 	}
 
-} // class facileFormsPiece
+}
 ?>

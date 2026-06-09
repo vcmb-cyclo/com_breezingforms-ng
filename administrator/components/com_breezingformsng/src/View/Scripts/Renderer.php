@@ -9,14 +9,18 @@
  * @license GNU General Public License version 2 or later; see LICENSE.txt
  **/
 
+namespace Vcmb\Component\BreezingformsNG\Administrator\View\Scripts;
+
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
+use BFRequest;
+use BFText;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 
-class HTML_facileFormsScript
+class Renderer
 {
 	static function edit($option, $pkg, &$row, &$typelist)
 	{
@@ -74,7 +78,8 @@ class HTML_facileFormsScript
 				if (error != '')
 					alert(error);
 				else
-					Joomla.submitform(pressbutton);
+					var task = pressbutton === 'new' ? 'add' : (pressbutton === 'prev' ? 'previous' : pressbutton);
+					Joomla.submitform('scripts.' + task);
 			} // submitbutton
 			Joomla.submitbutton = submitbutton;
 			window.submitbutton = submitbutton;
@@ -664,7 +669,7 @@ class HTML_facileFormsScript
 						<input type="text" size="70" maxlength="50" id="title" name="title" value="<?php echo $row->title; ?>"
 							class="inputbox" />
 						<?php
-						echo '<span><span title="' . bf_ToolTipText(BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_TIPTITLE')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
+						echo '<span><span title="' . HTMLHelper::tooltipText(BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_TIPTITLE')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
 						?>
 					</td>
 					<td nowrap>
@@ -702,7 +707,7 @@ class HTML_facileFormsScript
 						<input type="text" size="30" maxlength="30" id="name" name="name" value="<?php echo $row->name; ?>"
 							class="inputbox" />
 						<?php
-						echo '<span><span title="' . bf_ToolTipText(BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_TIPNAME')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
+						echo '<span><span title="' . HTMLHelper::tooltipText(BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_TIPNAME')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
 						?>
 					</td>
 					<td nowrap>
@@ -800,9 +805,9 @@ class HTML_facileFormsScript
 			<input type="hidden" name="pkg" value="<?php echo $pkg; ?>" />
 			<input type="hidden" name="id" value="<?php echo $row->id; ?>" />
 			<input type="hidden" name="option" value="<?php echo $option; ?>" />
+			<input type="hidden" name="view" value="scripts" />
 			<input type="hidden" name="task" value="" />
 			<input type="hidden" name="test_mode" value="" />
-			<input type="hidden" name="act" value="managescripts" />
 			<?php echo HTMLHelper::_('form.token'); ?>
 		</form>
 		<?php
@@ -836,7 +841,7 @@ class HTML_facileFormsScript
 		$dir = strtoupper(BFRequest::getCmd('dir', 'ASC'));
 		$dir = $dir === 'DESC' ? 'DESC' : 'ASC';
 		$baseQuery = 'index.php?option=' . $option .
-			'&act=managescripts' .
+			'&view=scripts' .
 			'&pkg=' . urlencode($pkg) .
 			'&search=' . urlencode($search) .
 			'&limit=' . (int) $limit .
@@ -914,7 +919,8 @@ class HTML_facileFormsScript
 										}
 									}
 									bfScriptsSyncPackage(form);
-									Joomla.submitform(pressbutton, form);
+									var task = pressbutton === 'new' ? 'add' : pressbutton;
+									Joomla.submitform('scripts.' + task, form);
 								} // submitbutton
 								Joomla.submitbutton = submitbutton;
 
@@ -1077,7 +1083,7 @@ class HTML_facileFormsScript
 							<?php echo $row->name; ?>
 						</td>
 						<td valign="top" align="left">
-							<?php echo HTML_facileFormsScript::typeName($row->type); ?>
+							<?php echo self::typeName($row->type); ?>
 						</td>
 						<td valign="top" align="left">
 							<?php echo htmlspecialchars($desc, ENT_QUOTES); ?>
@@ -1136,7 +1142,7 @@ class HTML_facileFormsScript
 				</div>
 				<input type="hidden" name="boxchecked" value="0" />
 				<input type="hidden" name="option" value="<?php echo $option; ?>" />
-				<input type="hidden" name="act" value="managescripts" />
+				<input type="hidden" name="view" value="scripts" />
 				<input type="hidden" name="task" value="" />
 				<input type="hidden" name="limitstart" value="<?php echo (int) $limitstart; ?>" />
 				<input type="hidden" name="list[start]" value="<?php echo (int) $limitstart; ?>" />
@@ -1299,7 +1305,8 @@ class HTML_facileFormsScript
 					}
 
 				window.submitbutton = function (pressbutton) {
-					Joomla.submitform(pressbutton, document.getElementById('adminForm'));
+					var task = pressbutton === 'prev' ? 'previous' : pressbutton;
+					Joomla.submitform('scripts.' + task, document.getElementById('adminForm'));
 				};
 
 				window.bfRunScriptTest = function () {
@@ -1816,8 +1823,8 @@ class HTML_facileFormsScript
 				</div>
 			</div>
 			<input type="hidden" name="option" value="<?php echo $option; ?>" />
-			<input type="hidden" name="task" value="test" />
-			<input type="hidden" name="act" value="managescripts" />
+			<input type="hidden" name="view" value="scripts" />
+			<input type="hidden" name="task" value="scripts.test" />
 			<input type="hidden" name="pkg" value="<?php echo htmlspecialchars((string) $pkg, ENT_QUOTES); ?>" />
 			<input type="hidden" name="ids[]" value="<?php echo (int) $row->id; ?>" />
 			<input type="hidden" name="test_context" value="1" />
@@ -1827,5 +1834,5 @@ class HTML_facileFormsScript
 		<?php
 	} // test
 
-} // class HTML_facileFormsScript
+}
 ?>

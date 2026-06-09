@@ -96,8 +96,8 @@ class HtmlView extends BaseHtmlView
         Sidebar::addEntry(
             '<i class="fa fa-info-circle" aria-hidden="true"></i> ' . '<m>' .
             \BFText::_('COM_BREEZINGFORMSNG_ABOUT') . '</m>',
-            'index.php?option=com_breezingformsng&act=about',
-            \BFRequest::getVar('act', '') == 'about'
+            'index.php?option=com_breezingformsng&task=about.display&view=about',
+            \BFRequest::getVar('view', '') == 'about'
         );
 
         $this->sidebar = '<div id="bf-sidebar">' . Sidebar::render() . '</div>';
@@ -141,7 +141,7 @@ class HtmlView extends BaseHtmlView
             $act === 'manageforms', $act === 'easymode', $act === 'quickmode' => \BFText::_('COM_BREEZINGFORMSNG_MANAGEFORMS'),
             $act === 'integrate' => \BFText::_('COM_BREEZINGFORMSNG_INTEGRATOR'),
             $act === 'configuration' => \BFText::_('COM_BREEZINGFORMSNG_CONFIG'),
-            $act === 'about' => \BFText::_('COM_BREEZINGFORMSNG_ABOUT'),
+            $view === 'about' => \BFText::_('COM_BREEZINGFORMSNG_ABOUT'),
             default => '',
         };
     }

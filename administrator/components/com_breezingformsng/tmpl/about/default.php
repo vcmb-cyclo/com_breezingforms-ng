@@ -612,7 +612,7 @@ $aboutDescription = str_replace(
     }
 </style>
 
-<form action="index.php?option=com_breezingformsng&act=about" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_breezingformsng&task=about.display&amp;view=about" method="post" name="adminForm" id="adminForm">
     <div class="bf-about-intro mt-3 mb-3">
         <div class="bf-about-intro-media">
             <img
@@ -780,7 +780,7 @@ $aboutDescription = str_replace(
     </div>
 
     <input type="hidden" name="option" value="com_breezingformsng" />
-    <input type="hidden" name="act" value="about" />
-    <input type="hidden" name="task" value="" />
+    <input type="hidden" name="task" value="about.display" />
+    <input type="hidden" name="view" value="about" />
     <?php echo HTMLHelper::_('form.token'); ?>
 </form>

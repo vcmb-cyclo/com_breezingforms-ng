@@ -10,16 +10,21 @@
  * @license GNU General Public License version 2 or later; see LICENSE.txt
  **/
 
+namespace Vcmb\Component\BreezingformsNG\Administrator\Service;
+
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
+use BFRequest;
+use BFText;
+use facileFormsScripts;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
+use RuntimeException;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\ScriptModel;
+use Vcmb\Component\BreezingformsNG\Administrator\View\Scripts\Renderer;
 
-require_once($ff_admpath . '/admin/script.html.php');
-
-class facileFormsScript
+class ScriptManager
 {
 	static function edit($option, $pkg, $ids)
 	{
@@ -40,7 +45,7 @@ class facileFormsScript
 			$row->package = $pkg;
 			$row->published = 1;
 		} // if
-		HTML_facileFormsScript::edit($option, $pkg, $row, $typelist);
+		Renderer::edit($option, $pkg, $row, $typelist);
 	} // edit
 
 
@@ -94,13 +99,13 @@ class facileFormsScript
 		}
 
 		$app->enqueueMessage(BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_SAVED'));
-		$app->redirect("index.php?option=$option&act=managescripts&task=edit&pkg=$pkg&ids[]=" . (int) $row->id);
+		$app->redirect("index.php?option=$option&task=scripts.edit&pkg=$pkg&ids[]=" . (int) $row->id);
 	}
 
 
 	static function cancel($option, $pkg)
 	{
-		Factory::getApplication()->redirect("index.php?option=$option&act=managescripts&pkg=$pkg");
+		Factory::getApplication()->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 	} // cancel
 
 	static function copy($option, $pkg, $ids)
@@ -119,7 +124,7 @@ class facileFormsScript
 		} // foreach
 		$msg = $total . ' ' . BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_SUCCOPIED');
 		Factory::getApplication()->enqueueMessage($msg);
-		Factory::getApplication()->redirect("index.php?option=$option&act=managescripts&pkg=$pkg");
+		Factory::getApplication()->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 	} // copy
 
 	static function del($option, $pkg, $ids)
@@ -139,7 +144,7 @@ class facileFormsScript
 				'message'
 			);
 		}
-		Factory::getApplication()->redirect("index.php?option=$option&act=managescripts&pkg=$pkg");
+		Factory::getApplication()->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 	} // del
 
 	static function publish($option, $pkg, $ids, $publish)
@@ -151,7 +156,7 @@ class facileFormsScript
 			exit();
 		}
 
-		Factory::getApplication()->redirect("index.php?option=$option&act=managescripts&pkg=$pkg");
+		Factory::getApplication()->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 	} // publish
 
 	static function listitems($option, $pkg)
@@ -239,7 +244,7 @@ class facileFormsScript
 		$session->set('bf.scripts_limitstart', $limitstart);
 		$rows = $listData['rows'];
 
-		HTML_facileFormsScript::listitems($option, $rows, $pkglist, $pkg, $search, $total, $limit, $limitstart, $pageSizes);
+		Renderer::listitems($option, $rows, $pkglist, $pkg, $search, $total, $limit, $limitstart, $pageSizes);
 	} // listitems
 
 	static function test($option, $pkg, $ids)
@@ -254,14 +259,14 @@ class facileFormsScript
 			}
 		}
 		if (!count($ids)) {
-			$app->redirect("index.php?option=$option&act=managescripts&pkg=$pkg");
+			$app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 			return;
 		}
 
 		$row = new facileFormsScripts($database);
 		$row->load($ids[0]);
 		if (!(int) $row->id) {
-			$app->redirect("index.php?option=$option&act=managescripts&pkg=$pkg");
+			$app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 			return;
 		}
 
@@ -281,7 +286,7 @@ class facileFormsScript
 			$autoRun = $allDefaults;
 		}
 		$testMode = BFRequest::getCmd('test_mode', '');
-		HTML_facileFormsScript::test($option, $pkg, $row, $functionName, $params, $paramDefaults, $autoRun, $testMode);
+		Renderer::test($option, $pkg, $row, $functionName, $params, $paramDefaults, $autoRun, $testMode);
 	}
 
 	static function prev($option, $pkg, $ids)
@@ -306,7 +311,7 @@ class facileFormsScript
 			}
 		}
 		if (!count($ids)) {
-			$app->redirect("index.php?option=$option&act=managescripts&pkg=$pkg");
+			$app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 			return;
 		}
 
@@ -346,9 +351,9 @@ class facileFormsScript
 		$testMode = BFRequest::getCmd('test_mode', '');
 		if ($testContext) {
 			$testModeQuery = $testMode !== '' ? '&test_mode=' . urlencode($testMode) : '';
-			$app->redirect("index.php?option=$option&act=managescripts&task=test&pkg=$pkg&ids[]=" . $targetId . $testModeQuery);
+			$app->redirect("index.php?option=$option&task=scripts.test&pkg=$pkg&ids[]=" . $targetId . $testModeQuery);
 		} else {
-			$app->redirect("index.php?option=$option&act=managescripts&task=edit&pkg=$pkg&ids[]=" . $targetId);
+			$app->redirect("index.php?option=$option&task=scripts.edit&pkg=$pkg&ids[]=" . $targetId);
 		}
 	}
 
@@ -396,4 +401,4 @@ class facileFormsScript
 		return array($functionName, $params, $defaults);
 	}
 
-} // class facileFormsScript
+}

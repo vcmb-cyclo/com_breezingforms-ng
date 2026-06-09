@@ -9,15 +9,19 @@
  * @license GNU General Public License version 2 or later; see LICENSE.txt
  **/
 
+namespace Vcmb\Component\BreezingformsNG\Administrator\View\Pieces;
+
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
+use BFRequest;
+use BFText;
 use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 
-class HTML_facileFormsPiece
+class Renderer
 {
 	static function edit($option, $pkg, &$row, &$typelist)
 	{
@@ -75,7 +79,8 @@ class HTML_facileFormsPiece
 				if (error != '')
 					alert(error);
 				else
-					submitform(pressbutton);
+					var task = pressbutton === 'new' ? 'add' : (pressbutton === 'prev' ? 'previous' : pressbutton);
+					Joomla.submitform('pieces.' + task);
 			} // submitbutton
 			window.submitbutton = submitbutton;
 
@@ -363,8 +368,8 @@ class HTML_facileFormsPiece
 				var details = document.getElementById('bf-edit-piece-unit-tests-details');
 				var payload = new URLSearchParams();
 				payload.set('option', form.option.value);
-				payload.set('act', 'managepieces');
-				payload.set('task', 'testrunajax');
+				payload.set('view', 'pieces');
+				payload.set('task', 'pieces.runTestsAjax');
 				payload.set('pkg', form.pkg.value || '');
 				payload.set('id', form.id.value || '');
 				payload.set('code', document.getElementById('code').value || '');
@@ -470,7 +475,7 @@ class HTML_facileFormsPiece
 						<input type="text" size="50" maxlength="50" id="title" name="title" value="<?php echo $row->title; ?>"
 							class="inputbox" />
 						<?php
-						echo '<span><span title="' . bf_ToolTipText(BFText::_('COM_BREEZINGFORMSNG_PIECES_TIPTITLE')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
+						echo '<span><span title="' . HTMLHelper::tooltipText(BFText::_('COM_BREEZINGFORMSNG_PIECES_TIPTITLE')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
 						?>
 					</td>
 					<td nowrap>
@@ -508,7 +513,7 @@ class HTML_facileFormsPiece
 						<input type="text" size="30" maxlength="30" id="name" name="name" value="<?php echo $row->name; ?>"
 							class="inputbox" />
 						<?php
-						echo '<span><span title="' . bf_ToolTipText(BFText::_('COM_BREEZINGFORMSNG_PIECES_TIPNAME')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
+						echo '<span><span title="' . HTMLHelper::tooltipText(BFText::_('COM_BREEZINGFORMSNG_PIECES_TIPNAME')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
 						?>
 					</td>
 					<td nowrap>
@@ -596,9 +601,9 @@ class HTML_facileFormsPiece
 			<input type="hidden" name="pkg" value="<?php echo $pkg; ?>" />
 			<input type="hidden" name="id" value="<?php echo $row->id; ?>" />
 			<input type="hidden" name="option" value="<?php echo $option; ?>" />
+			<input type="hidden" name="view" value="pieces" />
 			<input type="hidden" name="task" value="" />
 			<input type="hidden" name="test_mode" value="" />
-			<input type="hidden" name="act" value="managepieces" />
 			<?php echo HTMLHelper::_('form.token'); ?>
 		</form>
 		<?php
@@ -630,7 +635,7 @@ class HTML_facileFormsPiece
 		$dir = strtoupper(BFRequest::getCmd('dir', 'ASC'));
 		$dir = $dir === 'DESC' ? 'DESC' : 'ASC';
 		$baseQuery = 'index.php?option=' . $option .
-			'&act=managepieces' .
+			'&view=pieces' .
 			'&pkg=' . urlencode($pkg) .
 			'&show_internal=' . (int) $showInternal .
 			'&search=' . urlencode($search) .
@@ -709,8 +714,10 @@ class HTML_facileFormsPiece
 										}
 									}
 									bfPiecesSyncPackage(form);
-									Joomla.submitform(pressbutton, form);
+									var task = pressbutton === 'new' ? 'add' : pressbutton;
+									Joomla.submitform('pieces.' + task, form);
 								} // submitbutton
+								Joomla.submitbutton = submitbutton;
 
 								function bfPiecesGoToPage(pageNo)
 								{
@@ -877,7 +884,7 @@ class HTML_facileFormsPiece
 							<?php echo $row->name; ?>
 						</td>
 						<td valign="top" align="left">
-							<?php echo HTML_facileFormsPiece::typeName($row->type); ?>
+							<?php echo self::typeName($row->type); ?>
 						</td>
 						<td valign="top" align="left">
 							<?php echo htmlspecialchars($desc, ENT_QUOTES); ?>
@@ -941,7 +948,7 @@ class HTML_facileFormsPiece
 				</div>
 				<input type="hidden" name="boxchecked" value="0" />
 				<input type="hidden" name="option" value="<?php echo $option; ?>" />
-				<input type="hidden" name="act" value="managepieces" />
+				<input type="hidden" name="view" value="pieces" />
 				<input type="hidden" name="task" value="" />
 				<input type="hidden" name="limitstart" value="<?php echo (int) $limitstart; ?>" />
 				<input type="hidden" name="list[start]" value="<?php echo (int) $limitstart; ?>" />
@@ -969,6 +976,13 @@ class HTML_facileFormsPiece
 				? $autoOpenUnitFailureCount . ' ' . BFText::_($autoOpenUnitFailureCount > 1 ? 'COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES_PLURAL' : 'COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES_SINGULAR')
 				: BFText::_('COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES_ON_OPEN');
 			?>
+		<script type="text/javascript">
+			Joomla.submitbutton = function (pressbutton) {
+				var task = pressbutton === 'prev' ? 'previous' : pressbutton;
+				Joomla.submitform('pieces.' + task, document.getElementById('adminForm'));
+			};
+			window.submitbutton = Joomla.submitbutton;
+		</script>
 		<?php if ($autoRun || $testMode === 'unit' || $shouldAutoRunUnitTestsOnly) { ?>
 			<script type="text/javascript">
 				window.addEventListener('load', function () {
@@ -1213,8 +1227,8 @@ class HTML_facileFormsPiece
 			<?php } ?>
 
 			<input type="hidden" name="option" value="<?php echo $option; ?>" />
-			<input type="hidden" name="task" value="testrun" />
-			<input type="hidden" name="act" value="managepieces" />
+			<input type="hidden" name="view" value="pieces" />
+			<input type="hidden" name="task" value="pieces.runTest" />
 			<input type="hidden" name="pkg" value="<?php echo $pkg; ?>" />
 			<input type="hidden" name="ids[]" value="<?php echo $row->id; ?>" />
 			<input type="hidden" name="test_function" value="<?php echo htmlspecialchars($functionName, ENT_QUOTES); ?>" />
@@ -1226,5 +1240,5 @@ class HTML_facileFormsPiece
 		<?php
 	} // test
 
-} // class HTML_facileFormsPiece
+}
 ?>

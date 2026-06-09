@@ -7,9 +7,9 @@
 
 \defined('_JEXEC') or die;
 
-require_once JPATH_ADMINISTRATOR . '/components/com_breezingformsng/admin/piece.html.php';
+use Vcmb\Component\BreezingformsNG\Administrator\View\Pieces\Renderer;
 
-HTML_facileFormsPiece::listitems(
+Renderer::listitems(
     $this->option,
     $this->rows,
     $this->packageList,

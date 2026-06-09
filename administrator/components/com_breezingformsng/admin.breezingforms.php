@@ -413,12 +413,6 @@ switch ($act) {
     case 'editpage':
         require_once ($ff_admpath . '/admin/element.php');
         break;
-    case 'managescripts':
-        require_once ($ff_admpath . '/admin/script.php');
-        break;
-    case 'managepieces':
-        require_once ($ff_admpath . '/admin/piece.php');
-        break;
     case 'run':
         require_once ($ff_admpath . '/admin/run.php');
         break;
@@ -436,9 +430,6 @@ switch ($act) {
         break;
     case 'recordmanagement':
         require_once ($ff_admpath . '/admin/recordmanagement.php');
-        break;
-    case 'about':
-        require_once ($ff_admpath . '/admin/about.php');
         break;
     default:
         require_once ($ff_admpath . '/admin/recordmanagement.php');
@@ -551,12 +542,12 @@ function protectedComponentIds()
         "'index.php?option=com_breezingformsng&act=managerecs'," .
         "'index.php?option=com_breezingformsng&act=managemenus'," .
         "'index.php?option=com_breezingformsng&act=manageforms'," .
-        "'index.php?option=com_breezingformsng&act=managescripts'," .
-        "'index.php?option=com_breezingformsng&act=managepieces'," .
+        "'index.php?option=com_breezingformsng&view=scripts'," .
+        "'index.php?option=com_breezingformsng&view=pieces'," .
         "'index.php?option=com_breezingformsng&act=share'," .
         "'index.php?option=com_breezingformsng&act=integrate'," .
         "'index.php?option=com_breezingformsng&act=configuration'," .
-        "'index.php?option=com_breezingformsng&act=about'" .
+        "'index.php?option=com_breezingformsng&task=about.display&view=about'" .
         ") " .
         "order by id"
     );

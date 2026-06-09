@@ -297,7 +297,8 @@ class bfRecordManagement
 
         $recordRows = $this->getEditableRecordRows((int) $record->id, (int) $record->form, (string) $record->name);
         $submitted = Factory::getDate($record->submitted, $this->tz)->format('Y-m-d H:i:s', true);
-        $backUrl = 'index.php?option=com_breezingformsng&act=managerecs&form_selection=' . (int) $record->form;
+        $formSelection = BFRequest::getInt('form_selection', 0);
+        $backUrl = 'index.php?option=com_breezingformsng&act=managerecs&form_selection=' . $formSelection;
         ?>
         <form action="index.php?option=com_breezingformsng&act=managerecs" method="post" name="adminForm" id="adminForm">
             <div class="row">
@@ -378,7 +379,7 @@ class bfRecordManagement
 
             <input type="hidden" name="task" value="saveRecord">
             <input type="hidden" name="record_id" value="<?php echo (int) $record->id; ?>">
-            <input type="hidden" name="form_selection" value="<?php echo (int) $record->form; ?>">
+            <input type="hidden" name="form_selection" value="<?php echo $formSelection; ?>">
             <?php echo HTMLHelper::_('form.token'); ?>
         </form>
         <?php
@@ -387,6 +388,7 @@ class bfRecordManagement
     function saveRecord(): void
     {
         $recordId = BFRequest::getInt('record_id', 0);
+        $formSelection = BFRequest::getInt('form_selection', 0);
 
         if ($recordId < 1) {
             Factory::getApplication()->redirect('index.php?option=com_breezingformsng&act=managerecs');
@@ -435,6 +437,7 @@ class bfRecordManagement
 
         Factory::getApplication()->redirect(
             'index.php?option=com_breezingformsng&act=managerecs&task=edit&record_id=' . (int) $recordId
+            . '&form_selection=' . $formSelection
         );
     }
 
@@ -2158,13 +2161,12 @@ class bfRecordManagement
                         <th class="text-center"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_VIEWED'), ENT_QUOTES, 'UTF-8'); ?></th>
                         <th class="text-center"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_EXPORTED'), ENT_QUOTES, 'UTF-8'); ?></th>
                         <th class="text-center"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_ARCHIVED'), ENT_QUOTES, 'UTF-8'); ?></th>
-                        <th class="text-center"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_EDIT'), ENT_QUOTES, 'UTF-8'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (!count($records)) : ?>
                         <tr>
-                            <td colspan="10" class="text-center">
+                            <td colspan="9" class="text-center">
                                 <?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_NONE_FOUND'), ENT_QUOTES, 'UTF-8'); ?>
                             </td>
                         </tr>
@@ -2178,7 +2180,11 @@ class bfRecordManagement
                             <td class="text-center">
                                 <input type="checkbox" name="cid[]" value="<?php echo (int) $record['id']; ?>">
                             </td>
-                            <td><?php echo (int) $record['id']; ?></td>
+                            <td>
+                                <a href="index.php?option=com_breezingformsng&act=managerecs&task=edit&record_id=<?php echo (int) $record['id']; ?>&form_selection=<?php echo (int) $formSelection; ?>">
+                                    <?php echo (int) $record['id']; ?>
+                                </a>
+                            </td>
                             <td><?php echo htmlentities($submitted, ENT_QUOTES, 'UTF-8'); ?></td>
                             <td>
                                 <strong><?php echo htmlentities($record['form_title'], ENT_QUOTES, 'UTF-8'); ?></strong>
@@ -2194,11 +2200,6 @@ class bfRecordManagement
                             <td class="text-center"><?php echo $this->renderNativeFlag((int) $record['viewed']); ?></td>
                             <td class="text-center"><?php echo $this->renderNativeFlag((int) $record['exported']); ?></td>
                             <td class="text-center"><?php echo $this->renderNativeFlag((int) $record['archived']); ?></td>
-                            <td class="text-center">
-                                <a class="btn btn-sm btn-secondary" href="index.php?option=com_breezingformsng&act=managerecs&task=edit&record_id=<?php echo (int) $record['id']; ?>&form_selection=<?php echo (int) $formSelection; ?>">
-                                    <?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_EDIT'), ENT_QUOTES, 'UTF-8'); ?>
-                                </a>
-                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
@@ -2230,9 +2231,10 @@ class bfRecordManagement
     private function renderNativeFlag(int $value): string
     {
         $text = $value === 1 ? BFText::_('COM_BREEZINGFORMSNG_RECORDS_YES') : BFText::_('COM_BREEZINGFORMSNG_RECORDS_NO');
-        $class = $value === 1 ? 'badge bg-success' : 'badge bg-secondary';
+        $class = $value === 1 ? 'icon-check text-success' : 'icon-times text-muted';
 
-        return '<span class="' . $class . '">' . htmlentities($text, ENT_QUOTES, 'UTF-8') . '</span>';
+        return '<span class="' . $class . '" aria-hidden="true"></span>'
+            . '<span class="visually-hidden">' . htmlentities($text, ENT_QUOTES, 'UTF-8') . '</span>';
     }
 
     private function renderNativePagination(int $total, int $limitStart, int $limit, int $formSelection, string $searchTerm): string

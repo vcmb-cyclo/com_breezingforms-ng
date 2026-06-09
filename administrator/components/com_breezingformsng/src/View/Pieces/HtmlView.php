@@ -28,8 +28,6 @@ class HtmlView extends BaseHtmlView
 
     public int $limitStart = 0;
 
-    public array $pageSizes = [];
-
     public array $packageList = [];
 
     public array $rows = [];
@@ -68,7 +66,6 @@ class HtmlView extends BaseHtmlView
         $this->total = $list['total'];
         $this->limit = $list['limit'];
         $this->limitStart = $list['limitStart'];
-        $this->pageSizes = $list['pageSizes'];
         $this->rows = $list['rows'];
         $this->pagination = $list['pagination'];
         $this->listOrder = $list['listOrder'];

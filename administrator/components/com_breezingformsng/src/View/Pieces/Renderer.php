@@ -637,34 +637,15 @@ class Renderer
 		return '???';
 	} // typeName
 
-	static function listitems($option, &$rows, &$pkglist, $pkg, $showInternal, $search, $total, $limit, $limitstart, $pageSizes, $pagination = null, $listOrder = 'a.name', $listDirn = 'asc', $filterState = '')
+	static function listitems($option, &$rows, &$pkglist, $pkg, $showInternal, $search, $total, $limit, $limitstart, $pagination = null, $listOrder = 'a.name', $listDirn = 'asc', $filterState = '')
 	{
 		global $ff_config, $ff_version;
 		$listOrder = (string) $listOrder;
 		$listDirn = strtolower((string) $listDirn);
 		$listDirn = $listDirn === 'desc' ? 'desc' : 'asc';
-		$fullOrdering = trim($listOrder . ' ' . strtoupper($listDirn));
-		$pageCount = $limit > 0 ? (int) ceil($total / $limit) : 1;
-		$pageCount = max(1, $pageCount);
-		$currentPage = $limit > 0 ? ((int) floor($limitstart / $limit) + 1) : 1;
-		$currentPage = min(max($currentPage, 1), $pageCount);
-		$startNo = $total > 0 ? $limitstart + 1 : 0;
-		$endNo = $total > 0 ? min($limitstart + $limit, $total) : 0;
-		$shownPageNumbers = array();
-		if ($pageCount <= 4) {
-			for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-				$shownPageNumbers[] = $pageNo;
-			}
-		} else {
-			$shownPageNumbers = array(1, 2, $pageCount - 1, $pageCount, max(1, $currentPage - 1), $currentPage, min($pageCount, $currentPage + 1));
-			$shownPageNumbers = array_values(array_unique($shownPageNumbers));
-			sort($shownPageNumbers);
-		}
-		$gotoLabel = rtrim(BFText::_('COM_BREEZINGFORMSNG_GO_TO_PAGE'), '.');
 		?>
 			<script type="text/javascript">
 								<!--
-								var bfPiecesPageCount = <?php echo (int) $pageCount; ?>;
 								function bfPiecesSyncPackage(form)
 								{
 									if (!form) {
@@ -716,45 +697,6 @@ class Renderer
 								} // submitbutton
 								Joomla.submitbutton = submitbutton;
 
-								function bfPiecesGoToPage(pageNo)
-								{
-									var form = document.adminForm;
-									var limit = parseInt(form.limit.value, 10);
-									var page = parseInt(pageNo, 10);
-									if (isNaN(limit) || limit <= 0) {
-										limit = 10;
-									}
-									if (isNaN(page) || page < 1) {
-										page = 1;
-									}
-									if (page > bfPiecesPageCount) {
-										page = bfPiecesPageCount;
-									}
-									form.limitstart.value = (page - 1) * limit;
-									return bfPiecesSubmitList(false);
-								}
-
-								function bfPiecesChangePageSize(pageSize)
-								{
-									var form = document.adminForm;
-									var size = parseInt(pageSize, 10);
-									if (isNaN(size) || size <= 0) {
-										return false;
-									}
-									form.limit.value = size;
-									form.limitstart.value = 0;
-									return bfPiecesSubmitList(false);
-								}
-
-								function bfPiecesGotoPageFromInput()
-								{
-									var input = document.getElementById('bfPiecesGotoPage');
-									if (!input) {
-										return false;
-									}
-									return bfPiecesGoToPage(input.value);
-								}
-
 			<?php
 
 			ToolBarHelper::custom('new', 'new.png', 'new_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_NEW'), false);
@@ -779,30 +721,6 @@ class Renderer
 					return false;
 				} // listItemTask
 				window.listItemTask = listItemTask;
-
-				document.addEventListener('DOMContentLoaded', function() {
-					var form = document.getElementById('adminForm');
-					if (!form) { return; }
-					var setValue = function(name, value) {
-						var el = form.elements[name];
-						if (el) { el.value = value; }
-					};
-					document.querySelectorAll('#adminForm .js-stools-column-order').forEach(function(link) {
-						link.addEventListener('click', function(event) {
-							event.preventDefault();
-							var order = String(link.getAttribute('data-order') || '');
-							var dir = String(link.getAttribute('data-direction') || 'ASC').toUpperCase();
-							setValue('filter_order', order);
-							setValue('filter_order_Dir', dir.toLowerCase());
-							setValue('list[ordering]', order);
-							setValue('list[direction]', dir.toLowerCase());
-							setValue('list[fullordering]', order !== '' ? (order + ' ' + dir) : '');
-							setValue('limitstart', 0);
-							setValue('list[start]', 0);
-							form.submit();
-						});
-					});
-				});
 
 				//-->
 			</script>
@@ -850,30 +768,30 @@ class Renderer
 				<thead>
 				<tr>
 					<th class="w-1 text-nowrap">
-						<?php echo HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ID', 'a.id', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('grid.sort', 'JGRID_HEADING_ID', 'a.id', $listDirn, $listOrder); ?>
 					</th>
 					<th class="w-1 text-center"><input class="form-check-input" type="checkbox" name="toggle" value=""
 							onclick="Joomla.checkAll(this);" /></th>
 					<th>
-						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_PIECES_PACKAGE', 'a.package', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('grid.sort', 'COM_BREEZINGFORMSNG_PIECES_PACKAGE', 'a.package', $listDirn, $listOrder); ?>
 					</th>
 					<th>
-						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_PIECES_TITLE', 'a.title', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('grid.sort', 'COM_BREEZINGFORMSNG_PIECES_TITLE', 'a.title', $listDirn, $listOrder); ?>
 					</th>
 					<th>
-						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_PIECES_NAME', 'a.name', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('grid.sort', 'COM_BREEZINGFORMSNG_PIECES_NAME', 'a.name', $listDirn, $listOrder); ?>
 					</th>
 					<th>
-						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_PIECES_TYPE', 'a.type', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('grid.sort', 'COM_BREEZINGFORMSNG_PIECES_TYPE', 'a.type', $listDirn, $listOrder); ?>
 					</th>
 					<th>
-						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_PIECES_DESCRIPTION', 'a.description', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('grid.sort', 'COM_BREEZINGFORMSNG_PIECES_DESCRIPTION', 'a.description', $listDirn, $listOrder); ?>
 					</th>
 					<th class="text-nowrap">
-						<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_MODIFIED', 'a.modified', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('grid.sort', 'JGLOBAL_MODIFIED', 'a.modified', $listDirn, $listOrder); ?>
 					</th>
 					<th class="w-1 text-center">
-						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_PIECES_PUBLISHED', 'a.published', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('grid.sort', 'COM_BREEZINGFORMSNG_PIECES_PUBLISHED', 'a.published', $listDirn, $listOrder); ?>
 					</th>
 				</tr>
 				</thead>
@@ -941,24 +859,7 @@ class Renderer
 				<tfoot>
 					<tr>
 						<td colspan="9">
-							<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
-								<div class="d-flex flex-wrap align-items-center gap-2">
-									<?php echo $pagination ? $pagination->getPagesCounter() : ($total > 0 ? ('Showing ' . (int) $startNo . '-' . (int) $endNo . ' of ' . (int) $total) : ''); ?>
-									<span><?php echo BFText::_('COM_BREEZINGFORMSNG_DISPLAY_NUM'); ?></span>
-									<span class="d-inline-block">
-										<select name="list[limit]" class="form-select js-select-submit-on-change active" id="list_limit" onchange="document.adminForm.submit();">
-											<?php foreach ($pageSizes as $pageSize) { ?>
-												<option value="<?php echo (int) $pageSize; ?>"<?php echo (int) $pageSize === (int) $limit ? ' selected="selected"' : ''; ?>><?php echo (int) $pageSize; ?></option>
-											<?php } ?>
-										</select>
-									</span>
-									<span><?php echo BFText::_('COM_BREEZINGFORMSNG_OF'); ?></span>
-									<span><?php echo (int) $total; ?></span>
-								</div>
-								<div>
-									<?php echo $pagination ? $pagination->getPagesLinks() : ''; ?>
-								</div>
-							</div>
+							<?php echo $pagination ? $pagination->getPaginationLinks('joomla.pagination.links', ['showLimitBox' => true]) : ''; ?>
 						</td>
 					</tr>
 				</tfoot>
@@ -968,14 +869,9 @@ class Renderer
 				<input type="hidden" name="option" value="<?php echo $option; ?>" />
 				<input type="hidden" name="view" value="pieces" />
 				<input type="hidden" name="task" value="" />
-				<input type="hidden" name="limitstart" value="<?php echo (int) $limitstart; ?>" />
-				<input type="hidden" name="list[start]" value="<?php echo (int) $limitstart; ?>" />
 				<input type="hidden" name="pkg" value="<?php echo htmlspecialchars($pkg, ENT_QUOTES); ?>" />
 				<input type="hidden" name="filter_order" value="<?php echo htmlspecialchars($listOrder, ENT_QUOTES); ?>" />
 				<input type="hidden" name="filter_order_Dir" value="<?php echo htmlspecialchars($listDirn, ENT_QUOTES); ?>" />
-				<input type="hidden" name="list[ordering]" value="<?php echo htmlspecialchars($listOrder, ENT_QUOTES); ?>" />
-				<input type="hidden" name="list[direction]" value="<?php echo htmlspecialchars($listDirn, ENT_QUOTES); ?>" />
-				<input type="hidden" id="list_fullordering" name="list[fullordering]" value="<?php echo htmlspecialchars($fullOrdering, ENT_QUOTES); ?>" />
 				<?php echo HTMLHelper::_('form.token'); ?>
 			</form>
 		<?php

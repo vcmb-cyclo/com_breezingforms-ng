@@ -18,7 +18,6 @@ Renderer::listitems(
     $this->total,
     $this->limit,
     $this->limitStart,
-    $this->pageSizes,
     $this->pagination,
     $this->listOrder,
     $this->listDirn,

@@ -118,7 +118,7 @@ class DisplayController extends BaseController
     {
         $input = Factory::getApplication()->getInput();
         $section = match ($act) {
-            'managerecs', 'recordmanagement', '' => Text::_('COM_BREEZINGFORMSNG_MANAGERECS'),
+            'managerecs', 'recordmanagement', '' => Text::_('COM_BREEZINGFORMSNG_RECORDS_SECTION_TITLE'),
             'manageforms', 'easymode', 'quickmode' => Text::_('COM_BREEZINGFORMSNG_MANAGEFORMS'),
             'managescripts' => Text::_('COM_BREEZINGFORMSNG_MANAGESCRIPTS'),
             'managepieces' => Text::_('COM_BREEZINGFORMSNG_MANAGEPIECES'),

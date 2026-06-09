@@ -902,6 +902,9 @@ class bfRecordManagement
 
         HTMLHelper::_('behavior.keepalive');
 
+        $bfListPageTitle = BFText::_('COM_BREEZINGFORMSNG') . ' / ' . BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_MANAGERECS');
+        Factory::getApplication()->getDocument()->setTitle(strip_tags($bfListPageTitle));
+        ToolbarHelper::title($bfListPageTitle, 'logo_left');
 
         ToolBarHelper::custom('exportPdf', 'download', 'download', BFText::_('COM_BREEZINGFORMSNG_PDF'), false);
         ToolBarHelper::custom('exportCsv', 'download', 'download', BFText::_('COM_BREEZINGFORMSNG_CSV'), false);
@@ -912,6 +915,7 @@ class bfRecordManagement
         ToolBarHelper::custom('archived', 'archive', 'archive', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_ARCHIVE'), false);
         ToolBarHelper::custom('remove', 'delete.png', 'delete_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_DELETE'), false);
 
+        Factory::getApplication()->getDocument()->getWebAssetManager()->useScript('table.columns');
         $this->renderNativeRecordsList();
         return;
 
@@ -2056,6 +2060,7 @@ class bfRecordManagement
     private function renderNativeRecordsList(): void
     {
         $app = Factory::getApplication();
+        $session = $app->getSession();
         $db = Factory::getContainer()->get(DatabaseInterface::class);
         $wa = $app->getDocument()->getWebAssetManager();
 
@@ -2065,6 +2070,42 @@ class bfRecordManagement
         $searchTerm = trim((string) BFRequest::getVar('searchterm', ''));
         $limit = max(1, BFRequest::getInt('limit', 20));
         $limitStart = max(0, BFRequest::getInt('limitstart', 0));
+
+        $allowedSorts = [
+            'records.id' => 'records.id',
+            'records.submitted' => 'records.submitted',
+            'forms.title' => 'forms.title',
+            'records.ip' => 'records.ip',
+            'records.username' => 'records.username',
+            'records.viewed' => 'records.viewed',
+            'records.exported' => 'records.exported',
+            'records.archived' => 'records.archived',
+        ];
+
+        $filterOrderInput = trim((string) BFRequest::getVar('filter_order', ''));
+        $filterOrderDirInput = strtoupper(trim((string) BFRequest::getVar('filter_order_Dir', '')));
+
+        if (isset($allowedSorts[$filterOrderInput])) {
+            $listOrder = $filterOrderInput;
+            $session->set('bf.records_sort', $listOrder);
+        } else {
+            $listOrder = (string) $session->get('bf.records_sort', 'records.submitted');
+            if (!isset($allowedSorts[$listOrder])) {
+                $listOrder = 'records.submitted';
+            }
+        }
+
+        if ($filterOrderDirInput !== '') {
+            $listDirn = $filterOrderDirInput === 'ASC' ? 'asc' : 'desc';
+            $session->set('bf.records_dir', $listDirn);
+        } else {
+            $listDirn = strtolower((string) $session->get('bf.records_dir', 'desc'));
+            $listDirn = $listDirn === 'asc' ? 'asc' : 'desc';
+        }
+
+        $orderSql = $allowedSorts[$listOrder] . ' ' . strtoupper($listDirn)
+            . ($listOrder !== 'records.id' ? ', records.id ' . strtoupper($listDirn) : '');
+        $fullOrdering = $listOrder . ' ' . strtoupper($listDirn);
 
         $db->setQuery("Select id, title, name From #__facileforms_forms Order By `title`");
         $forms = $db->loadAssocList();
@@ -2105,7 +2146,7 @@ class bfRecordManagement
             . ' From #__facileforms_records As records'
             . ' Inner Join #__facileforms_forms As forms On forms.id = records.form'
             . $whereSql
-            . ' Order By records.submitted Desc, records.id Desc',
+            . ' Order By ' . $orderSql,
             $limitStart,
             $limit
         );
@@ -2146,21 +2187,22 @@ class bfRecordManagement
                 </div>
             </div>
 
-            <table class="table itemList">
+            <div class="table-responsive">
+            <table class="table table-striped itemList" id="bfRecordsList" data-name="breezingformsng-records">
                 <caption class="visually-hidden"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_MANAGERECS'), ENT_QUOTES, 'UTF-8'); ?></caption>
                 <thead>
                     <tr>
                         <th class="w-1 text-center">
                             <input type="checkbox" id="bfRecordsCheckAll" onclick="document.querySelectorAll('#adminForm input[name=&quot;cid[]&quot;]').forEach(function(box){ box.checked = document.getElementById('bfRecordsCheckAll').checked; });">
                         </th>
-                        <th><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_ID'), ENT_QUOTES, 'UTF-8'); ?></th>
-                        <th><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_SUBMITTED'), ENT_QUOTES, 'UTF-8'); ?></th>
-                        <th><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_TITLE'), ENT_QUOTES, 'UTF-8'); ?></th>
-                        <th><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_IP'), ENT_QUOTES, 'UTF-8'); ?></th>
-                        <th><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME'), ENT_QUOTES, 'UTF-8'); ?></th>
-                        <th class="text-center"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_VIEWED'), ENT_QUOTES, 'UTF-8'); ?></th>
-                        <th class="text-center"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_EXPORTED'), ENT_QUOTES, 'UTF-8'); ?></th>
-                        <th class="text-center"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_RECORDS_ARCHIVED'), ENT_QUOTES, 'UTF-8'); ?></th>
+                        <th class="w-1 text-nowrap"><?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_ID', 'records.id', $listDirn, $listOrder); ?></th>
+                        <th class="text-nowrap"><?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_RECORDS_SUBMITTED', 'records.submitted', $listDirn, $listOrder); ?></th>
+                        <th><?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_RECORDS_TITLE', 'forms.title', $listDirn, $listOrder); ?></th>
+                        <th><?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_IP', 'records.ip', $listDirn, $listOrder); ?></th>
+                        <th><?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME', 'records.username', $listDirn, $listOrder); ?></th>
+                        <th class="text-center"><?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_RECORDS_VIEWED', 'records.viewed', $listDirn, $listOrder); ?></th>
+                        <th class="text-center"><?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_RECORDS_EXPORTED', 'records.exported', $listDirn, $listOrder); ?></th>
+                        <th class="text-center"><?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_RECORDS_ARCHIVED', 'records.archived', $listDirn, $listOrder); ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -2205,10 +2247,15 @@ class bfRecordManagement
                 </tbody>
             </table>
 
+            </div>
+
             <?php echo $this->renderNativePagination($total, $limitStart, $limit, $formSelection, $searchTerm); ?>
 
             <input type="hidden" name="task" value="">
             <input type="hidden" name="boxchecked" value="0">
+            <input type="hidden" name="filter_order" value="<?php echo htmlspecialchars($listOrder, ENT_QUOTES, 'UTF-8'); ?>">
+            <input type="hidden" name="filter_order_Dir" value="<?php echo htmlspecialchars($listDirn, ENT_QUOTES, 'UTF-8'); ?>">
+            <input type="hidden" id="list_fullordering" name="list[fullordering]" value="<?php echo htmlspecialchars($fullOrdering, ENT_QUOTES, 'UTF-8'); ?>">
             <?php echo HTMLHelper::_('form.token'); ?>
         </form>
 
@@ -2224,6 +2271,27 @@ class bfRecordManagement
                 form.submit();
                 return true;
             };
+
+            document.addEventListener('DOMContentLoaded', function() {
+                var form = document.getElementById('adminForm');
+                if (!form) { return; }
+                var setValue = function(name, value) {
+                    var el = form.elements[name];
+                    if (el) { el.value = value; }
+                };
+                document.querySelectorAll('#adminForm .js-stools-column-order').forEach(function(link) {
+                    link.addEventListener('click', function(event) {
+                        event.preventDefault();
+                        var order = String(link.getAttribute('data-order') || '');
+                        var dir = String(link.getAttribute('data-direction') || 'DESC').toUpperCase();
+                        setValue('filter_order', order);
+                        setValue('filter_order_Dir', dir.toLowerCase());
+                        setValue('list[fullordering]', order !== '' ? (order + ' ' + dir) : '');
+                        setValue('limitstart', 0);
+                        form.submit();
+                    });
+                });
+            });
         </script>
         <?php
     }

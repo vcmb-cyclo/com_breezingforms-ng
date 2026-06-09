@@ -60,14 +60,23 @@ class PieceModel extends LegacyPackageModel
             $session->set('bf.pieces_search', $search);
         }
 
-        if (!$input->exists('sort')) {
-            $sort = (string) $session->get('bf.pieces_sort', 'name');
+        $filterOrderInput = trim($input->getString('filter_order', ''));
+        $filterOrderDirInput = strtoupper(trim($input->getString('filter_order_Dir', '')));
+
+        if ($filterOrderInput !== '') {
+            $sort = $filterOrderInput;
+            $session->set('bf.pieces_sort', $sort);
+        } elseif (!$input->exists('sort')) {
+            $sort = (string) $session->get('bf.pieces_sort', 'a.name');
         } else {
-            $sort = $input->getCmd('sort', 'name');
+            $sort = $input->getCmd('sort', 'a.name');
             $session->set('bf.pieces_sort', $sort);
         }
 
-        if (!$input->exists('dir')) {
+        if ($filterOrderDirInput !== '') {
+            $direction = $filterOrderDirInput === 'DESC' ? 'DESC' : 'ASC';
+            $session->set('bf.pieces_dir', $direction);
+        } elseif (!$input->exists('dir')) {
             $direction = strtoupper((string) $session->get('bf.pieces_dir', 'ASC'));
         } else {
             $direction = strtoupper($input->getCmd('dir', 'ASC'));
@@ -75,6 +84,15 @@ class PieceModel extends LegacyPackageModel
         }
 
         $direction = $direction === 'DESC' ? 'DESC' : 'ASC';
+
+        $filterStateInput = strtoupper(trim($input->getString('filter_state', '')));
+        if ($input->exists('filter_state')) {
+            $filterState = in_array($filterStateInput, ['P', 'U'], true) ? $filterStateInput : '';
+            $session->set('bf.pieces_filter_state', $filterState);
+        } else {
+            $filterState = (string) $session->get('bf.pieces_filter_state', '');
+        }
+
         $pageSizes = [10, 25, 50, 100, 250, 500, 1000, 5000, 10000, 100000];
         $list = (array) $input->get('list', [], 'array');
         $limitRequest = isset($list['limit']) ? (int) $list['limit'] : $input->getInt('limit', -1);
@@ -94,8 +112,11 @@ class PieceModel extends LegacyPackageModel
         $limitStart = $limitStartRequest >= 0 ? $limitStartRequest : (int) $session->get('bf.pieces_limitstart', 0);
         $limitStart = max(0, $limitStart);
 
-        $listData = $this->getListData($package, $search, $sort, $direction, $limit, $limitStart, (bool) $showInternal);
+        $listData = $this->getListData($package, $search, $sort, $direction, $limit, $limitStart, (bool) $showInternal, $filterState);
         $session->set('bf.pieces_limitstart', $listData['limitstart']);
+
+        $listOrder = (string) $this->getState('list.ordering', 'a.name');
+        $listDirn = strtolower((string) $this->getState('list.direction', 'asc'));
 
         return [
             'package' => $package,
@@ -108,6 +129,9 @@ class PieceModel extends LegacyPackageModel
             'pageSizes' => $pageSizes,
             'rows' => $listData['rows'],
             'pagination' => $listData['pagination'],
+            'listOrder' => $listOrder,
+            'listDirn' => $listDirn,
+            'filterState' => $filterState,
         ];
     }
 

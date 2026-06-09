@@ -13,7 +13,6 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Scripts;
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
-use BFRequest;
 use BFText;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Editor\Editor;
@@ -843,24 +842,13 @@ class Renderer
 		return '???';
 	} // typeName
 
-	static function listitems($option, &$rows, &$pkglist, $pkg, $search, $total, $limit, $limitstart, $pageSizes, $pagination = null)
+	static function listitems($option, &$rows, &$pkglist, $pkg, $search, $total, $limit, $limitstart, $pageSizes, $pagination = null, $listOrder = 'a.name', $listDirn = 'asc', $filterState = '')
 	{
 		global $ff_config, $ff_version;
-		$sort = BFRequest::getCmd('sort', 'name');
-		$dir = strtoupper(BFRequest::getCmd('dir', 'ASC'));
-		$dir = $dir === 'DESC' ? 'DESC' : 'ASC';
-		$baseQuery = 'index.php?option=' . $option .
-			'&view=scripts' .
-			'&pkg=' . urlencode($pkg) .
-			'&search=' . urlencode($search) .
-			'&limit=' . (int) $limit .
-			'&limitstart=' . (int) $limitstart;
-		$toggleDir = function ($column) use ($sort, $dir) {
-			if ($sort === $column) {
-				return $dir === 'ASC' ? 'DESC' : 'ASC';
-			}
-			return 'ASC';
-		};
+		$listOrder = (string) $listOrder;
+		$listDirn = strtolower((string) $listDirn);
+		$listDirn = $listDirn === 'desc' ? 'desc' : 'asc';
+		$fullOrdering = trim($listOrder . ' ' . strtoupper($listDirn));
 		$pageCount = $limit > 0 ? (int) ceil($total / $limit) : 1;
 		$pageCount = max(1, $pageCount);
 		$currentPage = $limit > 0 ? ((int) floor($limitstart / $limit) + 1) : 1;
@@ -995,6 +983,30 @@ class Renderer
 			} // listItemTask
 			window.listItemTask = listItemTask;
 
+			document.addEventListener('DOMContentLoaded', function() {
+				var form = document.getElementById('adminForm');
+				if (!form) { return; }
+				var setValue = function(name, value) {
+					var el = form.elements[name];
+					if (el) { el.value = value; }
+				};
+				document.querySelectorAll('#adminForm .js-stools-column-order').forEach(function(link) {
+					link.addEventListener('click', function(event) {
+						event.preventDefault();
+						var order = String(link.getAttribute('data-order') || '');
+						var dir = String(link.getAttribute('data-direction') || 'ASC').toUpperCase();
+						setValue('filter_order', order);
+						setValue('filter_order_Dir', dir.toLowerCase());
+						setValue('list[ordering]', order);
+						setValue('list[direction]', dir.toLowerCase());
+						setValue('list[fullordering]', order !== '' ? (order + ' ' + dir) : '');
+						setValue('limitstart', 0);
+						setValue('list[start]', 0);
+						form.submit();
+					});
+				});
+			});
+
 			//-->
 		</script>
 		<form action="index.php?option=<?php echo htmlspecialchars($option, ENT_QUOTES); ?>&amp;view=scripts" method="post" name="adminForm" id="adminForm">
@@ -1022,88 +1034,85 @@ class Renderer
 						value="<?php echo htmlspecialchars($search, ENT_QUOTES); ?>" onchange="return bfScriptsSubmitList(true);"
 						onkeydown="if(event.key==='Enter'){event.preventDefault();bfScriptsSubmitList(true);}" />
 				</label>
+				<label class="bfPackageSelector">
+					<select name="filter_state" id="filter_state" class="inputbox form-select form-select-sm"
+						onchange="return bfScriptsSubmitList(true);">
+						<option value=""><?php echo BFText::_('JOPTION_SELECT_PUBLISHED'); ?></option>
+						<option value="P"<?php echo $filterState === 'P' ? ' selected="selected"' : ''; ?>><?php echo BFText::_('JPUBLISHED'); ?></option>
+						<option value="U"<?php echo $filterState === 'U' ? ' selected="selected"' : ''; ?>><?php echo BFText::_('JUNPUBLISHED'); ?></option>
+					</select>
+				</label>
 			<div style="clear: both;"></div>
 
-				<div class="jtable-main-container bf-manage-list-pagination-container" id="bfScriptsPaginationContainer">
-				<table cellpadding="4" cellspacing="0" border="0" width="100%" class="adminlist table table-striped">
+				<div class="jtable-main-container bf-manage-list-pagination-container table-responsive" id="bfScriptsPaginationContainer">
+				<table class="adminlist table table-striped" id="bfScriptsList" data-name="breezingformsng-scripts">
+				<thead>
 				<tr>
-					<th style="width: 25px;" nowrap align="right">
-						<a href="<?php echo $baseQuery . '&sort=id&dir=' . $toggleDir('id'); ?>">ID</a>
+					<th class="w-1 text-nowrap">
+						<?php echo HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ID', 'a.id', $listDirn, $listOrder); ?>
 					</th>
-					<th style="width: 25px;" nowrap align="center"><input type="checkbox" name="toggle" value=""
+					<th class="w-1 text-center"><input class="form-check-input" type="checkbox" name="toggle" value=""
 							onclick="Joomla.checkAll(this);" /></th>
-					<th align="left">
-						<a href="<?php echo $baseQuery . '&sort=package&dir=' . $toggleDir('package'); ?>">
-							<?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_PACKAGE'); ?>
-						</a>
+					<th>
+						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_SCRIPTS_PACKAGE', 'a.package', $listDirn, $listOrder); ?>
 					</th>
-					<th align="left">
-						<a href="<?php echo $baseQuery . '&sort=title&dir=' . $toggleDir('title'); ?>">
-							<?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_TITLE'); ?>
-						</a>
+					<th>
+						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_SCRIPTS_TITLE', 'a.title', $listDirn, $listOrder); ?>
 					</th>
-					<th align="left">
-						<a href="<?php echo $baseQuery . '&sort=name&dir=' . $toggleDir('name'); ?>">
-							<?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_NAME'); ?>
-						</a>
+					<th>
+						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_SCRIPTS_NAME', 'a.name', $listDirn, $listOrder); ?>
 					</th>
-					<th align="left">
-						<a href="<?php echo $baseQuery . '&sort=type&dir=' . $toggleDir('type'); ?>">
-							<?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_TYPE'); ?>
-						</a>
+					<th>
+						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_SCRIPTS_TYPE', 'a.type', $listDirn, $listOrder); ?>
 					</th>
-					<th align="left">
-						<a href="<?php echo $baseQuery . '&sort=description&dir=' . $toggleDir('description'); ?>">
-							<?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_DESCRIPTION'); ?>
-						</a>
+					<th>
+						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_SCRIPTS_DESCRIPTION', 'a.description', $listDirn, $listOrder); ?>
 					</th>
-					<th align="left">
-						<a href="<?php echo $baseQuery . '&sort=modified&dir=' . $toggleDir('modified'); ?>">
-							<?php echo BFText::_('JGLOBAL_MODIFIED'); ?>
-						</a>
+					<th class="text-nowrap">
+						<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_MODIFIED', 'a.modified', $listDirn, $listOrder); ?>
 					</th>
-					<th align="center">
-						<a href="<?php echo $baseQuery . '&sort=published&dir=' . $toggleDir('published'); ?>">
-							<?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_PUBLISHED'); ?>
-						</a>
+					<th class="w-1 text-center">
+						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_SCRIPTS_PUBLISHED', 'a.published', $listDirn, $listOrder); ?>
 					</th>
 				</tr>
-				<?php
-				$k = 0;
+				</thead>
+				<tbody>
+				<?php if (count($rows) === 0) { ?>
+					<tr><td colspan="9" class="text-center text-muted py-4"><?php echo BFText::_('JGLOBAL_NO_MATCHING_RESULTS'); ?></td></tr>
+				<?php } else {
 				for ($i = 0; $i < count($rows); $i++) {
 					$row = $rows[$i];
 					$desc = $row->description;
 					if (strlen($desc) > $ff_config->limitdesc)
 						$desc = substr($desc, 0, $ff_config->limitdesc) . '...';
+					$editLink = 'index.php?option=' . htmlspecialchars($option, ENT_QUOTES) . '&amp;view=scripts&amp;task=scripts.edit&amp;pkg=' . urlencode($pkg) . '&amp;ids[]=' . (int) $row->id;
 					?>
-					<tr class="row<?php echo $k; ?>">
-						<td nowrap valign="top" align="right">
-							<?php echo $row->id; ?>
+					<tr>
+						<td class="text-nowrap">
+							<?php echo (int) $row->id; ?>
 						</td>
-						<td nowrap valign="top" align="center"><input type="checkbox" id="cb<?php echo $i; ?>" name="ids[]"
+						<td class="text-center"><input class="form-check-input" type="checkbox" id="cb<?php echo $i; ?>" name="ids[]"
 								value="<?php echo $row->id; ?>" onclick="Joomla.isChecked(this.checked);" /></td>
-						<td valign="top" align="left">
+						<td>
 							<?php echo htmlspecialchars((string) $row->package, ENT_QUOTES); ?>
 						</td>
-						<td valign="top" align="left"><a href="index.php?option=<?php echo htmlspecialchars($option, ENT_QUOTES); ?>&amp;view=scripts&amp;task=scripts.edit&amp;pkg=<?php echo urlencode($pkg); ?>&amp;ids[]=<?php echo (int) $row->id; ?>">
-								<?php echo $row->title; ?>
-							</a></td>
-						<td valign="top" align="left">
-							<?php echo $row->name; ?>
+						<td><a href="<?php echo $editLink; ?>"><?php echo htmlspecialchars((string) $row->title, ENT_QUOTES); ?></a></td>
+						<td>
+							<a href="<?php echo $editLink; ?>"><?php echo htmlspecialchars((string) $row->name, ENT_QUOTES); ?></a>
 						</td>
-						<td valign="top" align="left">
+						<td>
 							<?php echo self::typeName($row->type); ?>
 						</td>
-						<td valign="top" align="left">
+						<td>
 							<?php echo htmlspecialchars($desc, ENT_QUOTES); ?>
 						</td>
-						<td valign="top" align="left">
+						<td class="text-nowrap">
 							<?php
 							$lastModified = $row->modified ?? $row->created ?? '';
 							echo $lastModified ? HTMLHelper::date($lastModified, 'Y-m-d H:i') : '-';
 							?>
 						</td>
-						<td valign="top" align="center">
+						<td class="text-center">
 							<?php
 							if ($row->published == "1") {
 								?><a class="tbody-icon active" href="javascript:void(0);"
@@ -1120,9 +1129,9 @@ class Renderer
 						</td>
 					</tr>
 					<?php
-					$k = 1 - $k;
 				} // for
-				?>
+				} // if count ?>
+				</tbody>
 				<tfoot>
 					<tr>
 						<td colspan="9">
@@ -1156,6 +1165,11 @@ class Renderer
 				<input type="hidden" name="limitstart" value="<?php echo (int) $limitstart; ?>" />
 				<input type="hidden" name="list[start]" value="<?php echo (int) $limitstart; ?>" />
 				<input type="hidden" name="pkg" value="<?php echo htmlspecialchars($pkg, ENT_QUOTES); ?>" />
+				<input type="hidden" name="filter_order" value="<?php echo htmlspecialchars($listOrder, ENT_QUOTES); ?>" />
+				<input type="hidden" name="filter_order_Dir" value="<?php echo htmlspecialchars($listDirn, ENT_QUOTES); ?>" />
+				<input type="hidden" name="list[ordering]" value="<?php echo htmlspecialchars($listOrder, ENT_QUOTES); ?>" />
+				<input type="hidden" name="list[direction]" value="<?php echo htmlspecialchars($listDirn, ENT_QUOTES); ?>" />
+				<input type="hidden" id="list_fullordering" name="list[fullordering]" value="<?php echo htmlspecialchars($fullOrdering, ENT_QUOTES); ?>" />
 				<?php echo HTMLHelper::_('form.token'); ?>
 			</form>
 		<?php

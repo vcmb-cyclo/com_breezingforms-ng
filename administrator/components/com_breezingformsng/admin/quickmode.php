@@ -13,6 +13,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\Filesystem\File;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Database\DatabaseInterface;
 
@@ -133,6 +134,14 @@ switch ($task) {
 			$formEmailadr = $fOptions->emailadr;
 			$formDesc = $fOptions->description;
 		}
+
+		$_bfSectionTitle = BFText::_('COM_BREEZINGFORMSNG_MANAGEFORMS');
+		if ($formTitle !== '') {
+			$_bfSectionTitle .= ' / ' . htmlspecialchars($formTitle, ENT_QUOTES, 'UTF-8');
+		}
+		$_bfPageTitle = BFText::_('COM_BREEZINGFORMSNG') . ' / ' . $_bfSectionTitle;
+		Factory::getApplication()->getDocument()->setTitle(strip_tags($_bfPageTitle));
+		ToolbarHelper::title($_bfPageTitle, 'logo_left');
 
 		$root = "{
 			      	attributes: {

@@ -129,7 +129,7 @@ abstract class LegacyPackageModel extends ListModel
         $this->setState('filter.state', $filterState);
         $this->setState('list.ordering', $this->normaliseSortField($sort));
         $this->setState('list.direction', strtoupper($direction) === 'DESC' ? 'DESC' : 'ASC');
-        $this->setState('list.limit', max(1, $limit));
+        $this->setState('list.limit', max(0, $limit));
         $this->setState('list.start', max(0, $limitStart));
         $this->setState('list.links', 0);
 

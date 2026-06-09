@@ -1226,11 +1226,11 @@ class com_breezingformsngInstallerScript
             }
 
             $items = [
-                ['COM_BREEZINGFORMSNG_MANAGE_RECORDS', 'breezingformsng-records', 'managerecs', []],
+                ['COM_BREEZINGFORMSNG_MANAGE_RECORDS', 'breezingformsng-records', 'act=managerecs', []],
                 [
                     'COM_BREEZINGFORMSNG_MANAGE_FORMS',
                     'breezingformsng-forms',
-                    'manageforms',
+                    'act=manageforms',
                     [
                         'menu-quicktask' => 'index.php?option=' . self::TARGET_COMPONENT . '&act=manageforms&task=quickmode',
                         'menu-quicktask-title' => 'COM_BREEZINGFORMSNG_MENUS_NEW_FORM',
@@ -1240,9 +1240,9 @@ class com_breezingformsngInstallerScript
                 [
                     'COM_BREEZINGFORMSNG_MANAGE_SCRIPTS',
                     'breezingformsng-scripts',
-                    'managescripts',
+                    'view=scripts',
                     [
-                        'menu-quicktask' => 'index.php?option=' . self::TARGET_COMPONENT . '&act=managescripts&task=new',
+                        'menu-quicktask' => 'index.php?option=' . self::TARGET_COMPONENT . '&view=scripts&task=scripts.add',
                         'menu-quicktask-title' => 'COM_BREEZINGFORMSNG_MENUS_NEW_SCRIPT',
                         'menu-quicktask-icon' => 'plus',
                     ],
@@ -1250,9 +1250,9 @@ class com_breezingformsngInstallerScript
                 [
                     'COM_BREEZINGFORMSNG_MANAGE_PIECES',
                     'breezingformsng-pieces',
-                    'managepieces',
+                    'view=pieces',
                     [
-                        'menu-quicktask' => 'index.php?option=' . self::TARGET_COMPONENT . '&act=managepieces&task=new',
+                        'menu-quicktask' => 'index.php?option=' . self::TARGET_COMPONENT . '&view=pieces&task=pieces.add',
                         'menu-quicktask-title' => 'COM_BREEZINGFORMSNG_MENUS_NEW_PIECE',
                         'menu-quicktask-icon' => 'plus',
                     ],
@@ -1260,21 +1260,21 @@ class com_breezingformsngInstallerScript
                 [
                     'COM_BREEZINGFORMSNG_INTEGRATOR',
                     'breezingformsng-integrator',
-                    'integrate',
+                    'act=integrate',
                     [
                         'menu-quicktask' => 'index.php?option=' . self::TARGET_COMPONENT . '&act=integrate&task=add',
                         'menu-quicktask-title' => 'COM_BREEZINGFORMSNG_MENUS_NEW_INTEGRATION',
                         'menu-quicktask-icon' => 'plus',
                     ],
                 ],
-                ['COM_BREEZINGFORMSNG_CONFIGURATION', 'breezingformsng-configuration', 'configuration', []],
-                ['COM_BREEZINGFORMSNG_ABOUT', 'breezingformsng-about', 'about', []],
+                ['COM_BREEZINGFORMSNG_CONFIGURATION', 'breezingformsng-configuration', 'act=configuration', []],
+                ['COM_BREEZINGFORMSNG_ABOUT', 'breezingformsng-about', 'act=about', []],
             ];
 
             $checked = 0;
 
-            foreach ($items as [$title, $alias, $act, $params]) {
-                $link = 'index.php?option=' . self::TARGET_COMPONENT . '&act=' . $act;
+            foreach ($items as [$title, $alias, $route, $params]) {
+                $link = 'index.php?option=' . self::TARGET_COMPONENT . '&' . $route;
 
                 $db->setQuery(
                     $db->getQuery(true)

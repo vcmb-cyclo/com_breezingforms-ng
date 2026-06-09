@@ -197,29 +197,6 @@ overflow:hidden;width: 100%;
     border-left-color: #0088CC;
 }
 
-/* Record Manager */
-
-#bfFormSelection{
-    float: left;
-    margin-right: 10px;
-    margin-top: 7px;
-}
-
-#bfFormSelection{
-    max-width: 50% !important;
-}
-
-@media (max-width: 767px) {
-    #bfFormSelection{
-        float: none;
-        margin-right: 0;
-        margin-top: 7px;
-        width: 100%;
-        max-width: 100% !important;
-    }
-}
-
-
 /* Available Fields */
 
 #bfAvailableFieldsMenu{

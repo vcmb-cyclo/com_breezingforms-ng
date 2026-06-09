@@ -298,7 +298,6 @@ class bfRecordManagement
         $recordRows = $this->getEditableRecordRows((int) $record->id, (int) $record->form, (string) $record->name);
         $submitted = Factory::getDate($record->submitted, $this->tz)->format('Y-m-d H:i:s', true);
         $formSelection = BFRequest::getInt('form_selection', 0);
-        $backUrl = 'index.php?option=com_breezingformsng&act=managerecs&form_selection=' . $formSelection;
         ?>
         <form action="index.php?option=com_breezingformsng&act=managerecs" method="post" name="adminForm" id="adminForm">
             <div class="row">
@@ -336,12 +335,6 @@ class bfRecordManagement
                             </tr>
                         </tbody>
                     </table>
-                    <a class="btn btn-secondary" href="<?php echo $backUrl; ?>">
-                        <?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_CANCEL'), ENT_QUOTES, 'UTF-8'); ?>
-                    </a>
-                    <button type="submit" class="btn btn-primary">
-                        <?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_SAVE'), ENT_QUOTES, 'UTF-8'); ?>
-                    </button>
                 </div>
                 <div class="col-12 col-lg-8">
                     <table class="table itemList">
@@ -902,7 +895,7 @@ class bfRecordManagement
 
         HTMLHelper::_('behavior.keepalive');
 
-        $bfListPageTitle = BFText::_('COM_BREEZINGFORMSNG') . ' / ' . BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_MANAGERECS');
+        $bfListPageTitle = BFText::_('COM_BREEZINGFORMSNG') . ' / ' . BFText::_('COM_BREEZINGFORMSNG_RECORDS_SECTION_TITLE');
         Factory::getApplication()->getDocument()->setTitle(strip_tags($bfListPageTitle));
         ToolbarHelper::title($bfListPageTitle, 'logo_left');
 
@@ -2155,33 +2148,37 @@ class bfRecordManagement
         $action = 'index.php?option=com_breezingformsng&act=managerecs';
         ?>
         <form action="<?php echo $action; ?>" method="post" name="adminForm" id="adminForm">
-            <div class="js-stools clearfix">
-                <div class="js-stools-container-bar">
-                    <div class="btn-toolbar">
-                        <div class="filter-search-bar btn-group">
-                            <label for="bfRecordSearch" class="visually-hidden"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHTEXT'), ENT_QUOTES, 'UTF-8'); ?></label>
-                            <input type="text" name="searchterm" id="bfRecordSearch" class="form-control"
-                                   value="<?php echo htmlentities($searchTerm, ENT_QUOTES, 'UTF-8'); ?>"
-                                   placeholder="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHTEXT'), ENT_QUOTES, 'UTF-8'); ?>">
-                        </div>
-                        <div class="btn-group">
-                            <button type="submit" class="btn btn-primary">
-                                <?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_BUTTONFILTER'), ENT_QUOTES, 'UTF-8'); ?>
-                            </button>
-                            <a class="btn btn-secondary" href="<?php echo $action; ?>">
-                                <?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_BUTTONFILTERRESET'), ENT_QUOTES, 'UTF-8'); ?>
-                            </a>
-                        </div>
-                        <div class="btn-group">
-                            <label for="bfFormSelection" class="visually-hidden"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_ALL'), ENT_QUOTES, 'UTF-8'); ?></label>
-                            <select name="form_selection" id="bfFormSelection" class="form-select" onchange="this.form.submit();">
-                                <option value="0"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_ALL'), ENT_QUOTES, 'UTF-8'); ?></option>
-                                <?php foreach ($forms as $form) : ?>
-                                    <option value="<?php echo (int) $form['id']; ?>"<?php echo (int) $form['id'] === $formSelection ? ' selected' : ''; ?>>
-                                        <?php echo htmlentities($form['title'] . ' (' . $form['name'] . ')', ENT_QUOTES, 'UTF-8'); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
+            <div class="js-stools mb-3">
+                <div class="clearfix">
+                    <div class="js-stools-container-bar">
+                        <div class="btn-toolbar flex-wrap gap-2" role="toolbar">
+                            <div class="input-group input-group-sm" style="max-width: 380px;">
+                                <label for="bfRecordSearch" class="visually-hidden"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHTEXT'), ENT_QUOTES, 'UTF-8'); ?></label>
+                                <input type="text" name="searchterm" id="bfRecordSearch" class="form-control"
+                                       value="<?php echo htmlentities($searchTerm, ENT_QUOTES, 'UTF-8'); ?>"
+                                       placeholder="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_SEARCHTEXT'), ENT_QUOTES, 'UTF-8'); ?>">
+                                <button type="submit" class="btn btn-primary"
+                                        aria-label="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_BUTTONFILTER'), ENT_QUOTES, 'UTF-8'); ?>"
+                                        title="<?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_BUTTONFILTER'), ENT_QUOTES, 'UTF-8'); ?>">
+                                    <span class="icon-search" aria-hidden="true"></span>
+                                    <span class="visually-hidden"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_BUTTONFILTER'), ENT_QUOTES, 'UTF-8'); ?></span>
+                                </button>
+                                <button id="bfRecordsClear" type="button" class="btn btn-outline-secondary"
+                                        onclick="document.getElementById('bfRecordSearch').value='';document.getElementById('bfFormSelection').value='0';document.adminForm.submit();">
+                                    <?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_BUTTONFILTERRESET'), ENT_QUOTES, 'UTF-8'); ?>
+                                </button>
+                            </div>
+                            <div class="btn-group">
+                                <label for="bfFormSelection" class="visually-hidden"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_ALL'), ENT_QUOTES, 'UTF-8'); ?></label>
+                                <select name="form_selection" id="bfFormSelection" class="form-select form-select-sm" onchange="this.form.submit();">
+                                    <option value="0"><?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_ALL'), ENT_QUOTES, 'UTF-8'); ?></option>
+                                    <?php foreach ($forms as $form) : ?>
+                                        <option value="<?php echo (int) $form['id']; ?>"<?php echo (int) $form['id'] === $formSelection ? ' selected' : ''; ?>>
+                                            <?php echo htmlentities($form['title'] . ' (' . $form['name'] . ')', ENT_QUOTES, 'UTF-8'); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>

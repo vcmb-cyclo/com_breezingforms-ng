@@ -93,11 +93,11 @@ class PieceModel extends LegacyPackageModel
             $filterState = (string) $session->get('bf.pieces_filter_state', '');
         }
 
-        $pageSizes = [10, 25, 50, 100, 250, 500, 1000, 5000, 10000, 100000];
+        $pageSizes = [0, 5, 10, 15, 20, 25, 30, 50, 100, 200, 500];
         $list = (array) $input->get('list', [], 'array');
         $limitRequest = isset($list['limit']) ? (int) $list['limit'] : $input->getInt('limit', -1);
 
-        if ($limitRequest > 0 && in_array($limitRequest, $pageSizes, true)) {
+        if ($limitRequest >= 0 && in_array($limitRequest, $pageSizes, true)) {
             $limit = $limitRequest;
             $session->set('bf.pieces_limit', $limit);
         } else {
@@ -126,7 +126,6 @@ class PieceModel extends LegacyPackageModel
             'total' => $listData['total'],
             'limit' => $limit,
             'limitStart' => $listData['limitstart'],
-            'pageSizes' => $pageSizes,
             'rows' => $listData['rows'],
             'pagination' => $listData['pagination'],
             'listOrder' => $listOrder,

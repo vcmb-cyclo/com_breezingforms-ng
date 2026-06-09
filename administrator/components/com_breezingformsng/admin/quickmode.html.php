@@ -43,6 +43,7 @@ class QuickModeHtml
         $wa->useStyle('com_breezingformsng.quickmode-style');
         $wa->useStyle('com_breezingformsng.jtree-style');
         $wa->useStyle('com_breezingformsng.admin-style');
+        $wa->useStyle('com_breezingformsng.custom-style');
         $wa->useScript('com_breezingformsng.jquery-alias');
         $wa->useScript('com_breezingformsng.jtree');
         $wa->useScript('com_breezingformsng.jq-ui');

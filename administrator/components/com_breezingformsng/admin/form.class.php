@@ -588,32 +588,55 @@ class facileFormsForm
             $search = trim((string) $searchReq);
             $session->set('bf.forms_search', $search);
         }
+        $allowedSorts = array(
+            'id' => 'id',
+            'title' => 'title',
+            'name' => 'name',
+            'pages' => 'pages',
+            'description' => 'description',
+            'modified' => 'modified',
+            'published' => 'published',
+            'ordering' => 'ordering',
+        );
+
+        $filterOrderInput = trim((string) BFRequest::getVar('filter_order', ''));
+        $filterOrderDirInput = strtoupper(trim((string) BFRequest::getVar('filter_order_Dir', '')));
         $sortReq = BFRequest::getVar('sort', null);
         $dirReq = BFRequest::getVar('dir', null);
-        if ($sortReq === null) {
+
+        if (isset($allowedSorts[$filterOrderInput])) {
+            $sort = $filterOrderInput;
+            $session->set('bf.forms_sort', $sort);
+        } elseif ($sortReq === null) {
             $sort = (string) $session->get('bf.forms_sort', 'ordering');
         } else {
             $sort = (string) $sortReq;
             $session->set('bf.forms_sort', $sort);
         }
-        if ($dirReq === null) {
+        if (!isset($allowedSorts[$sort])) {
+            $sort = 'ordering';
+        }
+
+        if ($filterOrderDirInput !== '') {
+            $dir = $filterOrderDirInput === 'DESC' ? 'DESC' : 'ASC';
+            $session->set('bf.forms_dir', $dir);
+        } elseif ($dirReq === null) {
             $dir = strtoupper((string) $session->get('bf.forms_dir', 'ASC'));
         } else {
             $dir = strtoupper((string) $dirReq);
             $session->set('bf.forms_dir', $dir);
         }
-		$allowedSorts = array(
-			'id' => 'id',
-			'title' => 'title',
-			'name' => 'name',
-			'pages' => 'pages',
-			'description' => 'description',
-			'modified' => 'modified',
-			'published' => 'published',
-			'ordering' => 'ordering',
-		);
-        $sortField = isset($allowedSorts[$sort]) ? $allowedSorts[$sort] : 'ordering';
         $dir = $dir === 'DESC' ? 'DESC' : 'ASC';
+
+        $filterStateInput = strtoupper(trim((string) BFRequest::getVar('filter_state', '')));
+        if (BFRequest::getVar('filter_state', null) !== null) {
+            $filterState = in_array($filterStateInput, ['P', 'U'], true) ? $filterStateInput : '';
+            $session->set('bf.forms_filter_state', $filterState);
+        } else {
+            $filterState = (string) $session->get('bf.forms_filter_state', '');
+        }
+
+        $sortField = $allowedSorts[$sort];
         $orderBy = "order by {$sortField} {$dir}, id desc";
         $conditions = array();
         if ($pkg !== '') {
@@ -626,6 +649,11 @@ class facileFormsForm
                 "name LIKE " . $searchLike . " or " .
                 "description LIKE " . $searchLike .
                 ")";
+        }
+        if ($filterState === 'P') {
+            $conditions[] = "published = 1";
+        } elseif ($filterState === 'U') {
+            $conditions[] = "published = 0";
         }
         $whereClause = count($conditions) ? "where " . implode(' and ', $conditions) . " " : "";
 
@@ -648,7 +676,8 @@ class facileFormsForm
         $database->setQuery('SELECT FOUND_ROWS();');
         $total = $database->loadResult();
 
-        HTML_facileFormsForm::listitems($option, $rows, $pkglist, $total, $sort, $dir, $pkg, $search);
+        $listDirn = strtolower($dir);
+        HTML_facileFormsForm::listitems($option, $rows, $pkglist, $total, $sort, $listDirn, $pkg, $search, $filterState);
     }
 
     // listitems

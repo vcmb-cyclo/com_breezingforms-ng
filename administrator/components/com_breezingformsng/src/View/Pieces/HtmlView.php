@@ -36,6 +36,12 @@ class HtmlView extends BaseHtmlView
 
     public $pagination = null;
 
+    public string $listOrder = 'a.name';
+
+    public string $listDirn = 'asc';
+
+    public string $filterState = '';
+
     public function display($tpl = null)
     {
         $model = \Joomla\CMS\Factory::getApplication()
@@ -65,6 +71,11 @@ class HtmlView extends BaseHtmlView
         $this->pageSizes = $list['pageSizes'];
         $this->rows = $list['rows'];
         $this->pagination = $list['pagination'];
+        $this->listOrder = $list['listOrder'];
+        $this->listDirn = $list['listDirn'];
+        $this->filterState = $list['filterState'];
+
+        \Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager()->useScript('table.columns');
 
         parent::display($tpl);
     }

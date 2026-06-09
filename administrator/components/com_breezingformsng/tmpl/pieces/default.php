@@ -20,5 +20,8 @@ Renderer::listitems(
     $this->limit,
     $this->limitStart,
     $this->pageSizes,
-    $this->pagination
+    $this->pagination,
+    $this->listOrder,
+    $this->listDirn,
+    $this->filterState
 );

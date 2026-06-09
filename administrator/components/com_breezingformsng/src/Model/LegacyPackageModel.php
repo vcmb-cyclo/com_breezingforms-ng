@@ -120,11 +120,13 @@ abstract class LegacyPackageModel extends ListModel
         string $direction,
         int $limit,
         int $limitStart,
-        bool $includeInternal = true
+        bool $includeInternal = true,
+        string $filterState = ''
     ): array {
         $this->setState('filter.package', $package);
         $this->setState('filter.search', $search);
         $this->setState('filter.include_internal', $includeInternal);
+        $this->setState('filter.state', $filterState);
         $this->setState('list.ordering', $this->normaliseSortField($sort));
         $this->setState('list.direction', strtoupper($direction) === 'DESC' ? 'DESC' : 'ASC');
         $this->setState('list.limit', max(1, $limit));
@@ -164,6 +166,7 @@ abstract class LegacyPackageModel extends ListModel
         $package = (string) $this->getState('filter.package', '');
         $search = (string) $this->getState('filter.search', '');
         $includeInternal = (bool) $this->getState('filter.include_internal', true);
+        $state = (string) $this->getState('filter.state', '');
 
         if ($package !== '') {
             $query->where($db->quoteName('a.package') . ' = :package');
@@ -174,6 +177,16 @@ abstract class LegacyPackageModel extends ListModel
             $internalPrefix = '\\_%';
             $query->where($db->quoteName('a.name') . ' NOT LIKE :internalPrefix');
             $query->bind(':internalPrefix', $internalPrefix);
+        }
+
+        if ($state === 'P') {
+            $publishedVal = 1;
+            $query->where($db->quoteName('a.published') . ' = :published');
+            $query->bind(':published', $publishedVal, \Joomla\Database\ParameterType::INTEGER);
+        } elseif ($state === 'U') {
+            $publishedVal = 0;
+            $query->where($db->quoteName('a.published') . ' = :published');
+            $query->bind(':published', $publishedVal, \Joomla\Database\ParameterType::INTEGER);
         }
 
         if ($search !== '') {

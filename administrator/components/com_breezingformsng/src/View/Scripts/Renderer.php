@@ -26,6 +26,15 @@ class Renderer
 	{
 		global $ff_mossite, $ff_admsite, $ff_config;
 		$action = $row->id ? BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_EDITSCRIPT') : BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_ADDSCRIPT');
+
+		$sectionTitle = BFText::_('COM_BREEZINGFORMSNG_MANAGESCRIPTS');
+		if ($row->id && $row->name !== '') {
+			$sectionTitle .= ' / ' . htmlspecialchars((string) $row->name, ENT_QUOTES, 'UTF-8');
+		}
+		$pageTitle = BFText::_('COM_BREEZINGFORMSNG') . ' / ' . $sectionTitle;
+		Factory::getApplication()->getDocument()->setTitle(strip_tags($pageTitle));
+		ToolbarHelper::title($pageTitle, 'logo_left');
+
 		$hasPersistedUnitTests = $row->id && trim((string) $row->unit_tests) !== '';
 		$safePersistedUnitTests = json_encode((string) $row->unit_tests);
 		$initialState = array(
@@ -658,7 +667,7 @@ class Renderer
 			});
 			//-->
 		</script>
-		<form action="index.php" method="post" name="adminForm" id="adminForm" class="adminForm">
+		<form action="index.php?option=<?php echo htmlspecialchars($option, ENT_QUOTES); ?>&amp;view=scripts" method="post" name="adminForm" id="adminForm" class="adminForm">
 			<table cellpadding="4" cellspacing="1" border="0" class="adminform" style="width:100%;">
 				<tr>
 					<td></td>
@@ -988,7 +997,7 @@ class Renderer
 
 			//-->
 		</script>
-		<form action="index.php" method="post" name="adminForm" id="adminForm">
+		<form action="index.php?option=<?php echo htmlspecialchars($option, ENT_QUOTES); ?>&amp;view=scripts" method="post" name="adminForm" id="adminForm">
 
 			<label class="bfPackageSelector">
 
@@ -1076,7 +1085,7 @@ class Renderer
 						<td valign="top" align="left">
 							<?php echo htmlspecialchars((string) $row->package, ENT_QUOTES); ?>
 						</td>
-						<td valign="top" align="left"><a href="#edit" onclick="return listItemTask('cb<?php echo $i; ?>','edit')">
+						<td valign="top" align="left"><a href="index.php?option=<?php echo htmlspecialchars($option, ENT_QUOTES); ?>&amp;view=scripts&amp;task=scripts.edit&amp;pkg=<?php echo urlencode($pkg); ?>&amp;ids[]=<?php echo (int) $row->id; ?>">
 								<?php echo $row->title; ?>
 							</a></td>
 						<td valign="top" align="left">
@@ -1633,7 +1642,7 @@ class Renderer
 				}
 			})();
 		</script>
-		<form action="index.php" method="post" name="adminForm" id="adminForm" class="adminForm">
+		<form action="index.php?option=<?php echo htmlspecialchars($option, ENT_QUOTES); ?>&amp;view=scripts" method="post" name="adminForm" id="adminForm" class="adminForm">
 			<div id="bf-script-auto-unit-warning" class="alert alert-warning" style="display:none;">
 				<span class="icon-warning text-warning" aria-hidden="true"></span>
 				<span id="bf-script-auto-unit-warning-text"></span>

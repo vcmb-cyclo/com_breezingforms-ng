@@ -6,7 +6,7 @@
  * @version 6.0.0
  * @package BreezingFormsNG
  * @copyright Copyright (C) 2008-2020 by Markus Bopp
- * @copyright Copyright (C) 2024-2006 by XDA+GIL 
+ * @copyright Copyright (C) 2024-2026 by XDA+GIL 
  * @license GNU General Public License version 2 or later; see LICENSE.txt
  *
  * This is the main component entry point that will be called by joomla or mambo

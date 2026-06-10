@@ -5,7 +5,7 @@
  * @version 6.0.0
  * @package BreezingFormsNG
  * @copyright Copyright (C) 2008-2012 by Markus Bopp
- * @copyright Copyright (C) 2024-2006 by XDA+GIL
+ * @copyright Copyright (C) 2024-2026 by XDA+GIL
  * @license GNU General Public License version 2 or later; see LICENSE.txt
  * */
 
@@ -17,6 +17,7 @@ use Joomla\CMS\Uri\Uri;
 use Joomla\Filesystem\File;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\HTML\Helpers\Bootstrap;
+use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Table\Table;
 use Joomla\Database\DatabaseInterface;
@@ -899,14 +900,39 @@ class bfRecordManagement
         Factory::getApplication()->getDocument()->setTitle(strip_tags($bfListPageTitle));
         ToolbarHelper::title($bfListPageTitle, 'logo_left');
 
-        ToolBarHelper::custom('exportPdf', 'download', 'download', BFText::_('COM_BREEZINGFORMSNG_PDF'), false);
-        ToolBarHelper::custom('exportCsv', 'download', 'download', BFText::_('COM_BREEZINGFORMSNG_CSV'), false);
-        ToolBarHelper::custom('exportXml', 'download', 'download', BFText::_('COM_BREEZINGFORMSNG_XML'), false);
-        ToolBarHelper::custom('csvimport', 'upload', 'upload', BFText::_('COM_BREEZINGFORMSNG_CSV'), false);
+        $exportDropdown = Toolbar::getInstance()
+            ->dropdownButton('export-options')
+            ->text(BFText::_('COM_BREEZINGFORMSNG_EXPORT_DOWNLOAD'))
+            ->toggleSplit(false)
+            ->icon('icon-download')
+            ->buttonClass('btn btn-action');
+        $exportChildBar = $exportDropdown->getChildToolbar();
+        $exportChildBar->standardButton('exportPdf')
+            ->text(BFText::_('COM_BREEZINGFORMSNG_PDF'))
+            ->task('exportPdf')
+            ->icon('icon-download')
+            ->listCheck(false);
+        $exportChildBar->standardButton('exportCsv')
+            ->text(BFText::_('COM_BREEZINGFORMSNG_CSV'))
+            ->task('exportCsv')
+            ->icon('icon-download')
+            ->listCheck(false);
+        $exportChildBar->standardButton('exportXml')
+            ->text(BFText::_('COM_BREEZINGFORMSNG_XML'))
+            ->task('exportXml')
+            ->icon('icon-download')
+            ->listCheck(false);
+        ToolBarHelper::custom('csvimport', 'upload', 'upload', BFText::_('COM_BREEZINGFORMSNG_BTN_IMPORT_CSV'), false);
         ToolBarHelper::custom('viewed', 'eye-open', 'eye-open', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_VIEW'), false);
         ToolBarHelper::custom('exported', 'share', 'share', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_EXPORT'), false);
         ToolBarHelper::custom('archived', 'archive', 'archive', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_ARCHIVE'), false);
         ToolBarHelper::custom('remove', 'delete.png', 'delete_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_DELETE'), false);
+
+        ToolbarHelper::help(
+            'COM_BREEZINGFORMSNG_HELP_RECORDS_TITLE',
+            false,
+            Uri::base() . 'index.php?option=com_breezingformsng&view=help&section=records&tmpl=component'
+        );
 
         Factory::getApplication()->getDocument()->getWebAssetManager()->useScript('table.columns');
         $this->renderNativeRecordsList();

@@ -5,8 +5,10 @@
  * @version 6.0.0
  * @package BreezingFormsNG
  * @copyright Copyright (C) 2008-2020 by Markus Bopp
- * @copyright Copyright (C) 2024-2006 by XDA+GIL
+ * @copyright Copyright (C) 2024-2026 by XDA+GIL
  * @license GNU General Public License version 2 or later; see LICENSE.txt
+ * 
+ * SPDX-License-Identifier: GPL-2.0-or-later
  **/
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
@@ -15,9 +17,15 @@ use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\CMS\Uri\Uri;
 
 if (BFRequest::getVar('act', '') == 'configuration') {
 	ToolBarHelper::preferences('com_breezingformsng');
+	ToolbarHelper::help(
+		'COM_BREEZINGFORMSNG_HELP_CONFIGURATION_TITLE',
+		false,
+		Uri::base() . 'index.php?option=com_breezingformsng&view=help&section=configuration&tmpl=component'
+	);
 }
 
 echo '<style type="text/css">

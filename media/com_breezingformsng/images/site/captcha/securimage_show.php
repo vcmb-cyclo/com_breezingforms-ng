@@ -7,6 +7,8 @@
  * @package BreezingFormsNG
  * @copyright Copyright (C) 2004-2005 by Peter Koch
  * @license GNU General Public License version 2 or later; see LICENSE.txt
+ * 
+ * SPDX-License-Identifier: GPL-2.0-or-later
  **/
 ob_start();
 

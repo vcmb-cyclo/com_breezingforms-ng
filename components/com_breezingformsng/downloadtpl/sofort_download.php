@@ -10,6 +10,8 @@ use Joomla\CMS\Uri\Uri;
  * @package BreezingFormsNG
  * @copyright Copyright (C) 2008-2020 by Markus Bopp
  * @license GNU General Public License version 2 or later; see LICENSE.txt
+ * 
+ * SPDX-License-Identifier: GPL-2.0-or-later
  **/
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');

@@ -9,6 +9,8 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Pieces;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\CMS\Uri\Uri;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\PiecesModel;
 use Vcmb\Component\BreezingformsNG\Administrator\View\BreezingformsNG\HtmlView as BaseHtmlView;
 
@@ -73,6 +75,12 @@ class HtmlView extends BaseHtmlView
         $this->filterState = $list['filterState'];
 
         \Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager()->useScript('table.columns');
+
+        ToolbarHelper::help(
+            'COM_BREEZINGFORMSNG_HELP_PIECES_TITLE',
+            false,
+            Uri::base() . 'index.php?option=com_breezingformsng&view=pieces&layout=help&tmpl=component'
+        );
 
         parent::display($tpl);
     }

@@ -10,7 +10,7 @@
 
 	<name>COM_BREEZINGFORMSNG</name>
 	<element>com_breezingformsng</element>
-	<creationDate>2026-06-09</creationDate>
+	<creationDate>2026-06-10</creationDate>
 	<author>XDA/GIL</author>
 	<copyright>Copyright 2024 - 2026 by XDA+GIL</copyright>
 	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
@@ -36,21 +36,12 @@
 		<filename>router.php</filename>
 		<folder>downloadtpl</folder>
 		<folder>exports</folder>
+		<folder>language</folder>
 		<folder>libraries</folder>
 		<folder>src</folder>
 		<folder>themes</folder>
 		<folder>uploads</folder>
 	</files>
-
-	<languages folder="components/com_breezingformsng">
-		<language tag="de-DE">languages/de-DE/de-DE.com_breezingformsng.ini</language>
-		<language tag="en-GB">languages/en-GB/en-GB.com_breezingformsng.ini</language>
-		<language tag="es-ES">languages/es-ES/es-ES.com_breezingformsng.ini</language>
-		<language tag="fr-FR">languages/fr-FR/fr-FR.com_breezingformsng.ini</language>
-		<language tag="hu-HU">languages/hu-HU/hu-HU.com_breezingformsng.ini</language>
-		<language tag="nl-NL">languages/nl-NL/nl-NL.com_breezingformsng.ini</language>
-		<language tag="tr-TR">languages/tr-TR/tr-TR.com_breezingformsng.ini</language>
-	</languages>
 
 	<administration>
 		<menu>COM_BREEZINGFORMSNG</menu>
@@ -77,7 +68,7 @@
 			<folder>admin</folder>
 			<folder>ajax_cache</folder>
 			<folder>images</folder>
-			<folder>languages</folder>
+			<folder>language</folder>
 			<folder>libraries</folder>
 			<folder>mailtpl</folder>
 			<folder>packages</folder>
@@ -90,28 +81,6 @@
 			<folder>plugins</folder>
 		</files>
 
-		<languages folder="administrator/components/com_breezingformsng">
-			<language tag="de-DE">languages/de-DE/de-DE.com_breezingformsng.ini</language>
-			<language tag="de-DE">languages/de-DE/de-DE.com_breezingformsng.sys.ini</language>
-
-			<language tag="en-GB">languages/en-GB/en-GB.com_breezingformsng.ini</language>
-			<language tag="en-GB">languages/en-GB/en-GB.com_breezingformsng.sys.ini</language>
-
-			<language tag="es-ES">languages/es-ES/es-ES.com_breezingformsng.ini</language>
-			<language tag="es-ES">languages/es-ES/es-ES.com_breezingformsng.sys.ini</language>
-
-			<language tag="fr-FR">languages/fr-FR/fr-FR.com_breezingformsng.ini</language>
-			<language tag="fr-FR">languages/fr-FR/fr-FR.com_breezingformsng.sys.ini</language>
-
-			<language tag="hu-HU">languages/hu-HU/hu-HU.com_breezingformsng.ini</language>
-			<language tag="hu-HU">languages/hu-HU/hu-HU.com_breezingformsng.sys.ini</language>
-
-			<language tag="nl-NL">languages/nl-NL/nl-NL.com_breezingformsng.ini</language>
-			<language tag="nl-NL">languages/nl-NL/nl-NL.com_breezingformsng.sys.ini</language>
-
-			<language tag="tr-TR">languages/tr-TR/tr-TR.com_breezingformsng.ini</language>
-			<language tag="tr-TR">languages/tr-TR/tr-TR.com_breezingformsng.sys.ini</language>
-		</languages>
 
 	</administration>
 

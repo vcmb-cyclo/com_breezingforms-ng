@@ -1268,7 +1268,7 @@ class com_breezingformsngInstallerScript
                     ],
                 ],
                 ['COM_BREEZINGFORMSNG_CONFIGURATION', 'breezingformsng-configuration', 'act=configuration', []],
-                ['COM_BREEZINGFORMSNG_ABOUT', 'breezingformsng-about', 'act=about', []],
+                ['COM_BREEZINGFORMSNG_ABOUT', 'breezingformsng-about', 'task=about.display&view=about', []],
             ];
 
             $checked = 0;
@@ -1554,10 +1554,43 @@ class com_breezingformsngInstallerScript
         }
     }
 
+    private function migrateStaleMenuLinks(): void
+    {
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+
+        $replacements = [
+            'index.php?option=' . self::TARGET_COMPONENT . '&act=about'
+                => 'index.php?option=' . self::TARGET_COMPONENT . '&task=about.display&view=about',
+            'index.php?option=' . self::TARGET_COMPONENT . '&task=integrate.display&view=integrate'
+                => 'index.php?option=' . self::TARGET_COMPONENT . '&act=integrate',
+        ];
+
+        foreach ($replacements as $oldLink => $newLink) {
+            try {
+                $db->setQuery(
+                    $db->getQuery(true)
+                        ->update($db->quoteName('#__menu'))
+                        ->set($db->quoteName('link') . ' = ' . $db->quote($newLink))
+                        ->where($db->quoteName('client_id') . ' = 1')
+                        ->where($db->quoteName('link') . ' = ' . $db->quote($oldLink))
+                );
+                $db->execute();
+                $updated = (int) $db->getAffectedRows();
+
+                if ($updated > 0) {
+                    $this->log("[OK] Migrated {$updated} menu link(s): {$oldLink} → {$newLink}");
+                }
+            } catch (\Throwable $e) {
+                $this->log("Unable to migrate menu link {$oldLink}: " . $e->getMessage(), Log::WARNING);
+            }
+        }
+    }
+
     private function cleanupLegacyBreezingFormsAfterInstall(): void
     {
         $this->normalizeJoomlaComponentReferences();
         $this->ensureAdministrationMainMenuEntry();
+        $this->migrateStaleMenuLinks();
         $this->ensureAdministrationSubmenuEntries();
         $this->deduplicateBreezingFormsComponentRows();
         $this->removeLegacyBreezingFormsComponentRows();

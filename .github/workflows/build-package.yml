@@ -26,7 +26,7 @@ jobs:
       - name: Check PHP syntax
         run: |
           set -o pipefail
-          if ! git ls-files -z '*.php' | xargs -0 -n1 php -l > php-lint.log; then
+          if ! git ls-files -z '*.php' | xargs -0 -n1 php -l > php-lint.log 2>&1; then
             cat php-lint.log
             exit 1
           fi

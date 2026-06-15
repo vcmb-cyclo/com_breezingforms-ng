@@ -22,4 +22,5 @@ administrator/error_log
 
 # Directories
 cache/
+build/
 #libraries/ 

@@ -1,0 +1,92 @@
+name: Test and Build Package
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: Check PHP syntax
+        run: |
+          set -o pipefail
+          if ! git ls-files -z '*.php' | xargs -0 -n1 php -l > php-lint.log; then
+            cat php-lint.log
+            exit 1
+          fi
+          echo "PHP syntax check passed."
+
+      - name: Validate XML manifests
+        run: |
+          php -r '
+          foreach (["com_breezingformsng.xml", "com_breezingformsng_update.xml"] as $path) {
+              libxml_use_internal_errors(true);
+              if (simplexml_load_file($path) === false) {
+                  fwrite(STDERR, "Invalid XML manifest: {$path}\n");
+                  exit(1);
+              }
+          }
+          '
+
+  package:
+    needs: quality
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Resolve package version
+        id: version
+        run: |
+          version="$(grep -oPm1 '(?<=<version>)[^<]+' com_breezingformsng.xml)"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Set package creation date
+        run: |
+          creation_date="$(TZ=Europe/Paris date +%F)"
+          build_timestamp="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          perl -0pi -e "s#<creationDate>.*?</creationDate>#<creationDate>${creation_date}</creationDate>#" com_breezingformsng.xml
+          perl -0pi -e "s#\\n\\s*<buildType>.*?</buildType>##g; s#(<creationDate>.*?</creationDate>)#\$1\n\t<buildType>production</buildType>#" com_breezingformsng.xml
+          perl -0pi -e "s#\\n\\s*<buildTimestamp>.*?</buildTimestamp>##g; s#(<buildType>.*?</buildType>)#\$1\n\t<buildTimestamp>${build_timestamp}</buildTimestamp>#" com_breezingformsng.xml
+
+      - name: Build production package
+        id: package
+        run: echo "archive=$(scripts/build-package.sh)" >> "$GITHUB_OUTPUT"
+
+      - name: Validate package contents
+        run: scripts/validate-package.sh "${{ steps.package.outputs.archive }}"
+
+      - name: Upload installation package
+        uses: actions/upload-artifact@v7
+        with:
+          name: com_breezingformsng-${{ steps.version.outputs.version }}
+          path: ${{ steps.package.outputs.archive }}
+
+      - name: Create GitHub release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" \
+            "${{ steps.package.outputs.archive }}" \
+            --title "BreezingForms NG ${GITHUB_REF_NAME}" \
+            --generate-notes

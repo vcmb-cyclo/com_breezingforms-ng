@@ -92,8 +92,8 @@ class HtmlView extends BaseHtmlView
         Sidebar::addEntry(
             '<i class="fa fa-cog" aria-hidden="true"></i> ' . '<m>' .
             \BFText::_('COM_BREEZINGFORMSNG_CONFIG') . '</m>',
-            'index.php?option=com_breezingformsng&act=configuration',
-            \BFRequest::getVar('act', '') == 'configuration'
+            'index.php?option=com_config&view=component&component=com_breezingformsng',
+            false
         );
 
         Sidebar::addEntry(

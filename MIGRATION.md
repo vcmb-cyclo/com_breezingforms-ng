@@ -83,17 +83,19 @@
 **Priorité : haute. Effort faible : `config.xml` existe déjà.**
 
 ### Fichiers à modifier
-- [ ] `config.xml` — ajouter les vrais champs :  
-  clé de mise à jour, délimiteur CSV, chemin uploads, paramètres email, etc.  
-  (actuellement ne contient que le champ `rules` de permissions)
-- [ ] `com_breezingformsng.xml` — changer l'entrée de menu :  
-  `act=configuration` → `option=com_config&view=component&component=com_breezingformsng`
-- [ ] `src/View/BreezingformsNG/HtmlView.php` — mettre à jour le lien menu sidebar
+- [x] `config.xml` — fieldsets `general` (disable_ip, emailadr, uploads) + `csv` (csvdelimiter, csvquote, cellnewline) + `permissions`
+- [x] `com_breezingformsng.xml` — entrée submenu Configuration → `com_config`
+- [x] `src/View/BreezingformsNG/HtmlView.php` — lien sidebar Configuration → `com_config`
+- [x] `src/Model/RecordModel::getExportConfig()` — lit depuis `ComponentHelper::getParams()` au lieu de `#__facileforms_config`
 
 ### Fichiers à supprimer (après validation)
-- [ ] `administrator/components/com_breezingformsng/admin/config.class.php`
-- [ ] `administrator/components/com_breezingformsng/admin/config.html.php`
-- [ ] `administrator/components/com_breezingformsng/admin/config.php`
+- [x] `admin/config.class.php` *(git mv → src/Model/ConfigModel.php)*
+- [x] `admin/config.html.php` *(git rm — remplacé par com_config)*
+- [x] `admin/config.php` *(git rm — dispatcher inutile)*
+
+> **Note Phase 6** : le runtime legacy (`$ff_config->csvdelimiter` etc.) lit toujours depuis `#__facileforms_config`.
+> La migration des lectures runtime vers `ComponentHelper::getParams()` se fera en Phase 6.
+> `src/Model/ConfigModel.php` contiendra la logique de migration.
 
 ### Vérification
 - [ ] Composants → BreezingForms NG → Options ouvre l'écran natif Joomla

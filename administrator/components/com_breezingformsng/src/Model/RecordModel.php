@@ -9,6 +9,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\BaseModel;
 use Joomla\CMS\Table\Table;
@@ -265,25 +266,13 @@ class RecordModel extends BaseModel
 
     public function getExportConfig(): \stdClass
     {
-        $config = new \stdClass();
-        $config->csvdelimiter = ';';
-        $config->csvquote = '"';
-        $config->cellnewline = 1;
-        $config->csvinverted = false;
+        $params = ComponentHelper::getParams('com_breezingformsng');
 
-        try {
-            $db = Factory::getContainer()->get(DatabaseInterface::class);
-            $db->setQuery(
-                "Select id, value From #__facileforms_config"
-                . " Where id In ('csvdelimiter','csvquote','cellnewline','csvinverted')"
-            );
-            foreach ($db->loadObjectList() as $row) {
-                $prop = $row->id;
-                $config->$prop = stripcslashes($row->value);
-            }
-        } catch (\Throwable) {
-            // use defaults
-        }
+        $config = new \stdClass();
+        $config->csvdelimiter = $params->get('csvdelimiter', ';');
+        $config->csvquote     = $params->get('csvquote', '"');
+        $config->cellnewline  = (int) $params->get('cellnewline', 1);
+        $config->csvinverted  = false;
 
         return $config;
     }

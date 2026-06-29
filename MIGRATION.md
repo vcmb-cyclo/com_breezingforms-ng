@@ -21,7 +21,7 @@
 
 ### ❌ Encore legacy (périmètre de cette migration)
 - [ ] Routeur admin central (`admin.breezingforms.php` — 766 lignes, `$act`-routing)
-- [ ] Gestion des enregistrements (`admin/recordmanagement.class.php` — 3 127 lignes)
+- [x] Gestion des enregistrements (`admin/recordmanagement.class.php` — migré Phase 1)
 - [ ] Configuration (`admin/config.class.php` + `config.html.php` — 1 078 lignes)
 - [ ] Intégrateur (`admin/integrator.class.php` + `.html.php`)
 - [ ] Gestion des menus (`admin/menu.class.php` + `menu.html.php`)
@@ -50,24 +50,23 @@
 **Priorité : haute. La toolbar est déjà Joomla 6 native.**
 
 ### Fichiers à créer
-- [ ] `src/Controller/RecordsController.php`  
+- [x] `src/Controller/RecordsController.php`  
   Tasks : `display`, `edit`, `save`, `delete`, `exportPdf`, `exportCsv`, `exportXml`, `csvImport`, `setFlag`, `setViewed`, `setExported`, `setArchived`
-- [ ] `src/Model/RecordModel.php` — CRUD enregistrement unique  
+- [x] `src/Model/RecordModel.php` — CRUD enregistrement unique  
   Table : `#__facileforms_records` + `#__facileforms_subrecords`
-- [ ] `src/Model/RecordsModel.php` — liste filtrée, paginée  
-  Filtres : formulaire, date début/fin, état (viewed/exported/archived), recherche texte
-- [ ] `src/View/Records/HtmlView.php`
-- [ ] `tmpl/records/default.php` — liste native Joomla (WebAsset `table.columns`)
-- [ ] `tmpl/records/edit.php` — formulaire édition enregistrement
-- [ ] `tmpl/records/csvimport.php` — upload CSV
-- [ ] `tmpl/records/help.php` — modal aide (déjà dans `tmpl/help/default.php` section=records)
+- [x] `src/Model/RecordsModel.php` — liste filtrée, paginée  
+  Filtres : formulaire, état (viewed/exported/archived), recherche texte
+- [x] `src/View/Records/HtmlView.php`
+- [x] `tmpl/records/default.php` — liste avec filtres, pagination, toggle flags inline
+- [x] `tmpl/records/edit.php` — formulaire édition enregistrement
+- [x] `tmpl/records/csvimport.php` — upload CSV
 
 ### Fichiers à modifier
-- [ ] `src/Controller/DisplayController.php` — ajouter `view=records` → MVC, retirer le `case recordmanagement` du bridge
+- [x] `src/Controller/DisplayController.php` — routing `view=records` + intercept `act=managerecs/recordmanagement`
 
 ### Fichiers à supprimer (après validation)
-- [ ] `administrator/components/com_breezingformsng/admin/recordmanagement.class.php`
-- [ ] `administrator/components/com_breezingformsng/admin/recordmanagement.php`
+- [x] `administrator/components/com_breezingformsng/admin/recordmanagement.class.php` *(git mv → RecordsController)*
+- [x] `administrator/components/com_breezingformsng/admin/recordmanagement.php` *(git mv → RecordsModel)*
 
 ### Vérification
 - [ ] Liste des enregistrements s'affiche avec filtres et pagination

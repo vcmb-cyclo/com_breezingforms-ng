@@ -49,8 +49,11 @@ class HtmlView extends BaseHtmlView
         Sidebar::addEntry(
             '<i class="fa fa-folder-open" aria-hidden="true"></i> ' . '<m>' .
             \BFText::_('COM_BREEZINGFORMSNG_MANAGERECS') . '</m>',
-            'index.php?option=com_breezingformsng&act=managerecs',
-            \BFRequest::getVar('act', '') == 'managerecs' || \BFRequest::getVar('act', '') == 'recordmanagement' || \BFRequest::getVar('act', '') == ''
+            'index.php?option=com_breezingformsng&view=records',
+            \BFRequest::getVar('view', '') == 'records'
+            || \BFRequest::getVar('act', '') == 'managerecs'
+            || \BFRequest::getVar('act', '') == 'recordmanagement'
+            || (\BFRequest::getVar('act', '') == '' && \BFRequest::getVar('view', '') == '')
         );
 
         Sidebar::addEntry(
@@ -137,7 +140,7 @@ class HtmlView extends BaseHtmlView
         return match (true) {
             $view === 'scripts', $act === 'managescripts' => \BFText::_('COM_BREEZINGFORMSNG_MANAGESCRIPTS'),
             $view === 'pieces', $act === 'managepieces' => \BFText::_('COM_BREEZINGFORMSNG_MANAGEPIECES'),
-            $act === 'managerecs', $act === 'recordmanagement' => \BFText::_('COM_BREEZINGFORMSNG_RECORDS_SECTION_TITLE'),
+            $view === 'records', $act === 'managerecs', $act === 'recordmanagement' => \BFText::_('COM_BREEZINGFORMSNG_RECORDS_SECTION_TITLE'),
             $act === 'manageforms', $act === 'easymode', $act === 'quickmode' => \BFText::_('COM_BREEZINGFORMSNG_MANAGEFORMS'),
             $act === 'integrate' => \BFText::_('COM_BREEZINGFORMSNG_INTEGRATOR'),
             $act === 'configuration' => \BFText::_('COM_BREEZINGFORMSNG_CONFIG'),

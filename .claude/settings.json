@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/home/xavier/.local/node_modules/.bin/playwright-cli --version)",
+      "Bash(/home/xavier/.local/node_modules/.bin/playwright-cli open *)",
+      "Bash(/home/xavier/.local/node_modules/.bin/playwright-cli video-start *)",
+      "Bash(/home/xavier/.local/node_modules/.bin/playwright-cli video-chapter *)",
+      "Bash(/home/xavier/.local/node_modules/.bin/playwright-cli screenshot *)",
+      "Bash(/home/xavier/.local/node_modules/.bin/playwright-cli console *)",
+      "Bash(/home/xavier/.local/node_modules/.bin/playwright-cli snapshot *)",
+      "Bash(/home/xavier/.local/node_modules/.bin/playwright-cli eval *)",
+      "Bash(git -C /home/xavier/workspaces/vcmb/com_breezingformsng status --short -- \"administrator/components/com_breezingformsng/src/Controller/RecordsController.php\" \"administrator/components/com_breezingformsng/src/Model/RecordModel.php\" \"administrator/components/com_breezingformsng/src/Model/RecordsModel.php\")",
+      "Bash(git status *)",
+      "Bash(git ls-files *)",
+      "Bash(cat /home/xavier/workspaces/vcmb/com_breezingformsng/administrator/components/com_breezingformsng/src/Controller/RecordsController.php)",
+      "Bash(cat /home/xavier/workspaces/vcmb/com_breezingformsng/administrator/components/com_breezingformsng/src/Model/RecordModel.php)",
+      "Bash(cat /home/xavier/workspaces/vcmb/com_breezingformsng/administrator/components/com_breezingformsng/src/Model/RecordsModel.php)",
+      "Bash(cp /tmp/RecordsController_new.php administrator/components/com_breezingformsng/src/Controller/RecordsController.php)",
+      "Bash(cp /tmp/RecordModel_new.php administrator/components/com_breezingformsng/src/Model/RecordModel.php)",
+      "Bash(cp /tmp/RecordsModel_new.php administrator/components/com_breezingformsng/src/Model/RecordsModel.php)",
+      "Bash(git commit -m ' *)"
+    ]
+  }
+}

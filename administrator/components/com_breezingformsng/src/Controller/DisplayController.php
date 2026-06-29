@@ -39,6 +39,15 @@ class DisplayController extends BaseController
             return parent::display($cachable, $urlparams);
         }
 
+        if ($task === '' && (
+            $view === 'records'
+            || in_array($act, ['', 'managerecs', 'recordmanagement'], true)
+        )) {
+            $input->set('view', 'records');
+            $input->set('act', '');
+            return parent::display($cachable, $urlparams);
+        }
+
         if ($task === '' && in_array($view, ['pieces', 'scripts'], true)) {
             $this->bootstrapLegacyListRenderer();
             $this->prepareListPackage($view);

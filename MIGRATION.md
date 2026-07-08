@@ -139,15 +139,20 @@
 **Priorité : faible. Fonctionnalité réduite.**
 
 ### Fichiers à créer
-- [ ] `src/Controller/MenusController.php`
-- [ ] `src/Model/MenuModel.php`
-- [ ] `src/View/Menus/HtmlView.php`
-- [ ] `tmpl/menus/default.php`
+- [x] `src/Controller/MenusController.php`
+- [x] `src/Model/MenuModel.php`
+- [x] `src/View/Menus/HtmlView.php`
+- [x] `tmpl/menus/default.php`
+- [x] `tmpl/menus/edit.php`
+
+### Fichiers à modifier
+- [x] `src/Controller/DisplayController.php` — intercept `act=managemenus` → `view=menus`
+- [x] `src/View/BreezingformsNG/HtmlView.php` — sidebar Menus activé → `view=menus`
 
 ### Fichiers à supprimer
-- [ ] `administrator/components/com_breezingformsng/admin/menu.class.php`
-- [ ] `administrator/components/com_breezingformsng/admin/menu.html.php`
-- [ ] `administrator/components/com_breezingformsng/admin/menu.php`
+- [x] `administrator/components/com_breezingformsng/admin/menu.class.php` *(git mv → MenuModel)*
+- [x] `administrator/components/com_breezingformsng/admin/menu.html.php` *(git mv → Menus/HtmlView)*
+- [x] `administrator/components/com_breezingformsng/admin/menu.php` *(git rm)*
 
 ### Vérification
 - [ ] Liste / création / suppression d'éléments de menu

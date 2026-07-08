@@ -85,10 +85,12 @@ class HtmlView extends BaseHtmlView
             || \BFRequest::getVar('act', '') === 'integrate'
         );
 
-        /*
-        Sidebar::addEntry('<i class="fa fa-bars" aria-hidden="true"></i> '  .'<m>'.
-            \BFText::_('COM_BREEZINGFORMSNG_MANAGEMENUS') .'</m>',
-            'index.php?option=com_breezingformsng&act=managemenus', \BFRequest::getVar('act','') == 'managemenus');*/
+        Sidebar::addEntry(
+            '<i class="fa fa-bars" aria-hidden="true"></i> ' . '<m>' .
+            \BFText::_('COM_BREEZINGFORMSNG_MANAGEMENUS') . '</m>',
+            'index.php?option=com_breezingformsng&view=menus',
+            \BFRequest::getVar('view', '') === 'menus' || \BFRequest::getVar('act', '') === 'managemenus'
+        );
 
         Sidebar::addEntry(
             '<i class="fa fa-cog" aria-hidden="true"></i> ' . '<m>' .
@@ -143,6 +145,7 @@ class HtmlView extends BaseHtmlView
             $view === 'pieces', $act === 'managepieces' => \BFText::_('COM_BREEZINGFORMSNG_MANAGEPIECES'),
             $view === 'records', $act === 'managerecs', $act === 'recordmanagement' => \BFText::_('COM_BREEZINGFORMSNG_RECORDS_SECTION_TITLE'),
             $act === 'manageforms', $act === 'easymode', $act === 'quickmode' => \BFText::_('COM_BREEZINGFORMSNG_MANAGEFORMS'),
+            $view === 'menus', $act === 'managemenus' => \BFText::_('COM_BREEZINGFORMSNG_MANAGEMENUS'),
             $act === 'integrate' => \BFText::_('COM_BREEZINGFORMSNG_INTEGRATOR'),
             $act === 'configuration' => \BFText::_('COM_BREEZINGFORMSNG_CONFIG'),
             $view === 'about' => \BFText::_('COM_BREEZINGFORMSNG_ABOUT'),

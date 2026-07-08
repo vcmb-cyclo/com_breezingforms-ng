@@ -1,0 +1,216 @@
+<?php
+/**
+ * @package BreezingFormsNG
+ * @copyright Copyright (C) 2024-2026 by XDA+GIL
+ * @license GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
+namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
+
+\defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\CMS\Router\Route;
+use Vcmb\Component\BreezingformsNG\Administrator\Model\MenuModel;
+
+class MenusController extends BaseController
+{
+    public function display($cachable = false, $urlparams = []): static
+    {
+        $input = Factory::getApplication()->getInput();
+        $input->set('view', 'menus');
+        return parent::display($cachable, $urlparams);
+    }
+
+    public function edit(): void
+    {
+        $input  = Factory::getApplication()->getInput();
+        $id     = $input->getInt('id', 0);
+        $pkg    = $input->getString('pkg', '');
+        $formId = $input->getInt('form_id', 0);
+
+        $url = 'index.php?option=com_breezingformsng&view=menus&layout=edit'
+            . '&id=' . $id . '&pkg=' . rawurlencode($pkg)
+            . ($formId > 0 ? '&form_id=' . $formId : '');
+
+        Factory::getApplication()->redirect(Route::_($url, false));
+    }
+
+    public function save(): void
+    {
+        $app   = Factory::getApplication();
+        $input = $app->getInput();
+
+        if (!$this->checkToken()) {
+            $app->enqueueMessage(Text::_('JINVALID_TOKEN'), 'error');
+            $app->redirect(Route::_($this->listUrl($input->getString('pkg', '')), false));
+            return;
+        }
+
+        $data = $input->post->getArray([
+            'id'        => 'INT',
+            'package'   => 'STRING',
+            'parent'    => 'INT',
+            'title'     => 'STRING',
+            'name'      => 'STRING',
+            'page'      => 'INT',
+            'frame'     => 'INT',
+            'border'    => 'INT',
+            'img'       => 'STRING',
+            'params'    => 'STRING',
+            'published' => 'INT',
+        ]);
+
+        try {
+            $id = $this->getMenuModel()->saveItem($data);
+            $app->enqueueMessage(Text::_('JLIB_APPLICATION_SAVE_SUCCESS'), 'message');
+            $app->redirect(Route::_($this->listUrl((string) ($data['package'] ?? '')), false));
+        } catch (\Throwable $e) {
+            $app->enqueueMessage($e->getMessage(), 'error');
+            $pkg = (string) ($data['package'] ?? '');
+            $id  = (int) ($data['id'] ?? 0);
+            $app->redirect(Route::_(
+                'index.php?option=com_breezingformsng&view=menus&layout=edit&id=' . $id . '&pkg=' . rawurlencode($pkg),
+                false
+            ));
+        }
+    }
+
+    public function cancel(): void
+    {
+        $pkg = Factory::getApplication()->getInput()->getString('pkg', '');
+        Factory::getApplication()->redirect(Route::_($this->listUrl($pkg), false));
+    }
+
+    public function remove(): void
+    {
+        $app   = Factory::getApplication();
+        $input = $app->getInput();
+
+        if (!$this->checkToken()) {
+            $app->enqueueMessage(Text::_('JINVALID_TOKEN'), 'error');
+        } else {
+            $ids = (array) $input->get('cid', [], 'INT');
+            if (!empty($ids)) {
+                $this->getMenuModel()->deleteItems($ids);
+                $app->enqueueMessage(Text::_('JLIB_APPLICATION_DELETE_SUCCESS'), 'message');
+            }
+        }
+
+        $app->redirect(Route::_($this->listUrl($input->getString('pkg', '')), false));
+    }
+
+    public function copy(): void
+    {
+        $app   = Factory::getApplication();
+        $input = $app->getInput();
+
+        if (!$this->checkToken()) {
+            $app->enqueueMessage(Text::_('JINVALID_TOKEN'), 'error');
+        } else {
+            $ids = (array) $input->get('cid', [], 'INT');
+            if (!empty($ids)) {
+                $this->getMenuModel()->copyItems($ids);
+                $app->enqueueMessage(Text::_('COM_BREEZINGFORMSNG_MENUS_SUCOPIED'), 'message');
+            }
+        }
+
+        $app->redirect(Route::_($this->listUrl($input->getString('pkg', '')), false));
+    }
+
+    public function publish(): void
+    {
+        $this->togglePublish(1);
+    }
+
+    public function unpublish(): void
+    {
+        $this->togglePublish(0);
+    }
+
+    public function orderup(): void
+    {
+        $this->moveOrder(-1);
+    }
+
+    public function orderdown(): void
+    {
+        $this->moveOrder(1);
+    }
+
+    public function sync(): void
+    {
+        $app   = Factory::getApplication();
+        $input = $app->getInput();
+
+        if (!$this->checkToken()) {
+            $app->enqueueMessage(Text::_('JINVALID_TOKEN'), 'error');
+        } else {
+            try {
+                $this->getMenuModel()->syncToJoomlaMenu();
+                $app->enqueueMessage(Text::_('COM_BREEZINGFORMSNG_MENUS_SAVED'), 'message');
+            } catch (\Throwable $e) {
+                $app->enqueueMessage($e->getMessage(), 'error');
+            }
+        }
+
+        $app->redirect(Route::_($this->listUrl($input->getString('pkg', '')), false));
+    }
+
+    private function togglePublish(int $state): void
+    {
+        $app   = Factory::getApplication();
+        $input = $app->getInput();
+
+        if (!$this->checkToken()) {
+            $app->enqueueMessage(Text::_('JINVALID_TOKEN'), 'error');
+        } else {
+            $ids = (array) $input->get('cid', [], 'INT');
+            if (!empty($ids)) {
+                $this->getMenuModel()->publish($ids, $state);
+            }
+        }
+
+        $app->redirect(Route::_($this->listUrl($input->getString('pkg', '')), false));
+    }
+
+    private function moveOrder(int $inc): void
+    {
+        $app   = Factory::getApplication();
+        $input = $app->getInput();
+
+        if (!$this->checkToken()) {
+            $app->enqueueMessage(Text::_('JINVALID_TOKEN'), 'error');
+        } else {
+            $ids = (array) $input->get('cid', [], 'INT');
+            $pkg = $input->getString('pkg', '');
+            if (!empty($ids)) {
+                $this->getMenuModel()->moveOrder((int) $ids[0], $inc, $pkg);
+            }
+        }
+
+        $app->redirect(Route::_($this->listUrl($input->getString('pkg', '')), false));
+    }
+
+    private function listUrl(string $pkg): string
+    {
+        return 'index.php?option=com_breezingformsng&view=menus'
+            . ($pkg !== '' ? '&pkg=' . rawurlencode($pkg) : '');
+    }
+
+    private function getMenuModel(): MenuModel
+    {
+        $model = Factory::getApplication()
+            ->bootComponent('com_breezingformsng')
+            ->getMVCFactory()
+            ->createModel('Menu', 'Administrator', ['ignore_request' => true]);
+
+        if (!$model instanceof MenuModel) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        return $model;
+    }
+}

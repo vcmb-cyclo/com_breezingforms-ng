@@ -282,9 +282,7 @@ class facileFormsConf
 	public $csvquote = '"';
 	public $cellnewline = 1;
 
-	public $enable_classic = 0;
-
-	public $disable_ip = 0;
+		public $disable_ip = 0;
 
 	function __construct()
 	{
@@ -491,7 +489,7 @@ class facileFormsForms extends Table
 	public $piece4code = null;     // custom code
 	public $prevmode = null;     // preview mode 0-none 1-below 2-overlay
 	public $prevwidth = null;     // preview width px in case of widthmode=1
-	public $template_code_processed = null; // the processed templated easymode form html code
+		public $template_code_processed = null; // processed QuickMode template marker
 	public $template_code = null;
 	public $template_areas = null;
 	public $custom_mail_subject = null;

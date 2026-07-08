@@ -138,9 +138,6 @@ jQuery(document).ready(function () {
 
     jQuery('.admin').css('display', 'block');
 
-    jQuery('#SelectOptionDialog').wrap('<div class="classicmode-box"></div>');
-
-
 });
 
 jQuery(document).ajaxComplete(function () {

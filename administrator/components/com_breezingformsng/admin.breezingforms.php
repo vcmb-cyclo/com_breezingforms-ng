@@ -406,19 +406,13 @@ switch ($act) {
                 require_once ($ff_admpath . '/admin/quickmode-editor.php');
                 break;
             default:
-                require_once ($ff_admpath . '/admin/form.php');
+                require_once ($ff_admpath . '/admin/quickmode.php');
                 break;
         }
-        break;
-    case 'editpage':
-        require_once ($ff_admpath . '/admin/element.php');
         break;
     case 'run':
         require_once ($ff_admpath . '/admin/run.php');
         break;
-    //case 'easymode':
-    //    require_once ($ff_admpath . '/admin/easymode.php');
-    //    break;
     case 'quickmode':
         require_once ($ff_admpath . '/admin/quickmode.php');
         break;

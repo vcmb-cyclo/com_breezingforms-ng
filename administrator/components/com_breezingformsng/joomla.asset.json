@@ -181,13 +181,6 @@
     },
 
     {
-      "name": "com_breezingformsng.easymode",
-      "type": "style",
-      "uri": "administrator/components/com_breezingformsng/libraries/jquery/themes/easymode/easymode.all.css",
-      "version": "auto"
-    },
-
-    {
       "name": "com_breezingformsng.quickmode-style",
       "type": "style",
       "uri": "administrator/components/com_breezingformsng/libraries/jquery/themes/quickmode/quickmode.all.css",

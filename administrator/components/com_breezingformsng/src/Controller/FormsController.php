@@ -113,9 +113,8 @@ class FormsController extends BaseController
             $id  = $this->getFormModel()->saveForm($data);
             $pkg = (string) ($data['package'] ?? '');
             $app->enqueueMessage(Text::_('JLIB_APPLICATION_SAVE_SUCCESS'), 'message');
-            // Redirect to legacy element editor after save
             $app->redirect(Route::_(
-                'index.php?option=com_breezingformsng&act=editpage&form=' . $id
+                'index.php?option=com_breezingformsng&act=manageforms&task=quickmode&form=' . $id
                 . ($pkg !== '' ? '&pkg=' . rawurlencode($pkg) : ''),
                 false
             ));

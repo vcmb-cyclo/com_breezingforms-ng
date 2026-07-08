@@ -381,8 +381,8 @@ function _ff_errorHandler($errno, $errstr, $errfile, $errline)
             $what = $id;
             switch ($type) {
                 case 'f':
-                    $url .= '&act=editpage' .
-                        '&task=editform' .
+                    $url .= '&act=manageforms' .
+                        '&task=quickmode' .
                         '&form=' . $ff_processor->form;
                     if ($ff_processor->formrow->package != '')
                         $url .= '&pkg=' . urlencode($ff_processor->formrow->package);
@@ -399,11 +399,10 @@ function _ff_errorHandler($errno, $errstr, $errfile, $errline)
                             break;
                         } // if
                     $what = 'element ' . $what;
-                    $url .= '&act=editpage' .
-                        '&task=edit' .
+                    $url .= '&act=manageforms' .
+                        '&task=quickmode' .
                         '&form=' . $ff_processor->form .
-                        '&page=' . $page .
-                        '&ids[]=' . $id;
+                        '&page=' . $page;
                     if ($ff_processor->formrow->package != '')
                         $url .= '&pkg=' . urlencode($ff_processor->formrow->package);
                     if ($pane > 0)
@@ -2422,6 +2421,11 @@ class HTML_facileFormsProcessor
         global $ff_mospath, $ff_mossite, $my;
         global $ff_config, $ff_version, $ff_comsite, $ff_otherparams;
 
+        if (trim((string) $this->formrow->template_code_processed) !== 'QuickMode') {
+            echo '<div class="alert alert-warning">' . Text::_('COM_BREEZINGFORMSNG_QUICKMODE_ONLY') . '</div>';
+            return;
+        }
+
         $is_mobile_type = '';
 
         if (trim($this->formrow->template_code_processed) == 'QuickMode') {
@@ -4244,32 +4248,6 @@ class HTML_facileFormsProcessor
             }
 
             $quickMode->render();
-        } else { // case if forms done with the easy mode
-            // always load calendar
-            HTMLHelper::_('behavior.calendar');
-
-            echo '
-			<style type="text/css">
-			ul.droppableArea, ul.droppableArea li { background-image: none; list-style: none; }
-			li.ff_listItem { width: auto; list-style: none; }
-			li.ff_listItem .ff_div { width: auto; float: left; }
-			.ff_label { outline: none; }
-			.ff_elem { float: left; }
-			.ff_dragBox { display: none; }
-			</style>
-			' . nl();
-            echo $this->formrow->template_code_processed;
-            $visPages = '';
-            $pagesSize = isset($this->formrow->pages) ? intval($this->formrow->pages) : 1;
-            for ($pageCnt = 1; $pageCnt <= $pagesSize; $pageCnt++) {
-                $visPages .= 'if(document.getElementById("bfPage' . $pageCnt . '"))document.getElementById("bfPage' . $pageCnt . '").style.display = "none";';
-            }
-            echo '<script type="text/javascript">
-                              <!--
-				' . $visPages . ';
-				if(document.getElementById("bfPage' . $this->page . '"))document.getElementById("bfPage' . $this->page . '").style.display = "";
-                              //-->
-                              </script>' . nl();
         }
 
         if ($this->editable) {
@@ -7806,6 +7784,11 @@ class HTML_facileFormsProcessor
     {
         global $ff_config, $ff_comsite, $ff_mossite, $ff_otherparams;
 
+        if (trim((string) $this->formrow->template_code_processed) !== 'QuickMode') {
+            echo '<div class="alert alert-warning">' . Text::_('COM_BREEZINGFORMSNG_QUICKMODE_ONLY') . '</div>';
+            return;
+        }
+
         // CONTENTBUILDER BEGIN
         $cbRecordId = 0;
         $cbEmailNotifications = false;
@@ -7832,11 +7815,6 @@ class HTML_facileFormsProcessor
         // CONTENTBUILDER END
         if (!$this->okrun)
             return;
-
-        // currently only available in classic mode
-        if (trim($this->formrow->template_code_processed) == '') {
-            set_error_handler('_ff_errorHandler');
-        }
 
         ob_start();
         $this->record_id = '';

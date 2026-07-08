@@ -51,12 +51,12 @@ Format : `COM_<EXTENSION>_<CONTEXTE>_<ELEMENT>`, toujours en MAJUSCULES,
 underscores, pas d'espaces ni d'accents dans la clé elle-même.
 
 ```ini
-COM_BREEZINGFORMSNG_FIELD_API_KEY_LABEL="API Key"
-COM_BREEZINGFORMSNG_FIELD_API_KEY_DESC="Your Anthropic API key, used for completions."
-COM_BREEZINGFORMSNG_ERROR_INVALID_KEY="The provided API key is invalid."
-COM_BREEZINGFORMSNG_TOOLBAR_REINDEX="Reindex"
-COM_BREEZINGFORMSNG_N_ITEMS_INDEXED_1="%d item indexed"
-COM_BREEZINGFORMSNG_N_ITEMS_INDEXED_MORE="%d items indexed"
+COM_CONTENTBUILDERNG_FIELD_API_KEY_LABEL="API Key"
+COM_CONTENTBUILDERNG_FIELD_API_KEY_DESC="Your Anthropic API key, used for completions."
+COM_CONTENTBUILDERNG_ERROR_INVALID_KEY="The provided API key is invalid."
+COM_CONTENTBUILDERNG_TOOLBAR_REINDEX="Reindex"
+COM_CONTENTBUILDERNG_N_ITEMS_INDEXED_1="%d item indexed"
+COM_CONTENTBUILDERNG_N_ITEMS_INDEXED_MORE="%d items indexed"
 ```
 
 Suffixes courants à respecter pour la cohérence avec le cœur Joomla :
@@ -81,11 +81,11 @@ Exemple correct (ordre des arguments figé par index, pas par position) :
 
 ```ini
 ; en-GB
-COM_BREEZINGFORMSNG_MSG_REINDEXED="%1$s items reindexed in %2$s seconds"
+COM_CONTENTBUILDERNG_MSG_REINDEXED="%1$s items reindexed in %2$s seconds"
 ; fr-FR
-COM_BREEZINGFORMSNG_MSG_REINDEXED="%1$s éléments réindexés en %2$s secondes"
+COM_CONTENTBUILDERNG_MSG_REINDEXED="%1$s éléments réindexés en %2$s secondes"
 ; de-DE
-COM_BREEZINGFORMSNG_MSG_REINDEXED="%1$s Elemente in %2$s Sekunden neu indiziert"
+COM_CONTENTBUILDERNG_MSG_REINDEXED="%1$s Elemente in %2$s Sekunden neu indiziert"
 ```
 
 ## 4. Typographie française (fr-FR)

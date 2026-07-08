@@ -10,7 +10,6 @@
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
-require_once($ff_admpath.'/admin/form.class.php');
 require_once($ff_admpath.'/admin/element.class.php');
 
 $form = BFRequest::getInt( 'form', 0);

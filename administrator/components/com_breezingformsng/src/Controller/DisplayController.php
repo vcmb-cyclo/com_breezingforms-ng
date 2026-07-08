@@ -54,6 +54,32 @@ class DisplayController extends BaseController
             return parent::display($cachable, $urlparams);
         }
 
+        if ($act === 'manageforms' || ($task === '' && $view === 'forms')) {
+            $input->set('view', 'forms');
+            $input->set('act', '');
+            if ($task === '' || $task === 'listitems') {
+                $input->set('task', '');
+                return parent::display($cachable, $urlparams);
+            }
+            // Map legacy tasks to MVC tasks
+            $taskMap = [
+                'new'       => 'forms.edit',
+                'edit'      => 'forms.edit',
+                'save'      => 'forms.save',
+                'cancel'    => 'forms.cancel',
+                'copy'      => 'forms.copy',
+                'remove'    => 'forms.remove',
+                'publish'   => 'forms.publish',
+                'unpublish' => 'forms.unpublish',
+                'orderup'   => 'forms.orderup',
+                'orderdown' => 'forms.orderdown',
+            ];
+            if (isset($taskMap[$task])) {
+                $input->set('task', $taskMap[$task]);
+            }
+            return parent::display($cachable, $urlparams);
+        }
+
         if ($task === '' && ($view === 'menus' || $act === 'managemenus')) {
             $input->set('view', 'menus');
             $input->set('act', '');

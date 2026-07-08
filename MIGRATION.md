@@ -163,36 +163,41 @@
 
 **Priorité : critique. Effort très élevé (cœur du produit).**
 
-### Fichiers à créer
-- [ ] `src/Controller/FormsController.php`  
-  Tasks : `list`, `add`, `edit`, `save`, `copy`, `delete`, `publish`, `unpublish`, `quickmode`, `quickmode_editor`
-- [ ] `src/Controller/ElementsController.php`  
-  Tasks : `edit`, `save`, `delete`, `add`, `copy`
-- [ ] `src/Model/FormModel.php` — CRUD formulaire unique
-- [ ] `src/Model/FormsModel.php` — liste filtrée
-- [ ] `src/Model/ElementModel.php`
-- [ ] `src/View/Forms/HtmlView.php` + templates
-- [ ] `src/View/Elements/HtmlView.php` + templates
+### Fichiers créés
+- [x] `src/Controller/FormsController.php`  
+  Tasks : `display`, `edit`, `save`, `cancel`, `copy`, `remove`, `publish`, `unpublish`, `orderup`, `orderdown`, `run`
+- [x] `src/Model/FormModel.php` — CRUD formulaire unique + copy + publish + ordering
+- [x] `src/Model/FormsModel.php` — liste filtrée + paginée (git mv depuis `form.class.php`)
+- [x] `src/Model/ImportModel.php` — stub (git mv depuis `import.class.php`)
+- [x] `src/View/Forms/HtmlView.php` — layouts `default` (liste) et `edit` (propriétés)
+- [x] `tmpl/forms/default.php` — liste Bootstrap avec filtres, tri, pagination, publish toggle
+- [x] `tmpl/forms/edit.php` — 3 onglets : Général, Email, Scripts & Pièces (CodeMirror)
 
-### Fichiers à modifier
-- [ ] `src/Controller/DisplayController.php` — retirer les `case manageforms / editpage / quickmode / run`
-- [ ] QuickMode JS (`admin/quickmode-app.js`) — adapter les endpoints AJAX vers les nouvelles routes controller
+### Fichiers modifiés
+- [x] `src/Controller/DisplayController.php` — intercept `act=manageforms` → `view=forms`
+- [x] `src/View/BreezingformsNG/HtmlView.php` — sidebar Forms → `view=forms`
+- [x] `admin/element.php` — suppression de l'include `form.class.php` devenu inutile
 
-### Fichiers à supprimer
-- [ ] `administrator/components/com_breezingformsng/admin/form.*`
-- [ ] `administrator/components/com_breezingformsng/admin/element.*`
-- [ ] `administrator/components/com_breezingformsng/admin/quickmode.*`
-- [ ] `administrator/components/com_breezingformsng/admin/easymode.*`
-- [ ] `administrator/components/com_breezingformsng/admin/run.php`
-- [ ] `administrator/components/com_breezingformsng/admin/import.class.php` (si intégré au FormModel)
+### Fichiers supprimés
+- [x] `administrator/components/com_breezingformsng/admin/form.php` (git rm)
+- [x] `administrator/components/com_breezingformsng/admin/run.php` (git rm, remplacé par `forms.run`)
+- [x] `administrator/components/com_breezingformsng/admin/form.class.php` (git mv → FormsModel)
+- [x] `administrator/components/com_breezingformsng/admin/form.html.php` (git mv → Forms/HtmlView)
+- [x] `administrator/components/com_breezingformsng/admin/import.class.php` (git mv → ImportModel)
+
+### Périmètre différé (encore via legacy bridge)
+- Éditeur d'éléments (`act=editpage`) — `element.class.php` / `element.html.php` en place
+- QuickMode (`act=quickmode`) — `quickmode.class.php` / `quickmode.html.php` en place
+- EasyMode (`act=easymode`) — `easymode.class.php` / `easymode.html.php` en place
+- QuickMode JS AJAX endpoints — non migrés, restent sur legacy bridge
+- Import/export de paquets — ImportModel stub seulement
 
 ### Vérification
-- [ ] Lister les formulaires
-- [ ] Créer / éditer / sauvegarder un formulaire
-- [ ] Ajouter / modifier / supprimer des éléments
-- [ ] Ouvrir et utiliser QuickMode
-- [ ] Prévisualiser un formulaire (`act=run`)
-- [ ] Importer / exporter un paquet
+- [ ] Lister les formulaires (filtres package, état, recherche ; tri ; pagination)
+- [ ] Créer / éditer / sauvegarder un formulaire (3 onglets de propriétés)
+- [ ] Dupliquer / supprimer / publier un formulaire
+- [ ] Ouvrir l'éditeur d'éléments depuis la liste (bouton Actions → legacy bridge)
+- [ ] QuickMode fonctionnel depuis l'éditeur d'éléments (legacy bridge intact)
 
 ---
 

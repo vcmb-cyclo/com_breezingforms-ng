@@ -480,6 +480,11 @@ if (
                 // http://www.gnu.org/copyleft/gpl.html
                 echo "\n<!-- BreezingForms V" . $ff_version . " Copyright(c) 2008-2013 by Markus Bopp | FacileForms Copyright 2004-2006 by Peter Koch, Chur, Switzerland.  All rights reserved. -->\n";
                 // END OF COPYRIGHT
+                if (trim((string) $form->template_code_processed) !== 'QuickMode') {
+                    echo '<div class="alert alert-warning">' . Text::_('COM_BREEZINGFORMSNG_QUICKMODE_ONLY') . '</div>';
+                    return;
+                }
+
                 $bfStyle = '';
                 if ($form->template_code == '') {
                     $bfStyle = ' style="' . $div1style . '"';

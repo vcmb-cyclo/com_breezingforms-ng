@@ -1,364 +1,448 @@
 <?php
 /**
- * BreezingForms NG - A Joomla Forms Application
- * 
- * @version 6.0.0
  * @package BreezingFormsNG
- * @copyright Copyright (C) 2008-2020 by Markus Bopp
  * @copyright Copyright (C) 2024-2026 by XDA+GIL
  * @license GNU General Public License version 2 or later; see LICENSE.txt
- * 
- * SPDX-License-Identifier: GPL-2.0-or-later
- **/
+ */
 
-defined('_JEXEC') or die('Direct Access to this location is not allowed.');
+namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 
-use Joomla\Utilities\ArrayHelper;
-use Joomla\CMS\Factory;
+\defined('_JEXEC') or die;
+
+use Joomla\CMS\MVC\Model\BaseModel;
 use Joomla\Database\DatabaseInterface;
-use Joomla\CMS\HTML\HTMLHelper;
 
-require_once($ff_admpath . '/admin/menu.html.php');
-
-class facileFormsMenu
+class MenuModel extends BaseModel
 {
-	static function create($option, $pkg)
-	{
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
-		$lists = array();
+    private function db(): DatabaseInterface
+    {
+        return $this->getDatabase();
+    }
 
-		$database->setQuery(
-			"select id, name, title " .
-			"from #__facileforms_forms " .
-			"order by ordering"
-		);
-		$lists['forms'] = $database->loadObjectList();
+    public function getPackages(): array
+    {
+        $db = $this->db();
+        $q  = $db->getQuery(true)
+            ->select('DISTINCT ' . $db->quoteName('package'))
+            ->from($db->quoteName('#__facileforms_compmenus'))
+            ->order($db->quoteName('package') . ' ASC');
 
-		$parents = array();
-		$parents[] = HTMLHelper::_('select.option', 0, BFText::_('COM_BREEZINGFORMSNG_MENUS_TOP'));
-		$database->setQuery(
-			"select id as value, title as text " .
-			"from #__facileforms_compmenus " .
-			"where parent=0 " .
-			"order by title, id"
-		);
-		$plist = $database->loadObjectList();
-		if (count($plist))
-			foreach ($plist as $obj)
-				$parents[] = $obj;
-		$lists['parents'] =
-			HTMLHelper::_(
-				'select.genericlist',
-				$parents,
-				'parent',
-				'class="inputbox" size="1"',
-				'value',
-				'text',
-				0
-			);
+        return $db->setQuery($q)->loadColumn() ?: [];
+    }
 
-		HTML_facileFormsMenu::create($option, $pkg, $lists);
-	} // create
+    public function getItems(string $pkg): array
+    {
+        $db = $this->db();
+        $q  = $db->getQuery(true)
+            ->select([
+                $db->quoteName('m', 'id'),
+                $db->quoteName('m', 'package'),
+                $db->quoteName('m', 'parent'),
+                $db->quoteName('m', 'ordering'),
+                $db->quoteName('m', 'published'),
+                $db->quoteName('m', 'title'),
+                $db->quoteName('m', 'name'),
+                $db->quoteName('m', 'page'),
+            ])
+            ->from($db->quoteName('#__facileforms_compmenus', 'm'))
+            ->order([$db->quoteName('m.parent') . ' ASC', $db->quoteName('m.ordering') . ' ASC']);
 
-	static function edit($option, $pkg, $ids, $formid, $parent)
-	{
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
-		ArrayHelper::toInteger($ids);
-		$row = new facileFormsMenus($database);
-		if ($formid == '')
-			$row->load($ids[0]);
-		else {
-			if ($formid > 0) {
-				$form = new facileFormsForms($database);
-				$form->load($formid);
-				$row->title = $form->title;
-				$row->name = $form->name;
-			} // if
-			$row->parent = $parent;
-			$database->setQuery(
-				"select max(ordering)+1 " .
-				"from #__facileforms_compmenus " .
-				"where parent=$parent"
-			);
-			$row->ordering = $database->loadResult();
-		} // if
+        if ($pkg !== '') {
+            $q->where($db->quoteName('m.package') . ' = ' . $db->quote($pkg));
+        }
 
-		$lists = array();
+        return $db->setQuery($q)->loadObjectList() ?: [];
+    }
 
-		$parents = array();
-		$parents[] = HTMLHelper::_('select.option', 0, BFText::_('COM_BREEZINGFORMSNG_MENUS_TOP'));
-		$database->setQuery(
-			"select id as value, title as text " .
-			"from #__facileforms_compmenus " .
-			"where parent=0 " .
-			"order by title, id"
-		);
-		$plist = $database->loadObjectList();
-		if (count($plist))
-			foreach ($plist as $obj)
-				$parents[] = $obj;
-		$lists['parents'] =
-			HTMLHelper::_(
-				'select.genericlist',
-				$parents,
-				'parent',
-				'class="inputbox" size="1"',
-				'value',
-				'text',
-				intval($row->parent)
-			);
+    public function getItem(int $id): ?\stdClass
+    {
+        if ($id <= 0) {
+            $obj            = new \stdClass();
+            $obj->id        = 0;
+            $obj->package   = '';
+            $obj->parent    = 0;
+            $obj->ordering  = 0;
+            $obj->published = 1;
+            $obj->img       = '';
+            $obj->title     = '';
+            $obj->name      = '';
+            $obj->page      = 1;
+            $obj->frame     = 0;
+            $obj->border    = 0;
+            $obj->params    = '';
+            return $obj;
+        }
 
-		$order =
-			HTMLHelper::_(
-				'list.genericordering',
-				"select ordering as value, title as text " .
-				"from #__facileforms_compmenus " .
-				"where parent=" . $row->parent . " and package= " . $database->Quote($pkg) . " " .
-				"order by ordering"
-			);
-		$lists['ordering'] =
-			HTMLHelper::_(
-				'select.genericlist',
-				$order,
-				'ordering',
-				'class="inputbox" size="1"',
-				'value',
-				'text',
-				intval($row->ordering)
-			);
+        $db = $this->db();
+        $q  = $db->getQuery(true)
+            ->select('*')
+            ->from($db->quoteName('#__facileforms_compmenus'))
+            ->where($db->quoteName('id') . ' = ' . $db->quote($id));
 
-		$lists['imgs'] = array(
-			'js/ThemeOffice/add_section.png',
-			'js/ThemeOffice/backup.png',
-			'js/ThemeOffice/categories.png',
-			'js/ThemeOffice/checkin.png',
-			'js/ThemeOffice/component.png',
-			'js/ThemeOffice/config.png',
-			'js/ThemeOffice/content.png',
-			'js/ThemeOffice/controlpanel.png',
-			'js/ThemeOffice/credits.png',
-			'js/ThemeOffice/db.png',
-			'js/ThemeOffice/document.png',
-			'js/ThemeOffice/edit.png',
-			'js/ThemeOffice/globe1.png',
-			'js/ThemeOffice/globe2.png',
-			'js/ThemeOffice/globe3.png',
-			'js/ThemeOffice/globe4.png',
-			'js/ThemeOffice/help.png',
-			'js/ThemeOffice/home.png',
-			'js/ThemeOffice/install.png',
-			'js/ThemeOffice/language.png',
-			'js/ThemeOffice/license.png',
-			'js/ThemeOffice/mail.png',
-			'js/ThemeOffice/mainmenu.png',
-			'js/ThemeOffice/mass_email.png',
-			'js/ThemeOffice/media.png',
-			'js/ThemeOffice/menus.png',
-			'js/ThemeOffice/messaging.png',
-			'js/ThemeOffice/messaging_config.png',
-			'js/ThemeOffice/messaging_inbox.png',
-			'js/ThemeOffice/module.png',
-			'js/ThemeOffice/preview.png',
-			'js/ThemeOffice/query.png',
-			'js/ThemeOffice/restore.png',
-			'js/ThemeOffice/search_text.png',
-			'js/ThemeOffice/sections.png',
-			'js/ThemeOffice/statistics.png',
-			'js/ThemeOffice/sysinfo.png',
-			'js/ThemeOffice/template.png',
-			'js/ThemeOffice/tooltip.png',
-			'js/ThemeOffice/trash.png',
-			'js/ThemeOffice/tux.png',
-			'js/ThemeOffice/user.png',
-			'js/ThemeOffice/users.png',
-			'js/ThemeOffice/users_add.png',
-			'js/ThemeOffice/warning.png'
-		);
-		HTML_facileFormsMenu::edit($option, $pkg, $row, $lists);
-	} // edit
+        return $db->setQuery($q)->loadObject() ?: null;
+    }
 
-	static function save($option, $pkg)
-	{
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
-		$row = new facileFormsMenus($database);
+    public function getForms(): array
+    {
+        $db = $this->db();
+        $q  = $db->getQuery(true)
+            ->select([$db->quoteName('id'), $db->quoteName('name'), $db->quoteName('title')])
+            ->from($db->quoteName('#__facileforms_forms'))
+            ->order($db->quoteName('title') . ' ASC');
 
-		unset($_POST['ordering']);
-		unset($row->ordering);
+        return $db->setQuery($q)->loadObjectList() ?: [];
+    }
 
-		// bind it to the table
-		if (!$row->bind($_POST)) {
-			echo "<script> alert('" . $row->getError() . "'); window.history.go(-1); </script>\n";
-			exit();
-		} // if
+    public function getParents(string $pkg): array
+    {
+        $db = $this->db();
+        $q  = $db->getQuery(true)
+            ->select([$db->quoteName('id'), $db->quoteName('title')])
+            ->from($db->quoteName('#__facileforms_compmenus'))
+            ->where($db->quoteName('parent') . ' = 0')
+            ->order($db->quoteName('ordering') . ' ASC');
 
-		// store it in the db
-		if (!$row->store()) {
-			echo "<script> alert('" . $row->getError() . "'); window.history.go(-1); </script>\n";
-			exit();
-		} // if
-		$row->reorder('parent=' . $row->parent);
-		$result = updateComponentMenus();
-		$type = 'message';
-		$msg = BFText::_('COM_BREEZINGFORMSNG_MENUS_SAVED');
-		if ($result != '') {
-			$msg = $result;
-			$type = 'error';
-		}
-		Factory::getApplication()->enqueueMessage($msg, $type);
-		Factory::getApplication()->redirect("index.php?option=$option&act=managemenus&pkg=$pkg");
-	} // save
+        if ($pkg !== '') {
+            $q->where($db->quoteName('package') . ' = ' . $db->quote($pkg));
+        }
 
-	static function cancel($option, $pkg)
-	{
-		Factory::getApplication()->redirect("index.php?option=$option&act=managemenus&pkg=$pkg");
-	} // cancel
+        return $db->setQuery($q)->loadObjectList() ?: [];
+    }
 
-	static function copy($option, $pkg, $ids)
-	{
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
-		$total = count($ids);
-		$row = new facileFormsMenus($database);
-		$child = new facileFormsMenus($database);
-		if (count($ids))
-			foreach ($ids as $id) {
-				$row->load(intval($id));
-				$row->id = NULL;
-				$row->ordering = 999999;
-				$row->store();
-				$row->reorder('parent=0');
-				$database->setQuery("select id from #__facileforms_compmenus where parent=$id");
-				$cids = $database->loadObjectList();
-				for ($i = 0; $i < count($cids); $i++) {
-					$cid = $cids[$i];
-					$child->load(intval($cid->id));
-					$child->id = NULL;
-					$child->parent = $row->id;
-					$child->store();
-				} // for
-			} // foreach
-		$msg = $total . ' ' . BFText::_('COM_BREEZINGFORMSNG_MENUS_SUCOPIED');
-		$result = updateComponentMenus(true);
-		if ($result != '') {
-			$msg = $result;
-		}
-		Factory::getApplication()->enqueueMessage($msg, $result != '' ? 'error' : 'message');
-		Factory::getApplication()->redirect("index.php?option=$option&act=managemenus&pkg=$pkg");
-	} // copy
+    public function prefillFromForm(int $formId): \stdClass
+    {
+        $db  = $this->db();
+        $q   = $db->getQuery(true)
+            ->select([$db->quoteName('name'), $db->quoteName('title')])
+            ->from($db->quoteName('#__facileforms_forms'))
+            ->where($db->quoteName('id') . ' = ' . $db->quote($formId));
+        $form = $db->setQuery($q)->loadObject();
 
-	static function del($option, $pkg, $ids)
-	{
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
-		ArrayHelper::toInteger($ids);
-		if (count($ids)) {
-			$ids = implode(',', $ids);
-			$database->setQuery("delete from #__facileforms_compmenus where parent in ($ids)");
-			try {
-                $database->execute();
-            } catch (RuntimeException $e) {
-                echo "<script> alert('" . $e->getMessage() . "'); window.history.go(-1); </script>\n";
+        $obj            = new \stdClass();
+        $obj->id        = 0;
+        $obj->package   = '';
+        $obj->parent    = 0;
+        $obj->ordering  = 0;
+        $obj->published = 1;
+        $obj->img       = '';
+        $obj->title     = $form ? (string) $form->title : '';
+        $obj->name      = $form ? (string) $form->name  : '';
+        $obj->page      = 1;
+        $obj->frame     = 0;
+        $obj->border    = 0;
+        $obj->params    = '';
+        return $obj;
+    }
+
+    public function saveItem(array $data): int
+    {
+        $db = $this->db();
+
+        $id      = (int) ($data['id'] ?? 0);
+        $pkg     = (string) ($data['package'] ?? '');
+        $parent  = (int) ($data['parent']  ?? 0);
+        $title   = (string) ($data['title']   ?? '');
+        $name    = (string) ($data['name']    ?? '');
+        $page    = (int) ($data['page']    ?? 1);
+        $frame   = (int) ($data['frame']   ?? 0);
+        $border  = (int) ($data['border']  ?? 0);
+        $img     = (string) ($data['img']     ?? '');
+        $params  = (string) ($data['params']  ?? '');
+        $pub     = (int) ($data['published'] ?? 1);
+
+        if ($title === '') {
+            throw new \RuntimeException(\Joomla\CMS\Language\Text::_('COM_BREEZINGFORMSNG_MENUS_TITLEEMPTY'));
+        }
+
+        if ($id > 0) {
+            $q = $db->getQuery(true)
+                ->update($db->quoteName('#__facileforms_compmenus'))
+                ->set([
+                    $db->quoteName('package')   . ' = ' . $db->quote($pkg),
+                    $db->quoteName('parent')    . ' = ' . $db->quote($parent),
+                    $db->quoteName('title')     . ' = ' . $db->quote($title),
+                    $db->quoteName('name')      . ' = ' . $db->quote($name),
+                    $db->quoteName('page')      . ' = ' . $db->quote($page),
+                    $db->quoteName('frame')     . ' = ' . $db->quote($frame),
+                    $db->quoteName('border')    . ' = ' . $db->quote($border),
+                    $db->quoteName('img')       . ' = ' . $db->quote($img),
+                    $db->quoteName('params')    . ' = ' . $db->quote($params),
+                    $db->quoteName('published') . ' = ' . $db->quote($pub),
+                ])
+                ->where($db->quoteName('id') . ' = ' . $db->quote($id));
+            $db->setQuery($q)->execute();
+        } else {
+            $maxQ = $db->getQuery(true)
+                ->select('COALESCE(MAX(' . $db->quoteName('ordering') . '), 0) + 1')
+                ->from($db->quoteName('#__facileforms_compmenus'))
+                ->where($db->quoteName('parent') . ' = ' . $db->quote($parent))
+                ->where($db->quoteName('package') . ' = ' . $db->quote($pkg));
+            $ordering = (int) $db->setQuery($maxQ)->loadResult();
+
+            $q = $db->getQuery(true)
+                ->insert($db->quoteName('#__facileforms_compmenus'))
+                ->columns([
+                    $db->quoteName('package'), $db->quoteName('parent'), $db->quoteName('ordering'),
+                    $db->quoteName('published'), $db->quoteName('img'), $db->quoteName('title'),
+                    $db->quoteName('name'), $db->quoteName('page'), $db->quoteName('frame'),
+                    $db->quoteName('border'), $db->quoteName('params'),
+                ])
+                ->values(implode(',', [
+                    $db->quote($pkg), $db->quote($parent), $db->quote($ordering),
+                    $db->quote($pub), $db->quote($img), $db->quote($title),
+                    $db->quote($name), $db->quote($page), $db->quote($frame),
+                    $db->quote($border), $db->quote($params),
+                ]));
+            $db->setQuery($q)->execute();
+            $id = (int) $db->insertid();
+        }
+
+        $this->reorder($parent, $pkg);
+        return $id;
+    }
+
+    public function deleteItems(array $ids): void
+    {
+        if (empty($ids)) {
+            return;
+        }
+
+        $db      = $this->db();
+        $intIds  = array_map('intval', $ids);
+        $inList  = implode(',', $intIds);
+
+        $childQ = $db->getQuery(true)
+            ->select($db->quoteName('id'))
+            ->from($db->quoteName('#__facileforms_compmenus'))
+            ->where($db->quoteName('parent') . ' IN (' . $inList . ')');
+        $childIds = $db->setQuery($childQ)->loadColumn();
+
+        $allIds = array_merge($intIds, array_map('intval', $childIds ?: []));
+        $allIn  = implode(',', array_unique($allIds));
+
+        $db->setQuery(
+            $db->getQuery(true)
+                ->delete($db->quoteName('#__facileforms_compmenus'))
+                ->where($db->quoteName('id') . ' IN (' . $allIn . ')')
+        )->execute();
+    }
+
+    public function copyItems(array $ids): void
+    {
+        if (empty($ids)) {
+            return;
+        }
+
+        $db = $this->db();
+        foreach (array_map('intval', $ids) as $id) {
+            $src = $this->getItem($id);
+            if ($src === null) {
+                continue;
             }
-			$database->setQuery("delete from #__facileforms_compmenus where id in ($ids)");
-            try {
-                $database->execute();
-            } catch (RuntimeException $e) {
-                echo "<script> alert('" . $e->getMessage() . "'); window.history.go(-1); </script>\n";
+
+            $data           = (array) $src;
+            $data['id']     = 0;
+            $data['title']  = $src->title . ' (copy)';
+            $newId          = $this->saveItem($data);
+
+            $childQ = $db->getQuery(true)
+                ->select('*')
+                ->from($db->quoteName('#__facileforms_compmenus'))
+                ->where($db->quoteName('parent') . ' = ' . $db->quote($id));
+            $children = $db->setQuery($childQ)->loadObjectList() ?: [];
+
+            foreach ($children as $child) {
+                $cd          = (array) $child;
+                $cd['id']    = 0;
+                $cd['parent']= $newId;
+                $this->saveItem($cd);
             }
-		} // if
-		updateComponentMenus();
-		Factory::getApplication()->redirect("index.php?option=$option&act=managemenus&pkg=$pkg");
-	} // del
+        }
+    }
 
-	static function order($option, $pkg, $ids, $inc)
-	{
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
-		ArrayHelper::toInteger($ids);
-		$row = new facileFormsMenus($database);
-		$row->load($ids[0]);
-		$row->move($inc, "package=" . $database->Quote($pkg) . " and parent=" . $row->parent);
-		updateComponentMenus();
-		Factory::getApplication()->redirect("index.php?option=$option&act=managemenus&pkg=$pkg");
-	} // order
+    public function publish(array $ids, int $state): void
+    {
+        if (empty($ids)) {
+            return;
+        }
 
-	static function publish($option, $pkg, $ids, $publish)
-	{
-		ArrayHelper::toInteger($ids);
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
-		$ids = implode(',', $ids);
-		$database->setQuery(
-			"update #__facileforms_compmenus set published='$publish' where id in ($ids)"
-		);
-		try {
-			$database->execute();
-		} catch (RuntimeException $e) {
-			echo "<script> alert('" . $e->getMessage() . "'); window.history.go(-1); </script>\n";
-			exit();
-		}
+        $db     = $this->db();
+        $intIds = implode(',', array_map('intval', $ids));
+        $db->setQuery(
+            $db->getQuery(true)
+                ->update($db->quoteName('#__facileforms_compmenus'))
+                ->set($db->quoteName('published') . ' = ' . $db->quote($state))
+                ->where($db->quoteName('id') . ' IN (' . $intIds . ')')
+        )->execute();
+    }
 
-		updateComponentMenus();
-		Factory::getApplication()->redirect("index.php?option=$option&act=managemenus&pkg=$pkg");
-	} // publish
+    public function moveOrder(int $id, int $inc, string $pkg): void
+    {
+        $item = $this->getItem($id);
+        if ($item === null) {
+            return;
+        }
 
-	static function listitems($option, $pkg)
-	{
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->db();
 
-		$database->setQuery(
-			"select distinct package as name " .
-			"from #__facileforms_compmenus " .
-			"where package is not null and package!='' " .
-			"order by name"
-		);
+        $dir      = $inc > 0 ? '>' : '<';
+        $sort     = $inc > 0 ? 'ASC' : 'DESC';
+        $neighbor = $db->setQuery(
+            $db->getQuery(true)
+                ->select(['id', 'ordering'])
+                ->from($db->quoteName('#__facileforms_compmenus'))
+                ->where($db->quoteName('parent')  . ' = ' . $db->quote($item->parent))
+                ->where($db->quoteName('package') . ' = ' . $db->quote($pkg))
+                ->where($db->quoteName('ordering') . ' ' . $dir . ' ' . $db->quote($item->ordering))
+                ->order($db->quoteName('ordering') . ' ' . $sort)
+        )->loadObject();
 
-		try {
-			$pkgs = $database->loadObjectList();
-		} catch (\Exception $e) {
-			echo $e->getMessage();
-			return false;
-		} // try
+        if ($neighbor === null) {
+            return;
+        }
 
-		$pkgok = $pkg == '';
-		if (!$pkgok && count($pkgs))
-			foreach ($pkgs as $p)
-				if ($p->name == $pkg) {
-					$pkgok = true;
-					break;
-				}
-		if (!$pkgok)
-			$pkg = '';
-		$pkglist = array();
-		$pkglist[] = array($pkg == '', '');
-		if (count($pkgs))
-			foreach ($pkgs as $p)
-				$pkglist[] = array($p->name == $pkg, $p->name);
+        $db->setQuery(
+            $db->getQuery(true)
+                ->update($db->quoteName('#__facileforms_compmenus'))
+                ->set($db->quoteName('ordering') . ' = ' . $db->quote($neighbor->ordering))
+                ->where($db->quoteName('id') . ' = ' . $db->quote($id))
+        )->execute();
 
-		$database->setQuery(
-			"select " .
-			"m.id as id, " .
-			"if(m.parent,concat(p.title,'/',m.title),m.title) as title, " .
-			"m.img as img, " .
-			"m.name as name, " .
-			"m.frame as frame, " .
-			"m.border as border, " .
-			"m.params as params, " .
-			"m.published as published " .
-			"from #__facileforms_compmenus as m " .
-			"left join #__facileforms_compmenus as p on m.parent=p.id " .
-			"where m.package =  " . $database->Quote($pkg) . " " .
-			"order by " .
-			"if(m.parent,p.ordering,m.ordering), " .
-			"if(m.parent,m.ordering,-1)"
-		);
-		$rows = $database->loadObjectList();
+        $db->setQuery(
+            $db->getQuery(true)
+                ->update($db->quoteName('#__facileforms_compmenus'))
+                ->set($db->quoteName('ordering') . ' = ' . $db->quote($item->ordering))
+                ->where($db->quoteName('id') . ' = ' . $db->quote($neighbor->id))
+        )->execute();
+    }
 
-		try {
-			$rows = $database->loadObjectList();
-		} catch (\Exception $e) {
-			echo $e->getMessage();
-			return false;
-		} // try
+    public function syncToJoomlaMenu(): void
+    {
+        $db = $this->db();
 
-		HTML_facileFormsMenu::listitems($option, $rows, $pkglist);
-	} // listitems
+        $protectedQ = $db->getQuery(true)
+            ->select($db->quoteName('id'))
+            ->from($db->quoteName('#__menu'))
+            ->where($db->quoteName('link') . ' LIKE ' . $db->quote('index.php?option=com_breezingformsng&act=run%'))
+            ->where($db->quoteName('checked_out') . ' != 0');
+        $protected = $db->setQuery($protectedQ)->loadColumn() ?: [];
 
-} // class facileFormsMenu
-?>
+        $deleteQ = $db->getQuery(true)
+            ->delete($db->quoteName('#__menu'))
+            ->where($db->quoteName('link') . ' LIKE ' . $db->quote('index.php?option=com_breezingformsng&act=run%'));
+
+        if (!empty($protected)) {
+            $deleteQ->where($db->quoteName('id') . ' NOT IN (' . implode(',', array_map('intval', $protected)) . ')');
+        }
+
+        $db->setQuery($deleteQ)->execute();
+
+        $menuQ = $db->getQuery(true)
+            ->select('*')
+            ->from($db->quoteName('#__facileforms_compmenus'))
+            ->where($db->quoteName('published') . ' = 1')
+            ->order($db->quoteName('id') . ' ASC');
+        $items = $db->setQuery($menuQ)->loadObjectList() ?: [];
+
+        $parentRowQ = $db->getQuery(true)
+            ->select(['id', 'lft', 'rgt', 'level', 'client_id'])
+            ->from($db->quoteName('#__menu'))
+            ->where($db->quoteName('link') . ' = ' . $db->quote('index.php?option=com_breezingformsng'))
+            ->where($db->quoteName('client_id') . ' = 1');
+        $parentRow = $db->setQuery($parentRowQ)->loadObject();
+
+        if ($parentRow === null) {
+            return;
+        }
+
+        $idMap = [];
+
+        foreach ($items as $item) {
+            $link  = 'index.php?option=com_breezingformsng&act=run&ff_name=' . rawurlencode((string) $item->name);
+            $title = (string) $item->title;
+
+            $parentId    = (int) $item->parent;
+            $joomlaParentId = $parentId > 0 && isset($idMap[$parentId])
+                ? $idMap[$parentId]
+                : (int) $parentRow->id;
+
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->select(['rgt', 'level'])
+                    ->from($db->quoteName('#__menu'))
+                    ->where($db->quoteName('id') . ' = ' . $db->quote($joomlaParentId))
+            );
+            $parentData = $db->loadObject();
+            if ($parentData === null) {
+                continue;
+            }
+
+            $rgt   = (int) $parentData->rgt;
+            $level = (int) $parentData->level + 1;
+
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->update($db->quoteName('#__menu'))
+                    ->set($db->quoteName('lft') . ' = ' . $db->quoteName('lft') . ' + 2')
+                    ->where($db->quoteName('lft') . ' >= ' . $db->quote($rgt))
+                    ->where($db->quoteName('client_id') . ' = 1')
+            )->execute();
+
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->update($db->quoteName('#__menu'))
+                    ->set($db->quoteName('rgt') . ' = ' . $db->quoteName('rgt') . ' + 2')
+                    ->where($db->quoteName('rgt') . ' >= ' . $db->quote($rgt))
+                    ->where($db->quoteName('client_id') . ' = 1')
+            )->execute();
+
+            $q = $db->getQuery(true)
+                ->insert($db->quoteName('#__menu'))
+                ->columns([
+                    $db->quoteName('menutype'), $db->quoteName('title'), $db->quoteName('alias'),
+                    $db->quoteName('note'), $db->quoteName('link'), $db->quoteName('type'),
+                    $db->quoteName('published'), $db->quoteName('parent_id'), $db->quoteName('level'),
+                    $db->quoteName('component_id'), $db->quoteName('checked_out'),
+                    $db->quoteName('checked_out_time'), $db->quoteName('browserNav'),
+                    $db->quoteName('access'), $db->quoteName('img'), $db->quoteName('template_style_id'),
+                    $db->quoteName('params'), $db->quoteName('lft'), $db->quoteName('rgt'),
+                    $db->quoteName('home'), $db->quoteName('language'), $db->quoteName('client_id'),
+                ])
+                ->values(implode(',', [
+                    $db->quote(''), $db->quote($title), $db->quote($title),
+                    $db->quote(''), $db->quote($link), $db->quote('component'),
+                    $db->quote(1), $db->quote($joomlaParentId), $db->quote($level),
+                    $db->quote(0), $db->quote(0),
+                    $db->quote('0000-00-00 00:00:00'), $db->quote(0),
+                    $db->quote(0), $db->quote(''), $db->quote(0),
+                    $db->quote(''), $db->quote($rgt), $db->quote($rgt + 1),
+                    $db->quote(0), $db->quote('*'), $db->quote(1),
+                ]));
+
+            $db->setQuery($q)->execute();
+            $idMap[(int) $item->id] = (int) $db->insertid();
+        }
+    }
+
+    private function reorder(int $parent, string $pkg): void
+    {
+        $db = $this->db();
+        $q  = $db->getQuery(true)
+            ->select($db->quoteName('id'))
+            ->from($db->quoteName('#__facileforms_compmenus'))
+            ->where($db->quoteName('parent')  . ' = ' . $db->quote($parent))
+            ->where($db->quoteName('package') . ' = ' . $db->quote($pkg))
+            ->order($db->quoteName('ordering') . ' ASC');
+
+        $ids = $db->setQuery($q)->loadColumn() ?: [];
+
+        foreach (array_values($ids) as $pos => $rowId) {
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->update($db->quoteName('#__facileforms_compmenus'))
+                    ->set($db->quoteName('ordering') . ' = ' . $db->quote($pos + 1))
+                    ->where($db->quoteName('id') . ' = ' . $db->quote($rowId))
+            )->execute();
+        }
+    }
+}

@@ -204,14 +204,18 @@
 - [x] `admin.breezingforms.php` : `default` ne tente plus d'inclure des fichiers supprimés
 - [x] EasyMode et ClassicMode supprimés côté fichiers admin (par l'utilisateur)
 
-### Bloqué — dépend de la migration Pieces/Scripts (bootstrapLegacyRuntime)
-- [ ] Corriger `toolbar.facileforms.php` : `facileforms.class.php` et `admin/config.class.php` sont absents → `PiecesController::bootstrapLegacyRuntime()` est cassé pour `testrunajax`
-- [ ] Vider `DisplayController::display()` de son `include admin.breezingforms.php` (le bridge n'est plus atteint pour aucune route valide)
-- [ ] Supprimer `administrator/components/com_breezingformsng/admin.breezingforms.php`
-- [ ] Supprimer `toolbar.facileforms.php` et `toolbar.facileforms.html.php`
-- [ ] Supprimer `src/Helper/LegacyClassLoader.php`
+### Complété
+- [x] `PiecesController::bootstrapLegacyRuntime()` — `toolbar.facileforms.php` remplacé : require direct de `facileforms.class.php` + stdClass `$ff_config`
+- [x] `ScriptsController::bootstrapLegacyRuntime()` — même correction
+- [x] `DisplayController::display()` vidé de son `include admin.breezingforms.php`
+- [x] Supprimé `administrator/components/com_breezingformsng/admin.breezingforms.php`
+- [x] Supprimé `toolbar.facileforms.php` et `toolbar.facileforms.html.php`
+- [x] Supprimé `admin/download.php`
+
+### Bloqué — dépend de phases futures
+- [ ] Supprimer `src/Helper/LegacyClassLoader.php` (QuickModeHtml + BF* encore nécessaires)
 - [ ] Retirer l'enregistrement de `LegacyClassLoader` dans `services/provider.php`
-- [ ] Supprimer `admin/download.php` et le répertoire `admin/` s'il est vide
+- [ ] Supprimer le répertoire `admin/` (JS/CSS encore référencés dans `joomla.asset.json`)
 
 ### Vérification finale
 - [ ] Naviguer dans **tous** les écrans admin sans erreur

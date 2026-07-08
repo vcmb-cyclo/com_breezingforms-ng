@@ -573,7 +573,7 @@ class RecordsController extends BaseController
             ->createModel('Record', 'Administrator');
     }
 
-    private function listUrl(\Joomla\CMS\Input\Input $input): string
+    private function listUrl(\Joomla\Input\Input $input): string
     {
         $formSelection = $input->getInt('form_selection', 0);
         $searchTerm = $input->getString('searchterm', '');

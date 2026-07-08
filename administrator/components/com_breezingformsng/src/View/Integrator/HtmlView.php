@@ -51,7 +51,7 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
         ToolbarHelper::deleteList('', 'integrator.remove');
     }
 
-    private function prepareEdit(IntegratorModel $model, \Joomla\CMS\Input\Input $input): void
+    private function prepareEdit(IntegratorModel $model, \Joomla\Input\Input $input): void
     {
         $id         = $input->getInt('id', 0);
         $this->rule = $id > 0 ? $model->getRule($id) : null;

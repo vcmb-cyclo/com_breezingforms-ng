@@ -64,7 +64,7 @@ class HtmlView extends BaseHtmlView
         parent::display($tpl);
     }
 
-    private function prepareListData(\Joomla\CMS\Application\CMSApplication $app, \Joomla\CMS\Input\Input $input): void
+    private function prepareListData(\Joomla\CMS\Application\CMSApplication $app, \Joomla\Input\Input $input): void
     {
         $session = $app->getSession();
 
@@ -112,7 +112,7 @@ class HtmlView extends BaseHtmlView
         $app->getDocument()->getWebAssetManager()->useScript('table.columns');
     }
 
-    private function prepareEditData(\Joomla\CMS\Input\Input $input): void
+    private function prepareEditData(\Joomla\Input\Input $input): void
     {
         $recordId = $input->getInt('record_id', 0);
         $app = Factory::getApplication();

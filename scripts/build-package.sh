@@ -27,7 +27,8 @@ while IFS= read -r -d '' path; do
 done < <(
     git -C "${root_dir}" ls-files -z \
         administrator \
-        site \
+        components \
+        media \
         com_breezingformsng.xml \
         script.php
 )

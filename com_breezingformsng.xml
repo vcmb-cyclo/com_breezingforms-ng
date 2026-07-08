@@ -43,6 +43,16 @@
 		<folder>uploads</folder>
 	</files>
 
+	<languages folder="components/com_breezingformsng/language">
+		<language tag="de-DE">de-DE/com_breezingformsng.ini</language>
+		<language tag="en-GB">en-GB/com_breezingformsng.ini</language>
+		<language tag="es-ES">es-ES/com_breezingformsng.ini</language>
+		<language tag="fr-FR">fr-FR/com_breezingformsng.ini</language>
+		<language tag="hu-HU">hu-HU/com_breezingformsng.ini</language>
+		<language tag="nl-NL">nl-NL/com_breezingformsng.ini</language>
+		<language tag="tr-TR">tr-TR/com_breezingformsng.ini</language>
+	</languages>
+
 	<administration>
 		<menu>COM_BREEZINGFORMSNG</menu>
 
@@ -77,6 +87,29 @@
 			<folder>plugins</folder>
 		</files>
 
+		<languages folder="administrator/components/com_breezingformsng/language">
+			<language tag="de-DE">de-DE/com_breezingformsng.ini</language>
+			<language tag="de-DE">de-DE/com_breezingformsng.menu.ini</language>
+			<language tag="de-DE">de-DE/com_breezingformsng.sys.ini</language>
+			<language tag="en-GB">en-GB/com_breezingformsng.ini</language>
+			<language tag="en-GB">en-GB/com_breezingformsng.menu.ini</language>
+			<language tag="en-GB">en-GB/com_breezingformsng.sys.ini</language>
+			<language tag="es-ES">es-ES/com_breezingformsng.ini</language>
+			<language tag="es-ES">es-ES/com_breezingformsng.menu.ini</language>
+			<language tag="es-ES">es-ES/com_breezingformsng.sys.ini</language>
+			<language tag="fr-FR">fr-FR/com_breezingformsng.ini</language>
+			<language tag="fr-FR">fr-FR/com_breezingformsng.menu.ini</language>
+			<language tag="fr-FR">fr-FR/com_breezingformsng.sys.ini</language>
+			<language tag="hu-HU">hu-HU/com_breezingformsng.ini</language>
+			<language tag="hu-HU">hu-HU/com_breezingformsng.menu.ini</language>
+			<language tag="hu-HU">hu-HU/com_breezingformsng.sys.ini</language>
+			<language tag="nl-NL">nl-NL/com_breezingformsng.ini</language>
+			<language tag="nl-NL">nl-NL/com_breezingformsng.menu.ini</language>
+			<language tag="nl-NL">nl-NL/com_breezingformsng.sys.ini</language>
+			<language tag="tr-TR">tr-TR/com_breezingformsng.ini</language>
+			<language tag="tr-TR">tr-TR/com_breezingformsng.menu.ini</language>
+			<language tag="tr-TR">tr-TR/com_breezingformsng.sys.ini</language>
+		</languages>
 
 	</administration>
 

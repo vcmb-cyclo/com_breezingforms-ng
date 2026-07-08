@@ -166,12 +166,25 @@ class ScriptsController extends BaseController
             return;
         }
 
-        $task = Factory::getApplication()->getInput()->getCmd('task', '');
-        $comppath = '/components/com_breezingformsng';
+        $task       = '';
+        $comppath   = '/components/com_breezingformsng';
         $ff_admpath = str_replace('\\', '/', JPATH_ADMINISTRATOR . '/components/com_breezingformsng');
         $ff_mospath = str_replace('\\', '/', dirname(dirname(dirname($ff_admpath))));
         $ff_compath = $ff_mospath . $comppath;
+        $ff_admsite = $ff_mospath . '/administrator' . $comppath;
+        $ff_admicon = $ff_admsite . '/images/icons';
 
-        require JPATH_ADMINISTRATOR . '/components/com_breezingformsng/toolbar.facileforms.php';
+        require_once JPATH_SITE . '/components/com_breezingformsng/facileforms.class.php';
+
+        $ff_config = (object) [
+            'areasmall'  => 4,
+            'areamedium' => 12,
+            'arealarge'  => 20,
+            'limitdesc'  => 100,
+            'piecepkg'   => '',
+            'scriptpkg'  => '',
+        ];
+        $ff_compatible = true;
+        $ff_install    = false;
     }
 }

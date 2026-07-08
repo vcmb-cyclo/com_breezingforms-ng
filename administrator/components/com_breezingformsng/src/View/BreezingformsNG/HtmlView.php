@@ -80,8 +80,9 @@ class HtmlView extends BaseHtmlView
         Sidebar::addEntry(
             '<i class="fa fa-link" aria-hidden="true"></i> ' . '<m>' .
             \BFText::_('COM_BREEZINGFORMSNG_INTEGRATOR') . '</m>',
-            'index.php?option=com_breezingformsng&act=integrate',
-            \BFRequest::getVar('act', '') == 'integrate'
+            'index.php?option=com_breezingformsng&view=integrator',
+            \BFRequest::getVar('view', '') === 'integrator'
+            || \BFRequest::getVar('act', '') === 'integrate'
         );
 
         /*

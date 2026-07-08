@@ -109,24 +109,28 @@
 **Priorité : moyenne.**
 
 ### Fichiers à créer
-- [ ] `src/Controller/IntegratorController.php`  
-  Tasks : `display`, `save`, `delete`, `test`
-- [ ] `src/Model/IntegratorModel.php`
-- [ ] `src/View/Integrator/HtmlView.php`
-- [ ] `tmpl/integrator/default.php`
+- [x] `src/Controller/IntegratorController.php`  
+  Tasks : `display`, `edit`, `save`, `remove`, `publish`, `unpublish`, `addItem`, `removeItem`, `saveCode`, `saveFinalizeCode`, `addCriteria*`, `removeCriteria*`, `publishItem`, `unpublishItem`
+- [x] `src/Model/IntegratorModel.php`
+- [x] `src/View/Integrator/HtmlView.php`
+- [x] `tmpl/integrator/default.php`
+- [x] `tmpl/integrator/edit.php`
 
 ### Fichiers à modifier
-- [ ] `src/Controller/DisplayController.php` — ajouter `view=integrator`
+- [x] `src/Controller/DisplayController.php` — ajouter `view=integrator` + intercept `act=integrate`
+- [x] `src/View/BreezingformsNG/HtmlView.php` — sidebar Integrator → `view=integrator`
 
 ### Fichiers à supprimer
-- [ ] `administrator/components/com_breezingformsng/admin/integrator.class.php`
-- [ ] `administrator/components/com_breezingformsng/admin/integrator.html.php`
-- [ ] `administrator/components/com_breezingformsng/admin/integrator.php`
+- [x] `admin/integrator.class.php` *(git mv → src/Model/IntegratorModel.php)*
+- [x] `admin/integrator.html.php` *(git mv → src/View/Integrator/HtmlView.php)*
+- [x] `admin/integrator.php` *(git rm — dispatcher)*
 
 ### Vérification
-- [ ] Liste des intégrations s'affiche
-- [ ] Création / sauvegarde / suppression d'une intégration
-- [ ] Test d'intégration fonctionnel
+- [ ] Liste des règles d'intégration s'affiche
+- [ ] Création d'une nouvelle règle (insert/update)
+- [ ] Ajout/suppression d'items et critères
+- [ ] Éditeur de code (CodeMirror) fonctionnel
+- [ ] Publish/unpublish règle et item
 
 ---
 

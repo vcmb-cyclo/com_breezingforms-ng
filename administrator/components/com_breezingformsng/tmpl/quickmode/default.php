@@ -1,0 +1,86 @@
+<?php
+/**
+ * @package BreezingFormsNG
+ * @copyright Copyright (C) 2024-2026 by XDA+GIL
+ * @license GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
+\defined('_JEXEC') or die;
+
+use Joomla\CMS\Uri\Uri;
+
+// QuickModeHtml is a legacy renderer loaded via LegacyClassLoader.
+// Trigger autoload so the class is available.
+class_exists('QuickModeHtml', true);
+
+$iconBase = Uri::root() . 'media/com_breezingformsng/images/quickmode/';
+
+// Build root JSON node when creating a new form (no saved template_code yet).
+if ($this->formId === 0 || $this->templateCode === '') {
+    $formNameJs = addslashes($this->formName);
+    $o = '{
+        attributes: {
+            "class": "bfQuickModeRootClass",
+            id: "bfQuickModeRoot",
+            mdata: JQuery.toJSON({ type: "root" })
+        },
+        properties: {
+            type: "root",
+            title: "' . $formNameJs . '",
+            name: "",
+            rollover: true,
+            rolloverColor: "#ffc",
+            toggleFields: "",
+            description: "",
+            mailNotification: false,
+            mailRecipient: "",
+            submitInclude: true,
+            submitLabel: "submit",
+            cancelInclude: false,
+            cancelLabel: "reset",
+            pagingInclude: true,
+            pagingNextLabel: "next",
+            pagingPrevLabel: "back",
+            theme: "default",
+            themebootstrap: "",
+            themebootstrapbefore: "",
+            themebootstrapLabelTop: false,
+            themebootstrapThemeEngine: "bootstrap",
+            themebootstrapUseHeroUnit: false,
+            themebootstrapUseWell: false,
+            themebootstrapUseProgress: false,
+            themeusebootstraplegacy: true,
+            fadeIn: false,
+            lastPageThankYou: false,
+            submittedScriptCondidtion: 0,
+            submittedScriptCode: "",
+            useErrorAlerts: false,
+            useDefaultErrors: true,
+            useBalloonErrors: false,
+            disableJQuery: false,
+            joomlaHint: false,
+            mobileEnabled: false,
+            forceMobile: false,
+            forceMobileUrl: "index.php"
+        },
+        state: "open",
+        data: { title: "' . $formNameJs . '", icon: "' . $iconBase . 'icon_form.png" },
+        children: []
+    }';
+} else {
+    $o = $this->templateCode;
+}
+
+echo QuickModeHtml::showApplication(
+    $this->formId,
+    $this->formName,
+    $this->formTitle,
+    $this->formDesc,
+    $this->emailntf,
+    $this->emailadr,
+    $o,
+    $this->elementScripts,
+    $this->themes,
+    $this->themesBootstrap,
+    $this->themesBootstrap4
+);

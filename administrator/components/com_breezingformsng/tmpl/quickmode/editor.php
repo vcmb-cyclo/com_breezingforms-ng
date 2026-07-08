@@ -17,7 +17,7 @@ use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 
-if (BFRequest::getVar('task') == 'editor_saved') {
+if (Factory::getApplication()->getInput()->getCmd('task') === 'quickmode.editor') {
     Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('
     parent.jQuery(".modal-header .close").trigger("click");
     ');
@@ -171,9 +171,8 @@ setTimeout("bfLoadText()",500);
 </script>
 
     <input type="hidden" name="option" value="com_breezingformsng"/>
-    <input type="hidden" name="act" value="quickmode_editor"/>
+    <input type="hidden" name="task" value="quickmode.editor"/>
     <input type="hidden" name="tmpl" value="component"/>
-    <input type="hidden" name="task" value="editor_saved"/>
 </form>
 ';
 

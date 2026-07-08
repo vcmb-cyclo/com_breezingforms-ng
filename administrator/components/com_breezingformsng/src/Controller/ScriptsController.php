@@ -156,7 +156,7 @@ class ScriptsController extends BaseController
         global $ff_mospath, $ff_admpath, $ff_compath;
         global $ff_mossite, $ff_admsite, $ff_admicon, $ff_comsite;
         global $ff_config, $ff_compatible, $ff_install;
-        global $task;
+        global $database, $task;
 
         Factory::getApplication()->getDocument()->getWebAssetManager()
             ->getRegistry()
@@ -165,6 +165,8 @@ class ScriptsController extends BaseController
         if (isset($ff_config)) {
             return;
         }
+
+        $database = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
         $task       = '';
         $comppath   = '/components/com_breezingformsng';

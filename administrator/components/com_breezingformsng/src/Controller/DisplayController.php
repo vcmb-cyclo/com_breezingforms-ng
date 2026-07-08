@@ -39,11 +39,18 @@ class DisplayController extends BaseController
 
         if ($task === '' && (
             $view === 'records'
-            || in_array($act, ['', 'managerecs', 'recordmanagement'], true)
+            || in_array($act, ['managerecs', 'recordmanagement'], true)
+            || ($act === '' && $view === '')
         )) {
             $input->set('view', 'records');
             $input->set('act', '');
             return parent::display($cachable, $urlparams);
+        }
+
+        if ($act === 'configuration') {
+            Factory::getApplication()->redirect(
+                'index.php?option=com_config&view=component&component=com_breezingformsng'
+            );
         }
 
         if ($task === '' && ($view === 'integrator' || $act === 'integrate')) {
@@ -124,11 +131,13 @@ class DisplayController extends BaseController
         global $ff_mospath, $ff_admpath, $ff_compath;
         global $ff_mossite, $ff_admsite, $ff_admicon, $ff_comsite;
         global $ff_config, $ff_compatible, $ff_install;
-        global $task;
+        global $database, $task;
 
         if (isset($ff_config)) {
             return;
         }
+
+        $database = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
         $task       = '';
         $comppath   = '/components/com_breezingformsng';

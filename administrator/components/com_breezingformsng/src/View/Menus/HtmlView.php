@@ -62,7 +62,7 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
         parent::display($tpl);
     }
 
-    private function resolvedPkg(\Joomla\CMS\Input\Input $input, MenuModel $model): string
+    private function resolvedPkg(\Joomla\Input\Input $input, MenuModel $model): string
     {
         $session = Factory::getApplication()->getSession();
         $pkg     = $input->getString('pkg', '__unset__');

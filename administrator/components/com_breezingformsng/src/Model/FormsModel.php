@@ -28,7 +28,7 @@ class FormsModel extends BaseModel
 
     private function db(): DatabaseInterface
     {
-        return $this->getDatabase();
+        return Factory::getContainer()->get(DatabaseInterface::class);
     }
 
     public function getPackages(): array

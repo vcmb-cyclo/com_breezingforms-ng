@@ -9,6 +9,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\BaseModel;
 use Joomla\Database\DatabaseInterface;
 
@@ -16,7 +17,7 @@ class MenuModel extends BaseModel
 {
     private function db(): DatabaseInterface
     {
-        return $this->getDatabase();
+        return Factory::getContainer()->get(DatabaseInterface::class);
     }
 
     public function getPackages(): array

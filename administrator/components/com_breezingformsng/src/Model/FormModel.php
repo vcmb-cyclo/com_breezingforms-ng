@@ -19,7 +19,7 @@ class FormModel extends BaseModel
 {
     private function db(): DatabaseInterface
     {
-        return $this->getDatabase();
+        return Factory::getContainer()->get(DatabaseInterface::class);
     }
 
     public function getForm(int $id): ?\stdClass

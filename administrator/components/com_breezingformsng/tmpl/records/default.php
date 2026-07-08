@@ -16,6 +16,8 @@ $listDirn   = $this->listDirn;
 $total      = $this->total;
 $limitStart = $this->limitStart;
 $limit      = $this->limit;
+$formSelection = $this->formSelection;
+$searchTerm = $this->searchTerm;
 
 $totalPages  = ($limit > 0) ? (int) ceil($total / $limit) : 1;
 $currentPage = ($limit > 0) ? (int) floor($limitStart / $limit) : 0;
@@ -29,22 +31,22 @@ $sortIcon = function (string $col) use ($listOrder, $listDirn): string {
         : ' <span class="icon-arrow-down" aria-hidden="true"></span>';
 };
 
-$sortUrl = function (string $col) use ($listOrder, $listDirn, $this): string {
+$sortUrl = function (string $col) use ($listOrder, $listDirn, $formSelection, $searchTerm): string {
     $dir = ($listOrder === $col && $listDirn === 'asc') ? 'desc' : 'asc';
     return 'index.php?option=com_breezingformsng&view=records'
         . '&filter_order=' . rawurlencode($col)
         . '&filter_order_Dir=' . $dir
-        . '&form_selection=' . $this->formSelection
-        . ($this->searchTerm !== '' ? '&searchterm=' . rawurlencode($this->searchTerm) : '')
+        . '&form_selection=' . $formSelection
+        . ($searchTerm !== '' ? '&searchterm=' . rawurlencode($searchTerm) : '')
         . '&limitstart=0';
 };
 
-$pageUrl = function (int $start) use ($listOrder, $listDirn, $this): string {
+$pageUrl = function (int $start) use ($listOrder, $listDirn, $formSelection, $searchTerm): string {
     return 'index.php?option=com_breezingformsng&view=records'
         . '&filter_order=' . rawurlencode($listOrder)
         . '&filter_order_Dir=' . $listDirn
-        . '&form_selection=' . $this->formSelection
-        . ($this->searchTerm !== '' ? '&searchterm=' . rawurlencode($this->searchTerm) : '')
+        . '&form_selection=' . $formSelection
+        . ($searchTerm !== '' ? '&searchterm=' . rawurlencode($searchTerm) : '')
         . '&limitstart=' . $start;
 };
 ?>

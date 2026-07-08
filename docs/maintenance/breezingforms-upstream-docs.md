@@ -160,9 +160,8 @@ Relevant local areas:
 - `administrator/components/com_breezingformsng/src/Service/PieceManager.php`
 - `components/com_breezingformsng/facileforms.process.php`
 
-The old ClassicMode `administrator/components/com_breezingformsng/admin/element*.php`
-editor files have been removed. Script and validation maintenance should target
-QuickMode and the shared runtime paths only.
+Script and validation maintenance should target QuickMode and the shared runtime
+paths only.
 
 ## Maintenance Use
 

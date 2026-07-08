@@ -26,9 +26,7 @@
 - [ ] Intégrateur (`admin/integrator.class.php` + `.html.php`)
 - [ ] Gestion des menus (`admin/menu.class.php` + `menu.html.php`)
 - [ ] Gestionnaire de formulaires (`admin/form.class.php` + `form.html.php` — ~180K lignes)
-- [ ] Éditeur d'éléments (`admin/element.class.php` + `element.html.php` — ~171K lignes)
 - [ ] QuickMode (`admin/quickmode.class.php` + `.html.php` + `.js` — ~560K lignes)
-- [ ] EasyMode (`admin/easymode.*`)
 - [ ] Import/export paquets (`admin/import.class.php`)
 - [ ] Frontend moteur formulaires (`facileforms.process.php` — **448 KB**, hors périmètre immédiat)
 
@@ -159,7 +157,7 @@
 
 ---
 
-## Phase 5 — Gestionnaire de formulaires `act=manageforms` + éditeur `act=editpage`
+## Phase 5 — Gestionnaire de formulaires `act=manageforms`
 
 **Priorité : critique. Effort très élevé (cœur du produit).**
 
@@ -176,8 +174,6 @@
 ### Fichiers modifiés
 - [x] `src/Controller/DisplayController.php` — intercept `act=manageforms` → `view=forms`
 - [x] `src/View/BreezingformsNG/HtmlView.php` — sidebar Forms → `view=forms`
-- [x] `admin/element.php` — suppression de l'include `form.class.php` devenu inutile
-
 ### Fichiers supprimés
 - [x] `administrator/components/com_breezingformsng/admin/form.php` (git rm)
 - [x] `administrator/components/com_breezingformsng/admin/run.php` (git rm, remplacé par `forms.run`)
@@ -186,9 +182,7 @@
 - [x] `administrator/components/com_breezingformsng/admin/import.class.php` (git mv → ImportModel)
 
 ### Périmètre différé (encore via legacy bridge)
-- Éditeur d'éléments (`act=editpage`) — `element.class.php` / `element.html.php` en place
 - QuickMode (`act=quickmode`) — `quickmode.class.php` / `quickmode.html.php` en place
-- EasyMode (`act=easymode`) — `easymode.class.php` / `easymode.html.php` en place
 - QuickMode JS AJAX endpoints — non migrés, restent sur legacy bridge
 - Import/export de paquets — ImportModel stub seulement
 
@@ -196,8 +190,7 @@
 - [ ] Lister les formulaires (filtres package, état, recherche ; tri ; pagination)
 - [ ] Créer / éditer / sauvegarder un formulaire (3 onglets de propriétés)
 - [ ] Dupliquer / supprimer / publier un formulaire
-- [ ] Ouvrir l'éditeur d'éléments depuis la liste (bouton Actions → legacy bridge)
-- [ ] QuickMode fonctionnel depuis l'éditeur d'éléments (legacy bridge intact)
+- [ ] Ouvrir QuickMode depuis la liste
 
 ---
 

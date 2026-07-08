@@ -48,6 +48,12 @@ class DisplayController extends BaseController
             return parent::display($cachable, $urlparams);
         }
 
+        if ($task === '' && ($view === 'integrator' || $act === 'integrate')) {
+            $input->set('view', 'integrator');
+            $input->set('act', '');
+            return parent::display($cachable, $urlparams);
+        }
+
         if ($task === '' && in_array($view, ['pieces', 'scripts'], true)) {
             $this->bootstrapLegacyListRenderer();
             $this->prepareListPackage($view);

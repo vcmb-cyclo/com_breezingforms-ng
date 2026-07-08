@@ -385,48 +385,7 @@ if (!$isRawAjaxTask) {
 }
 
 switch ($act) {
-    case 'installation':
-        require_once ($ff_admpath . '/admin/config.php');
-        break;
-    case 'configuration':
-        require_once ($ff_admpath . '/admin/config.php');
-        break;
-    case 'managemenus':
-        require_once ($ff_admpath . '/admin/menu.php');
-        break;
-    case 'manageforms':
-        switch ($task) {
-            case 'manageforms':
-                require_once ($ff_admpath . '/admin/quickmode.php');
-                break;
-            case 'quickmode':
-                require_once ($ff_admpath . '/admin/quickmode.php');
-                break;
-            case 'quickmode_editor':
-                require_once ($ff_admpath . '/admin/quickmode-editor.php');
-                break;
-            default:
-                require_once ($ff_admpath . '/admin/quickmode.php');
-                break;
-        }
-        break;
-    case 'run':
-        require_once ($ff_admpath . '/admin/run.php');
-        break;
-    case 'quickmode':
-        require_once ($ff_admpath . '/admin/quickmode.php');
-        break;
-    case 'quickmode_editor':
-        require_once ($ff_admpath . '/admin/quickmode-editor.php');
-        break;
-    case 'integrate':
-        require_once ($ff_admpath . '/admin/integrator.php');
-        break;
-    case 'recordmanagement':
-        require_once ($ff_admpath . '/admin/recordmanagement.php');
-        break;
     default:
-        require_once ($ff_admpath . '/admin/recordmanagement.php');
         break;
 } // switch
 

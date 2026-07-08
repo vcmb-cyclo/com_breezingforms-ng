@@ -22,6 +22,7 @@ final class LegacyClassLoader
         'BFPDF' => 'libraries/crosstec/classes/BFPDF.php',
         'BFPagination' => 'libraries/crosstec/classes/BFPagination.php',
         'BFPaginationChrome' => 'libraries/crosstec/classes/BFPaginationChrome.php',
+        'QuickModeHtml' => 'src/Helper/QuickmodeHtml.php',
         'BFQuickMode' => 'libraries/crosstec/classes/BFQuickMode.php',
         'BFQuickModeBootstrap' => 'libraries/crosstec/classes/BFQuickModeBootstrap.php',
         'BFQuickModeMobile' => 'libraries/crosstec/classes/BFQuickModeMobile.php',

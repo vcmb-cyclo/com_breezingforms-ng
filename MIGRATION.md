@@ -194,16 +194,24 @@
 
 ---
 
-## Phase 6 — Suppression du bridge legacy
+## Phase 6 — Nettoyage partiel du bridge legacy
 
-**À faire uniquement quand toutes les phases 1–5 sont complètes.**
+**Phase partielle — QuickMode encore via bridge.**
 
-- [ ] Vider `DisplayController::display()` de son `include admin.breezingforms.php`
+### Effectué
+- [x] `DisplayController` : les tâches `quickmode`/`quickmode_editor`/`doAjaxSave` passent au bridge sans interception MVC
+- [x] `admin.breezingforms.php` : suppression des `case` morts (`installation`, `configuration`, `managemenus`, `integrate`, `recordmanagement`, `run`) — tous ces actes sont interceptés par MVC avant d'atteindre le bridge
+- [x] `admin.breezingforms.php` : `default` ne tente plus d'inclure des fichiers supprimés
+- [x] EasyMode et ClassicMode supprimés côté fichiers admin (par l'utilisateur)
+
+### Bloqué — dépend de la migration Pieces/Scripts (bootstrapLegacyRuntime)
+- [ ] Corriger `toolbar.facileforms.php` : `facileforms.class.php` et `admin/config.class.php` sont absents → `PiecesController::bootstrapLegacyRuntime()` est cassé pour `testrunajax`
+- [ ] Vider `DisplayController::display()` de son `include admin.breezingforms.php` (le bridge n'est plus atteint pour aucune route valide)
 - [ ] Supprimer `administrator/components/com_breezingformsng/admin.breezingforms.php`
 - [ ] Supprimer `toolbar.facileforms.php` et `toolbar.facileforms.html.php`
 - [ ] Supprimer `src/Helper/LegacyClassLoader.php`
 - [ ] Retirer l'enregistrement de `LegacyClassLoader` dans `services/provider.php`
-- [ ] Supprimer le répertoire `admin/` s'il est vide
+- [ ] Supprimer `admin/download.php` et le répertoire `admin/` s'il est vide
 
 ### Vérification finale
 - [ ] Naviguer dans **tous** les écrans admin sans erreur
@@ -212,7 +220,31 @@
 
 ---
 
-## Phase 7 — Frontend (hors périmètre immédiat)
+## Phase 7 — QuickMode `act=quickmode` / `act=manageforms&task=quickmode`
+
+**Priorité : critique. QuickMode était cassé (toolbar.facileforms.php manquait config.class.php).**
+
+### Effectué
+- [x] `src/Model/QuickmodeModel.php` — migration complète de `QuickMode` : namespace, PHP 8.1, `json_encode/decode` et `base64_encode/decode` natifs (suppression dépendances `Zend_Json` et `bf_b64*`)
+- [x] `src/Helper/QuickmodeHtml.php` — renderer legacy déplacé, enregistré dans `LegacyClassLoader`
+- [x] `src/Controller/QuickmodeController.php` — tasks : `display`, `doAjaxSave`, `editor`
+- [x] `src/View/Quickmode/HtmlView.php` — vue Joomla 6 native, configure toolbar
+- [x] `tmpl/quickmode/default.php` — appelle `QuickModeHtml::showApplication()`
+- [x] `tmpl/quickmode/editor.php` — éditeur inline (git mv depuis `quickmode-editor.php`), task mise à jour vers `quickmode.editor`
+- [x] `DisplayController` — toutes les routes QuickMode (`act=quickmode*`, `act=manageforms&task=quickmode*`) interceptées avant le bridge
+- [x] `admin.breezingforms.php` — bridge entièrement vidé (switch ne contient plus que `default: break`)
+- [x] `admin/quickmode.php`, `admin/quickmode.class.php`, `admin/quickmode.html.php`, `admin/quickmode-editor.php` — supprimés
+
+### Vérification
+- [ ] Ouvrir QuickMode depuis la liste des formulaires
+- [ ] Sauvegarder un formulaire (AJAX chunked save → `doAjaxSave`)
+- [ ] Ajouter / modifier / supprimer des éléments
+- [ ] Éditeur inline (`act=quickmode_editor`, `tmpl=component`)
+- [ ] Prévisualisation frontend depuis QuickMode
+
+---
+
+## Phase 8 — Frontend (hors périmètre immédiat)
 
 > Projet de refonte dédié. Ne pas commencer avant que les phases 1–6 soient validées.
 

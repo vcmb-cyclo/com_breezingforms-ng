@@ -114,7 +114,7 @@ class FormsController extends BaseController
             $pkg = (string) ($data['package'] ?? '');
             $app->enqueueMessage(Text::_('JLIB_APPLICATION_SAVE_SUCCESS'), 'message');
             $app->redirect(Route::_(
-                'index.php?option=com_breezingformsng&act=manageforms&task=quickmode&form=' . $id
+                'index.php?option=com_breezingformsng&task=quickmode.display&form=' . $id
                 . ($pkg !== '' ? '&pkg=' . rawurlencode($pkg) : ''),
                 false
             ));

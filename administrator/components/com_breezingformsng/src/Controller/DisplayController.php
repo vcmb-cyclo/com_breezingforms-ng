@@ -59,31 +59,6 @@ class DisplayController extends BaseController
             return parent::display($cachable, $urlparams);
         }
 
-        // QuickMode: all routes → QuickmodeController (bypasses legacy bridge entirely)
-        if ($act === 'quickmode_editor'
-            || ($act === 'quickmode' && $task !== '')
-            || ($act === 'manageforms' && in_array($task, ['quickmode', 'quickmode_editor', 'doAjaxSave'], true))
-        ) {
-            $input->set('view', 'quickmode');
-            $input->set('act', '');
-            if ($act === 'quickmode_editor' || $task === 'quickmode_editor') {
-                $input->set('task', 'quickmode.editor');
-            } elseif ($task === 'doAjaxSave') {
-                $input->set('task', 'quickmode.doAjaxSave');
-            } else {
-                $input->set('task', '');
-            }
-            return parent::display($cachable, $urlparams);
-        }
-
-        // QuickMode display (no task): act=quickmode or act=manageforms&task=quickmode (JS redirect after save)
-        if ($act === 'quickmode' && $task === '') {
-            $input->set('view', 'quickmode');
-            $input->set('act', '');
-            $input->set('task', '');
-            return parent::display($cachable, $urlparams);
-        }
-
         if ($act === 'manageforms' || ($task === '' && $view === 'forms')) {
             $input->set('view', 'forms');
             $input->set('act', '');

@@ -103,7 +103,7 @@ $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
               </a>
             </td>
             <td class="text-center">
-              <a href="index.php?option=com_breezingformsng&act=manageforms&task=quickmode&form=<?= (int) $form->id; ?>&pkg=<?= rawurlencode($pkg); ?>"
+              <a href="index.php?option=com_breezingformsng&task=quickmode.display&form=<?= (int) $form->id; ?>&pkg=<?= rawurlencode($pkg); ?>"
                  class="btn btn-sm btn-outline-secondary" title="<?= Text::_('COM_BREEZINGFORMSNG_FORMS_OPEN_EDITOR'); ?>">
                 <span class="icon-edit" aria-hidden="true"></span>
               </a>

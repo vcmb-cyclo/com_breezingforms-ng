@@ -26,7 +26,7 @@
 - [ ] Intégrateur (`admin/integrator.class.php` + `.html.php`)
 - [ ] Gestion des menus (`admin/menu.class.php` + `menu.html.php`)
 - [ ] Gestionnaire de formulaires (`admin/form.class.php` + `form.html.php` — ~180K lignes)
-- [ ] QuickMode (`admin/quickmode.class.php` + `.html.php` + `.js` — ~560K lignes)
+- [x] QuickMode (`admin/quickmode.class.php` + `.html.php` + `.js` — migré Phase 7)
 - [ ] Import/export paquets (`admin/import.class.php`)
 - [ ] Frontend moteur formulaires (`facileforms.process.php` — **448 KB**, hors périmètre immédiat)
 
@@ -181,10 +181,12 @@
 - [x] `administrator/components/com_breezingformsng/admin/form.html.php` (git mv → Forms/HtmlView)
 - [x] `administrator/components/com_breezingformsng/admin/import.class.php` (git mv → ImportModel)
 
-### Périmètre différé (encore via legacy bridge)
-- QuickMode (`act=quickmode`) — `quickmode.class.php` / `quickmode.html.php` en place
-- QuickMode JS AJAX endpoints — non migrés, restent sur legacy bridge
+### Périmètre différé
 - Import/export de paquets — ImportModel stub seulement
+
+### Migré depuis cette phase
+- QuickMode — déplacé en Phase 7 vers `QuickmodeController`, `QuickmodeModel`, `QuickmodeHtml` et routes `task=quickmode.*`
+- QuickMode JS AJAX endpoint — migré vers `task=quickmode.doAjaxSave`
 
 ### Vérification
 - [ ] Lister les formulaires (filtres package, état, recherche ; tri ; pagination)
@@ -196,10 +198,10 @@
 
 ## Phase 6 — Nettoyage partiel du bridge legacy
 
-**Phase partielle — QuickMode encore via bridge.**
+**Phase partielle — le bridge admin principal est supprimé.**
 
 ### Effectué
-- [x] `DisplayController` : les tâches `quickmode`/`quickmode_editor`/`doAjaxSave` passent au bridge sans interception MVC
+- [x] `DisplayController` : les tâches `quickmode.display`/`quickmode.editor`/`quickmode.doAjaxSave` passent par le contrôleur MVC
 - [x] `admin.breezingforms.php` : suppression des `case` morts (`installation`, `configuration`, `managemenus`, `integrate`, `recordmanagement`, `run`) — tous ces actes sont interceptés par MVC avant d'atteindre le bridge
 - [x] `admin.breezingforms.php` : `default` ne tente plus d'inclure des fichiers supprimés
 - [x] EasyMode et ClassicMode supprimés côté fichiers admin (par l'utilisateur)
@@ -211,6 +213,8 @@
 - [x] Supprimé `administrator/components/com_breezingformsng/admin.breezingforms.php`
 - [x] Supprimé `toolbar.facileforms.php` et `toolbar.facileforms.html.php`
 - [x] Supprimé `admin/download.php`
+- [x] Routes sortantes QuickMode migrées vers `task=quickmode.display` / `task=quickmode.editor`
+- [x] Alias legacy QuickMode retirés de `DisplayController`
 
 ### Bloqué — dépend de phases futures
 - [ ] Supprimer `src/Helper/LegacyClassLoader.php` (QuickModeHtml + BF* encore nécessaires)
@@ -220,11 +224,11 @@
 ### Vérification finale
 - [ ] Naviguer dans **tous** les écrans admin sans erreur
 - [ ] Aucun `include` ou `require` vers `admin/` ne subsiste dans le call stack
-- [ ] `php -l` sur tous les fichiers `src/` : aucune erreur de syntaxe
+- [x] `php -l` sur tous les fichiers `src/` : aucune erreur de syntaxe
 
 ---
 
-## Phase 7 — QuickMode `act=quickmode` / `act=manageforms&task=quickmode`
+## Phase 7 — QuickMode `task=quickmode.display` / `task=quickmode.editor`
 
 **Priorité : critique. QuickMode était cassé (toolbar.facileforms.php manquait config.class.php).**
 
@@ -235,15 +239,17 @@
 - [x] `src/View/Quickmode/HtmlView.php` — vue Joomla 6 native, configure toolbar
 - [x] `tmpl/quickmode/default.php` — appelle `QuickModeHtml::showApplication()`
 - [x] `tmpl/quickmode/editor.php` — éditeur inline (git mv depuis `quickmode-editor.php`), task mise à jour vers `quickmode.editor`
-- [x] `DisplayController` — toutes les routes QuickMode (`act=quickmode*`, `act=manageforms&task=quickmode*`) interceptées avant le bridge
+- [x] `DisplayController` — alias legacy QuickMode (`act=quickmode*`, `act=manageforms&task=quickmode*`) retirés après migration des liens internes
 - [x] `admin.breezingforms.php` — bridge entièrement vidé (switch ne contient plus que `default: break`)
 - [x] `admin/quickmode.php`, `admin/quickmode.class.php`, `admin/quickmode.html.php`, `admin/quickmode-editor.php` — supprimés
+- [x] Liens internes migrés vers routes MVC `task=quickmode.display` / `task=quickmode.editor`
+- [x] Alias `act=quickmode*` supprimés de `DisplayController`
 
 ### Vérification
 - [ ] Ouvrir QuickMode depuis la liste des formulaires
 - [ ] Sauvegarder un formulaire (AJAX chunked save → `doAjaxSave`)
 - [ ] Ajouter / modifier / supprimer des éléments
-- [ ] Éditeur inline (`act=quickmode_editor`, `tmpl=component`)
+- [ ] Éditeur inline (`task=quickmode.editor`, `tmpl=component`)
 - [ ] Prévisualisation frontend depuis QuickMode
 
 ---

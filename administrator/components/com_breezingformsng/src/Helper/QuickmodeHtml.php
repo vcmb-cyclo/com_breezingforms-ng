@@ -175,7 +175,7 @@ class QuickModeHtml
                 ');
             }
             ?>
-            <div onclick="location.href = 'index.php?option=com_breezingformsng&format=html&act=manageforms&task=quickmode&formName=translationtest&form=<?php echo $formId ?>&active_language_code='"
+            <div onclick="location.href = 'index.php?option=com_breezingformsng&format=html&task=quickmode.display&formName=translationtest&form=<?php echo $formId ?>&active_language_code='"
                 class="bfLanguageButton<?php echo $active_language_code == $default || $active_language_code == '' ? ' bfLanguageButtonActive' : '' ?>">
                 <?php echo $default; ?>
             </div>
@@ -184,7 +184,7 @@ class QuickModeHtml
             foreach ($languages as $language) {
                 if ($language->lang_code != $default) {
                     ?>
-                    <div onclick="location.href = 'index.php?option=com_breezingformsng&format=html&act=manageforms&task=quickmode&formName=translationtest&form=<?php echo $formId ?>&active_language_code=<?php echo $language->lang_code; ?>'"
+                    <div onclick="location.href = 'index.php?option=com_breezingformsng&format=html&task=quickmode.display&formName=translationtest&form=<?php echo $formId ?>&active_language_code=<?php echo $language->lang_code; ?>'"
                         class="bfLanguageButton<?php echo $active_language_code == $language->lang_code ? ' bfLanguageButtonActive' : '' ?>">
                         <?php echo $language->lang_code; ?>
                     </div>
@@ -474,7 +474,7 @@ class QuickModeHtml
                                                 echo Bootstrap::renderModal(
                                                     'bfPropertiesIntroModal',
                                                     array(
-                                                        'url' => "index.php?option=com_breezingformsng&tmpl=component&act=quickmode_editor",
+                                                        'url' => "index.php?option=com_breezingformsng&tmpl=component&task=quickmode.editor",
                                                         'width' => '1024px',
                                                         'height' => '500px'
                                                     )
@@ -503,7 +503,7 @@ class QuickModeHtml
                                                 echo Bootstrap::renderModal(
                                                     'bfPropertiesIntroModal2',
                                                     array(
-                                                        'url' => "index.php?option=com_breezingformsng&tmpl=component&act=quickmode_editor&active_language_code=" . $active_language_code,
+                                                        'url' => "index.php?option=com_breezingformsng&tmpl=component&task=quickmode.editor&active_language_code=" . $active_language_code,
                                                         'width' => '1024px',
                                                         'height' => '500px'
                                                     )
@@ -598,7 +598,7 @@ class QuickModeHtml
                                                 echo Bootstrap::renderModal(
                                                     'bfPropertiesDescriptionModal',
                                                     array(
-                                                        'url' => "index.php?option=com_breezingformsng&tmpl=component&act=quickmode_editor",
+                                                        'url' => "index.php?option=com_breezingformsng&tmpl=component&task=quickmode.editor",
                                                         'width' => '1024px',
                                                         'height' => '500px'
                                                     )
@@ -626,7 +626,7 @@ class QuickModeHtml
                                                 echo Bootstrap::renderModal(
                                                     'bfPropertiesDescriptionModal2',
                                                     array(
-                                                        'url' => "index.php?option=com_breezingformsng&tmpl=component&act=quickmode_editor&active_language_code=" . $active_language_code,
+                                                        'url' => "index.php?option=com_breezingformsng&tmpl=component&task=quickmode.editor&active_language_code=" . $active_language_code,
                                                         'width' => '1024px',
                                                         'height' => '500px'
                                                     )
@@ -2186,7 +2186,7 @@ class QuickModeHtml
                                                 <?php echo BFText::_('COM_BREEZINGFORMSNG_ADVANCED_FORM_OPTIONS'); ?>
                                             </legend>
                                             <?php if ($formId != 0) { ?>
-                                                <a href="index.php?option=com_breezingformsng&task=editform&act=manageforms&form=<?php echo $formId ?>&pkg=QuickModeForms"
+                                                <a href="index.php?option=com_breezingformsng&task=forms.edit&id=<?php echo $formId ?>&pkg=QuickModeForms"
                                                     title="<?php echo BFText::_('COM_BREEZINGFORMSNG_MORE_OPTIONS'); ?>">
                                                     <?php echo htmlentities(BFText::_('COM_BREEZINGFORMSNG_MORE_OPTIONS'), ENT_QUOTES, 'UTF-8') ?>
                                                 </a>

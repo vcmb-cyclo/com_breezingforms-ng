@@ -111,73 +111,6 @@ if (!function_exists('bf_about_get_version_information')) {
     }
 }
 
-if (!function_exists('bf_about_get_log_report')) {
-    function bf_about_get_log_report()
-    {
-        $paths = array(
-            JPATH_ADMINISTRATOR . '/logs/breezingforms_install2.log',
-            JPATH_ADMINISTRATOR . '/logs/breezingforms_install.log',
-        );
-
-        $latestPath = '';
-        $latestMtime = 0;
-
-        foreach ($paths as $path) {
-            if (!is_file($path)) {
-                continue;
-            }
-
-            $mtime = (int) @filemtime($path);
-
-            if ($latestPath === '' || $mtime > $latestMtime) {
-                $latestPath = $path;
-                $latestMtime = $mtime;
-            }
-        }
-
-        if ($latestPath === '') {
-            return array();
-        }
-
-        $size = (int) @filesize($latestPath);
-        $tailBytes = 65536;
-        $content = '';
-        $truncated = false;
-
-        if ($size > 0) {
-            $handle = @fopen($latestPath, 'rb');
-
-            if (is_resource($handle)) {
-                if ($size > $tailBytes) {
-                    $truncated = true;
-                    fseek($handle, -$tailBytes, SEEK_END);
-                }
-
-                $content = (string) stream_get_contents($handle);
-                fclose($handle);
-            }
-        }
-
-        $loadedAt = '';
-
-        if ($latestMtime > 0) {
-            $timezone = new DateTimeZone((string) Factory::getApplication()->get('offset', 'UTC'));
-            $loadedAt = Factory::getDate('@' . $latestMtime)
-                ->setTimezone($timezone)
-                ->format('Y-m-d H:i:s', true);
-        }
-
-        return array(
-            'file' => basename($latestPath),
-            'size' => $size,
-            'loaded_at' => $loadedAt,
-            'content' => $content,
-            'truncated' => $truncated ? 1 : 0,
-            'tail_bytes' => $tailBytes,
-        );
-    }
-}
-
 if (!function_exists('bf_about_add_php_library')) {
     function bf_about_add_php_library(&$indexedLibraries, $name, $version, $isDev)
     {
@@ -376,7 +309,7 @@ if (!function_exists('bf_about_get_javascript_libraries')) {
 $versionInformation = bf_about_get_version_information();
 $phpLibraries = bf_about_get_php_libraries();
 $javascriptLibraries = bf_about_get_javascript_libraries();
-$logReport = bf_about_get_log_report();
+$logReport = is_array($this->logReport ?? null) ? $this->logReport : array();
 $notAvailable = BFText::_('COM_BREEZINGFORMSNG_NOT_AVAILABLE');
 
 $versionValue = $versionInformation['version'] !== '' ? $versionInformation['version'] : $notAvailable;

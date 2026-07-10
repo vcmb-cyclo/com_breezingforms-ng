@@ -3316,7 +3316,7 @@
                             JQuery('#adminForm').get(0).onsubmit = function () {
                                 return false;
                             };
-                            location.href = "index.php?option=com_breezingformsng&act=manageforms";
+                            location.href = "index.php?option=com_breezingformsng&view=forms";
                             break;
                         case 'save':
 

@@ -21,110 +21,6 @@ use Joomla\Filesystem\Folder;
 use Joomla\CMS\Log\Log;
 use Joomla\CMS\Table\Menu;
 
-if (!function_exists('_ff_query')) {
-    function _ff_query($sql, $insert = 0)
-    {
-        $database = Factory::getContainer()->get(DatabaseInterface::class);
-        $database->setQuery($sql);
-        $database->execute();
-
-        return $insert ? $database->insertid() : null;
-    }
-}
-
-if (!function_exists('_ff_select')) {
-    function _ff_select($sql)
-    {
-        $database = Factory::getContainer()->get(DatabaseInterface::class);
-        $database->setQuery($sql);
-
-        return $database->loadObjectList();
-    }
-}
-
-if (!function_exists('_ff_selectValue')) {
-    function _ff_selectValue($sql)
-    {
-        $database = Factory::getContainer()->get(DatabaseInterface::class);
-        $database->setQuery($sql);
-
-        return $database->loadResult();
-    }
-}
-
-if (!function_exists('savePackage')) {
-    function savePackage($id, $name, $title, $version, $created, $author, $email, $url, $description, $copyright)
-    {
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
-        $cnt = _ff_selectValue("select count(*) from #__facileforms_packages where id=" . $db->quote($id));
-
-        if (!$cnt) {
-            _ff_query(
-                "insert into #__facileforms_packages " .
-                "(id, name, title, version, created, author, email, url, description, copyright) " .
-                "values (" . $db->quote($id) . ", " . $db->quote($name) . ", " . $db->quote($title) . ", " .
-                $db->quote($version) . ", " . $db->quote($created) . ", " . $db->quote($author) . ", " .
-                $db->quote($email) . ", " . $db->quote($url) . ", " . $db->quote($description) . ", " .
-                $db->quote($copyright) . ")"
-            );
-        } else {
-            _ff_query(
-                "update #__facileforms_packages " .
-                "set name=" . $db->quote($name) . ", title=" . $db->quote($title) . ", version=" . $db->quote($version) . ", " .
-                "created=" . $db->quote($created) . ", author=" . $db->quote($author) . ", email=" . $db->quote($email) . ", " .
-                "url=" . $db->quote($url) . ", description=" . $db->quote($description) . ", " .
-                "copyright=" . $db->quote($copyright) . " where id = " . $db->quote($id)
-            );
-        }
-    }
-}
-
-if (!function_exists('relinkScripts')) {
-    function relinkScripts(&$oldscripts)
-    {
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
-
-        if ($oldscripts != null && count($oldscripts)) {
-            foreach ($oldscripts as $row) {
-                $newid = _ff_selectValue("select max(id) from #__facileforms_scripts where name = " . $db->quote($row->name));
-                if ($newid) {
-                    _ff_query("update #__facileforms_forms set script1id=$newid where script1id=$row->id");
-                    _ff_query("update #__facileforms_forms set script2id=$newid where script2id=$row->id");
-                    _ff_query("update #__facileforms_elements set script1id=$newid where script1id=$row->id");
-                    _ff_query("update #__facileforms_elements set script2id=$newid where script2id=$row->id");
-                    _ff_query("update #__facileforms_elements set script3id=$newid where script3id=$row->id");
-                }
-            }
-        }
-    }
-}
-
-if (!function_exists('relinkPieces')) {
-    function relinkPieces(&$oldpieces)
-    {
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
-
-        if ($oldpieces != null && count($oldpieces)) {
-            foreach ($oldpieces as $row) {
-                $newid = _ff_selectValue("select max(id) from #__facileforms_pieces where name = " . $db->quote($row->name));
-                if ($newid) {
-                    _ff_query("update #__facileforms_forms set piece1id=$newid where piece1id=$row->id");
-                    _ff_query("update #__facileforms_forms set piece2id=$newid where piece2id=$row->id");
-                    _ff_query("update #__facileforms_forms set piece3id=$newid where piece3id=$row->id");
-                    _ff_query("update #__facileforms_forms set piece4id=$newid where piece4id=$row->id");
-                }
-            }
-        }
-    }
-}
-
-if (!function_exists('updateComponentMenus')) {
-    function updateComponentMenus($copy = false)
-    {
-        return '';
-    }
-}
-
 Log::addLogger(
     [
         'text_file' => 'breezingforms_install.log',
@@ -506,47 +402,31 @@ class com_breezingformsngInstallerScript
 
     private function importStandardLibrary(): void
     {
-        global $ff_admpath, $ff_compath, $errors, $errmode;
-
-        $ff_admpath = str_replace('\\', '/', JPATH_ADMINISTRATOR . '/components/com_breezingformsng');
-        $ff_compath = str_replace('\\', '/', JPATH_SITE . '/components/com_breezingformsng');
-        $xmlFile = $ff_admpath . '/packages/stdlib.english.xml';
+        $admPath = JPATH_ADMINISTRATOR . '/components/com_breezingformsng';
+        $xmlFile = $admPath . '/packages/stdlib.english.xml';
 
         if (!File::exists($xmlFile)) {
             $this->log("Standard library package not found: {$xmlFile}", Log::WARNING);
             return;
         }
 
-        require_once $ff_admpath . '/libraries/crosstec/classes/BFText.php';
-        require_once $ff_compath . '/facileforms.class.php';
-        require_once $ff_admpath . '/admin/import.class.php';
+        require_once $admPath . '/src/Model/ImportModel.php';
 
-        $errors = [];
-        $errmode = 'log';
-
-        $importer = new ff_importPackage();
+        $importer = new \Vcmb\Component\BreezingformsNG\Administrator\Model\ImportModel();
         $importer->reinstallOnlyIfChanged = true;
 
-        if (!$importer->import($xmlFile)) {
-            $details = [];
-
-            if (!empty($errors)) {
-                $details = $errors;
-            } elseif (!empty($importer->error)) {
-                $details[] = $importer->error;
-            }
-
-            $detailText = empty($details) ? 'Unknown import error.' : implode(' | ', $details);
-            $this->log('Standard library import failed. ' . $detailText, Log::ERROR);
-            $this->announce('BreezingForms standard pieces import failed: ' . $detailText, 'error', Log::ERROR);
+        try {
+            $importer->import($xmlFile);
+        } catch (\Throwable $e) {
+            $this->log('Standard library import failed. ' . $e->getMessage(), Log::ERROR);
+            $this->announce('BreezingForms standard pieces import failed: ' . $e->getMessage(), 'error', Log::ERROR);
             return;
         }
 
         $this->log(
             'Standard library imported successfully: ' .
             count($importer->scripts) . ' script(s), ' .
-            count($importer->pieces) . ' piece(s), ' .
-            count($importer->forms) . ' form(s).'
+            count($importer->pieces) . ' piece(s).'
         );
 
         $this->announceImportedLibraryChanges($importer);

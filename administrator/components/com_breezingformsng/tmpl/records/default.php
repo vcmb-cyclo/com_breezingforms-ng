@@ -103,7 +103,7 @@ $pageUrl = function (int $start) use ($listOrder, $listDirn, $formSelection, $se
             <td><?= $recId; ?></td>
             <td><?= htmlspecialchars((string) $rec['submitted']); ?></td>
             <td>
-              <a href="index.php?option=com_breezingformsng&view=records&form_selection=<?= (int) $rec['form_id']; ?>">
+              <a href="index.php?option=com_breezingformsng&view=records&layout=edit&record_id=<?= $recId; ?>&form_selection=<?= $this->formSelection; ?>">
                 <?= htmlspecialchars((string) $rec['form_title']); ?>
               </a>
             </td>

@@ -27,7 +27,7 @@
 - [x] Gestion des menus (`admin/menu.class.php` + `menu.html.php` — migré Phase 4)
 - [x] Gestionnaire de formulaires (`admin/form.class.php` + `form.html.php` — migré Phase 5)
 - [x] QuickMode (`admin/quickmode.class.php` + `.html.php` + `.js` — migré Phase 7)
-- [ ] Import/export paquets (`admin/import.class.php`)
+- [x] Import paquets (`admin/import.class.php` → `src/Model/ImportModel.php`, SimpleXML + transactions ; bibliothèques scripts/pièces uniquement, les paquets contenant formulaires/menus sont refusés ; export de paquets abandonné avec l'UI legacy)
 - [ ] Frontend moteur formulaires (`facileforms.process.php` — **448 KB**, hors périmètre immédiat)
 
 ---
@@ -182,7 +182,7 @@
 - [x] `administrator/components/com_breezingformsng/admin/import.class.php` (git mv → ImportModel)
 
 ### Périmètre différé
-- Import/export de paquets — ImportModel stub seulement
+- [x] Import de paquets — `ImportModel` réécrit (SimpleXML, requêtes paramétrées, transaction) ; consommé par `script.php::importStandardLibrary()`. Limité aux bibliothèques de scripts/pièces (seul cas réel : `packages/stdlib.english.xml`) ; les paquets avec formulaires/menus sont refusés avec un message clair.
 
 ### Migré depuis cette phase
 - QuickMode — déplacé en Phase 7 vers `QuickmodeController`, `QuickmodeModel`, `QuickmodeHtml` et routes `task=quickmode.*`

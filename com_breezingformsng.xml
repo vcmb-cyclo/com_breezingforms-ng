@@ -57,11 +57,11 @@
 		<menu>COM_BREEZINGFORMSNG</menu>
 
 		<submenu>
-			<menu link="index.php?option=com_breezingformsng&amp;act=managerecs">COM_BREEZINGFORMSNG_MANAGE_RECORDS</menu>
-			<menu link="index.php?option=com_breezingformsng&amp;act=manageforms">COM_BREEZINGFORMSNG_MANAGE_FORMS</menu>
+			<menu link="index.php?option=com_breezingformsng&amp;view=records">COM_BREEZINGFORMSNG_MANAGE_RECORDS</menu>
+			<menu link="index.php?option=com_breezingformsng&amp;view=forms">COM_BREEZINGFORMSNG_MANAGE_FORMS</menu>
 			<menu link="index.php?option=com_breezingformsng&amp;view=scripts">COM_BREEZINGFORMSNG_MANAGE_SCRIPTS</menu>
 			<menu link="index.php?option=com_breezingformsng&amp;view=pieces">COM_BREEZINGFORMSNG_MANAGE_PIECES</menu>
-			<menu link="index.php?option=com_breezingformsng&amp;act=integrate">COM_BREEZINGFORMSNG_INTEGRATOR</menu>
+			<menu link="index.php?option=com_breezingformsng&amp;view=integrator">COM_BREEZINGFORMSNG_INTEGRATOR</menu>
 			<menu link="index.php?option=com_config&amp;view=component&amp;component=com_breezingformsng">COM_BREEZINGFORMSNG_CONFIGURATION</menu>
 			<menu link="index.php?option=com_breezingformsng&amp;task=about.display&amp;view=about">COM_BREEZINGFORMSNG_ABOUT</menu>
 		</submenu>
@@ -71,7 +71,6 @@
 			<filename>access.xml</filename>
 			<filename>config.xml</filename>
 			<filename>joomla.asset.json</filename>
-			<folder>admin</folder>
 			<folder>ajax_cache</folder>
 			<folder>images</folder>
 			<folder>language</folder>

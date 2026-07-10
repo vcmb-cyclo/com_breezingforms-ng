@@ -20,12 +20,12 @@
 - [x] `script.php` : migration liens menu `act=about` → `task=about.display&view=about`
 
 ### ❌ Encore legacy (périmètre de cette migration)
-- [ ] Routeur admin central (`admin.breezingforms.php` — 766 lignes, `$act`-routing)
+- [x] Routeur admin central (`admin.breezingforms.php` — supprimé Phase 6)
 - [x] Gestion des enregistrements (`admin/recordmanagement.class.php` — migré Phase 1)
-- [ ] Configuration (`admin/config.class.php` + `config.html.php` — 1 078 lignes)
-- [ ] Intégrateur (`admin/integrator.class.php` + `.html.php`)
-- [ ] Gestion des menus (`admin/menu.class.php` + `menu.html.php`)
-- [ ] Gestionnaire de formulaires (`admin/form.class.php` + `form.html.php` — ~180K lignes)
+- [x] Configuration (`admin/config.class.php` + `config.html.php` — migré Phase 2 vers `com_config`)
+- [x] Intégrateur (`admin/integrator.class.php` + `.html.php` — migré Phase 3)
+- [x] Gestion des menus (`admin/menu.class.php` + `menu.html.php` — migré Phase 4)
+- [x] Gestionnaire de formulaires (`admin/form.class.php` + `form.html.php` — migré Phase 5)
 - [x] QuickMode (`admin/quickmode.class.php` + `.html.php` + `.js` — migré Phase 7)
 - [ ] Import/export paquets (`admin/import.class.php`)
 - [ ] Frontend moteur formulaires (`facileforms.process.php` — **448 KB**, hors périmètre immédiat)
@@ -217,9 +217,9 @@
 - [x] Alias legacy QuickMode retirés de `DisplayController`
 
 ### Bloqué — dépend de phases futures
-- [ ] Supprimer `src/Helper/LegacyClassLoader.php` (QuickModeHtml + BF* encore nécessaires)
+- [ ] Supprimer `src/Helper/LegacyClassLoader.php` (QuickModeHtml + BF* encore nécessaires ; classes mortes `BFTabs`, `BFJNewTabs`, `BFBehaviorTabs`, `BFPagination`, `BFPaginationChrome`, alias `BFTableElements` déjà supprimées)
 - [ ] Retirer l'enregistrement de `LegacyClassLoader` dans `services/provider.php`
-- [ ] Supprimer le répertoire `admin/` (JS/CSS encore référencés dans `joomla.asset.json`)
+- [x] Supprimer le répertoire `admin/` — assets déplacés vers `media/com_breezingformsng/js/admin/` et `css/admin.css`, `joomla.asset.json` et manifeste mis à jour, `bluestork.fix.css` supprimé (obsolète)
 
 ### Vérification finale
 - [ ] Naviguer dans **tous** les écrans admin sans erreur

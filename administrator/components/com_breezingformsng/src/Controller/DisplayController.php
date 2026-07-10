@@ -66,6 +66,14 @@ class DisplayController extends BaseController
         if ($act === 'manageforms' || ($task === '' && $view === 'forms')) {
             $input->set('view', 'forms');
             $input->set('act', '');
+            if ($task === '' && $input->getCmd('layout', '') === 'edit' && $input->getInt('id', 0) > 0) {
+                Factory::getApplication()->redirect(
+                    'index.php?option=com_breezingformsng&task=quickmode.display'
+                    . '&form=' . $input->getInt('id', 0)
+                    . '&pkg=' . rawurlencode($input->getString('pkg', ''))
+                );
+                return $this;
+            }
             if ($task === '' || $task === 'listitems') {
                 $input->set('task', '');
                 return parent::display($cachable, $urlparams);

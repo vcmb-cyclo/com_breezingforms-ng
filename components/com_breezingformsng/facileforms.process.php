@@ -2436,11 +2436,9 @@ class HTML_facileFormsProcessor
                 $this->app->getSession()->set('com_breezingformsng.mobile', true);
             }
 
-            require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Decoder.php');
-            require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Encoder.php');
             require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
 
-            $dataObject = Zend_Json::decode(bf_b64dec($this->formrow->template_code));
+            $dataObject = json_decode(bf_b64dec($this->formrow->template_code), true);
             $rootMdata = $dataObject['properties'];
             $is_device = false;
 
@@ -3216,7 +3214,7 @@ class HTML_facileFormsProcessor
                             /*
                               if($recordEntry->type == 'Textarea'){
 
-                              $dataObject = Zend_Json::decode( bf_b64dec($this->formrow->template_code) );
+                              $dataObject = json_decode(bf_b64dec($this->formrow->template_code), true);
                               $qmelement = $this->findQuickModeElement($dataObject, $recordEntry->name);
 
                               if(isset($recordEntry->value) && $qmelement !== null && isset($qmelement['properties']['is_html']) && $qmelement['properties']['is_html']) {
@@ -3384,7 +3382,7 @@ class HTML_facileFormsProcessor
                             /*
                               if($cbEntry->recType == 'Textarea'){
 
-                              $dataObject = Zend_Json::decode( bf_b64dec($this->formrow->template_code) );
+                              $dataObject = json_decode(bf_b64dec($this->formrow->template_code), true);
                               $qmelement = $this->findQuickModeElement($dataObject, $cbEntry->recName);
 
                               if(isset($cbEntry->recValue) && $qmelement !== null && isset($qmelement['properties']['is_html']) && $qmelement['properties']['is_html']) {
@@ -5993,9 +5991,7 @@ class HTML_facileFormsProcessor
     function getFormTitleTranslated()
     {
         if (trim($this->formrow->template_code_processed) == 'QuickMode') {
-            require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Decoder.php');
-            require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Encoder.php');
-            $dataObject = Zend_Json::decode(bf_b64dec($this->formrow->template_code));
+            $dataObject = json_decode(bf_b64dec($this->formrow->template_code), true);
             $rootMdata = $dataObject['properties'];
 
             $default = ComponentHelper::getParams('com_languages')->get('site');
@@ -6019,9 +6015,7 @@ class HTML_facileFormsProcessor
 
         if (trim($this->formrow->template_code_processed) == 'QuickMode') {
             if ($dataObject === null && $childrenLength == 0) {
-                require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Decoder.php');
-                require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Encoder.php');
-                $dataObject = Zend_Json::decode(bf_b64dec($this->formrow->template_code));
+                $dataObject = json_decode(bf_b64dec($this->formrow->template_code), true);
             }
 
             if (isset($dataObject['attributes']) && isset($dataObject['properties'])) {
@@ -6156,9 +6150,7 @@ class HTML_facileFormsProcessor
         $isHtml = false;
         $filter = array();
 
-        require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Decoder.php');
-        require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Encoder.php');
-        $areas = Zend_Json::decode($this->formrow->template_areas);
+        $areas = json_decode($this->formrow->template_areas, true);
         if (trim($this->formrow->template_code_processed) == 'QuickMode' && is_array($areas)) {
             foreach ($areas as $area) { // don't worry, size is only 1 in QM
                 if (isset($area['elements'])) {
@@ -7242,9 +7234,7 @@ class HTML_facileFormsProcessor
                                 }
                             }
 
-                            require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Decoder.php');
-                            require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Encoder.php');
-                            $areas = Zend_Json::decode($this->formrow->template_areas);
+                            $areas = json_decode($this->formrow->template_areas, true);
                             $useUrl = false;
                             $useUrlDownloadDirectory = '';
                             $resize_target_width = 0;
@@ -7593,12 +7583,10 @@ class HTML_facileFormsProcessor
                                 $values = @BFRequest::getVar("ff_nm_" . $row->name, array(''), 'POST', 'HTML', BFREQUEST_ALLOWHTML);
 
                                 if ($row->type == 'Textarea') {
-                                    require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Decoder.php');
-                                    require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Encoder.php');
                                     require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
 
                                     if (trim($this->formrow->template_code_processed) == 'QuickMode') {
-                                        $dataObject = Zend_Json::decode(bf_b64dec($this->formrow->template_code));
+                                        $dataObject = json_decode(bf_b64dec($this->formrow->template_code), true);
                                         $qmelement = $this->findQuickModeElement($dataObject, $row->name);
 
                                         if ($qmelement !== null && isset($qmelement['properties']['is_html']) && $qmelement['properties']['is_html']) {
@@ -7828,11 +7816,9 @@ class HTML_facileFormsProcessor
 
         if (!$halt) {
 
-            require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Decoder.php');
-            require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Encoder.php');
             require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
 
-            $dataObject = Zend_Json::decode(bf_b64dec($this->formrow->template_code));
+            $dataObject = json_decode(bf_b64dec($this->formrow->template_code), true);
             $rootMdata = $dataObject['properties'];
 
             if (BFRequest::getVar('ff_applic', '') != 'mod_facileforms' && BFRequest::getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
@@ -7857,10 +7843,8 @@ class HTML_facileFormsProcessor
                 } else
                     if ($row->type == "ReCaptcha") {
 
-                        require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Decoder.php');
-                        require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Encoder.php');
 
-                        $areas = Zend_Json::decode($this->formrow->template_areas);
+                        $areas = json_decode($this->formrow->template_areas, true);
 
                         foreach ($areas as $area) {
                             foreach ($area['elements'] as $element) {
@@ -7897,10 +7881,8 @@ class HTML_facileFormsProcessor
                     }
             }
 
-            require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Decoder.php');
-            require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Encoder.php');
 
-            $areas = Zend_Json::decode($this->formrow->template_areas);
+            $areas = json_decode($this->formrow->template_areas, true);
 
             if (is_array($areas)) {
                 switch (BFRequest::getVar('ff_payment_method', '')) {
@@ -8180,11 +8162,9 @@ class HTML_facileFormsProcessor
 
         if ($this->formrow->template_code != '') {
 
-            require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Decoder.php');
-            require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Encoder.php');
 
-            $areas = Zend_Json::decode($this->formrow->template_areas);
-            $head = Zend_Json::decode(bf_b64dec($this->formrow->template_code));
+            $areas = json_decode($this->formrow->template_areas, true);
+            $head = json_decode(bf_b64dec($this->formrow->template_code), true);
 
             if (is_array($areas)) {
                 $j15 = false;

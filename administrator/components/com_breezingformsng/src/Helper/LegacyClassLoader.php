@@ -16,6 +16,7 @@ final class LegacyClassLoader
     private const CLASS_PATHS = [
         'BFBehaviorTabs' => 'libraries/crosstec/classes/BFBehaviorTabs.php',
         'BFFactory' => 'libraries/crosstec/classes/BFFactory.php',
+        'BFFile' => 'libraries/crosstec/classes/BFFactory.php',
         'BFIntegrate' => 'libraries/crosstec/classes/BFIntegrate.php',
         'BFJNewTabs' => 'libraries/crosstec/classes/BFJNewTabs.php',
         'BFJoomlaConfig' => 'libraries/crosstec/classes/BFJoomlaConfig.php',

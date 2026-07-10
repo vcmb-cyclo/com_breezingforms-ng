@@ -74,6 +74,9 @@ class HtmlView extends BaseHtmlView
         $pageTitle = Text::_('COM_BREEZINGFORMSNG') . ' / ' . $sectionTitle;
 
         $doc = Factory::getApplication()->getDocument();
+        $doc->getWebAssetManager()
+            ->getRegistry()
+            ->addRegistryFile('administrator/components/com_breezingformsng/joomla.asset.json');
         $doc->setTitle(strip_tags($pageTitle));
         $doc->getWebAssetManager()->addInlineStyle(
             '.icon-logo_left{

@@ -16,7 +16,7 @@ $pkg = $this->pkg;
 
 $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
 ?>
-<form action="index.php?option=com_breezingformsng" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_breezingformsng&amp;view=forms&amp;act=manageforms" method="post" name="adminForm" id="adminForm">
   <input type="hidden" name="view" value="forms">
 
   <div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
@@ -72,7 +72,7 @@ $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
           <tr>
             <td class="text-center"><?= HTMLHelper::_('grid.id', $i, $form->id); ?></td>
             <td>
-              <a href="index.php?option=com_breezingformsng&view=forms&layout=edit&id=<?= (int) $form->id; ?>&pkg=<?= rawurlencode($pkg); ?>">
+              <a href="index.php?option=com_breezingformsng&task=quickmode.display&form=<?= (int) $form->id; ?>&pkg=<?= rawurlencode($pkg); ?>">
                 <?= htmlspecialchars($form->title); ?>
               </a>
             </td>

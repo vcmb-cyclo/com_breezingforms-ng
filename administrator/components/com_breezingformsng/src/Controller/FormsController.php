@@ -29,6 +29,14 @@ class FormsController extends BaseController
         $id    = $input->getInt('id', 0);
         $pkg   = $input->getString('pkg', '');
 
+        if ($id > 0) {
+            Factory::getApplication()->redirect(Route::_(
+                'index.php?option=com_breezingformsng&task=quickmode.display&form=' . $id . '&pkg=' . rawurlencode($pkg),
+                false
+            ));
+            return;
+        }
+
         Factory::getApplication()->redirect(Route::_(
             'index.php?option=com_breezingformsng&view=forms&layout=edit&id=' . $id . '&pkg=' . rawurlencode($pkg),
             false

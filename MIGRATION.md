@@ -182,7 +182,7 @@
 - [x] `administrator/components/com_breezingformsng/admin/import.class.php` (git mv → ImportModel)
 
 ### Périmètre différé
-- [x] Import de paquets — `ImportModel` réécrit (SimpleXML, requêtes paramétrées, transaction) ; consommé par `script.php::importStandardLibrary()`. Limité aux bibliothèques de scripts/pièces (seul cas réel : `packages/stdlib.english.xml`) ; les paquets avec formulaires/menus sont refusés avec un message clair.
+- [x] Import de paquets — `ImportModel` réécrit (SimpleXML, requêtes paramétrées, transaction) ; consommé par `script.php::importStandardLibrary()`. Limité aux bibliothèques de scripts/pièces (seul cas réel : `packages/stdlib.english.xml`) ; les paquets avec formulaires/menus sont refusés avec un message clair. Vérifié de bout en bout le 2026-07-10 : installation du paquet 6.1.0-RC2 dans le conteneur `joomla6-joomla-1`, import stdlib OK (71 scripts inchangés ignorés, 3 pièces mises à jour, métadonnées paquet actualisées).
 
 ### Migré depuis cette phase
 - QuickMode — déplacé en Phase 7 vers `QuickmodeController`, `QuickmodeModel`, `QuickmodeHtml` et routes `task=quickmode.*`
@@ -223,7 +223,7 @@
 
 ### Vérification finale
 - [ ] Naviguer dans **tous** les écrans admin sans erreur
-- [ ] Aucun `include` ou `require` vers `admin/` ne subsiste dans le call stack
+- [x] Aucun `include` ou `require` vers `admin/` ne subsiste dans le call stack (répertoire supprimé, grep sans résultat, paquet reconstruit et validé)
 - [x] `php -l` sur tous les fichiers `src/` : aucune erreur de syntaxe
 
 ---

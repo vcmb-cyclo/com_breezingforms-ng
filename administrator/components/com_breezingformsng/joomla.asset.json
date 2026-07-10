@@ -9,7 +9,7 @@
     {
       "name": "com_breezingformsng.jquery-alias",
       "type": "script",
-      "uri": "administrator/components/com_breezingformsng/admin/jquery-alias.js",
+      "uri": "com_breezingformsng/js/admin/jquery-alias.js",
       "dependencies": ["jquery"],
       "version": "auto"
     },
@@ -65,7 +65,7 @@
     {
       "name": "com_breezingformsng.quickmode-elements",
       "type": "script",
-      "uri": "administrator/components/com_breezingformsng/admin/quickmode-elements.js",
+      "uri": "com_breezingformsng/js/admin/quickmode-elements.js",
       "dependencies": ["com_breezingformsng.jquery-alias"],
       "version": "auto"
     },
@@ -73,7 +73,7 @@
     {
       "name": "com_breezingformsng.quickmode-app",
       "type": "script",
-      "uri": "administrator/components/com_breezingformsng/admin/quickmode-app.js",
+      "uri": "com_breezingformsng/js/admin/quickmode-app.js",
       "dependencies": [
         "com_breezingformsng.quickmode-elements",
         "com_breezingformsng.jtree",
@@ -106,7 +106,7 @@
     {
       "name": "com_breezingformsng.areautils",
       "type": "script",
-      "uri": "administrator/components/com_breezingformsng/admin/areautils.js",
+      "uri": "com_breezingformsng/js/admin/areautils.js",
       "dependencies": ["com_breezingformsng.jquery-alias"],
       "version": "auto"
     },
@@ -176,7 +176,7 @@
     {
       "name": "com_breezingformsng.admin-style",
       "type": "style",
-      "uri": "administrator/components/com_breezingformsng/admin/style.css",
+      "uri": "com_breezingformsng/css/admin.css",
       "version": "auto"
     },
 

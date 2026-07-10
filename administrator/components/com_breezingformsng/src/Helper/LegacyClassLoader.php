@@ -9,32 +9,21 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Helper;
 
 \defined('_JEXEC') or die;
 
-use Vcmb\Component\BreezingformsNG\Administrator\Table\ElementTable;
-
 final class LegacyClassLoader
 {
     private const CLASS_PATHS = [
-        'BFBehaviorTabs' => 'libraries/crosstec/classes/BFBehaviorTabs.php',
         'BFFactory' => 'libraries/crosstec/classes/BFFactory.php',
         'BFFile' => 'libraries/crosstec/classes/BFFactory.php',
         'BFIntegrate' => 'libraries/crosstec/classes/BFIntegrate.php',
-        'BFJNewTabs' => 'libraries/crosstec/classes/BFJNewTabs.php',
         'BFJoomlaConfig' => 'libraries/crosstec/classes/BFJoomlaConfig.php',
         'BFPDF' => 'libraries/crosstec/classes/BFPDF.php',
-        'BFPagination' => 'libraries/crosstec/classes/BFPagination.php',
-        'BFPaginationChrome' => 'libraries/crosstec/classes/BFPaginationChrome.php',
         'QuickModeHtml' => 'src/Helper/QuickmodeHtml.php',
         'BFQuickMode' => 'libraries/crosstec/classes/BFQuickMode.php',
         'BFQuickModeBootstrap' => 'libraries/crosstec/classes/BFQuickModeBootstrap.php',
         'BFQuickModeMobile' => 'libraries/crosstec/classes/BFQuickModeMobile.php',
         'BFQuickModeOnePage' => 'libraries/crosstec/classes/BFQuickModeOnePage.php',
         'BFRequest' => 'libraries/crosstec/classes/BFRequest.php',
-        'BFTabs' => 'libraries/crosstec/classes/BFTabs.php',
         'BFText' => 'libraries/crosstec/classes/BFText.php',
-    ];
-
-    private const CLASS_ALIASES = [
-        'BFTableElements' => ElementTable::class,
     ];
 
     private static bool $registered = false;
@@ -52,12 +41,6 @@ final class LegacyClassLoader
 
     public static function load(string $class): void
     {
-        if (isset(self::CLASS_ALIASES[$class])) {
-            class_alias(self::CLASS_ALIASES[$class], $class);
-
-            return;
-        }
-
         if (!isset(self::CLASS_PATHS[$class])) {
             return;
         }

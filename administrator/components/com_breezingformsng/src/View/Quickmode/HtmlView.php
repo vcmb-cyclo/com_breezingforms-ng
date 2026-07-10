@@ -36,7 +36,7 @@ class HtmlView extends BaseHtmlView
         $layout = $input->getCmd('layout', '');
 
         if ($layout === 'editor') {
-            parent::display('editor');
+            parent::display($tpl);
             return;
         }
 

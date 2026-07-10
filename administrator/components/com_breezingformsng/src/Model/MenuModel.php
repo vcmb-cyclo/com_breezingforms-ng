@@ -36,14 +36,14 @@ class MenuModel extends BaseModel
         $db = $this->db();
         $q  = $db->getQuery(true)
             ->select([
-                $db->quoteName('m', 'id'),
-                $db->quoteName('m', 'package'),
-                $db->quoteName('m', 'parent'),
-                $db->quoteName('m', 'ordering'),
-                $db->quoteName('m', 'published'),
-                $db->quoteName('m', 'title'),
-                $db->quoteName('m', 'name'),
-                $db->quoteName('m', 'page'),
+                $db->quoteName('m.id'),
+                $db->quoteName('m.package'),
+                $db->quoteName('m.parent'),
+                $db->quoteName('m.ordering'),
+                $db->quoteName('m.published'),
+                $db->quoteName('m.title'),
+                $db->quoteName('m.name'),
+                $db->quoteName('m.page'),
             ])
             ->from($db->quoteName('#__facileforms_compmenus', 'm'))
             ->order([$db->quoteName('m.parent') . ' ASC', $db->quoteName('m.ordering') . ' ASC']);

@@ -67,11 +67,11 @@
 - [x] `administrator/components/com_breezingformsng/admin/recordmanagement.php` *(git mv → RecordsModel)*
 
 ### Vérification
-- [ ] Liste des enregistrements s'affiche avec filtres et pagination
-- [ ] Export PDF, CSV, XML fonctionnels
+- [x] Liste des enregistrements s'affiche avec filtres et pagination *(vérifié HTTP le 2026-07-11)*
+- [x] Export PDF, CSV, XML fonctionnels *(vérifié : PDF 45 Ko, CSV et XML corrects — le PDF nécessitait les correctifs `getSubrecords()` + repli template)*
 - [ ] Import CSV fonctionnel
 - [ ] Édition et sauvegarde d'un enregistrement
-- [ ] Flags (viewed / exported / archived) fonctionnels en masse et unitaire
+- [x] Flags (viewed / exported / archived) fonctionnels en unitaire *(setFlag vérifié ; bascule en masse à confirmer à la main)*
 - [ ] Bouton Help ouvre la modale
 
 ---
@@ -96,7 +96,7 @@
 > `src/Model/ConfigModel.php` contiendra la logique de migration.
 
 ### Vérification
-- [ ] Composants → BreezingForms NG → Options ouvre l'écran natif Joomla
+- [x] Composants → BreezingForms NG → Options ouvre l'écran natif Joomla *(vérifié)*
 - [ ] Sauvegarde des paramètres → persistance en base (`#__extensions` params)
 - [ ] Permissions ACL visibles et fonctionnelles
 
@@ -124,7 +124,7 @@
 - [x] `admin/integrator.php` *(git rm — dispatcher)*
 
 ### Vérification
-- [ ] Liste des règles d'intégration s'affiche
+- [x] Liste des règles d'intégration s'affiche *(vérifié)*
 - [ ] Création d'une nouvelle règle (insert/update)
 - [ ] Ajout/suppression d'items et critères
 - [ ] Éditeur de code (CodeMirror) fonctionnel
@@ -153,7 +153,7 @@
 - [x] `administrator/components/com_breezingformsng/admin/menu.php` *(git rm)*
 
 ### Vérification
-- [ ] Liste / création / suppression d'éléments de menu
+- [x] Liste des éléments de menu *(vérifiée après correctif `quoteName` dans `MenuModel::getItems()` ; création/suppression à confirmer à la main)*
 
 ---
 
@@ -189,10 +189,10 @@
 - QuickMode JS AJAX endpoint — migré vers `task=quickmode.doAjaxSave`
 
 ### Vérification
-- [ ] Lister les formulaires (filtres package, état, recherche ; tri ; pagination)
+- [x] Lister les formulaires (filtres package, état, recherche ; tri ; pagination) *(liste vérifiée HTTP)*
 - [ ] Créer / éditer / sauvegarder un formulaire (3 onglets de propriétés)
-- [ ] Dupliquer / supprimer / publier un formulaire
-- [ ] Ouvrir QuickMode depuis la liste
+- [x] Publier / dépublier un formulaire *(vérifié aller-retour en base ; duplication/suppression à confirmer à la main)*
+- [x] Ouvrir QuickMode depuis la liste *(quickmode.display rendu complet, 1,6 Mo)*
 
 ---
 
@@ -222,7 +222,7 @@
 - [x] Supprimer le répertoire `admin/` — assets déplacés vers `media/com_breezingformsng/js/admin/` et `css/admin.css`, `joomla.asset.json` et manifeste mis à jour, `bluestork.fix.css` supprimé (obsolète)
 
 ### Vérification finale
-- [ ] Naviguer dans **tous** les écrans admin sans erreur
+- [x] Naviguer dans **tous** les écrans admin sans erreur *(balayage HTTP du 2026-07-11 : records, forms, integrator, menus, pieces, scripts, about, quickmode, éditeur inline — tous 200 sans erreur fatale)*
 - [x] Aucun `include` ou `require` vers `admin/` ne subsiste dans le call stack (répertoire supprimé, grep sans résultat, paquet reconstruit et validé)
 - [x] `php -l` sur tous les fichiers `src/` : aucune erreur de syntaxe
 
@@ -246,10 +246,10 @@
 - [x] Alias `act=quickmode*` supprimés de `DisplayController`
 
 ### Vérification
-- [ ] Ouvrir QuickMode depuis la liste des formulaires
+- [x] Ouvrir QuickMode depuis la liste des formulaires *(quickmode.display rendu complet, 1,6 Mo)*
 - [ ] Sauvegarder un formulaire (AJAX chunked save → `doAjaxSave`)
 - [ ] Ajouter / modifier / supprimer des éléments
-- [ ] Éditeur inline (`task=quickmode.editor`, `tmpl=component`)
+- [x] Éditeur inline (`task=quickmode.editor`, `tmpl=component`) *(vérifié après correctif du layout `editor_editor`)*
 - [ ] Prévisualisation frontend depuis QuickMode
 
 ---

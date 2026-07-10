@@ -15,7 +15,6 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\ToolbarHelper;
-use Joomla\CMS\HTML\Helpers\Sidebar;
 use Joomla\CMS\Uri\Uri;
 
 class HtmlView extends BaseHtmlView
@@ -45,77 +44,6 @@ class HtmlView extends BaseHtmlView
         // Add Joomla core JavaScript framework
  //       HTMLHelper::_('bootstrap.framework');
  //       $doc->addScript('media/system/js/core.js');
-
-        Sidebar::addEntry(
-            '<i class="fa fa-folder-open" aria-hidden="true"></i> ' . '<m>' .
-            \BFText::_('COM_BREEZINGFORMSNG_MANAGERECS') . '</m>',
-            'index.php?option=com_breezingformsng&view=records',
-            \BFRequest::getVar('view', '') == 'records'
-            || \BFRequest::getVar('act', '') == 'managerecs'
-            || \BFRequest::getVar('act', '') == 'recordmanagement'
-            || (\BFRequest::getVar('act', '') == '' && \BFRequest::getVar('view', '') == '')
-        );
-
-        Sidebar::addEntry(
-            '<i class="fa fa-pencil-square-o" aria-hidden="true"></i> ' . '<m>' .
-            \BFText::_('COM_BREEZINGFORMSNG_MANAGEFORMS') . '</m>',
-	            'index.php?option=com_breezingformsng&view=forms',
-	            \BFRequest::getVar('view', '') === 'forms'
-	            || \BFRequest::getVar('act', '') === 'manageforms'
-	            || \BFRequest::getVar('act', '') === 'quickmode'
-	        );
-
-        Sidebar::addEntry(
-            '<i class="fa fa-code" aria-hidden="true"></i> ' . '<m>' .
-            \BFText::_('COM_BREEZINGFORMSNG_MANAGESCRIPTS') . '</m>',
-            'index.php?option=com_breezingformsng&view=scripts',
-            \BFRequest::getVar('act', '') == 'managescripts' || \BFRequest::getVar('view', '') == 'scripts'
-        );
-
-        Sidebar::addEntry(
-            '<i class="fa fa-puzzle-piece" aria-hidden="true"></i> ' . '<m>' .
-            \BFText::_('COM_BREEZINGFORMSNG_MANAGEPIECES') . '</m>',
-            'index.php?option=com_breezingformsng&view=pieces',
-            \BFRequest::getVar('act', '') == 'managepieces' || \BFRequest::getVar('view', '') == 'pieces'
-        );
-
-        Sidebar::addEntry(
-            '<i class="fa fa-link" aria-hidden="true"></i> ' . '<m>' .
-            \BFText::_('COM_BREEZINGFORMSNG_INTEGRATOR') . '</m>',
-            'index.php?option=com_breezingformsng&view=integrator',
-            \BFRequest::getVar('view', '') === 'integrator'
-            || \BFRequest::getVar('act', '') === 'integrate'
-        );
-
-        Sidebar::addEntry(
-            '<i class="fa fa-bars" aria-hidden="true"></i> ' . '<m>' .
-            \BFText::_('COM_BREEZINGFORMSNG_MANAGEMENUS') . '</m>',
-            'index.php?option=com_breezingformsng&view=menus',
-            \BFRequest::getVar('view', '') === 'menus' || \BFRequest::getVar('act', '') === 'managemenus'
-        );
-
-        Sidebar::addEntry(
-            '<i class="fa fa-cog" aria-hidden="true"></i> ' . '<m>' .
-            \BFText::_('COM_BREEZINGFORMSNG_CONFIG') . '</m>',
-            'index.php?option=com_config&view=component&component=com_breezingformsng',
-            false
-        );
-
-        Sidebar::addEntry(
-            '<i class="fa fa-info-circle" aria-hidden="true"></i> ' . '<m>' .
-            \BFText::_('COM_BREEZINGFORMSNG_ABOUT') . '</m>',
-            'index.php?option=com_breezingformsng&task=about.display&view=about',
-            \BFRequest::getVar('view', '') == 'about'
-        );
-
-        $this->sidebar = '<div id="bf-sidebar">' . Sidebar::render() . '</div>';
-
-
-        Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('
-            jQuery(document).ready(function(){
-                jQuery("#bf-sidebar").appendTo("#wrapper");
-            });
-            ');
 
         parent::display($tpl);
     }

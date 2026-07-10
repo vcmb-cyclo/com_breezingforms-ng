@@ -19,8 +19,16 @@ use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Language\LanguageHelper;
 
+require_once JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php';
+
 class QuickModeHtml
 {
+    private static function decodeJsonArray(string $json): array
+    {
+        $decoded = json_decode($json, true);
+
+        return is_array($decoded) ? $decoded : [];
+    }
 
     public static function showApplication($formId, $formName, $formTitle, $formDesc, $formEmailntf, $formEmailadr, $dataObjectString, $elementScripts, $themes, $themesbootstrap, $themesbootstrap3)
     {
@@ -29,11 +37,7 @@ class QuickModeHtml
         HTMLHelper::_('behavior.keepalive');
         $iconBase = Uri::root() . 'media/com_breezingformsng/images/quickmode/';
         $decodedThemeObject = null;
-        try {
-            $decodedThemeObject = Zend_Json::decode($dataObjectString);
-        } catch (\Exception $e) {
-            $decodedThemeObject = null;
-        }
+        $decodedThemeObject = self::decodeJsonArray((string) $dataObjectString);
         $isAzureBootstrapTheme = is_array($decodedThemeObject)
             && isset($decodedThemeObject['properties'])
             && is_array($decodedThemeObject['properties'])
@@ -71,7 +75,7 @@ class QuickModeHtml
             formDesc:      '<?php echo addslashes(str_replace(["\n", "\r"], ['', ''], $formDesc)); ?>',
             formEmailadr:  '<?php echo addslashes($formEmailadr); ?>',
             formEmailntf:  <?php echo (addslashes($formEmailntf) == 2 || addslashes($formEmailntf) == 1) ? 'true' : 'false'; ?>,
-            elementScripts: <?php echo Zend_Json::encode($elementScripts); ?>,
+            elementScripts: <?php echo json_encode($elementScripts); ?>,
             dataObject:    <?php echo str_replace(
                 [
                     '..\\/administrator\\/components\\/com_facileforms',
@@ -2246,7 +2250,7 @@ class QuickModeHtml
                                                         <?php echo BFText::_('COM_BREEZINGFORMSNG_THEME_BOOTSTRAP'); ?>
                                                     </label>
                                                     <?php
-                                                    $dbObject = Zend_Json::decode($dataObjectString);
+                                                    $dbObject = self::decodeJsonArray((string) $dataObjectString);
                                                     $useBs3 = false;
                                                     if (isset($dbObject['properties']['themebootstrapUse3']) && $dbObject['properties']['themebootstrapUse3']) {
                                                         $useBs3 = true;
@@ -2393,7 +2397,7 @@ class QuickModeHtml
                                                 </div>
 
                                                 <?php
-                                                $dbObject = Zend_Json::decode($dataObjectString);
+                                                $dbObject = self::decodeJsonArray((string) $dataObjectString);
                                                 if (isset($dbObject['properties']['themebootstrap'])) {
                                                     $themeboostrapfolder = $dbObject['properties']['themebootstrap'];
                                                     $folder = 'themes-bootstrap';

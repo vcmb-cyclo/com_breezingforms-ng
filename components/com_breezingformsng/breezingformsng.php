@@ -55,6 +55,15 @@ $cache->setCaching(false);
 
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/constants.php');
+require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFRequest.php');
+require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFText.php');
+require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFFactory.php');
+require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFIntegrate.php');
+require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFPDF.php');
+require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickMode.php');
+require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickModeBootstrap.php');
+require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickModeMobile.php');
+require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickModeOnePage.php');
 
 // declare global variables
 global
@@ -715,8 +724,6 @@ if (
 
     BFRequest::setVar('format', 'html');
 
-    require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Decoder.php');
-    require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Encoder.php');
 
     $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote(BFRequest::getInt('form_id', -1)));
     $list = $db->loadObjectList();
@@ -727,7 +734,7 @@ if (
 
     $form = $list[0];
 
-    $areas = Zend_Json::decode($form->template_areas);
+    $areas = json_decode($form->template_areas, true);
     if (!is_array($areas)) {
         header("Status: 200 OK");
         exit;
@@ -876,8 +883,6 @@ if (
 
     BFRequest::setVar('format', 'html');
 
-    require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Decoder.php');
-    require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Encoder.php');
 
     $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote(BFRequest::getInt('form_id', -1)));
     $list = $db->loadObjectList();
@@ -889,7 +894,7 @@ if (
 
     $form = $list[0];
 
-    $areas = Zend_Json::decode($form->template_areas);
+    $areas = json_decode($form->template_areas, true);
 
     if (!is_array($areas)) {
         BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_STRIPE_DATA'));
@@ -1053,8 +1058,6 @@ if (
 
     BFRequest::setVar('format', 'raw');
 
-    require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Decoder.php');
-    require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Encoder.php');
 
     $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote(BFRequest::getInt('form', -1)));
     $list = $db->loadObjectList();
@@ -1065,7 +1068,7 @@ if (
 
     $form = $list[0];
 
-    $areas = Zend_Json::decode($form->template_areas);
+    $areas = json_decode($form->template_areas, true);
     if (!is_array($areas)) {
         BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYMENT_DATA'));
     }
@@ -1145,8 +1148,6 @@ if (
 
     BFRequest::setVar('format', 'html');
 
-    require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Decoder.php');
-    require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Encoder.php');
 
     $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote(BFRequest::getInt('form_id', -1)));
     $list = $db->loadObjectList();
@@ -1157,7 +1158,7 @@ if (
 
     $form = $list[0];
 
-    $areas = Zend_Json::decode($form->template_areas);
+    $areas = json_decode($form->template_areas, true);
     if (!is_array($areas)) {
         BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYPAL_DATA'));
         exit;
@@ -1335,8 +1336,6 @@ if (
 
     BFRequest::setVar('format', 'raw');
 
-    require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Decoder.php');
-    require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Encoder.php');
 
     $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote(BFRequest::getInt('form', -1)));
     $list = $db->loadObjectList();
@@ -1347,7 +1346,7 @@ if (
 
     $form = $list[0];
 
-    $areas = Zend_Json::decode($form->template_areas);
+    $areas = json_decode($form->template_areas, true);
     if (!is_array($areas)) {
         BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYPAL_DATA'));
     }
@@ -1461,8 +1460,6 @@ if (
 
         if ($formId != '' && $recordId != '') {
 
-            require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Decoder.php');
-            require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Encoder.php');
 
             $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($formId));
             $list = $db->loadObjectList();
@@ -1473,7 +1470,7 @@ if (
 
             $form = $list[0];
 
-            $areas = Zend_Json::decode($form->template_areas);
+            $areas = json_decode($form->template_areas, true);
             if (!is_array($areas)) {
                 BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_SU_DATA'));
             }
@@ -1531,8 +1528,6 @@ if (
     $formId = BFRequest::getInt('user_variable_0', -1);
     $recordId = BFRequest::getInt('user_variable_1', -1);
 
-    require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Decoder.php');
-    require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Encoder.php');
 
     $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($formId));
     $list = $db->loadObjectList();
@@ -1542,7 +1537,7 @@ if (
 
     $form = $list[0];
 
-    $areas = Zend_Json::decode($form->template_areas);
+    $areas = json_decode($form->template_areas, true);
     if (!is_array($areas)) {
         exit;
     }
@@ -1677,8 +1672,6 @@ if (
 
     BFRequest::setVar('format', 'raw');
 
-    require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Decoder.php');
-    require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Encoder.php');
 
     $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote(BFRequest::getInt('form', -1)));
     $list = $db->loadObjectList();
@@ -1689,7 +1682,7 @@ if (
 
     $form = $list[0];
 
-    $areas = Zend_Json::decode($form->template_areas);
+    $areas = json_decode($form->template_areas, true);
     if (!is_array($areas)) {
         BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYMENT_DATA'));
     }
@@ -1836,9 +1829,7 @@ if (
                         @File::write($finaltargetFile, $newbuf);
                     }
 
-                    require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Decoder.php');
-                    require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Encoder.php');
-                    $dataObject = Zend_Json::decode(bf_b64dec($objectList[0]->template_code));
+                    $dataObject = json_decode(bf_b64dec($objectList[0]->template_code), true);
 
                     bfProcess($dataObject, $finaltargetFile);
                     @File::delete($targetFile);

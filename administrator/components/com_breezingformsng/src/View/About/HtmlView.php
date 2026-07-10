@@ -38,6 +38,38 @@ class HtmlView extends BaseHtmlView
         $toolbar = $document->getToolbar('toolbar');
 
         if ($layout !== 'extensions') {
+            $actionsDropdown = $toolbar->dropdownButton('about-actions-group');
+            $actionsDropdown->text(Text::_('COM_BREEZINGFORMSNG_TOOLBAR_ACTIONS'));
+            $actionsDropdown->toggleSplit(false);
+            $actionsDropdown->icon('fa fa-wrench');
+            $actionsDropdown->buttonClass('btn btn-action');
+            $actionsDropdown->listCheck(false);
+
+            $actionsChildToolbar = $actionsDropdown->getChildToolbar();
+            $actionsChildToolbar->standardButton('about_audit')
+                ->task('about.runAudit')
+                ->text('COM_BREEZINGFORMSNG_ABOUT_AUDIT')
+                ->icon('fa fa-stethoscope')
+                ->listCheck(false);
+
+            $actionsChildToolbar->standardButton('about_migrate_packed_data')
+                ->task('about.startRepairWorkflow')
+                ->text('COM_BREEZINGFORMSNG_ABOUT_MIGRATE_PACKED_DATA')
+                ->icon('fa fa-refresh')
+                ->listCheck(false);
+
+            $actionsChildToolbar->standardButton('about_export_configuration')
+                ->task('about.exportConfiguration')
+                ->text('COM_BREEZINGFORMSNG_ABOUT_EXPORT_CONFIGURATION')
+                ->icon('fa fa-download')
+                ->listCheck(false);
+
+            $actionsChildToolbar->standardButton('about_import_configuration')
+                ->task('about.importConfiguration')
+                ->text('COM_BREEZINGFORMSNG_ABOUT_IMPORT_CONFIGURATION')
+                ->icon('fa fa-upload')
+                ->listCheck(false);
+
             $toolbar->standardButton('about_show_log')
                 ->task('about.showLog')
                 ->text('COM_BREEZINGFORMSNG_ABOUT_SHOW_LOG')

@@ -51,7 +51,7 @@ $pageUrl = function (int $start) use ($listOrder, $listDirn, $formSelection, $se
 
 $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key), ENT_QUOTES, 'UTF-8');
 ?>
-<form action="index.php?option=com_breezingformsng" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_breezingformsng&amp;view=records" method="post" name="adminForm" id="adminForm">
 
   <div class="row mb-3">
     <div class="col-md-4">
@@ -164,6 +164,7 @@ $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key)
   <?php endif; ?>
 
   <input type="hidden" name="task" value="">
+  <input type="hidden" name="view" value="records">
   <input type="hidden" name="boxchecked" value="0">
   <input type="hidden" name="form_selection" value="<?= $this->formSelection; ?>">
   <input type="hidden" name="searchterm" value="<?= htmlspecialchars($this->searchTerm); ?>">

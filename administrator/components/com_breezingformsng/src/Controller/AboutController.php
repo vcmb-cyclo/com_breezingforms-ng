@@ -13,11 +13,25 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\CMS\Router\Route;
+use Joomla\Database\DatabaseInterface;
 
 class AboutController extends BaseController
 {
     private const ABOUT_LOG_FILES = ['breezingforms_install2.log', 'breezingforms_install.log'];
     private const ABOUT_LOG_TAIL_BYTES = 65536;
+    private const CONFIGURATION_TABLES = [
+        'facileforms_packages',
+        'facileforms_compmenus',
+        'facileforms_forms',
+        'facileforms_elements',
+        'facileforms_scripts',
+        'facileforms_pieces',
+        'facileforms_integrator_rules',
+        'facileforms_integrator_items',
+        'facileforms_integrator_criteria_fixed',
+        'facileforms_integrator_criteria_form',
+        'facileforms_integrator_criteria_joomla',
+    ];
 
     public function display($cachable = false, $urlparams = [])
     {
@@ -32,15 +46,89 @@ class AboutController extends BaseController
         return parent::display($cachable, $urlparams);
     }
 
+    public function migratePackedData(): void
+    {
+        $this->startRepairWorkflow();
+    }
+
+    public function startRepairWorkflow(): void
+    {
+        $this->checkToken();
+
+        try {
+            $app = $this->getAuthorizedApplication();
+            $db = $this->getDatabase();
+            $converted = 0;
+            $missing = 0;
+
+            foreach (self::CONFIGURATION_TABLES as $table) {
+                if (!$this->tableExists($table)) {
+                    $missing++;
+                    continue;
+                }
+
+                $db->setQuery(
+                    'ALTER TABLE ' . $db->quoteName('#__' . $table)
+                    . ' CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci'
+                );
+                $db->execute();
+                $converted++;
+            }
+
+            $this->setMessage(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_DB_REPAIR_DONE', $converted, $missing), 'message');
+        } catch (\Throwable $exception) {
+            $this->setMessage(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_DB_REPAIR_FAILED', $exception->getMessage()), 'error');
+        }
+
+        $this->setRedirect(Route::_('index.php?option=com_breezingformsng&view=about', false));
+    }
+
+    public function runAudit(): void
+    {
+        $this->checkToken();
+
+        try {
+            $this->getAuthorizedApplication();
+
+            $scannedTables = 0;
+            $missingTables = 0;
+            $totalRows = 0;
+            $nonUtf8Tables = 0;
+
+            foreach (self::CONFIGURATION_TABLES as $table) {
+                if (!$this->tableExists($table)) {
+                    $missingTables++;
+                    continue;
+                }
+
+                $scannedTables++;
+                $totalRows += $this->countRows($table);
+
+                $status = $this->getTableStatus($table);
+                $collation = strtolower((string) ($status->Collation ?? ''));
+
+                if ($collation !== '' && $collation !== 'utf8mb4_unicode_ci') {
+                    $nonUtf8Tables++;
+                }
+            }
+
+            if ($missingTables === 0 && $nonUtf8Tables === 0) {
+                $this->setMessage(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_SUMMARY_CLEAN', $scannedTables, $totalRows), 'message');
+            } else {
+                $this->setMessage(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_SUMMARY_ISSUES', $missingTables, $nonUtf8Tables, $scannedTables), 'warning');
+            }
+        } catch (\Throwable $exception) {
+            $this->setMessage(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_FAILED', $exception->getMessage()), 'error');
+        }
+
+        $this->setRedirect(Route::_('index.php?option=com_breezingformsng&view=about', false));
+    }
+
     public function showLog(): void
     {
         $this->checkToken();
 
-        $application = Factory::getApplication();
-
-        if (!$application->getIdentity()->authorise('core.manage', 'com_breezingformsng')) {
-            throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'), 403);
-        }
+        $application = $this->getAuthorizedApplication();
 
         try {
             $logReport = $this->readAboutLogReport();
@@ -52,6 +140,103 @@ class AboutController extends BaseController
         }
 
         $this->setRedirect(Route::_('index.php?option=com_breezingformsng&view=about#bf-about-log', false));
+    }
+
+    public function exportConfiguration(): void
+    {
+        $this->checkToken();
+
+        try {
+            $app = $this->getAuthorizedApplication();
+            $db = $this->getDatabase();
+            $tables = [];
+
+            foreach (self::CONFIGURATION_TABLES as $table) {
+                if (!$this->tableExists($table)) {
+                    continue;
+                }
+
+                $db->setQuery('SELECT * FROM ' . $db->quoteName('#__' . $table));
+                $tables[$table] = $db->loadAssocList() ?: [];
+            }
+
+            $payload = [
+                'component' => 'com_breezingformsng',
+                'format' => 'breezingformsng-configuration',
+                'version' => 1,
+                'exported_at' => Factory::getDate()->toSql(),
+                'tables' => $tables,
+            ];
+            $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+            if (!is_string($json)) {
+                throw new \RuntimeException(Text::_('COM_BREEZINGFORMSNG_ABOUT_EXPORT_CONFIGURATION_INVALID'));
+            }
+
+            while (ob_get_level() > 0) {
+                ob_end_clean();
+            }
+
+            $fileName = 'breezingformsng-config-' . Factory::getDate()->format('Ymd-His') . '.json';
+            $app->setHeader('Pragma', 'public', true);
+            $app->setHeader('Expires', '0', true);
+            $app->setHeader('Cache-Control', 'private', true);
+            $app->setHeader('Content-Type', 'application/json; charset=utf-8', true);
+            $app->setHeader('Content-Disposition', 'attachment; filename="' . $fileName . '"', true);
+            $app->sendHeaders();
+            echo $json;
+            $app->close();
+        } catch (\Throwable $exception) {
+            $this->setMessage(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_EXPORT_CONFIGURATION_FAILED', $exception->getMessage()), 'error');
+            $this->setRedirect(Route::_('index.php?option=com_breezingformsng&view=about', false));
+        }
+    }
+
+    public function importConfiguration(): void
+    {
+        $this->checkToken();
+        $this->getAuthorizedApplication();
+        $this->setMessage(Text::_('COM_BREEZINGFORMSNG_ABOUT_IMPORT_CONFIGURATION_PREPARE'), 'warning');
+        $this->setRedirect(Route::_('index.php?option=com_breezingformsng&view=about', false));
+    }
+
+    private function getAuthorizedApplication()
+    {
+        $application = Factory::getApplication();
+
+        if (!$application->getIdentity()->authorise('core.manage', 'com_breezingformsng')) {
+            throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'), 403);
+        }
+
+        return $application;
+    }
+
+    private function getDatabase(): DatabaseInterface
+    {
+        return Factory::getContainer()->get(DatabaseInterface::class);
+    }
+
+    private function tableExists(string $table): bool
+    {
+        $db = $this->getDatabase();
+
+        return in_array($db->getPrefix() . $table, $db->getTableList(), true);
+    }
+
+    private function countRows(string $table): int
+    {
+        $db = $this->getDatabase();
+        $db->setQuery('SELECT COUNT(*) FROM ' . $db->quoteName('#__' . $table));
+
+        return (int) $db->loadResult();
+    }
+
+    private function getTableStatus(string $table): object
+    {
+        $db = $this->getDatabase();
+        $db->setQuery('SHOW TABLE STATUS LIKE ' . $db->quote($db->getPrefix() . $table));
+
+        return (object) ($db->loadObject() ?: []);
     }
 
     private function readAboutLogReport(): array

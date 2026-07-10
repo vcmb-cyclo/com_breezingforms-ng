@@ -9,7 +9,6 @@
 
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\Uri\Uri;
 
 $listOrder  = $this->listOrder;
 $listDirn   = $this->listDirn;
@@ -49,6 +48,8 @@ $pageUrl = function (int $start) use ($listOrder, $listDirn, $formSelection, $se
         . ($searchTerm !== '' ? '&searchterm=' . rawurlencode($searchTerm) : '')
         . '&limitstart=' . $start;
 };
+
+$headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key), ENT_QUOTES, 'UTF-8');
 ?>
 <form action="index.php?option=com_breezingformsng" method="post" name="adminForm" id="adminForm">
 
@@ -66,9 +67,9 @@ $pageUrl = function (int $start) use ($listOrder, $listDirn, $formSelection, $se
     <div class="col-md-4">
       <div class="input-group">
         <input type="text" name="searchterm" class="form-control" placeholder="<?= Text::_('JSEARCH_FILTER'); ?>" value="<?= htmlspecialchars($this->searchTerm); ?>">
-        <button type="submit" class="btn btn-primary" onclick="this.form.limitstart.value=0;"><?= Text::_('JSEARCH_FILTER_SUBMIT'); ?></button>
+        <button type="submit" class="btn btn-primary" onclick="this.form.limitstart.value=0;" title="<?= $headerTitle('JSEARCH_FILTER_SUBMIT'); ?>"><?= Text::_('JSEARCH_FILTER_SUBMIT'); ?></button>
         <?php if ($this->searchTerm !== ''): ?>
-          <a href="index.php?option=com_breezingformsng&view=records&form_selection=<?= $this->formSelection; ?>" class="btn btn-secondary"><?= Text::_('JSEARCH_FILTER_CLEAR'); ?></a>
+          <a href="index.php?option=com_breezingformsng&view=records&form_selection=<?= $this->formSelection; ?>" class="btn btn-secondary" title="<?= $headerTitle('JSEARCH_FILTER_CLEAR'); ?>"><?= Text::_('JSEARCH_FILTER_CLEAR'); ?></a>
         <?php endif; ?>
       </div>
     </div>
@@ -81,15 +82,15 @@ $pageUrl = function (int $start) use ($listOrder, $listDirn, $formSelection, $se
     <thead>
       <tr>
         <th class="w-1 text-center"><input type="checkbox" class="form-check-input" onclick="Joomla.checkAll(this)" title="<?= Text::_('JGLOBAL_CHECK_ALL'); ?>"></th>
-        <th><a href="<?= $sortUrl('records.id'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_ID'); ?><?= $sortIcon('records.id'); ?></a></th>
-        <th><a href="<?= $sortUrl('records.submitted'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_SUBMITTED'); ?><?= $sortIcon('records.submitted'); ?></a></th>
-        <th><a href="<?= $sortUrl('forms.title'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_FORM'); ?><?= $sortIcon('forms.title'); ?></a></th>
-        <th><a href="<?= $sortUrl('records.ip'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_IP'); ?><?= $sortIcon('records.ip'); ?></a></th>
-        <th><a href="<?= $sortUrl('records.username'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_USER'); ?><?= $sortIcon('records.username'); ?></a></th>
-        <th class="text-center"><a href="<?= $sortUrl('records.viewed'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_VIEWED'); ?><?= $sortIcon('records.viewed'); ?></a></th>
-        <th class="text-center"><a href="<?= $sortUrl('records.exported'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_EXPORTED'); ?><?= $sortIcon('records.exported'); ?></a></th>
-        <th class="text-center"><a href="<?= $sortUrl('records.archived'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_ARCHIVED'); ?><?= $sortIcon('records.archived'); ?></a></th>
-        <th><?= Text::_('COM_BREEZINGFORMSNG_ACTIONS'); ?></th>
+        <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_ID'); ?>"><a href="<?= $sortUrl('records.id'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_ID'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_ID'); ?><?= $sortIcon('records.id'); ?></a></th>
+        <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_FORM'); ?>"><a href="<?= $sortUrl('forms.title'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_FORM'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_FORM'); ?><?= $sortIcon('forms.title'); ?></a></th>
+        <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_IP'); ?>"><a href="<?= $sortUrl('records.ip'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_IP'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_IP'); ?><?= $sortIcon('records.ip'); ?></a></th>
+        <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_USER'); ?>"><a href="<?= $sortUrl('records.username'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_USER'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_USER'); ?><?= $sortIcon('records.username'); ?></a></th>
+        <th class="text-center" title="<?= $headerTitle('COM_BREEZINGFORMSNG_VIEWED'); ?>"><a href="<?= $sortUrl('records.viewed'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_VIEWED'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_VIEWED'); ?><?= $sortIcon('records.viewed'); ?></a></th>
+        <th class="text-center" title="<?= $headerTitle('COM_BREEZINGFORMSNG_EXPORTED'); ?>"><a href="<?= $sortUrl('records.exported'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_EXPORTED'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_EXPORTED'); ?><?= $sortIcon('records.exported'); ?></a></th>
+        <th class="text-center" title="<?= $headerTitle('COM_BREEZINGFORMSNG_ARCHIVED'); ?>"><a href="<?= $sortUrl('records.archived'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_ARCHIVED'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_ARCHIVED'); ?><?= $sortIcon('records.archived'); ?></a></th>
+        <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_ACTIONS'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_ACTIONS'); ?></th>
+        <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_SUBMITTED'); ?>"><a href="<?= $sortUrl('records.submitted'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_SUBMITTED'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_SUBMITTED'); ?><?= $sortIcon('records.submitted'); ?></a></th>
       </tr>
     </thead>
     <tbody>
@@ -101,9 +102,8 @@ $pageUrl = function (int $start) use ($listOrder, $listDirn, $formSelection, $se
           <tr>
             <td class="text-center"><?= HTMLHelper::_('grid.id', $i, $recId); ?></td>
             <td><?= $recId; ?></td>
-            <td><?= htmlspecialchars((string) $rec['submitted']); ?></td>
             <td>
-              <a href="index.php?option=com_breezingformsng&view=records&layout=edit&record_id=<?= $recId; ?>&form_selection=<?= $this->formSelection; ?>">
+              <a href="index.php?option=com_breezingformsng&view=records&layout=edit&record_id=<?= $recId; ?>&form_selection=<?= $this->formSelection; ?>" title="<?= $headerTitle('JACTION_EDIT'); ?>">
                 <?= htmlspecialchars((string) $rec['form_title']); ?>
               </a>
             </td>
@@ -125,10 +125,11 @@ $pageUrl = function (int $start) use ($listOrder, $listDirn, $formSelection, $se
               </a>
             </td>
             <td>
-              <a class="btn btn-sm btn-secondary" href="index.php?option=com_breezingformsng&view=records&layout=edit&record_id=<?= $recId; ?>&form_selection=<?= $this->formSelection; ?>">
-                <span class="icon-edit" aria-hidden="true"></span> <?= Text::_('JACTION_EDIT'); ?>
+              <a class="btn btn-sm btn-secondary" href="index.php?option=com_breezingformsng&view=records&layout=edit&record_id=<?= $recId; ?>&form_selection=<?= $this->formSelection; ?>" title="<?= $headerTitle('JACTION_EDIT'); ?>" aria-label="<?= $headerTitle('JACTION_EDIT'); ?>">
+                <span class="icon-edit" aria-hidden="true"></span>
               </a>
             </td>
+            <td><?= htmlspecialchars((string) $rec['submitted']); ?></td>
           </tr>
         <?php endforeach; ?>
       <?php endif; ?>

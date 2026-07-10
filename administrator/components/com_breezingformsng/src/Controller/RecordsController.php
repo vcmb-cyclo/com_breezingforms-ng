@@ -249,6 +249,9 @@ class RecordsController extends BaseController
         if (!file_exists($file)) {
             $file = JPATH_SITE . '/media/breezingforms/pdftpl/export_pdf.php';
         }
+        if (!file_exists($file)) {
+            $file = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/pdftpl/export_pdf.php';
+        }
         if ($formName !== '') {
             $custom = JPATH_SITE . '/media/breezingforms/pdftpl/' . $formName . '_export_pdf.php';
             if (file_exists($custom)) {
@@ -337,6 +340,14 @@ class RecordsController extends BaseController
         $pdf->lastPage();
         $pdf->Output($pdfName, 'D');
         $app->close();
+    }
+
+    /**
+     * Exposed for the PDF export templates, which call $this->getSubrecords().
+     */
+    public function getSubrecords(int $recordId): array
+    {
+        return $this->getRecordModel()->getSubrecords($recordId);
     }
 
     public function exportCsv(): void

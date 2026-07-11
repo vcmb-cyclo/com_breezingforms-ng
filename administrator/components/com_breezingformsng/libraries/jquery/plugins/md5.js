@@ -1,3 +1,5 @@
+// BF legacy jQuery scope
+(function (jQuery) {
 	
 	/**
 	 * jQuery MD5 hash algorithm function
@@ -228,3 +230,4 @@
 			}
 		});
 	})(jQuery);
+}(window.JQuery));

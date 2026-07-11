@@ -28,6 +28,12 @@ class DisplayController extends BaseController
         $task = $input->getCmd('task', '');
         $view = $input->getCmd('view', '');
 
+        // List screens must keep the main admin menu enabled; only the edit
+        // layouts re-enable hidemainmenu themselves (same fix as ContentBuilderNG).
+        if (!\in_array($input->getCmd('layout', ''), ['edit', 'csvimport'], true)) {
+            $input->set('hidemainmenu', 0);
+        }
+
         if ($task === '' && in_array($act, ['managepieces', 'managescripts'], true)) {
             $view = $act === 'managepieces' ? 'pieces' : 'scripts';
             $input->set('view', $view);

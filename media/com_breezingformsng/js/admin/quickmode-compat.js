@@ -2,8 +2,8 @@
 (function () {
     'use strict';
 
-if (window.jQuery && window.jQuery.fn && !window.jQuery.fn.on && window.jQuery.fn.bind) {
-    window.jQuery.fn.on = function (types, selector, data, fn) {
+if (window.JQuery && window.JQuery.fn && !window.JQuery.fn.on && window.JQuery.fn.bind) {
+    window.JQuery.fn.on = function (types, selector, data, fn) {
         if (typeof selector === 'function') {
             return this.bind(types, selector);
         }
@@ -20,8 +20,8 @@ if (window.jQuery && window.jQuery.fn && !window.jQuery.fn.on && window.jQuery.f
     };
 }
 
-if (window.jQuery && window.jQuery.fn && !window.jQuery.fn.prop) {
-    window.jQuery.fn.prop = function (name, value) {
+if (window.JQuery && window.JQuery.fn && !window.JQuery.fn.prop) {
+    window.JQuery.fn.prop = function (name, value) {
         if (arguments.length === 1) {
             return this.length ? this[0][name] : undefined;
         }
@@ -32,20 +32,20 @@ if (window.jQuery && window.jQuery.fn && !window.jQuery.fn.prop) {
     };
 }
 
-if (window.jQuery && window.jQuery.fn && !window.jQuery.fn.off && window.jQuery.fn.unbind) {
-    window.jQuery.fn.off = function (types, fn) {
+if (window.JQuery && window.JQuery.fn && !window.JQuery.fn.off && window.JQuery.fn.unbind) {
+    window.JQuery.fn.off = function (types, fn) {
         return this.unbind(types, fn);
     };
 }
 
-if (window.jQuery && window.jQuery.fn && !window.jQuery.fn.first) {
-    window.jQuery.fn.first = function () {
+if (window.JQuery && window.JQuery.fn && !window.JQuery.fn.first) {
+    window.JQuery.fn.first = function () {
         return this.eq(0);
     };
 }
 
-if (window.jQuery && !window.jQuery.isEmptyObject) {
-    window.jQuery.isEmptyObject = function (object) {
+if (window.JQuery && !window.JQuery.isEmptyObject) {
+    window.JQuery.isEmptyObject = function (object) {
         for (var name in object) {
             if (Object.prototype.hasOwnProperty.call(object, name)) {
                 return false;

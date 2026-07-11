@@ -912,7 +912,7 @@ if (
 
                 $options = $element['options'];
 
-                require_once JPATH_ADMINISTRATOR . '/components/com_breezingformsng/vendor/autoload.php';
+                \Vcmb\Component\BreezingformsNG\Administrator\Helper\VendorHelper::load();
 
                 \Stripe\Stripe::setApiKey($options['secretKey']);
                 $stripe = new \Stripe\StripeClient($options['secretKey']);

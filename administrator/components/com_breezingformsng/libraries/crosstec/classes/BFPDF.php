@@ -10,7 +10,7 @@
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 if(!class_exists('TCPDF')) {
-    require_once JPATH_ADMINISTRATOR . '/components/com_breezingformsng/vendor/autoload.php';
+    \Vcmb\Component\BreezingformsNG\Administrator\Helper\VendorHelper::load();
 }
 
 class BFPDF extends TCPDF{

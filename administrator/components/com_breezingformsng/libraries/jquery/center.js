@@ -1,3 +1,5 @@
+// BF legacy jQuery scope
+(function (jQuery) {
 jQuery.fn.bfcenter = function ()
 {
     this.css("position","fixed");
@@ -5,3 +7,4 @@ jQuery.fn.bfcenter = function ()
     this.css("left", (jQuery(window).width() / 2) - (this.outerWidth() / 2));
     return this;
 };
+}(window.JQuery));

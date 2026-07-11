@@ -170,9 +170,6 @@ class PiecesController extends BaseController
         global $ff_config, $ff_compatible, $ff_install;
         global $database, $task;
 
-        Factory::getApplication()->getDocument()->getWebAssetManager()
-            ->getRegistry()
-            ->addRegistryFile('administrator/components/com_breezingformsng/joomla.asset.json');
 
         if (isset($ff_config)) {
             return;

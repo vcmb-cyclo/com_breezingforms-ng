@@ -4,6 +4,8 @@
 (function () {
     'use strict';
 
+    var jQuery = window.JQuery;
+
             var app = null;
 
             function BF_QuickModeApp() {
@@ -912,8 +914,7 @@
                     url: 'index.php',
                     data: {
                         option: 'com_breezingformsng',
-                        act: "quickmode",
-                        task: "doAjaxSave",
+                        task: "quickmode.doAjaxSave",
                         form: document.adminForm.form.value,
                         chunksLength: chunks.length,
                         chunkIdx: chunki,
@@ -925,7 +926,7 @@
                         if (data != '' && data != 0 && !isNaN(data)) {
 
                             document.adminForm.form.value = data;
-                            document.adminForm.submit();
+                            location.href = "index.php?option=com_breezingformsng&task=quickmode.display&form=" + encodeURIComponent(data) + "&active_language_code=" + encodeURIComponent(document.adminForm.active_language_code.value);
 
                         } else if (JQuery.trim(data) == '') {
                             JQuery("#bfSaveQueue").get(0).innerHTML = BFQMConfig.labels['COM_BREEZINGFORMSNG_LOAD_PACKAGE'] + (chunki + 1) + BFQMConfig.labels['COM_BREEZINGFORMSNG_LOAD_PACKAGE_OF'] + (chunks.length - 1);
@@ -998,8 +999,7 @@
 
                             saveButtonClicked = true;
 
-                            form.task.value = 'save';
-                            form.act.value = 'quickmode';
+                            form.task.value = 'quickmode.display';
 
                             var base = 'base';
                             var sixty_four = '64Encode';

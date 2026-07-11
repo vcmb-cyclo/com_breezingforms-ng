@@ -6,6 +6,8 @@
  */
 
 defined('_JEXEC') or die;
+
+use Joomla\CMS\HTML\Helpers\Bootstrap;
 ?>
                                     <div class="bfProperties" id="bfPageProperties" style="display:none">
                                         <br />

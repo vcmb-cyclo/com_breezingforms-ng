@@ -64,6 +64,18 @@ class HtmlView extends BaseHtmlView
         return Text::_('COM_BREEZINGFORMSNG') . ' / ' . $section;
     }
 
+    private function withRecordIdSuffix(string $title): string
+    {
+        $input = Factory::getApplication()->getInput();
+        $recordId = $input->getInt('record_id', 0);
+
+        if ($input->getCmd('layout', '') === 'edit' && $recordId > 0) {
+            return $title . ' / ' . $recordId;
+        }
+
+        return $title;
+    }
+
     private function getToolbarSectionTitle(): string
     {
         $input = Factory::getApplication()->getInput();
@@ -73,7 +85,7 @@ class HtmlView extends BaseHtmlView
         return match (true) {
             $view === 'scripts', $act === 'managescripts' => \BFText::_('COM_BREEZINGFORMSNG_MANAGESCRIPTS'),
             $view === 'pieces', $act === 'managepieces' => \BFText::_('COM_BREEZINGFORMSNG_MANAGEPIECES'),
-            $view === 'records', $act === 'managerecs', $act === 'recordmanagement' => \BFText::_('COM_BREEZINGFORMSNG_RECORDS_SECTION_TITLE'),
+            $view === 'records', $act === 'managerecs', $act === 'recordmanagement' => $this->withRecordIdSuffix(\BFText::_('COM_BREEZINGFORMSNG_RECORDS_SECTION_TITLE')),
 	            $view === 'forms', $act === 'manageforms', $act === 'quickmode' => \BFText::_('COM_BREEZINGFORMSNG_MANAGEFORMS'),
             $view === 'menus', $act === 'managemenus' => \BFText::_('COM_BREEZINGFORMSNG_MANAGEMENUS'),
             $act === 'integrate' => \BFText::_('COM_BREEZINGFORMSNG_INTEGRATOR'),

@@ -303,6 +303,7 @@ class Renderer
 
 	static function listitems($option, &$rows, &$pkglist, $pkg, $search, $total, $limit, $limitstart, $pagination = null, $listOrder = 'a.name', $listDirn = 'asc', $filterState = '')
 	{
+		Factory::getApplication()->getInput()->set('hidemainmenu', 0);
 		global $ff_config, $ff_version;
 		$listOrder = (string) $listOrder;
 		$listDirn = strtolower((string) $listDirn);

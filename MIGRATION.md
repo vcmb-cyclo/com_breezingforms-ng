@@ -279,4 +279,4 @@
   `FormRenderer`, `FormProcessor`, `SubmissionHandler`, intégrations (Stripe, Mailchimp, Dropbox…)
 - [ ] Créer `src/Controller/FormController` côté site (remplacer `breezingformsng.php`)
 - [ ] Créer `src/View/Form/HtmlView.php` (remplacer le rendering legacy)
-- [ ] Migrer `router.php` vers `RouterInterface` Joomla 6
+- [x] Migrer `router.php` vers `RouterInterface` Joomla 6 *(fait le 2026-07-11 : `Site\Service\Router extends RouterBase`, `RouterFactory` au provider, `RouterServiceInterface` sur l'extension ; `router.php` supprimé du paquet et nettoyé des sites installés par `script.php::removeObsoleteComponentFiles()` ; pages de formulaires SEF vérifiées en front)*

@@ -45,7 +45,6 @@
 		<filename>facileforms.class.php</filename>
 		<filename>facileforms.process.php</filename>
 		<filename>facileforms.xml.php</filename>
-		<filename>router.php</filename>
 		<folder>downloadtpl</folder>
 		<folder>exports</folder>
 		<folder>language</folder>

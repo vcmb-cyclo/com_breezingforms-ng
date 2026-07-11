@@ -1772,7 +1772,26 @@ class com_breezingformsngInstallerScript
         $this->deduplicateBreezingFormsComponentRows();
         $this->removeLegacyBreezingFormsComponentRows();
         $this->removeLegacyBreezingFormsComponentDirectories();
+        $this->removeObsoleteComponentFiles();
         $this->log('Legacy BreezingForms component cleanup completed in safe mode; uninstall hooks intentionally skipped.');
+    }
+
+    /**
+     * Files shipped by earlier NG releases and replaced since; Joomla does
+     * not delete removed package files on update.
+     */
+    private function removeObsoleteComponentFiles(): void
+    {
+        $obsolete = [
+            JPATH_SITE . '/components/com_breezingformsng/router.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/sql/create_sql.php',
+        ];
+
+        foreach ($obsolete as $file) {
+            if (File::exists($file) && File::delete($file)) {
+                $this->log('Obsolete file removed: ' . basename($file));
+            }
+        }
     }
 
 

@@ -16,7 +16,7 @@ required=(
     "script.php"
     "administrator/components/com_breezingformsng/services/provider.php"
     "administrator/components/com_breezingformsng/src/Extension/BreezingFormsNGComponent.php"
-    "administrator/components/com_breezingformsng/sql/create_sql.php"
+    "administrator/components/com_breezingformsng/sql/install.mysql.utf8.sql"
     "administrator/components/com_breezingformsng/plugins/sysbreezingforms/sysbreezingforms.xml"
     "components/com_breezingformsng/breezingformsng.php"
     "components/com_breezingformsng/facileforms.process.php"

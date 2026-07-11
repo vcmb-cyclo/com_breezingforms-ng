@@ -83,6 +83,22 @@ class HtmlView extends BaseHtmlView
                 display:inline-block;width:48px;height:48px;vertical-align:middle;
             }'
         );
+        $wa = $doc->getWebAssetManager();
+        $wa->useStyle('com_breezingformsng.quickmode-style');
+        $wa->useStyle('com_breezingformsng.jtree-style');
+        $wa->useStyle('com_breezingformsng.admin-style');
+        $wa->useStyle('com_breezingformsng.custom-style');
+        $wa->useScript('com_breezingformsng.jquery-alias');
+        $wa->useScript('com_breezingformsng.jtree');
+        $wa->useScript('com_breezingformsng.jq-ui');
+        $wa->useScript('com_breezingformsng.base64');
+        $wa->useScript('com_breezingformsng.json-plugin');
+        $wa->useScript('com_breezingformsng.md5');
+        $wa->useScript('com_breezingformsng.center');
+        $wa->useScript('com_breezingformsng.scroll');
+        $wa->useScript('com_breezingformsng.quickmode-elements');
+        $wa->useScript('com_breezingformsng.quickmode-app');
+        $wa->useScript('com_breezingformsng.jquery-restore');
         ToolbarHelper::title($pageTitle, 'logo_left');
 
         parent::display($tpl);

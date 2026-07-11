@@ -9,7 +9,7 @@
     {
       "name": "com_breezingformsng.jquery-alias",
       "type": "script",
-      "uri": "com_breezingformsng/js/admin/jquery-alias.js",
+      "uri": "media/com_breezingformsng/js/admin/jquery-alias.js",
       "dependencies": ["jquery"],
       "version": "auto"
     },
@@ -65,7 +65,7 @@
     {
       "name": "com_breezingformsng.quickmode-elements",
       "type": "script",
-      "uri": "com_breezingformsng/js/admin/quickmode-elements.js",
+      "uri": "media/com_breezingformsng/js/admin/quickmode-elements.js",
       "dependencies": ["com_breezingformsng.jquery-alias"],
       "version": "auto"
     },
@@ -73,7 +73,7 @@
     {
       "name": "com_breezingformsng.quickmode-compat",
       "type": "script",
-      "uri": "com_breezingformsng/js/admin/quickmode-compat.js",
+      "uri": "media/com_breezingformsng/js/admin/quickmode-compat.js",
       "dependencies": ["com_breezingformsng.jquery-alias"],
       "version": "auto"
     },
@@ -81,7 +81,7 @@
     {
       "name": "com_breezingformsng.quickmode-app-properties",
       "type": "script",
-      "uri": "com_breezingformsng/js/admin/quickmode-app-properties.js",
+      "uri": "media/com_breezingformsng/js/admin/quickmode-app-properties.js",
       "dependencies": ["com_breezingformsng.quickmode-compat"],
       "version": "auto"
     },
@@ -89,7 +89,7 @@
     {
       "name": "com_breezingformsng.quickmode-app",
       "type": "script",
-      "uri": "com_breezingformsng/js/admin/quickmode-app.js",
+      "uri": "media/com_breezingformsng/js/admin/quickmode-app.js",
       "dependencies": [
         "com_breezingformsng.quickmode-elements",
         "com_breezingformsng.quickmode-compat",
@@ -102,6 +102,14 @@
         "com_breezingformsng.center",
         "com_breezingformsng.scroll"
       ],
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.jquery-restore",
+      "type": "script",
+      "uri": "media/com_breezingformsng/js/admin/jquery-restore.js",
+      "dependencies": ["com_breezingformsng.quickmode-app"],
       "version": "auto"
     },
 

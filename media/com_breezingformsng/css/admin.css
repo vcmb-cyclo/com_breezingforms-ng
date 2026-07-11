@@ -482,3 +482,7 @@ div.jtable-main-container > table.jtable > tbody > tr.jtable-row-selected {
     text-align: center;
     width: 7% !important;
 }
+
+#bfQuickModeRight #menutab {
+    width: 100%;
+}

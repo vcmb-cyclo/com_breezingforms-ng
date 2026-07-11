@@ -7,6 +7,7 @@
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
@@ -380,14 +381,8 @@ $editor = Editor::getInstance('codemirror');
   <?= HTMLHelper::_('form.token'); ?>
 </form>
 
-<script>
-function bfToggle(libId, codeId, value) {
-  document.getElementById(libId).style.display  = (value === '1') ? '' : 'none';
-  document.getElementById(codeId).style.display = (value === '2') ? '' : 'none';
-}
-Joomla.submitbutton = function (task) {
-  if (task !== 'forms.cancel' && !document.getElementById('adminForm').reportValidity()) return;
-  document.getElementById('adminForm').querySelector('[name="task"]').value = task;
-  document.getElementById('adminForm').submit();
-};
-</script>
+<?php
+$bfDocument = Factory::getApplication()->getDocument();
+$bfDocument->getWebAssetManager()->useScript('com_breezingformsng.admin-form');
+$bfDocument->addScriptOptions('com_breezingformsng.admin-form', ['cancelTask' => 'forms.cancel']);
+?>

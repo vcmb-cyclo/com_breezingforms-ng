@@ -74,6 +74,7 @@
 			<folder>ajax_cache</folder>
 			<folder>images</folder>
 			<folder>language</folder>
+			<folder>layouts</folder>
 			<folder>libraries</folder>
 			<folder>mailtpl</folder>
 			<folder>packages</folder>

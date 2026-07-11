@@ -7,8 +7,10 @@
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Session\Session;
 
 $listOrder  = $this->listOrder;
 $listDirn   = $this->listDirn;
@@ -174,38 +176,11 @@ $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key)
   <?= HTMLHelper::_('form.token'); ?>
 </form>
 
-<script>
-Joomla.submitbutton = function (task) {
-  var form = document.getElementById('adminForm');
-  if (task === 'records.remove') {
-    if (!confirm(<?= json_encode(Text::_('COM_BREEZINGFORMSNG_CONFIRM_DELETE_RECORDS')); ?>)) {
-      return false;
-    }
-  }
-  form.querySelector('input[name="task"]').value = task;
-  form.submit();
-  return true;
-};
-
-function bfToggleFlag(recordId, column, link) {
-  var span = link.querySelector('span');
-  var isChecked = span.classList.contains('icon-check');
-  var newFlag = isChecked ? 0 : 1;
-  fetch('index.php?option=com_breezingformsng&task=records.setFlag&format=json', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-    body: 'record_id=' + recordId + '&column=' + column + '&flag=' + newFlag
-      + '&<?= \Joomla\CMS\Session\Session::getFormToken(); ?>=1'
-  }).then(function (r) { return r.json(); }).then(function (data) {
-    if (data.Result === 'OK') {
-      if (newFlag) {
-        span.classList.remove('icon-times', 'text-danger');
-        span.classList.add('icon-check', 'text-success');
-      } else {
-        span.classList.remove('icon-check', 'text-success');
-        span.classList.add('icon-times', 'text-danger');
-      }
-    }
-  });
-}
-</script>
+<?php
+$bfDocument = Factory::getApplication()->getDocument();
+$bfDocument->getWebAssetManager()->useScript('com_breezingformsng.records-list');
+$bfDocument->addScriptOptions('com_breezingformsng.records-list', [
+    'csrfToken' => Session::getFormToken(),
+]);
+Text::script('COM_BREEZINGFORMSNG_CONFIRM_DELETE_RECORDS');
+?>

@@ -66,9 +66,4 @@ $formSelection = Factory::getApplication()->getInput()->getInt('form_selection',
   <?= HTMLHelper::_('form.token'); ?>
 </form>
 
-<script>
-Joomla.submitbutton = function (task) {
-  document.getElementById('adminForm').querySelector('input[name="task"]').value = task;
-  document.getElementById('adminForm').submit();
-};
-</script>
+<?php Factory::getApplication()->getDocument()->getWebAssetManager()->useScript('com_breezingformsng.admin-form'); ?>

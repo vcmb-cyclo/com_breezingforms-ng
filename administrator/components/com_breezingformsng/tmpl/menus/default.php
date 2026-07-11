@@ -7,6 +7,7 @@
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Session\Session;
@@ -94,15 +95,9 @@ $pkg = $this->pkg;
   <?= HTMLHelper::_('form.token'); ?>
 </form>
 
-<script>
-Joomla.submitbutton = function (task) {
-  if (task === 'menus.remove') {
-    if (!confirm(<?= json_encode(Text::_('JGLOBAL_CONFIRM_DELETE')); ?>)) return false;
-  }
-  var form = document.getElementById('adminForm');
-  if (task !== '') {
-    form.querySelector('[name="task"]').value = task;
-  }
-  form.submit();
-};
-</script>
+<?php
+$bfDocument = Factory::getApplication()->getDocument();
+$bfDocument->getWebAssetManager()->useScript('com_breezingformsng.admin-form');
+$bfDocument->addScriptOptions('com_breezingformsng.admin-form', ['confirmDeleteTask' => 'menus.remove']);
+Text::script('JGLOBAL_CONFIRM_DELETE');
+?>

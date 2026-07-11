@@ -51,6 +51,7 @@
 		<folder>libraries</folder>
 		<folder>src</folder>
 		<folder>themes</folder>
+		<folder>tmpl</folder>
 		<folder>uploads</folder>
 	</files>
 

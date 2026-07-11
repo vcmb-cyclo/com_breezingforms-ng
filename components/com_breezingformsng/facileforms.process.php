@@ -4334,7 +4334,8 @@ class HTML_facileFormsProcessor
                     indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->record_id . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_module_id" value="' . BFRequest::getInt('ff_module_id', 0) . '"/>' . nl();
                 echo indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities($this->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl();
+                    indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
+                    indentc(1) . \Joomla\CMS\HTML\HTMLHelper::_('form.token') . nl();
                 if ($this->target > 1)
                     echo indentc(1) . '<input type="hidden" name="ff_target" value="' . htmlentities($this->target, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                 if ($this->inframe)
@@ -4375,6 +4376,7 @@ class HTML_facileFormsProcessor
                     indentc(1) . '<input type="hidden" name="act" value="run"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities($this->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
+                    indentc(1) . \Joomla\CMS\HTML\HTMLHelper::_('form.token') . nl() .
                     indentc(1) . '<input type="hidden" name="ff_contentid" value="' . BFRequest::getInt('ff_contentid', 0) . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_applic" value="' . BFRequest::getWord('ff_applic', '') . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->record_id . '"/>' . nl() .
@@ -4417,6 +4419,7 @@ class HTML_facileFormsProcessor
                         indentc(1) . '<input type="hidden" name="ff_frame" value="1"/>' . nl() .
                         indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities($this->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
                         indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
+                    indentc(1) . \Joomla\CMS\HTML\HTMLHelper::_('form.token') . nl() .
                         indentc(1) . '<input type="hidden" name="ff_contentid" value="' . BFRequest::getInt('ff_contentid', 0) . '"/>' . nl() .
                         indentc(1) . '<input type="hidden" name="ff_applic" value="' . BFRequest::getWord('ff_applic', '') . '"/>' . nl() .
                         indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->record_id . '"/>' . nl() .

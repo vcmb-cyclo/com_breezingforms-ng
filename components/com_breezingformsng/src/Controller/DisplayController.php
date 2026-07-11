@@ -9,14 +9,23 @@ namespace Vcmb\Component\BreezingformsNG\Site\Controller;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\CMS\Session\Session;
 
 class DisplayController extends BaseController
 {
+    protected $default_view = 'form';
+
     public function display($cachable = false, $urlparams = [])
     {
-        require JPATH_SITE . '/components/com_breezingformsng/breezingformsng.php';
+        $input = Factory::getApplication()->getInput();
 
-        return $this;
+        if ($input->getCmd('ff_task') === 'submit' && !Session::checkToken('request')) {
+            throw new \Exception(Text::_('JINVALID_TOKEN_NOTICE'), 403);
+        }
+
+        return parent::display($cachable, $urlparams);
     }
 }

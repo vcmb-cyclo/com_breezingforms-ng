@@ -32,6 +32,7 @@ class HtmlView extends BaseHtmlView
 
     public function display($tpl = null): void
     {
+        Factory::getApplication()->getInput()->set('hidemainmenu', 1);
         $input  = Factory::getApplication()->getInput();
         $layout = $input->getCmd('layout', '');
 

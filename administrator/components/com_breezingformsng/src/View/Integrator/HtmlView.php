@@ -36,6 +36,13 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
         $model  = $this->getIntegratorModel();
 
         if ($layout === 'edit') {
+
+            $input->set('hidemainmenu', 1);
+
+        }
+
+
+        if ($layout === 'edit') {
             $this->prepareEdit($model, $input);
         } else {
             $this->prepareList($model);

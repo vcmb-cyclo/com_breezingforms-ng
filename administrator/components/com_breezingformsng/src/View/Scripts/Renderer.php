@@ -79,6 +79,7 @@ class Renderer
 
 	static function edit($option, $pkg, &$row, &$typelist)
 	{
+		Factory::getApplication()->getInput()->set('hidemainmenu', 1);
 		global $ff_mossite, $ff_admsite, $ff_config;
 		$action = $row->id ? BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_EDITSCRIPT') : BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_ADDSCRIPT');
 
@@ -463,6 +464,7 @@ class Renderer
 
 	static function test($option, $pkg, &$row, $functionName, $paramNames, $paramDefaults, $autoRun = false, $testMode = '')
 	{
+		Factory::getApplication()->getInput()->set('hidemainmenu', 1);
 		ToolBarHelper::custom('edit', 'undo', '', BFText::_('COM_BREEZINGFORMSNG_TEST_BACK'), false);
 		ToolBarHelper::custom('prev', 'arrow-left', '', BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV'), false);
 		ToolBarHelper::custom('next', 'arrow-right', '', BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT'), false);

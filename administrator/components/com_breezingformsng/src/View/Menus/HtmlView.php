@@ -35,6 +35,13 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
         $model = $factory->createModel('Menu', 'Administrator', ['ignore_request' => true]);
 
         if ($layout === 'edit') {
+
+            $input->set('hidemainmenu', 1);
+
+        }
+
+
+        if ($layout === 'edit') {
             $id         = $input->getInt('id', 0);
             $formId     = $input->getInt('form_id', 0);
             $this->pkg  = $input->getString('pkg', '');

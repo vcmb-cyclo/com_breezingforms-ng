@@ -244,13 +244,15 @@
 - [x] `admin/quickmode.php`, `admin/quickmode.class.php`, `admin/quickmode.html.php`, `admin/quickmode-editor.php` — supprimés
 - [x] Liens internes migrés vers routes MVC `task=quickmode.display` / `task=quickmode.editor`
 - [x] Alias `act=quickmode*` supprimés de `DisplayController`
+- [x] Save AJAX QuickMode : `quickmode-app.js` poste sur `task=quickmode.doAjaxSave`, puis redirige vers `quickmode.display`
+- [x] `QuickmodeController::doAjaxSave()` crée `media/breezingforms/ajax_cache` si absent, valide les bornes de chunks et refuse les payloads JSON invalides
 
 ### Vérification
 - [x] Ouvrir QuickMode depuis la liste des formulaires *(quickmode.display rendu complet, 1,6 Mo)*
-- [ ] Sauvegarder un formulaire (AJAX chunked save → `doAjaxSave`)
+- [x] Sauvegarder un formulaire (AJAX chunked save → `quickmode.doAjaxSave`) *(vérifié HTTP authentifié le 2026-07-11 : formulaire 8, réponse `8`, hash `template_code` inchangé)*
 - [ ] Ajouter / modifier / supprimer des éléments
 - [x] Éditeur inline (`task=quickmode.editor`, `tmpl=component`) *(vérifié après correctif du layout `editor_editor`)*
-- [ ] Prévisualisation frontend depuis QuickMode
+- [x] Prévisualisation frontend depuis QuickMode *(vérifié HTTP le 2026-07-11 : preview component + site, formulaire 8 rendu sans erreur fatale)*
 
 ---
 

@@ -14,6 +14,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Filesystem\File;
+use Joomla\Filesystem\Folder;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\QuickmodeModel;
 
 class QuickmodeController extends BaseController
@@ -40,7 +41,18 @@ class QuickmodeController extends BaseController
         $rndAdd       = $input->getString('rndAdd', '0');
         $chunk        = $input->getString('chunk', '');
 
-        $dest = JPATH_SITE . '/media/breezingforms/ajax_cache/ajaxsave_' . $chunkIdx . '_' . $rndAdd . '.txt';
+        if ($chunksLength < 1 || $chunkIdx < 0 || $chunkIdx >= $chunksLength) {
+            http_response_code(400);
+            exit;
+        }
+
+        $cacheDir = JPATH_SITE . '/media/breezingforms/ajax_cache';
+
+        if (!is_dir($cacheDir)) {
+            Folder::create($cacheDir);
+        }
+
+        $dest = $cacheDir . '/ajaxsave_' . $chunkIdx . '_' . $rndAdd . '.txt';
         @File::write($dest, $chunk);
 
         @ob_end_clean();
@@ -48,12 +60,19 @@ class QuickmodeController extends BaseController
         if ($chunkIdx === $chunksLength - 1) {
             $contents = '';
             for ($i = 0; $i < $chunksLength; $i++) {
-                $file = JPATH_SITE . '/media/breezingforms/ajax_cache/ajaxsave_' . $i . '_' . $rndAdd . '.txt';
+                $file = $cacheDir . '/ajaxsave_' . $i . '_' . $rndAdd . '.txt';
                 $contents .= (string) @file_get_contents($file);
                 @File::delete($file);
             }
 
-            $formId = $this->getQuickmodeModel()->save($form, (array) json_decode(base64_decode($contents), true));
+            $dataObject = json_decode(base64_decode($contents), true);
+
+            if (!is_array($dataObject)) {
+                http_response_code(400);
+                exit;
+            }
+
+            $formId = $this->getQuickmodeModel()->save($form, $dataObject);
 
             // Optional ContentBuilderNG integration
             $cbngBasePath = JPATH_SITE . '/administrator/components/com_contentbuilderng';

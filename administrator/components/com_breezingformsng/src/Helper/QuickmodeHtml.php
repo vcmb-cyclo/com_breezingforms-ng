@@ -146,6 +146,7 @@ class QuickModeHtml
         $wa->useScript('com_breezingformsng.scroll');
         $wa->useScript('com_breezingformsng.quickmode-elements');
         $wa->useScript('com_breezingformsng.quickmode-app');
+        $wa->useScript('com_breezingformsng.jquery-restore');
 
         $wa->addInlineScript(self::buildConfigScript(
             $iconBase,
@@ -192,7 +193,6 @@ class QuickModeHtml
             <?php ToolbarHelper::custom('close', 'cancel.png', 'cancel_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_QUICKMODE_CLOSE'), false); ?>
             <form action="index.php" method="post" name="adminForm" id="adminForm">
                 <input type="hidden" name="option" value="com_breezingformsng" />
-                <input type="hidden" name="act" value="quickmode" />
                 <input type="hidden" name="task" value="" />
                 <input type="hidden" name="form" value="<?php echo $formId; ?>" />
                 <input type="hidden" name="active_language_code" value="<?php echo $active_language_code; ?>" />

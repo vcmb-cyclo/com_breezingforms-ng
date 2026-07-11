@@ -400,6 +400,24 @@ class com_breezingformsngInstallerScript
         return ' COLLATE ' . $this->utf8mb4Collation;
     }
 
+    private function migrateLegacyConfig(): void
+    {
+        $admPath = JPATH_ADMINISTRATOR . '/components/com_breezingformsng';
+
+        require_once $admPath . '/src/Model/ConfigModel.php';
+
+        try {
+            $migrated = (new \Vcmb\Component\BreezingformsNG\Administrator\Model\ConfigModel())->migrateFromLegacy();
+        } catch (\Throwable $e) {
+            $this->log('Legacy config migration failed: ' . $e->getMessage(), Log::WARNING);
+            return;
+        }
+
+        if ($migrated !== []) {
+            $this->log('Legacy config migrated to component params: ' . implode(', ', $migrated));
+        }
+    }
+
     private function importStandardLibrary(): void
     {
         $admPath = JPATH_ADMINISTRATOR . '/components/com_breezingformsng';
@@ -2125,6 +2143,7 @@ class com_breezingformsngInstallerScript
 
         if (in_array($type, ['install', 'update', 'discover_install'], true)) {
             $this->ensureUtf8mb4Columns();
+            $this->migrateLegacyConfig();
             $this->importStandardLibrary();
             $this->copyComponentImageAssets();
             $this->installPlugins();

@@ -17,6 +17,7 @@ use Joomla\CMS\Uri\Uri;
 use Joomla\Filesystem\File;
 use Joomla\CMS\Table\Table;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Component\ComponentHelper;
 use Joomla\Database\DatabaseInterface;
 
 global $ff_version, $ff_resnames, $ff_request, $ff_target;
@@ -291,118 +292,19 @@ class facileFormsConf
 
 	function load()
 	{
-		global $ff_compath, $database;
+		global $database;
 
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
 
-		$configfile = JPATH_SITE . '/media/breezingforms/facileforms.config.php';
-		if (file_exists($configfile)) {
-			include ($configfile);
-		} else {
-			$arr = get_object_vars($this);
-			$ids = array();
+		$params = ComponentHelper::getParams('com_breezingformsng');
 
-			foreach ($arr as $prop => $val)
-				$ids[] = "'" . $prop . "'";
-			Joomla\Utilities\ArrayHelper::toInteger($ids);
-
-			$rows = array();
-
-			try {
-				$database->setQuery(
-					"select id, value from #__facileforms_config " .
-					"where id in (" . implode(',', $ids) . ")"
-				);
-				$rows = $database->loadObjectList();
-			} catch (Exception $e) {
+		foreach (['disable_ip', 'emailadr', 'uploads', 'csvdelimiter', 'csvquote', 'cellnewline'] as $key) {
+			$value = $params->get($key);
+			if ($value !== null) {
+				$this->$key = $value;
 			}
-
-			if (count($rows))
-				foreach ($rows as $row) {
-					$prop = $row->id;
-					$this->$prop = stripcslashes($row->value);
-				} // foreach
-		} // if
-	} // load
-
-	function store()
-	{
-		global $ff_compath, $database, $mosConfig_fileperms;
-
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
-		$configfile = JPATH_SITE . '/media/breezingforms/facileforms.config.php';
-
-		// prepare output
-		$config = "<?php\n";
-		$arr = get_object_vars($this);
-
-		foreach ($arr as $prop => $val) {
-			$config .= "\$this->" . $prop . " = \"" . addslashes($val) . "\";\n";
-
-			$database->setQuery(
-				"update #__facileforms_config " .
-				"set value=" . $database->Quote($val) . " " .
-				"where id = " . $database->Quote($prop) . ""
-			);
-
-			try {
-				$database->execute();
-			} catch (RuntimeException $e) {
-				echo "<br/>" . $e->getMessage();
-				exit;
-			}
-
-			$database->setQuery(
-				"select count(*) from #__facileforms_config " .
-				"where id = " . $database->Quote($prop)
-			);
-			$saved = $database->loadResult();
-			if (!$saved) {
-				$database->setQuery(
-					"insert into #__facileforms_config (id, value) " .
-					"values (" . $database->Quote($prop) . ", " . $database->Quote($val) . ")"
-				);
-				try {
-					$database->execute();
-				} catch (RuntimeException $e) {
-					echo "<br/>" . $e->getMessage();
-					exit;
-				}
-
-			} // if
-		} // while
-		$config .= "?>\n";
-
-		// save to file
-
-		if (!File::write($configfile, $config)) {
-			die('Could not write config file, please check the permissions! <a href="javascript:history.go(-1)">back</a>');
 		}
-
-		/**
-			$existed = file_exists($configfile);
-			if ($fp = fopen($configfile, "w")) {
-				fputs($fp, $config, strlen($config));
-				fclose($fp);
-				if (!$existed) {
-					$filemode = NULL;
-					if (isset($mosConfig_fileperms)) {
-						if ($mosConfig_fileperms!='')
-							$filemode = octdec($mosConfig_fileperms);
-					} else
-						$filemode = 0644;
-					if (isset($filemode)) @chmod($configfile, $filemode);
-				} // if
-			} // if
-					*/
-	} // store
-
-	function bindRequest($request)
-	{
-		$arr = get_object_vars($this);
-		foreach ($arr as $prop => $val)
-			$this->$prop = @BFRequest::getVar($prop, $val);
-	} // bindRequest
+	} // load
 } // class facileFormsConf
 
 class facileFormsMenus extends Table

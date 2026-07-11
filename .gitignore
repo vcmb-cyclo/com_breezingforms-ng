@@ -24,3 +24,6 @@ administrator/error_log
 cache/
 build/
 #libraries/ 
+
+# Composer dependencies (installed at build time by scripts/build-package.sh)
+administrator/components/com_breezingformsng/vendor/

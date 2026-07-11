@@ -9,8 +9,6 @@
  * */
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
-require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Decoder.php');
-require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Encoder.php');
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
@@ -75,7 +73,7 @@ class BFQuickModeOnePage
         Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('<!--');
 
         $this->p = $p;
-        $this->dataObject = Zend_Json::decode(bf_b64dec($this->p->formrow->template_code));
+        $this->dataObject = json_decode(bf_b64dec($this->p->formrow->template_code), true);
 
         $this->rootMdata = $this->dataObject['properties'];
 

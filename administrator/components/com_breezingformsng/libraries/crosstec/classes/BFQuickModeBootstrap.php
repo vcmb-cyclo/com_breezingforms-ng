@@ -16,8 +16,6 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\Component\ComponentHelper;
 
-require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Decoder.php');
-require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/Zend/Json/Encoder.php');
 
 
 
@@ -77,7 +75,7 @@ class BFQuickModeBootstrap
         Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('<!--');
 
         $this->p = $p;
-        $this->dataObject = Zend_Json::decode(bf_b64dec($this->p->formrow->template_code));
+        $this->dataObject = json_decode(bf_b64dec($this->p->formrow->template_code), true);
 
         $this->rootMdata = $this->dataObject['properties'];
 

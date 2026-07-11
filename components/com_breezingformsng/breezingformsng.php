@@ -912,7 +912,7 @@ if (
 
                 $options = $element['options'];
 
-                require_once JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/stripe/vendor/autoload.php';
+                require_once JPATH_ADMINISTRATOR . '/components/com_breezingformsng/vendor/autoload.php';
 
                 \Stripe\Stripe::setApiKey($options['secretKey']);
                 $stripe = new \Stripe\StripeClient($options['secretKey']);
@@ -1044,7 +1044,7 @@ if (
                             }
                         }
                     }
-                } catch (\Stripe\Error\Card $e) {
+                } catch (\Stripe\Exception\CardException $e) {
 
                     $msg = Text::_("COM_BREEZINGFORMSNG_STRIPE_DECLINED");
                     require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');

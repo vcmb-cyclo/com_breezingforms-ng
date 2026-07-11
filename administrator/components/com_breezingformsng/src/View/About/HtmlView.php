@@ -32,6 +32,9 @@ class HtmlView extends BaseHtmlView
 
         $app = Factory::getApplication();
         $document = $app->getDocument();
+        $wa = $document->getWebAssetManager();
+        $wa->getRegistry()->addExtensionRegistryFile('com_breezingformsng');
+        $wa->useStyle('com_breezingformsng.about-style');
         $layout = $this->getLayout();
 
         /** @var Toolbar $toolbar */

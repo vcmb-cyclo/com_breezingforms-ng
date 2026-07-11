@@ -35,6 +35,8 @@ class RecordsController extends BaseController
 
     public function save(): void
     {
+        $this->checkToken();
+
         $app = Factory::getApplication();
         $input = $app->getInput();
         $recordId = $input->getInt('record_id', 0);
@@ -54,6 +56,8 @@ class RecordsController extends BaseController
 
     public function remove(): void
     {
+        $this->checkToken();
+
         $app = Factory::getApplication();
         $input = $app->getInput();
         $ids = $input->get('cid', [], 'post', 'array');
@@ -68,6 +72,8 @@ class RecordsController extends BaseController
 
     public function setFlag(): void
     {
+        $this->checkToken();
+
         @ob_end_clean();
         $input = Factory::getApplication()->getInput();
         $recordId = $input->getInt('record_id', 0);
@@ -90,6 +96,8 @@ class RecordsController extends BaseController
 
     public function setCsvImport(): void
     {
+        $this->checkToken();
+
         $app = Factory::getApplication();
         $input = $app->getInput();
         $formId = $input->getInt('form_id', 0);
@@ -100,130 +108,24 @@ class RecordsController extends BaseController
             return;
         }
 
-        $encoding = $_POST['encoding'] ?? '0';
-        $tmpFile = $_FILES['csv_file']['tmp_name'] ?? '';
+        $encoding = $input->getString('encoding', '0');
+        $upload = $input->files->get('csv_file', [], 'array');
+        $tmpFile = is_array($upload) ? (string) ($upload['tmp_name'] ?? '') : '';
 
-        if (!$tmpFile || !@fopen($tmpFile, 'r')) {
+        if ($tmpFile === '' || !is_uploaded_file($tmpFile)) {
             $app->redirect($this->listUrl($input));
             return;
         }
 
-        if ($encoding !== '0' && function_exists('iconv')) {
-            $content = iconv($encoding, 'UTF-8//TRANSLIT', file_get_contents($tmpFile));
-            $handle = fopen('php://memory', 'rw');
-            fwrite($handle, $content);
-            fseek($handle, 0);
-        } else {
-            $handle = fopen($tmpFile, 'rb');
-        }
-
-        $lines = [];
-        while (!feof($handle)) {
-            $line = fgets($handle);
-            if ($line !== false) {
-                $lines[] = $line;
-            }
-        }
-        fclose($handle);
-
-        if (empty($lines[0]) || trim($lines[0]) === '') {
-            $app->redirect($this->listUrl($input));
-            return;
-        }
-
-        $firstLine = strtolower(str_replace('"', '', $lines[0]));
-        $title = explode(';', $firstLine);
-        if (count($title) <= 1) {
-            $app->redirect($this->listUrl($input));
-            return;
-        }
-
-        $db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-        $db->setQuery("Select `title`, `name` From #__facileforms_forms Where id = " . $formId);
-        $theForm = $db->loadObject();
-
-        $fixedColumns = 'id, submitted, form, title, name, ip, browser, opsys, provider, viewed, exported, archived, user_id, username, user_full_name, paypal_tx_id, paypal_payment_date, paypal_testaccount, paypal_download_tries';
-        $fixedKeys = explode(', ', strtolower($fixedColumns));
-        $fixedKeys[3] = 'bf_form_title';
-        $fixedKeys[4] = 'bf_form_name';
-        $identity = $app->getIdentity();
-
-        foreach (array_slice($lines, 1) as $rawLine) {
-            $record = str_replace('"', '', explode('";"', $rawLine));
-            if (count($record) <= 1) {
-                continue;
-            }
-
-            $values = [];
-            foreach ($fixedKeys as $ci => $col) {
-                $values[$col] = match ($col) {
-                    'id'                    => null,
-                    'form'                  => $formId,
-                    'bf_form_title'         => in_array($col, $title) ? ($record[array_search($col, $title)] ?? '') : ($theForm->title ?? ''),
-                    'bf_form_name'          => in_array($col, $title) ? ($record[array_search($col, $title)] ?? '') : ($theForm->name ?? ''),
-                    'submitted'             => in_array($col, $title) ? ($record[array_search($col, $title)] ?? date('Y-m-d H:i:s')) : date('Y-m-d H:i:s'),
-                    'ip'                    => in_array($col, $title) ? ($record[array_search($col, $title)] ?? '') : ($_SERVER['REMOTE_ADDR'] ?? ''),
-                    'user_id'               => in_array($col, $title) ? (int) ($record[array_search($col, $title)] ?? 0) : (int) $identity->id,
-                    'username'              => in_array($col, $title) ? ($record[array_search($col, $title)] ?? '') : (string) $identity->username,
-                    'viewed', 'exported', 'archived', 'paypal_testaccount', 'paypal_download_tries'
-                                            => (int) (in_array($col, $title) && !empty($record[array_search($col, $title)])),
-                    'paypal_payment_date'   => (function () use ($col, $title, $record) {
-                        $ji = array_search($col, $title);
-                        $val = ($ji !== false) ? trim($record[$ji] ?? '') : '';
-                        return ($val && $val !== '-') ? $val : '1970-01-01 00:00:00';
-                    })(),
-                    default                 => in_array($col, $title) ? ($record[array_search($col, $title)] ?? '') : '',
-                };
-            }
-
-            $cols = array_keys(array_filter($values, fn($v) => $v !== null));
-            $real_cols = array_map(fn($c) => match ($c) { 'bf_form_title' => 'title', 'bf_form_name' => 'name', default => $c }, $cols);
-
-            $query = 'Insert Into #__facileforms_records (' . implode(', ', $real_cols) . ') Values ('
-                . implode(', ', array_map(fn($c) => $db->quote($values[$c]), $cols))
-                . ')';
-            $db->setQuery($query);
-            try {
-                $db->execute();
-            } catch (\RuntimeException) {
-                continue;
-            }
-
-            $db->setQuery('Select MAX(id) From #__facileforms_records');
-            $lastId = (int) $db->loadResult();
-
-            $dlIndex = array_search('download_tries', $title);
-            $startIndex = $dlIndex !== false ? $dlIndex + 1 : count($fixedKeys);
-
-            for ($si = $startIndex; $si < count($record); $si++) {
-                $fieldName = trim($title[$si] ?? '');
-                if ($fieldName === '') {
-                    continue;
-                }
-                $db->setQuery("Select id, title, type From #__facileforms_elements Where form = " . $formId . " And `name` = " . $db->quote($fieldName));
-                $element = $db->loadAssoc();
-                $db->setQuery(
-                    'Insert Into #__facileforms_subrecords (record, element, title, name, type, value) Values ('
-                    . $db->quote($lastId) . ', '
-                    . $db->quote($element['id'] ?? 0) . ', '
-                    . $db->quote($element['title'] ?? '') . ', '
-                    . $db->quote($fieldName) . ', '
-                    . $db->quote($element['type'] ?? '') . ', '
-                    . $db->quote($record[$si] ?? '') . ')'
-                );
-                try {
-                    $db->execute();
-                } catch (\RuntimeException) {
-                    // continue
-                }
-            }
-        }
+        $this->getRecordModel()->importCsv($formId, $tmpFile, $encoding);
 
         $app->redirect('index.php?option=com_breezingformsng&act=managerecs&view=records&form_selection=' . $formSelection);
     }
 
     public function exportPdf(): void
     {
+        $this->checkToken();
+
         $app = Factory::getApplication();
         $input = $app->getInput();
         $ids = $input->get('cid', [], 'post', 'array');
@@ -352,6 +254,8 @@ class RecordsController extends BaseController
 
     public function exportCsv(): void
     {
+        $this->checkToken();
+
         $app = Factory::getApplication();
         $input = $app->getInput();
         $ids = $input->get('cid', [], 'post', 'array');
@@ -467,6 +371,8 @@ class RecordsController extends BaseController
 
     public function exportXml(): void
     {
+        $this->checkToken();
+
         $app = Factory::getApplication();
         $input = $app->getInput();
         $ids = $input->get('cid', [], 'post', 'array');
@@ -568,6 +474,8 @@ class RecordsController extends BaseController
 
     private function batchFlag(string $column): void
     {
+        $this->checkToken();
+
         $app = Factory::getApplication();
         $input = $app->getInput();
         $ids = $input->get('cid', [], 'post', 'array');

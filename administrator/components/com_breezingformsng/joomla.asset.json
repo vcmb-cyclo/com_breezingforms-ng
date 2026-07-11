@@ -71,11 +71,29 @@
     },
 
     {
+      "name": "com_breezingformsng.quickmode-compat",
+      "type": "script",
+      "uri": "com_breezingformsng/js/admin/quickmode-compat.js",
+      "dependencies": ["com_breezingformsng.jquery-alias"],
+      "version": "auto"
+    },
+
+    {
+      "name": "com_breezingformsng.quickmode-app-properties",
+      "type": "script",
+      "uri": "com_breezingformsng/js/admin/quickmode-app-properties.js",
+      "dependencies": ["com_breezingformsng.quickmode-compat"],
+      "version": "auto"
+    },
+
+    {
       "name": "com_breezingformsng.quickmode-app",
       "type": "script",
       "uri": "com_breezingformsng/js/admin/quickmode-app.js",
       "dependencies": [
         "com_breezingformsng.quickmode-elements",
+        "com_breezingformsng.quickmode-compat",
+        "com_breezingformsng.quickmode-app-properties",
         "com_breezingformsng.jtree",
         "com_breezingformsng.jq-ui",
         "com_breezingformsng.base64",

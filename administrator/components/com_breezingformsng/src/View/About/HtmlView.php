@@ -80,7 +80,7 @@ class HtmlView extends BaseHtmlView
                 ->listCheck(false);
 
             $toolbar->linkButton('about_extensions')
-                ->url(Route::_('index.php?option=com_breezingformsng&view=about&layout=extensions', false))
+                ->url(Route::_('index.php?option=com_breezingformsng&task=about.display&view=about&layout=extensions', false))
                 ->text('COM_BREEZINGFORMSNG_ABOUT_EXTENSIONS')
                 ->icon('fa fa-plug');
         }

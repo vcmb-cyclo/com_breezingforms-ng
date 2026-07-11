@@ -126,7 +126,7 @@ class HtmlView extends BaseHtmlView
         $app = Factory::getApplication();
 
         if ($recordId < 1) {
-            $app->redirect('index.php?option=com_breezingformsng&view=records');
+            $app->redirect('index.php?option=com_breezingformsng&act=managerecs&view=records');
             return;
         }
 
@@ -136,7 +136,7 @@ class HtmlView extends BaseHtmlView
 
         $this->record = $model->getRecord($recordId);
         if (!$this->record) {
-            $app->redirect('index.php?option=com_breezingformsng&view=records');
+            $app->redirect('index.php?option=com_breezingformsng&act=managerecs&view=records');
             return;
         }
 

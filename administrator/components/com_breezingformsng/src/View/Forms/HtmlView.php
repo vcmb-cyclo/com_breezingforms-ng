@@ -63,7 +63,7 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
 
             if ($this->form === null) {
                 Factory::getApplication()->enqueueMessage(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'), 'error');
-                Factory::getApplication()->redirect('index.php?option=com_breezingformsng&view=forms');
+                Factory::getApplication()->redirect('index.php?option=com_breezingformsng&act=manageforms&view=forms');
                 return;
             }
 

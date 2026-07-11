@@ -38,7 +38,7 @@ class FormsController extends BaseController
         }
 
         Factory::getApplication()->redirect(Route::_(
-            'index.php?option=com_breezingformsng&view=forms&layout=edit&id=' . $id . '&pkg=' . rawurlencode($pkg),
+            'index.php?option=com_breezingformsng&act=manageforms&view=forms&layout=edit&id=' . $id . '&pkg=' . rawurlencode($pkg),
             false
         ));
     }
@@ -131,7 +131,7 @@ class FormsController extends BaseController
             $id  = (int) ($data['id'] ?? 0);
             $pkg = (string) ($data['package'] ?? '');
             $app->redirect(Route::_(
-                'index.php?option=com_breezingformsng&view=forms&layout=edit&id=' . $id . '&pkg=' . rawurlencode($pkg),
+                'index.php?option=com_breezingformsng&act=manageforms&view=forms&layout=edit&id=' . $id . '&pkg=' . rawurlencode($pkg),
                 false
             ));
         }
@@ -255,7 +255,7 @@ class FormsController extends BaseController
 
     private function listUrl(string $pkg): string
     {
-        return 'index.php?option=com_breezingformsng&view=forms'
+        return 'index.php?option=com_breezingformsng&act=manageforms&view=forms'
             . ($pkg !== '' ? '&pkg=' . rawurlencode($pkg) : '');
     }
 

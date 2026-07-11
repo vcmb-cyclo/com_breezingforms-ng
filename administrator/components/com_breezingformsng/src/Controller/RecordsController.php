@@ -27,7 +27,7 @@ class RecordsController extends BaseController
     {
         $input = Factory::getApplication()->getInput();
         Factory::getApplication()->redirect(
-            'index.php?option=com_breezingformsng&view=records&layout=edit'
+            'index.php?option=com_breezingformsng&act=managerecs&view=records&layout=edit'
             . '&record_id=' . $input->getInt('record_id', 0)
             . '&form_selection=' . $input->getInt('form_selection', 0)
         );
@@ -46,7 +46,7 @@ class RecordsController extends BaseController
         }
 
         $app->redirect(
-            'index.php?option=com_breezingformsng&view=records&layout=edit'
+            'index.php?option=com_breezingformsng&act=managerecs&view=records&layout=edit'
             . '&record_id=' . $recordId
             . '&form_selection=' . $formSelection
         );
@@ -219,7 +219,7 @@ class RecordsController extends BaseController
             }
         }
 
-        $app->redirect('index.php?option=com_breezingformsng&view=records&form_selection=' . $formSelection);
+        $app->redirect('index.php?option=com_breezingformsng&act=managerecs&view=records&form_selection=' . $formSelection);
     }
 
     public function exportPdf(): void
@@ -588,7 +588,7 @@ class RecordsController extends BaseController
     {
         $formSelection = $input->getInt('form_selection', 0);
         $searchTerm = $input->getString('searchterm', '');
-        return 'index.php?option=com_breezingformsng&view=records'
+        return 'index.php?option=com_breezingformsng&act=managerecs&view=records'
             . ($formSelection > 0 ? '&form_selection=' . $formSelection : '')
             . ($searchTerm !== '' ? '&searchterm=' . rawurlencode($searchTerm) : '');
     }

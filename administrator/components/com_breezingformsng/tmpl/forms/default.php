@@ -17,7 +17,7 @@ $pkg = $this->pkg;
 
 $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
 ?>
-<form action="index.php?option=com_breezingformsng&amp;view=forms&amp;act=manageforms" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_breezingformsng&amp;act=manageforms&amp;view=forms" method="post" name="adminForm" id="adminForm">
   <input type="hidden" name="view" value="forms">
 
   <div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
@@ -43,7 +43,7 @@ $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
              placeholder="<?= Text::_('JSEARCH'); ?>">
       <button type="submit" class="btn btn-primary"><?= Text::_('JSEARCH'); ?></button>
       <?php if ($this->search !== ''): ?>
-        <a href="index.php?option=com_breezingformsng&view=forms&search=&pkg=<?= rawurlencode($pkg); ?>"
+        <a href="index.php?option=com_breezingformsng&act=manageforms&view=forms&search=&pkg=<?= rawurlencode($pkg); ?>"
            class="btn btn-secondary"><?= Text::_('JSEARCH_RESET'); ?></a>
       <?php endif; ?>
     </div>

@@ -205,12 +205,12 @@ class IntegratorController extends BaseController
 
     private function editUrl(int $id): string
     {
-        return 'index.php?option=com_breezingformsng&view=integrator&layout=edit&id=' . $id;
+        return 'index.php?option=com_breezingformsng&act=integrate&view=integrator&layout=edit&id=' . $id;
     }
 
     private function listUrl(): string
     {
-        return 'index.php?option=com_breezingformsng&view=integrator';
+        return 'index.php?option=com_breezingformsng&act=integrate&view=integrator';
     }
 
     private function getIntegratorModel(): IntegratorModel

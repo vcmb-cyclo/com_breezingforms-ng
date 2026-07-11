@@ -1419,14 +1419,21 @@ class com_breezingformsngInstallerScript
                         'menu-quicktask-icon' => 'plus',
                     ],
                 ],
-                ['COM_BREEZINGFORMSNG_CONFIGURATION', 'breezingformsng-configuration', 'act=configuration', []],
+                [
+                    'COM_BREEZINGFORMSNG_CONFIGURATION',
+                    'breezingformsng-configuration',
+                    'index.php?option=com_config&view=component&component=' . self::TARGET_COMPONENT,
+                    [],
+                ],
                 ['COM_BREEZINGFORMSNG_ABOUT', 'breezingformsng-about', 'task=about.display&view=about', []],
             ];
 
             $checked = 0;
 
             foreach ($items as [$title, $alias, $route, $params]) {
-                $link = 'index.php?option=' . self::TARGET_COMPONENT . '&' . $route;
+                $link = str_starts_with($route, 'index.php?')
+                    ? $route
+                    : 'index.php?option=' . self::TARGET_COMPONENT . '&' . $route;
 
                 $db->setQuery(
                     $db->getQuery(true)

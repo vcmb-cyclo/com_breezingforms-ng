@@ -200,10 +200,11 @@ class QuickModeHtml
             </form>
         </div>
         <?php
-        $default = ComponentHelper::getParams('com_languages')->get('site');
+        $default = (string) ComponentHelper::getParams('com_languages')->get('site');
+        $languages = array_keys(LanguageHelper::getInstalledLanguages(0));
 
         $showTranslations = $formId > 0
-            && count(LanguageHelper::getLanguages()) > 1
+            && count($languages) > 1
             && $active_language_code != ''
             && $active_language_code != $default;
         $wa->addInlineScript(
@@ -211,20 +212,19 @@ class QuickModeHtml
             . ($showTranslations ? 'block' : 'none') . '"); });'
         );
 
-        if ($formId > 0 && count(LanguageHelper::getLanguages()) > 1) {
+        if ($formId > 0 && count($languages) > 1) {
             ?>
             <div onclick="location.href = 'index.php?option=com_breezingformsng&format=html&task=quickmode.display&formName=translationtest&form=<?php echo $formId ?>&active_language_code='"
                 class="bfLanguageButton<?php echo $active_language_code == $default || $active_language_code == '' ? ' bfLanguageButtonActive' : '' ?>">
                 <?php echo $default; ?>
             </div>
             <?php
-            $languages = LanguageHelper::getLanguages();
-            foreach ($languages as $language) {
-                if ($language->lang_code != $default) {
+            foreach ($languages as $languageCode) {
+                if ($languageCode !== $default) {
                     ?>
-                    <div onclick="location.href = 'index.php?option=com_breezingformsng&format=html&task=quickmode.display&formName=translationtest&form=<?php echo $formId ?>&active_language_code=<?php echo $language->lang_code; ?>'"
-                        class="bfLanguageButton<?php echo $active_language_code == $language->lang_code ? ' bfLanguageButtonActive' : '' ?>">
-                        <?php echo $language->lang_code; ?>
+                    <div onclick="location.href = 'index.php?option=com_breezingformsng&format=html&task=quickmode.display&formName=translationtest&form=<?php echo $formId ?>&active_language_code=<?php echo rawurlencode($languageCode); ?>'"
+                        class="bfLanguageButton<?php echo $active_language_code === $languageCode ? ' bfLanguageButtonActive' : '' ?>">
+                        <?php echo htmlspecialchars($languageCode, ENT_QUOTES, 'UTF-8'); ?>
                     </div>
                     <?php
                 }
@@ -291,6 +291,7 @@ class QuickModeHtml
                                     <div class="bfFadingMessage" style="display:none"></div>
                                     <input type="submit" class="btn btn-secondary"
                                         value="<?php echo BFText::_('COM_BREEZINGFORMSNG_PROPERTIES_SAVE'); ?>"
+                                        id="bfPropertySaveButtonTop" />
                                     <?php self::renderSection('properties_form', get_defined_vars()); ?>
                                     <?php self::renderSection('properties_page', get_defined_vars()); ?>
                                     <?php self::renderSection('properties_section', get_defined_vars()); ?>

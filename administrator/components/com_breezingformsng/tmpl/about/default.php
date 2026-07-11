@@ -352,7 +352,6 @@ $aboutDescription = str_replace(
     $aboutDescription
 );
 ?>
-<?php Factory::getApplication()->getDocument()->getWebAssetManager()->useStyle('com_breezingformsng.about-style'); ?>
 
 <form action="index.php?option=com_breezingformsng&task=about.display&amp;view=about" method="post" name="adminForm" id="adminForm">
     <div class="bf-about-intro mt-3 mb-3">

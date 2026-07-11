@@ -188,7 +188,7 @@
     {
       "name": "com_breezingformsng.about-style",
       "type": "style",
-      "uri": "com_breezingformsng/css/about.css",
+      "uri": "media/com_breezingformsng/css/about.css",
       "version": "auto"
     },
 

@@ -277,6 +277,9 @@
 
 - [ ] Décomposer `facileforms.process.php` (448 KB) en services :  
   `FormRenderer`, `FormProcessor`, `SubmissionHandler`, intégrations (Stripe, Mailchimp, Dropbox…)
-- [ ] Créer `src/Controller/FormController` côté site (remplacer `breezingformsng.php`)
-- [ ] Créer `src/View/Form/HtmlView.php` (remplacer le rendering legacy)
+- [x] Squelette MVC site (2026-07-11) : `DisplayController` (vue par défaut `form`, **contrôle CSRF sur `ff_task=submit`**),
+  `View/Form/HtmlView`, `tmpl/form/default.php` (délègue encore au moteur legacy), métadonnées de menu modernisées
+  (`tmpl/form/default.xml`, blocs 1.5/1.6 supprimés), jeton `form.token` injecté dans les 3 branches d'émission du moteur.
+  Vérifié sur le conteneur : rendu 200, soumission sans jeton → 403 (index.php et URL SEF), soumission avec jeton → enregistrement créé puis nettoyé.
+- [ ] Remplacer le moteur `breezingformsng.php` par `FormRenderer`/`SubmissionProcessor` (le `require` vit désormais dans le template, prochaine étape : extraction du rendu)
 - [x] Migrer `router.php` vers `RouterInterface` Joomla 6 *(fait le 2026-07-11 : `Site\Service\Router extends RouterBase`, `RouterFactory` au provider, `RouterServiceInterface` sur l'extension ; `router.php` supprimé du paquet et nettoyé des sites installés par `script.php::removeObsoleteComponentFiles()` ; pages de formulaires SEF vérifiées en front)*

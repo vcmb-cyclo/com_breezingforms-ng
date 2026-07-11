@@ -8258,7 +8258,7 @@ box-shadow: 0 1px 0 rgba(46,86,153,0.15),0 0 4px rgba(86,149,219,0),inset 0 2px 
 transition: box-shadow .15s linear;
 }
 </style></head><body>';*/
-                                    require_once JPATH_ADMINISTRATOR . '/components/com_breezingformsng/vendor/autoload.php';
+                                    \Vcmb\Component\BreezingformsNG\Administrator\Helper\VendorHelper::load();
                                 \Stripe\Stripe::setApiKey($options['secretKey']);
                                 $stripeemail = strtolower(BFRequest::getVar('ff_nm_' . $options['emailfield'], '')[0]);
                                 //header('Content-Type: application/json');

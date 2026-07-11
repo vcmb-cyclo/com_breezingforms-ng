@@ -23,7 +23,7 @@ $plugins = is_array($this->plugins ?? null) ? $this->plugins : [];
                 <span class="fa-solid fa-plug" aria-hidden="true"></span>
                 <?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_EXTENSIONS_MANAGE_PLUGINS'); ?>
             </a>
-            <a class="btn btn-sm btn-outline-secondary" href="<?php echo Route::_('index.php?option=com_breezingformsng&view=about', false); ?>">
+            <a class="btn btn-sm btn-outline-secondary" href="<?php echo Route::_('index.php?option=com_breezingformsng&task=about.display&view=about', false); ?>">
                 <?php echo Text::_('COM_BREEZINGFORMSNG_HELP_BACK_TO_ABOUT'); ?>
             </a>
         </div>

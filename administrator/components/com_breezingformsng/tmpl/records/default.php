@@ -34,7 +34,7 @@ $sortIcon = function (string $col) use ($listOrder, $listDirn): string {
 
 $sortUrl = function (string $col) use ($listOrder, $listDirn, $formSelection, $searchTerm): string {
     $dir = ($listOrder === $col && $listDirn === 'asc') ? 'desc' : 'asc';
-    return 'index.php?option=com_breezingformsng&view=records'
+    return 'index.php?option=com_breezingformsng&act=managerecs&view=records'
         . '&filter_order=' . rawurlencode($col)
         . '&filter_order_Dir=' . $dir
         . '&form_selection=' . $formSelection
@@ -43,7 +43,7 @@ $sortUrl = function (string $col) use ($listOrder, $listDirn, $formSelection, $s
 };
 
 $pageUrl = function (int $start) use ($listOrder, $listDirn, $formSelection, $searchTerm): string {
-    return 'index.php?option=com_breezingformsng&view=records'
+    return 'index.php?option=com_breezingformsng&act=managerecs&view=records'
         . '&filter_order=' . rawurlencode($listOrder)
         . '&filter_order_Dir=' . $listDirn
         . '&form_selection=' . $formSelection
@@ -53,7 +53,7 @@ $pageUrl = function (int $start) use ($listOrder, $listDirn, $formSelection, $se
 
 $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key), ENT_QUOTES, 'UTF-8');
 ?>
-<form action="index.php?option=com_breezingformsng&amp;view=records" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_breezingformsng&amp;act=managerecs&amp;view=records" method="post" name="adminForm" id="adminForm">
 
   <div class="row mb-3">
     <div class="col-md-4">
@@ -71,7 +71,7 @@ $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key)
         <input type="text" name="searchterm" class="form-control" placeholder="<?= Text::_('JSEARCH_FILTER'); ?>" value="<?= htmlspecialchars($this->searchTerm); ?>">
         <button type="submit" class="btn btn-primary" onclick="this.form.limitstart.value=0;" title="<?= $headerTitle('JSEARCH_FILTER_SUBMIT'); ?>"><?= Text::_('JSEARCH_FILTER_SUBMIT'); ?></button>
         <?php if ($this->searchTerm !== ''): ?>
-          <a href="index.php?option=com_breezingformsng&view=records&form_selection=<?= $this->formSelection; ?>" class="btn btn-secondary" title="<?= $headerTitle('JSEARCH_FILTER_CLEAR'); ?>"><?= Text::_('JSEARCH_FILTER_CLEAR'); ?></a>
+          <a href="index.php?option=com_breezingformsng&act=managerecs&view=records&form_selection=<?= $this->formSelection; ?>" class="btn btn-secondary" title="<?= $headerTitle('JSEARCH_FILTER_CLEAR'); ?>"><?= Text::_('JSEARCH_FILTER_CLEAR'); ?></a>
         <?php endif; ?>
       </div>
     </div>
@@ -105,7 +105,7 @@ $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key)
             <td class="text-center"><?= HTMLHelper::_('grid.id', $i, $recId); ?></td>
             <td><?= $recId; ?></td>
             <td>
-              <a href="index.php?option=com_breezingformsng&view=records&layout=edit&record_id=<?= $recId; ?>&form_selection=<?= $this->formSelection; ?>" title="<?= $headerTitle('JACTION_EDIT'); ?>">
+              <a href="index.php?option=com_breezingformsng&act=managerecs&view=records&layout=edit&record_id=<?= $recId; ?>&form_selection=<?= $this->formSelection; ?>" title="<?= $headerTitle('JACTION_EDIT'); ?>">
                 <?= htmlspecialchars((string) $rec['form_title']); ?>
               </a>
             </td>
@@ -127,7 +127,7 @@ $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key)
               </a>
             </td>
             <td>
-              <a class="btn btn-sm btn-secondary" href="index.php?option=com_breezingformsng&view=records&layout=edit&record_id=<?= $recId; ?>&form_selection=<?= $this->formSelection; ?>" title="<?= $headerTitle('JACTION_EDIT'); ?>" aria-label="<?= $headerTitle('JACTION_EDIT'); ?>">
+              <a class="btn btn-sm btn-secondary" href="index.php?option=com_breezingformsng&act=managerecs&view=records&layout=edit&record_id=<?= $recId; ?>&form_selection=<?= $this->formSelection; ?>" title="<?= $headerTitle('JACTION_EDIT'); ?>" aria-label="<?= $headerTitle('JACTION_EDIT'); ?>">
                 <span class="icon-edit" aria-hidden="true"></span>
               </a>
             </td>

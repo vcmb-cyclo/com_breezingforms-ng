@@ -80,7 +80,7 @@ class AboutController extends BaseController
             $this->setMessage(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_DB_REPAIR_FAILED', $exception->getMessage()), 'error');
         }
 
-        $this->setRedirect(Route::_('index.php?option=com_breezingformsng&view=about', false));
+        $this->setRedirect(Route::_('index.php?option=com_breezingformsng&task=about.display&view=about', false));
     }
 
     public function runAudit(): void
@@ -121,7 +121,7 @@ class AboutController extends BaseController
             $this->setMessage(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_FAILED', $exception->getMessage()), 'error');
         }
 
-        $this->setRedirect(Route::_('index.php?option=com_breezingformsng&view=about', false));
+        $this->setRedirect(Route::_('index.php?option=com_breezingformsng&task=about.display&view=about', false));
     }
 
     public function showLog(): void
@@ -139,7 +139,7 @@ class AboutController extends BaseController
             $this->setMessage(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_LOG_LOAD_FAILED', $exception->getMessage()), 'error');
         }
 
-        $this->setRedirect(Route::_('index.php?option=com_breezingformsng&view=about#bf-about-log', false));
+        $this->setRedirect(Route::_('index.php?option=com_breezingformsng&task=about.display&view=about#bf-about-log', false));
     }
 
     public function exportConfiguration(): void
@@ -188,7 +188,7 @@ class AboutController extends BaseController
             $app->close();
         } catch (\Throwable $exception) {
             $this->setMessage(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_EXPORT_CONFIGURATION_FAILED', $exception->getMessage()), 'error');
-            $this->setRedirect(Route::_('index.php?option=com_breezingformsng&view=about', false));
+            $this->setRedirect(Route::_('index.php?option=com_breezingformsng&task=about.display&view=about', false));
         }
     }
 
@@ -197,7 +197,7 @@ class AboutController extends BaseController
         $this->checkToken();
         $this->getAuthorizedApplication();
         $this->setMessage(Text::_('COM_BREEZINGFORMSNG_ABOUT_IMPORT_CONFIGURATION_PREPARE'), 'warning');
-        $this->setRedirect(Route::_('index.php?option=com_breezingformsng&view=about', false));
+        $this->setRedirect(Route::_('index.php?option=com_breezingformsng&task=about.display&view=about', false));
     }
 
     private function getAuthorizedApplication()

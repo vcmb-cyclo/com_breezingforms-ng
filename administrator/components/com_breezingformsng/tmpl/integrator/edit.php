@@ -16,8 +16,8 @@ $rule        = $this->rule;
 $ruleId      = $rule ? (int) $rule->id : 0;
 $isNew       = ($ruleId === 0);
 $token       = Session::getFormToken();
-$baseUrl     = 'index.php?option=com_breezingformsng';
-$editUrl     = $baseUrl . '&view=integrator&layout=edit&id=' . $ruleId;
+$baseUrl     = 'index.php?option=com_breezingformsng&act=integrate&view=integrator';
+$editUrl     = $baseUrl . '&layout=edit&id=' . $ruleId;
 
 $operators = [
     '='     => 'equals',

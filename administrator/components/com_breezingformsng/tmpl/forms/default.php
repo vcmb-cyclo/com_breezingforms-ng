@@ -7,6 +7,7 @@
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Pagination\Pagination;
@@ -124,12 +125,9 @@ $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
   <?= HTMLHelper::_('form.token'); ?>
 </form>
 
-<script>
-Joomla.submitbutton = function (task) {
-  if (task === 'forms.remove') {
-    if (!confirm(<?= json_encode(Text::_('JGLOBAL_CONFIRM_DELETE')); ?>)) return false;
-  }
-  document.getElementById('adminForm').querySelector('[name="task"]').value = task;
-  document.getElementById('adminForm').submit();
-};
-</script>
+<?php
+$bfDocument = Factory::getApplication()->getDocument();
+$bfDocument->getWebAssetManager()->useScript('com_breezingformsng.admin-form');
+$bfDocument->addScriptOptions('com_breezingformsng.admin-form', ['confirmDeleteTask' => 'forms.remove']);
+Text::script('JGLOBAL_CONFIRM_DELETE');
+?>

@@ -72,8 +72,8 @@ class ScriptManager
 
 		// bind du reste
 		if (!$row->bind($_POST)) {
-			echo "<script> alert('" . $row->getError() . "'); window.history.go(-1); </script>\n";
-			exit();
+			Factory::getApplication()->enqueueMessage($row->getError(), 'error');
+			Factory::getApplication()->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 		}
 
 		// Forcer code non filtré
@@ -96,8 +96,8 @@ class ScriptManager
 		$row->modified_by = $userId;
 
 		if (!$row->store()) {
-			echo "<script> alert('" . $row->getError() . "'); window.history.go(-1); </script>\n";
-			exit();
+			Factory::getApplication()->enqueueMessage($row->getError(), 'error');
+			Factory::getApplication()->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 		}
 
 		$app->enqueueMessage(BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_SAVED'));
@@ -136,8 +136,8 @@ class ScriptManager
 		try {
 			$total = $model->deleteByIds($ids);
 		} catch (RuntimeException $e) {
-			echo "<script> alert('" . $e->getMessage() . "'); window.history.go(-1); </script>\n";
-			return;
+			Factory::getApplication()->enqueueMessage($e->getMessage(), 'error');
+			Factory::getApplication()->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 		}
 
 		if ($total) {
@@ -154,8 +154,8 @@ class ScriptManager
 		try {
 			ScriptModel::create()->publishByIds($ids, (bool) $publish);
 		} catch (RuntimeException $e) {
-			echo "<script> alert('" . $e->getMessage() . "'); window.history.go(-1); </script>\n";
-			exit();
+			Factory::getApplication()->enqueueMessage($e->getMessage(), 'error');
+			Factory::getApplication()->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 		}
 
 		Factory::getApplication()->redirect("index.php?option=$option&view=scripts&pkg=$pkg");

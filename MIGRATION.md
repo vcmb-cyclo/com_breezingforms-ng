@@ -91,9 +91,10 @@
 - [x] `admin/config.html.php` *(git rm — remplacé par com_config)*
 - [x] `admin/config.php` *(git rm — dispatcher inutile)*
 
-> **Note Phase 6** : le runtime legacy (`$ff_config->csvdelimiter` etc.) lit toujours depuis `#__facileforms_config`.
-> La migration des lectures runtime vers `ComponentHelper::getParams()` se fera en Phase 6.
-> `src/Model/ConfigModel.php` contiendra la logique de migration.
+> **Fait (2026-07-11)** : `facileFormsConf::load()` lit désormais `ComponentHelper::getParams()` (6 clés gérées par `config.xml`) ;
+> `ConfigModel::migrateFromLegacy()` copie une seule fois les valeurs de `#__facileforms_config` vers les params
+> (appelée par `script.php::migrateLegacyConfig()` en postflight, idempotente — vérifiée sur le conteneur joomla6).
+> `store()` et `bindRequest()` (morts) supprimés. La table `#__facileforms_config` sera supprimée après une version de battement.
 
 ### Vérification
 - [x] Composants → BreezingForms NG → Options ouvre l'écran natif Joomla *(vérifié)*

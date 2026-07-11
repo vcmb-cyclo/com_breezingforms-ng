@@ -7,7 +7,6 @@
 
 defined('_JEXEC') or die;
 ?>
-                                        id="bfPropertySaveButtonTop" />
                                     <!-- FORM PROPERTIES BEGIN -->
                                     <div class="bfProperties" id="bfFormProperties" style="display:none">
                                         <br />

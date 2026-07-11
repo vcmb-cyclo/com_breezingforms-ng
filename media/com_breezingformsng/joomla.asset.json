@@ -281,7 +281,7 @@
     {
       "name": "com_breezingformsng.admin-style",
       "type": "style",
-      "uri": "com_breezingformsng/css/admin.css",
+      "uri": "media/com_breezingformsng/css/admin.css",
       "version": "auto"
     },
 

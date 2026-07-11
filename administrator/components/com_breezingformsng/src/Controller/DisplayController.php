@@ -57,12 +57,6 @@ class DisplayController extends BaseController
             return parent::display($cachable, $urlparams);
         }
 
-        if ($act === 'configuration') {
-            Factory::getApplication()->redirect(
-                'index.php?option=com_config&view=component&component=com_breezingformsng'
-            );
-        }
-
         if ($task === '' && ($view === 'integrator' || $act === 'integrate')) {
             $input->set('view', 'integrator');
             $input->set('act', '');

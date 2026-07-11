@@ -326,7 +326,7 @@ class RecordsController extends BaseController
 
         if (!$activeFound) {
             \TCPDF_FONTS::addTTFfont(
-                JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/tcpdf/fonts/verdana.ttf',
+                JPATH_SITE . '/media/com_breezingformsng/fonts/verdana.ttf',
                 'TrueTypeUnicode'
             );
             $pdf->SetFont('verdana');

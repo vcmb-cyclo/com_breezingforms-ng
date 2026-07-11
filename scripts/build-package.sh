@@ -33,6 +33,23 @@ done < <(
         script.php
 )
 
+# Install PHP dependencies (managed by Composer) into the package
+composer install --no-dev --no-interaction --quiet \
+    --working-dir="${package_dir}/administrator/components/com_breezingformsng"
+
+# Prune TCPDF font families the component does not use: it relies on the
+# helvetica core fonts plus a runtime TTF conversion of media/.../verdana.ttf
+fonts_dir="${package_dir}/administrator/components/com_breezingformsng/vendor/tecnickcom/tcpdf/fonts"
+if [[ -d "${fonts_dir}" ]]; then
+    find "${fonts_dir}" -maxdepth 1 -type f \
+        ! -name 'helvetica*' \
+        ! -name 'courier*' \
+        ! -name 'times*' \
+        ! -name 'symbol*' \
+        ! -name 'zapfdingbats*' \
+        -delete
+fi
+
 archive="${output_dir}/com_breezingformsng-${version}.zip"
 rm -f "${archive}"
 

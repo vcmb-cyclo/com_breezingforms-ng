@@ -10,7 +10,7 @@
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 if(!class_exists('TCPDF')) {
-    require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/tcpdf/tcpdf.php');
+    require_once JPATH_ADMINISTRATOR . '/components/com_breezingformsng/vendor/autoload.php';
 }
 
 class BFPDF extends TCPDF{
@@ -88,7 +88,7 @@ class BFPDF extends TCPDF{
         }
 
         if(!$active_found){
-            TCPDF_FONTS::addTTFfont(JPATH_SITE.'/administrator/components/com_breezingformsng/libraries/tcpdf/fonts/verdana.ttf', 'TrueTypeUnicode');
+            TCPDF_FONTS::addTTFfont(JPATH_SITE . '/media/com_breezingformsng/fonts/verdana.ttf', 'TrueTypeUnicode');
             $pdf->SetFont('verdana');
         }
 
@@ -154,7 +154,7 @@ class BFPDF extends TCPDF{
         }
 
         if(!$active_found){
-            TCPDF_FONTS::addTTFfont(JPATH_SITE.'/administrator/components/com_breezingformsng/libraries/tcpdf/fonts/verdana.ttf', 'TrueTypeUnicode');
+            TCPDF_FONTS::addTTFfont(JPATH_SITE . '/media/com_breezingformsng/fonts/verdana.ttf', 'TrueTypeUnicode');
             $pdf->SetFont('verdana');
         }
 

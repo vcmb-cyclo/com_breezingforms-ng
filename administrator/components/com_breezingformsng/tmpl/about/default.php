@@ -191,18 +191,11 @@ if (!function_exists('bf_about_get_php_libraries')) {
     {
         $indexedLibraries = array();
 
-        $stripeInstalled = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/administrator/libraries/stripe/vendor/composer/installed.json';
-        $dropboxInstalled = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/administrator/libraries/dropbox/v2/composer/installed.json';
-        $tcpdfComposer = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/administrator/libraries/tcpdf/composer.json';
-        $vendorComposer = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/administrator/libraries/vendor/composer.json';
+        $vendorInstalled = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/vendor/composer/installed.json';
+        $dropboxInstalled = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/dropbox/v2/composer/installed.json';
 
-        bf_about_collect_php_libraries_from_installed_json($indexedLibraries, $stripeInstalled);
+        bf_about_collect_php_libraries_from_installed_json($indexedLibraries, $vendorInstalled);
         bf_about_collect_php_libraries_from_installed_json($indexedLibraries, $dropboxInstalled);
-        bf_about_collect_php_library_from_composer_json($indexedLibraries, $tcpdfComposer);
-
-        if (empty($indexedLibraries)) {
-            bf_about_collect_php_library_from_composer_json($indexedLibraries, $vendorComposer);
-        }
 
         $libraries = array_values($indexedLibraries);
 

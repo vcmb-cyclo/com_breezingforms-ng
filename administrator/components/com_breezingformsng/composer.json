@@ -1,0 +1,15 @@
+{
+    "name": "vcmb/com_breezingformsng",
+    "description": "PHP dependencies for BreezingForms NG (Joomla 6 component)",
+    "license": "GPL-2.0-or-later",
+    "type": "project",
+    "require": {
+        "php": ">=8.1",
+        "stripe/stripe-php": "^17.3",
+        "tecnickcom/tcpdf": "^6.10"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}

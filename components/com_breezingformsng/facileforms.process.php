@@ -5104,7 +5104,7 @@ class HTML_facileFormsProcessor
         }
 
         if (!$active_found) {
-            TCPDF_FONTS::addTTFfont(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/tcpdf/fonts/verdana.ttf', 'TrueTypeUnicode');
+            TCPDF_FONTS::addTTFfont(JPATH_SITE . '/media/com_breezingformsng/fonts/verdana.ttf', 'TrueTypeUnicode');
             $pdf->SetFont('verdana');
         }
 
@@ -8258,7 +8258,7 @@ box-shadow: 0 1px 0 rgba(46,86,153,0.15),0 0 4px rgba(86,149,219,0),inset 0 2px 
 transition: box-shadow .15s linear;
 }
 </style></head><body>';*/
-                                    require_once JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/stripe/vendor/autoload.php';
+                                    require_once JPATH_ADMINISTRATOR . '/components/com_breezingformsng/vendor/autoload.php';
                                 \Stripe\Stripe::setApiKey($options['secretKey']);
                                 $stripeemail = strtolower(BFRequest::getVar('ff_nm_' . $options['emailfield'], '')[0]);
                                 //header('Content-Type: application/json');

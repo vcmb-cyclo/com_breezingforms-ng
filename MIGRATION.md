@@ -257,6 +257,20 @@
 
 ---
 
+## Phase 8a — SQL versionné (Lot B du plan — fait le 2026-07-11)
+
+- [x] `sql/create_sql.php` (code mort — plus exécuté par personne) converti en `sql/install.mysql.utf8.sql`
+  (14 tables, `CREATE TABLE IF NOT EXISTS` non destructif, index/PK/AUTO_INCREMENT fusionnés, `INSERT IGNORE` du paquet FF)
+- [x] Manifeste : sections `<install><sql>` + `<update><schemas><schemapath>` ; baseline `sql/updates/mysql/6.1.0.sql`
+- [x] Vérifié sur le conteneur joomla6 : exécution du SQL deux fois sans erreur (idempotent) sur préfixe de test,
+  schéma identique à la base réelle (hors colonnes ajoutées par ContentBuilderNG), version `6.1.0` enregistrée dans `#__schemas`,
+  données préservées après mise à jour (58 formulaires)
+- [x] `validate-package.sh` mis à jour
+
+> Toute évolution de schéma future = un fichier `sql/updates/mysql/<version>.sql`, plus d'ALTER dans `script.php::update()` pour les nouvelles versions.
+
+---
+
 ## Phase 8 — Frontend (hors périmètre immédiat)
 
 > Projet de refonte dédié. Ne pas commencer avant que les phases 1–6 soient validées.

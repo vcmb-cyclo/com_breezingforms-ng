@@ -23,6 +23,18 @@
 
 	<scriptfile>script.php</scriptfile>
 
+	<install>
+		<sql>
+			<file driver="mysql" charset="utf8">sql/install.mysql.utf8.sql</file>
+		</sql>
+	</install>
+
+	<update>
+		<schemas>
+			<schemapath type="mysql">sql/updates/mysql</schemapath>
+		</schemas>
+	</update>
+
 	<updateservers>
 		<server type="extension" name="BreezingForms-ng" priority="1">https://breezingforms-ng.vcmb.fr/download/com_breezingformsng_update.xml</server>
 	</updateservers>

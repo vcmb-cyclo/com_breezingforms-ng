@@ -85,6 +85,8 @@ class IntegratorController extends BaseController
 
     public function removeItem(): void
     {
+        $this->checkToken();
+
         $input  = Factory::getApplication()->getInput();
         $ruleId = $input->getInt('id', 0);
         $this->getIntegratorModel()->removeItem($input->getInt('itemId', 0));
@@ -133,6 +135,8 @@ class IntegratorController extends BaseController
 
     public function removeCriteria(): void
     {
+        $this->checkToken();
+
         $input  = Factory::getApplication()->getInput();
         $ruleId = $input->getInt('id', 0);
         $this->getIntegratorModel()->removeCriteria($input->getInt('criteriaId', 0));
@@ -156,6 +160,8 @@ class IntegratorController extends BaseController
 
     public function removeCriteriaJoomla(): void
     {
+        $this->checkToken();
+
         $input  = Factory::getApplication()->getInput();
         $ruleId = $input->getInt('id', 0);
         $this->getIntegratorModel()->removeCriteriaJoomla($input->getInt('criteriaId', 0));
@@ -179,6 +185,8 @@ class IntegratorController extends BaseController
 
     public function removeCriteriaFixed(): void
     {
+        $this->checkToken();
+
         $input  = Factory::getApplication()->getInput();
         $ruleId = $input->getInt('id', 0);
         $this->getIntegratorModel()->removeCriteriaFixed($input->getInt('criteriaId', 0));

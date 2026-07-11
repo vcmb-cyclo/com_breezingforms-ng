@@ -43,15 +43,15 @@ use Joomla\CMS\Language\Text;
             <td><?= htmlspecialchars($rule->reference_table); ?></td>
             <td class="text-center">
               <?php if ($rule->published): ?>
-                <a href="index.php?option=com_breezingformsng&task=integrator.unpublish&publish_id=<?= (int) $rule->id; ?>&<?= \Joomla\CMS\Session\Session::getFormToken(); ?>=1"
-                   class="tbody-icon active" title="<?= Text::_('JPUBLISHED'); ?>">
+                <button type="button" class="tbody-icon active border-0 bg-transparent" title="<?= Text::_('JPUBLISHED'); ?>"
+                        onclick="this.form.publish_id.value='<?= (int) $rule->id; ?>';Joomla.submitbutton('integrator.unpublish');">
                   <span class="icon-publish" aria-hidden="true"></span>
-                </a>
+                </button>
               <?php else: ?>
-                <a href="index.php?option=com_breezingformsng&task=integrator.publish&publish_id=<?= (int) $rule->id; ?>&<?= \Joomla\CMS\Session\Session::getFormToken(); ?>=1"
-                   class="tbody-icon" title="<?= Text::_('JUNPUBLISHED'); ?>">
+                <button type="button" class="tbody-icon border-0 bg-transparent" title="<?= Text::_('JUNPUBLISHED'); ?>"
+                        onclick="this.form.publish_id.value='<?= (int) $rule->id; ?>';Joomla.submitbutton('integrator.publish');">
                   <span class="icon-unpublish" aria-hidden="true"></span>
-                </a>
+                </button>
               <?php endif; ?>
             </td>
           </tr>
@@ -61,6 +61,7 @@ use Joomla\CMS\Language\Text;
   </table>
 
   <input type="hidden" name="task" value="">
+  <input type="hidden" name="publish_id" value="0">
   <input type="hidden" name="boxchecked" value="0">
   <?= HTMLHelper::_('form.token'); ?>
 </form>

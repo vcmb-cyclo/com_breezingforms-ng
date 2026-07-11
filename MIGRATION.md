@@ -69,10 +69,16 @@
 ### Vérification
 - [x] Liste des enregistrements s'affiche avec filtres et pagination *(vérifié HTTP le 2026-07-11)*
 - [x] Export PDF, CSV, XML fonctionnels *(vérifié : PDF 45 Ko, CSV et XML corrects — le PDF nécessitait les correctifs `getSubrecords()` + repli template)*
-- [ ] Import CSV fonctionnel
-- [ ] Édition et sauvegarde d'un enregistrement
+- [x] Import CSV fonctionnel *(vérifié de bout en bout le 2026-07-11 : upload authentifié, création de l'enregistrement et de ses sous-enregistrements, puis nettoyage des données de test)*
+- [x] Édition et sauvegarde d'un enregistrement *(vérifié HTTP et en base le 2026-07-11 : valeur modifiée puis restaurée ; requête sans jeton rejetée sans mutation)*
 - [x] Flags (viewed / exported / archived) fonctionnels en unitaire *(setFlag vérifié ; bascule en masse à confirmer à la main)*
-- [ ] Bouton Help ouvre la modale
+- [x] Bouton Help ouvre la modale *(vérifié dans Chrome le 2026-07-11 : popup Joomla iframe, URL d'aide Records correcte, aucune nouvelle fenêtre)*
+
+> **Durcissement (2026-07-11)** : contrôle CSRF ajouté aux sauvegardes, suppressions, flags unitaires/en masse,
+> imports CSV et exports (ces derniers marquent les enregistrements comme exportés). `RecordModel::saveRecord()` ne dépend
+> plus des colonnes `modified*` ajoutées par ContentBuilderNG mais absentes du schéma BreezingFormsNG autonome.
+> L'import CSV utilise désormais `fgetcsv()` avec le séparateur et le caractère de citation configurés, convertit l'encodage
+> demandé, reconnaît le format produit par l'export BFNG et insère en transaction l'enregistrement et ses sous-enregistrements.
 
 ---
 
@@ -98,8 +104,8 @@
 
 ### Vérification
 - [x] Composants → BreezingForms NG → Options ouvre l'écran natif Joomla *(vérifié)*
-- [ ] Sauvegarde des paramètres → persistance en base (`#__extensions` params)
-- [ ] Permissions ACL visibles et fonctionnelles
+- [x] Sauvegarde des paramètres → persistance en base (`#__extensions` params) *(vérifié dans Chrome le 2026-07-11 : `disable_ip` modifié, relu après `component.apply`, puis restauré)*
+- [ ] Permissions ACL visibles et fonctionnelles *(interface native et groupes vérifiés ; modification effective d'une règle restant à tester)*
 
 ---
 
@@ -126,10 +132,13 @@
 
 ### Vérification
 - [x] Liste des règles d'intégration s'affiche *(vérifié)*
-- [ ] Création d'une nouvelle règle (insert/update)
-- [ ] Ajout/suppression d'items et critères
-- [ ] Éditeur de code (CodeMirror) fonctionnel
-- [ ] Publish/unpublish règle et item
+- [x] Création d'une nouvelle règle (insert/update) *(deux types vérifiés en HTTP et en base le 2026-07-11, puis règles de test supprimées)*
+- [x] Ajout/suppression d'items et critères *(item et critères formulaire/Joomla/valeur fixe vérifiés, puis supprimés)*
+- [x] Éditeur de code (CodeMirror) fonctionnel *(assets présents, code d'item et code de finalisation sauvegardés et vérifiés en base)*
+- [x] Publish/unpublish règle et item *(aller-retour 1 → 0 → 1 vérifié pour les deux)*
+
+> **Durcissement (2026-07-11)** : toutes les suppressions d'items et de critères vérifient maintenant le jeton CSRF.
+> Les actions supprimer et publier/dépublier utilisent des formulaires POST avec jeton au lieu de mutations par URL GET.
 
 ---
 

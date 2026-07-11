@@ -165,11 +165,14 @@ class HtmlView extends BaseHtmlView
         ToolbarHelper::custom('records.exported', 'share', 'share', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_EXPORT'), false);
         ToolbarHelper::custom('records.archived', 'archive', 'archive', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_ARCHIVE'), false);
         ToolbarHelper::custom('records.remove', 'delete', 'delete', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_DELETE'), false);
-        ToolbarHelper::help(
-            'COM_BREEZINGFORMSNG_HELP_RECORDS_TITLE',
-            false,
-            Uri::base() . 'index.php?option=com_breezingformsng&view=help&section=records&tmpl=component'
-        );
+        Toolbar::getInstance()
+            ->popupButton('help', 'JHELP')
+            ->popupType('iframe')
+            ->url(Uri::base() . 'index.php?option=com_breezingformsng&view=help&section=records&tmpl=component')
+            ->icon('icon-question-sign')
+            ->iframeWidth(900)
+            ->iframeHeight(700)
+            ->attributes(['title' => Text::_('COM_BREEZINGFORMSNG_HELP_RECORDS_TITLE')]);
     }
 
     private function prepareEditToolbar(): void

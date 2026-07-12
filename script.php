@@ -1784,6 +1784,7 @@ class com_breezingformsngInstallerScript
     {
         $obsolete = [
             JPATH_SITE . '/components/com_breezingformsng/router.php',
+            JPATH_SITE . '/components/com_breezingformsng/facileforms.xml.php',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/sql/create_sql.php',
         ];
 

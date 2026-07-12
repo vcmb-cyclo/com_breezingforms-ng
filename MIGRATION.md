@@ -360,9 +360,25 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > (`media/com_breezingformsng/images/site/captcha/securimage.php`, sans rapport avec ce changement — nettoyage
 > possible mais hors périmètre de la Phase 9). Journal Joomla surveillé sur toute la fenêtre de test : aucune entrée
 > liée à `BFRequest`/`Callback`. `Stripe`/`PayPal`/`Sofort` restent à confirmer avec un vrai paiement de test (accès
-> à un compte sandbox nécessaire, non disponible dans cette session). Prochaine étape : les traits
-> `legacy/processor/bfProcessor*`, puis `breezingformsng.php`/`FormRenderer.php` (à ce moment-là les `setVar()`
-> restants pourront être convertis aussi), puis les rendus `BFQuickMode*`.
+> à un compte sandbox nécessaire, non disponible dans cette session).
+>
+> **Suite (2026-07-12)** : `bfProcessorUploads.php` (1 appel), `bfProcessorNotifications.php` (13),
+> `bfProcessorExports.php` (16) et `bfProcessorSubmission.php` (45) sont également convertis — **235 appels au
+> total sur 393**. Le couplage `cb_category_id`/`cb_controller` entre Exports (écrivain) et Submission (lecteur)
+> est résolu : les deux côtés utilisent désormais `Factory::getApplication()->getInput()->set()/get()` sur le
+> même singleton `Input` de la requête — `Input::set()` écrit dans le même tableau `$this->data` que `get()` lit,
+> contrairement à `BFRequest::setVar()` qui mute les superglobales brutes après que l'objet `Input` de Joomla les
+> a déjà capturées en cache (c'est précisément le piège décrit plus haut). Les lectures `ff_nm_*` en mode
+> `POST`/`HTML`/`BFREQUEST_ALLOWHTML` (valeurs de champs soumis, tokens de gabarit de nom de fichier) utilisent
+> un `InputFilter` permissif construit à la volée (`InputFilter::getInstance([], [], 1, 1)`, mode liste noire vide
+> = laisse tout passer), reproduisant fidèlement le filtre historique plutôt que le filtre `'html'` par défaut de
+> Joomla qui est bien plus strict (liste blanche vide = supprime toutes les balises) — les deux ne sont **pas**
+> équivalents. Vérifié en conditions réelles : soumission d'un vrai formulaire (« Contactez le VCMB », enregistrement
+> de test créé puis supprimé) avec les valeurs de champs correctement persistées ; rendu de formulaire toujours
+> HTTP 200 après chaque déploiement ; journal Joomla surveillé, aucune entrée liée à `BFRequest`. Prochaine étape :
+> `bfProcessorRendering.php` (54 appels, le plus gros trait restant), puis `breezingformsng.php`/`FormRenderer.php`
+> (35+29, à ce moment-là les derniers `setVar()` — `format` dans les Callback — pourront être convertis aussi),
+> puis les rendus `BFQuickMode*` (Phase 9c).
 
 - **393 appels** répartis sur 19 fichiers. Par volume décroissant :
   1. `components/com_breezingformsng/src/Service/Callback/SofortCallback.php` — 69

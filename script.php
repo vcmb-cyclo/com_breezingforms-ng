@@ -1797,6 +1797,19 @@ class com_breezingformsngInstallerScript
                 $this->log('Obsolete file removed: ' . basename($file));
             }
         }
+
+        $obsoleteDirectories = [
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/dropbox/v2',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/mailchimp',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/recaptcha',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/salesforce',
+        ];
+
+        foreach ($obsoleteDirectories as $directory) {
+            if (Folder::exists($directory) && Folder::delete($directory)) {
+                $this->log('Obsolete library directory removed: ' . basename($directory));
+            }
+        }
     }
 
 

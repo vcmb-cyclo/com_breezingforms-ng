@@ -676,11 +676,15 @@ trait bfProcessorSubmission
                             foreach ($area['elements'] as $element) {
                                 if ($element['bfType'] == 'ReCaptcha') {
 
-                                    $verified = (new RemoteApiClient())->verifyRecaptcha(
-                                        (string) $element['privkey'],
-                                        Factory::getApplication()->getInput()->getString('g-recaptcha-response', ''),
-                                        Factory::getApplication()->getInput()->server->getString('REMOTE_ADDR', '')
-                                    );
+                                    try {
+                                        $verified = (new RemoteApiClient())->verifyRecaptcha(
+                                            (string) $element['privkey'],
+                                            Factory::getApplication()->getInput()->getString('g-recaptcha-response', ''),
+                                            Factory::getApplication()->getInput()->server->getString('REMOTE_ADDR', '')
+                                        );
+                                    } catch (\Throwable) {
+                                        $verified = false;
+                                    }
 
                                     if ($verified) {
 

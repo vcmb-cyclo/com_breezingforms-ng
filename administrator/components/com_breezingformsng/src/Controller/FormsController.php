@@ -217,6 +217,21 @@ class FormsController extends BaseController
         ));
     }
 
+    public function setPublished(): void
+    {
+        $this->checkToken();
+
+        @ob_end_clean();
+        $input = Factory::getApplication()->getInput();
+        $id    = $input->getInt('id', 0);
+        $state = $input->getInt('state', 0);
+        if ($id > 0) {
+            $this->getFormModel()->publish([$id], $state);
+        }
+        echo json_encode(['Result' => 'OK']);
+        Factory::getApplication()->close();
+    }
+
     private function togglePublish(int $state): void
     {
         $app   = Factory::getApplication();

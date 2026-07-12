@@ -53,6 +53,21 @@ class IntegratorController extends BaseController
         $this->setRedirect($this->listUrl());
     }
 
+    public function setPublished(): void
+    {
+        $this->checkToken();
+
+        @ob_end_clean();
+        $input = Factory::getApplication()->getInput();
+        $id    = $input->getInt('id', 0);
+        $state = $input->getInt('state', 0);
+        if ($id > 0) {
+            $this->getIntegratorModel()->publishRule($id, $state);
+        }
+        echo json_encode(['Result' => 'OK']);
+        Factory::getApplication()->close();
+    }
+
     public function publish(): void
     {
         $this->checkToken();

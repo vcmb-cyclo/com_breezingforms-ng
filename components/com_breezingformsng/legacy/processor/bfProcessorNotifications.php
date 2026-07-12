@@ -28,7 +28,8 @@ use Joomla\CMS\Environment\Browser;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Log\Log;
-use Vcmb\Component\BreezingformsNG\Site\Service\RemoteApiClient;
+use Vcmb\Component\BreezingformsNG\Site\Service\Integration\MailchimpClient;
+use Vcmb\Component\BreezingformsNG\Site\Service\Integration\SalesforceClient;
 use CB\Component\Contentbuilderng\Administrator\Helper\ContentbuilderngHelper;
 use CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory;
 use CB\Component\Contentbuilderng\Administrator\Service\ArticleService;
@@ -1335,7 +1336,7 @@ trait bfProcessorNotifications
                 }
             }
 
-            $recordId = (new RemoteApiClient())->createSalesforceRecord(
+            $recordId = (new SalesforceClient())->createRecord(
                 trim((string) $this->formrow->salesforce_username),
                 (string) $this->formrow->salesforce_password . (string) $this->formrow->salesforce_token,
                 trim((string) $this->formrow->salesforce_type),
@@ -1370,7 +1371,7 @@ trait bfProcessorNotifications
             $unsubscribeField = trim($this->formrow->mailchimp_unsubscribe_field);
             $emailField = trim($this->formrow->mailchimp_email_field);
             $mergeVarFields = explode(',', str_replace(' ', '', $this->formrow->mailchimp_mergevars));
-            $api = new RemoteApiClient();
+            $api = new MailchimpClient();
             $apiKey = trim((string) $this->formrow->mailchimp_api_key);
             $list_ids = explode(',', trim($this->formrow->mailchimp_list_id));
 
@@ -1417,7 +1418,7 @@ trait bfProcessorNotifications
 
                 try {
                     if ($email != '' && $checked) {
-                        $api->mailchimp($apiKey, 'PUT', $resource, [
+                        $api->request($apiKey, 'PUT', $resource, [
                             'email_address' => $email,
                             'merge_fields' => (object) $mergeVars,
                             'status_if_new' => ($this->formrow->mailchimp_double_optin ? 'pending' : 'subscribed'),
@@ -1425,9 +1426,9 @@ trait bfProcessorNotifications
                             'email_type' => $htmlTextMobile,
                         ]);
                     } else if ($email != '' && $unsubscribe) {
-                        $api->mailchimp($apiKey, 'PUT', $resource, ['status' => 'unsubscribed']);
+                        $api->request($apiKey, 'PUT', $resource, ['status' => 'unsubscribed']);
                         if ($this->formrow->mailchimp_delete_member) {
-                            $api->mailchimp($apiKey, 'DELETE', $resource);
+                            $api->request($apiKey, 'DELETE', $resource);
                         }
                     }
                 } catch (\Throwable $exception) {

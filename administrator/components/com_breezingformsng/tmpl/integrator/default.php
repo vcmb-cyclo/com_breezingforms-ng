@@ -10,6 +10,7 @@
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Session\Session;
 ?>
 <form action="index.php?option=com_breezingformsng&amp;act=integrate&amp;view=integrator" method="post" name="adminForm" id="adminForm">
 
@@ -42,17 +43,10 @@ use Joomla\CMS\Language\Text;
             <td><?= htmlspecialchars($rule->form_name); ?></td>
             <td><?= htmlspecialchars($rule->reference_table); ?></td>
             <td class="text-center">
-              <?php if ($rule->published): ?>
-                <button type="button" class="tbody-icon active border-0 bg-transparent" title="<?= Text::_('JPUBLISHED'); ?>"
-                        onclick="this.form.publish_id.value='<?= (int) $rule->id; ?>';Joomla.submitbutton('integrator.unpublish');">
-                  <span class="icon-publish" aria-hidden="true"></span>
-                </button>
-              <?php else: ?>
-                <button type="button" class="tbody-icon border-0 bg-transparent" title="<?= Text::_('JUNPUBLISHED'); ?>"
-                        onclick="this.form.publish_id.value='<?= (int) $rule->id; ?>';Joomla.submitbutton('integrator.publish');">
-                  <span class="icon-unpublish" aria-hidden="true"></span>
-                </button>
-              <?php endif; ?>
+              <a href="#" onclick="bfTogglePublished(<?= (int) $rule->id; ?>, 'integrator', this); return false;"
+                 title="<?= $rule->published ? Text::_('JPUBLISHED') : Text::_('JUNPUBLISHED'); ?>">
+                <span class="<?= $rule->published ? 'icon-publish' : 'icon-unpublish'; ?>" aria-hidden="true"></span>
+              </a>
             </td>
           </tr>
         <?php endforeach; ?>
@@ -71,4 +65,9 @@ $bfDocument = Factory::getApplication()->getDocument();
 $bfDocument->getWebAssetManager()->useScript('com_breezingformsng.admin-form');
 $bfDocument->addScriptOptions('com_breezingformsng.admin-form', ['confirmDeleteTask' => 'integrator.remove']);
 Text::script('JGLOBAL_CONFIRM_DELETE');
+
+$bfDocument->getWebAssetManager()->useScript('com_breezingformsng.admin-toggle-published');
+$bfDocument->addScriptOptions('com_breezingformsng.admin-toggle-published', ['csrfToken' => Session::getFormToken()]);
+Text::script('JPUBLISHED');
+Text::script('JUNPUBLISHED');
 ?>

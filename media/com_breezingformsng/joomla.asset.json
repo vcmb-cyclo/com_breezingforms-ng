@@ -209,6 +209,14 @@
     },
 
     {
+      "name": "com_breezingformsng.admin-toggle-published",
+      "type": "script",
+      "uri": "com_breezingformsng/js/admin/admin-toggle-published.js",
+      "dependencies": ["core"],
+      "version": "auto"
+    },
+
+    {
       "name": "com_breezingformsng.quickmode-editor",
       "type": "script",
       "uri": "com_breezingformsng/js/admin/quickmode-editor.js",

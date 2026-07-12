@@ -30,7 +30,8 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Log\Log;
 use Joomla\CMS\Mail\MailerFactoryInterface;
-use Vcmb\Component\BreezingformsNG\Site\Service\RemoteApiClient;
+use Vcmb\Component\BreezingformsNG\Site\Service\Integration\DropboxUploader;
+use Vcmb\Component\BreezingformsNG\Site\Service\Integration\RecaptchaVerifier;
 use CB\Component\Contentbuilderng\Administrator\Helper\ContentbuilderngHelper;
 use CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory;
 use CB\Component\Contentbuilderng\Administrator\Service\ArticleService;
@@ -677,7 +678,7 @@ trait bfProcessorSubmission
                                 if ($element['bfType'] == 'ReCaptcha') {
 
                                     try {
-                                        $verified = (new RemoteApiClient())->verifyRecaptcha(
+                                        $verified = (new RecaptchaVerifier())->verify(
                                             (string) $element['privkey'],
                                             Factory::getApplication()->getInput()->getString('g-recaptcha-response', ''),
                                             Factory::getApplication()->getInput()->server->getString('REMOTE_ADDR', '')
@@ -1643,7 +1644,7 @@ transition: box-shadow .15s linear;
         $folder = trim((string) ($this->formrow->dropbox_folder ?: $this->formrow->name), '/');
         $remotePath = '/' . ($folder !== '' ? $folder . '/' : '') . basename($localFile);
 
-        (new RemoteApiClient())->uploadToDropbox(
+        (new DropboxUploader())->upload(
             trim((string) $this->formrow->dropbox_email),
             $remotePath,
             $localFile

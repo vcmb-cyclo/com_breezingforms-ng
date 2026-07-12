@@ -1166,16 +1166,16 @@ function bfTriggerRules() {
                 if ($this->rootMdata['themebootstrap'] != '' && $this->rootMdata['themebootstrap'] != 'none' && file_exists($themecss_path)) {
 
                     if (file_exists($vars_path)) {
-                        $vars = BFFile::read($vars_path);
+                        $vars = file_get_contents($vars_path);
                     }
                     if (file_exists($themecss_path)) {
-                        $themecss = BFFile::read($themecss_path);
+                        $themecss = file_get_contents($themecss_path);
                     }
                     if (file_exists($scriptphp_path)) {
                         require_once($scriptphp_path);
                     }
                     if (file_exists($scriptjs_path)) {
-                        $scriptjs = BFFile::read($scriptjs_path);
+                        $scriptjs = file_get_contents($scriptjs_path);
                     }
 
                     $vars = str_replace("\r", '', $vars);

@@ -379,6 +379,20 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > `bfProcessorRendering.php` (54 appels, le plus gros trait restant), puis `breezingformsng.php`/`FormRenderer.php`
 > (35+29, à ce moment-là les derniers `setVar()` — `format` dans les Callback — pourront être convertis aussi),
 > puis les rendus `BFQuickMode*` (Phase 9c).
+>
+> **`bfProcessorRendering.php` fait (2026-07-12)** : les 54 derniers appels du trait sont convertis, avec les mêmes
+> techniques (filtre `InputFilter` permissif inline pour les lectures `ff_nm_*` en tableau, les deux boucles
+> `bfCleanVar` réduites à un appel direct `InputFilter::clean()`). Aucune des clés lues ici (`cb_form_id`,
+> `cb_record_id`, `cbIsNew`, `non_mobile`/`mobile`, `ff_applic`, `ff_frame`, `ff_task`, `ff_status`, `ff_message`,
+> `tmpl`, `ff_contentid`, `ff_module_id`, `return`) n'a de `BFRequest::setVar()` ailleurs dans le dépôt — vérifié
+> avant conversion. **Les 5 traits `legacy/processor/bfProcessor*` sont désormais intégralement migrés** (129
+> appels : Uploads 1, Notifications 13, Exports 16, Submission 45, Rendering 54), portant le total Phase 9a à
+> **257 appels sur 393**. Vérifié : `php -l` propre, deux formulaires réels différents (un formulaire simple et un
+> formulaire construit avec QuickMode) rendus en HTTP 200 après déploiement, journal Joomla surveillé sans aucune
+> entrée liée à `BFRequest`. Reste : `breezingformsng.php` (29 appels, le dispatcher) et `FormRenderer.php`
+> (35 appels) — c'est là que les derniers `BFRequest::setVar('format', ...)` laissés intacts dans les 6 services
+> Callback pourront enfin être convertis, puisque `breezingformsng.php` est leur seul lecteur restant — puis les
+> 4 rendus `BFQuickMode*` (26 appels, Phase 9c, le poste le plus lourd).
 
 - **393 appels** répartis sur 19 fichiers. Par volume décroissant :
   1. `components/com_breezingformsng/src/Service/Callback/SofortCallback.php` — 69

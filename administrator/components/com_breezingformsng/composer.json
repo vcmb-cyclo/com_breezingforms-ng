@@ -5,7 +5,7 @@
     "type": "project",
     "require": {
         "php": ">=8.1",
-        "stripe/stripe-php": "^17.3",
+        "stripe/stripe-php": "^20.3",
         "tecnickcom/tcpdf": "^6.10"
     },
     "config": {

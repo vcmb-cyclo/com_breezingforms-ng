@@ -13,6 +13,7 @@
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Filter\InputFilter;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Event\Event;
 use Joomla\Event\EventInterface;
@@ -89,7 +90,14 @@ trait bfProcessorUploads
         if ($fmtest != basename($_baseDir)) {
             $fm = basename($_baseDir);
             foreach ($this->rows as $row) {
-                $fname = BFRequest::getVar('ff_nm_' . $row->name, array(), 'POST', 'HTML', BFREQUEST_ALLOWHTML);
+                // BFRequest::getVar(..., 'POST', 'HTML', BFREQUEST_ALLOWHTML) used a permissive (blacklist,
+                // nothing blacklisted) InputFilter so array values pass through mostly unfiltered; replicate
+                // that exact filter here rather than Joomla's stricter default 'html' Input filter type.
+                $rawFname = Factory::getApplication()->getInput()->post->get('ff_nm_' . $row->name, [], 'raw');
+                $permissiveFilter = InputFilter::getInstance([], [], 1, 1);
+                $fname = \is_array($rawFname)
+                    ? array_map(static fn ($value) => $permissiveFilter->clean((string) $value, 'html'), $rawFname)
+                    : [];
 
                 foreach ($fname as $_fname) {
                     $fm = str_replace('{filemask:' . strtolower($row->name) . '}', File::makeSafe(trim($_fname)), $fm);

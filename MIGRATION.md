@@ -315,18 +315,28 @@
   au bootstrap du moteur) ; `BFFile::read` → `file_get_contents` et suppression de `BFFactory`/`BFDbo` (sans appelant) ;
   `BFRedirect()` → `Site\Service\Support\RedirectHelper`. Fichiers purgés des sites installés via `removeObsoleteComponentFiles()`)*
 
-  > ⚠️ **Régression découverte le 2026-07-12** (en creusant un incident similaire sur `BFRequest`, cf. Phase 9a) :
-  > `BFFactory` était en réalité utilisé par du **code PHP personnalisé stocké en base** sur le site de dev
-  > lui-même — 4 Pièces admin (`ff_databaseToSelect` id 3, `ff_query` id 18, `ff_select` id 25,
-  > `ff_selectValue` id 26) et la colonne `piece1code` du formulaire `hash_password` (id 11) appellent toutes
-  > `BFFactory::`. « Sans appelant » n'était vrai qu'au sens grep-sur-le-code-source — ces pièces génèrent
-  > actuellement `Class "BFFactory" not found` à chaque exécution (visible dans `administrator/logs/everything.php`
-  > en DEBUG depuis le début de cette série de sessions, à tort classé comme « bruit préexistant sans rapport »).
-  > **Pas corrigé dans cette session** (hors périmètre de la demande initiale ; ces 4 pièces + 1 formulaire
-  > semblent être des utilitaires internes/exemples plutôt que des fonctionnalités du site en production, mais
-  > ça reste à confirmer avec l'utilisateur avant de les modifier ou de les supprimer). Un futur agent devra soit
-  > réintroduire un `BFFactory` minimal (probablement juste `Factory::getContainer()->get(DatabaseInterface::class)`),
-  > soit réécrire ces 5 pièces avec l'API native, après consultation de l'utilisateur.
+  > ⚠️ **Régression découverte et corrigée le 2026-07-12** (en creusant un incident similaire sur `BFRequest`,
+  > cf. Phase 9a) : `BFFactory` était en réalité utilisé par du **code PHP personnalisé stocké en base**, en
+  > **production** (confirmé par l'utilisateur) — 4 Pièces admin (`ff_databaseToSelect` id 3, `ff_query` id 18,
+  > `ff_select` id 25, `ff_selectValue` id 26) et la colonne `piece1code` du formulaire `hash_password` (id 11)
+  > appellent toutes `BFFactory::getDbo()`/`getDBO()`. « Sans appelant » n'était vrai qu'au sens grep-sur-le-code-
+  > source — ces pièces généraient `Class "BFFactory" not found` à chaque exécution (visible dans
+  > `administrator/logs/everything.php` en DEBUG depuis le début de cette série de sessions, à tort classé comme
+  > « bruit préexistant sans rapport »).
+  >
+  > **Corrigé** : le fichier original a été restauré tel quel depuis l'historique git (commit `4d3c0813^`) plutôt
+  > qu'une réimplémentation « minimale » réécrite — le code des pièces a été écrit contre le comportement précis
+  > de `BFDbo` (avale silencieusement les exceptions de `setQuery()`/`execute()` et renvoie `false`/tableau vide
+  > au lieu de les relancer), reproduire exactement ce comportement est plus sûr que deviner ce qui est
+  > « suffisamment minimal ». Un commentaire d'avertissement a été ajouté en tête du fichier pour qu'un futur
+  > agent ne le supprime plus jamais sur la seule foi d'un grep. `require_once` restauré dans `breezingformsng.php`
+  > (même emplacement qu'avant suppression) ; `BFFactory.php` retiré de la liste `removeObsoleteComponentFiles()`
+  > de `script.php` (sinon la prochaine mise à jour du composant l'aurait supprimé à nouveau).
+  >
+  > Vérifié : `php -l` propre sur les 3 fichiers touchés ; les 4 formulaires de test rechargés après déploiement
+  > — l'entrée `DEBUG` « data1 of Record_ID[1] : Class BFFactory not found » n'apparaît plus (confirmé par
+  > l'horodatage du journal : aucune nouvelle entrée après le correctif malgré les rechargements, alors qu'elle
+  > apparaissait à chaque chargement avant).
 - [x] Remplacer les accesseurs `Factory` dépréciés *(fait le 2026-07-12 : derniers `Factory::getUser()` du moteur,
   des notifications, des exports, des uploads et de l'intégrateur remplacés par `Factory::getApplication()->getIdentity()` ;
   `Factory::getMailer()` remplacé par `MailerFactoryInterface`, `Factory::getCache()` par

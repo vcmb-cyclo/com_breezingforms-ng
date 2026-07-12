@@ -30,6 +30,7 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Log\Log;
 use Joomla\CMS\Mail\MailerFactoryInterface;
+use Vcmb\Component\BreezingformsNG\Site\Service\RemoteApiClient;
 use CB\Component\Contentbuilderng\Administrator\Helper\ContentbuilderngHelper;
 use CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory;
 use CB\Component\Contentbuilderng\Administrator\Service\ArticleService;
@@ -323,24 +324,11 @@ trait bfProcessorSubmission
                                 // db and attachment
                                 // DROPBOX SUPPORT request v2 API
 
-                                require_once JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/dropbox/v2/autoload.php';
-
                                 foreach ($serverPaths as $serverPath) {
 
                                     // DROPBOX File Upload
                                     if ($this->formrow->dropbox_email) {
-
-                                        Alorel\Dropbox\Operation\AbstractOperation::setDefaultToken($this->formrow->dropbox_email);
-                                        $upload = new Alorel\Dropbox\Operation\Files\Upload();
-                                        $file_to_upload = fopen($serverPath, "rb");
-                                        $upload->raw(
-                                            '/' . ($this->formrow->dropbox_folder != '' ? $this->formrow->dropbox_folder : $this->formrow->name) . '/' . basename($serverPath),
-                                            $file_to_upload
-                                        );
-                                        try {
-                                            fclose($file_to_upload);
-                                        } catch (Error $e) {
-                                        }
+                                        $this->uploadFileToDropbox($serverPath);
                                     }
 
                                     // CONTENTBUILDER: to keep the relative path with prefix
@@ -482,25 +470,9 @@ trait bfProcessorSubmission
                                         $sigValues .= $value;
 
                                         // DROPBOX SUPPORT request v2 API
-                                        if ($this->formrow->dropbox_email) {
-
-                                            require_once JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/dropbox/v2/autoload.php';
-                                        }
-
                                         // DROPBOX Signature upload
                                         if ($this->formrow->dropbox_email) {
-
-                                            Alorel\Dropbox\Operation\AbstractOperation::setDefaultToken($this->formrow->dropbox_email);
-                                            $upload = new Alorel\Dropbox\Operation\Files\Upload();
-                                            $file_to_upload = fopen($sig_file, "rb");
-                                            $upload->raw(
-                                                '/' . ($this->formrow->dropbox_folder != '' ? $this->formrow->dropbox_folder : $this->formrow->name) . '/' . basename($sig_file),
-                                                $file_to_upload
-                                            );
-                                            try {
-                                                fclose($file_to_upload);
-                                            } catch (Error $e) {
-                                            }
+                                            $this->uploadFileToDropbox($sig_file);
                                         }
                                     }
 
@@ -704,19 +676,13 @@ trait bfProcessorSubmission
                             foreach ($area['elements'] as $element) {
                                 if ($element['bfType'] == 'ReCaptcha') {
 
-                                    if (!class_exists('ReCaptcha')) {
-
-                                        require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/recaptcha/newrecaptchalib.php');
-                                    }
-
-                                    $reCaptcha = new ReCaptcha($element['privkey']);
-
-                                    $resp = @$reCaptcha->verifyResponse(
-                                        $_SERVER["REMOTE_ADDR"],
-                                        Factory::getApplication()->getInput()->getString('g-recaptcha-response', '')
+                                    $verified = (new RemoteApiClient())->verifyRecaptcha(
+                                        (string) $element['privkey'],
+                                        Factory::getApplication()->getInput()->getString('g-recaptcha-response', ''),
+                                        Factory::getApplication()->getInput()->server->getString('REMOTE_ADDR', '')
                                     );
 
-                                    if ($resp != null && $resp->success) {
+                                    if ($verified) {
 
                                         // all good
                                     } else {
@@ -812,11 +778,6 @@ trait bfProcessorSubmission
                             if ($this->formrow->dropbox_submission_enabled) {
                                 if ($this->formrow->dropbox_email) {
                                     try {
-                                        require_once JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/dropbox/v2/autoload.php';
-                                        // $space = "Dropbox\\Client";
-                                        // $dbxClient = new $space($this->formrow->dropbox_email, "BreezingForms/1.8.5");
-                                        Alorel\Dropbox\Operation\AbstractOperation::setDefaultToken($this->formrow->dropbox_email);
-
                                         $dropbox_types = explode(',', $this->formrow->dropbox_submission_types);
                                         foreach ($dropbox_types as $dropbox_type) {
                                             $dropbox_file = '';
@@ -832,21 +793,7 @@ trait bfProcessorSubmission
                                                     break;
                                             }
                                             if ($dropbox_file != '') {
-                                                try {
-
-                                                    $upload = new Alorel\Dropbox\Operation\Files\Upload();
-                                                    $file_to_upload = fopen($dropbox_file, "rb");
-                                                    $upload->raw(
-                                                        '/' . ($this->formrow->dropbox_folder != '' ? $this->formrow->dropbox_folder : $this->formrow->name) . '/' . basename($dropbox_file),
-                                                        $file_to_upload
-                                                    );
-                                                    try {
-                                                        fclose($file_to_upload);
-                                                    } catch (Error $e) {
-                                                    }
-                                                } catch (Exception $e) {
-
-                                                }
+                                                $this->uploadFileToDropbox($dropbox_file);
                                             }
                                         }
                                     } catch (Exception $e) {
@@ -1685,6 +1632,18 @@ transition: box-shadow .15s linear;
         if (!defined('VMBFCF_RUNNING')) {
             exit;
         }
+    }
+
+    private function uploadFileToDropbox(string $localFile): void
+    {
+        $folder = trim((string) ($this->formrow->dropbox_folder ?: $this->formrow->name), '/');
+        $remotePath = '/' . ($folder !== '' ? $folder . '/' : '') . basename($localFile);
+
+        (new RemoteApiClient())->uploadToDropbox(
+            trim((string) $this->formrow->dropbox_email),
+            $remotePath,
+            $localFile
+        );
     }
 
     private function getEvent(string $name): EventInterface

@@ -436,7 +436,7 @@ class QuickmodeModel extends BaseModel
     {
         $dataObject = json_decode(base64_decode($templateCode), true);
         $mdata      = $dataObject['properties'];
-        $now        = Factory::getDate()->toSql();
+        $now        = (new \Joomla\CMS\Date\Date())->toSql();
         $userId     = (string) Factory::getApplication()->getIdentity()->username;
 
         $this->db->setQuery('SELECT id FROM #__facileforms_forms WHERE id = ' . $this->db->quote($form));

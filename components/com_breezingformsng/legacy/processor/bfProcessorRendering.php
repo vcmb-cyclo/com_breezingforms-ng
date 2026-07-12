@@ -114,9 +114,9 @@ trait bfProcessorRendering
             $path = str_replace('{field:' . strtolower($row->name) . '}', strtolower($row->name), $path);
         }
 
-        $path = str_replace('{userid}', Factory::getUser()->get('id', 0), $path);
-        $path = str_replace('{username}', Factory::getUser()->get('username', 'anonymous') . '_' . Factory::getUser()->get('id', 0), $path);
-        $path = str_replace('{name}', Factory::getUser()->get('name', 'Anonymous') . '_' . Factory::getUser()->get('id', 0), $path);
+        $path = str_replace('{userid}', Factory::getApplication()->getIdentity()->get('id', 0), $path);
+        $path = str_replace('{username}', Factory::getApplication()->getIdentity()->get('username', 'anonymous') . '_' . Factory::getApplication()->getIdentity()->get('id', 0), $path);
+        $path = str_replace('{name}', Factory::getApplication()->getIdentity()->get('name', 'Anonymous') . '_' . Factory::getApplication()->getIdentity()->get('id', 0), $path);
         $path = str_replace('{field}', File::makeSafe(strtolower(trim($field_name))), $path);
 
         $tz = 'UTC';
@@ -126,7 +126,7 @@ trait bfProcessorRendering
         $date_stamp2 = date('H_i_s');
         $date_stamp3 = date('Y_m_d_H_i_s');
 
-        $date_ = Factory::getDate($this->submitted, $tz);
+        $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
         $offset = $date_->getOffsetFromGMT();
         if ($offset > 0) {
             $date_->add(new DateInterval('PT' . $offset . 'S'));
@@ -138,7 +138,7 @@ trait bfProcessorRendering
         $date_stamp2 = $date_->format('H_i_s', true);
         $date_stamp3 = $date_->format('Y_m_d_H_i_s', true);
 
-        $_now = Factory::getDate();
+        $_now = new \Joomla\CMS\Date\Date();
         $path = str_replace('{date}', $date_stamp1, $path);
         $path = str_replace('{time}', $date_stamp2, $path);
         $path = str_replace('{datetime}', $date_stamp3, $path);
@@ -234,7 +234,7 @@ trait bfProcessorRendering
                     $permissionService = new PermissionService();
                     $cbFull = $cbFrontend ? $permissionService->authorizeFe('fullarticle') : $permissionService->authorize('fullarticle');
                     $cbForm = FormSourceFactory::getForm('com_breezingformsng', $cbData['reference_id']);
-                    $cbRecord = $cbForm->getRecord(BFRequest::getInt('cb_record_id', 0), $cbData['published_only'], $cbFrontend ? ($cbData['own_only_fe'] ? Factory::getUser()->get('id', 0) : -1) : ($cbData['own_only'] ? Factory::getUser()->get('id', 0) : -1), $cbFrontend ? $cbData['show_all_languages_fe'] : true);
+                    $cbRecord = $cbForm->getRecord(BFRequest::getInt('cb_record_id', 0), $cbData['published_only'], $cbFrontend ? ($cbData['own_only_fe'] ? Factory::getApplication()->getIdentity()->get('id', 0) : -1) : ($cbData['own_only'] ? Factory::getApplication()->getIdentity()->get('id', 0) : -1), $cbFrontend ? $cbData['show_all_languages_fe'] : true);
 
                     if (!count($cbRecord) && !BFRequest::getBool('cbIsNew')) {
                         throw new Exception(Text::_('COM_CONTENTBUILDERNG_RECORD_NOT_FOUND'), 404);
@@ -1015,7 +1015,7 @@ trait bfProcessorRendering
 
         if ($this->editable && $cbRecord === null) {
             $db = Factory::getContainer()->get(DatabaseInterface::class);
-            $db->setQuery("Select id, form From #__facileforms_records Where form = " . $db->Quote($this->form) . " And user_id = " . $db->Quote(Factory::getUser()->get('id', -1)) . " And user_id <> 0 And archived = 0 Order By id Desc Limit 1");
+            $db->setQuery("Select id, form From #__facileforms_records Where form = " . $db->Quote($this->form) . " And user_id = " . $db->Quote(Factory::getApplication()->getIdentity()->get('id', -1)) . " And user_id <> 0 And archived = 0 Order By id Desc Limit 1");
             $recordsResult = $db->loadObjectList();
             if (count($recordsResult) != 0) {
                 $this->record_id = $recordsResult[0]->id;
@@ -1027,7 +1027,7 @@ trait bfProcessorRendering
                     //$recordEntry->value = $this->removeDangerousHtml($recordEntry->value);
 
                     /*
-                      $input = $this->app->input;
+                      $input = $this->app->getInput();
                       $input->set('cbCleanVar', $recordEntry->value);
                       $recordEntry->value = $input->getHtml('cbCleanVar'); */
 
@@ -1125,7 +1125,7 @@ trait bfProcessorRendering
                     //$cbEntry->recValue = $this->removeDangerousHtml($cbEntry->recValue);
 
                     /*
-                      $input = $this->app->input;
+                      $input = $this->app->getInput();
                       $input->set('cbCleanVar', $cbEntry->recValue);
                       $cbEntry->recValue = $input->getHtml('cbCleanVar'); */
 

@@ -211,7 +211,7 @@ trait bfProcessorNotifications
                 $tz = new DateTimeZone($this->app->get('offset'));
 
                 $SUBMITTED = $this->submitted;
-                $date_ = Factory::getDate($this->submitted, $tz);
+                $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
                 $offset = $date_->getOffsetFromGMT();
                 if ($offset > 0) {
                     $date_->add(new DateInterval('PT' . $offset . 'S'));
@@ -243,10 +243,10 @@ trait bfProcessorNotifications
                 $PROCESS_SUBMITTERFULLNAME = Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME');
                 $SUBMITTERFULLNAME = '-';
 
-                if (Factory::getUser()->get('id', 0) > 0) {
-                    $SUBMITTERID = Factory::getUser()->get('id', 0);
-                    $SUBMITTERUSERNAME = Factory::getUser()->get('username', '');
-                    $SUBMITTERFULLNAME = Factory::getUser()->get('name', '');
+                if (Factory::getApplication()->getIdentity()->get('id', 0) > 0) {
+                    $SUBMITTERID = Factory::getApplication()->getIdentity()->get('id', 0);
+                    $SUBMITTERUSERNAME = Factory::getApplication()->getIdentity()->get('username', '');
+                    $SUBMITTERFULLNAME = Factory::getApplication()->getIdentity()->get('name', '');
                 }
 
                 $MAILDATA = array();
@@ -271,7 +271,7 @@ trait bfProcessorNotifications
                 $tz = new DateTimeZone($this->app->get('offset'));
 
                 $submitted = $this->submitted;
-                $date_ = Factory::getDate($this->submitted, $tz);
+                $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
                 $offset = $date_->getOffsetFromGMT();
                 if ($offset > 0) {
                     $date_->add(new DateInterval('PT' . $offset . 'S'));
@@ -289,9 +289,9 @@ trait bfProcessorNotifications
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMNAME') . ": " . $this->formrow->name . nl() . nl() .
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT') . ": " . $submitted . nl() .
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP') . ": " . $this->ip . nl() .
-                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID') . ": " . Factory::getUser()->get('id', 0) . nl() .
-                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME') . ": " . Factory::getUser()->get('username', '') . nl() .
-                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME') . ": " . Factory::getUser()->get('name', '') . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID') . ": " . Factory::getApplication()->getIdentity()->get('id', 0) . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME') . ": " . Factory::getApplication()->getIdentity()->get('username', '') . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME') . ": " . Factory::getApplication()->getIdentity()->get('name', '') . nl() .
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_PROVIDER') . ": " . $this->provider . nl() .
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_BROWSER') . ": " . $this->browser . nl() .
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS') . ": " . $this->opsys . nl() . nl();
@@ -322,7 +322,7 @@ trait bfProcessorNotifications
             $tz = 'UTC';
             $tz = new DateTimeZone($this->app->get('offset'));
 
-            $date_ = Factory::getDate($this->submitted, $tz);
+            $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
             $offset = $date_->getOffsetFromGMT();
             if ($offset > 0) {
                 $date_->add(new DateInterval('PT' . $offset . 'S'));
@@ -340,10 +340,10 @@ trait bfProcessorNotifications
             $SUBMITTERID = 0;
             $SUBMITTERUSERNAME = '-';
             $SUBMITTERFULLNAME = '-';
-            if (Factory::getUser()->get('id', 0) > 0) {
-                $SUBMITTERID = Factory::getUser()->get('id', 0);
-                $SUBMITTERUSERNAME = Factory::getUser()->get('username', '');
-                $SUBMITTERFULLNAME = Factory::getUser()->get('name', '');
+            if (Factory::getApplication()->getIdentity()->get('id', 0) > 0) {
+                $SUBMITTERID = Factory::getApplication()->getIdentity()->get('id', 0);
+                $SUBMITTERUSERNAME = Factory::getApplication()->getIdentity()->get('username', '');
+                $SUBMITTERFULLNAME = Factory::getApplication()->getIdentity()->get('name', '');
             }
 
             $body = str_replace('{BF_RECORD_ID:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID'), $body);
@@ -964,7 +964,7 @@ trait bfProcessorNotifications
                 $tz = 'UTC';
                 $tz = new DateTimeZone($this->app->get('offset'));
 
-                $date_ = Factory::getDate($this->submitted, $tz);
+                $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
                 $offset = $date_->getOffsetFromGMT();
                 if ($offset > 0) {
                     $date_->add(new DateInterval('PT' . $offset . 'S'));
@@ -996,10 +996,10 @@ trait bfProcessorNotifications
                 $PROCESS_SUBMITTERFULLNAME = Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME');
                 $SUBMITTERFULLNAME = '-';
 
-                if (Factory::getUser()->get('id', 0) > 0) {
-                    $SUBMITTERID = Factory::getUser()->get('id', 0);
-                    $SUBMITTERUSERNAME = Factory::getUser()->get('username', '');
-                    $SUBMITTERFULLNAME = Factory::getUser()->get('name', '');
+                if (Factory::getApplication()->getIdentity()->get('id', 0) > 0) {
+                    $SUBMITTERID = Factory::getApplication()->getIdentity()->get('id', 0);
+                    $SUBMITTERUSERNAME = Factory::getApplication()->getIdentity()->get('username', '');
+                    $SUBMITTERFULLNAME = Factory::getApplication()->getIdentity()->get('name', '');
                 }
 
                 $MAILDATA = array();
@@ -1039,7 +1039,7 @@ trait bfProcessorNotifications
                 $tz = new DateTimeZone($this->app->get('offset'));
 
                 $submitted = $this->submitted;
-                $date_ = Factory::getDate($this->submitted, $tz);
+                $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
                 $offset = $date_->getOffsetFromGMT();
                 if ($offset > 0) {
                     $date_->add(new DateInterval('PT' . $offset . 'S'));
@@ -1055,9 +1055,9 @@ trait bfProcessorNotifications
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMNAME') . ": " . $this->formrow->name . nl() . nl() .
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT') . ": " . $submitted . nl() .
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP') . ": " . $this->ip . nl() .
-                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID') . ": " . Factory::getUser()->get('id', 0) . nl() .
-                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME') . ": " . Factory::getUser()->get('username', '') . nl() .
-                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME') . ": " . Factory::getUser()->get('name', '') . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID') . ": " . Factory::getApplication()->getIdentity()->get('id', 0) . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME') . ": " . Factory::getApplication()->getIdentity()->get('username', '') . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME') . ": " . Factory::getApplication()->getIdentity()->get('name', '') . nl() .
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_PROVIDER') . ": " . $this->provider . nl() .
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_BROWSER') . ": " . $this->browser . nl() .
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS') . ": " . $this->opsys . nl() . nl();
@@ -1101,7 +1101,7 @@ trait bfProcessorNotifications
             $tz = new DateTimeZone($this->app->get('offset'));
 
             $submitted = $this->submitted;
-            $date_ = Factory::getDate($this->submitted, $tz);
+            $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
             $offset = $date_->getOffsetFromGMT();
             if ($offset > 0) {
                 $date_->add(new DateInterval('PT' . $offset . 'S'));
@@ -1119,10 +1119,10 @@ trait bfProcessorNotifications
             $SUBMITTERID = 0;
             $SUBMITTERUSERNAME = '-';
             $SUBMITTERFULLNAME = '-';
-            if (Factory::getUser()->get('id', 0) > 0) {
-                $SUBMITTERID = Factory::getUser()->get('id', 0);
-                $SUBMITTERUSERNAME = Factory::getUser()->get('username', '');
-                $SUBMITTERFULLNAME = Factory::getUser()->get('name', '');
+            if (Factory::getApplication()->getIdentity()->get('id', 0) > 0) {
+                $SUBMITTERID = Factory::getApplication()->getIdentity()->get('id', 0);
+                $SUBMITTERUSERNAME = Factory::getApplication()->getIdentity()->get('username', '');
+                $SUBMITTERFULLNAME = Factory::getApplication()->getIdentity()->get('name', '');
             }
 
             $body = str_replace('{BF_RECORD_ID:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID'), $body);

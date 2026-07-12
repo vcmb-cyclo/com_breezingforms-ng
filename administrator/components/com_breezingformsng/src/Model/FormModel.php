@@ -10,6 +10,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\BaseModel;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\Database\DatabaseInterface;
@@ -71,7 +72,6 @@ class FormModel extends BaseModel
         $obj->mb_emailntf            = 1;
         $obj->mb_emaillog            = 1;
         $obj->mb_emailxml            = 0;
-        $obj->mb_emailadr            = '';
         $obj->mb_custom_mail_subject = '';
         $obj->mb_alt_mailfrom        = '';
         $obj->mb_alt_fromname        = '';
@@ -84,7 +84,6 @@ class FormModel extends BaseModel
         $obj->script2cond            = 0;
         $obj->script2id              = 0;
         $obj->script2code            = '';
-        $obj->script3code            = '';
         $obj->piece1cond             = 0;
         $obj->piece1id               = 0;
         $obj->piece1code             = '';
@@ -108,13 +107,13 @@ class FormModel extends BaseModel
     public function saveForm(array $data): int
     {
         $db  = $this->db();
-        $now = Factory::getDate()->toSql();
+        $now = (new \Joomla\CMS\Date\Date())->toSql();
         $uid = (string) Factory::getApplication()->getIdentity()->username;
         $id  = (int) ($data['id'] ?? 0);
 
         $title = trim((string) ($data['title'] ?? ''));
         if ($title === '') {
-            throw new \RuntimeException(\Joomla\CMS\LanguageText::_('COM_BREEZINGFORMSNG_FORMS_TITLEEMPTY'));
+            throw new \RuntimeException(Text::_('COM_BREEZINGFORMSNG_FORMS_TITLEEMPTY'));
         }
 
         $cols = [
@@ -124,11 +123,11 @@ class FormModel extends BaseModel
             'emailntf', 'emaillog', 'emailxml', 'dblog', 'emailadr',
             'custom_mail_subject', 'alt_mailfrom', 'alt_fromname',
             'email_type', 'email_custom_html', 'email_custom_template',
-            'mb_emailntf', 'mb_emaillog', 'mb_emailxml', 'mb_emailadr',
+            'mb_emailntf', 'mb_emaillog', 'mb_emailxml',
             'mb_custom_mail_subject', 'mb_alt_mailfrom', 'mb_alt_fromname',
             'mb_email_type', 'mb_email_custom_html', 'mb_email_custom_template',
             'script1cond', 'script1id', 'script1code',
-            'script2cond', 'script2id', 'script2code', 'script3code',
+            'script2cond', 'script2id', 'script2code',
             'piece1cond', 'piece1id', 'piece1code',
             'piece2cond', 'piece2id', 'piece2code',
             'piece3cond', 'piece3id', 'piece3code',
@@ -210,7 +209,7 @@ class FormModel extends BaseModel
         }
 
         $db  = $this->db();
-        $now = Factory::getDate()->toSql();
+        $now = (new \Joomla\CMS\Date\Date())->toSql();
         $uid = (string) Factory::getApplication()->getIdentity()->username;
 
         foreach (array_map('intval', $ids) as $id) {

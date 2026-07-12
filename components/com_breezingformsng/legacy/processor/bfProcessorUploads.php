@@ -50,7 +50,7 @@ trait bfProcessorUploads
         $tz = new DateTimeZone($this->app->get('offset'));
 
         $date_stamp = date('Y_m_d_H_i_s');
-        $date_ = Factory::getDate($this->submitted, $tz);
+        $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
         $offset = $date_->getOffsetFromGMT();
         if ($offset > 0) {
             $date_->add(new DateInterval('PT' . $offset . 'S'));
@@ -61,7 +61,7 @@ trait bfProcessorUploads
         $date_stamp = $date_->format('Y_m_d_H_i_s', true);
 
         $date_stamp2 = date('Y_m_d');
-        $date_ = Factory::getDate($this->submitted, $tz);
+        $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
         $offset = $date_->getOffsetFromGMT();
         if ($offset > 0) {
             $date_->add(new DateInterval('PT' . $offset . 'S'));
@@ -98,9 +98,9 @@ trait bfProcessorUploads
                 }
             }
             $fm = str_replace('{filemask:_separator}', '_', $fm);
-            $fm = str_replace('{filemask:_username}', trim(Factory::getUser()->get('username')), $fm);
-            $fm = str_replace('{filemask:_userid}', trim(Factory::getUser()->get('id')), $fm);
-            $fm = str_replace('{filemask:_name}', trim(Factory::getUser()->get('name')), $fm);
+            $fm = str_replace('{filemask:_username}', trim(Factory::getApplication()->getIdentity()->get('username')), $fm);
+            $fm = str_replace('{filemask:_userid}', trim(Factory::getApplication()->getIdentity()->get('id')), $fm);
+            $fm = str_replace('{filemask:_name}', trim(Factory::getApplication()->getIdentity()->get('name')), $fm);
             $fm = str_replace('{filemask:_datetime}', trim($date_stamp), $fm);
             $fm = str_replace('{filemask:_date}', trim($date_stamp2), $fm);
             $fm = str_replace('{filemask:_timestamp}', trim(time()), $fm);

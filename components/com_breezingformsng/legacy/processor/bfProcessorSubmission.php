@@ -28,6 +28,7 @@ use Joomla\CMS\Environment\Browser;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Log\Log;
+use Joomla\CMS\Mail\MailerFactoryInterface;
 use CB\Component\Contentbuilderng\Administrator\Helper\ContentbuilderngHelper;
 use CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory;
 use CB\Component\Contentbuilderng\Administrator\Service\ArticleService;
@@ -158,7 +159,7 @@ trait bfProcessorSubmission
                                         $tz = new DateTimeZone($this->app->get('offset'));
 
                                         $date_stamp = date('Y_m_d_H_i_s');
-                                        $date_ = Factory::getDate($this->submitted, $tz);
+                                        $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
                                         $offset = $date_->getOffsetFromGMT();
                                         if ($offset > 0) {
                                             $date_->add(new DateInterval('PT' . $offset . 'S'));
@@ -169,7 +170,7 @@ trait bfProcessorSubmission
                                         $date_stamp = $date_->format('Y_m_d_H_i_s', true);
 
                                         $date_stamp2 = date('Y_m_d');
-                                        $date_ = Factory::getDate($this->submitted, $tz);
+                                        $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
                                         $offset = $date_->getOffsetFromGMT();
                                         if ($offset > 0) {
                                             $date_->add(new DateInterval('PT' . $offset . 'S'));
@@ -229,9 +230,9 @@ trait bfProcessorSubmission
                                                                     }
 
                                                                     $fm = str_replace('{filemask:_separator}', '_', $fm);
-                                                                    $fm = str_replace('{filemask:_username}', trim(Factory::getUser()->get('username')), $fm);
-                                                                    $fm = str_replace('{filemask:_userid}', trim(Factory::getUser()->get('id')), $fm);
-                                                                    $fm = str_replace('{filemask:_name}', trim(Factory::getUser()->get('name')), $fm);
+                                                                    $fm = str_replace('{filemask:_username}', trim(Factory::getApplication()->getIdentity()->get('username')), $fm);
+                                                                    $fm = str_replace('{filemask:_userid}', trim(Factory::getApplication()->getIdentity()->get('id')), $fm);
+                                                                    $fm = str_replace('{filemask:_name}', trim(Factory::getApplication()->getIdentity()->get('name')), $fm);
                                                                     $fm = str_replace('{filemask:_datetime}', trim($date_stamp), $fm);
                                                                     $fm = str_replace('{filemask:_date}', trim($date_stamp2), $fm);
                                                                     $fm = str_replace('{filemask:_timestamp}', trim(time()), $fm);
@@ -440,7 +441,7 @@ trait bfProcessorSubmission
                                                 //$values[$html_i] = $this->removeDangerousHtml($values[$html_i]);
 
                                                 /*
-                                                  $input = $this->app->input;
+                                                  $input = $this->app->getInput();
                                                   $input->set('cbCleanVar', $values[$html_i]);
                                                   $values[$html_i] = $input->getHtml('cbCleanVar'); */
 
@@ -871,8 +872,8 @@ trait bfProcessorSubmission
                 $uri = Uri::getInstance();
                 $domainAddress = $uri->toString(array('scheme', 'host', 'port', 'path'));
 
-                $mailer = Factory::getMailer();
-                $config = Factory::getConfig();
+                $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
+                $config = Factory::getApplication()->getConfig();
 
                 $recipient = '';
                 $email_field_name = $this->formrow->opt_mail;
@@ -1514,7 +1515,7 @@ transition: box-shadow .15s linear;
             if ($cbResult['data']['force_login']) {
                 $is15 = false;
 
-                if (!Factory::getUser()->get('id', 0)) {
+                if (!Factory::getApplication()->getIdentity()->get('id', 0)) {
                     $this->app->redirect(Route::_('index.php?option=com_users&view=login&Itemid=' . BFRequest::getInt('Itemid', 0), false));
                 } else {
 

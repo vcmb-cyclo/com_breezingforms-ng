@@ -16,6 +16,7 @@
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use Joomla\Database\DatabaseInterface;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\CaptchaCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\FlashUploadCallback;
@@ -53,14 +54,15 @@ $mainframe = Factory::getApplication();
 // make sure the component language is available for Text::_()
 $mainframe->getLanguage()->load('com_breezingformsng');
 
-$cache = Factory::getCache();
+$cache = Factory::getContainer()
+    ->get(CacheControllerFactoryInterface::class)
+    ->createCacheController('callback');
 $cache->setCaching(false);
 
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/constants.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFRequest.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFIntegrate.php');
-require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFPDF.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickMode.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickModeBootstrap.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickModeMobile.php');

@@ -20,6 +20,7 @@ use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 use Joomla\String\StringHelper;
 use Joomla\CMS\Filter\OutputFilter;
+use Joomla\CMS\Mail\MailerFactoryInterface;
 
 function bf_sanitizeFilename($fileName, $defaultIfEmpty = 'upload', $separator = '_', $lowerCase = true)
 {
@@ -67,8 +68,6 @@ function bf_sanitizeFilename($fileName, $defaultIfEmpty = 'upload', $separator =
 
 function bf_tooltipText($title = '', $content = '', $translate = 1, $escape = 1)
 {
-	HTMLHelper::_('bootstrap.tooltip');
-
 	// Return empty in no title or content is given.
 	if ($title == '' && $content == '') {
 		return '';
@@ -350,18 +349,6 @@ function bf_getFieldSelectorListHTML($form_id, $editor, $element_target_id)
 	return $out;
 }
 
-function bf_ToolTip($tooltip, $title = '', $width = '', $image = 'tooltip.png', $text = '', $href = '', $link = 1)
-{
-	// Initialize the toolips if required
-	static $init;
-	if (!$init) {
-		//HTMLHelper::_( 'bootstrap.tooltip' );
-		$init = true;
-	}
-
-	return HTMLHelper::_('tooltip', $tooltip, $title, $image, $text, $href, $link);
-}
-
 // used if copy is disabled
 function bf_copy($file1, $file2)
 {
@@ -384,10 +371,10 @@ function bf_createMail($from, $fromname, $subject, $body, $alt_sender = '')
 	$_mailfrom = '';
 	$_fromname = '';
 
-	$_mailfrom = Factory::getConfig()->get('mailfrom', '');
-	$_fromname = Factory::getConfig()->get('fromname', '');
+	$_mailfrom = Factory::getApplication()->getConfig()->get('mailfrom', '');
+	$_fromname = Factory::getApplication()->getConfig()->get('fromname', '');
 
-	$mail = Factory::getMailer();
+	$mail = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
 
 	/*
 				try {
@@ -806,4 +793,3 @@ function bf_is_email($email, $checkDNS = false)
 		return true;
 	}
 }
-

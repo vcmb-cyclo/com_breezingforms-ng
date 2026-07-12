@@ -603,8 +603,8 @@ class HTML_facileFormsProcessor
         $tz = 'UTC';
         $tz = new DateTimeZone($this->app->get('offset'));
 
-        $submitted = Factory::getDate();
-        $submitted = Factory::getDate('now', $tz);
+        $submitted = new \Joomla\CMS\Date\Date();
+        $submitted = new \Joomla\CMS\Date\Date('now', $tz);
 
         $this->submitted = $submitted->format('Y-m-d H:i:s');
 
@@ -613,9 +613,9 @@ class HTML_facileFormsProcessor
           if ( !$format ) {
           $this->submitted = date('Y-m-d H:i:s');
           }else{
-          $config = Factory::getConfig();
+          $config = Factory::getApplication()->getConfig();
           $offset = $config->getValue('config.offset');
-          $instance = Factory::getDate(date('Y-m-d H:i:s'));
+          $instance = new \Joomla\CMS\Date\Date(date('Y-m-d H:i:s'));
           $instance->setOffset($offset);
           $this->submitted = $instance->toFormat($format);
           } */

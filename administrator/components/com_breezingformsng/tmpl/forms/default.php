@@ -11,7 +11,6 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Pagination\Pagination;
-use Joomla\CMS\Session\Session;
 
 $pkg = $this->pkg;
 
@@ -82,26 +81,26 @@ $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
             <td><?= $form->modified ? htmlspecialchars(substr((string) $form->modified, 0, 10)) : '—'; ?></td>
             <td class="text-center">
               <?php if ($form->published): ?>
-                <a href="index.php?option=com_breezingformsng&task=forms.unpublish&cid[]=<?= (int) $form->id; ?>&pkg=<?= rawurlencode($pkg); ?>&<?= Session::getFormToken(); ?>=1"
-                   class="tbody-icon active" title="<?= Text::_('JPUBLISHED'); ?>">
+                <button type="button" class="tbody-icon active border-0 bg-transparent" title="<?= Text::_('JPUBLISHED'); ?>"
+                        onclick="this.form.action_id.value='<?= (int) $form->id; ?>';Joomla.submitbutton('forms.unpublish');">
                   <span class="icon-publish" aria-hidden="true"></span>
-                </a>
+                </button>
               <?php else: ?>
-                <a href="index.php?option=com_breezingformsng&task=forms.publish&cid[]=<?= (int) $form->id; ?>&pkg=<?= rawurlencode($pkg); ?>&<?= Session::getFormToken(); ?>=1"
-                   class="tbody-icon" title="<?= Text::_('JUNPUBLISHED'); ?>">
+                <button type="button" class="tbody-icon border-0 bg-transparent" title="<?= Text::_('JUNPUBLISHED'); ?>"
+                        onclick="this.form.action_id.value='<?= (int) $form->id; ?>';Joomla.submitbutton('forms.publish');">
                   <span class="icon-unpublish" aria-hidden="true"></span>
-                </a>
+                </button>
               <?php endif; ?>
             </td>
             <td class="text-center">
-              <a href="index.php?option=com_breezingformsng&task=forms.orderup&cid[]=<?= (int) $form->id; ?>&pkg=<?= rawurlencode($pkg); ?>&<?= Session::getFormToken(); ?>=1"
-                 title="<?= Text::_('JLIB_HTML_MOVE_UP'); ?>">
+              <button type="button" class="btn btn-link p-0 border-0" title="<?= Text::_('JLIB_HTML_MOVE_UP'); ?>"
+                      onclick="this.form.action_id.value='<?= (int) $form->id; ?>';Joomla.submitbutton('forms.orderup');">
                 <span class="icon-arrow-up-2" aria-hidden="true"></span>
-              </a>
-              <a href="index.php?option=com_breezingformsng&task=forms.orderdown&cid[]=<?= (int) $form->id; ?>&pkg=<?= rawurlencode($pkg); ?>&<?= Session::getFormToken(); ?>=1"
-                 title="<?= Text::_('JLIB_HTML_MOVE_DOWN'); ?>">
+              </button>
+              <button type="button" class="btn btn-link p-0 border-0" title="<?= Text::_('JLIB_HTML_MOVE_DOWN'); ?>"
+                      onclick="this.form.action_id.value='<?= (int) $form->id; ?>';Joomla.submitbutton('forms.orderdown');">
                 <span class="icon-arrow-down-2" aria-hidden="true"></span>
-              </a>
+              </button>
             </td>
             <td class="text-center">
               <a href="index.php?option=com_breezingformsng&task=quickmode.display&form=<?= (int) $form->id; ?>&pkg=<?= rawurlencode($pkg); ?>"
@@ -122,6 +121,7 @@ $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
   <input type="hidden" name="filter_order_Dir" value="<?= htmlspecialchars($this->listDirn); ?>">
   <input type="hidden" name="pkg" value="<?= htmlspecialchars($pkg); ?>">
   <input type="hidden" name="boxchecked" value="0">
+  <input type="hidden" name="action_id" value="0">
   <?= HTMLHelper::_('form.token'); ?>
 </form>
 

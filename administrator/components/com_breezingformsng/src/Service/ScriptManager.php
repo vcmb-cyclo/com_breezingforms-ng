@@ -16,7 +16,6 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Service;
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
-use BFRequest;
 use facileFormsScripts;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Factory;
@@ -80,7 +79,7 @@ class ScriptManager
 		$row->code = $code;
 		$row->unit_tests = $unitTests;
 
-		$now = Factory::getDate()->toSql();
+		$now = (new \Joomla\CMS\Date\Date())->toSql();
 		$userId = (string) Factory::getApplication()->getIdentity()->username;
 
 		if (empty($row->id)) {
@@ -118,7 +117,7 @@ class ScriptManager
 		if (count($ids)) foreach ($ids as $id) {
 			$row->load(intval($id));
 			$row->id       = NULL;
-			$row->created = Factory::getDate()->toSql();
+			$row->created = (new \Joomla\CMS\Date\Date())->toSql();
 			$row->created_by = (string) Factory::getApplication()->getIdentity()->username;
 			$row->modified = $row->created;
 			$row->modified_by = $row->created_by;
@@ -164,6 +163,7 @@ class ScriptManager
 	static function listitems($option, $pkg)
 	{
 		$app = Factory::getApplication();
+		$input = $app->getInput();
 		$session = $app->getSession();
 
 		try {
@@ -182,7 +182,7 @@ class ScriptManager
 		$pkglist = array();
 		$pkglist[] = array($pkg == '', '');
 		if (count($pkgs)) foreach ($pkgs as $p) $pkglist[] = array($p->name == $pkg, $p->name);
-		$searchReq = BFRequest::getVar('search', null);
+		$searchReq = $input->get('search', null, 'string');
 		if ($searchReq === null) {
 			$search = (string) $session->get('bf.scripts_search', '');
 		} else {
@@ -190,8 +190,8 @@ class ScriptManager
 			$session->set('bf.scripts_search', $search);
 		}
 
-		$sortReq = BFRequest::getVar('sort', null);
-		$dirReq = BFRequest::getVar('dir', null);
+		$sortReq = $input->get('sort', null, 'string');
+		$dirReq = $input->get('dir', null, 'cmd');
 
 		if ($sortReq === null) {
 			$sort = (string) $session->get('bf.scripts_sort', 'name');
@@ -209,7 +209,7 @@ class ScriptManager
 
 		$dir = $dir === 'DESC' ? 'DESC' : 'ASC';
 		$pageSizes = array(10, 25, 50, 100, 250, 500, 1000, 5000, 10000, 100000);
-		$limitReq = BFRequest::getInt('limit', -1);
+		$limitReq = $input->getInt('limit', -1);
 
 		if ($limitReq > 0 && in_array($limitReq, $pageSizes, true)) {
 			$limit = $limitReq;
@@ -222,7 +222,7 @@ class ScriptManager
 			}
 		}
 
-		$limitstartReq = BFRequest::getInt('limitstart', -1);
+		$limitstartReq = $input->getInt('limitstart', -1);
 
 		if ($limitstartReq >= 0) {
 			$limitstart = $limitstartReq;
@@ -255,7 +255,7 @@ class ScriptManager
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
 		ArrayHelper::toInteger($ids);
 		if (!count($ids)) {
-			$id = BFRequest::getInt('id', 0);
+			$id = $app->getInput()->getInt('id', 0);
 			if ($id) {
 				$ids = array($id);
 			}
@@ -287,7 +287,7 @@ class ScriptManager
 			}
 			$autoRun = $allDefaults;
 		}
-		$testMode = BFRequest::getCmd('test_mode', '');
+		$testMode = $app->getInput()->getCmd('test_mode', '');
 		Renderer::test($option, $pkg, $row, $functionName, $params, $paramDefaults, $autoRun, $testMode);
 	}
 
@@ -307,7 +307,7 @@ class ScriptManager
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
 		ArrayHelper::toInteger($ids);
 		if (!count($ids)) {
-			$id = BFRequest::getInt('id', 0);
+			$id = $app->getInput()->getInt('id', 0);
 			if ($id) {
 				$ids = array($id);
 			}
@@ -349,8 +349,8 @@ class ScriptManager
 			}
 		}
 
-		$testContext = BFRequest::getInt('test_context', 0);
-		$testMode = BFRequest::getCmd('test_mode', '');
+		$testContext = $app->getInput()->getInt('test_context', 0);
+		$testMode = $app->getInput()->getCmd('test_mode', '');
 		if ($testContext) {
 			$testModeQuery = $testMode !== '' ? '&test_mode=' . urlencode($testMode) : '';
 			$app->redirect("index.php?option=$option&task=scripts.test&pkg=$pkg&ids[]=" . $targetId . $testModeQuery);

@@ -25,7 +25,7 @@ abstract class BreezingformsNGHelperRoute
         $itemid = BFRequest::getVar('Itemid', 0);
         $the_id = explode(':', $id);
         $menu = 'Itemid';
-        if (Factory::getConfig()->get('sef')) {
+        if (Factory::getApplication()->getConfig()->get('sef')) {
             $menu = 'menuitemid';
             $db = Factory::getContainer()->get(DatabaseInterface::class);
             $db->setQuery("Select `name` From #__facileforms_forms Where id = " . intval($the_id[0]));

@@ -316,16 +316,16 @@ class BFIntegrate
 
                         switch ($crit->joomla_object) {
                             case 'Userid':
-                                $jobject = Factory::getUser()->get('id', '');
+                                $jobject = Factory::getApplication()->getIdentity()->get('id', '');
                                 break;
                             case 'Username':
-                                $jobject = Factory::getUser()->get('username', '');
+                                $jobject = Factory::getApplication()->getIdentity()->get('username', '');
                                 break;
                             case 'Language':
                                 $jobject = Factory::getApplication()->getLanguage()->getName();
                                 break;
                             case 'Date':
-                                $jobject = Factory::getDate()->toSql();
+                                $jobject = (new \Joomla\CMS\Date\Date())->toSql();
                                 break;
                         }
 

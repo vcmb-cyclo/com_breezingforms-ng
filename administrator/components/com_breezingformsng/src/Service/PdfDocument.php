@@ -7,13 +7,18 @@
  * @copyright Copyright (C) 2008-2020 by Markus Bopp
  * @license GNU General Public License version 2 or later; see LICENSE.txt
  * */
+namespace Vcmb\Component\BreezingformsNG\Administrator\Service;
+
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
-if(!class_exists('TCPDF')) {
-    \Vcmb\Component\BreezingformsNG\Administrator\Helper\VendorHelper::load();
+use Vcmb\Component\BreezingformsNG\Administrator\Helper\VendorHelper;
+
+if (!class_exists(\TCPDF::class)) {
+    VendorHelper::load();
 }
 
-class BFPDF extends TCPDF{
+class PdfDocument extends \TCPDF
+{
 
     public $form_name = '';
     public $mailback = false;
@@ -62,7 +67,7 @@ class BFPDF extends TCPDF{
                         $file_sep = explode('.', $file);
                         if(count($file_sep) > 1){
                             unset($file_sep[count($file_sep)-1]);
-                            $ttf_name = TCPDF_FONTS::addTTFfont($sourcePath.$file, 'TrueTypeUnicode');
+                            $ttf_name = \TCPDF_FONTS::addTTFfont($sourcePath.$file, 'TrueTypeUnicode');
                             $font_loaded = true;
                         }
                     }
@@ -88,7 +93,7 @@ class BFPDF extends TCPDF{
         }
 
         if(!$active_found){
-            TCPDF_FONTS::addTTFfont(JPATH_SITE . '/media/com_breezingformsng/fonts/verdana.ttf', 'TrueTypeUnicode');
+            \TCPDF_FONTS::addTTFfont(JPATH_SITE . '/media/com_breezingformsng/fonts/verdana.ttf', 'TrueTypeUnicode');
             $pdf->SetFont('verdana');
         }
 
@@ -128,7 +133,7 @@ class BFPDF extends TCPDF{
                         $file_sep = explode('.', $file);
                         if(count($file_sep) > 1){
                             unset($file_sep[count($file_sep)-1]);
-                            $ttf_name = TCPDF_FONTS::addTTFfont($sourcePath.$file, 'TrueTypeUnicode');
+                            $ttf_name = \TCPDF_FONTS::addTTFfont($sourcePath.$file, 'TrueTypeUnicode');
                             $font_loaded = true;
                         }
                     }
@@ -154,7 +159,7 @@ class BFPDF extends TCPDF{
         }
 
         if(!$active_found){
-            TCPDF_FONTS::addTTFfont(JPATH_SITE . '/media/com_breezingformsng/fonts/verdana.ttf', 'TrueTypeUnicode');
+            \TCPDF_FONTS::addTTFfont(JPATH_SITE . '/media/com_breezingformsng/fonts/verdana.ttf', 'TrueTypeUnicode');
             $pdf->SetFont('verdana');
         }
 

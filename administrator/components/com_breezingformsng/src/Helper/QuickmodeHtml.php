@@ -8,6 +8,8 @@
  * @copyright Copyright (C) 2024-2026 by XDA+GIL - EVH
  * @license     Released under the terms of the GNU General Public License
  * */
+namespace Vcmb\Component\BreezingformsNG\Administrator\Helper;
+
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\Factory;
@@ -22,7 +24,7 @@ use Joomla\CMS\Language\Text;
 
 require_once JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php';
 
-class QuickModeHtml
+final class QuickmodeHtml
 {
     private static function decodeJsonArray(string $json): array
     {
@@ -121,7 +123,11 @@ class QuickModeHtml
 
     public static function showApplication($formId, $formName, $formTitle, $formDesc, $formEmailntf, $formEmailadr, $dataObjectString, $elementScripts, $themes, $themesbootstrap, $themesbootstrap3)
     {
-        $active_language_code = htmlentities(BFRequest::getVar('active_language_code', ''), ENT_QUOTES, 'UTF-8');
+        $active_language_code = htmlentities(
+            Factory::getApplication()->getInput()->getString('active_language_code'),
+            ENT_QUOTES,
+            'UTF-8'
+        );
         HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
         HTMLHelper::_('behavior.keepalive');
         $iconBase = Uri::root() . 'media/com_breezingformsng/images/quickmode/';

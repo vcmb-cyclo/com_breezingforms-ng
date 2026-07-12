@@ -90,7 +90,6 @@ class FormsController extends BaseController
             'mb_emailntf'              => 'INT',
             'mb_emaillog'              => 'INT',
             'mb_emailxml'              => 'INT',
-            'mb_emailadr'              => 'STRING',
             'mb_custom_mail_subject'   => 'STRING',
             'mb_alt_mailfrom'          => 'STRING',
             'mb_alt_fromname'          => 'STRING',
@@ -112,7 +111,7 @@ class FormsController extends BaseController
 
         // Override PHP code fields with raw (unfiltered) values
         foreach (['piece1code', 'piece2code', 'piece3code', 'piece4code',
-                  'script1code', 'script2code', 'script3code',
+                  'script1code', 'script2code',
                   'email_custom_template', 'mb_email_custom_template'] as $field) {
             $data[$field] = $post[$field] ?? '';
         }
@@ -151,7 +150,7 @@ class FormsController extends BaseController
         if (!$this->checkToken()) {
             $app->enqueueMessage(Text::_('JINVALID_TOKEN'), 'error');
         } else {
-            $ids = (array) $input->get('cid', [], 'INT');
+            $ids = $this->selectedIds($input);
             if (!empty($ids)) {
                 $this->getFormModel()->deleteItems($ids);
                 $app->enqueueMessage(Text::_('JLIB_APPLICATION_DELETE_SUCCESS'), 'message');
@@ -169,7 +168,7 @@ class FormsController extends BaseController
         if (!$this->checkToken()) {
             $app->enqueueMessage(Text::_('JINVALID_TOKEN'), 'error');
         } else {
-            $ids = (array) $input->get('cid', [], 'INT');
+            $ids = $this->selectedIds($input);
             if (!empty($ids)) {
                 $this->getFormModel()->copyItems($ids);
                 $app->enqueueMessage(
@@ -226,7 +225,7 @@ class FormsController extends BaseController
         if (!$this->checkToken()) {
             $app->enqueueMessage(Text::_('JINVALID_TOKEN'), 'error');
         } else {
-            $ids = (array) $input->get('cid', [], 'INT');
+            $ids = $this->selectedIds($input);
             if (!empty($ids)) {
                 $this->getFormModel()->publish($ids, $state);
             }
@@ -243,7 +242,7 @@ class FormsController extends BaseController
         if (!$this->checkToken()) {
             $app->enqueueMessage(Text::_('JINVALID_TOKEN'), 'error');
         } else {
-            $ids = (array) $input->get('cid', [], 'INT');
+            $ids = $this->selectedIds($input);
             $pkg = $input->getString('pkg', '');
             if (!empty($ids)) {
                 $this->getFormModel()->moveOrder((int) $ids[0], $inc, $pkg);
@@ -257,6 +256,20 @@ class FormsController extends BaseController
     {
         return 'index.php?option=com_breezingformsng&act=manageforms&view=forms'
             . ($pkg !== '' ? '&pkg=' . rawurlencode($pkg) : '');
+    }
+
+    private function selectedIds(\Joomla\Input\Input $input): array
+    {
+        $ids = array_values(array_filter(array_map('intval', (array) $input->get('cid', [], 'array'))));
+
+        if ($ids === []) {
+            $actionId = $input->getInt('action_id', 0);
+            if ($actionId > 0) {
+                $ids[] = $actionId;
+            }
+        }
+
+        return $ids;
     }
 
     private function getFormModel(): FormModel

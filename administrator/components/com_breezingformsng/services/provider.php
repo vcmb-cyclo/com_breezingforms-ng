@@ -17,15 +17,12 @@ use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
 use Vcmb\Component\BreezingformsNG\Administrator\Extension\BreezingFormsNGComponent;
-use Vcmb\Component\BreezingformsNG\Administrator\Helper\LegacyClassLoader;
 
 return new class implements ServiceProviderInterface
 {
     public function register(Container $container): void
     {
         $namespace = 'Vcmb\\Component\\BreezingformsNG';
-
-        LegacyClassLoader::register();
 
         $container->registerServiceProvider(new MVCFactory($namespace));
         $container->registerServiceProvider(new ComponentDispatcherFactory($namespace));

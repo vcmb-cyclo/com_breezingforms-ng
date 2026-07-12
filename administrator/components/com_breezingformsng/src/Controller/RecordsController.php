@@ -14,6 +14,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\Utilities\ArrayHelper;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\RecordModel;
+use Vcmb\Component\BreezingformsNG\Administrator\Service\PdfDocument;
 
 class RecordsController extends BaseController
 {
@@ -164,7 +165,7 @@ class RecordsController extends BaseController
         $updIds = [];
         foreach ($recs as $i => $rec) {
             $updIds[] = (int) $rec->id;
-            $date = Factory::getDate($rec->submitted, $tz);
+            $date = new \Joomla\CMS\Date\Date($rec->submitted, $tz);
             $offset = $date->getOffsetFromGMT();
             if ($offset > 0) {
                 $date->add(new \DateInterval('PT' . $offset . 'S'));
@@ -178,11 +179,7 @@ class RecordsController extends BaseController
             $model->markExported($updIds);
         }
 
-        if (!class_exists('BFPDF')) {
-            require_once JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFPDF.php';
-        }
-
-        $datestamp = Factory::getDate('now', $tz);
+        $datestamp = new \Joomla\CMS\Date\Date('now', $tz);
         $dsOffset = $datestamp->getOffsetFromGMT();
         if ($dsOffset > 0) {
             $datestamp->add(new \DateInterval('PT' . $dsOffset . 'S'));
@@ -190,7 +187,7 @@ class RecordsController extends BaseController
             $datestamp->sub(new \DateInterval('PT' . abs($dsOffset) . 'S'));
         }
 
-        $pdf = new \BFPDF();
+        $pdf = new PdfDocument();
         $pdf->setFormName($formName);
         $pdf->setWhich('export');
 
@@ -313,7 +310,7 @@ class RecordsController extends BaseController
         $body = '';
         foreach ($recs as $rec) {
             $updIds[] = (int) $rec->id;
-            $date = Factory::getDate($rec->submitted, $tz);
+            $date = new \Joomla\CMS\Date\Date($rec->submitted, $tz);
             $offset = $date->getOffsetFromGMT();
             if ($offset > 0) {
                 $date->add(new \DateInterval('PT' . $offset . 'S'));
@@ -393,7 +390,7 @@ class RecordsController extends BaseController
         $recs = $db->loadObjectList();
         $formName = ($formSelection && $recs) ? ($recs[0]->name ?? '') : '';
 
-        $datestamp = Factory::getDate('now', $tz);
+        $datestamp = new \Joomla\CMS\Date\Date('now', $tz);
         $dsOffset = $datestamp->getOffsetFromGMT();
         if ($dsOffset > 0) {
             $datestamp->add(new \DateInterval('PT' . $dsOffset . 'S'));
@@ -410,7 +407,7 @@ class RecordsController extends BaseController
         $updIds = [];
         foreach ($recs as $rec) {
             $updIds[] = (int) $rec->id;
-            $date = Factory::getDate($rec->submitted, $tz);
+            $date = new \Joomla\CMS\Date\Date($rec->submitted, $tz);
             $offset = $date->getOffsetFromGMT();
             if ($offset > 0) {
                 $date->add(new \DateInterval('PT' . $offset . 'S'));

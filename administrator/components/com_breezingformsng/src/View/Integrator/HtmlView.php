@@ -12,6 +12,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Integrator;
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\IntegratorModel;
 
@@ -80,6 +81,17 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
             ToolbarHelper::save('integrator.save');
         }
         ToolbarHelper::cancel('integrator.display', 'JTOOLBAR_CLOSE');
+    }
+
+    protected function getDetailLabel(): ?string
+    {
+        if ($this->rule === null) {
+            return null;
+        }
+
+        $name = trim((string) $this->rule->name);
+
+        return $name !== '' ? $name : Text::_('COM_BREEZINGFORMSNG_INSTALLER_UNKNOWN');
     }
 
     private function getIntegratorModel(): IntegratorModel

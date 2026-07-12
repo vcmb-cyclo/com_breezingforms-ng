@@ -69,6 +69,17 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
         parent::display($tpl);
     }
 
+    protected function getDetailLabel(): ?string
+    {
+        if ($this->item === null) {
+            return null;
+        }
+
+        $title = trim((string) $this->item->title);
+
+        return $title !== '' ? $title : Text::_('COM_BREEZINGFORMSNG_INSTALLER_UNKNOWN');
+    }
+
     private function resolvedPkg(\Joomla\Input\Input $input, MenuModel $model): string
     {
         $session = Factory::getApplication()->getSession();

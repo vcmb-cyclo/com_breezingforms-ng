@@ -14,6 +14,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
+use Vcmb\Component\BreezingformsNG\Administrator\Helper\BreadcrumbHelper;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\QuickmodeModel;
 
 class HtmlView extends BaseHtmlView
@@ -68,11 +69,11 @@ class HtmlView extends BaseHtmlView
         $this->themesBootstrap4 = $model->getThemesBootstrap4();
 
         // Toolbar
-        $sectionTitle = Text::_('COM_BREEZINGFORMSNG_MANAGEFORMS');
-        if ($this->formTitle !== '') {
-            $sectionTitle .= ' / ' . htmlspecialchars($this->formTitle, ENT_QUOTES, 'UTF-8');
-        }
-        $pageTitle = Text::_('COM_BREEZINGFORMSNG') . ' / ' . $sectionTitle;
+        $pageTitle = BreadcrumbHelper::render([
+            ['label' => Text::_('COM_BREEZINGFORMSNG'), 'url' => 'index.php?option=com_breezingformsng'],
+            ['label' => Text::_('COM_BREEZINGFORMSNG_MANAGEFORMS'), 'url' => 'index.php?option=com_breezingformsng&view=forms'],
+            ['label' => $this->formTitle !== '' ? $this->formTitle : Text::_('COM_BREEZINGFORMSNG_INSTALLER_UNKNOWN')],
+        ]);
 
         $doc = Factory::getApplication()->getDocument();
         $doc->setTitle(strip_tags($pageTitle));

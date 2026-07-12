@@ -22,7 +22,7 @@ abstract class BreezingformsNGHelperRoute
     public static function getFormRoute($id)
     {
         $found_menu = '&found_menu=false';
-        $itemid = BFRequest::getVar('Itemid', 0);
+        $itemid = Factory::getApplication()->getInput()->getInt('Itemid', 0);
         $the_id = explode(':', $id);
         $menu = 'Itemid';
         if (Factory::getApplication()->getConfig()->get('sef')) {

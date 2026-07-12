@@ -149,8 +149,9 @@ function ff_reserved($p, $ff_param = true)
 function saveOtherParam($name)
 {
 	global $ff_otherparams;
-	if (BFRequest::getVar($name, null) != null && !is_array(BFRequest::getVar($name, null))) {
-		$value = BFRequest::getVar($name);
+	$input = Factory::getApplication()->getInput();
+	if ($input->get($name, null, 'string') != null && !is_array($input->get($name, null, 'string'))) {
+		$value = $input->get($name, null, 'string');
 		$ff_otherparams[$name] = $value;
 		return $value;
 	} // if

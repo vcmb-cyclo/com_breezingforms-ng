@@ -109,51 +109,51 @@ $bfEngineContext = [
 ];
 
 if (
-    !BFRequest::getBool('bfCaptcha') &&
-    !BFRequest::getBool('checkCaptcha') &&
-    !BFRequest::getBool('confirmStripe') &&
-    !BFRequest::getBool('confirmPayPal') &&
-    !BFRequest::getBool('confirmPayPalIpn') &&
-    !BFRequest::getBool('paypalDownload') &&
-    !BFRequest::getBool('stripeDownload') &&
-    !BFRequest::getBool('showPayPalConnectMsg') &&
-    !BFRequest::getBool('successSofortueberweisung') &&
-    !BFRequest::getBool('confirmSofortueberweisung') &&
-    !BFRequest::getBool('sofortueberweisungDownload') &&
-    !BFRequest::getBool('flashUpload') &&
-    BFRequest::getVar('opt_in') != 'true' &&
-    BFRequest::getVar('opt_out') != 'true'
+    !Factory::getApplication()->getInput()->getBool('bfCaptcha', false) &&
+    !Factory::getApplication()->getInput()->getBool('checkCaptcha', false) &&
+    !Factory::getApplication()->getInput()->getBool('confirmStripe', false) &&
+    !Factory::getApplication()->getInput()->getBool('confirmPayPal', false) &&
+    !Factory::getApplication()->getInput()->getBool('confirmPayPalIpn', false) &&
+    !Factory::getApplication()->getInput()->getBool('paypalDownload', false) &&
+    !Factory::getApplication()->getInput()->getBool('stripeDownload', false) &&
+    !Factory::getApplication()->getInput()->getBool('showPayPalConnectMsg', false) &&
+    !Factory::getApplication()->getInput()->getBool('successSofortueberweisung', false) &&
+    !Factory::getApplication()->getInput()->getBool('confirmSofortueberweisung', false) &&
+    !Factory::getApplication()->getInput()->getBool('sofortueberweisungDownload', false) &&
+    !Factory::getApplication()->getInput()->getBool('flashUpload', false) &&
+    Factory::getApplication()->getInput()->getString('opt_in', '') != 'true' &&
+    Factory::getApplication()->getInput()->getString('opt_out', '') != 'true'
 ) {
     (new FormRenderer())->render($bfEngineContext);
-} else if (BFRequest::getBool('checkCaptcha')) {
+} else if (Factory::getApplication()->getInput()->getBool('checkCaptcha', false)) {
     (new CaptchaCallback())->check();
-} else if (BFRequest::getBool('confirmPayPalIpn') && $ff_applic == '') {
+} else if (Factory::getApplication()->getInput()->getBool('confirmPayPalIpn', false) && $ff_applic == '') {
     (new PayPalCallback())->confirmIpn();
-} else if (BFRequest::getBool('confirmStripe') && $ff_applic == '') {
+} else if (Factory::getApplication()->getInput()->getBool('confirmStripe', false) && $ff_applic == '') {
     (new StripeCallback())->confirm();
-} else if (BFRequest::getBool('stripeDownload') && $ff_applic == '') {
+} else if (Factory::getApplication()->getInput()->getBool('stripeDownload', false) && $ff_applic == '') {
     (new StripeCallback())->download();
-} else if (BFRequest::getBool('confirmPayPal') && $ff_applic == '') {
+} else if (Factory::getApplication()->getInput()->getBool('confirmPayPal', false) && $ff_applic == '') {
     (new PayPalCallback())->confirm();
-} else if (BFRequest::getBool('paypalDownload') && $ff_applic == '') {
+} else if (Factory::getApplication()->getInput()->getBool('paypalDownload', false) && $ff_applic == '') {
     (new PayPalCallback())->download();
-} else if (BFRequest::getBool('showPayPalConnectMsg')) {
+} else if (Factory::getApplication()->getInput()->getBool('showPayPalConnectMsg', false)) {
     (new PayPalCallback())->connectMessage();
-} else if (BFRequest::getBool('successSofortueberweisung')) {
+} else if (Factory::getApplication()->getInput()->getBool('successSofortueberweisung', false)) {
     (new SofortCallback())->success();
-} else if (BFRequest::getBool('confirmSofortueberweisung')) {
+} else if (Factory::getApplication()->getInput()->getBool('confirmSofortueberweisung', false)) {
     (new SofortCallback())->confirm();
-} else if (BFRequest::getBool('sofortueberweisungDownload') && $ff_applic == '') {
+} else if (Factory::getApplication()->getInput()->getBool('sofortueberweisungDownload', false) && $ff_applic == '') {
     (new SofortCallback())->download();
-} else if (BFRequest::getBool('flashUpload')) {
+} else if (Factory::getApplication()->getInput()->getBool('flashUpload', false)) {
     (new FlashUploadCallback())->handle();
-} else if (BFRequest::getVar('opt_in') == 'true') {
+} else if (Factory::getApplication()->getInput()->getString('opt_in', '') == 'true') {
     (new OptCallback())->optIn();
-} else if (BFRequest::getVar('opt_out') == 'true') {
+} else if (Factory::getApplication()->getInput()->getString('opt_out', '') == 'true') {
     (new OptCallback())->optOut();
 }
 
-if (BFRequest::getBool('raw', false)) {
+if (Factory::getApplication()->getInput()->getBool('raw', false)) {
     session_write_close();
     exit;
 }

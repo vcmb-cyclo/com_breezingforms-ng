@@ -9,7 +9,6 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service;
 
 \defined('_JEXEC') or die;
 
-use BFRequest;
 use Exception;
 use HTML_facileFormsProcessor;
 use Joomla\CMS\Factory;
@@ -61,25 +60,24 @@ $menu_item_page_heading = '';
 $menu_item_meta_description = '';
 $menu_item_meta_keywords = '';
 $menu_item_robots = '';
-$runmode = htmlentities(@BFRequest::getVar('ff_runmode', $runmode), ENT_QUOTES, 'UTF-8');
+$runmode = htmlentities(Factory::getApplication()->getInput()->getString('ff_runmode', $runmode), ENT_QUOTES, 'UTF-8');
 
 // check for plain form
 
-$plainform = BFRequest::getWord('tmpl', '') == 'component';
+$plainform = Factory::getApplication()->getInput()->getWord('tmpl', '') == 'component';
 
 // create target id for this form and check if ff params are ment for this target
 if (!$ff_target)
     $ff_target = 1;
 else
     $ff_target++;
-$parent_target = @BFRequest::getInt('ff_target', 1);
+$parent_target = Factory::getApplication()->getInput()->getInt('ff_target', 1);
 $my_ff_params = $plainform || $parent_target == $ff_target;
 
 // clear list of request parameters
 $ff_request = array();
 
-    BFRequest::setVar('format', 'html');
-
+    
     if ($runmode == _FF_RUNMODE_FRONTEND) {
 
         // is this called by a module?
@@ -102,22 +100,22 @@ $ff_request = array();
             Factory::getApplication()->getSession()->set('ff_editable_overrideMod' . $xModuleId . $formname, intval($params->get('ff_mod_editable_override', $editable_override)));
         } else if (isset($ff_applic) && $ff_applic == 'plg_facileforms') {
 
-            $formname = htmlentities(BFRequest::getVar('ff_name', ''), ENT_QUOTES, 'UTF-8');
-            $page = htmlentities(BFRequest::getVar('ff_page', 1), ENT_QUOTES, 'UTF-8');
-            $inframe = htmlentities(BFRequest::getVar('ff_frame', ''), ENT_QUOTES, 'UTF-8');
-            $border = htmlentities(BFRequest::getVar('ff_border', ''), ENT_QUOTES, 'UTF-8');
-            $align = htmlentities(BFRequest::getVar('ff_align', ''), ENT_QUOTES, 'UTF-8');
+            $formname = htmlentities(Factory::getApplication()->getInput()->getString('ff_name', ''), ENT_QUOTES, 'UTF-8');
+            $page = htmlentities(Factory::getApplication()->getInput()->getString('ff_page', 1), ENT_QUOTES, 'UTF-8');
+            $inframe = htmlentities(Factory::getApplication()->getInput()->getString('ff_frame', ''), ENT_QUOTES, 'UTF-8');
+            $border = htmlentities(Factory::getApplication()->getInput()->getString('ff_border', ''), ENT_QUOTES, 'UTF-8');
+            $align = htmlentities(Factory::getApplication()->getInput()->getString('ff_align', ''), ENT_QUOTES, 'UTF-8');
             $editable = intval($plg_editable);
             $editable_override = intval($plg_editable_override);
             $left = '';
             $top = '';
-            $suffix = htmlentities(BFRequest::getVar('ff_suffix', ''), ENT_QUOTES, 'UTF-8');
+            $suffix = htmlentities(Factory::getApplication()->getInput()->getString('ff_suffix', ''), ENT_QUOTES, 'UTF-8');
             $parprv = '';
             addRequestParams('');
         } else {
 
             // is this called with an Itemid?
-            if (BFRequest::getInt('Itemid', 0) > 0 && BFRequest::getVar('ff_applic', '') != 'mod_facileforms' && BFRequest::getVar('ff_applic', '') != 'plg_facileforms') {
+            if (Factory::getApplication()->getInput()->getInt('Itemid', 0) > 0 && Factory::getApplication()->getInput()->getString('ff_applic', '') != 'mod_facileforms' && Factory::getApplication()->getInput()->getString('ff_applic', '') != 'plg_facileforms') {
 
                 $menu = Factory::getApplication()->getMenu()->getActive();
                 $params = $menu->getParams();
@@ -163,28 +161,28 @@ $ff_request = array();
 
     if ($my_ff_params) {
         // allow overriding by url params
-        $formid = @BFRequest::getVar('ff_form', $formid);
+        $formid = Factory::getApplication()->getInput()->getString('ff_form', $formid);
 
         if ($formid == null)
-            $formname = @BFRequest::getVar('ff_name', $formname);
+            $formname = Factory::getApplication()->getInput()->getString('ff_name', $formname);
         else
             $formname = null;
 
-        $task = @BFRequest::getVar('ff_task', $task);
-        $page = @BFRequest::getVar('ff_page', $page);
-        $inframe = @BFRequest::getVar('ff_frame', $inframe);
-        $border = @BFRequest::getVar('ff_border', $border);
-        $align1 = @BFRequest::getVar('ff_align', -1);
+        $task = Factory::getApplication()->getInput()->getString('ff_task', $task);
+        $page = Factory::getApplication()->getInput()->getString('ff_page', $page);
+        $inframe = Factory::getApplication()->getInput()->getString('ff_frame', $inframe);
+        $border = Factory::getApplication()->getInput()->getString('ff_border', $border);
+        $align1 = Factory::getApplication()->getInput()->getString('ff_align', -1);
         if ($align1 >= 0) {
-            $align = @BFRequest::getVar('ff_align', $align);
+            $align = Factory::getApplication()->getInput()->getString('ff_align', $align);
             $left = 0;
             if ($align > 2) {
                 $left = $align;
                 $align = 3;
             }
         } // if
-        $top = @BFRequest::getVar('ff_top', $top);
-        $suffix = @BFRequest::getVar('ff_suffix', $suffix);
+        $top = Factory::getApplication()->getInput()->getString('ff_top', $top);
+        $suffix = Factory::getApplication()->getInput()->getString('ff_suffix', $suffix);
     }
 
     // load form
@@ -215,7 +213,7 @@ $ff_request = array();
                 $form = $forms[0];
         } else {
 
-            if (BFRequest::getVar('option', '') != 'com_breezingformsng') {
+            if (Factory::getApplication()->getInput()->getString('option', '') != 'com_breezingformsng') {
                 throw new Exception(Text::_('COM_BREEZINGFORMSNG_NO_FORM_ID_PROVIDED'), 404);
             } else {
                 echo '[No form id or name provided!]';
@@ -227,34 +225,34 @@ $ff_request = array();
     if ($ok) {
 
         // set by plugin
-        if (isset($_SESSION['ff_editablePlg' . $form->name]) && $_SESSION['ff_editablePlg' . BFRequest::getInt('ff_contentid', 0) . $form->name] != 0 && (BFRequest::getVar('ff_applic') == 'plg_facileforms' || (isset($ff_applic) && $ff_applic == 'plg_facileforms'))) {
-            $editable = $_SESSION['ff_editablePlg' . BFRequest::getInt('ff_contentid', 0) . $form->name];
+        if (isset($_SESSION['ff_editablePlg' . $form->name]) && $_SESSION['ff_editablePlg' . Factory::getApplication()->getInput()->getInt('ff_contentid', 0) . $form->name] != 0 && (Factory::getApplication()->getInput()->getString('ff_applic', '') == 'plg_facileforms' || (isset($ff_applic) && $ff_applic == 'plg_facileforms'))) {
+            $editable = $_SESSION['ff_editablePlg' . Factory::getApplication()->getInput()->getInt('ff_contentid', 0) . $form->name];
         }
 
         // set by plugin
-        if (isset($_SESSION['ff_editable_overridePlg' . $form->name]) && $_SESSION['ff_editable_overridePlg' . BFRequest::getInt('ff_contentid', 0) . $form->name] != 0 && (BFRequest::getVar('ff_applic') == 'plg_facileforms' || (isset($ff_applic) && $ff_applic == 'plg_facileforms'))) {
-            $editable_override = $_SESSION['ff_editable_overridePlg' . BFRequest::getInt('ff_contentid', 0) . $form->name];
+        if (isset($_SESSION['ff_editable_overridePlg' . $form->name]) && $_SESSION['ff_editable_overridePlg' . Factory::getApplication()->getInput()->getInt('ff_contentid', 0) . $form->name] != 0 && (Factory::getApplication()->getInput()->getString('ff_applic', '') == 'plg_facileforms' || (isset($ff_applic) && $ff_applic == 'plg_facileforms'))) {
+            $editable_override = $_SESSION['ff_editable_overridePlg' . Factory::getApplication()->getInput()->getInt('ff_contentid', 0) . $form->name];
         }
 
         // set by module
-        if ((BFRequest::getVar('ff_applic') == 'mod_facileforms' || (isset($ff_applic) && $ff_applic == 'mod_facileforms'))) {
+        if ((Factory::getApplication()->getInput()->getString('ff_applic', '') == 'mod_facileforms' || (isset($ff_applic) && $ff_applic == 'mod_facileforms'))) {
             if (Factory::getApplication()->getSession()->get('ff_editableMod' . $xModuleId . $form->name, 0) != 0) {
                 $editable = Factory::getApplication()->getSession()->get('ff_editableMod' . $xModuleId . $form->name, 0);
-            } else if (Factory::getApplication()->getSession()->get('ff_editableMod' . BFRequest::getInt('ff_module_id', 0) . $form->name, 0) != 0) {
-                $editable = Factory::getApplication()->getSession()->get('ff_editableMod' . BFRequest::getInt('ff_module_id', 0) . $form->name, 0);
+            } else if (Factory::getApplication()->getSession()->get('ff_editableMod' . Factory::getApplication()->getInput()->getInt('ff_module_id', 0) . $form->name, 0) != 0) {
+                $editable = Factory::getApplication()->getSession()->get('ff_editableMod' . Factory::getApplication()->getInput()->getInt('ff_module_id', 0) . $form->name, 0);
             }
         }
 
         // set by module
-        if ((BFRequest::getVar('ff_applic') == 'mod_facileforms' || (isset($ff_applic) && $ff_applic == 'mod_facileforms'))) {
+        if ((Factory::getApplication()->getInput()->getString('ff_applic', '') == 'mod_facileforms' || (isset($ff_applic) && $ff_applic == 'mod_facileforms'))) {
             if (Factory::getApplication()->getSession()->get('ff_editable_overrideMod' . $xModuleId . $form->name, 0) != 0) {
                 $editable_override = Factory::getApplication()->getSession()->get('ff_editable_overrideMod' . $xModuleId . $form->name, 0);
-            } else if (Factory::getApplication()->getSession()->get('ff_editable_overrideMod' . BFRequest::getInt('ff_module_id', 0) . $form->name, 0) != 0) {
-                $editable_override = Factory::getApplication()->getSession()->get('ff_editable_overrideMod' . BFRequest::getInt('ff_module_id', 0) . $form->name, 0);
+            } else if (Factory::getApplication()->getSession()->get('ff_editable_overrideMod' . Factory::getApplication()->getInput()->getInt('ff_module_id', 0) . $form->name, 0) != 0) {
+                $editable_override = Factory::getApplication()->getSession()->get('ff_editable_overrideMod' . Factory::getApplication()->getInput()->getInt('ff_module_id', 0) . $form->name, 0);
             }
         }
 
-        if ((!isset($ff_applic) || $ff_applic != 'plg_facileforms') && $pagetitle && $form->title != '' && !(BFRequest::getInt('cb_form_id', 0) || BFRequest::getCmd('cb_record_id', ''))) {
+        if ((!isset($ff_applic) || $ff_applic != 'plg_facileforms') && $pagetitle && $form->title != '' && !(Factory::getApplication()->getInput()->getInt('cb_form_id', 0) || Factory::getApplication()->getInput()->getCmd('cb_record_id', ''))) {
             if ($menu_item_title != '') {
                 Factory::getApplication()->getDocument()->setTitle($menu_item_title);
             } else if ($pagetitle) { // being set by module, false implies no change at all
@@ -305,7 +303,7 @@ $ff_request = array();
                 $frameheight = 'height="' . htmlentities($form->height, ENT_QUOTES, 'UTF-8') . '" ';
             $url = $ff_mossite . '/index.php'
                 . '?option=com_breezingformsng'
-                . '&amp;Itemid=' . ((BFRequest::getInt('Itemid', 0) > 0 && BFRequest::getInt('Itemid', 0) < 99999999) ? BFRequest::getInt('Itemid', 0) : 0)
+                . '&amp;Itemid=' . ((Factory::getApplication()->getInput()->getInt('Itemid', 0) > 0 && Factory::getApplication()->getInput()->getInt('Itemid', 0) < 99999999) ? Factory::getApplication()->getInput()->getInt('Itemid', 0) : 0)
                 . '&amp;ff_form=' . htmlentities($form->id, ENT_QUOTES, 'UTF-8')
                 . '&amp;ff_applic=' . htmlentities($ff_applic, ENT_QUOTES, 'UTF-8')
                 . '&amp;ff_module_id=' . htmlentities($xModuleId, ENT_QUOTES, 'UTF-8')

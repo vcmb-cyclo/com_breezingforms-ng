@@ -18,6 +18,7 @@ use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Language\LanguageHelper;
+use Joomla\CMS\Language\Text;
 
 require_once JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php';
 
@@ -72,7 +73,7 @@ class QuickModeHtml
         $labels = [];
 
         foreach ($labelKeys as $key) {
-            $labels[$key] = BFText::_($key);
+            $labels[$key] = Text::_($key);
         }
 
         $config = [
@@ -183,14 +184,14 @@ class QuickModeHtml
         ?>
 
         <div style="float:left; margin-right: 3px;">
-            <?php ToolbarHelper::custom('save', 'save.png', 'save_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_QUICKMODE_SAVE'), false); ?>
+            <?php ToolbarHelper::custom('save', 'save.png', 'save_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_QUICKMODE_SAVE'), false); ?>
             <?php
             if ($formId != 0) {
-                ToolbarHelper::custom('preview', 'publish.png', 'save_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_QUICKMODE_PREVIEW'), false);
-                ToolbarHelper::custom('preview_site', 'publish.png', 'save_f2.png', BFText::_('COM_BREEZINGFORMSNG_SITE_PREVIEW'), false);
+                ToolbarHelper::custom('preview', 'publish.png', 'save_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_QUICKMODE_PREVIEW'), false);
+                ToolbarHelper::custom('preview_site', 'publish.png', 'save_f2.png', Text::_('COM_BREEZINGFORMSNG_SITE_PREVIEW'), false);
             }
             ?>
-            <?php ToolbarHelper::custom('close', 'cancel.png', 'cancel_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_QUICKMODE_CLOSE'), false); ?>
+            <?php ToolbarHelper::custom('close', 'cancel.png', 'cancel_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_QUICKMODE_CLOSE'), false); ?>
             <form action="index.php" method="post" name="adminForm" id="adminForm">
                 <input type="hidden" name="option" value="com_breezingformsng" />
                 <input type="hidden" name="task" value="" />
@@ -238,13 +239,13 @@ class QuickModeHtml
 
                 <form id="newStuffBar" onsubmit="return false;">
                     <button class="btn btn-warning" id="bfNewPageButton">
-                        <?php echo BFText::_('COM_BREEZINGFORMSNG_NEW_PAGE'); ?>
+                        <?php echo Text::_('COM_BREEZINGFORMSNG_NEW_PAGE'); ?>
                     </button>
                     <button class="btn btn-warning" id="bfNewSectionButton">
-                        <?php echo BFText::_('COM_BREEZINGFORMSNG_NEW_SECTION'); ?>
+                        <?php echo Text::_('COM_BREEZINGFORMSNG_NEW_SECTION'); ?>
                     </button>
                     <button class="btn btn-warning" id="bfNewElementButton">
-                        <?php echo BFText::_('COM_BREEZINGFORMSNG_NEW_ELEMENT'); ?>
+                        <?php echo Text::_('COM_BREEZINGFORMSNG_NEW_ELEMENT'); ?>
                     </button>
                 </form>
                 <input id="scrollElementList" type="checkbox"><label for="scrollElementList"
@@ -264,13 +265,13 @@ class QuickModeHtml
                         <ul>
                             <li><a onclick="JQuery('.bfFadingMessage').css('display', 'none')" href="#fragment-1"><span>
                                         <div class="tab-items">
-                                            <?php echo BFText::_('COM_BREEZINGFORMSNG_PROPERTIES') ?>
+                                            <?php echo Text::_('COM_BREEZINGFORMSNG_PROPERTIES') ?>
                                         </div>
                                     </span></a>
                             </li>
                             <li><a onclick="JQuery('.bfFadingMessage').css('display', 'none')" href="#fragment-2"><span>
                                         <div class="tab-element">
-                                            <?php echo BFText::_('COM_BREEZINGFORMSNG_ADVANCED') ?>
+                                            <?php echo Text::_('COM_BREEZINGFORMSNG_ADVANCED') ?>
                                         </div>
                                     </span></a>
                             </li>
@@ -290,7 +291,7 @@ class QuickModeHtml
                                     <br />
                                     <div class="bfFadingMessage" style="display:none"></div>
                                     <input type="submit" class="btn btn-secondary"
-                                        value="<?php echo BFText::_('COM_BREEZINGFORMSNG_PROPERTIES_SAVE'); ?>"
+                                        value="<?php echo Text::_('COM_BREEZINGFORMSNG_PROPERTIES_SAVE'); ?>"
                                         id="bfPropertySaveButtonTop" />
                                     <?php self::renderSection('properties_form', get_defined_vars()); ?>
                                     <?php self::renderSection('properties_page', get_defined_vars()); ?>
@@ -299,7 +300,7 @@ class QuickModeHtml
                                     <!-- ELEMENT PROPERTIES END -->
                                     <div class="bfFadingMessage" style="display:none"></div>
                                     <input type="submit" class="btn btn-secondary"
-                                        value="<?php echo BFText::_('COM_BREEZINGFORMSNG_PROPERTIES_SAVE'); ?>"
+                                        value="<?php echo Text::_('COM_BREEZINGFORMSNG_PROPERTIES_SAVE'); ?>"
                                         id="bfPropertySaveButton" />
                                     <br />
                                     <br />
@@ -313,14 +314,14 @@ class QuickModeHtml
 
                                     <div class="bfFadingMessage" style="display:none"></div>
                                     <input type="submit" class="btn btn-secondary"
-                                        value="<?php echo BFText::_('COM_BREEZINGFORMSNG_PROPERTIES_SAVE'); ?>"
+                                        value="<?php echo Text::_('COM_BREEZINGFORMSNG_PROPERTIES_SAVE'); ?>"
                                         id="bfAdvancedSaveButtonTop" />
                                     <?php self::renderSection('advanced_form', get_defined_vars()); ?>
                                     <?php self::renderSection('advanced_element', get_defined_vars()); ?>
                                     <br />
                                     <div class="bfFadingMessage" style="display:none"></div>
                                     <input type="submit" class="btn btn-secondary"
-                                        value="<?php echo BFText::_('COM_BREEZINGFORMSNG_PROPERTIES_SAVE'); ?>"
+                                        value="<?php echo Text::_('COM_BREEZINGFORMSNG_PROPERTIES_SAVE'); ?>"
                                         id="bfAdvancedSaveButton" />
                                     <br />
                                     <br />

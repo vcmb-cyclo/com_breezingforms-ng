@@ -14,6 +14,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Database\DatabaseInterface;
+use Joomla\CMS\Language\Text;
 
 if (!function_exists('bf_about_read_json_file')) {
     function bf_about_read_json_file($path)
@@ -240,8 +241,8 @@ if (!function_exists('bf_about_extract_version_from_file')) {
 if (!function_exists('bf_about_get_javascript_libraries')) {
     function bf_about_get_javascript_libraries()
     {
-        $notAvailable = BFText::_('COM_BREEZINGFORMSNG_NOT_AVAILABLE');
-        $bundledSource = BFText::_('COM_BREEZINGFORMSNG_JS_LIBRARY_SOURCE_BUNDLED');
+        $notAvailable = Text::_('COM_BREEZINGFORMSNG_NOT_AVAILABLE');
+        $bundledSource = Text::_('COM_BREEZINGFORMSNG_JS_LIBRARY_SOURCE_BUNDLED');
         $basePath = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/administrator/libraries/jquery/';
         $libraries = array();
 
@@ -303,7 +304,7 @@ $versionInformation = bf_about_get_version_information();
 $phpLibraries = bf_about_get_php_libraries();
 $javascriptLibraries = bf_about_get_javascript_libraries();
 $logReport = is_array($this->logReport ?? null) ? $this->logReport : array();
-$notAvailable = BFText::_('COM_BREEZINGFORMSNG_NOT_AVAILABLE');
+$notAvailable = Text::_('COM_BREEZINGFORMSNG_NOT_AVAILABLE');
 
 $versionValue = $versionInformation['version'] !== '' ? $versionInformation['version'] : $notAvailable;
 $creationDateValue = $versionInformation['creationDate'] !== '' ? $versionInformation['creationDate'] : $notAvailable;
@@ -313,7 +314,7 @@ $licenseValue = trim((string) ($versionInformation['license'] ?? ''));
 $genericLicenseValues = array('gpl', 'gnu/gpl', 'gnu/gpl v2 or later');
 
 if ($licenseValue === '' || in_array(strtolower($licenseValue), $genericLicenseValues, true)) {
-    $licenseValue = BFText::_('COM_BREEZINGFORMSNG_LICENSE_FALLBACK');
+    $licenseValue = Text::_('COM_BREEZINGFORMSNG_LICENSE_FALLBACK');
 }
 
 $licenseUrl = 'https://www.gnu.org/licenses/gpl-2.0.html';
@@ -335,7 +336,7 @@ if ($logDisplayContent !== '') {
 
 $logTruncated = (int) ($logReport['truncated'] ?? 0) === 1;
 $logTailBytes = (int) ($logReport['tail_bytes'] ?? 0);
-$aboutDescription = (string) BFText::_('COM_BREEZINGFORMSNG_ABOUT_DESC');
+$aboutDescription = (string) Text::_('COM_BREEZINGFORMSNG_ABOUT_DESC');
 $aboutDescription = str_replace(
     '<strong>BreezingForms</strong>',
     '<strong>BreezingForms NG</strong>',
@@ -358,7 +359,7 @@ $aboutDescription = str_replace(
         <div class="bf-about-intro-media">
             <img
                 src="<?php echo htmlspecialchars(Uri::root(true) . '/media/com_breezingformsng/images/bf_logo.png', ENT_QUOTES, 'UTF-8'); ?>"
-                alt="<?php echo htmlspecialchars(BFText::_('COM_BREEZINGFORMSNG_ABOUT'), ENT_QUOTES, 'UTF-8'); ?>"
+                alt="<?php echo htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_ABOUT'), ENT_QUOTES, 'UTF-8'); ?>"
                 class="img-fluid"
                 style="max-width: 150px; height: auto;"
                 loading="lazy"
@@ -369,10 +370,10 @@ $aboutDescription = str_replace(
                 <?php echo $aboutDescription; ?>
             </p>
             <div class="bf-about-intro-links">
-                <a class="bf-about-intro-link bf-about-intro-link--vcmb" href="<?php echo htmlspecialchars($vcmbUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer"><?php echo BFText::_('COM_BREEZINGFORMSNG_VCMB_LINK'); ?></a>
-                <a class="bf-about-intro-link bf-about-intro-link--github" href="<?php echo htmlspecialchars($githubUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer"><?php echo BFText::_('COM_BREEZINGFORMSNG_GITHUB_LINK'); ?></a>
-                <a class="bf-about-intro-link bf-about-intro-link--license" href="<?php echo htmlspecialchars($licenseUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer"><?php echo BFText::_('COM_BREEZINGFORMSNG_LICENSE_LINK'); ?></a>
-                <a class="bf-about-intro-link bf-about-intro-link--log" href="#bf-about-log"><?php echo BFText::_('COM_BREEZINGFORMSNG_ABOUT_SHOW_LOG'); ?></a>
+                <a class="bf-about-intro-link bf-about-intro-link--vcmb" href="<?php echo htmlspecialchars($vcmbUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer"><?php echo Text::_('COM_BREEZINGFORMSNG_VCMB_LINK'); ?></a>
+                <a class="bf-about-intro-link bf-about-intro-link--github" href="<?php echo htmlspecialchars($githubUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer"><?php echo Text::_('COM_BREEZINGFORMSNG_GITHUB_LINK'); ?></a>
+                <a class="bf-about-intro-link bf-about-intro-link--license" href="<?php echo htmlspecialchars($licenseUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer"><?php echo Text::_('COM_BREEZINGFORMSNG_LICENSE_LINK'); ?></a>
+                <a class="bf-about-intro-link bf-about-intro-link--log" href="#bf-about-log"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_SHOW_LOG'); ?></a>
             </div>
         </div>
     </div>
@@ -380,7 +381,7 @@ $aboutDescription = str_replace(
     <div class="card mt-3 bf-about-version-card">
         <div class="card-body p-3 p-lg-4">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3 bf-about-version-header">
-                <h3 class="h5 mb-0 bf-about-version-title"><?php echo BFText::_('COM_BREEZINGFORMSNG_VERSION_INFORMATION'); ?></h3>
+                <h3 class="h5 mb-0 bf-about-version-title"><?php echo Text::_('COM_BREEZINGFORMSNG_VERSION_INFORMATION'); ?></h3>
                 <span class="bf-about-version-badge">BreezingForms</span>
             </div>
 
@@ -388,32 +389,32 @@ $aboutDescription = str_replace(
                 <div class="col-12 col-md-6 col-lg-2">
                     <div class="bf-about-version-tile bf-about-version-tile--version">
                         <span class="bf-about-version-icon" aria-hidden="true">VER</span>
-                        <p class="bf-about-version-label"><?php echo BFText::_('COM_BREEZINGFORMSNG_VERSION_LABEL'); ?></p>
+                        <p class="bf-about-version-label"><?php echo Text::_('COM_BREEZINGFORMSNG_VERSION_LABEL'); ?></p>
                         <p class="bf-about-version-value"><?php echo htmlspecialchars((string) $versionValue, ENT_QUOTES, 'UTF-8'); ?></p>
                     </div>
                 </div>
                 <div class="col-12 col-md-6 col-lg-2">
                     <div class="bf-about-version-tile bf-about-version-tile--date">
                         <span class="bf-about-version-icon" aria-hidden="true">DATE</span>
-                        <p class="bf-about-version-label"><?php echo BFText::_('COM_BREEZINGFORMSNG_CREATION_DATE_LABEL'); ?></p>
+                        <p class="bf-about-version-label"><?php echo Text::_('COM_BREEZINGFORMSNG_CREATION_DATE_LABEL'); ?></p>
                         <p class="bf-about-version-value"><?php echo htmlspecialchars((string) $creationDateValue, ENT_QUOTES, 'UTF-8'); ?></p>
                     </div>
                 </div>
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="bf-about-version-tile bf-about-version-tile--author">
                         <span class="bf-about-version-icon" aria-hidden="true">DEV</span>
-                        <p class="bf-about-version-label"><?php echo BFText::_('COM_BREEZINGFORMSNG_AUTHOR_LABEL'); ?></p>
+                        <p class="bf-about-version-label"><?php echo Text::_('COM_BREEZINGFORMSNG_AUTHOR_LABEL'); ?></p>
                         <p class="bf-about-version-value"><?php echo htmlspecialchars((string) $authorValue, ENT_QUOTES, 'UTF-8'); ?></p>
-                        <p class="bf-about-version-label mt-2"><?php echo BFText::_('COM_BREEZINGFORMSNG_COPYRIGHT_LABEL'); ?></p>
+                        <p class="bf-about-version-label mt-2"><?php echo Text::_('COM_BREEZINGFORMSNG_COPYRIGHT_LABEL'); ?></p>
                         <p class="bf-about-version-value"><?php echo htmlspecialchars((string) $copyrightValue, ENT_QUOTES, 'UTF-8'); ?></p>
                     </div>
                 </div>
                 <div class="col-12 col-md-12 col-lg-4">
                     <div class="bf-about-version-tile bf-about-version-tile--license">
                         <span class="bf-about-version-icon" aria-hidden="true">GPL</span>
-                        <p class="bf-about-version-label"><?php echo BFText::_('COM_BREEZINGFORMSNG_LICENSE_LABEL'); ?></p>
+                        <p class="bf-about-version-label"><?php echo Text::_('COM_BREEZINGFORMSNG_LICENSE_LABEL'); ?></p>
                         <p class="bf-about-version-value"><?php echo htmlspecialchars((string) $licenseValue, ENT_QUOTES, 'UTF-8'); ?></p>
-                        <a class="bf-about-version-link" href="<?php echo htmlspecialchars($licenseUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer"><?php echo BFText::_('COM_BREEZINGFORMSNG_LICENSE_LINK'); ?></a>
+                        <a class="bf-about-version-link" href="<?php echo htmlspecialchars($licenseUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer"><?php echo Text::_('COM_BREEZINGFORMSNG_LICENSE_LINK'); ?></a>
                     </div>
                 </div>
             </div>
@@ -422,10 +423,10 @@ $aboutDescription = str_replace(
 
     <div class="card mt-3" id="bf-about-log">
         <div class="card-body">
-            <h3 class="h6 card-title mb-3"><?php echo BFText::_('COM_BREEZINGFORMSNG_ABOUT_LOG_TITLE'); ?></h3>
+            <h3 class="h6 card-title mb-3"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_LOG_TITLE'); ?></h3>
             <p class="text-muted small mb-2">
                 <?php echo sprintf(
-                    BFText::_('COM_BREEZINGFORMSNG_ABOUT_LOG_LAST_READ'),
+                    Text::_('COM_BREEZINGFORMSNG_ABOUT_LOG_LAST_READ'),
                     htmlspecialchars($logFileName, ENT_QUOTES, 'UTF-8'),
                     number_format($logSize, 0, '.', ' '),
                     htmlspecialchars($logLoadedAt, ENT_QUOTES, 'UTF-8')
@@ -434,13 +435,13 @@ $aboutDescription = str_replace(
 
             <?php if ($logTruncated) : ?>
                 <div class="alert alert-warning py-2">
-                    <?php echo sprintf(BFText::_('COM_BREEZINGFORMSNG_ABOUT_LOG_TRUNCATED'), max(1, $logTailBytes)); ?>
+                    <?php echo sprintf(Text::_('COM_BREEZINGFORMSNG_ABOUT_LOG_TRUNCATED'), max(1, $logTailBytes)); ?>
                 </div>
             <?php endif; ?>
 
             <?php if ($logDisplayContent === '') : ?>
                 <div class="alert alert-info mb-0">
-                    <?php echo BFText::_('COM_BREEZINGFORMSNG_ABOUT_LOG_EMPTY'); ?>
+                    <?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_LOG_EMPTY'); ?>
                 </div>
             <?php else : ?>
                 <pre class="bg-body-tertiary text-body p-3 border rounded small mb-0" style="max-height: 420px; overflow: auto;"><?php echo htmlspecialchars($logDisplayContent, ENT_QUOTES, 'UTF-8'); ?></pre>
@@ -450,22 +451,22 @@ $aboutDescription = str_replace(
 
     <div class="card mt-3">
         <div class="card-body">
-            <h3 class="h6 card-title mb-3"><?php echo BFText::_('COM_BREEZINGFORMSNG_PHP_LIBRARIES'); ?></h3>
+            <h3 class="h6 card-title mb-3"><?php echo Text::_('COM_BREEZINGFORMSNG_PHP_LIBRARIES'); ?></h3>
             <?php if (empty($phpLibraries)) : ?>
                 <div class="alert alert-info mb-0">
-                    <?php echo BFText::_('COM_BREEZINGFORMSNG_PHP_LIBRARIES_NOT_AVAILABLE'); ?>
+                    <?php echo Text::_('COM_BREEZINGFORMSNG_PHP_LIBRARIES_NOT_AVAILABLE'); ?>
                 </div>
             <?php else : ?>
                 <p class="text-muted small">
-                    <?php echo sprintf(BFText::_('COM_BREEZINGFORMSNG_PHP_LIBRARIES_COUNT'), count($phpLibraries)); ?>
+                    <?php echo sprintf(Text::_('COM_BREEZINGFORMSNG_PHP_LIBRARIES_COUNT'), count($phpLibraries)); ?>
                 </p>
                 <div class="table-responsive">
                     <table class="table table-sm table-striped align-middle mb-0">
                         <thead>
                         <tr>
-                            <th scope="col"><?php echo BFText::_('COM_BREEZINGFORMSNG_PHP_LIBRARY'); ?></th>
-                            <th scope="col"><?php echo BFText::_('COM_BREEZINGFORMSNG_PHP_LIBRARY_VERSION'); ?></th>
-                            <th scope="col"><?php echo BFText::_('COM_BREEZINGFORMSNG_PHP_LIBRARY_SCOPE'); ?></th>
+                            <th scope="col"><?php echo Text::_('COM_BREEZINGFORMSNG_PHP_LIBRARY'); ?></th>
+                            <th scope="col"><?php echo Text::_('COM_BREEZINGFORMSNG_PHP_LIBRARY_VERSION'); ?></th>
+                            <th scope="col"><?php echo Text::_('COM_BREEZINGFORMSNG_PHP_LIBRARY_SCOPE'); ?></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -473,7 +474,7 @@ $aboutDescription = str_replace(
                             <tr>
                                 <td><?php echo htmlspecialchars((string) ($library['name'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td><?php echo htmlspecialchars((string) (($library['version'] ?? '') !== '' ? $library['version'] : $notAvailable), ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td><?php echo BFText::_(!empty($library['is_dev']) ? 'COM_BREEZINGFORMSNG_PHP_LIBRARY_SCOPE_DEV' : 'COM_BREEZINGFORMSNG_PHP_LIBRARY_SCOPE_RUNTIME'); ?></td>
+                                <td><?php echo Text::_(!empty($library['is_dev']) ? 'COM_BREEZINGFORMSNG_PHP_LIBRARY_SCOPE_DEV' : 'COM_BREEZINGFORMSNG_PHP_LIBRARY_SCOPE_RUNTIME'); ?></td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
@@ -485,23 +486,23 @@ $aboutDescription = str_replace(
 
     <div class="card mt-3">
         <div class="card-body">
-            <h3 class="h6 card-title mb-3"><?php echo BFText::_('COM_BREEZINGFORMSNG_JS_LIBRARIES'); ?></h3>
+            <h3 class="h6 card-title mb-3"><?php echo Text::_('COM_BREEZINGFORMSNG_JS_LIBRARIES'); ?></h3>
             <?php if (empty($javascriptLibraries)) : ?>
                 <div class="alert alert-info mb-0">
-                    <?php echo BFText::_('COM_BREEZINGFORMSNG_JS_LIBRARIES_NOT_AVAILABLE'); ?>
+                    <?php echo Text::_('COM_BREEZINGFORMSNG_JS_LIBRARIES_NOT_AVAILABLE'); ?>
                 </div>
             <?php else : ?>
                 <p class="text-muted small">
-                    <?php echo sprintf(BFText::_('COM_BREEZINGFORMSNG_JS_LIBRARIES_COUNT'), count($javascriptLibraries)); ?>
+                    <?php echo sprintf(Text::_('COM_BREEZINGFORMSNG_JS_LIBRARIES_COUNT'), count($javascriptLibraries)); ?>
                 </p>
                 <div class="table-responsive">
                     <table class="table table-sm table-striped align-middle mb-0">
                         <thead>
                         <tr>
-                            <th scope="col"><?php echo BFText::_('COM_BREEZINGFORMSNG_JS_LIBRARY'); ?></th>
-                            <th scope="col"><?php echo BFText::_('COM_BREEZINGFORMSNG_JS_LIBRARY_VERSION'); ?></th>
-                            <th scope="col"><?php echo BFText::_('COM_BREEZINGFORMSNG_JS_LIBRARY_ASSETS'); ?></th>
-                            <th scope="col"><?php echo BFText::_('COM_BREEZINGFORMSNG_JS_LIBRARY_SOURCE'); ?></th>
+                            <th scope="col"><?php echo Text::_('COM_BREEZINGFORMSNG_JS_LIBRARY'); ?></th>
+                            <th scope="col"><?php echo Text::_('COM_BREEZINGFORMSNG_JS_LIBRARY_VERSION'); ?></th>
+                            <th scope="col"><?php echo Text::_('COM_BREEZINGFORMSNG_JS_LIBRARY_ASSETS'); ?></th>
+                            <th scope="col"><?php echo Text::_('COM_BREEZINGFORMSNG_JS_LIBRARY_SOURCE'); ?></th>
                         </tr>
                         </thead>
                         <tbody>

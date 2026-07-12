@@ -253,7 +253,7 @@ trait bfProcessorSubmission
                                                                     //if ($row->flag1) $path .= '.'.date('YmdHis');
                                                                     if (file_exists($path)) {
                                                                         $this->status = _FF_STATUS_UPLOAD_FAILED;
-                                                                        $this->message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FILEEXISTS');
+                                                                        $this->message = Text::_('COM_BREEZINGFORMSNG_PROCESS_FILEEXISTS');
                                                                         return '';
                                                                     }
                                                                 } else if (file_exists($path) && !$this->app->getSession()->get('bfFileUploadOverride', true)) {
@@ -274,7 +274,7 @@ trait bfProcessorSubmission
                                                                     @File::copy($sourcePath . $file, $path);
                                                                 } else {
                                                                     $this->status = _FF_STATUS_UPLOAD_FAILED;
-                                                                    $this->message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FILEMOVEFAILED');
+                                                                    $this->message = Text::_('COM_BREEZINGFORMSNG_PROCESS_FILEMOVEFAILED');
                                                                     return;
                                                                 }
                                                                 @File::delete($sourcePath . $file);
@@ -758,7 +758,7 @@ trait bfProcessorSubmission
                     if (count($rows))
                         echo $this->execPiece(
                             $rows[0]->code,
-                            BFText::_('COM_BREEZINGFORMSNG_PROCESS_BSPIECE') . " " . $rows[0]->name,
+                            Text::_('COM_BREEZINGFORMSNG_PROCESS_BSPIECE') . " " . $rows[0]->name,
                             'p',
                             $this->formrow->piece3id,
                             null
@@ -767,7 +767,7 @@ trait bfProcessorSubmission
                 case 2: // custom code
                     echo $this->execPiece(
                         $this->formrow->piece3code,
-                        BFText::_('COM_BREEZINGFORMSNG_PROCESS_BSPIECEC'),
+                        Text::_('COM_BREEZINGFORMSNG_PROCESS_BSPIECEC'),
                         'f',
                         $this->form,
                         3
@@ -942,7 +942,7 @@ trait bfProcessorSubmission
                     if (count($rows))
                         echo $this->execPiece(
                             $rows[0]->code,
-                            BFText::_('COM_BREEZINGFORMSNG_PROCESS_ESPIECE') . " " . $rows[0]->name,
+                            Text::_('COM_BREEZINGFORMSNG_PROCESS_ESPIECE') . " " . $rows[0]->name,
                             'p',
                             $this->formrow->piece4id,
                             null
@@ -951,7 +951,7 @@ trait bfProcessorSubmission
                 case 2: // custom code
                     echo $this->execPiece(
                         $this->formrow->piece4code,
-                        BFText::_('COM_BREEZINGFORMSNG_PROCESS_ESPIECEC'),
+                        Text::_('COM_BREEZINGFORMSNG_PROCESS_ESPIECEC'),
                         'f',
                         $this->form,
                         3
@@ -967,31 +967,31 @@ trait bfProcessorSubmission
 
         switch ($this->status) {
             case _FF_STATUS_OK:
-                $message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITSUCCESS');
+                $message = Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITSUCCESS');
                 break;
             case _FF_STATUS_UNPUBLISHED:
-                $message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_UNPUBLISHED');
+                $message = Text::_('COM_BREEZINGFORMSNG_PROCESS_UNPUBLISHED');
                 break;
             case _FF_STATUS_SAVERECORD_FAILED:
-                $message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SAVERECFAILED');
+                $message = Text::_('COM_BREEZINGFORMSNG_PROCESS_SAVERECFAILED');
                 break;
             case _FF_STATUS_SAVESUBRECORD_FAILED:
-                $message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SAVESUBFAILED');
+                $message = Text::_('COM_BREEZINGFORMSNG_PROCESS_SAVESUBFAILED');
                 break;
             case _FF_STATUS_UPLOAD_FAILED:
-                $message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_UPLOADFAILED');
+                $message = Text::_('COM_BREEZINGFORMSNG_PROCESS_UPLOADFAILED');
                 break;
             case _FF_STATUS_SENDMAIL_FAILED:
-                $message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SENDMAILFAILED');
+                $message = Text::_('COM_BREEZINGFORMSNG_PROCESS_SENDMAILFAILED');
                 break;
             case _FF_STATUS_ATTACHMENT_FAILED:
-                $message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_ATTACHMTFAILED');
+                $message = Text::_('COM_BREEZINGFORMSNG_PROCESS_ATTACHMTFAILED');
                 break;
             case _FF_STATUS_CAPTCHA_FAILED:
-                $message = BFText::_('COM_BREEZINGFORMSNG_CAPTCHA_ENTRY_FAILED');
+                $message = Text::_('COM_BREEZINGFORMSNG_CAPTCHA_ENTRY_FAILED');
                 break;
             case _FF_STATUS_FILE_EXTENSION_NOT_ALLOWED:
-                $message = BFText::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED');
+                $message = Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED');
                 break;
             default:
                 $message = '';
@@ -1252,7 +1252,7 @@ transition: box-shadow .15s linear;
                                     }
 
                                     $returnurl = htmlentities(Uri::root() . "index.php?option=com_breezingformsng&confirmPayPal=true&form_id=" . $this->form . "&record_id=" . $this->record_id);
-                                    // $cancelurl = htmlentities(Uri::root() . "index.php?msg=" . BFText::_('Transaction Cancelled'));
+                                    // $cancelurl = htmlentities(Uri::root() . "index.php?msg=" . Text::_('Transaction Cancelled'));
                                     $cancelurl = $options['cancelURL'];
 
                                     $html = '';
@@ -1524,7 +1524,7 @@ transition: box-shadow .15s linear;
                 $this->app->redirect(trim($cbResult['data']['force_url']));
             }
 
-            $this->app->enqueueMessage(BFText::_('COM_CONTENTBUILDERNG_SAVED'), 'success');
+            $this->app->enqueueMessage(Text::_('COM_CONTENTBUILDERNG_SAVED'), 'success');
             $this->app->redirect(Route::_('index.php?option=com_contentbuilderng&task=details.display&Itemid=' . BFRequest::getInt('Itemid', 0) . '&backtolist=' . BFRequest::getInt('backtolist', 0) . '&id=' . $cbResult['data']['id'] . '&record_id=' . $cbRecordId . '&limitstart=' . BFRequest::getInt('limitstart', 0) . '&filter_order=' . BFRequest::getCmd('filter_order'), false));
         }
 

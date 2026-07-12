@@ -352,10 +352,10 @@ trait bfProcessorRendering
                 );
                 $rows = $this->database->loadObjectList();
                 if (count($rows))
-                    echo $this->execPiece($rows[0]->code, BFText::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECE') . " " . $rows[0]->name, 'p', $this->formrow->piece1id, null);
+                    echo $this->execPiece($rows[0]->code, Text::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECE') . " " . $rows[0]->name, 'p', $this->formrow->piece1id, null);
                 break;
             case 2: // custom code
-                echo $this->execPiece($this->formrow->piece1code, BFText::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECEC'), 'f', $this->form, 2);
+                echo $this->execPiece($this->formrow->piece1code, Text::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECEC'), 'f', $this->form, 2);
                 break;
             default:
                 break;
@@ -383,9 +383,9 @@ trait bfProcessorRendering
                     $fileExtensionsCheck .= '
 					if(!ff_elem' . $row->id . 'Exts){
 						if(typeof bfUseErrorAlerts == "undefined"){
-							alert("' . addslashes(BFText::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED')) . '");
+							alert("' . addslashes(Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED')) . '");
 						} else {
-							bfShowErrors("' . addslashes(BFText::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED')) . '");
+							bfShowErrors("' . addslashes(Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED')) . '");
 						}
 						if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
                                                 if(document.getElementById("bfSubmitButton")){
@@ -459,12 +459,12 @@ trait bfProcessorRendering
                                                                                     JQuery("#bfSubmitMessage").css("display","none");
 									        }
                                                                                 if(typeof bfUseErrorAlerts == "undefined"){
-                                                                                    alert("' . addslashes(BFText::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
+                                                                                    alert("' . addslashes(Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
 									        } else {
                                                                                    if(typeof inlineErrorElements != "undefined"){
-                                                                                     inlineErrorElements.push(["bfCaptchaEntry","' . addslashes(BFText::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '"]);
+                                                                                     inlineErrorElements.push(["bfCaptchaEntry","' . addslashes(Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '"]);
                                                                                    }
-									           bfShowErrors("' . addslashes(BFText::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
+									           bfShowErrors("' . addslashes(Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
 									        }
                                                                                 if(typeof ladda_button != "undefined"){
                                                                                     
@@ -538,12 +538,12 @@ trait bfProcessorRendering
                                                         else
                                                         {
                                                                 if(typeof bfUseErrorAlerts == "undefined"){
-                                                                        alert("' . addslashes(BFText::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
+                                                                        alert("' . addslashes(Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
                                                                 } else {
                                                                     if(typeof inlineErrorElements != "undefined"){
-                                                                        inlineErrorElements.push(["bfReCaptchaEntry","' . addslashes(BFText::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '"]);
+                                                                        inlineErrorElements.push(["bfReCaptchaEntry","' . addslashes(Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '"]);
                                                                     }
-                                                                    bfShowErrors("' . addslashes(BFText::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
+                                                                    bfShowErrors("' . addslashes(Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
                                                                 }
 
                                                                 if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
@@ -575,12 +575,12 @@ trait bfProcessorRendering
                                                             if(typeof bfInvisibleRecaptcha == "undefined"){
                                                             
 	                                                            if(typeof bfUseErrorAlerts == "undefined"){
-	                                                                    alert("' . addslashes(BFText::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
+	                                                                    alert("' . addslashes(Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
 	                                                            } else {
 	                                                                if(typeof inlineErrorElements != "undefined"){
-	                                                                    inlineErrorElements.push(["bfReCaptchaEntry","' . addslashes(BFText::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '"]);
+	                                                                    inlineErrorElements.push(["bfReCaptchaEntry","' . addslashes(Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '"]);
 	                                                                }
-	                                                                bfShowErrors("' . addslashes(BFText::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
+	                                                                bfShowErrors("' . addslashes(Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
 	                                                            }
                                                             
                                                             
@@ -942,12 +942,12 @@ trait bfProcessorRendering
                 '        if (pagenav<=4) {' . nl() .
                 '            if (page>1) navi += \'<a href="javascript:ff_dispQueryPage(\'+id+\',1);">\';' . nl() .
                 '            navi += \'&lt;&lt;\';' . nl() .
-                '            if (pagenav<=2) navi += \' ' . BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGESTART') . '\';' . nl() .
+                '            if (pagenav<=2) navi += \' ' . Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGESTART') . '\';' . nl() .
                 '            if (page>1) navi += \'<\/a>\';' . nl() .
                 '            navi += \' \';' . nl() .
                 '            if (page>1) navi += \'<a href="javascript:ff_dispQueryPage(\'+id+\',\'+(page-1)+\');">\';' . nl() .
                 '            navi += \'&lt;\';' . nl() .
-                '            if (pagenav<=2) navi += \' ' . BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV') . '\';' . nl() .
+                '            if (pagenav<=2) navi += \' ' . Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV') . '\';' . nl() .
                 '            if (page>1) navi += \'<\/a>\';' . nl() .
                 '            navi += \' \';' . nl() .
                 '        } // if' . nl() .
@@ -960,12 +960,12 @@ trait bfProcessorRendering
                 '        } // if' . nl() .
                 '        if (pagenav<=4) {' . nl() .
                 '            if (page<lastpage) navi += \'<a href="javascript:ff_dispQueryPage(\'+id+\',\'+(page+1)+\');">\';' . nl() .
-                '            if (pagenav<=2) navi += \'' . BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT') . ' \';' . nl() .
+                '            if (pagenav<=2) navi += \'' . Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT') . ' \';' . nl() .
                 '            navi += \'&gt;\';' . nl() .
                 '            if (page<lastpage) navi += \'<\/a>\';' . nl() .
                 '            navi += \' \';' . nl() .
                 '            if (page<lastpage) navi += \'<a href="javascript:ff_dispQueryPage(\'+id+\',\'+lastpage+\');">\';' . nl() .
-                '            if (pagenav<=2) navi += \'' . BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGEEND') . ' \';' . nl() .
+                '            if (pagenav<=2) navi += \'' . Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEEND') . ' \';' . nl() .
                 '            navi += \'&gt;&gt;\';' . nl() .
                 '            if (page<lastpage) navi += \'<\/a>\';' . nl() .
                 '        } // if' . nl() .
@@ -1882,7 +1882,7 @@ trait bfProcessorRendering
                                             else
                                                 echo indentc(4) . '<th' . $attribs . '></th>' . nlc();
                                         } else
-                                            echo indentc(4) . '<th' . $attribs . '>' . $this->replaceCode($col->title, BFText::_('COM_BREEZINGFORMSNG_PROCESS_QTITLEOF') . " $row->name::$col->name", 'e', $row->id, 2) . '</th>' . nlc();
+                                            echo indentc(4) . '<th' . $attribs . '>' . $this->replaceCode($col->title, Text::_('COM_BREEZINGFORMSNG_PROCESS_QTITLEOF') . " $row->name::$col->name", 'e', $row->id, 2) . '</th>' . nlc();
                                     } // if
                                     unset($col);
                                 } // if
@@ -1996,11 +1996,11 @@ trait bfProcessorRendering
                                 if ($pagenav <= 4)
                                     echo '&lt;&lt; ';
                                 if ($pagenav <= 2)
-                                    echo BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGESTART') . ' ';
+                                    echo Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGESTART') . ' ';
                                 if ($pagenav <= 4)
                                     echo '&lt; ';
                                 if ($pagenav <= 2)
-                                    echo BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV') . ' ';
+                                    echo Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV') . ' ';
                                 echo nlc();
                                 if ($pagenav % 2) {
                                     echo indentc(5);
@@ -2012,11 +2012,11 @@ trait bfProcessorRendering
                                 if ($pagenav <= 4) {
                                     echo indentc(5) . '<a href="javascript:ff_dispQueryPage(' . $row->id . ',2);">';
                                     if ($pagenav <= 2)
-                                        echo BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT') . ' ';
+                                        echo Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT') . ' ';
                                     echo '&gt;</a> ' . nlc();
                                     echo indentc(5) . '<a href="javascript:ff_dispQueryPage(' . $row->id . ',' . $pages . ');">';
                                     if ($pagenav <= 2)
-                                        echo BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGEEND') . ' ';
+                                        echo Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEEND') . ' ';
                                     echo '&gt;&gt;</a>' . nlc();
                                 } // if
                             } // if
@@ -2288,7 +2288,7 @@ trait bfProcessorRendering
                 if (count($rows))
                     echo $this->execPiece(
                         $rows[0]->code,
-                        BFText::_('COM_BREEZINGFORMSNG_PROCESS_AFPIECE') . " " . $rows[0]->name,
+                        Text::_('COM_BREEZINGFORMSNG_PROCESS_AFPIECE') . " " . $rows[0]->name,
                         'p',
                         $this->formrow->piece2id,
                         null
@@ -2297,7 +2297,7 @@ trait bfProcessorRendering
             case 2: // custom code
                 echo $this->execPiece(
                     $this->formrow->piece2code,
-                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_AFPIECEC'),
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_AFPIECEC'),
                     'f',
                     $this->form,
                     2

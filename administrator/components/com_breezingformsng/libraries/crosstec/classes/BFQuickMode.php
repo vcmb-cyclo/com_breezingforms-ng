@@ -561,7 +561,7 @@ function bfTriggerRules() {
 					JQuery("#ff_elem"+id).val( JQuery("#ff_elem"+id).val().substring(0, maxlength) );
 				}
 				if(showMaxlength){
-					JQuery("#bfMaxLengthCounter"+id).text( "(" + (maxlength - JQuery("#ff_elem"+id).val().length) + " ' . BFText::_('COM_BREEZINGFORMSNG_CHARS_LEFT') . ')" );
+					JQuery("#bfMaxLengthCounter"+id).text( "(" + (maxlength - JQuery("#ff_elem"+id).val().length) + " ' . Text::_('COM_BREEZINGFORMSNG_CHARS_LEFT') . ')" );
 				}
 			}
 			function bfRegisterSummarize(id, connectWith, type, emptyMessage, hideIfEmpty){
@@ -1141,7 +1141,7 @@ function bfTriggerRules() {
 
 						$maxlengthCounter = '';
 						if ( $mdata['bfType'] == 'bfTextarea' && isset( $mdata['maxlength'] ) && $mdata['maxlength'] > 0 && isset( $mdata['showMaxlengthCounter'] ) && $mdata['showMaxlengthCounter'] ) {
-							$maxlengthCounter = ' <span class=***bfMaxLengthCounter*** id=***bfMaxLengthCounter' . $mdata['dbId'] . '***>(' . $mdata['maxlength'] . ' ' . BFText::_( 'COM_BREEZINGFORMSNG_CHARS_LEFT' ) . ')</span>';
+							$maxlengthCounter = ' <span class=***bfMaxLengthCounter*** id=***bfMaxLengthCounter' . $mdata['dbId'] . '***>(' . $mdata['maxlength'] . ' ' . Text::_( 'COM_BREEZINGFORMSNG_CHARS_LEFT' ) . ')</span>';
 						}
 
 						/* translatables */
@@ -1641,7 +1641,7 @@ function bfTriggerRules() {
                                                                         url : '" . $base . "index.php',
                                                                         flash_swf_url : '" . $base . "components/com_breezingformsng/libraries/jquery/plupload/Moxie.swf',
                                                                         filters : [
-                                                                                {title : '" . addslashes(BFText::_('COM_BREEZINGFORMSNG_CHOOSE_FILE')) . "', extensions : '" . $exts . "'}
+                                                                                {title : '" . addslashes(Text::_('COM_BREEZINGFORMSNG_CHOOSE_FILE')) . "', extensions : '" . $exts . "'}
                                                                         ]
                                                                 });
                                                                 uploader.bind('FilesAdded', function(up, files) {
@@ -1694,7 +1694,7 @@ function bfTriggerRules() {
                                                                                 );
                                                                                 var thebytes = " . (isset($mdata['flashUploaderBytes']) && is_numeric($mdata['flashUploaderBytes']) && $mdata['flashUploaderBytes'] > 0 ? intval($mdata['flashUploaderBytes']) : '0') . ";
                                                                                 if(thebytes > 0 && typeof files[i].size != 'undefined' && files[i].size > thebytes){
-                                                                                     alert(' " . addslashes(BFText::_('COM_BREEZINGFORMSNG_FLASH_UPLOADER_TOO_LARGE')) . "');
+                                                                                     alert(' " . addslashes(Text::_('COM_BREEZINGFORMSNG_FLASH_UPLOADER_TOO_LARGE')) . "');
                                                                                      error = true;
                                                                                 }
                                                                                 var ext = files[i].name.replace(/[/\\?%*:|\"<>]/g, '').split('.').pop().toLowerCase();
@@ -1706,7 +1706,7 @@ function bfTriggerRules() {
                                                                                     }
                                                                                 }
                                                                                 if(found == 0){
-                                                                                    alert( ' " . addslashes(BFText::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED')) . "' );
+                                                                                    alert( ' " . addslashes(Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED')) . "' );
                                                                                     error = true;
                                                                                 }
                                                                                 if(error){
@@ -2497,7 +2497,7 @@ function bfTriggerRules() {
 			}
 			');
 			echo "<div style=\"visibility:hidden;\" id=\"bfFileQueue\"></div>";
-			echo "<div style=\"visibility:hidden;display:none;\" id=\"bfSubmitMessage\">" . BFText::_('COM_BREEZINGFORMSNG_SUBMIT_MESSAGE') . "</div>";
+			echo "<div style=\"visibility:hidden;display:none;\" id=\"bfSubmitMessage\">" . Text::_('COM_BREEZINGFORMSNG_SUBMIT_MESSAGE') . "</div>";
 		}
 		echo '<noscript>Please turn on javascript to submit your data. Thank you!</noscript>' . "\n";
 		Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('//-->');

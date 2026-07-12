@@ -11,7 +11,6 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Callback;
 
 use BFFile;
 use BFRequest;
-use BFText;
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
@@ -41,7 +40,7 @@ class FlashUploadCallback
                     if (isset($mdata['flashUploaderBytes']) && intval($mdata['flashUploaderBytes']) > 0 && isset($mdata['bfName']) && trim($mdata['bfName']) == trim(BFRequest::getVar('itemName', ''))) {
                         if (file_exists($finaltargetFile) && @filesize($finaltargetFile) > intval($mdata['flashUploaderBytes'])) {
                             @File::delete($finaltargetFile);
-                            echo trim($mdata['label']) . ': ' . BFText::_('COM_BREEZINGFORMSNG_FLASH_UPLOADER_TOO_LARGE');
+                            echo trim($mdata['label']) . ': ' . Text::_('COM_BREEZINGFORMSNG_FLASH_UPLOADER_TOO_LARGE');
                             exit;
                         }
                         break;

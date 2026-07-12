@@ -82,7 +82,7 @@ trait bfProcessorUploads
 
         if (!file_exists($baseDir)) {
             $this->status = _FF_STATUS_UPLOAD_FAILED;
-            $this->message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_DIRNOTEXISTS');
+            $this->message = Text::_('COM_BREEZINGFORMSNG_PROCESS_DIRNOTEXISTS');
             return '';
         } // if
 
@@ -122,7 +122,7 @@ trait bfProcessorUploads
             //if ($timestamp) $path .= '.'.date('YmdHis');
             if (file_exists($path)) {
                 $this->status = _FF_STATUS_UPLOAD_FAILED;
-                $this->message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FILEEXISTS');
+                $this->message = Text::_('COM_BREEZINGFORMSNG_PROCESS_FILEEXISTS');
                 return '';
             }
         } else if (file_exists($path) && !$this->app->getSession()->get('bfFileUploadOverride', true)) {
@@ -131,7 +131,7 @@ trait bfProcessorUploads
 
         if (!move_uploaded_file($filename, $path)) {
             $this->status = _FF_STATUS_UPLOAD_FAILED;
-            $this->message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FILEMOVEFAILED');
+            $this->message = Text::_('COM_BREEZINGFORMSNG_PROCESS_FILEMOVEFAILED');
             return '';
         } // if
 
@@ -144,7 +144,7 @@ trait bfProcessorUploads
         if (isset($filemode)) {
             if (!@chmod($path, $filemode)) {
                 $this->status = _FF_STATUS_UPLOAD_FAILED;
-                $this->message = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FILECHMODFAILED');
+                $this->message = Text::_('COM_BREEZINGFORMSNG_PROCESS_FILECHMODFAILED');
                 return '';
             } // if
         } // if

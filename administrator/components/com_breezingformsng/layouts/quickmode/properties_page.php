@@ -8,18 +8,19 @@
 defined('_JEXEC') or die;
 
 use Joomla\CMS\HTML\Helpers\Bootstrap;
+use Joomla\CMS\Language\Text;
 ?>
                                     <div class="bfProperties" id="bfPageProperties" style="display:none">
                                         <br />
                                         <fieldset>
                                             <legend>
-                                                <?php echo BFText::_('COM_BREEZINGFORMSNG_PAGE_PROPERTIES'); ?>
+                                                <?php echo Text::_('COM_BREEZINGFORMSNG_PAGE_PROPERTIES'); ?>
                                             </legend>
                                             <div class="bfPropertyWrap">
                                                 <label class="bfPropertyLabel hasTooltip"
-                                                    title="<?php echo bf_tooltipText(BFText::_('COM_BREEZINGFORMSNG_QM_PAGE_INTRO')); ?>"
+                                                    title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_PAGE_INTRO')); ?>"
                                                     for="bfPageIntro">
-                                                    <?php echo BFText::_('COM_BREEZINGFORMSNG_PAGE_INTRO'); ?>
+                                                    <?php echo Text::_('COM_BREEZINGFORMSNG_PAGE_INTRO'); ?>
                                                 </label>
 
                                                 <?php
@@ -35,16 +36,16 @@ use Joomla\CMS\HTML\Helpers\Bootstrap;
 
                                                 <a href="javascript:jQuery('#bfPropertiesIntroModal').modal('show');void(0);"
                                                     data-toggle="modal">
-                                                    <?php echo BFText::_('COM_BREEZINGFORMSNG_EDIT_INTRO'); ?>
+                                                    <?php echo Text::_('COM_BREEZINGFORMSNG_EDIT_INTRO'); ?>
                                                 </a>
 
                                             </div>
 
                                             <div class="bfPropertyWrap bfTrans">
                                                 <label class="bfPropertyLabel hasTooltip"
-                                                    title="<?php echo bf_tooltipText(BFText::_('COM_BREEZINGFORMSNG_QM_PAGE_INTRO')); ?>"
+                                                    title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_PAGE_INTRO')); ?>"
                                                     for="bfPageIntroTrans">
-                                                    <?php echo BFText::_('COM_BREEZINGFORMSNG_PAGE_INTRO'); ?>
+                                                    <?php echo Text::_('COM_BREEZINGFORMSNG_PAGE_INTRO'); ?>
                                                     <br /><em>(
                                                         <?php echo $active_language_code ?>)
                                                     </em>
@@ -64,7 +65,7 @@ use Joomla\CMS\HTML\Helpers\Bootstrap;
 
                                                 <a href="javascript:jQuery('#bfPropertiesIntroModal2').modal('show');void(0);"
                                                     data-toggle="modal">
-                                                    <?php echo BFText::_('COM_BREEZINGFORMSNG_EDIT_INTRO'); ?>
+                                                    <?php echo Text::_('COM_BREEZINGFORMSNG_EDIT_INTRO'); ?>
                                                 </a>
 
                                             </div>

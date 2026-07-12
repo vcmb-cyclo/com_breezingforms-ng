@@ -10,7 +10,6 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Callback;
 \defined('_JEXEC') or die;
 
 use BFRequest;
-use BFText;
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
@@ -204,7 +203,7 @@ class PayPalCallback
     $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote(BFRequest::getInt('form_id', -1)));
     $list = $db->loadObjectList();
     if (count($list) == 0) {
-        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
+        BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
         exit;
     }
 
@@ -212,7 +211,7 @@ class PayPalCallback
 
     $areas = json_decode($form->template_areas, true);
     if (!is_array($areas)) {
-        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYPAL_DATA'));
+        BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYPAL_DATA'));
         exit;
     }
 
@@ -338,7 +337,7 @@ class PayPalCallback
                                     if ($options['thankYouPage'] != '') {
                                         BFRedirect($options['thankYouPage']);
                                     } else {
-                                        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_PAYING_WITH_PAYPAL'));
+                                        BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_PAYING_WITH_PAYPAL'));
                                     }
                                 }
 
@@ -355,7 +354,7 @@ class PayPalCallback
                                         if ($options['thankYouPage'] != '') {
                                             BFRedirect($options['thankYouPage']);
                                         } else {
-                                            BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_PAYING_WITH_PAYPAL'));
+                                            BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_PAYING_WITH_PAYPAL'));
                                         }
                                     } else {
                                         $success = false;
@@ -400,7 +399,7 @@ class PayPalCallback
     $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote(BFRequest::getInt('form', -1)));
     $list = $db->loadObjectList();
     if (count($list) == 0) {
-        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
+        BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
         exit;
     }
 
@@ -408,7 +407,7 @@ class PayPalCallback
 
     $areas = json_decode($form->template_areas, true);
     if (!is_array($areas)) {
-        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYPAL_DATA'));
+        BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYPAL_DATA'));
     }
 
     foreach ($areas as $area) {
@@ -458,21 +457,21 @@ class PayPalCallback
                             $db->execute();
 
                             if (!file_exists($file)) {
-                                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_DOWNLOAD_FILE'));
+                                BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_DOWNLOAD_FILE'));
                             }
 
                             \Vcmb\Component\BreezingformsNG\Site\Service\Support\DownloadHelper::stream($file);
                         } else {
 
-                            BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_MAX_DOWNLOAD_TRIES_REACHED'));
+                            BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_MAX_DOWNLOAD_TRIES_REACHED'));
                         }
                     } else {
 
-                        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_DOWNLOAD_NOT_POSSIBLE'));
+                        BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_DOWNLOAD_NOT_POSSIBLE'));
                     }
                 } else {
 
-                    BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_NO_DOWNLOADABLE_PRODUCT'));
+                    BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_NO_DOWNLOADABLE_PRODUCT'));
                 }
 
                 break;
@@ -498,7 +497,7 @@ class PayPalCallback
 <head>' . $style . '</head>
 <div class="payPalConnectMsg">
 <div class="paymentConnectMsg">
-' . BFText::_('COM_BREEZINGFORMSNG_PLEASE_WAIT_REQUEST') . '
+' . Text::_('COM_BREEZINGFORMSNG_PLEASE_WAIT_REQUEST') . '
 </div>
 </div>
 </body>';

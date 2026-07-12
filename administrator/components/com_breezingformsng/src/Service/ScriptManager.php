@@ -17,7 +17,6 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Service;
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use BFRequest;
-use BFText;
 use facileFormsScripts;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Factory;
@@ -25,6 +24,7 @@ use Joomla\Database\DatabaseInterface;
 use RuntimeException;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\ScriptModel;
 use Vcmb\Component\BreezingformsNG\Administrator\View\Scripts\Renderer;
+use Joomla\CMS\Language\Text;
 
 class ScriptManager
 {
@@ -33,12 +33,12 @@ class ScriptManager
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
 		ArrayHelper::toInteger($ids);
 		$typelist = array();
-		$typelist[] = array('Untyped', BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_UNTYPED'));
-		$typelist[] = array('Element Init', BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_ELEMENTINIT'));
-		$typelist[] = array('Element Action', BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_ELEMENTACTION'));
-		$typelist[] = array('Element Validation', BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_ELEMENTVALID'));
-		$typelist[] = array('Form Init', BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_FORMINIT'));
-		$typelist[] = array('Form Submitted', BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_FORMSUBMIT'));
+		$typelist[] = array('Untyped', Text::_('COM_BREEZINGFORMSNG_SCRIPTS_UNTYPED'));
+		$typelist[] = array('Element Init', Text::_('COM_BREEZINGFORMSNG_SCRIPTS_ELEMENTINIT'));
+		$typelist[] = array('Element Action', Text::_('COM_BREEZINGFORMSNG_SCRIPTS_ELEMENTACTION'));
+		$typelist[] = array('Element Validation', Text::_('COM_BREEZINGFORMSNG_SCRIPTS_ELEMENTVALID'));
+		$typelist[] = array('Form Init', Text::_('COM_BREEZINGFORMSNG_SCRIPTS_FORMINIT'));
+		$typelist[] = array('Form Submitted', Text::_('COM_BREEZINGFORMSNG_SCRIPTS_FORMSUBMIT'));
 		$row = new facileFormsScripts($database);
 		if (count($ids)) {
 			$row->load($ids[0]);
@@ -100,7 +100,7 @@ class ScriptManager
 			Factory::getApplication()->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 		}
 
-		$app->enqueueMessage(BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_SAVED'));
+		$app->enqueueMessage(Text::_('COM_BREEZINGFORMSNG_SCRIPTS_SAVED'));
 		$app->redirect("index.php?option=$option&task=scripts.edit&pkg=$pkg&ids[]=" . (int) $row->id);
 	}
 
@@ -124,7 +124,7 @@ class ScriptManager
 			$row->modified_by = $row->created_by;
 			$row->store();
 		} // foreach
-		$msg = $total . ' ' . BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_SUCCOPIED');
+		$msg = $total . ' ' . Text::_('COM_BREEZINGFORMSNG_SCRIPTS_SUCCOPIED');
 		Factory::getApplication()->enqueueMessage($msg);
 		Factory::getApplication()->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 	} // copy
@@ -142,7 +142,7 @@ class ScriptManager
 
 		if ($total) {
 			Factory::getApplication()->enqueueMessage(
-				$total . ' ' . BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_SUCCDELETED'),
+				$total . ' ' . Text::_('COM_BREEZINGFORMSNG_SCRIPTS_SUCCDELETED'),
 				'message'
 			);
 		}

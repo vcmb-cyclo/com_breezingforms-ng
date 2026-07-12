@@ -10,7 +10,6 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Callback;
 \defined('_JEXEC') or die;
 
 use BFRequest;
-use BFText;
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
@@ -37,7 +36,7 @@ class StripeCallback
     $list = $db->loadObjectList();
 
     if (count($list) == 0) {
-        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
+        BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
         exit;
     }
 
@@ -46,7 +45,7 @@ class StripeCallback
     $areas = json_decode($form->template_areas, true);
 
     if (!is_array($areas)) {
-        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_STRIPE_DATA'));
+        BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_STRIPE_DATA'));
         exit;
     }
 
@@ -85,7 +84,7 @@ class StripeCallback
 
                         /* XDA if( Factory::getApplication()->getSession()->get('bf_stripe_last_payment_amount'.$record_id, null) == null ){
 
-            BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_STRIPE_AMOUNT'));
+            BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_STRIPE_AMOUNT'));
             exit;
                                 } XDA */
 
@@ -189,7 +188,7 @@ class StripeCallback
                             if ($options['thankYouPage'] != '') {
                                 BFRedirect($options['thankYouPage']);
                             } else {
-                                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_PAYING_WITH_STRIPE'));
+                                BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_PAYING_WITH_STRIPE'));
                             }
                         }
                     }
@@ -219,7 +218,7 @@ class StripeCallback
     $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote(BFRequest::getInt('form', -1)));
     $list = $db->loadObjectList();
     if (count($list) == 0) {
-        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
+        BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
         exit;
     }
 
@@ -227,7 +226,7 @@ class StripeCallback
 
     $areas = json_decode($form->template_areas, true);
     if (!is_array($areas)) {
-        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYMENT_DATA'));
+        BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYMENT_DATA'));
     }
 
     foreach ($areas as $area) {
@@ -269,21 +268,21 @@ class StripeCallback
                             $db->execute();
 
                             if (!file_exists($file)) {
-                                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_DOWNLOAD_FILE'));
+                                BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_DOWNLOAD_FILE'));
                             }
 
                             \Vcmb\Component\BreezingformsNG\Site\Service\Support\DownloadHelper::stream($file);
                         } else {
 
-                            BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_MAX_DOWNLOAD_TRIES_REACHED'));
+                            BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_MAX_DOWNLOAD_TRIES_REACHED'));
                         }
                     } else {
 
-                        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_DOWNLOAD_NOT_POSSIBLE'));
+                        BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_DOWNLOAD_NOT_POSSIBLE'));
                     }
                 } else {
 
-                    BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_NO_DOWNLOADABLE_PRODUCT'));
+                    BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_NO_DOWNLOADABLE_PRODUCT'));
                 }
 
                 break;

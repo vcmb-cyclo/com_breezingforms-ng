@@ -100,7 +100,7 @@ trait bfProcessorScripting
     {
         $name = null;
         $code = $this->getPieceById($id, $name);
-        return $this->execPiece($code, BFText::_('COM_BREEZINGFORMSNG_PROCESS_PIECE') . " $name", 'p', $id, null);
+        return $this->execPiece($code, Text::_('COM_BREEZINGFORMSNG_PROCESS_PIECE') . " $name", 'p', $id, null);
     }
 
     // execPieceById
@@ -109,7 +109,7 @@ trait bfProcessorScripting
     {
         $id = null;
         $code = $this->getPieceByName($name, $id);
-        return $this->execPiece($code, BFText::_('COM_BREEZINGFORMSNG_PROCESS_PIECE') . " $name", 'p', $id, null);
+        return $this->execPiece($code, Text::_('COM_BREEZINGFORMSNG_PROCESS_PIECE') . " $name", 'p', $id, null);
     }
 
     // execPieceByName
@@ -176,7 +176,7 @@ trait bfProcessorScripting
                     if (
                         $this->prepareEvalCode(
                             $coldef->comp[$c][1],
-                            BFText::_('COM_BREEZINGFORMSNG_PROCESS_QVALUEOF') . " " . $elem->name . "::" . $coldef->name,
+                            Text::_('COM_BREEZINGFORMSNG_PROCESS_QVALUEOF') . " " . $elem->name . "::" . $coldef->name,
                             'e',
                             $elem->id,
                             2
@@ -195,7 +195,7 @@ trait bfProcessorScripting
 
     function execQueryValue($code, &$elem, &$row, &$coldef, $value)
     {
-        $this->traceEval(BFText::_('COM_BREEZINGFORMSNG_PROCESS_QVALUEOF') . " " . $elem->name . "::" . $coldef->name);
+        $this->traceEval(Text::_('COM_BREEZINGFORMSNG_PROCESS_QVALUEOF') . " " . $elem->name . "::" . $coldef->name);
         try {
             return eval($code);
         } catch (Error $e) {
@@ -212,9 +212,9 @@ trait bfProcessorScripting
     {
         $ret = null;
         $code = $elem->data2;
-        if ($this->prepareEvalCode($code, BFText::_('COM_BREEZINGFORMSNG_PROCESS_QPIECEOF') . " " . $elem->name, 'e', $elem->id, 1)) {
+        if ($this->prepareEvalCode($code, Text::_('COM_BREEZINGFORMSNG_PROCESS_QPIECEOF') . " " . $elem->name, 'e', $elem->id, 1)) {
             $rows = array();
-            $this->traceEval(BFText::_('COM_BREEZINGFORMSNG_PROCESS_QPIECEOF') . " " . $elem->name);
+            $this->traceEval(Text::_('COM_BREEZINGFORMSNG_PROCESS_QPIECEOF') . " " . $elem->name);
 
             try {
                 eval($code);
@@ -918,10 +918,10 @@ trait bfProcessorScripting
             // emit the code
             if ($ff_config->compress)
                 echo $this->compressJavascript(
-                    $this->replaceCode($code, BFText::_('COM_BREEZINGFORMSNG_PROCESS_SCRIPT') . " $func", $type, $id, $pane)
+                    $this->replaceCode($code, Text::_('COM_BREEZINGFORMSNG_PROCESS_SCRIPT') . " $func", $type, $id, $pane)
                 );
             else
-                echo $this->replaceCode($code, BFText::_('COM_BREEZINGFORMSNG_PROCESS_SCRIPT') . " $func", $type, $id, $pane) . nl() . nl();
+                echo $this->replaceCode($code, Text::_('COM_BREEZINGFORMSNG_PROCESS_SCRIPT') . " $func", $type, $id, $pane) . nl() . nl();
         } // if
     }
 

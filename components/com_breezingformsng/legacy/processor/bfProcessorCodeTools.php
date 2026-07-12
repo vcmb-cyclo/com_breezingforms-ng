@@ -176,9 +176,9 @@ trait bfProcessorCodeTools
         } // if
         // not supported types
         if (is_resource($mixed))
-            return $indent . "'" . BFText::_('COM_BREEZINGFORMSNG_PROCESS_RESOURCE') . "'";
+            return $indent . "'" . Text::_('COM_BREEZINGFORMSNG_PROCESS_RESOURCE') . "'";
 
-        return $indent . "'" . BFText::_('COM_BREEZINGFORMSNG_PROCESS_UNKNOWN') . "'";
+        return $indent . "'" . Text::_('COM_BREEZINGFORMSNG_PROCESS_UNKNOWN') . "'";
     }
 
     // expJsValue

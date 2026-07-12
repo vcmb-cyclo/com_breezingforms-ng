@@ -1501,7 +1501,7 @@ class com_breezingformsngInstallerScript
                 ];
 
                 if (!$menu->bind($data) || !$menu->check() || !$menu->store()) {
-                    $this->log('Unable to ensure BFNG admin submenu entry ' . $title . ': ' . $menu->getError(), Log::WARNING);
+                    $this->log('Unable to ensure BFNG admin submenu entry ' . $title . '.', Log::WARNING);
                     continue;
                 }
 

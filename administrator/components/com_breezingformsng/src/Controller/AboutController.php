@@ -14,6 +14,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\CMS\Router\Route;
 use Joomla\Database\DatabaseInterface;
+use Vcmb\Component\BreezingformsNG\Administrator\Service\DatabaseAuditService;
 
 class AboutController extends BaseController
 {
@@ -90,34 +91,17 @@ class AboutController extends BaseController
         try {
             $this->getAuthorizedApplication();
 
-            $scannedTables = 0;
-            $missingTables = 0;
-            $totalRows = 0;
-            $nonUtf8Tables = 0;
+            $report = (new DatabaseAuditService($this->getDatabase()))->run();
+            $summary = (array) ($report['summary'] ?? []);
+            Factory::getApplication()->setUserState('com_breezingformsng.about.audit', $report);
 
-            foreach (self::CONFIGURATION_TABLES as $table) {
-                if (!$this->tableExists($table)) {
-                    $missingTables++;
-                    continue;
-                }
-
-                $scannedTables++;
-                $totalRows += $this->countRows($table);
-
-                $status = $this->getTableStatus($table);
-                $collation = strtolower((string) ($status->Collation ?? ''));
-
-                if ($collation !== '' && $collation !== 'utf8mb4_unicode_ci') {
-                    $nonUtf8Tables++;
-                }
-            }
-
-            if ($missingTables === 0 && $nonUtf8Tables === 0) {
-                $this->setMessage(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_SUMMARY_CLEAN', $scannedTables, $totalRows), 'message');
+            if ((int) ($summary['issues_total'] ?? 0) === 0) {
+                $this->setMessage(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_SUMMARY_CLEAN', $summary['scanned_tables'], $summary['total_rows']), 'message');
             } else {
-                $this->setMessage(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_SUMMARY_ISSUES', $missingTables, $nonUtf8Tables, $scannedTables), 'warning');
+                $this->setMessage(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_SUMMARY_ISSUES', $summary['issues_total'], $summary['scanned_tables']), 'warning');
             }
         } catch (\Throwable $exception) {
+            Factory::getApplication()->setUserState('com_breezingformsng.about.audit', []);
             $this->setMessage(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_FAILED', $exception->getMessage()), 'error');
         }
 
@@ -221,22 +205,6 @@ class AboutController extends BaseController
         $db = $this->getDatabase();
 
         return in_array($db->getPrefix() . $table, $db->getTableList(), true);
-    }
-
-    private function countRows(string $table): int
-    {
-        $db = $this->getDatabase();
-        $db->setQuery('SELECT COUNT(*) FROM ' . $db->quoteName('#__' . $table));
-
-        return (int) $db->loadResult();
-    }
-
-    private function getTableStatus(string $table): object
-    {
-        $db = $this->getDatabase();
-        $db->setQuery('SHOW TABLE STATUS LIKE ' . $db->quote($db->getPrefix() . $table));
-
-        return (object) ($db->loadObject() ?: []);
     }
 
     private function readAboutLogReport(): array

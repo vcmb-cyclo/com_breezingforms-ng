@@ -21,6 +21,7 @@ use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 use RuntimeException;
+use Throwable;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\ScriptModel;
 use Vcmb\Component\BreezingformsNG\Administrator\View\Scripts\Renderer;
 use Joomla\CMS\Language\Text;
@@ -69,34 +70,37 @@ class ScriptManager
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
 		$row      = new facileFormsScripts($database);
 
-		// bind du reste
-		if (!$row->bind($_POST)) {
-			Factory::getApplication()->enqueueMessage($row->getError(), 'error');
-			Factory::getApplication()->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
-		}
-
-		// Forcer code non filtré
-		$row->code = $code;
-		$row->unit_tests = $unitTests;
-
-		$now = (new \Joomla\CMS\Date\Date())->toSql();
-		$userId = (string) Factory::getApplication()->getIdentity()->username;
-
-		if (empty($row->id)) {
-			if (empty($row->created)) {
-				$row->created = $now;
+		try {
+			if (!$row->bind($_POST)) {
+				throw new RuntimeException(Text::_('COM_BREEZINGFORMSNG_SCRIPTS_SAVE_FAILED'));
 			}
-			if (empty($row->created_by)) {
-				$row->created_by = $userId;
+
+			// Forcer code non filtré
+			$row->code = $code;
+			$row->unit_tests = $unitTests;
+
+			$now = (new \Joomla\CMS\Date\Date())->toSql();
+			$userId = (string) Factory::getApplication()->getIdentity()->username;
+
+			if (empty($row->id)) {
+				if (empty($row->created)) {
+					$row->created = $now;
+				}
+				if (empty($row->created_by)) {
+					$row->created_by = $userId;
+				}
 			}
-		}
 
-		$row->modified = $now;
-		$row->modified_by = $userId;
+			$row->modified = $now;
+			$row->modified_by = $userId;
 
-		if (!$row->store()) {
-			Factory::getApplication()->enqueueMessage($row->getError(), 'error');
-			Factory::getApplication()->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
+			if (!$row->store()) {
+				throw new RuntimeException(Text::_('COM_BREEZINGFORMSNG_SCRIPTS_SAVE_FAILED'));
+			}
+		} catch (Throwable $exception) {
+			$app->enqueueMessage($exception->getMessage(), 'error');
+			$app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
+			return;
 		}
 
 		$app->enqueueMessage(Text::_('COM_BREEZINGFORMSNG_SCRIPTS_SAVED'));

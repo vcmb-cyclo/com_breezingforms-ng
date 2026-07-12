@@ -241,7 +241,7 @@ if (!function_exists('bf_about_get_javascript_libraries')) {
     {
         $notAvailable = Text::_('COM_BREEZINGFORMSNG_NOT_AVAILABLE');
         $bundledSource = Text::_('COM_BREEZINGFORMSNG_JS_LIBRARY_SOURCE_BUNDLED');
-        $basePath = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/administrator/libraries/jquery/';
+        $basePath = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/jquery/';
         $libraries = array();
 
         $candidates = array(
@@ -302,6 +302,16 @@ $versionInformation = bf_about_get_version_information();
 $phpLibraries = bf_about_get_php_libraries();
 $javascriptLibraries = bf_about_get_javascript_libraries();
 $logReport = is_array($this->logReport ?? null) ? $this->logReport : array();
+$auditReport = is_array($this->auditReport ?? null) ? $this->auditReport : array();
+$auditSummary = (array) ($auditReport['summary'] ?? array());
+$auditTables = (array) ($auditReport['tables'] ?? array());
+$auditMissingTables = (array) ($auditReport['missing_tables'] ?? array());
+$auditCollationIssues = (array) ($auditReport['collation_issues'] ?? array());
+$auditDuplicateIndexes = (array) ($auditReport['duplicate_indexes'] ?? array());
+$auditOrphanChecks = array_values(array_filter(
+    (array) ($auditReport['orphan_checks'] ?? array()),
+    static fn(array $check): bool => (int) ($check['count'] ?? 0) > 0
+));
 $notAvailable = Text::_('COM_BREEZINGFORMSNG_NOT_AVAILABLE');
 
 $versionValue = $versionInformation['version'] !== '' ? $versionInformation['version'] : $notAvailable;
@@ -375,6 +385,104 @@ $aboutDescription = str_replace(
             </div>
         </div>
     </div>
+
+    <?php if ($auditReport !== array()) : ?>
+        <div class="card mt-3" id="bf-audit-section">
+            <div class="card-body p-3 p-lg-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                    <h3 class="h5 mb-0"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_REPORT_TITLE'); ?></h3>
+                    <span class="text-muted small">
+                        <?php echo Text::sprintf(
+                            'COM_BREEZINGFORMSNG_ABOUT_AUDIT_GENERATED_AT',
+                            htmlspecialchars((string) ($auditReport['generated_at'] ?? $notAvailable), ENT_QUOTES, 'UTF-8')
+                        ); ?>
+                    </span>
+                </div>
+
+                <?php if ((int) ($auditSummary['issues_total'] ?? 0) === 0) : ?>
+                    <div class="alert alert-success bf-audit-ok-alert">
+                        <?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_REPORT_CLEAN'); ?>
+                    </div>
+                <?php else : ?>
+                    <div class="alert alert-warning bf-audit-warning-alert">
+                        <?php echo Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_REPORT_ISSUES', (int) ($auditSummary['issues_total'] ?? 0)); ?>
+                    </div>
+                <?php endif; ?>
+
+                <dl class="row mb-3">
+                    <dt class="col-sm-4"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_TABLES'); ?></dt>
+                    <dd class="col-sm-8"><?php echo (int) ($auditSummary['scanned_tables'] ?? 0); ?> / <?php echo (int) ($auditSummary['expected_tables'] ?? 0); ?></dd>
+                    <dt class="col-sm-4"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_ROWS'); ?></dt>
+                    <dd class="col-sm-8"><?php echo number_format((int) ($auditSummary['total_rows'] ?? 0), 0, '.', ' '); ?></dd>
+                    <dt class="col-sm-4"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_ORPHANS'); ?></dt>
+                    <dd class="col-sm-8"><?php echo (int) ($auditSummary['orphan_rows'] ?? 0); ?></dd>
+                </dl>
+
+                <?php if ($auditMissingTables !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_MISSING_TABLES'); ?></h4>
+                        <ul class="mb-0">
+                            <?php foreach ($auditMissingTables as $table) : ?>
+                                <li><code><?php echo htmlspecialchars((string) $table, ENT_QUOTES, 'UTF-8'); ?></code></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($auditCollationIssues !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_COLLATIONS'); ?></h4>
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead><tr><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_TABLE'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_CURRENT'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_EXPECTED'); ?></th></tr></thead>
+                                <tbody>
+                                <?php foreach ($auditCollationIssues as $issue) : ?>
+                                    <tr class="table-warning"><td><code><?php echo htmlspecialchars((string) ($issue['table'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code></td><td><?php echo htmlspecialchars((string) ($issue['collation'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td><td><?php echo htmlspecialchars((string) ($issue['expected'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td></tr>
+                                <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($auditDuplicateIndexes !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_INDEXES'); ?></h4>
+                        <ul class="mb-0">
+                            <?php foreach ($auditDuplicateIndexes as $issue) : ?>
+                                <li><code><?php echo htmlspecialchars((string) ($issue['table'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code>: <?php echo htmlspecialchars(implode(', ', (array) ($issue['indexes'] ?? array())), ENT_QUOTES, 'UTF-8'); ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($auditOrphanChecks !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_ORPHAN_REFERENCES'); ?></h4>
+                        <ul class="mb-0">
+                            <?php foreach ($auditOrphanChecks as $check) : ?>
+                                <li><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_' . strtoupper((string) ($check['id'] ?? ''))); ?>: <strong><?php echo (int) ($check['count'] ?? 0); ?></strong></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <div class="bf-audit-section-block">
+                    <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_TABLE_INVENTORY'); ?></h4>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped align-middle mb-0">
+                            <thead><tr><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_TABLE'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_ROWS'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_ENGINE'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_COLLATION'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_SIZE'); ?></th></tr></thead>
+                            <tbody>
+                            <?php foreach ($auditTables as $table) : ?>
+                                <tr><td><code><?php echo htmlspecialchars((string) ($table['table'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code></td><td><?php echo number_format((int) ($table['rows'] ?? 0), 0, '.', ' '); ?></td><td><?php echo htmlspecialchars((string) ($table['engine'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td><td><?php echo htmlspecialchars((string) ($table['collation'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td><td><?php echo HTMLHelper::_('number.bytes', (int) ($table['size_bytes'] ?? 0)); ?></td></tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
 
     <div class="card mt-3 bf-about-version-card">
         <div class="card-body p-3 p-lg-4">

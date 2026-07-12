@@ -84,7 +84,7 @@ trait bfProcessorExports
         if (!is_object($cbResult['form'])) {
             if (!$record->store()) {
                 $this->status = _FF_STATUS_SAVERECORD_FAILED;
-                $this->message = $record->getError();
+                $this->message = Text::_('COM_BREEZINGFORMSNG_PROCESS_SAVERECFAILED');
                 return;
             } // if
 
@@ -209,7 +209,7 @@ trait bfProcessorExports
                     if (!isset($isset[$data[_FF_DATA_ID]])) {
                         if (!$subrecord->store()) {
                             $this->status = _FF_STATUS_SAVESUBRECORD_FAILED;
-                            $this->message = $subrecord->getError();
+                            $this->message = Text::_('COM_BREEZINGFORMSNG_PROCESS_SAVESUBFAILED');
                             return;
                         }
                     }

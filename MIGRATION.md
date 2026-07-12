@@ -35,6 +35,12 @@
 - [x] SDK PHP externes historiques → `RemoteApiClient` Joomla natif (2026-07-12 — reCAPTCHA, Mailchimp API v3, Dropbox API v2 et Salesforce login SOAP/API REST ; anciens SDK embarqués supprimés)
 - [x] Stripe PHP `17.6.0` → `20.3.1` (2026-07-12 — classes utilisées et package Joomla 6 vérifiés)
 - [x] PDF : TCPDF maintenu en `6.11.3` tant que PHP 8.1 reste supporté ; `tc-lib-pdf 8.x` exige PHP 8.2 minimum
+- [x] Audit About enrichi depuis les concepts CBNG (2026-07-12) : rapport persistant sur un affichage, inventaire des
+  14 tables BFNG, volumes et tailles, tables manquantes, collations, index dupliqués et références orphelines ;
+  aucune réparation destructive automatique.
+- [x] API Joomla dépréciées (2026-07-12) : `Application::getCfg()` remplacé par `get()`, `Table::getInstance()`
+  remplacé par la `MVCFactory` native de `com_content`, et `LegacyErrorHandlingTrait::getError()` remplacé par
+  des exceptions ou des messages traduits. Les six classes Crosstec protégées restent inchangées.
 
 ---
 
@@ -370,6 +376,11 @@
 portent de la logique métier et des effets de bord qui doivent être réécrits, pas simplement déplacés.
 Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 
+> **Contrainte confirmée par l'utilisateur le 2026-07-12** : ne pas modifier, déplacer, renommer ni supprimer
+> `BFRequest.php`, `BFIntegrate.php`, `BFQuickMode.php`, `BFQuickModeBootstrap.php`, `BFQuickModeMobile.php` et
+> `BFQuickModeOnePage.php`, ni retirer leurs chargements. Ces six classes forment une API consommée par une
+> bibliothèque externe qui n'est pas visible par l'audit du seul dépôt.
+
 ### 9a. `BFRequest` → `Input` Joomla natif
 
 > **Avancement (2026-07-12)** : les 6 services `Site\Service\Callback\*` sont convertis (127 appels de lecture
@@ -545,9 +556,10 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 - [ ] Chaque service qui remplace un fichier crosstec repasse les scénarios déjà validés dans ce document :
   rendu de formulaire (tous thèmes QuickMode), soumission SEF, callbacks de paiement (Stripe/PayPal/Sofort),
   upload, `commit()` Intégrateur — sans régression.
-- [ ] `grep -rl "BFRequest\|BFIntegrate\|BFQuickMode" --include="*.php" .` ne retourne plus rien.
-- [ ] Suppression des 6 fichiers `libraries/crosstec/classes/BF{Request,Integrate,QuickMode,QuickModeBootstrap,QuickModeMobile,QuickModeOnePage}.php`
-  et du répertoire `libraries/crosstec/` s'il devient vide.
+- [ ] Les appels internes et la bibliothèque externe continuent de fonctionner avec l'API publique conservée de
+  `BFRequest`, `BFIntegrate` et `BFQuickMode*`.
+- [x] Conservation obligatoire des 6 fichiers `libraries/crosstec/classes/BF{Request,Integrate,QuickMode,QuickModeBootstrap,QuickModeMobile,QuickModeOnePage}.php`
+  et de leurs chargements : API utilisée par une bibliothèque externe.
 
 ---
 

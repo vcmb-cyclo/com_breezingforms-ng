@@ -30,7 +30,8 @@
 - [x] Import paquets (`admin/import.class.php` → `src/Model/ImportModel.php`, SimpleXML + transactions ; bibliothèques scripts/pièces uniquement, les paquets contenant formulaires/menus sont refusés ; export de paquets abandonné avec l'UI legacy)
 - [x] Frontend moteur formulaires — dispatcher, config, routeur SEF et `HTML_facileFormsProcessor` (8 907 lignes) décomposés en services/traits Joomla 6 (Phase 8)
 - [x] `BFRequest` → `Input` Joomla natif (Phase 9a, 326 appels convertis ; ne reste que dans les 4 rendus `BFQuickMode*`, cf. Phase 9c)
-- [ ] Réécriture native des dernières classes crosstec du moteur : `BFIntegrate`, rendus `BFQuickMode*` (Phase 9b/9c — chantier de fond, voir détail en bas de document)
+- [x] Rendus `BFQuickMode*` — migration `BFRequest` (Phase 9c, 33 appels convertis ; la réécriture native complète du rendu reste un chantier séparé, hors périmètre `BFRequest`)
+- [ ] `BFIntegrate` → service typé (Phase 9b — chantier de fond, voir détail en bas de document)
 
 ---
 
@@ -414,6 +415,28 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > au sens strict : Stripe/PayPal/Sofort restent à confirmer avec un vrai paiement de test (accès sandbox non
 > disponible dans cette session). **Prochaine étape : Phase 9c** (les 4 rendus `BFQuickMode*`, 11 097 lignes
 > cumulées, le poste le plus lourd — commencer par `BFQuickMode.php`, le plus petit, comme preuve de concept).
+>
+> **Phase 9c terminée (2026-07-12)** — et avec elle, la totalité de la Phase 9a/9c (`BFRequest`). Les 4 rendus
+> se sont révélés beaucoup plus simples que redouté sur ce point précis : seulement 8+9+9+7 = 33 appels au total
+> (à comparer aux 11 097 lignes cumulées des fichiers), tous des lectures pures des mêmes quatre clés
+> (`ff_applic`, `ff_form_submitted`, `ff_page`, `lang`), sans aucun `setVar()` nulle part dans le dépôt. Convertis
+> avec le même patron que le reste de la Phase 9a. **`grep -rn "BFRequest::" --include="*.php"` hors du fichier de
+> définition de la classe elle-même ne retourne plus qu'un commentaire explicatif** (aucun appel fonctionnel
+> restant). Vérifié : `php -l` propre sur les 3 derniers fichiers ; quatre formulaires réels différents (contact,
+> QuickMode debug, deux formulaires à intégration Stripe) rendus en HTTP 200 ; une troisième soumission réelle
+> bout en bout (enregistrement 274, champs persistés) vérifiée puis supprimée ; journal Joomla surveillé sur
+> toute la session Phase 9, aucune entrée liée à `BFRequest`.
+>
+> **Ce qui reste avant de clore complètement la Phase 9** :
+> - Confirmer Stripe/PayPal/Sofort avec un vrai paiement de test (accès sandbox non disponible dans les sessions
+>   agent) — seul point de la Phase 9a non vérifié en conditions réelles.
+> - Supprimer les 3 `require_once .../BFRequest.php` désormais inertes (`breezingformsng.php`,
+>   `bfProcessorUploads.php` — commentaire seulement —, `route.php`) une fois confirmé qu'aucun caller externe
+>   (plugins tiers, thèmes personnalisés) ne dépend encore de la classe globale `BFRequest` étant chargée
+>   implicitement par ce composant.
+> - Supprimer `libraries/crosstec/classes/BFRequest.php` lui-même et le retirer du paquet.
+> - Traiter la Phase 9b (`BFIntegrate`, 445 lignes, SQL concaténé + `eval()` — nécessite une vraie réécriture,
+>   pas une substitution) : seul chantier de fond encore ouvert dans ce document.
 
 - **393 appels** répartis sur 19 fichiers. Par volume décroissant :
   1. `components/com_breezingformsng/src/Service/Callback/SofortCallback.php` — 69

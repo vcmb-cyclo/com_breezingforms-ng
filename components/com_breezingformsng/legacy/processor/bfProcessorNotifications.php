@@ -71,11 +71,11 @@ trait bfProcessorNotifications
 
         /*
           $customSender = false;
-          $sender = BFRequest::getVar('mailbackSender', array());
+          $sender = Factory::getApplication()->getInput()->get('mailbackSender', array(), 'string');
 
           for ($i = 0; $i < $this->rowcount; $i++) {
           $row = $this->rows[$i];
-          $mb = BFRequest::getVar('ff_nm_' . $row->name, '');
+          $mb = Factory::getApplication()->getInput()->get('ff_nm_' . $row->name, '', 'string');
           if ($row->mailback == 1) {
           $mbCnt = count($mb);
           for ($x = 0; $x < $mbCnt; $x++) {
@@ -442,10 +442,10 @@ trait bfProcessorNotifications
                 return;
         }
 
-        $sender = BFRequest::getVar('mailbackSender', array());
+        $sender = Factory::getApplication()->getInput()->get('mailbackSender', array(), 'string');
         for ($i = 0; $i < $this->rowcount; $i++) {
             $row = $this->rows[$i];
-            $mb = BFRequest::getVar('ff_nm_' . $row->name, '');
+            $mb = Factory::getApplication()->getInput()->get('ff_nm_' . $row->name, '', 'string');
             if ($row->mailback == 1 && is_array($mb)) {
                 $mbCnt = count($mb);
                 for ($x = 0; $x < $mbCnt; $x++) {
@@ -546,7 +546,7 @@ trait bfProcessorNotifications
 
         $signatures = array();
 
-        $attachToAdminMail = BFRequest::getVar('attachToAdminMail', array());
+        $attachToAdminMail = Factory::getApplication()->getInput()->get('attachToAdminMail', array(), 'string');
         if (count($this->maildata)) {
             foreach ($this->maildata as $data) {
                 if (isset($attachToAdminMail[$data[_FF_DATA_NAME]])) {
@@ -726,15 +726,15 @@ trait bfProcessorNotifications
             }
         }
 
-        $accept = BFRequest::getVar('mailbackConnectWith', array());
-        $sender = BFRequest::getVar('mailbackSender', array());
-        $attachToUserMail = BFRequest::getVar('attachToUserMail', array());
+        $accept = Factory::getApplication()->getInput()->get('mailbackConnectWith', array(), 'string');
+        $sender = Factory::getApplication()->getInput()->get('mailbackSender', array(), 'string');
+        $attachToUserMail = Factory::getApplication()->getInput()->get('attachToUserMail', array(), 'string');
 
         $mailbackfiles = array();
         $recipients = array();
         for ($i = 0; $i < $this->rowcount; $i++) {
             $row = $this->rows[$i];
-            $mb = BFRequest::getVar('ff_nm_' . $row->name, '');
+            $mb = Factory::getApplication()->getInput()->get('ff_nm_' . $row->name, '', 'string');
             if ($row->mailback == 1) {
                 $mbCnt = count($mb);
                 for ($x = 0; $x < $mbCnt; $x++) {
@@ -743,7 +743,7 @@ trait bfProcessorNotifications
                         $checked = array('');
                         if (isset($accept[$row->name])) {
                             $yesno = explode('_', $accept[$row->name]);
-                            $checked = BFRequest::getVar('ff_nm_' . $yesno[1], '');
+                            $checked = Factory::getApplication()->getInput()->get('ff_nm_' . $yesno[1], '', 'string');
                         }
 
                         //if (isset($sender[$row->name]) && !$customSender) {
@@ -1418,7 +1418,7 @@ trait bfProcessorNotifications
             $list_ids = explode(',', trim($this->formrow->mailchimp_list_id));
 
             if ($checkboxField != '') {
-                $box = BFRequest::getVar('ff_nm_' . $checkboxField, array(''));
+                $box = Factory::getApplication()->getInput()->get('ff_nm_' . $checkboxField, array(''), 'string');
                 if (isset($box[0]) && $box[0] != '') {
                     $checked = true;
                 } else {
@@ -1427,14 +1427,14 @@ trait bfProcessorNotifications
             }
 
             if ($unsubscribeField != '') {
-                $box = BFRequest::getVar('ff_nm_' . $unsubscribeField, array(''));
+                $box = Factory::getApplication()->getInput()->get('ff_nm_' . $unsubscribeField, array(''), 'string');
                 if (isset($box[0]) && $box[0] != '') {
                     $unsubscribe = true;
                 }
             }
 
             if ($htmlTextMobileField != '') {
-                $selection = BFRequest::getVar('ff_nm_' . $htmlTextMobileField, array(''));
+                $selection = Factory::getApplication()->getInput()->get('ff_nm_' . $htmlTextMobileField, array(''), 'string');
                 if (isset($selection[0]) && $selection[0] != '') {
                     $htmlTextMobile = $selection[0];
                 }

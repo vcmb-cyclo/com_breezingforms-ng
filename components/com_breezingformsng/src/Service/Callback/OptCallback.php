@@ -31,7 +31,7 @@ class OptCallback
 
     // DOUBLE OPT IN
 
-    $jinput = Factory::getApplication()->input;
+    $jinput = Factory::getApplication()->getInput();
     $ip = $jinput->server->get('REMOTE_ADDR');
 
     $userSubmitedID = BFRequest::getVar('id');
@@ -52,7 +52,7 @@ class OptCallback
         $db = $database;
 
 
-    $jinput = Factory::getApplication()->input;
+    $jinput = Factory::getApplication()->getInput();
     $ip = $jinput->server->get('REMOTE_ADDR');
 
     $userSubmitedID = BFRequest::getVar('id');

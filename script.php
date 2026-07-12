@@ -1788,6 +1788,9 @@ class com_breezingformsngInstallerScript
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/sql/create_sql.php',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFText.php',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFFactory.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFJoomlaConfig.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFPDF.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/src/Helper/LegacyClassLoader.php',
         ];
 
         foreach ($obsolete as $file) {

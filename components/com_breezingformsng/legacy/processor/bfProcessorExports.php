@@ -28,11 +28,13 @@ use Joomla\CMS\Environment\Browser;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Log\Log;
+use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use CB\Component\Contentbuilderng\Administrator\Helper\ContentbuilderngHelper;
 use CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory;
 use CB\Component\Contentbuilderng\Administrator\Service\ArticleService;
 use CB\Component\Contentbuilderng\Administrator\Service\ListSupportService;
 use CB\Component\Contentbuilderng\Administrator\Service\PermissionService;
+use Vcmb\Component\BreezingformsNG\Administrator\Service\PdfDocument;
 
 /**
  * Database logging, mailing primitives and PDF/CSV/XML exports.
@@ -46,7 +48,7 @@ trait bfProcessorExports
             return;
 
         if (!is_object($cbResult['form']) && $this->editable && $this->editable_override) {
-            $this->database->setQuery("Select id From #__facileforms_records Where form = " . $this->database->Quote($this->form) . " And user_id = " . $this->database->Quote(Factory::getUser()->get('id', 0)) . " And user_id <> 0");
+            $this->database->setQuery("Select id From #__facileforms_records Where form = " . $this->database->Quote($this->form) . " And user_id = " . $this->database->Quote(Factory::getApplication()->getIdentity()->get('id', 0)) . " And user_id <> 0");
             $records = $this->database->loadObjectList();
             foreach ($records as $record) {
                 $this->database->setQuery("Delete From #__facileforms_subrecords Where record = " . $record->id);
@@ -68,12 +70,12 @@ trait bfProcessorExports
         $record->viewed = 0;
         $record->exported = 0;
         $record->archived = 0;
-        if (Factory::getUser()->get('id', 0) > 0) {
-            $record->user_id = Factory::getUser()->get('id', 0);
-            $record->username = Factory::getUser()->get('username', '');
-            $record->user_full_name = Factory::getUser()->get('name', '');
+        if (Factory::getApplication()->getIdentity()->get('id', 0) > 0) {
+            $record->user_id = Factory::getApplication()->getIdentity()->get('id', 0);
+            $record->username = Factory::getApplication()->getIdentity()->get('username', '');
+            $record->user_full_name = Factory::getApplication()->getIdentity()->get('name', '');
         } else {
-            $record->user_id = Factory::getUser()->get('id', 0);
+            $record->user_id = Factory::getApplication()->getIdentity()->get('id', 0);
             $record->username = '-';
             $record->user_full_name = '-';
         }
@@ -89,7 +91,7 @@ trait bfProcessorExports
             $record_return = $record->id;
 
             if ($record_return && file_exists(JPATH_ADMINISTRATOR . '/components/com_contentbuilderng/com_contentbuilderng.xml')) {
-                $last_update = Factory::getDate();
+                $last_update = new \Joomla\CMS\Date\Date();
                 $last_update = $last_update->toSql();
                 $db = Factory::getContainer()->get(DatabaseInterface::class);
                 $db->setQuery("Select id From #__contentbuilderng_records Where `type` = 'com_breezingformsng' And `reference_id` = " . $db->Quote($this->form) . " And record_id = " . $db->Quote($record_return));
@@ -120,7 +122,7 @@ trait bfProcessorExports
                 $db->setQuery('Select SQL_CALC_FOUND_ROWS * From #__contentbuilderng_forms Where id = ' . BFRequest::getInt('cb_form_id', 0) . ' And published = 1');
                 $_settings = $db->loadObject();
 
-                $_record = $cbResult['form']->getRecord(BFRequest::getInt('record_id', 0), $_settings->published_only, $cbResult['frontend'] ? ($_settings->own_only_fe ? Factory::getUser()->get('id', 0) : -1) : ($_settings->own_only ? Factory::getUser()->get('id', 0) : -1), true);
+                $_record = $cbResult['form']->getRecord(BFRequest::getInt('record_id', 0), $_settings->published_only, $cbResult['frontend'] ? ($_settings->own_only_fe ? Factory::getApplication()->getIdentity()->get('id', 0) : -1) : ($_settings->own_only ? Factory::getApplication()->getIdentity()->get('id', 0) : -1), true);
                 foreach ($_record as $_rec) {
                     $_files_deleted = array();
                     if ($_rec->recType == 'File Upload') {
@@ -308,7 +310,7 @@ trait bfProcessorExports
 
                     $language = $cbResult['data']['default_lang_code_ignore'] ? $ignore_lang_code : $cbResult['data']['default_lang_code'];
                     $res = $db->loadResult();
-                    $last_update = Factory::getDate();
+                    $last_update = new \Joomla\CMS\Date\Date();
                     $last_update = $last_update->toSql();
                     if (!$res) {
 
@@ -316,12 +318,12 @@ trait bfProcessorExports
                         $created_up = $created_up->toSql();
                         if (intval($cbData->default_publish_up_days) != 0) {
                             $is_future = 1;
-                            $date = Factory::getDate(strtotime('now +' . intval($cbData->default_publish_up_days) . ' days'));
+                            $date = new \Joomla\CMS\Date\Date(strtotime('now +' . intval($cbData->default_publish_up_days) . ' days'));
                             $created_up = $date->toSql();
                         }
                         $created_down = '0000-00-00 00:00:00';
                         if (intval($cbData->default_publish_down_days) != 0) {
-                            $date = Factory::getDate(strtotime($created_up . ' +' . intval($cbData->default_publish_down_days) . ' days'));
+                            $date = new \Joomla\CMS\Date\Date(strtotime($created_up . ' +' . intval($cbData->default_publish_down_days) . ' days'));
                             $created_down = $date->toSql();
                         }
 
@@ -367,7 +369,7 @@ trait bfProcessorExports
                             $ids[] = $row['reference_id'];
                         }
                     }
-                    $cbData->items = $cbResult['form']->getRecord($record_return, $cbData->published_only, $cbResult['frontend'] ? ($cbData->own_only_fe ? Factory::getUser()->get('id', 0) : -1) : ($cbData->own_only ? Factory::getUser()->get('id', 0) : -1), true);
+                    $cbData->items = $cbResult['form']->getRecord($record_return, $cbData->published_only, $cbResult['frontend'] ? ($cbData->own_only_fe ? Factory::getApplication()->getIdentity()->get('id', 0) : -1) : ($cbData->own_only ? Factory::getApplication()->getIdentity()->get('id', 0) : -1), true);
                     if (!count($cbData->items)) {
                         throw new Exception(Text::_('COM_CONTENTBUILDERNG_RECORD_NOT_FOUND'), 404);
                     }
@@ -381,9 +383,10 @@ trait bfProcessorExports
                     $full = false;
                     $article_id = (new ArticleService())->createArticle(BFRequest::getInt('cb_form_id', 0), $record_return, $cbData->items, $ids, $cbData->title_field, $cbResult['form']->getRecordMetadata($record_return), $config, $full, true, BFRequest::getVar('cb_category_id', null));
 
-                    $cache = Factory::getCache('com_content');
+                    $cacheFactory = Factory::getContainer()->get(CacheControllerFactoryInterface::class);
+                    $cache = $cacheFactory->createCacheController('callback', ['defaultgroup' => 'com_content']);
                     $cache->clean();
-                    $cache = Factory::getCache('com_contentbuilderng');
+                    $cache = $cacheFactory->createCacheController('callback', ['defaultgroup' => 'com_contentbuilderng']);
                     $cache->clean();
                 }
 
@@ -541,7 +544,7 @@ trait bfProcessorExports
 
         $date_stamp = date('YmdHis');
         $submitted = $this->submitted;
-        $date_ = Factory::getDate($this->submitted, $tz);
+        $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
         $offset = $date_->getOffsetFromGMT();
         if ($offset > 0) {
             $date_->add(new DateInterval('PT' . $offset . 'S'));
@@ -553,7 +556,7 @@ trait bfProcessorExports
         $date_stamp = $date_->format('YmdHis', true);
 
         $date_stamp2 = date('Ymd');
-        $date_ = Factory::getDate($this->submitted, $tz);
+        $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
         $offset = $date_->getOffsetFromGMT();
         if ($offset > 0) {
             $date_->add(new DateInterval('PT' . $offset . 'S'));
@@ -565,11 +568,7 @@ trait bfProcessorExports
 
         $this->submitted = $submitted;
 
-        if (!class_exists('BFPDF')) {
-            require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFPDF.php');
-        }
-
-        $pdf = new BFPDF();
+        $pdf = new PdfDocument();
         $pdf->setMailback($mailback);
         $pdf->setFormName($this->formrow->name);
 
@@ -669,9 +668,9 @@ trait bfProcessorExports
             }
 
             $fm = str_replace('{filemask:_separator}', '_', $fm);
-            $fm = str_replace('{filemask:_username}', trim(Factory::getUser()->get('username')), $fm);
-            $fm = str_replace('{filemask:_userid}', trim(Factory::getUser()->get('id')), $fm);
-            $fm = str_replace('{filemask:_name}', trim(Factory::getUser()->get('name')), $fm);
+            $fm = str_replace('{filemask:_username}', trim(Factory::getApplication()->getIdentity()->get('username')), $fm);
+            $fm = str_replace('{filemask:_userid}', trim(Factory::getApplication()->getIdentity()->get('id')), $fm);
+            $fm = str_replace('{filemask:_name}', trim(Factory::getApplication()->getIdentity()->get('name')), $fm);
             $fm = str_replace('{filemask:_datetime}', trim($date_stamp), $fm);
             $fm = str_replace('{filemask:_date}', trim($date_stamp2), $fm);
             $fm = str_replace('{filemask:_timestamp}', trim(time()), $fm);
@@ -730,7 +729,7 @@ trait bfProcessorExports
 
         $date_stamp = date('YmdHis');
         $submitted = $this->submitted;
-        $date_ = Factory::getDate($this->submitted, $tz);
+        $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
         $offset = $date_->getOffsetFromGMT();
         if ($offset > 0) {
             $date_->add(new DateInterval('PT' . $offset . 'S'));
@@ -823,7 +822,7 @@ trait bfProcessorExports
         $date_stamp = date('YmdHis');
         $submitted = $this->submitted;
         $date_file = date('Y-m-d H:i:s');
-        $date_ = Factory::getDate($this->submitted, $tz);
+        $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
         $offset = $date_->getOffsetFromGMT();
         if ($offset > 0) {
             $date_->add(new DateInterval('PT' . $offset . 'S'));

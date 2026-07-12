@@ -140,7 +140,7 @@ class ImportModel extends BaseModel
             return;
         }
 
-        $now = Factory::getDate()->toSql();
+        $now = (new \Joomla\CMS\Date\Date())->toSql();
         $userName = (string) (Factory::getApplication()->getIdentity()?->username ?? '');
 
         if ($existing !== null) {

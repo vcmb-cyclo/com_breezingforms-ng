@@ -200,9 +200,13 @@
 
 ### Vérification
 - [x] Lister les formulaires (filtres package, état, recherche ; tri ; pagination) *(liste vérifiée HTTP)*
-- [ ] Créer / éditer / sauvegarder un formulaire (3 onglets de propriétés)
-- [x] Publier / dépublier un formulaire *(vérifié aller-retour en base ; duplication/suppression à confirmer à la main)*
+- [x] Créer / éditer / sauvegarder un formulaire (3 onglets de propriétés) *(vérifié HTTP et en base le 2026-07-12 : Général, Email et Scripts/Pièces, codes inline inclus)*
+- [x] Publier / dépublier un formulaire *(aller-retour vérifié ; copie, changement d'ordre et suppression également validés puis nettoyés)*
 - [x] Ouvrir QuickMode depuis la liste *(quickmode.display rendu complet, 1,6 Mo)*
+
+> **Durcissement (2026-07-12)** : les actions rapides publier/dépublier et monter/descendre utilisent désormais le POST
+> avec jeton du formulaire de liste. Les champs fantômes `mb_emailadr` et `script3code`, absents du schéma BFNG, ont été
+> retirés du contrôleur, du modèle et du gabarit de création. Les références invalides à `LanguageText` ont été corrigées.
 
 ---
 
@@ -227,8 +231,8 @@
 - [x] Alias legacy QuickMode retirés de `DisplayController`
 
 ### Bloqué — dépend de phases futures
-- [ ] Supprimer `src/Helper/LegacyClassLoader.php` (QuickModeHtml + BF* encore nécessaires ; classes mortes `BFTabs`, `BFJNewTabs`, `BFBehaviorTabs`, `BFPagination`, `BFPaginationChrome`, alias `BFTableElements` déjà supprimées)
-- [ ] Retirer l'enregistrement de `LegacyClassLoader` dans `services/provider.php`
+- [x] Supprimer `src/Helper/LegacyClassLoader.php` *(les classes du moteur sont chargées explicitement par son bootstrap ; les derniers usages admin de `BFRequest` ont été migrés vers l'Input Joomla. Vérifié sans le fichier le 2026-07-12 : Scripts, Pièces, éditeur QuickMode, QuickMode et formulaire frontend répondent en HTTP 200)*
+- [x] Retirer l'enregistrement de `LegacyClassLoader` dans `services/provider.php`
 - [x] Supprimer le répertoire `admin/` — assets déplacés vers `media/com_breezingformsng/js/admin/` et `css/admin.css`, `joomla.asset.json` et manifeste mis à jour, `bluestork.fix.css` supprimé (obsolète)
 
 ### Vérification finale
@@ -244,10 +248,10 @@
 
 ### Effectué
 - [x] `src/Model/QuickmodeModel.php` — migration complète de `QuickMode` : namespace, PHP 8.1, `json_encode/decode` et `base64_encode/decode` natifs (suppression dépendances `Zend_Json` et `bf_b64*`)
-- [x] `src/Helper/QuickmodeHtml.php` — renderer legacy déplacé, enregistré dans `LegacyClassLoader`
+- [x] `src/Helper/QuickmodeHtml.php` — renderer migré sous namespace Joomla et retiré de `LegacyClassLoader`
 - [x] `src/Controller/QuickmodeController.php` — tasks : `display`, `doAjaxSave`, `editor`
 - [x] `src/View/Quickmode/HtmlView.php` — vue Joomla 6 native, configure toolbar
-- [x] `tmpl/quickmode/default.php` — appelle `QuickModeHtml::showApplication()`
+- [x] `tmpl/quickmode/default.php` — appelle le renderer namespacé `QuickmodeHtml::showApplication()`
 - [x] `tmpl/quickmode/editor.php` — éditeur inline (git mv depuis `quickmode-editor.php`), task mise à jour vers `quickmode.editor`
 - [x] `DisplayController` — alias legacy QuickMode (`act=quickmode*`, `act=manageforms&task=quickmode*`) retirés après migration des liens internes
 - [x] `admin.breezingforms.php` — bridge entièrement vidé (switch ne contient plus que `default: break`)
@@ -303,8 +307,23 @@
 - [x] Éliminer les wrappers crosstec triviaux *(fait le 2026-07-12 : `BFText` → `Text` natif (68 fichiers, langue chargée
   au bootstrap du moteur) ; `BFFile::read` → `file_get_contents` et suppression de `BFFactory`/`BFDbo` (sans appelant) ;
   `BFRedirect()` → `Site\Service\Support\RedirectHelper`. Fichiers purgés des sites installés via `removeObsoleteComponentFiles()`)*
+- [x] Remplacer les accesseurs `Factory` dépréciés *(fait le 2026-07-12 : derniers `Factory::getUser()` du moteur,
+  des notifications, des exports, des uploads et de l'intégrateur remplacés par `Factory::getApplication()->getIdentity()` ;
+  `Factory::getMailer()` remplacé par `MailerFactoryInterface`, `Factory::getCache()` par
+  `CacheControllerFactoryInterface`, `Factory::getConfig()` par la configuration de l'application et les accès directs
+  `$app->input` par `getInput()`. Aucun accesseur Factory déprécié restant dans le composant. Rendu, callback opt-out et
+  soumission invitée vérifiés ; données de test nettoyées)*
+- [x] Remplacer les 41 `Factory::getDate()` par `Joomla\CMS\Date\Date` *(l'implémentation Joomla 6.0.4 de l'ancien
+  accesseur appelle encore `Factory::getLanguage()` déprécié ; 15 fichiers lintés, puis About, Records, QuickMode et
+  formulaire frontend vérifiés en HTTP 200)*
+- [x] Empêcher l'accès déprécié à la base pendant la construction de `LegacyPackageModel` *(injection explicite après
+  construction conservée, fallback `Factory::getDbo()` neutralisé avec `dbo => null` ; listes Scripts et Pièces en HTTP 200)*
+- [x] Retirer le helper mort `bf_ToolTip()` fondé sur l'ancien service `HTMLHelper::_('tooltip')` et supprimer
+  l'initialisation Bootstrap répétée dans les 293 appels à `bf_tooltipText()` *(tooltip initialisé une fois par QuickMode)*
 - [ ] Réécriture native du moteur (remplacer les traits legacy par de vrais services typés) — chantier de fond restant.
   Restent côté crosstec : `BFRequest` (387 appels — portage de JRequest avec caches `$GLOBALS` et `setVar` mutant les
-  superglobales : à traiter lors de la réécriture, pas par substitution), `BFPDF`, `BFIntegrate`, `BFJoomlaConfig`
-  et les rendus `BFQuickMode*`
+  superglobales : à traiter lors de la réécriture, pas par substitution), `BFIntegrate` et les rendus `BFQuickMode*`.
+  `BFJoomlaConfig` a été remplacé par `Factory::getConfig()` ; `BFPDF` a été migré vers le service namespacé
+  `Administrator\Service\PdfDocument`. Les deux classes globales ont été supprimées. Export administrateur vérifié
+  dans Joomla 6 le 2026-07-12 : PDF 1.7 valide généré avec les en-têtes de téléchargement attendus.*
 - [x] Migrer `router.php` vers `RouterInterface` Joomla 6 *(fait le 2026-07-11 : `Site\Service\Router extends RouterBase`, `RouterFactory` au provider, `RouterServiceInterface` sur l'extension ; `router.php` supprimé du paquet et nettoyé des sites installés par `script.php::removeObsoleteComponentFiles()` ; pages de formulaires SEF vérifiées en front)*

@@ -16,6 +16,7 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Filesystem\File;
+use Joomla\CMS\Mail\MailerFactoryInterface;
 
 /**
  * Sofortueberweisung payment callbacks: success page, server-side
@@ -203,7 +204,7 @@ class SofortCallback
 
                             $recipients = explode('###', BFRequest::getVar('user_variable_2', ''));
                             $recipientsSize = count($recipients);
-                            $mailer = Factory::getMailer();
+                            $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
                             $mailer->Subject = Text::_('COM_BREEZINGFORMSNG_YOUR_PAYMENT_AT_SU');
                             $mailer->Body = Text::_('COM_BREEZINGFORMSNG_HALLO') . "\n\n";
                             $mailer->Body .= Text::_('COM_BREEZINGFORMSNG_YOUR_PAYMENT_SUCCEEDED') . "\n\n";

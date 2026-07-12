@@ -1927,7 +1927,7 @@ function bfTriggerRules() {
                                                                         container: 'bfUploadContainer" . $mdata['dbId'] . "',
                                                                         file_data_name: 'Filedata',
                                                                         multipart_params: { form: " . $this->p->form . ", itemName : '" . $mdata['bfName'] . "', bfFlashUploadTicket: '" . $this->flashUploadTicket . "', option: 'com_breezingformsng', format: 'html', flashUpload: 'true', Itemid: 0 },
-                                                                        url : '" . $base . (BFJoomlaConfig::get('config.sef') && !BFJoomlaConfig::get('config.sef_rewrite') ? 'index.php/' : '') . (BFRequest::getCmd('lang', '') && BFJoomlaConfig::get('config.sef') ? (BFJoomlaConfig::get('config.sef_rewrite') ? 'index.php' : '') : 'index.php') . "',
+                                                                        url : '" . $base . (Factory::getApplication()->getConfig()->get('sef') && !Factory::getApplication()->getConfig()->get('sef_rewrite') ? 'index.php/' : '') . (BFRequest::getCmd('lang', '') && Factory::getApplication()->getConfig()->get('sef') ? (Factory::getApplication()->getConfig()->get('sef_rewrite') ? 'index.php' : '') : 'index.php') . "',
                                                                         flash_swf_url : '" . $base . "components/com_breezingformsng/libraries/jquery/plupload/Moxie.swf',
                                                                         filters : [
                                                                                 {title : '" . addslashes(Text::_('COM_BREEZINGFORMSNG_CHOOSE_FILE')) . "', extensions : '" . $exts . "'}
@@ -2890,9 +2890,9 @@ function bfTriggerRules() {
         }
 
         if ($this->hasFlashUpload) {
-            $tickets = Factory::getSession()->get('bfFlashUploadTickets', array());
+            $tickets = Factory::getApplication()->getSession()->get('bfFlashUploadTickets', array());
             $tickets[$this->flashUploadTicket] = array(); // stores file info for later processing
-	    Factory::getSession()->set('bfFlashUploadTickets', $tickets);
+	    Factory::getApplication()->getSession()->set('bfFlashUploadTickets', $tickets);
             echo '<input type="hidden" name="bfFlashUploadTicket" value="' . $this->flashUploadTicket . '"/>' . "\n";
             Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/center.js');
             Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('

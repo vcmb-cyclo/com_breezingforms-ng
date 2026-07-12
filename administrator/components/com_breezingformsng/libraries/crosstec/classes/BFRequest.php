@@ -523,7 +523,7 @@ class BFRequest
     }
 }
 
-$bf_request = Factory::getApplication()->input->getArray(array(), null, 'RAW');
+$bf_request = Factory::getApplication()->getInput()->getArray(array(), null, 'RAW');
 foreach ($bf_request as $bf_request_item_key => $bf_request_item_value) {
     BFRequest::setVar($bf_request_item_key, $bf_request_item_value);
 }

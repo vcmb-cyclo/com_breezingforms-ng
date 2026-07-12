@@ -345,7 +345,7 @@ class RecordModel extends BaseModel
                 $record = (object) [
                     'submitted' => preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $submitted)
                         ? $submitted
-                        : Factory::getDate()->toSql(),
+                        : (new \Joomla\CMS\Date\Date())->toSql(),
                     'form' => $formId,
                     'title' => $decodeCell($valueAt($row, $normalizedHeader, 'bf_form_title', $form->title)),
                     'name' => (string) $form->name,

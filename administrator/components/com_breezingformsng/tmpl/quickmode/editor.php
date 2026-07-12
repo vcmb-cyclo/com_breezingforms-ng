@@ -25,7 +25,7 @@ if (Factory::getApplication()->getInput()->getCmd('task') === 'quickmode.editor'
     ');
 }
 
-$active_language_code = BFRequest::getVar('active_language_code', '');
+$active_language_code = Factory::getApplication()->getInput()->getString('active_language_code', '');
 if ($active_language_code != '') {
     $active_language_code = '_translation' . $active_language_code;
 }

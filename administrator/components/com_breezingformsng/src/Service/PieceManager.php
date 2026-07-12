@@ -15,7 +15,6 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Service;
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
-use BFRequest;
 use Exception;
 use facileFormsPieces;
 use Joomla\Utilities\ArrayHelper;
@@ -187,9 +186,9 @@ class PieceManager
 		// Forcer code non filtré
 		$row->code = $code;
 		$row->unit_tests = $unitTests;
-		$row->description = BFRequest::getVar('description', '', 'POST', 'string', BFREQUEST_ALLOWRAW);
+		$row->description = $app->getInput()->post->get('description', '', 'raw');
 
-		$now = Factory::getDate()->toSql();
+		$now = (new \Joomla\CMS\Date\Date())->toSql();
 		$userId = (string) Factory::getApplication()->getIdentity()->username;
 
 		if (empty($row->id)) {
@@ -229,7 +228,7 @@ class PieceManager
 			foreach ($ids as $id) {
 				$row->load(intval($id));
 				$row->id = NULL;
-				$row->created = Factory::getDate()->toSql();
+				$row->created = (new \Joomla\CMS\Date\Date())->toSql();
 				$row->created_by = (string) Factory::getApplication()->getIdentity()->username;
 				$row->modified = $row->created;
 				$row->modified_by = $row->created_by;
@@ -302,23 +301,24 @@ class PieceManager
 				$pkglist[] = array($p->name == $pkg, $p->name);
 
 		$app = Factory::getApplication();
+		$input = $app->getInput();
 		$session = $app->getSession();
-		$showInternalReq = BFRequest::getVar('show_internal', null);
+		$showInternalReq = $input->get('show_internal', null, 'int');
 		if ($showInternalReq === null) {
 			$showInternal = (int) $session->get('bf.show_internal_pieces', 0);
 		} else {
 			$showInternal = (int) $showInternalReq;
 			$session->set('bf.show_internal_pieces', $showInternal);
 		}
-		$searchReq = BFRequest::getVar('search', null);
+		$searchReq = $input->get('search', null, 'string');
 		if ($searchReq === null) {
 			$search = (string) $session->get('bf.pieces_search', '');
 		} else {
 			$search = trim((string) $searchReq);
 			$session->set('bf.pieces_search', $search);
 		}
-		$sortReq = BFRequest::getVar('sort', null);
-		$dirReq = BFRequest::getVar('dir', null);
+		$sortReq = $input->get('sort', null, 'string');
+		$dirReq = $input->get('dir', null, 'cmd');
 		if ($sortReq === null) {
 			$sort = (string) $session->get('bf.pieces_sort', 'name');
 		} else {
@@ -334,7 +334,7 @@ class PieceManager
 		$dir = $dir === 'DESC' ? 'DESC' : 'ASC';
 
 		$pageSizes = array(10, 25, 50, 100, 250, 500, 1000, 5000, 10000, 100000);
-		$limitReq = BFRequest::getInt('limit', -1);
+		$limitReq = $input->getInt('limit', -1);
 		if ($limitReq > 0 && in_array($limitReq, $pageSizes, true)) {
 			$limit = $limitReq;
 			$session->set('bf.pieces_limit', $limit);
@@ -345,7 +345,7 @@ class PieceManager
 			}
 		}
 
-		$limitstartReq = BFRequest::getInt('limitstart', -1);
+		$limitstartReq = $input->getInt('limitstart', -1);
 		if ($limitstartReq >= 0) {
 			$limitstart = $limitstartReq;
 		} else {
@@ -374,7 +374,7 @@ class PieceManager
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
 		ArrayHelper::toInteger($ids);
 		if (!count($ids)) {
-			$id = BFRequest::getInt('id', 0);
+			$id = Factory::getApplication()->getInput()->getInt('id', 0);
 			if ($id) {
 				$ids = array($id);
 			}
@@ -418,7 +418,7 @@ class PieceManager
 			}
 			$autoRun = $allDefaults;
 		}
-		$testMode = BFRequest::getCmd('test_mode', '');
+		$testMode = Factory::getApplication()->getInput()->getCmd('test_mode', '');
 		Renderer::test($option, $pkg, $row, $functionName, $params, $paramDefaults, array(), null, '', '', 0, $autoRun, array(), $testMode, array());
 	}
 
@@ -428,7 +428,7 @@ class PieceManager
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
 		ArrayHelper::toInteger($ids);
 		if (!count($ids)) {
-			$id = BFRequest::getInt('id', 0);
+			$id = $app->getInput()->getInt('id', 0);
 			if ($id) {
 				$ids = array($id);
 			}
@@ -441,10 +441,10 @@ class PieceManager
 		$row = new facileFormsPieces($database);
 		$row->load($ids[0]);
 
-		$functionName = BFRequest::getVar('test_function', '');
-		$paramNames = BFRequest::getVar('test_param_names', array(), 'POST', 'array');
-		$paramDefaults = BFRequest::getVar('test_param_defaults', array(), 'POST', 'array');
-		$paramValues = BFRequest::getVar('test_param_values', array(), 'POST', 'array');
+		$functionName = $app->getInput()->post->getString('test_function', '');
+		$paramNames = $app->getInput()->post->get('test_param_names', array(), 'array');
+		$paramDefaults = $app->getInput()->post->get('test_param_defaults', array(), 'array');
+		$paramValues = $app->getInput()->post->get('test_param_values', array(), 'array');
 		$safeMode = 0;
 		$args = array();
 
@@ -485,8 +485,8 @@ class PieceManager
 			$args[] = $value;
 		}
 
-		$testMode = BFRequest::getCmd('test_mode', '');
-		$autoOpened = BFRequest::getInt('auto_open_tests', 0);
+		$testMode = $app->getInput()->getCmd('test_mode', '');
+		$autoOpened = $app->getInput()->getInt('auto_open_tests', 0);
 		$result = null;
 		$output = '';
 		$error = '';
@@ -543,7 +543,7 @@ class PieceManager
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
 		ArrayHelper::toInteger($ids);
 		if (!count($ids)) {
-			$id = BFRequest::getInt('id', 0);
+			$id = $app->getInput()->getInt('id', 0);
 			if ($id) {
 				$ids = array($id);
 			}
@@ -585,8 +585,8 @@ class PieceManager
 			}
 		}
 
-		$testContext = BFRequest::getInt('test_context', 0);
-		$testMode = BFRequest::getCmd('test_mode', '');
+		$testContext = $app->getInput()->getInt('test_context', 0);
+		$testMode = $app->getInput()->getCmd('test_mode', '');
 		if ($testContext) {
 			$testModeQuery = $testMode !== '' ? '&test_mode=' . urlencode($testMode) : '';
 			$app->redirect("index.php?option=$option&task=pieces.test&pkg=$pkg&ids[]=" . $targetId . $testModeQuery);

@@ -164,7 +164,7 @@ class AboutController extends BaseController
                 'component' => 'com_breezingformsng',
                 'format' => 'breezingformsng-configuration',
                 'version' => 1,
-                'exported_at' => Factory::getDate()->toSql(),
+                'exported_at' => (new \Joomla\CMS\Date\Date())->toSql(),
                 'tables' => $tables,
             ];
             $json = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
@@ -177,7 +177,7 @@ class AboutController extends BaseController
                 ob_end_clean();
             }
 
-            $fileName = 'breezingformsng-config-' . Factory::getDate()->format('Ymd-His') . '.json';
+            $fileName = 'breezingformsng-config-' . (new \Joomla\CMS\Date\Date())->format('Ymd-His') . '.json';
             $app->setHeader('Pragma', 'public', true);
             $app->setHeader('Expires', '0', true);
             $app->setHeader('Cache-Control', 'private', true);
@@ -300,7 +300,7 @@ class AboutController extends BaseController
 
         if ($latestMtime > 0) {
             $timezone = new \DateTimeZone((string) Factory::getApplication()->get('offset', 'UTC'));
-            $loadedAt = Factory::getDate('@' . $latestMtime)
+            $loadedAt = (new \Joomla\CMS\Date\Date('@' . $latestMtime))
                 ->setTimezone($timezone)
                 ->format('Y-m-d H:i:s', true);
         }

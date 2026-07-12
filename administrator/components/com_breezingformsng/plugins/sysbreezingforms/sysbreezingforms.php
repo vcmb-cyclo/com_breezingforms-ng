@@ -30,18 +30,19 @@ class PlgSystemSysbreezingforms extends CMSPlugin
         }
 
         $app = Factory::getApplication();
+        $input = $app->getInput();
 
         try {
                 $bNotValid = Factory::getApplication()->isClient('administrator') &&
                 (
                     (
-                        $app->input->getString('option') == 'com_breezingformsng' &&
-                        $app->input->getString('act', '') != '' &&
-                        $app->input->getString('act', '') != 'configuration'
+                        $input->getString('option') == 'com_breezingformsng' &&
+                        $input->getString('act', '') != '' &&
+                        $input->getString('act', '') != 'configuration'
                     )
                     ||
-                    $app->input->getString('option') == 'com_installer' &&
-                    $app->input->getString('view', '') == 'update'
+                    $input->getString('option') == 'com_installer' &&
+                    $input->getString('view', '') == 'update'
                     );
 
 //            if ($bNotValid) {
@@ -83,8 +84,8 @@ class PlgSystemSysbreezingforms extends CMSPlugin
                     $breaks2 = '';
                     $breaks = '';
                     if (
-                        $app->input->getString('option') == 'com_installer' &&
-                        $app->input->getString('view', '') == 'update'
+                        $input->getString('option') == 'com_installer' &&
+                        $input->getString('view', '') == 'update'
                     ) {
                         $breaks = '<br /><h4>BreezingForms NG</h4>';
                         $breaks2 = '<br /><br />';
@@ -108,8 +109,9 @@ class PlgSystemSysbreezingforms extends CMSPlugin
         }
 
         $app = Factory::getApplication();
+        $input = $app->getInput();
 
-        if ($app->input->getString('option') == 'com_menus' && $app->input->getString('view') == 'items') {
+        if ($input->getString('option') == 'com_menus' && $input->getString('view') == 'items') {
 
             $body = Factory::getApplication()->getBody();
             $body = str_replace('&lt;img src=../administrator/components/com_breezingformsng/images/icons/component-menu-icons/bf_icon.png width=23px; /&gt;', '', $body);
@@ -117,7 +119,7 @@ class PlgSystemSysbreezingforms extends CMSPlugin
             Factory::getApplication()->setBody($body);
         }
 
-        if ($app->input->getString('option') == 'com_cpanel' && $app->input->getString('dashboard') == 'components') {
+        if ($input->getString('option') == 'com_cpanel' && $input->getString('dashboard') == 'components') {
 
             $body = Factory::getApplication()->getBody();
             $body = str_replace('&lt;img src=../administrator/components/com_breezingformsng/images/icons/component-menu-icons/folder-open.png width=17; /&gt;', '', $body);

@@ -314,6 +314,19 @@
 - [x] Éliminer les wrappers crosstec triviaux *(fait le 2026-07-12 : `BFText` → `Text` natif (68 fichiers, langue chargée
   au bootstrap du moteur) ; `BFFile::read` → `file_get_contents` et suppression de `BFFactory`/`BFDbo` (sans appelant) ;
   `BFRedirect()` → `Site\Service\Support\RedirectHelper`. Fichiers purgés des sites installés via `removeObsoleteComponentFiles()`)*
+
+  > ⚠️ **Régression découverte le 2026-07-12** (en creusant un incident similaire sur `BFRequest`, cf. Phase 9a) :
+  > `BFFactory` était en réalité utilisé par du **code PHP personnalisé stocké en base** sur le site de dev
+  > lui-même — 4 Pièces admin (`ff_databaseToSelect` id 3, `ff_query` id 18, `ff_select` id 25,
+  > `ff_selectValue` id 26) et la colonne `piece1code` du formulaire `hash_password` (id 11) appellent toutes
+  > `BFFactory::`. « Sans appelant » n'était vrai qu'au sens grep-sur-le-code-source — ces pièces génèrent
+  > actuellement `Class "BFFactory" not found` à chaque exécution (visible dans `administrator/logs/everything.php`
+  > en DEBUG depuis le début de cette série de sessions, à tort classé comme « bruit préexistant sans rapport »).
+  > **Pas corrigé dans cette session** (hors périmètre de la demande initiale ; ces 4 pièces + 1 formulaire
+  > semblent être des utilitaires internes/exemples plutôt que des fonctionnalités du site en production, mais
+  > ça reste à confirmer avec l'utilisateur avant de les modifier ou de les supprimer). Un futur agent devra soit
+  > réintroduire un `BFFactory` minimal (probablement juste `Factory::getContainer()->get(DatabaseInterface::class)`),
+  > soit réécrire ces 5 pièces avec l'API native, après consultation de l'utilisateur.
 - [x] Remplacer les accesseurs `Factory` dépréciés *(fait le 2026-07-12 : derniers `Factory::getUser()` du moteur,
   des notifications, des exports, des uploads et de l'intégrateur remplacés par `Factory::getApplication()->getIdentity()` ;
   `Factory::getMailer()` remplacé par `MailerFactoryInterface`, `Factory::getCache()` par
@@ -430,13 +443,22 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > **Ce qui reste avant de clore complètement la Phase 9** :
 > - Confirmer Stripe/PayPal/Sofort avec un vrai paiement de test (accès sandbox non disponible dans les sessions
 >   agent) — seul point de la Phase 9a non vérifié en conditions réelles.
-> - Supprimer les 3 `require_once .../BFRequest.php` désormais inertes (`breezingformsng.php`,
->   `bfProcessorUploads.php` — commentaire seulement —, `route.php`) une fois confirmé qu'aucun caller externe
->   (plugins tiers, thèmes personnalisés) ne dépend encore de la classe globale `BFRequest` étant chargée
->   implicitement par ce composant.
-> - Supprimer `libraries/crosstec/classes/BFRequest.php` lui-même et le retirer du paquet.
+> - ~~Supprimer les 3 `require_once .../BFRequest.php`~~ **NE PAS FAIRE — tenté et annulé le 2026-07-12.**
+>   `BFRequest` fait partie de l'API publique historique que les utilisateurs du composant peuvent appeler depuis
+>   du **code PHP personnalisé stocké en base** (Pièces admin, code Intégrateur, ou colonnes `piece1code`/
+>   `piece2code`/etc. d'un formulaire — le contenu de ces champs est du PHP arbitraire évalué via `eval()`, pas
+>   du contenu affiché). Sur le site de dev lui-même, le formulaire `StripePaiement` (id 3) a une pièce
+>   « Avant le formulaire » écrite par un mainteneur du site qui appelle `BFRequest::getVar('ff_page', 1)` pour
+>   retrouver l'ID d'enregistrement après un retour de paiement Stripe. Supprimer le fichier a immédiatement cassé
+>   ce formulaire (`Class "BFRequest" not found`, détecté en rechargeant les 4 formulaires de test après coup —
+>   toujours revérifier après suppression d'un fichier legacy, même quand `grep` sur le code source ne trouve
+>   plus aucun appelant). Un `grep` sur les fichiers `.php` du dépôt ne peut **jamais** garantir qu'aucun site
+>   installé n'a de code personnalisé en base référençant une classe legacy — c'est un angle mort structurel de
+>   toute vérification par grep pour ce composant. `BFRequest.php` et ses 2 `require_once` restent en place
+>   indéfiniment (ou jusqu'à une dépréciation formelle communiquée aux utilisateurs, hors périmètre de cette
+>   migration). Le fichier reste néanmoins mort en interne : plus aucun code du composant lui-même ne l'appelle.
 > - Traiter la Phase 9b (`BFIntegrate`, 445 lignes, SQL concaténé + `eval()` — nécessite une vraie réécriture,
->   pas une substitution) : seul chantier de fond encore ouvert dans ce document.
+>   pas une substitution) — **fait, voir plus bas.**
 
 - **393 appels** répartis sur 19 fichiers. Par volume décroissant :
   1. `components/com_breezingformsng/src/Service/Callback/SofortCallback.php` — 69

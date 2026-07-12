@@ -28,6 +28,7 @@ use Joomla\CMS\Environment\Browser;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Log\Log;
+use Vcmb\Component\BreezingformsNG\Site\Service\RemoteApiClient;
 use CB\Component\Contentbuilderng\Administrator\Helper\ContentbuilderngHelper;
 use CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory;
 use CB\Component\Contentbuilderng\Administrator\Service\ArticleService;
@@ -1394,14 +1395,6 @@ trait bfProcessorNotifications
     function sendMailChimpNotification()
     {
 
-        // listSubscribe(string apikey, string id, string email_address, array merge_vars, string email_type, boolean double_optin, boolean update_existing, boolean replace_interests, boolean send_welcome)
-
-        if (!class_exists('MailChimp')) {
-            require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/mailchimp/MCAPI.class.php');
-        }
-
-
-
         if (trim($this->formrow->mailchimp_email_field) != '' && trim($this->formrow->mailchimp_api_key) != '' && trim($this->formrow->mailchimp_list_id) != '' && count($this->maildata)) {
 
             $email = '';
@@ -1414,7 +1407,8 @@ trait bfProcessorNotifications
             $unsubscribeField = trim($this->formrow->mailchimp_unsubscribe_field);
             $emailField = trim($this->formrow->mailchimp_email_field);
             $mergeVarFields = explode(',', str_replace(' ', '', $this->formrow->mailchimp_mergevars));
-            $api = new MailChimp(trim($this->formrow->mailchimp_api_key));
+            $api = new RemoteApiClient();
+            $apiKey = trim((string) $this->formrow->mailchimp_api_key);
             $list_ids = explode(',', trim($this->formrow->mailchimp_list_id));
 
             if ($checkboxField != '') {
@@ -1456,28 +1450,29 @@ trait bfProcessorNotifications
 
             // MailChimp API v3 update
             foreach ($list_ids as $list_id) {
-                $subHash = $api->subscriberHash($email);
+                $resource = 'lists/' . rawurlencode(trim($list_id)) . '/members/' . md5(strtolower($email));
 
-                if ($email != '' && $checked) {
-                    $try = $api->put('lists/' . trim($list_id) . '/members/' . $subHash, [
-                        'email_address' => $email,
-                        'merge_fields' => (count($mergeVars) == 0 ? new stdClass() : (object) $mergeVars),
-                        'status_if_new' => ($this->formrow->mailchimp_double_optin ? 'pending' : 'subscribed'),
-                        'status' => ($this->formrow->mailchimp_double_optin ? 'pending' : 'subscribed'),
-                        'email_type' => $htmlTextMobile,
-                    ]);
-                } else if ($email != '' && $unsubscribe) {
-                    $try = $api->put('lists/' . trim($list_id) . '/members/' . $subHash, [
-                        'status' => 'unsubscribed',
-                    ]);
-                    if ($this->formrow->mailchimp_delete_member) {
-                        $try = $api->delete('lists/' . trim($list_id) . '/members/' . $subHash);
+                try {
+                    if ($email != '' && $checked) {
+                        $api->mailchimp($apiKey, 'PUT', $resource, [
+                            'email_address' => $email,
+                            'merge_fields' => (object) $mergeVars,
+                            'status_if_new' => ($this->formrow->mailchimp_double_optin ? 'pending' : 'subscribed'),
+                            'status' => ($this->formrow->mailchimp_double_optin ? 'pending' : 'subscribed'),
+                            'email_type' => $htmlTextMobile,
+                        ]);
+                    } else if ($email != '' && $unsubscribe) {
+                        $api->mailchimp($apiKey, 'PUT', $resource, ['status' => 'unsubscribed']);
+                        if ($this->formrow->mailchimp_delete_member) {
+                            $api->mailchimp($apiKey, 'DELETE', $resource);
+                        }
                     }
-                }
-                if (!($api->success()) && $this->formrow->mailchimp_send_errors) {
-                    $from = $this->formrow->alt_mailfrom != '' ? $this->formrow->alt_mailfrom : $this->app->getCfg('mailfrom');
-                    $fromname = $this->formrow->alt_fromname != '' ? $this->formrow->alt_fromname : $this->app->getCfg('fromname');
-                    $this->sendMail($from, $fromname, $from, 'MailChimp API Error', 'Could not send data to MailChimp for email: ' . $email . "\n\nReason: " . $api->getLastError() . "\n" . implode('', $api->getLastResponse()) . "\n" . implode(' ', $api->getLastRequest()));
+                } catch (\Throwable $exception) {
+                    if ($this->formrow->mailchimp_send_errors) {
+                        $from = $this->formrow->alt_mailfrom != '' ? $this->formrow->alt_mailfrom : $this->app->getCfg('mailfrom');
+                        $fromname = $this->formrow->alt_fromname != '' ? $this->formrow->alt_fromname : $this->app->getCfg('fromname');
+                        $this->sendMail($from, $fromname, $from, 'MailChimp API Error', 'Could not send data to MailChimp for email: ' . $email . "\n\nReason: " . $exception->getMessage());
+                    }
                 }
             }
         }

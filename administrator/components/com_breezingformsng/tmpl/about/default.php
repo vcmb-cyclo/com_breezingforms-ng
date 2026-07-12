@@ -193,10 +193,8 @@ if (!function_exists('bf_about_get_php_libraries')) {
         $indexedLibraries = array();
 
         $vendorInstalled = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/vendor/composer/installed.json';
-        $dropboxInstalled = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/dropbox/v2/composer/installed.json';
 
         bf_about_collect_php_libraries_from_installed_json($indexedLibraries, $vendorInstalled);
-        bf_about_collect_php_libraries_from_installed_json($indexedLibraries, $dropboxInstalled);
 
         $libraries = array_values($indexedLibraries);
 

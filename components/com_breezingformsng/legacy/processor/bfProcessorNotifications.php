@@ -152,7 +152,7 @@ trait bfProcessorNotifications
             $recipientsSize = count($recipients);
         }
 
-        $subject = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMRECRECEIVED');
+        $subject = Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMRECRECEIVED');
         if ($this->formrow->custom_mail_subject != '') {
             $subject = $this->formrow->custom_mail_subject;
         }
@@ -192,20 +192,20 @@ trait bfProcessorNotifications
                 $RECORD_ID = '';
 
                 if ($this->record_id != '') {
-                    $PROCESS_RECORDSAVEDID = BFText::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID');
+                    $PROCESS_RECORDSAVEDID = Text::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID');
                     $RECORD_ID = $this->record_id;
                 }
 
-                $PROCESS_FORMID = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMID');
+                $PROCESS_FORMID = Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMID');
                 $FORM = $this->form;
 
-                $PROCESS_FORMTITLE = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMTITLE');
+                $PROCESS_FORMTITLE = Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMTITLE');
                 $TITLE = $this->formrow->title;
 
-                $PROCESS_FORMNAME = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMNAME');
+                $PROCESS_FORMNAME = Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMNAME');
                 $NAME = $this->formrow->name;
 
-                $PROCESS_SUBMITTEDAT = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT');
+                $PROCESS_SUBMITTEDAT = Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT');
 
                 $tz = 'UTC';
                 $tz = new DateTimeZone($this->app->get('offset'));
@@ -222,25 +222,25 @@ trait bfProcessorNotifications
 
                 $SUBMITTED = $date_->format('Y-m-d H:i:s', true);
 
-                $PROCESS_SUBMITTERIP = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP');
+                $PROCESS_SUBMITTERIP = Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP');
                 $IP = $this->ip;
 
-                $PROCESS_PROVIDER = BFText::_('COM_BREEZINGFORMSNG_PROCESS_PROVIDER');
+                $PROCESS_PROVIDER = Text::_('COM_BREEZINGFORMSNG_PROCESS_PROVIDER');
                 $PROVIDER = $this->provider;
 
-                $PROCESS_BROWSER = BFText::_('COM_BREEZINGFORMSNG_PROCESS_BROWSER');
+                $PROCESS_BROWSER = Text::_('COM_BREEZINGFORMSNG_PROCESS_BROWSER');
                 $BROWSER = $this->browser;
 
-                $PROCESS_OPSYS = BFText::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS');
+                $PROCESS_OPSYS = Text::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS');
                 $OPSYS = $this->opsys;
 
-                $PROCESS_SUBMITTERID = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID');
+                $PROCESS_SUBMITTERID = Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID');
                 $SUBMITTERID = 0;
 
-                $PROCESS_SUBMITTERUSERNAME = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME');
+                $PROCESS_SUBMITTERUSERNAME = Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME');
                 $SUBMITTERUSERNAME = '-';
 
-                $PROCESS_SUBMITTERFULLNAME = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME');
+                $PROCESS_SUBMITTERFULLNAME = Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME');
                 $SUBMITTERFULLNAME = '-';
 
                 if (Factory::getUser()->get('id', 0) > 0) {
@@ -283,18 +283,18 @@ trait bfProcessorNotifications
                 $submitted = $date_->format('Y-m-d H:i:s', true);
 
                 if ($this->record_id != '')
-                    $body .= BFText::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID') . " " . $this->record_id . nl() . nl();
-                $body .= BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMID') . ": " . $this->form . nl() .
-                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMTITLE') . ": " . $this->formrow->title . nl() .
-                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMNAME') . ": " . $this->formrow->name . nl() . nl() .
-                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT') . ": " . $submitted . nl() .
-                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP') . ": " . $this->ip . nl() .
-                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID') . ": " . Factory::getUser()->get('id', 0) . nl() .
-                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME') . ": " . Factory::getUser()->get('username', '') . nl() .
-                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME') . ": " . Factory::getUser()->get('name', '') . nl() .
-                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_PROVIDER') . ": " . $this->provider . nl() .
-                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_BROWSER') . ": " . $this->browser . nl() .
-                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS') . ": " . $this->opsys . nl() . nl();
+                    $body .= Text::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID') . " " . $this->record_id . nl() . nl();
+                $body .= Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMID') . ": " . $this->form . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMTITLE') . ": " . $this->formrow->title . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMNAME') . ": " . $this->formrow->name . nl() . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT') . ": " . $submitted . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP') . ": " . $this->ip . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID') . ": " . Factory::getUser()->get('id', 0) . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME') . ": " . Factory::getUser()->get('username', '') . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME') . ": " . Factory::getUser()->get('name', '') . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_PROVIDER') . ": " . $this->provider . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_BROWSER') . ": " . $this->browser . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS') . ": " . $this->opsys . nl() . nl();
                 if (count($this->maildata)) {
                     foreach ($this->maildata as $data) {
                         $subject = str_replace('{' . $data[_FF_DATA_NAME] . ':label}', strip_tags($data[_FF_DATA_TITLE]), $subject);
@@ -346,43 +346,43 @@ trait bfProcessorNotifications
                 $SUBMITTERFULLNAME = Factory::getUser()->get('name', '');
             }
 
-            $body = str_replace('{BF_RECORD_ID:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID'), $body);
+            $body = str_replace('{BF_RECORD_ID:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID'), $body);
             $body = str_replace('{BF_RECORD_ID:value}', $RECORD_ID, $body);
 
-            $body = str_replace('{BF_FORM_ID:label}', BFText::_('Form ID'), $body);
+            $body = str_replace('{BF_FORM_ID:label}', Text::_('Form ID'), $body);
             $body = str_replace('{BF_FORM_ID:value}', $this->form_id, $body);
 
-            $body = str_replace('{BF_FORM:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMID'), $body);
+            $body = str_replace('{BF_FORM:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMID'), $body);
             $body = str_replace('{BF_FORM:value}', $FORM, $body);
 
-            $body = str_replace('{BF_TITLE:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMTITLE'), $body);
+            $body = str_replace('{BF_TITLE:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMTITLE'), $body);
             $body = str_replace('{BF_TITLE:value}', $TITLE, $body);
 
-            $body = str_replace('{BF_FORMNAME:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMNAME'), $body);
+            $body = str_replace('{BF_FORMNAME:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMNAME'), $body);
             $body = str_replace('{BF_FORMNAME:value}', $FORMNAME, $body);
 
-            $body = str_replace('{BF_SUBMITTED:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT'), $body);
+            $body = str_replace('{BF_SUBMITTED:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT'), $body);
             $body = str_replace('{BF_SUBMITTED:value}', $SUBMITTED, $body);
 
-            $body = str_replace('{BF_IP:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP'), $body);
+            $body = str_replace('{BF_IP:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP'), $body);
             $body = str_replace('{BF_IP:value}', $IP, $body);
 
-            $body = str_replace('{BF_PROVIDER:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_PROVIDER'), $body);
+            $body = str_replace('{BF_PROVIDER:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_PROVIDER'), $body);
             $body = str_replace('{BF_PROVIDER:value}', $PROVIDER, $body);
 
-            $body = str_replace('{BF_BROWSER:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_BROWSER'), $body);
+            $body = str_replace('{BF_BROWSER:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_BROWSER'), $body);
             $body = str_replace('{BF_BROWSER:value}', $BROWSER, $body);
 
-            $body = str_replace('{BF_OPSYS:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS'), $body);
+            $body = str_replace('{BF_OPSYS:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS'), $body);
             $body = str_replace('{BF_OPSYS:value}', $OPSYS, $body);
 
-            $body = str_replace('{BF_SUBMITTERID:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID'), $body);
+            $body = str_replace('{BF_SUBMITTERID:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID'), $body);
             $body = str_replace('{BF_SUBMITTERID:value}', $SUBMITTERID, $body);
 
-            $body = str_replace('{BF_SUBMITTERUSERNAME:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME'), $body);
+            $body = str_replace('{BF_SUBMITTERUSERNAME:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME'), $body);
             $body = str_replace('{BF_SUBMITTERUSERNAME:value}', $SUBMITTERUSERNAME, $body);
 
-            $body = str_replace('{BF_SUBMITTERFULLNAME:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME'), $body);
+            $body = str_replace('{BF_SUBMITTERFULLNAME:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME'), $body);
             $body = str_replace('{BF_SUBMITTERFULLNAME:value}', $SUBMITTERFULLNAME, $body);
 
             if (count($this->savedata)) {
@@ -801,7 +801,7 @@ trait bfProcessorNotifications
 
         $recipientsSize = count($recipients);
 
-        $subject = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMRECRECEIVED');
+        $subject = Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMRECRECEIVED');
         if ($this->formrow->mb_custom_mail_subject != '') {
             $subject = $this->formrow->mb_custom_mail_subject;
         }
@@ -943,22 +943,22 @@ trait bfProcessorNotifications
                 $RECORD_ID = '';
 
                 if ($this->record_id != '') {
-                    $PROCESS_RECORDSAVEDID = BFText::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID');
+                    $PROCESS_RECORDSAVEDID = Text::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID');
                     $RECORD_ID = $this->record_id;
                 }
 
-                $PROCESS_FORMID = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMID');
+                $PROCESS_FORMID = Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMID');
                 $FORM = $this->form;
 
-                $PROCESS_FORMTITLE = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMTITLE');
+                $PROCESS_FORMTITLE = Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMTITLE');
 
                 $form_title_translated = $this->getFormTitleTranslated();
                 $TITLE = $form_title_translated != '' ? $form_title_translated : $this->formrow->title;
 
-                $PROCESS_FORMNAME = BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMNAME');
+                $PROCESS_FORMNAME = Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMNAME');
                 $NAME = $this->formrow->name;
 
-                $PROCESS_SUBMITTEDAT = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT');
+                $PROCESS_SUBMITTEDAT = Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT');
                 $SUBMITTED = $this->submitted;
 
                 $tz = 'UTC';
@@ -975,25 +975,25 @@ trait bfProcessorNotifications
 
                 $SUBMITTED = $date_->format('Y-m-d H:i:s', true);
 
-                $PROCESS_SUBMITTERIP = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP');
+                $PROCESS_SUBMITTERIP = Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP');
                 $IP = $this->ip;
 
-                $PROCESS_PROVIDER = BFText::_('COM_BREEZINGFORMSNG_PROCESS_PROVIDER');
+                $PROCESS_PROVIDER = Text::_('COM_BREEZINGFORMSNG_PROCESS_PROVIDER');
                 $PROVIDER = $this->provider;
 
-                $PROCESS_BROWSER = BFText::_('COM_BREEZINGFORMSNG_PROCESS_BROWSER');
+                $PROCESS_BROWSER = Text::_('COM_BREEZINGFORMSNG_PROCESS_BROWSER');
                 $BROWSER = $this->browser;
 
-                $PROCESS_OPSYS = BFText::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS');
+                $PROCESS_OPSYS = Text::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS');
                 $OPSYS = $this->opsys;
 
-                $PROCESS_SUBMITTERID = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID');
+                $PROCESS_SUBMITTERID = Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID');
                 $SUBMITTERID = 0;
 
-                $PROCESS_SUBMITTERUSERNAME = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME');
+                $PROCESS_SUBMITTERUSERNAME = Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME');
                 $SUBMITTERUSERNAME = '-';
 
-                $PROCESS_SUBMITTERFULLNAME = BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME');
+                $PROCESS_SUBMITTERFULLNAME = Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME');
                 $SUBMITTERFULLNAME = '-';
 
                 if (Factory::getUser()->get('id', 0) > 0) {
@@ -1031,7 +1031,7 @@ trait bfProcessorNotifications
                 // fallback if no template exists
 
                 if ($this->record_id != '')
-                    $body .= BFText::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID') . " " . $this->record_id . nl() . nl();
+                    $body .= Text::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID') . " " . $this->record_id . nl() . nl();
 
                 $form_title_translated = $this->getFormTitleTranslated();
 
@@ -1050,17 +1050,17 @@ trait bfProcessorNotifications
 
                 $submitted = $date_->format('Y-m-d H:i:s', true);
 
-                $body .= BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMID') . ": " . $this->form . nl() .
-                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMTITLE') . ": " . ($form_title_translated != '' ? $form_title_translated : $this->formrow->title) . nl() .
-                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMNAME') . ": " . $this->formrow->name . nl() . nl() .
-                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT') . ": " . $submitted . nl() .
-                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP') . ": " . $this->ip . nl() .
-                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID') . ": " . Factory::getUser()->get('id', 0) . nl() .
-                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME') . ": " . Factory::getUser()->get('username', '') . nl() .
-                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME') . ": " . Factory::getUser()->get('name', '') . nl() .
-                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_PROVIDER') . ": " . $this->provider . nl() .
-                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_BROWSER') . ": " . $this->browser . nl() .
-                    BFText::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS') . ": " . $this->opsys . nl() . nl();
+                $body .= Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMID') . ": " . $this->form . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMTITLE') . ": " . ($form_title_translated != '' ? $form_title_translated : $this->formrow->title) . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMNAME') . ": " . $this->formrow->name . nl() . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT') . ": " . $submitted . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP') . ": " . $this->ip . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID') . ": " . Factory::getUser()->get('id', 0) . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME') . ": " . Factory::getUser()->get('username', '') . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME') . ": " . Factory::getUser()->get('name', '') . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_PROVIDER') . ": " . $this->provider . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_BROWSER') . ": " . $this->browser . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS') . ": " . $this->opsys . nl() . nl();
                 if (count($this->maildata)) {
                     foreach ($this->maildata as $data) {
                         $trans_title = '';
@@ -1125,43 +1125,43 @@ trait bfProcessorNotifications
                 $SUBMITTERFULLNAME = Factory::getUser()->get('name', '');
             }
 
-            $body = str_replace('{BF_RECORD_ID:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID'), $body);
+            $body = str_replace('{BF_RECORD_ID:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID'), $body);
             $body = str_replace('{BF_RECORD_ID:value}', $RECORD_ID, $body);
 
-            $body = str_replace('{BF_FORM_ID:label}', BFText::_('Form ID'), $body);
+            $body = str_replace('{BF_FORM_ID:label}', Text::_('Form ID'), $body);
             $body = str_replace('{BF_FORM_ID:value}', $this->form_id, $body);
 
-            $body = str_replace('{BF_FORM:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMID'), $body);
+            $body = str_replace('{BF_FORM:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMID'), $body);
             $body = str_replace('{BF_FORM:value}', $FORM, $body);
 
-            $body = str_replace('{BF_TITLE:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMTITLE'), $body);
+            $body = str_replace('{BF_TITLE:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMTITLE'), $body);
             $body = str_replace('{BF_TITLE:value}', $TITLE, $body);
 
-            $body = str_replace('{BF_FORMNAME:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_FORMNAME'), $body);
+            $body = str_replace('{BF_FORMNAME:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMNAME'), $body);
             $body = str_replace('{BF_FORMNAME:value}', $FORMNAME, $body);
 
-            $body = str_replace('{BF_SUBMITTED:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT'), $body);
+            $body = str_replace('{BF_SUBMITTED:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT'), $body);
             $body = str_replace('{BF_SUBMITTED:value}', $SUBMITTED, $body);
 
-            $body = str_replace('{BF_IP:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP'), $body);
+            $body = str_replace('{BF_IP:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP'), $body);
             $body = str_replace('{BF_IP:value}', $IP, $body);
 
-            $body = str_replace('{BF_PROVIDER:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_PROVIDER'), $body);
+            $body = str_replace('{BF_PROVIDER:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_PROVIDER'), $body);
             $body = str_replace('{BF_PROVIDER:value}', $PROVIDER, $body);
 
-            $body = str_replace('{BF_BROWSER:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_BROWSER'), $body);
+            $body = str_replace('{BF_BROWSER:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_BROWSER'), $body);
             $body = str_replace('{BF_BROWSER:value}', $BROWSER, $body);
 
-            $body = str_replace('{BF_OPSYS:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS'), $body);
+            $body = str_replace('{BF_OPSYS:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS'), $body);
             $body = str_replace('{BF_OPSYS:value}', $OPSYS, $body);
 
-            $body = str_replace('{BF_SUBMITTERID:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID'), $body);
+            $body = str_replace('{BF_SUBMITTERID:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID'), $body);
             $body = str_replace('{BF_SUBMITTERID:value}', $SUBMITTERID, $body);
 
-            $body = str_replace('{BF_SUBMITTERUSERNAME:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME'), $body);
+            $body = str_replace('{BF_SUBMITTERUSERNAME:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME'), $body);
             $body = str_replace('{BF_SUBMITTERUSERNAME:value}', $SUBMITTERUSERNAME, $body);
 
-            $body = str_replace('{BF_SUBMITTERFULLNAME:label}', BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME'), $body);
+            $body = str_replace('{BF_SUBMITTERFULLNAME:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME'), $body);
             $body = str_replace('{BF_SUBMITTERFULLNAME:value}', $SUBMITTERFULLNAME, $body);
 
             if (count($this->savedata)) {

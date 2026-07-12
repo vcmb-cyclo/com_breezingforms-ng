@@ -10,7 +10,6 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service;
 \defined('_JEXEC') or die;
 
 use BFRequest;
-use BFText;
 use Exception;
 use HTML_facileFormsProcessor;
 use Joomla\CMS\Factory;

@@ -8,57 +8,58 @@
 defined('_JEXEC') or die;
 
 use Joomla\CMS\HTML\Helpers\Bootstrap;
+use Joomla\CMS\Language\Text;
 ?>
                                     <div class="bfProperties" id="bfSectionProperties" style="display:none">
                                         <br />
                                         <fieldset>
                                             <legend>
-                                                <?php echo BFText::_('COM_BREEZINGFORMSNG_SECTION_PROPERTIES'); ?>
+                                                <?php echo Text::_('COM_BREEZINGFORMSNG_SECTION_PROPERTIES'); ?>
                                             </legend>
                                             <div class="bfPropertyWrap">
                                                 <label class="bfPropertyLabel hasTooltip"
-                                                    title="<?php echo bf_tooltipText(BFText::_('COM_BREEZINGFORMSNG_QM_SECTION_TYPE')); ?>"
+                                                    title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_SECTION_TYPE')); ?>"
                                                     for="bfSectionType">
-                                                    <?php echo BFText::_('COM_BREEZINGFORMSNG_SECTION_TYPE'); ?>
+                                                    <?php echo Text::_('COM_BREEZINGFORMSNG_SECTION_TYPE'); ?>
                                                 </label>
                                                 <select id="bfSectionType">
                                                     <option value="normal">
-                                                        <?php echo BFText::_('COM_BREEZINGFORMSNG_NORMAL'); ?>
+                                                        <?php echo Text::_('COM_BREEZINGFORMSNG_NORMAL'); ?>
                                                     </option>
                                                     <option value="section">
-                                                        <?php echo BFText::_('COM_BREEZINGFORMSNG_FIELDSET'); ?>
+                                                        <?php echo Text::_('COM_BREEZINGFORMSNG_FIELDSET'); ?>
                                                     </option>
                                                 </select>
                                             </div>
                                             <div class="bfPropertyWrap">
                                                 <label class="bfPropertyLabel hasTooltip"
-                                                    title="<?php echo bf_tooltipText(BFText::_('COM_BREEZINGFORMSNG_QM_SECTION_DISPLAY_TYPE')); ?>"
+                                                    title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_SECTION_DISPLAY_TYPE')); ?>"
                                                     for="bfSectionDisplayType">
-                                                    <?php echo BFText::_('COM_BREEZINGFORMSNG_SECTION_DISPLAY_TYPE'); ?>
+                                                    <?php echo Text::_('COM_BREEZINGFORMSNG_SECTION_DISPLAY_TYPE'); ?>
                                                 </label>
                                                 <select id="bfSectionDisplayType">
                                                     <option value="inline">
-                                                        <?php echo BFText::_('COM_BREEZINGFORMSNG_INLINE'); ?>
+                                                        <?php echo Text::_('COM_BREEZINGFORMSNG_INLINE'); ?>
                                                     </option>
                                                     <option value="breaks">
-                                                        <?php echo BFText::_('COM_BREEZINGFORMSNG_BREAKS'); ?>
+                                                        <?php echo Text::_('COM_BREEZINGFORMSNG_BREAKS'); ?>
                                                     </option>
                                                 </select>
                                             </div>
                                             <div class="bfPropertyWrap">
                                                 <label class="bfPropertyLabel hasTooltip"
-                                                    title="<?php echo bf_tooltipText(BFText::_('COM_BREEZINGFORMSNG_QM_SECTION_TITLE')); ?>"
+                                                    title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_SECTION_TITLE')); ?>"
                                                     for="bfSectionTitle">
-                                                    <?php echo BFText::_('COM_BREEZINGFORMSNG_SECTION_TITLE'); ?>
+                                                    <?php echo Text::_('COM_BREEZINGFORMSNG_SECTION_TITLE'); ?>
                                                 </label>
                                                 <input type="text" value="" id="bfSectionTitle" />
                                             </div>
 
                                             <div class="bfPropertyWrap bfTrans">
                                                 <label class="bfPropertyLabel hasTooltip"
-                                                    title="<?php echo bf_tooltipText(BFText::_('COM_BREEZINGFORMSNG_QM_SECTION_TITLE')); ?>"
+                                                    title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_SECTION_TITLE')); ?>"
                                                     for="bfSectionTitleTrans">
-                                                    <?php echo BFText::_('COM_BREEZINGFORMSNG_SECTION_TITLE'); ?>
+                                                    <?php echo Text::_('COM_BREEZINGFORMSNG_SECTION_TITLE'); ?>
                                                     <br /><em>(
                                                         <?php echo $active_language_code ?>)
                                                     </em>
@@ -68,17 +69,17 @@ use Joomla\CMS\HTML\Helpers\Bootstrap;
 
                                             <div class="bfPropertyWrap">
                                                 <label class="bfPropertyLabel hasTooltip"
-                                                    title="<?php echo bf_tooltipText(BFText::_('COM_BREEZINGFORMSNG_QM_SECTION_NAME')); ?>"
+                                                    title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_SECTION_NAME')); ?>"
                                                     for="bfSectionName">
-                                                    <?php echo BFText::_('COM_BREEZINGFORMSNG_SECTION_NAME'); ?>
+                                                    <?php echo Text::_('COM_BREEZINGFORMSNG_SECTION_NAME'); ?>
                                                 </label>
                                                 <input type="text" value="" id="bfSectionName" />
                                             </div>
                                             <div class="bfPropertyWrap">
                                                 <label class="bfPropertyLabel hasTooltip"
-                                                    title="<?php echo bf_tooltipText(BFText::_('COM_BREEZINGFORMSNG_QM_SECTION_DESCRIPTION')); ?>"
+                                                    title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_SECTION_DESCRIPTION')); ?>"
                                                     for="bfSectionDescription">
-                                                    <?php echo BFText::_('COM_BREEZINGFORMSNG_SECTION_DESCRIPTION'); ?>
+                                                    <?php echo Text::_('COM_BREEZINGFORMSNG_SECTION_DESCRIPTION'); ?>
                                                 </label>
 
 
@@ -95,16 +96,16 @@ use Joomla\CMS\HTML\Helpers\Bootstrap;
 
                                                 <a
                                                     href="javascript:jQuery('#bfPropertiesDescriptionModal').modal('show');void(0);">
-                                                    <?php echo BFText::_('COM_BREEZINGFORMSNG_EDIT_DESCRIPTION'); ?>
+                                                    <?php echo Text::_('COM_BREEZINGFORMSNG_EDIT_DESCRIPTION'); ?>
                                                 </a>
 
                                             </div>
 
                                             <div class="bfPropertyWrap bfTrans">
                                                 <label class="bfPropertyLabel hasTooltip"
-                                                    title="<?php echo bf_tooltipText(BFText::_('COM_BREEZINGFORMSNG_QM_SECTION_DESCRIPTION')); ?>"
+                                                    title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_SECTION_DESCRIPTION')); ?>"
                                                     for="bfSectionDescriptionTrans">
-                                                    <?php echo BFText::_('COM_BREEZINGFORMSNG_SECTION_DESCRIPTION'); ?>
+                                                    <?php echo Text::_('COM_BREEZINGFORMSNG_SECTION_DESCRIPTION'); ?>
                                                     <br /><em>(
                                                         <?php echo $active_language_code ?>)
                                                     </em>
@@ -123,7 +124,7 @@ use Joomla\CMS\HTML\Helpers\Bootstrap;
 
                                                 <a
                                                     href="javascript:jQuery('#bfPropertiesDescriptionModal').modal('show');void(0);">
-                                                    <?php echo BFText::_('COM_BREEZINGFORMSNG_EDIT_DESCRIPTION'); ?>
+                                                    <?php echo Text::_('COM_BREEZINGFORMSNG_EDIT_DESCRIPTION'); ?>
                                                 </a>
 
 

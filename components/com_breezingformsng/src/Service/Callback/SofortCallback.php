@@ -10,7 +10,6 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Callback;
 \defined('_JEXEC') or die;
 
 use BFRequest;
-use BFText;
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
@@ -48,7 +47,7 @@ class SofortCallback
             $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($formId));
             $list = $db->loadObjectList();
             if (count($list) == 0) {
-                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
+                BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
                 exit;
             }
 
@@ -56,7 +55,7 @@ class SofortCallback
 
             $areas = json_decode($form->template_areas, true);
             if (!is_array($areas)) {
-                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_SU_DATA'));
+                BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_SU_DATA'));
             }
 
             foreach ($areas as $area) {
@@ -88,7 +87,7 @@ class SofortCallback
                             if ($options['thankYouPage'] != '') {
                                 BFRedirect($options['thankYouPage']);
                             } else {
-                                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_PAYING_WITH_SU'));
+                                BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_PAYING_WITH_SU'));
                             }
                         }
 
@@ -204,36 +203,36 @@ class SofortCallback
                             $recipients = explode('###', BFRequest::getVar('user_variable_2', ''));
                             $recipientsSize = count($recipients);
                             $mailer = Factory::getMailer();
-                            $mailer->Subject = BFText::_('COM_BREEZINGFORMSNG_YOUR_PAYMENT_AT_SU');
-                            $mailer->Body = BFText::_('COM_BREEZINGFORMSNG_HALLO') . "\n\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_YOUR_PAYMENT_SUCCEEDED') . "\n\n";
+                            $mailer->Subject = Text::_('COM_BREEZINGFORMSNG_YOUR_PAYMENT_AT_SU');
+                            $mailer->Body = Text::_('COM_BREEZINGFORMSNG_HALLO') . "\n\n";
+                            $mailer->Body .= Text::_('COM_BREEZINGFORMSNG_YOUR_PAYMENT_SUCCEEDED') . "\n\n";
                             $mailer->Body .= '--------------------------------------' . "\n\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_REASON1') . ': ' . BFRequest::getVar('reason_1', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_REASON2') . ': ' . BFRequest::getVar('reason_2', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_AMOUNT') . ': ' . str_replace('.', ',', BFRequest::getVar('amount', '')) . ' ' . BFRequest::getVar('currency_id', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_TRANSACTION') . ': ' . BFRequest::getVar('transaction', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_ACCOUNT_HOLDER') . ': ' . BFRequest::getVar('sender_holder', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_ACCOUNT_NUMBER') . ': ' . BFRequest::getVar('sender_account_number', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_BANK_CODE') . ': ' . BFRequest::getVar('recipient_bank_code', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_BANK_NAME') . ': ' . BFRequest::getVar('sender_bank_name', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_BIC') . ': ' . BFRequest::getVar('sender_bank_bic', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_IBAN') . ': ' . BFRequest::getVar('sender_iban', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_PAYMENT_DATE') . ': ' . BFRequest::getVar('created', '') . "\n\n";
+                            $mailer->Body .= Text::_('COM_BREEZINGFORMSNG_REASON1') . ': ' . BFRequest::getVar('reason_1', '') . "\n";
+                            $mailer->Body .= Text::_('COM_BREEZINGFORMSNG_REASON2') . ': ' . BFRequest::getVar('reason_2', '') . "\n";
+                            $mailer->Body .= Text::_('COM_BREEZINGFORMSNG_AMOUNT') . ': ' . str_replace('.', ',', BFRequest::getVar('amount', '')) . ' ' . BFRequest::getVar('currency_id', '') . "\n";
+                            $mailer->Body .= Text::_('COM_BREEZINGFORMSNG_TRANSACTION') . ': ' . BFRequest::getVar('transaction', '') . "\n";
+                            $mailer->Body .= Text::_('COM_BREEZINGFORMSNG_ACCOUNT_HOLDER') . ': ' . BFRequest::getVar('sender_holder', '') . "\n";
+                            $mailer->Body .= Text::_('COM_BREEZINGFORMSNG_ACCOUNT_NUMBER') . ': ' . BFRequest::getVar('sender_account_number', '') . "\n";
+                            $mailer->Body .= Text::_('COM_BREEZINGFORMSNG_BANK_CODE') . ': ' . BFRequest::getVar('recipient_bank_code', '') . "\n";
+                            $mailer->Body .= Text::_('COM_BREEZINGFORMSNG_BANK_NAME') . ': ' . BFRequest::getVar('sender_bank_name', '') . "\n";
+                            $mailer->Body .= Text::_('COM_BREEZINGFORMSNG_BIC') . ': ' . BFRequest::getVar('sender_bank_bic', '') . "\n";
+                            $mailer->Body .= Text::_('COM_BREEZINGFORMSNG_IBAN') . ': ' . BFRequest::getVar('sender_iban', '') . "\n";
+                            $mailer->Body .= Text::_('COM_BREEZINGFORMSNG_PAYMENT_DATE') . ': ' . BFRequest::getVar('created', '') . "\n\n";
 
                             $mailer->Body .= '--------------------------------------' . "\n\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_RECEIPT_FOR_YOUR_PAYMENT') . "\n\n";
+                            $mailer->Body .= Text::_('COM_BREEZINGFORMSNG_RECEIPT_FOR_YOUR_PAYMENT') . "\n\n";
                             $mailer->Body .= '--------------------------------------' . "\n\n";
 
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_ACCOUNT_HOLDER') . ': ' . BFRequest::getVar('recipient_holder', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_ACCOUNT_NUMBER') . ': ' . BFRequest::getVar('recipient_account_number', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_BANK_CODE') . ': ' . BFRequest::getVar('recipient_bank_code', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_BANK_NAME') . ': ' . BFRequest::getVar('recipient_bank_name', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_BIC') . ': ' . BFRequest::getVar('recipient_bank_bic', '') . "\n";
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_IBAN') . ': ' . BFRequest::getVar('recipient_iban', '') . "\n\n";
+                            $mailer->Body .= Text::_('COM_BREEZINGFORMSNG_ACCOUNT_HOLDER') . ': ' . BFRequest::getVar('recipient_holder', '') . "\n";
+                            $mailer->Body .= Text::_('COM_BREEZINGFORMSNG_ACCOUNT_NUMBER') . ': ' . BFRequest::getVar('recipient_account_number', '') . "\n";
+                            $mailer->Body .= Text::_('COM_BREEZINGFORMSNG_BANK_CODE') . ': ' . BFRequest::getVar('recipient_bank_code', '') . "\n";
+                            $mailer->Body .= Text::_('COM_BREEZINGFORMSNG_BANK_NAME') . ': ' . BFRequest::getVar('recipient_bank_name', '') . "\n";
+                            $mailer->Body .= Text::_('COM_BREEZINGFORMSNG_BIC') . ': ' . BFRequest::getVar('recipient_bank_bic', '') . "\n";
+                            $mailer->Body .= Text::_('COM_BREEZINGFORMSNG_IBAN') . ': ' . BFRequest::getVar('recipient_iban', '') . "\n\n";
 
                             $mailer->Body .= '--------------------------------------' . "\n\n";
 
-                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_PAYMENT_GATEWAY_SU');
+                            $mailer->Body .= Text::_('COM_BREEZINGFORMSNG_PAYMENT_GATEWAY_SU');
 
                             for ($i = 0; $i < $recipientsSize; $i++) {
                                 if (bf_is_email($recipients[$i])) {
@@ -276,7 +275,7 @@ class SofortCallback
     $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote(BFRequest::getInt('form', -1)));
     $list = $db->loadObjectList();
     if (count($list) == 0) {
-        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
+        BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
         exit;
     }
 
@@ -284,7 +283,7 @@ class SofortCallback
 
     $areas = json_decode($form->template_areas, true);
     if (!is_array($areas)) {
-        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYMENT_DATA'));
+        BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYMENT_DATA'));
     }
 
     foreach ($areas as $area) {
@@ -326,21 +325,21 @@ class SofortCallback
                             $db->execute();
 
                             if (!file_exists($file)) {
-                                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_DOWNLOAD_FILE'));
+                                BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_DOWNLOAD_FILE'));
                             }
 
                             \Vcmb\Component\BreezingformsNG\Site\Service\Support\DownloadHelper::stream($file);
                         } else {
 
-                            BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_MAX_DOWNLOAD_TRIES_REACHED'));
+                            BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_MAX_DOWNLOAD_TRIES_REACHED'));
                         }
                     } else {
 
-                        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_DOWNLOAD_NOT_POSSIBLE'));
+                        BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_DOWNLOAD_NOT_POSSIBLE'));
                     }
                 } else {
 
-                    BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_NO_DOWNLOADABLE_PRODUCT'));
+                    BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_NO_DOWNLOADABLE_PRODUCT'));
                 }
 
                 break;

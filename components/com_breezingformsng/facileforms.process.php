@@ -109,7 +109,7 @@ function ff_trace($msg = null)
     $trc = '';
     for ($l = 0; $l < $level; $l++)
         $trc .= '  ';
-    $trc .= BFText::_('COM_BREEZINGFORMSNG_PROCESS_MSGUNKNOWN') . ": $msg\n";
+    $trc .= Text::_('COM_BREEZINGFORMSNG_PROCESS_MSGUNKNOWN') . ": $msg\n";
     $ff_processor->traceBuffer .= htmlspecialchars($trc, ENT_QUOTES);
     if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
         $ff_processor->dumpTrace();
@@ -129,7 +129,7 @@ function _ff_trace($line, $msg = null)
         $trc = '';
         for ($l = 0; $l < $level; $l++)
             $trc .= '  ';
-        $trc .= BFText::_('COM_BREEZINGFORMSNG_PROCESS_LINE') . " $line: $msg\n";
+        $trc .= Text::_('COM_BREEZINGFORMSNG_PROCESS_LINE') . " $line: $msg\n";
         $ff_processor->traceBuffer .= htmlspecialchars($trc, ENT_QUOTES);
         if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
             $ff_processor->dumpTrace();
@@ -189,7 +189,7 @@ function _ff_tracePiece($newmode, $name, $line, $type, $id, $pane)
         for ($l = 0; $l < $level; $l++)
             $ff_processor->traceBuffer .= '  ';
         $ff_processor->traceBuffer .= htmlspecialchars(
-            "+" . BFText::_('COM_BREEZINGFORMSNG_PROCESS_ENTER') . " $name " . BFText::_('COM_BREEZINGFORMSNG_PROCESS_ATLINE') . " $line\n",
+            "+" . Text::_('COM_BREEZINGFORMSNG_PROCESS_ENTER') . " $name " . Text::_('COM_BREEZINGFORMSNG_PROCESS_ATLINE') . " $line\n",
             ENT_QUOTES
         );
         if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
@@ -212,7 +212,7 @@ function _ff_traceFunction($newmode, $name, $line, $type, $id, $pane, &$args)
         $trc = '';
         for ($l = 0; $l < $level; $l++)
             $trc .= '  ';
-        $trc .= "+" . BFText::_('COM_BREEZINGFORMSNG_PROCESS_ENTER') . " $name(";
+        $trc .= "+" . Text::_('COM_BREEZINGFORMSNG_PROCESS_ENTER') . " $name(";
         if ($args) {
             $next = false;
             foreach ($args as $arg) {
@@ -236,18 +236,18 @@ function _ff_traceFunction($newmode, $name, $line, $type, $id, $pane, &$args)
                                 $trc .= "'$arg'";
                             } else
                                 if (is_array($arg))
-                                    $trc .= BFText::_('COM_BREEZINGFORMSNG_PROCESS_ARRAY');
+                                    $trc .= Text::_('COM_BREEZINGFORMSNG_PROCESS_ARRAY');
                                 else
                                     if (is_object($arg))
-                                        $trc .= BFText::_('COM_BREEZINGFORMSNG_PROCESS_OBJECT');
+                                        $trc .= Text::_('COM_BREEZINGFORMSNG_PROCESS_OBJECT');
                                     else
                                         if (is_resource($arg))
-                                            $trc .= BFText::_('COM_BREEZINGFORMSNG_PROCESS_RESOURCE');
+                                            $trc .= Text::_('COM_BREEZINGFORMSNG_PROCESS_RESOURCE');
                                         else
                                             $trc .= _FACILEFORMS_PROCESS_UNKTYPE;
             } // foreach
         } // if
-        $trc .= ") " . BFText::_('COM_BREEZINGFORMSNG_PROCESS_ATLINE') . " $line\n";
+        $trc .= ") " . Text::_('COM_BREEZINGFORMSNG_PROCESS_ATLINE') . " $line\n";
         $ff_processor->traceBuffer .= htmlspecialchars($trc, ENT_QUOTES);
         if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
             $ff_processor->dumpTrace();
@@ -293,7 +293,7 @@ function _ff_traceExit($line, $retval = null)
             for ($l = 0; $l < $level; $l++)
                 $ff_processor->traceBuffer .= '  ';
             $ff_processor->traceBuffer .= htmlspecialchars(
-                "-" . BFText::_('COM_BREEZINGFORMSNG_PROCESS_LEAVE') . " $name " . BFText::_('COM_BREEZINGFORMSNG_PROCESS_ATLINE') . " $line\n",
+                "-" . Text::_('COM_BREEZINGFORMSNG_PROCESS_LEAVE') . " $name " . Text::_('COM_BREEZINGFORMSNG_PROCESS_ATLINE') . " $line\n",
                 ENT_QUOTES
             );
             if ($oldmode & _FF_TRACEMODE_DIRECT)
@@ -302,11 +302,11 @@ function _ff_traceExit($line, $retval = null)
         if ($oldmode != $newmode)
             $ff_processor->traceMode = ($oldmode & ~_FF_TRACEMODE_VARIABLE) | ($newmode & _FF_TRACEMODE_VARIABLE);
     } else {
-        $ff_processor->traceBuffer .= htmlspecialchars(BFText::_('COM_BREEZINGFORMSNG_PROCESS_WARNSTK') . "\n", ENT_QUOTES);
+        $ff_processor->traceBuffer .= htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_PROCESS_WARNSTK') . "\n", ENT_QUOTES);
         if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
             $ff_processor->dumpTrace();
         $type = $id = $pane = null;
-        $name = BFText::_('COM_BREEZINGFORMSNG_PROCESS_UNKNOWN');
+        $name = Text::_('COM_BREEZINGFORMSNG_PROCESS_UNKNOWN');
     } // if
     return $retval;
 }
@@ -321,8 +321,8 @@ function _ff_errorHandler($errno, $errstr, $errfile, $errline)
     if (isset($ff_processor->dying) && $ff_processor->dying)
         return;
 
-    $msg = "\n<strong>*** " . htmlspecialchars(BFText::_('COM_BREEZINGFORMSNG_PROCESS_EXCAUGHT'), ENT_QUOTES) . " ***</strong>\n" .
-        htmlspecialchars(BFText::_('COM_BREEZINGFORMSNG_PROCESS_PHPLEVEL') . ' ', ENT_QUOTES);
+    $msg = "\n<strong>*** " . htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_PROCESS_EXCAUGHT'), ENT_QUOTES) . " ***</strong>\n" .
+        htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_PROCESS_PHPLEVEL') . ' ', ENT_QUOTES);
     $fail = false;
     if (!defined('E_DEPRECATED')) {
         define('E_DEPRECATED', 8192);
@@ -360,8 +360,8 @@ function _ff_errorHandler($errno, $errstr, $errfile, $errline)
             $fail = true;
     } // switch
     $msg .= htmlspecialchars(
-        "\n" . BFText::_('COM_BREEZINGFORMSNG_PROCESS_PHPFILE') . " $errfile\n" .
-        BFText::_('COM_BREEZINGFORMSNG_PROCESS_PHPLINE') . " $errline\n",
+        "\n" . Text::_('COM_BREEZINGFORMSNG_PROCESS_PHPFILE') . " $errfile\n" .
+        Text::_('COM_BREEZINGFORMSNG_PROCESS_PHPLINE') . " $errline\n",
         ENT_QUOTES
     );
 
@@ -372,7 +372,7 @@ function _ff_errorHandler($errno, $errstr, $errfile, $errline)
 
     if ($n) {
         $info = $ff_processor->traceStack[$n - 1];
-        $name = htmlspecialchars($info[2] . ' ' . BFText::_('COM_BREEZINGFORMSNG_PROCESS_ATLINE') . ' ' . $info[3], ENT_QUOTES);
+        $name = htmlspecialchars($info[2] . ' ' . Text::_('COM_BREEZINGFORMSNG_PROCESS_ATLINE') . ' ' . $info[3], ENT_QUOTES);
         $type = $info[4];
         $id = $info[5];
         $pane = $info[6];
@@ -448,9 +448,9 @@ function _ff_errorHandler($errno, $errstr, $errfile, $errline)
                     'onClick="ff_redirectParent(\'' . htmlspecialchars($url, ENT_QUOTES) . '\');return true;"' .
                     '>' . $name . '</a>';
         } // if
-        $msg .= htmlspecialchars(BFText::_('COM_BREEZINGFORMSNG_PROCESS_LASTPOS'), ENT_QUOTES) . ' ' . $name . "\n";
+        $msg .= htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_PROCESS_LASTPOS'), ENT_QUOTES) . ' ' . $name . "\n";
     } // if
-    $msg .= htmlspecialchars(BFText::_('COM_BREEZINGFORMSNG_PROCESS_ERRMSG') . " $errstr\n\n", ENT_QUOTES);
+    $msg .= htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_PROCESS_ERRMSG') . " $errstr\n\n", ENT_QUOTES);
     if ($fail) {
         if (isset($ff_processor)) {
             $ff_processor->traceBuffer .= $msg;
@@ -593,7 +593,7 @@ class HTML_facileFormsProcessor
         $this->opsys = $jbrowserInstance->getPlatform();
 
         if ($ff_config->getprovider == 0)
-            $this->provider = BFText::_('COM_BREEZINGFORMSNG_PROCESS_UNKNOWN');
+            $this->provider = Text::_('COM_BREEZINGFORMSNG_PROCESS_UNKNOWN');
         else {
             $host = @GetHostByAddr($this->ip);
             $this->provider = preg_replace('/^./', '', strchr($host, '.'));

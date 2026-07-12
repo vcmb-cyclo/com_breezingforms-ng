@@ -16,7 +16,6 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Service;
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use BFRequest;
-use BFText;
 use Exception;
 use facileFormsPieces;
 use Joomla\Utilities\ArrayHelper;
@@ -26,6 +25,7 @@ use RuntimeException;
 use Throwable;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\PieceModel;
 use Vcmb\Component\BreezingformsNG\Administrator\View\Pieces\Renderer;
+use Joomla\CMS\Language\Text;
 
 class BFAdminPieceTestContext
 {
@@ -142,11 +142,11 @@ class PieceManager
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
 		ArrayHelper::toInteger($ids);
 		$typelist = array();
-		$typelist[] = array('Untyped', BFText::_('COM_BREEZINGFORMSNG_PIECES_UNTYPED'));
-		$typelist[] = array('Before Form', BFText::_('COM_BREEZINGFORMSNG_PIECES_BEFOREFORM'));
-		$typelist[] = array('After Form', BFText::_('COM_BREEZINGFORMSNG_PIECES_AFTERFORM'));
-		$typelist[] = array('Begin Submit', BFText::_('COM_BREEZINGFORMSNG_PIECES_BEGINSUBMIT'));
-		$typelist[] = array('End Submit', BFText::_('COM_BREEZINGFORMSNG_PIECES_ENDSUBMIT'));
+		$typelist[] = array('Untyped', Text::_('COM_BREEZINGFORMSNG_PIECES_UNTYPED'));
+		$typelist[] = array('Before Form', Text::_('COM_BREEZINGFORMSNG_PIECES_BEFOREFORM'));
+		$typelist[] = array('After Form', Text::_('COM_BREEZINGFORMSNG_PIECES_AFTERFORM'));
+		$typelist[] = array('Begin Submit', Text::_('COM_BREEZINGFORMSNG_PIECES_BEGINSUBMIT'));
+		$typelist[] = array('End Submit', Text::_('COM_BREEZINGFORMSNG_PIECES_ENDSUBMIT'));
 		$row = new facileFormsPieces($database);
 		if (count($ids)) {
 			$row->load($ids[0]);
@@ -209,7 +209,7 @@ class PieceManager
 			Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 		}
 
-		$app->enqueueMessage(BFText::_('COM_BREEZINGFORMSNG_PIECES_SAVED'));
+		$app->enqueueMessage(Text::_('COM_BREEZINGFORMSNG_PIECES_SAVED'));
 		$app->redirect("index.php?option=$option&task=pieces.edit&pkg=$pkg&ids[]=" . (int) $row->id);
 	}
 
@@ -235,7 +235,7 @@ class PieceManager
 				$row->modified_by = $row->created_by;
 				$row->store();
 			} // foreach
-		$msg = $total . ' ' . BFText::_('COM_BREEZINGFORMSNG_PIECES_SUCCOPIED');
+		$msg = $total . ' ' . Text::_('COM_BREEZINGFORMSNG_PIECES_SUCCOPIED');
 		Factory::getApplication()->enqueueMessage($msg);
 		Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 	} // copy
@@ -253,7 +253,7 @@ class PieceManager
 		}
 
 		if ($total) {
-			$msg = $total . ' ' . BFText::_('COM_BREEZINGFORMSNG_PIECES_SUCCDELETED');
+			$msg = $total . ' ' . Text::_('COM_BREEZINGFORMSNG_PIECES_SUCCDELETED');
 			Factory::getApplication()->enqueueMessage($msg);
 			Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 			return;

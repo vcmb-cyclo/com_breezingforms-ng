@@ -23,7 +23,6 @@ final class LegacyClassLoader
         'BFQuickModeMobile' => 'libraries/crosstec/classes/BFQuickModeMobile.php',
         'BFQuickModeOnePage' => 'libraries/crosstec/classes/BFQuickModeOnePage.php',
         'BFRequest' => 'libraries/crosstec/classes/BFRequest.php',
-        'BFText' => 'libraries/crosstec/classes/BFText.php',
     ];
 
     private static bool $registered = false;

@@ -49,13 +49,16 @@ if (!function_exists('bf_b64dec')) {
 
 $mainframe = Factory::getApplication();
 
+// the engine renders outside the MVC dispatch (modules, plugins, iframes):
+// make sure the component language is available for Text::_()
+$mainframe->getLanguage()->load('com_breezingformsng');
+
 $cache = Factory::getCache();
 $cache->setCaching(false);
 
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/constants.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFRequest.php');
-require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFText.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFFactory.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFIntegrate.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFPDF.php');

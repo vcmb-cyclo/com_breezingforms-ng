@@ -15,7 +15,6 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Scripts;
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
-use BFText;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\HTML\HTMLHelper;
@@ -81,13 +80,13 @@ class Renderer
 	{
 		Factory::getApplication()->getInput()->set('hidemainmenu', 1);
 		global $ff_mossite, $ff_admsite, $ff_config;
-		$action = $row->id ? BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_EDITSCRIPT') : BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_ADDSCRIPT');
+		$action = $row->id ? Text::_('COM_BREEZINGFORMSNG_SCRIPTS_EDITSCRIPT') : Text::_('COM_BREEZINGFORMSNG_SCRIPTS_ADDSCRIPT');
 
-		$sectionTitle = BFText::_('COM_BREEZINGFORMSNG_MANAGESCRIPTS');
+		$sectionTitle = Text::_('COM_BREEZINGFORMSNG_MANAGESCRIPTS');
 		if ($row->id && $row->name !== '') {
 			$sectionTitle .= ' / ' . htmlspecialchars((string) $row->name, ENT_QUOTES, 'UTF-8');
 		}
-		$pageTitle = BFText::_('COM_BREEZINGFORMSNG') . ' / ' . $sectionTitle;
+		$pageTitle = Text::_('COM_BREEZINGFORMSNG') . ' / ' . $sectionTitle;
 		Factory::getApplication()->getDocument()->setTitle(strip_tags($pageTitle));
 		ToolbarHelper::title($pageTitle, 'logo_left');
 
@@ -104,15 +103,15 @@ class Renderer
 			'unit_tests' => (string) $row->unit_tests
 		);
 		$safeInitialState = json_encode($initialState);
-		$unitTestsHelp = BFText::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS_HELP');
+		$unitTestsHelp = Text::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS_HELP');
 		HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
 		if ($row->id) {
-			ToolBarHelper::custom('prev', 'arrow-left', '', BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV'), false);
-			ToolBarHelper::custom('next', 'arrow-right', '', BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT'), false);
-			ToolBarHelper::custom('test', 'eye', '', BFText::_('COM_BREEZINGFORMSNG_TEST'), false);
+			ToolBarHelper::custom('prev', 'arrow-left', '', Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV'), false);
+			ToolBarHelper::custom('next', 'arrow-right', '', Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT'), false);
+			ToolBarHelper::custom('test', 'eye', '', Text::_('COM_BREEZINGFORMSNG_TEST'), false);
 		}
-		ToolBarHelper::custom('save', 'save.png', 'save_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_SAVE'), false);
-		ToolBarHelper::custom('cancel', 'cancel.png', 'cancel_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_QUICKMODE_CLOSE'), false);
+		ToolBarHelper::custom('save', 'save.png', 'save_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_SAVE'), false);
+		ToolBarHelper::custom('cancel', 'cancel.png', 'cancel_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_QUICKMODE_CLOSE'), false);
 		?>
 		<?php
 		$document = Factory::getApplication()->getDocument();
@@ -130,17 +129,17 @@ class Renderer
 				<tr>
 					<td></td>
 					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_TITLE'); ?>:
+						<?php echo Text::_('COM_BREEZINGFORMSNG_SCRIPTS_TITLE'); ?>:
 					</td>
 					<td nowrap>
 						<input type="text" size="70" maxlength="50" id="title" name="title" value="<?php echo $row->title; ?>"
 							class="inputbox" />
 						<?php
-						echo '<span><span title="' . HTMLHelper::tooltipText(BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_TIPTITLE')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
+						echo '<span><span title="' . HTMLHelper::tooltipText(Text::_('COM_BREEZINGFORMSNG_SCRIPTS_TIPTITLE')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
 						?>
 					</td>
 					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_TYPE'); ?>:
+						<?php echo Text::_('COM_BREEZINGFORMSNG_SCRIPTS_TYPE'); ?>:
 						<select id="type" name="type" class="inputbox" size="1">
 							<?php
 							for ($t = 0; $t < count($typelist); $t++) {
@@ -157,7 +156,7 @@ class Renderer
 				<tr>
 					<td></td>
 					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_PACKAGE'); ?>:
+						<?php echo Text::_('COM_BREEZINGFORMSNG_SCRIPTS_PACKAGE'); ?>:
 					</td>
 					<td nowrap>
 						<input type="text" size="30" maxlength="30" id="package" name="package"
@@ -168,24 +167,24 @@ class Renderer
 				<tr>
 					<td></td>
 					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_NAME'); ?>:
+						<?php echo Text::_('COM_BREEZINGFORMSNG_SCRIPTS_NAME'); ?>:
 					</td>
 					<td nowrap>
 						<input type="text" size="30" maxlength="30" id="name" name="name" value="<?php echo $row->name; ?>"
 							class="inputbox" />
 						<?php
-						echo '<span><span title="' . HTMLHelper::tooltipText(BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_TIPNAME')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
+						echo '<span><span title="' . HTMLHelper::tooltipText(Text::_('COM_BREEZINGFORMSNG_SCRIPTS_TIPNAME')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
 						?>
 					</td>
 					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_PUBLISHED'); ?>:
+						<?php echo Text::_('COM_BREEZINGFORMSNG_SCRIPTS_PUBLISHED'); ?>:
 						<?php echo HTMLHelper::_('select.booleanlist', "published", "", $row->published); ?>
 					</td>
 				</tr>
 				<tr>
 					<td></td>
 					<td nowrap colspan="3">
-						<?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_DESCRIPTION'); ?>:
+						<?php echo Text::_('COM_BREEZINGFORMSNG_SCRIPTS_DESCRIPTION'); ?>:
 						<a href="javascript:void(0);"
 							onClick="textAreaResize('description',<?php echo $ff_config->areasmall; ?>);">[
 							<?php echo $ff_config->areasmall; ?>]
@@ -207,7 +206,7 @@ class Renderer
 				<tr>
 					<td></td>
 					<td nowrap colspan="3">
-						<?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_CODE'); ?>:
+						<?php echo Text::_('COM_BREEZINGFORMSNG_SCRIPTS_CODE'); ?>:
 						<br />
 
 						<?php
@@ -221,7 +220,7 @@ class Renderer
 				<tr>
 					<td></td>
 					<td nowrap colspan="3">
-						<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS'); ?>:
+						<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS'); ?>:
 						<?php
 						echo '<span><span title="' . htmlspecialchars($unitTestsHelp, ENT_QUOTES) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
 						?>
@@ -241,11 +240,11 @@ class Renderer
 						<textarea wrap="off" name="unit_tests" id="unit_tests" style="width:100%;" rows="8"
 							class="inputbox"><?php echo htmlspecialchars((string) $row->unit_tests, ENT_QUOTES); ?></textarea>
 						<div class="mt-2 text-muted">
-							<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS_FORMAT_HINT'); ?>:
+							<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS_FORMAT_HINT'); ?>:
 							<code>'12/ 02/2023 ' -> '12/02/2023'</code><br />
 							<code>' abc ' -> 'abc'</code><br />
 							<code>'' -> ''</code><br />
-							<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS_TYPES_HINT'); ?>
+							<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS_TYPES_HINT'); ?>
 						</div>
 						<div class="mt-3">
 							<button
@@ -253,16 +252,16 @@ class Renderer
 								id="bf-edit-unit-tests-button"
 								class="btn btn-secondary"
 								onclick="return runUnitTestsFromEdit();"
-								<?php echo $hasPersistedUnitTests ? '' : 'disabled="disabled" aria-disabled="true" title="' . ($row->id ? htmlspecialchars(BFText::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS_NONE'), ENT_QUOTES) : htmlspecialchars(BFText::_('COM_BREEZINGFORMSNG_TEST_SAVE_FIRST_SCRIPT'), ENT_QUOTES)) . '"'; ?>>
+								<?php echo $hasPersistedUnitTests ? '' : 'disabled="disabled" aria-disabled="true" title="' . ($row->id ? htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS_NONE'), ENT_QUOTES) : htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_TEST_SAVE_FIRST_SCRIPT'), ENT_QUOTES)) . '"'; ?>>
 								<span class="icon-play" aria-hidden="true"></span>
-								<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS'); ?>
+								<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS'); ?>
 							</button>
 						</div>
 						<div id="bf-edit-script-unit-tests-status" class="alert mt-3" style="display:none;">
-							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS'); ?>:</strong>
+							<strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS'); ?>:</strong>
 							<div id="bf-edit-script-unit-tests-summary"></div>
 							<div id="bf-edit-script-unit-tests-details-wrap" style="display:none;">
-								<div><strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_DETAIL'); ?>:</strong></div>
+								<div><strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_DETAIL'); ?>:</strong></div>
 								<pre id="bf-edit-script-unit-tests-details"></pre>
 							</div>
 						</div>
@@ -284,17 +283,17 @@ class Renderer
 	{
 		switch ($type) {
 			case 'Untyped':
-				return BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_UNTYPED');
+				return Text::_('COM_BREEZINGFORMSNG_SCRIPTS_UNTYPED');
 			case 'Element Init':
-				return BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_ELEMENTINIT');
+				return Text::_('COM_BREEZINGFORMSNG_SCRIPTS_ELEMENTINIT');
 			case 'Element Action':
-				return BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_ELEMENTACTION');
+				return Text::_('COM_BREEZINGFORMSNG_SCRIPTS_ELEMENTACTION');
 			case 'Element Validation':
-				return BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_ELEMENTVALID');
+				return Text::_('COM_BREEZINGFORMSNG_SCRIPTS_ELEMENTVALID');
 			case 'Form Init':
-				return BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_FORMINIT');
+				return Text::_('COM_BREEZINGFORMSNG_SCRIPTS_FORMINIT');
 			case 'Form Submitted':
-				return BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_FORMSUBMIT');
+				return Text::_('COM_BREEZINGFORMSNG_SCRIPTS_FORMSUBMIT');
 			default:
 				;
 		} // switch
@@ -308,11 +307,11 @@ class Renderer
 		$listOrder = (string) $listOrder;
 		$listDirn = strtolower((string) $listDirn);
 		$listDirn = $listDirn === 'desc' ? 'desc' : 'asc';
-		ToolBarHelper::custom('new', 'new.png', 'new_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_NEW'), false);
-		ToolBarHelper::custom('copy', 'copy.png', 'copy_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_COPY'), false);
-		ToolBarHelper::custom('publish', 'publish.png', 'publish_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_PUBLISH'), false);
-		ToolBarHelper::custom('unpublish', 'unpublish.png', 'unpublish_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_UNPUBLISH'), false);
-		ToolBarHelper::custom('remove', 'delete.png', 'delete_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_DELETE'), false);
+		ToolBarHelper::custom('new', 'new.png', 'new_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_NEW'), false);
+		ToolBarHelper::custom('copy', 'copy.png', 'copy_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_COPY'), false);
+		ToolBarHelper::custom('publish', 'publish.png', 'publish_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_PUBLISH'), false);
+		ToolBarHelper::custom('unpublish', 'unpublish.png', 'unpublish_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_UNPUBLISH'), false);
+		ToolBarHelper::custom('remove', 'delete.png', 'delete_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_DELETE'), false);
 		?>
 		<?php
 		Factory::getApplication()->getDocument()->getWebAssetManager()->useScript('com_breezingformsng.scripts-list');
@@ -323,7 +322,7 @@ class Renderer
 
 			<label class="bfPackageSelector">
 
-				<?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_PACKAGE'); ?>
+				<?php echo Text::_('COM_BREEZINGFORMSNG_SCRIPTS_PACKAGE'); ?>
 					<select id="pkgsel" name="pkgsel" class="inputbox" size="1" onchange="return bfScriptsSubmitList(true);">
 					<?php
 					if (count($pkglist))
@@ -331,7 +330,7 @@ class Renderer
 							$selected = '';
 							if ($pkgEntry[0])
 								$selected = ' selected';
-							$label = $pkgEntry[1] === '' ? BFText::_('COM_BREEZINGFORMSNG_ALL_FILTER') : $pkgEntry[1];
+							$label = $pkgEntry[1] === '' ? Text::_('COM_BREEZINGFORMSNG_ALL_FILTER') : $pkgEntry[1];
 							echo '<option value="' . $pkgEntry[1] . '"' . $selected . '>' . $label . '&nbsp;</option>';
 						} // foreach
 					?>
@@ -339,7 +338,7 @@ class Renderer
 
 			</label>
 				<label class="bfPackageSelector bfFilterTools">
-					<?php echo BFText::_('COM_BREEZINGFORMSNG_FILTER'); ?>
+					<?php echo Text::_('COM_BREEZINGFORMSNG_FILTER'); ?>
 					<input type="text" name="search" id="search" class="inputbox"
 						value="<?php echo htmlspecialchars($search, ENT_QUOTES); ?>" onchange="return bfScriptsSubmitList(true);"
 						onkeydown="if(event.key==='Enter'){event.preventDefault();bfScriptsSubmitList(true);}" />
@@ -347,9 +346,9 @@ class Renderer
 				<label class="bfPackageSelector">
 					<select name="filter_state" id="filter_state" class="inputbox form-select form-select-sm"
 						onchange="return bfScriptsSubmitList(true);">
-						<option value=""><?php echo BFText::_('JOPTION_SELECT_PUBLISHED'); ?></option>
-						<option value="P"<?php echo $filterState === 'P' ? ' selected="selected"' : ''; ?>><?php echo BFText::_('JPUBLISHED'); ?></option>
-						<option value="U"<?php echo $filterState === 'U' ? ' selected="selected"' : ''; ?>><?php echo BFText::_('JUNPUBLISHED'); ?></option>
+						<option value=""><?php echo Text::_('JOPTION_SELECT_PUBLISHED'); ?></option>
+						<option value="P"<?php echo $filterState === 'P' ? ' selected="selected"' : ''; ?>><?php echo Text::_('JPUBLISHED'); ?></option>
+						<option value="U"<?php echo $filterState === 'U' ? ' selected="selected"' : ''; ?>><?php echo Text::_('JUNPUBLISHED'); ?></option>
 					</select>
 				</label>
 			<div style="clear: both;"></div>
@@ -388,7 +387,7 @@ class Renderer
 				</thead>
 				<tbody>
 				<?php if (count($rows) === 0) { ?>
-					<tr><td colspan="9" class="text-center text-muted py-4"><?php echo BFText::_('JGLOBAL_NO_MATCHING_RESULTS'); ?></td></tr>
+					<tr><td colspan="9" class="text-center text-muted py-4"><?php echo Text::_('JGLOBAL_NO_MATCHING_RESULTS'); ?></td></tr>
 				<?php } else {
 				for ($i = 0; $i < count($rows); $i++) {
 					$row = $rows[$i];
@@ -466,9 +465,9 @@ class Renderer
 	static function test($option, $pkg, &$row, $functionName, $paramNames, $paramDefaults, $autoRun = false, $testMode = '')
 	{
 		Factory::getApplication()->getInput()->set('hidemainmenu', 1);
-		ToolBarHelper::custom('edit', 'undo', '', BFText::_('COM_BREEZINGFORMSNG_TEST_BACK'), false);
-		ToolBarHelper::custom('prev', 'arrow-left', '', BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV'), false);
-		ToolBarHelper::custom('next', 'arrow-right', '', BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT'), false);
+		ToolBarHelper::custom('edit', 'undo', '', Text::_('COM_BREEZINGFORMSNG_TEST_BACK'), false);
+		ToolBarHelper::custom('prev', 'arrow-left', '', Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV'), false);
+		ToolBarHelper::custom('next', 'arrow-right', '', Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT'), false);
 		$document = Factory::getApplication()->getDocument();
 		$document->getWebAssetManager()->useScript('com_breezingformsng.scripts-test');
 		$document->addScriptOptions('com_breezingformsng.scripts-test', [
@@ -487,10 +486,10 @@ class Renderer
 				<span id="bf-script-auto-unit-warning-text"></span>
 			</div>
 			<div class="d-flex justify-content-between align-items-center mb-3">
-				<h2 class="m-0"><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_SCRIPT'); ?></h2>
+				<h2 class="m-0"><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_SCRIPT'); ?></h2>
 				<button type="button" class="btn btn-primary" onclick="return bfRunAllScriptTests();">
 					<span class="icon-play" aria-hidden="true"></span>
-					<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_RUN'); ?>
+					<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_RUN'); ?>
 				</button>
 			</div>
 			<h3><?php echo htmlspecialchars((string) $row->title, ENT_QUOTES); ?></h3>
@@ -498,16 +497,16 @@ class Renderer
 				<div class="card-body">
 					<div class="row">
 						<div class="col-sm-6 col-md-3">
-							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_SCRIPT_ID'); ?>:</strong> <?php echo (int) $row->id; ?>
+							<strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_SCRIPT_ID'); ?>:</strong> <?php echo (int) $row->id; ?>
 						</div>
 						<div class="col-sm-6 col-md-3">
-							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_PACKAGE'); ?>:</strong> <?php echo htmlspecialchars((string) $row->package, ENT_QUOTES); ?>
+							<strong><?php echo Text::_('COM_BREEZINGFORMSNG_SCRIPTS_PACKAGE'); ?>:</strong> <?php echo htmlspecialchars((string) $row->package, ENT_QUOTES); ?>
 						</div>
 						<div class="col-sm-6 col-md-3">
-							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_NAME'); ?>:</strong> <?php echo htmlspecialchars((string) $row->name, ENT_QUOTES); ?>
+							<strong><?php echo Text::_('COM_BREEZINGFORMSNG_SCRIPTS_NAME'); ?>:</strong> <?php echo htmlspecialchars((string) $row->name, ENT_QUOTES); ?>
 						</div>
 						<div class="col-sm-6 col-md-3">
-							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_TYPE'); ?>:</strong> <?php echo htmlspecialchars(self::typeName((string) $row->type), ENT_QUOTES); ?>
+							<strong><?php echo Text::_('COM_BREEZINGFORMSNG_SCRIPTS_TYPE'); ?>:</strong> <?php echo htmlspecialchars(self::typeName((string) $row->type), ENT_QUOTES); ?>
 						</div>
 					</div>
 				</div>
@@ -516,23 +515,23 @@ class Renderer
 				<div class="card-body">
 					<div class="row">
 						<div class="col-sm-6 col-md-3">
-							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_CREATED'); ?>:</strong> <?php echo !empty($row->created) ? HTMLHelper::date($row->created, 'Y-m-d H:i', true) : '-'; ?>
+							<strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_CREATED'); ?>:</strong> <?php echo !empty($row->created) ? HTMLHelper::date($row->created, 'Y-m-d H:i', true) : '-'; ?>
 						</div>
 						<div class="col-sm-6 col-md-3">
-							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_CREATED_BY'); ?>:</strong> <?php echo htmlspecialchars((string) ($row->created_by ?? ''), ENT_QUOTES); ?>
+							<strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_CREATED_BY'); ?>:</strong> <?php echo htmlspecialchars((string) ($row->created_by ?? ''), ENT_QUOTES); ?>
 						</div>
 						<div class="col-sm-6 col-md-3">
-							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_MODIFIED'); ?>:</strong> <?php echo !empty($row->modified) ? HTMLHelper::date($row->modified, 'Y-m-d H:i', true) : '-'; ?>
+							<strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_MODIFIED'); ?>:</strong> <?php echo !empty($row->modified) ? HTMLHelper::date($row->modified, 'Y-m-d H:i', true) : '-'; ?>
 						</div>
 						<div class="col-sm-6 col-md-3">
-							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_MODIFIED_BY'); ?>:</strong> <?php echo htmlspecialchars((string) ($row->modified_by ?? ''), ENT_QUOTES); ?>
+							<strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_MODIFIED_BY'); ?>:</strong> <?php echo htmlspecialchars((string) ($row->modified_by ?? ''), ENT_QUOTES); ?>
 						</div>
 					</div>
 				</div>
 			</div>
 			<?php if (!empty($row->description)) { ?>
 				<div class="card mb-3">
-					<div class="card-header"><?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_DESCRIPTION'); ?></div>
+					<div class="card-header"><?php echo Text::_('COM_BREEZINGFORMSNG_SCRIPTS_DESCRIPTION'); ?></div>
 					<div class="card-body">
 						<div class="form-control bg-light" style="white-space: pre-wrap;">
 							<?php echo HTMLHelper::_('content.prepare', $row->description); ?>
@@ -545,7 +544,7 @@ class Renderer
 					<h2 class="accordion-header" id="bfScriptCodeHeading">
 						<button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse"
 							data-bs-target="#bfScriptCodeCollapse" aria-expanded="false" aria-controls="bfScriptCodeCollapse">
-							<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_SCRIPT_CODE'); ?>
+							<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_SCRIPT_CODE'); ?>
 						</button>
 					</h2>
 					<div id="bfScriptCodeCollapse" class="accordion-collapse collapse" aria-labelledby="bfScriptCodeHeading"
@@ -562,7 +561,7 @@ class Renderer
 						<h2 class="accordion-header" id="bfScriptUnitTestsHeading">
 							<button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse"
 								data-bs-target="#bfScriptUnitTestsCollapse" aria-expanded="false" aria-controls="bfScriptUnitTestsCollapse">
-								<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS'); ?>
+								<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS'); ?>
 							</button>
 						</h2>
 						<div id="bfScriptUnitTestsCollapse" class="accordion-collapse collapse" aria-labelledby="bfScriptUnitTestsHeading"
@@ -576,23 +575,23 @@ class Renderer
 			<?php } ?>
 			<div class="card mb-3 bg-light">
 				<div class="card-body">
-					<label for="bf-script-function"><strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_FUNCTION'); ?></strong></label>
+					<label for="bf-script-function"><strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_FUNCTION'); ?></strong></label>
 					<input type="text" id="bf-script-function" class="form-control" value="<?php echo htmlspecialchars((string) $functionName, ENT_QUOTES); ?>" />
-					<small class="text-muted"><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_VALUES_HELP'); ?></small>
+					<small class="text-muted"><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_VALUES_HELP'); ?></small>
 				</div>
 			</div>
 			<div class="card mb-3">
-				<div class="card-header"><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_ARGUMENTS'); ?></div>
+				<div class="card-header"><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_ARGUMENTS'); ?></div>
 				<div class="card-body">
 					<table cellpadding="4" cellspacing="0" border="0" class="adminlist table table-striped">
 						<tr>
-							<th><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_PARAMETER'); ?></th>
-							<th><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_VALUE'); ?></th>
+							<th><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_PARAMETER'); ?></th>
+							<th><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_VALUE'); ?></th>
 							<th></th>
 						</tr>
 						<?php if (!count($paramNames)) { ?>
 							<tr>
-								<td colspan="3"><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_NO_PARAMETER_DETECTED'); ?></td>
+								<td colspan="3"><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_NO_PARAMETER_DETECTED'); ?></td>
 							</tr>
 						<?php } else { ?>
 							<?php $lastParamIndex = count($paramNames) - 1; ?>
@@ -614,7 +613,7 @@ class Renderer
 										<?php if ($i === $lastParamIndex) { ?>
 											<button type="button" class="btn btn-primary" onclick="return bfRunAllScriptTests();">
 												<span class="icon-play" aria-hidden="true"></span>
-												<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_RUN'); ?>
+												<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_RUN'); ?>
 											</button>
 										<?php } ?>
 									</td>
@@ -626,47 +625,47 @@ class Renderer
 			</div>
 			<div id="bf-script-test-error" class="alert alert-danger bf-piece-test-alert" style="display:none;">
 				<span class="icon-times text-danger" aria-hidden="true"></span>
-				<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_INVALID'); ?>: <span id="bf-script-test-error-message"></span>
+				<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_INVALID'); ?>: <span id="bf-script-test-error-message"></span>
 				<div id="bf-script-test-error-output-wrap" style="display:none;">
-					<div><strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_OUTPUT'); ?>:</strong></div>
+					<div><strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_OUTPUT'); ?>:</strong></div>
 					<pre id="bf-script-test-error-output"></pre>
 				</div>
 				<div id="bf-script-test-error-result-wrap" style="display:none;">
-					<div><strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_RESULT'); ?>:</strong></div>
+					<div><strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_RESULT'); ?>:</strong></div>
 					<pre id="bf-script-test-error-result"></pre>
 				</div>
-				<div><strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_PARAMETERS'); ?>:</strong></div>
+				<div><strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_PARAMETERS'); ?>:</strong></div>
 				<pre id="bf-script-test-error-params"></pre>
 			</div>
 			<div id="bf-script-test-output-wrap" style="display:none;">
-				<p><strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_OUTPUT'); ?>:</strong></p>
+				<p><strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_OUTPUT'); ?>:</strong></p>
 				<pre id="bf-script-test-output"></pre>
 			</div>
 			<div id="bf-script-test-status" class="alert" style="display:none;">
-				<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_RESULT'); ?>:</strong>
+				<strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_RESULT'); ?>:</strong>
 				<pre id="bf-script-test-result"></pre>
 				<div id="bf-script-test-status-warning" style="display:none;">
 					<span class="icon-warning text-warning" aria-hidden="true"></span>
-					<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_WARNING_EMPTY_RESULT'); ?>
+					<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_WARNING_EMPTY_RESULT'); ?>
 				</div>
 				<div id="bf-script-test-status-success" style="display:none;">
 					<span class="icon-check text-success" aria-hidden="true"></span>
-					<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_EXECUTED'); ?>
+					<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_EXECUTED'); ?>
 				</div>
 				<div id="bf-script-test-status-invalid" style="display:none;">
 					<span class="icon-times text-danger" aria-hidden="true"></span>
-					<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_INVALID_FALSE_RESULT'); ?>
+					<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_INVALID_FALSE_RESULT'); ?>
 				</div>
 				<div id="bf-script-test-status-params-wrap" style="display:none;">
-					<div><strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_PARAMETERS'); ?>:</strong></div>
+					<div><strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_PARAMETERS'); ?>:</strong></div>
 					<pre id="bf-script-test-status-params"></pre>
 				</div>
 			</div>
 			<div id="bf-script-unit-tests-status" class="alert" style="display:none;">
-				<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS'); ?>:</strong>
+				<strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS'); ?>:</strong>
 				<div id="bf-script-unit-tests-summary"></div>
 				<div id="bf-script-unit-tests-details-wrap" style="display:none;">
-					<div><strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_DETAIL'); ?>:</strong></div>
+					<div><strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_DETAIL'); ?>:</strong></div>
 					<pre id="bf-script-unit-tests-details"></pre>
 				</div>
 			</div>

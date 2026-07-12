@@ -79,7 +79,7 @@ trait bfProcessorRendering
             ($ff_config->compress ? $this->compressJavascript($code) : $code) .
             '//-->' . nl() .
             '</script>' . nl() .
-            '<script type="text/javascript" src="' . Uri::root(true) . '/components/com_breezingformsng/facileforms.js"></script>' . nl();
+            '<script type="text/javascript" src="' . Uri::root(true) . '/media/com_breezingformsng/js/facileforms.js"></script>' . nl();
     }
 
     // header

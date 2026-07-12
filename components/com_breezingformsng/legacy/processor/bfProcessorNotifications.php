@@ -1321,24 +1321,7 @@ trait bfProcessorNotifications
             return;
         }
 
-        define("BF_SOAP_CLIENT_BASEDIR", JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/salesforce');
-
-        if (!class_exists('SforcePartnerClient')) {
-            require_once(BF_SOAP_CLIENT_BASEDIR . '/SforcePartnerClient.php');
-        }
-        if (!class_exists('SforceHeaderOptions')) {
-            require_once(BF_SOAP_CLIENT_BASEDIR . '/SforceHeaderOptions.php');
-        }
-
         try {
-
-            $mySforceConnection = new SforcePartnerClient();
-            $trunc = new AllowFieldTruncationHeader(true);
-            $mySforceConnection->setAllowFieldTruncationHeader($trunc);
-            $mySoapClient = $mySforceConnection->createConnection(BF_SOAP_CLIENT_BASEDIR . '/partner.wsdl.xml');
-            $mylogin = $mySforceConnection->login($this->formrow->salesforce_username, $this->formrow->salesforce_password . $this->formrow->salesforce_token);
-            $sobjects = $mySforceConnection->describeSObject($this->formrow->salesforce_type)->fields;
-
             $fields = array();
             $this->formrow->salesforce_fields = explode(',', $this->formrow->salesforce_fields);
 
@@ -1346,42 +1329,22 @@ trait bfProcessorNotifications
                 foreach ($this->sfdata as $savedata) {
                     $sfield = explode('::', $sfields);
                     if ($sfield[0] == $savedata[1]) {
-                        foreach ($sobjects as $sobject) {
-                            // forcing some primitives
-                            if ($sobject->name == $sfield[1]) {
-                                switch ($sobject->type) {
-                                    case 'boolean':
-                                        $savedata[4] = ($savedata[4] ? 1 : 0);
-                                        break;
-                                    case 'int':
-                                        $savedata[4] = intval($savedata[4]);
-                                        break;
-                                    case 'double':
-                                        $savedata[4] = doubleval($savedata[4]);
-                                        break;
-                                }
-                                break;
-                            }
-                        }
-                        $fields[$sfield[1]] = '<![CDATA[' . $savedata[4] . ']]>'; // bug in SF Toolkit appeareantly requires CDATA
+                        $fields[$sfield[1]] = $savedata[4];
                         break;
                     }
                 }
             }
 
-            $sObject = new SObject();
-            $sObject->fields = $fields;
-            $sObject->type = $this->formrow->salesforce_type;
-
-            $createResponse = $mySforceConnection->create(array($sObject));
-
-            ob_start();
-            print_r($createResponse);
-            $c = date('Y-m-d H:i:s') . ': ' . ob_get_contents() . "\r\n";
-            ob_end_clean();
+            $recordId = (new RemoteApiClient())->createSalesforceRecord(
+                trim((string) $this->formrow->salesforce_username),
+                (string) $this->formrow->salesforce_password . (string) $this->formrow->salesforce_token,
+                trim((string) $this->formrow->salesforce_type),
+                $fields
+            );
+            $c = date('Y-m-d H:i:s') . ': Salesforce record created: ' . $recordId . "\r\n";
 
             file_put_contents(JPATH_SITE . '/sf.log', $c, FILE_APPEND);
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
 
             $c = date('Y-m-d H:i:s') . ': ' . $e->getMessage() . "\r\n";
             file_put_contents(JPATH_SITE . '/sf.log', $c, FILE_APPEND);

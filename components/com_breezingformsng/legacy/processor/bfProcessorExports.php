@@ -342,15 +342,15 @@ trait bfProcessorExports
                 // creating the article
                 if (is_object($cbData) && $cbData->create_articles) {
 
-                    BFRequest::setVar('cb_category_id', null);
-                    BFRequest::setVar('cb_controller', null);
+                    Factory::getApplication()->getInput()->set('cb_category_id', null);
+                    Factory::getApplication()->getInput()->set('cb_controller', null);
 
                     if ($this->app->isClient('site') && Factory::getApplication()->getInput()->getInt('Itemid', 0)) {
                         $menu = $this->app->getMenu();
                         $item = $menu->getActive();
                         if (is_object($item)) {
-                            BFRequest::setVar('cb_category_id', $item->getParams()->get('cb_category_id', null));
-                            BFRequest::setVar('cb_controller', $item->getParams()->get('cb_controller', null));
+                            Factory::getApplication()->getInput()->set('cb_category_id', $item->getParams()->get('cb_category_id', null));
+                            Factory::getApplication()->getInput()->set('cb_controller', $item->getParams()->get('cb_controller', null));
                         }
                     }
 
@@ -381,7 +381,7 @@ trait bfProcessorExports
                         }
                     }
                     $full = false;
-                    $article_id = (new ArticleService())->createArticle(Factory::getApplication()->getInput()->getInt('cb_form_id', 0), $record_return, $cbData->items, $ids, $cbData->title_field, $cbResult['form']->getRecordMetadata($record_return), $config, $full, true, BFRequest::getVar('cb_category_id', null));
+                    $article_id = (new ArticleService())->createArticle(Factory::getApplication()->getInput()->getInt('cb_form_id', 0), $record_return, $cbData->items, $ids, $cbData->title_field, $cbResult['form']->getRecordMetadata($record_return), $config, $full, true, Factory::getApplication()->getInput()->get('cb_category_id', null, 'string'));
 
                     $cacheFactory = Factory::getContainer()->get(CacheControllerFactoryInterface::class);
                     $cache = $cacheFactory->createCacheController('callback', ['defaultgroup' => 'com_content']);

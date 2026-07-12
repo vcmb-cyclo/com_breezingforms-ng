@@ -29,7 +29,8 @@
 - [x] QuickMode (`admin/quickmode.class.php` + `.html.php` + `.js` — migré Phase 7)
 - [x] Import paquets (`admin/import.class.php` → `src/Model/ImportModel.php`, SimpleXML + transactions ; bibliothèques scripts/pièces uniquement, les paquets contenant formulaires/menus sont refusés ; export de paquets abandonné avec l'UI legacy)
 - [x] Frontend moteur formulaires — dispatcher, config, routeur SEF et `HTML_facileFormsProcessor` (8 907 lignes) décomposés en services/traits Joomla 6 (Phase 8)
-- [ ] Réécriture native des dernières classes crosstec du moteur : `BFRequest`, `BFIntegrate`, rendus `BFQuickMode*` (Phase 9 — chantier de fond, voir détail en bas de document)
+- [x] `BFRequest` → `Input` Joomla natif (Phase 9a, 326 appels convertis ; ne reste que dans les 4 rendus `BFQuickMode*`, cf. Phase 9c)
+- [ ] Réécriture native des dernières classes crosstec du moteur : `BFIntegrate`, rendus `BFQuickMode*` (Phase 9b/9c — chantier de fond, voir détail en bas de document)
 
 ---
 
@@ -393,6 +394,26 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > (35 appels) — c'est là que les derniers `BFRequest::setVar('format', ...)` laissés intacts dans les 6 services
 > Callback pourront enfin être convertis, puisque `breezingformsng.php` est leur seul lecteur restant — puis les
 > 4 rendus `BFQuickMode*` (26 appels, Phase 9c, le poste le plus lourd).
+>
+> **Phase 9a terminée (2026-07-12)**, sauf Phase 9c. `breezingformsng.php` (28 appels) et `FormRenderer.php`
+> (41 appels) sont convertis. **Découverte utile en cours de route** : les 10 `BFRequest::setVar('format', ...)`
+> laissés intacts dans les 6 services Callback + `FormRenderer.php` se sont révélés être du **code mort** — un
+> grep exhaustif (`getVar('format'`, `getCmd('format'`, `getString('format'`, et accès directs
+> `$_GET`/`$_REQUEST`/`$_POST['format']`) ne trouve **aucun lecteur** nulle part dans le dépôt. Le piège de mutation
+> que ce document décrivait depuis le début de la Phase 9 s'est donc résolu de la façon la plus simple : il n'y avait
+> pas de vrai couplage à préserver, seulement de la logique héritée jamais nettoyée. Les 10 appels ont été supprimés
+> (pas convertis) ; les imports `use BFRequest;` devenus inutiles retirés des 3 fichiers Callback concernés.
+> `legacy/functions.php::saveOtherParam()` (2 appels) et `src/Helper/legacy/route.php::getFormRoute()` (1 appel)
+> convertis aussi au passage (aucun `setVar()` pour leurs clés). **Total Phase 9a : 326 appels convertis, zéro
+> appel `BFRequest::` fonctionnel restant hors des 4 rendus `BFQuickMode*`** (`grep -rl BFRequest` ne retourne plus
+> que ces 4 fichiers plus 3 `require_once` inertes vers la définition de la classe, conservés car ces 4 rendus en
+> dépendent encore). Vérifié : `php -l` propre sur tous les fichiers touchés ; trois formulaires réels différents
+> (contact simple, QuickMode, intégration Stripe) rendus en HTTP 200 ; deux soumissions réelles bout en bout
+> (formulaire « Contactez le VCMB », enregistrements créés avec les bonnes valeurs de champs puis supprimés) ;
+> journal Joomla surveillé sur toute la session, aucune entrée liée à `BFRequest`. Reste pour clore la Phase 9a
+> au sens strict : Stripe/PayPal/Sofort restent à confirmer avec un vrai paiement de test (accès sandbox non
+> disponible dans cette session). **Prochaine étape : Phase 9c** (les 4 rendus `BFQuickMode*`, 11 097 lignes
+> cumulées, le poste le plus lourd — commencer par `BFQuickMode.php`, le plus petit, comme preuve de concept).
 
 - **393 appels** répartis sur 19 fichiers. Par volume décroissant :
   1. `components/com_breezingformsng/src/Service/Callback/SofortCallback.php` — 69

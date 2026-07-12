@@ -119,14 +119,14 @@ trait bfProcessorExports
             if (is_object($cbResult['form'])) {
 
                 $db = Factory::getContainer()->get(DatabaseInterface::class);
-                $db->setQuery('Select SQL_CALC_FOUND_ROWS * From #__contentbuilderng_forms Where id = ' . BFRequest::getInt('cb_form_id', 0) . ' And published = 1');
+                $db->setQuery('Select SQL_CALC_FOUND_ROWS * From #__contentbuilderng_forms Where id = ' . Factory::getApplication()->getInput()->getInt('cb_form_id', 0) . ' And published = 1');
                 $_settings = $db->loadObject();
 
-                $_record = $cbResult['form']->getRecord(BFRequest::getInt('record_id', 0), $_settings->published_only, $cbResult['frontend'] ? ($_settings->own_only_fe ? Factory::getApplication()->getIdentity()->get('id', 0) : -1) : ($_settings->own_only ? Factory::getApplication()->getIdentity()->get('id', 0) : -1), true);
+                $_record = $cbResult['form']->getRecord(Factory::getApplication()->getInput()->getInt('record_id', 0), $_settings->published_only, $cbResult['frontend'] ? ($_settings->own_only_fe ? Factory::getApplication()->getIdentity()->get('id', 0) : -1) : ($_settings->own_only ? Factory::getApplication()->getIdentity()->get('id', 0) : -1), true);
                 foreach ($_record as $_rec) {
                     $_files_deleted = array();
                     if ($_rec->recType == 'File Upload') {
-                        $_array = BFRequest::getVar('cb_delete_' . $_rec->recElementId, array(), '', 'ARRAY');
+                        $_array = Factory::getApplication()->getInput()->get('cb_delete_' . $_rec->recElementId, [], 'array');
                         foreach ($_array as $_key => $_arr) {
                             if ($_arr == 1) {
                                 $_values = explode("\n", $_rec->recValue);
@@ -270,16 +270,16 @@ trait bfProcessorExports
 
                 $dispatcher = $this->app->getDispatcher();
                 $dispatcher->dispatch('onBeforeSubmit', new Joomla\Event\Event('onBeforeSubmit', array(
-                    BFRequest::getInt('cb_record_id', 0),
+                    Factory::getApplication()->getInput()->getInt('cb_record_id', 0),
                     $cbResult['form'],
                     $values
                 )
             ));
 
-                $record_return = $cbResult['form']->saveRecord(BFRequest::getInt('cb_record_id', 0), $values);
+                $record_return = $cbResult['form']->saveRecord(Factory::getApplication()->getInput()->getInt('cb_record_id', 0), $values);
 
                 $db = Factory::getContainer()->get(DatabaseInterface::class);
-                $db->setQuery('Select SQL_CALC_FOUND_ROWS * From #__contentbuilderng_forms Where id = ' . BFRequest::getInt('cb_form_id', 0) . ' And published = 1');
+                $db->setQuery('Select SQL_CALC_FOUND_ROWS * From #__contentbuilderng_forms Where id = ' . Factory::getApplication()->getInput()->getInt('cb_form_id', 0) . ' And published = 1');
                 $cbData = $db->loadObject();
 
                 if ($record_return) {
@@ -290,13 +290,13 @@ trait bfProcessorExports
                     $ignore_lang_code = '*';
                     if ($cbResult['data']['default_lang_code_ignore']) {
 
-                        $db->setQuery("Select lang_code From #__languages Where published = 1 And sef = " . $db->Quote(trim(BFRequest::getCmd('lang', ''))));
+                        $db->setQuery("Select lang_code From #__languages Where published = 1 And sef = " . $db->Quote(trim(Factory::getApplication()->getInput()->getCmd('lang', ''))));
                         $ignore_lang_code = $db->loadResult();
                         if (!$ignore_lang_code) {
                             $ignore_lang_code = '*';
                         }
 
-                        $sef = trim(BFRequest::getCmd('lang', ''));
+                        $sef = trim(Factory::getApplication()->getInput()->getCmd('lang', ''));
                         if ($ignore_lang_code == '*') {
                             $sef = '';
                         }
@@ -345,7 +345,7 @@ trait bfProcessorExports
                     BFRequest::setVar('cb_category_id', null);
                     BFRequest::setVar('cb_controller', null);
 
-                    if ($this->app->isClient('site') && BFRequest::getInt('Itemid', 0)) {
+                    if ($this->app->isClient('site') && Factory::getApplication()->getInput()->getInt('Itemid', 0)) {
                         $menu = $this->app->getMenu();
                         $item = $menu->getActive();
                         if (is_object($item)) {
@@ -362,7 +362,7 @@ trait bfProcessorExports
                     }
                     $cbData->labels = array();
                     if (count($ids)) {
-                        $db->setQuery("Select Distinct `label`, reference_id From #__contentbuilderng_elements Where form_id = " . BFRequest::getInt('cb_form_id', 0) . " And reference_id In (" . implode(',', $ids) . ") And published = 1 Order By ordering");
+                        $db->setQuery("Select Distinct `label`, reference_id From #__contentbuilderng_elements Where form_id = " . Factory::getApplication()->getInput()->getInt('cb_form_id', 0) . " And reference_id In (" . implode(',', $ids) . ") And published = 1 Order By ordering");
                         $rows = $db->loadAssocList();
                         $ids = array();
                         foreach ($rows as $row) {
@@ -381,7 +381,7 @@ trait bfProcessorExports
                         }
                     }
                     $full = false;
-                    $article_id = (new ArticleService())->createArticle(BFRequest::getInt('cb_form_id', 0), $record_return, $cbData->items, $ids, $cbData->title_field, $cbResult['form']->getRecordMetadata($record_return), $config, $full, true, BFRequest::getVar('cb_category_id', null));
+                    $article_id = (new ArticleService())->createArticle(Factory::getApplication()->getInput()->getInt('cb_form_id', 0), $record_return, $cbData->items, $ids, $cbData->title_field, $cbResult['form']->getRecordMetadata($record_return), $config, $full, true, BFRequest::getVar('cb_category_id', null));
 
                     $cacheFactory = Factory::getContainer()->get(CacheControllerFactoryInterface::class);
                     $cache = $cacheFactory->createCacheController('callback', ['defaultgroup' => 'com_content']);

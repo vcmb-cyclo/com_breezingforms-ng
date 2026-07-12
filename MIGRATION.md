@@ -266,7 +266,10 @@
 ### Vérification
 - [x] Ouvrir QuickMode depuis la liste des formulaires *(quickmode.display rendu complet, 1,6 Mo)*
 - [x] Sauvegarder un formulaire (AJAX chunked save → `quickmode.doAjaxSave`) *(vérifié HTTP authentifié le 2026-07-11 : formulaire 8, réponse `8`, hash `template_code` inchangé)*
-- [x] Ajouter / modifier / supprimer des éléments *(vérifié dans Chrome le 2026-07-12 sur le formulaire de test 28 « Test eddy elements » : sélection d'une page puis clic « Nouvel élément » ajoute exactement un nœud à l'arbre ; suppression via le menu contextuel `TREE_OBJ.remove()` le retire ; `template_code` en base inchangé avant/après (hash identique), confirmant que l'édition reste côté client jusqu'à l'enregistrement explicite)*
+- [x] Ajouter / modifier / supprimer des éléments *(vérifié dans Chrome le 2026-07-12 sur le formulaire de test 28
+  « Test eddy elements » : ajout et suppression dans l'arbre avant enregistrement ; puis cycle serveur validé via
+  `quickmode.doAjaxSave` sur un formulaire temporaire : ajout en base, modification du titre, suppression avec zéro
+  élément restant. Formulaire et éléments temporaires nettoyés)*
 - [x] Éditeur inline (`task=quickmode.editor`, `tmpl=component`) *(vérifié après correctif du layout `editor_editor`)*
 - [x] Prévisualisation frontend depuis QuickMode *(vérifié HTTP le 2026-07-11 : preview component + site, formulaire 8 rendu sans erreur fatale)*
 
@@ -341,6 +344,22 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 
 ### 9a. `BFRequest` → `Input` Joomla natif
 
+> **Avancement (2026-07-12)** : les 6 services `Site\Service\Callback\*` sont convertis (127 appels de lecture
+> sur les 393, soit les points 1, 5, 7, 11 et 13 de la liste ci-dessous — `SofortCallback`, `PayPalCallback`,
+> `StripeCallback`, `FlashUploadCallback`, `OptCallback`, `CaptchaCallback`). Toutes les lectures (`getVar`,
+> `getInt`) sont remplacées par `Factory::getApplication()->getInput()->getString()/getInt()`, en instanciant
+> `$input` une seule fois par méthode. **Les appels `BFRequest::setVar('format', ...)` sont volontairement
+> conservés tels quels** (import `use BFRequest;` gardé dans `StripeCallback`, `PayPalCallback`, `SofortCallback`) :
+> ce sont les mutations d'état décrites dans le piège ci-dessous, et le dispatcher `breezingformsng.php` qui les
+> consomme n'est pas encore converti — les remplacer aurait cassé la lecture `format` en aval. `php -l` propre sur
+> les 6 fichiers ; formulaire testé en rendu (`tmpl=component`, HTTP 200, aucune fatale) et journal Joomla surveillé
+> pendant les tests HTTP sans aucune entrée d'erreur liée à `BFRequest`/`Callback`. **Non vérifié en conditions
+> réelles** : le déclenchement HTTP direct de `optOut`/`checkCaptcha` etc. butait sur un problème de routage
+> préexistant et sans rapport (voir note de bas de Phase 9) ; à confirmer manuellement (soumettre un vrai paiement
+> Stripe/PayPal/Sofort de test, ou un lien de désinscription réel) avant de considérer ces 6 fichiers définitivement
+> clos. Prochaine étape : les traits `legacy/processor/bfProcessor*`, puis `breezingformsng.php`/`FormRenderer.php`
+> (à ce moment-là les `setVar()` restants pourront être convertis aussi), puis les rendus `BFQuickMode*`.
+
 - **393 appels** répartis sur 19 fichiers. Par volume décroissant :
   1. `components/com_breezingformsng/src/Service/Callback/SofortCallback.php` — 69
   2. `components/com_breezingformsng/legacy/processor/bfProcessorRendering.php` — 54
@@ -408,3 +427,13 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
   confirmation explicite de l'utilisateur avant qu'un agent retente, soit une vérification manuelle directe :
   Composants → BreezingForms NG → Droits → choisir un groupe → Autoriser/Refuser une action → Enregistrer →
   rouvrir l'écran et confirmer que la valeur a persisté.
+
+- **Site de dev (`joomla6-joomla-1`) — panne préexistante et sans rapport, observée le 2026-07-12** : toute page
+  du site qui déclenche le rendu complet du template (menu de site, pages d'erreur 404 comprises) répond en
+  HTTP 500, y compris pour une URL totalement étrangère au composant (`/this-page-does-not-exist-xyz`). Cause :
+  `com_contentbuilderng` (une extension distincte installée sur ce même site) a un
+  `services/provider.php` qui référence une classe `ContentbuilderngComponent` introuvable ; `mod_menu` tente de
+  construire une route vers un de ses éléments de menu à chaque rendu de template, ce qui fait planter n'importe
+  quelle page. Seules les réponses avec `tmpl=component` (qui court-circuitent le template/module de menu du site)
+  restent fiables pour tester le frontend de BreezingForms NG sur ce site tant que ContentBuilderNG n'est pas
+  réparé. Ne pas confondre avec une régression de ce composant.

@@ -9,7 +9,6 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Callback;
 
 \defined('_JEXEC') or die;
 
-use BFRequest;
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
@@ -36,7 +35,7 @@ class FlashUploadCallback
         if ($mdata['type'] == 'element') {
             switch ($mdata['bfType']) {
                 case 'bfFile':
-                    if (isset($mdata['flashUploaderBytes']) && intval($mdata['flashUploaderBytes']) > 0 && isset($mdata['bfName']) && trim($mdata['bfName']) == trim(BFRequest::getVar('itemName', ''))) {
+                    if (isset($mdata['flashUploaderBytes']) && intval($mdata['flashUploaderBytes']) > 0 && isset($mdata['bfName']) && trim($mdata['bfName']) == trim(Factory::getApplication()->getInput()->getString('itemName', ''))) {
                         if (file_exists($finaltargetFile) && @filesize($finaltargetFile) > intval($mdata['flashUploaderBytes'])) {
                             @File::delete($finaltargetFile);
                             echo trim($mdata['label']) . ': ' . Text::_('COM_BREEZINGFORMSNG_FLASH_UPLOADER_TOO_LARGE');
@@ -57,9 +56,10 @@ class FlashUploadCallback
     }
 
     @ob_end_clean();
-    if (is_numeric(BFRequest::getVar('form', '')) && !empty($_FILES) && BFRequest::getVar('bfFlashUploadTicket', '') != '') {
+    $input = Factory::getApplication()->getInput();
+    if (is_numeric($input->getString('form', '')) && !empty($_FILES) && $input->getString('bfFlashUploadTicket', '') != '') {
 
-        $db->setQuery("Select form.id, form.template_code_processed, form.template_code From #__facileforms_forms as form, #__facileforms_elements as element Where form.id = " . $db->Quote(BFRequest::getInt('form', -1)) . " And element.name = " . $db->Quote(BFRequest::getVar('itemName', '')) . " And element.form = " . $db->Quote(BFRequest::getInt('form', -1)));
+        $db->setQuery("Select form.id, form.template_code_processed, form.template_code From #__facileforms_forms as form, #__facileforms_elements as element Where form.id = " . $db->Quote($input->getInt('form', -1)) . " And element.name = " . $db->Quote($input->getString('itemName', '')) . " And element.form = " . $db->Quote($input->getInt('form', -1)));
         $objectList = $db->loadObjectList();
         $formIdCount = count($objectList);
         if ($formIdCount > 0) {
@@ -73,8 +73,8 @@ class FlashUploadCallback
                     Factory::getApplication()->getSession()->set('secure_ticket', $secureTicket, 'com_breezingformsng');
                 }
 
-                $targetFile = str_replace('//', '/', $targetPath) . 'chunks/' . BFRequest::getInt('offset', 0) . '_' . bf_sanitizeFilename(BFRequest::getVar('name', 'unknown')) . '_' . BFRequest::getVar('itemName', '') . '_' . BFRequest::getVar('bfFlashUploadTicket') . '_' . $secureTicket . '_chunktmp';
-                $finaltargetFile = str_replace('//', '/', $targetPath) . bf_sanitizeFilename(BFRequest::getVar('name', 'unknown')) . '_' . BFRequest::getVar('itemName', '') . '_' . BFRequest::getVar('bfFlashUploadTicket') . '_' . $secureTicket . '_flashtmp';
+                $targetFile = str_replace('//', '/', $targetPath) . 'chunks/' . $input->getInt('offset', 0) . '_' . bf_sanitizeFilename($input->getString('name', 'unknown')) . '_' . $input->getString('itemName', '') . '_' . $input->getString('bfFlashUploadTicket', '') . '_' . $secureTicket . '_chunktmp';
+                $finaltargetFile = str_replace('//', '/', $targetPath) . bf_sanitizeFilename($input->getString('name', 'unknown')) . '_' . $input->getString('itemName', '') . '_' . $input->getString('bfFlashUploadTicket', '') . '_' . $secureTicket . '_flashtmp';
 
                 if (@File::upload($tempFile, $targetFile)) {
 

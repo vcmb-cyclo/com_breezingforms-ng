@@ -11,7 +11,6 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Pagination\Pagination;
-use Joomla\CMS\Session\Session;
 
 $pkg = $this->pkg;
 
@@ -124,9 +123,4 @@ $bfDocument = Factory::getApplication()->getDocument();
 $bfDocument->getWebAssetManager()->useScript('com_breezingformsng.admin-form');
 $bfDocument->addScriptOptions('com_breezingformsng.admin-form', ['confirmDeleteTask' => 'forms.remove']);
 Text::script('JGLOBAL_CONFIRM_DELETE');
-
-$bfDocument->getWebAssetManager()->useScript('com_breezingformsng.admin-toggle-published');
-$bfDocument->addScriptOptions('com_breezingformsng.admin-toggle-published', ['csrfToken' => Session::getFormToken()]);
-Text::script('JPUBLISHED');
-Text::script('JUNPUBLISHED');
 ?>

@@ -126,7 +126,7 @@ final class QuickmodeHtml
     public static function showApplication($formId, $formName, $formTitle, $formDesc, $formEmailntf, $formEmailadr, $dataObjectString, $elementScripts, $themes, $themesbootstrap, $themesbootstrap3)
     {
         $active_language_code = htmlentities(
-            Factory::getApplication()->getInput()->getString('active_language_code'),
+            Factory::getApplication()->getInput()->getString('active_language_code', ''),
             ENT_QUOTES,
             'UTF-8'
         );

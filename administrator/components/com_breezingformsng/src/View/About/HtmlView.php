@@ -22,6 +22,7 @@ class HtmlView extends BaseHtmlView
 {
     protected array $plugins = [];
     protected array $logReport = [];
+    protected array $auditReport = [];
 
     public function display($tpl = null)
     {
@@ -95,6 +96,9 @@ class HtmlView extends BaseHtmlView
         if ($layout === 'extensions') {
             $this->plugins = $this->getInstalledPlugins();
         } else {
+            $auditReport = $app->getUserState('com_breezingformsng.about.audit', []);
+            $this->auditReport = is_array($auditReport) ? $auditReport : [];
+            $app->setUserState('com_breezingformsng.about.audit', []);
             $logReport = $app->getUserState('com_breezingformsng.about.log', []);
             $this->logReport = is_array($logReport) ? $logReport : [];
             $app->setUserState('com_breezingformsng.about.log', []);

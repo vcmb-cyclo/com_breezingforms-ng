@@ -12,7 +12,6 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\BaseModel;
-use Joomla\CMS\Table\Table;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Event\Event;
 
@@ -204,9 +203,12 @@ class RecordModel extends BaseModel
                 $db->execute();
 
                 if ((int) $cbRecord['delete_articles'] === 1) {
+                    $contentFactory = Factory::getApplication()
+                        ->bootComponent('com_content')
+                        ->getMVCFactory();
                     $db->setQuery("Select article_id From #__contentbuilderng_articles Where form_id = " . (int) $cbRecord['form_id'] . " And record_id = " . (int) $cbRecord['record_id']);
                     foreach ($db->loadColumn() as $article) {
-                        $table = Table::getInstance('content');
+                        $table = $contentFactory->createTable('Article', 'Administrator');
                         if ($table->load((int) $article)) {
                             Factory::getApplication()->getDispatcher()->dispatch('onContentBeforeDelete', new Event('onContentBeforeDelete', ['com_content.article', $table]));
                         }

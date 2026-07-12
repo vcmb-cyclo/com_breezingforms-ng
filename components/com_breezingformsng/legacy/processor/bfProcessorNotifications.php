@@ -48,8 +48,8 @@ trait bfProcessorNotifications
             return;
 
 
-        $from = $this->formrow->alt_mailfrom != '' ? $this->formrow->alt_mailfrom : $this->app->getCfg('mailfrom');
-        $fromname = $this->formrow->alt_fromname != '' ? $this->formrow->alt_fromname : $this->app->getCfg('fromname');
+        $from = $this->formrow->alt_mailfrom != '' ? $this->formrow->alt_mailfrom : $this->app->get('mailfrom');
+        $fromname = $this->formrow->alt_fromname != '' ? $this->formrow->alt_fromname : $this->app->get('fromname');
         if ($this->formrow->emailntf == 2)
             $recipient = $this->formrow->emailadr;
         else
@@ -707,8 +707,8 @@ trait bfProcessorNotifications
 
         if ($this->dying)
             return;
-        $from = $this->formrow->mb_alt_mailfrom != '' ? $this->formrow->mb_alt_mailfrom : $this->app->getCfg('mailfrom');
-        $fromname = $this->formrow->mb_alt_fromname != '' ? $this->formrow->mb_alt_fromname : $this->app->getCfg('fromname');
+        $from = $this->formrow->mb_alt_mailfrom != '' ? $this->formrow->mb_alt_mailfrom : $this->app->get('mailfrom');
+        $fromname = $this->formrow->mb_alt_fromname != '' ? $this->formrow->mb_alt_fromname : $this->app->get('fromname');
 
         $_senders = '';
         if ($this->formrow->emailntf == 2)
@@ -1432,8 +1432,8 @@ trait bfProcessorNotifications
                     }
                 } catch (\Throwable $exception) {
                     if ($this->formrow->mailchimp_send_errors) {
-                        $from = $this->formrow->alt_mailfrom != '' ? $this->formrow->alt_mailfrom : $this->app->getCfg('mailfrom');
-                        $fromname = $this->formrow->alt_fromname != '' ? $this->formrow->alt_fromname : $this->app->getCfg('fromname');
+                        $from = $this->formrow->alt_mailfrom != '' ? $this->formrow->alt_mailfrom : $this->app->get('mailfrom');
+                        $fromname = $this->formrow->alt_fromname != '' ? $this->formrow->alt_fromname : $this->app->get('fromname');
                         $this->sendMail($from, $fromname, $from, 'MailChimp API Error', 'Could not send data to MailChimp for email: ' . $email . "\n\nReason: " . $exception->getMessage());
                     }
                 }

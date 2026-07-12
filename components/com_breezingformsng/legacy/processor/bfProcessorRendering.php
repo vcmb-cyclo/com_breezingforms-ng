@@ -13,6 +13,7 @@
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Filter\InputFilter;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Event\Event;
 use Joomla\Event\EventInterface;
@@ -101,7 +102,11 @@ trait bfProcessorRendering
         $path = str_replace('|', '/', $path);
 
         foreach ($rows as $row) {
-            $value = BFRequest::getVar('ff_nm_' . $row->name, array(), 'POST', 'HTML', BFREQUEST_ALLOWHTML);
+            $rawValue = Factory::getApplication()->getInput()->post->get('ff_nm_' . $row->name, [], 'raw');
+            $permissiveFilter = InputFilter::getInstance([], [], 1, 1);
+            $value = \is_array($rawValue)
+                ? array_map(static fn ($v) => $permissiveFilter->clean((string) $v, 'html'), $rawValue)
+                : [];
 
             $value = implode('/', $value);
             if (trim($value) == '') {
@@ -198,7 +203,7 @@ trait bfProcessorRendering
             }
 
             // test if all published contentbuilder views allow creating new submissions
-            if (!BFRequest::getInt('cb_record_id', 0) || !BFRequest::getInt('cb_form_id', 0)) {
+            if (!Factory::getApplication()->getInput()->getInt('cb_record_id', 0) || !Factory::getApplication()->getInput()->getInt('cb_form_id', 0)) {
 
                 $permissionService = new PermissionService();
                 $cbAuth = true;
@@ -217,26 +222,26 @@ trait bfProcessorRendering
                 }
             }
 
-            if (BFRequest::getInt('cb_form_id', 0)) {
+            if (Factory::getApplication()->getInput()->getInt('cb_form_id', 0)) {
 
                 // test the permissions of given record
-                if (BFRequest::getInt('cb_record_id', 0)) {
-                    (new PermissionService())->setPermissions(BFRequest::getInt('cb_form_id', 0), BFRequest::getInt('cb_record_id', 0), $cbFrontend ? '_fe' : '');
+                if (Factory::getApplication()->getInput()->getInt('cb_record_id', 0)) {
+                    (new PermissionService())->setPermissions(Factory::getApplication()->getInput()->getInt('cb_form_id', 0), Factory::getApplication()->getInput()->getInt('cb_record_id', 0), $cbFrontend ? '_fe' : '');
                     (new PermissionService())->checkPermissions('edit', Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_EDIT_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
                 } else {
-                    (new PermissionService())->setPermissions(BFRequest::getInt('cb_form_id', 0), 0, $cbFrontend ? '_fe' : '');
+                    (new PermissionService())->setPermissions(Factory::getApplication()->getInput()->getInt('cb_form_id', 0), 0, $cbFrontend ? '_fe' : '');
                     (new PermissionService())->checkPermissions('new', Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_NEW_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
                 }
 
-                $db->setQuery("Select * From #__contentbuilderng_forms Where id = " . BFRequest::getInt('cb_form_id', 0) . " And published = 1");
+                $db->setQuery("Select * From #__contentbuilderng_forms Where id = " . Factory::getApplication()->getInput()->getInt('cb_form_id', 0) . " And published = 1");
                 $cbData = $db->loadAssoc();
                 if (is_array($cbData)) {
                     $permissionService = new PermissionService();
                     $cbFull = $cbFrontend ? $permissionService->authorizeFe('fullarticle') : $permissionService->authorize('fullarticle');
                     $cbForm = FormSourceFactory::getForm('com_breezingformsng', $cbData['reference_id']);
-                    $cbRecord = $cbForm->getRecord(BFRequest::getInt('cb_record_id', 0), $cbData['published_only'], $cbFrontend ? ($cbData['own_only_fe'] ? Factory::getApplication()->getIdentity()->get('id', 0) : -1) : ($cbData['own_only'] ? Factory::getApplication()->getIdentity()->get('id', 0) : -1), $cbFrontend ? $cbData['show_all_languages_fe'] : true);
+                    $cbRecord = $cbForm->getRecord(Factory::getApplication()->getInput()->getInt('cb_record_id', 0), $cbData['published_only'], $cbFrontend ? ($cbData['own_only_fe'] ? Factory::getApplication()->getIdentity()->get('id', 0) : -1) : ($cbData['own_only'] ? Factory::getApplication()->getIdentity()->get('id', 0) : -1), $cbFrontend ? $cbData['show_all_languages_fe'] : true);
 
-                    if (!count($cbRecord) && !BFRequest::getBool('cbIsNew')) {
+                    if (!count($cbRecord) && !Factory::getApplication()->getInput()->getBool('cbIsNew', false)) {
                         throw new Exception(Text::_('COM_CONTENTBUILDERNG_RECORD_NOT_FOUND'), 404);
                     }
                 }
@@ -260,9 +265,9 @@ trait bfProcessorRendering
 
         if (trim($this->formrow->template_code_processed) == 'QuickMode') {
 
-            if (isset($_GET['non_mobile']) && BFRequest::getBool('non_mobile', 0)) {
+            if (isset($_GET['non_mobile']) && Factory::getApplication()->getInput()->getBool('non_mobile', false)) {
                 $this->app->getSession()->clear('com_breezingformsng.mobile');
-            } else if (isset($_GET['mobile']) && BFRequest::getBool('mobile', 0)) {
+            } else if (isset($_GET['mobile']) && Factory::getApplication()->getInput()->getBool('mobile', false)) {
                 $this->app->getSession()->set('com_breezingformsng.mobile', true);
             }
 
@@ -278,7 +283,7 @@ trait bfProcessorRendering
                 $useragent = $_SERVER['HTTP_USER_AGENT'];
             }
 
-            if (BFRequest::getVar('ff_applic', '') != 'mod_facileforms' && BFRequest::getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
+            if (Factory::getApplication()->getInput()->getString('ff_applic', '') != 'mod_facileforms' && Factory::getApplication()->getInput()->getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
                 $is_device = true;
                 $this->isMobile = isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile'] ? true : (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $this->app->getSession()->get('com_breezingformsng.mobile', false) ? true : false);
             } else {
@@ -293,7 +298,7 @@ trait bfProcessorRendering
                 $is_mobile_type = 'choose';
             }
 
-            if (!$this->isMobile || ($this->isMobile && BFRequest::getVar('ff_task', '') == 'submit')) {
+            if (!$this->isMobile || ($this->isMobile && Factory::getApplication()->getInput()->getString('ff_task', '') == 'submit')) {
 
                 // nothing
             } else {
@@ -339,8 +344,8 @@ trait bfProcessorRendering
         } else {
             echo '>';
         }
-        $this->status = BFRequest::getCmd('ff_status', '');
-        $this->message = BFRequest::getVar('ff_message', '');
+        $this->status = Factory::getApplication()->getInput()->getCmd('ff_status', '');
+        $this->message = Factory::getApplication()->getInput()->getString('ff_message', '');
 
         // handle Before Form piece
         $code = '';
@@ -999,7 +1004,7 @@ trait bfProcessorRendering
         if (!$this->inline) {
             $current_url = Uri::getInstance()->toString();
 
-            $url = ($this->inframe) ? $ff_mossite . '/index.php?format=html&tmpl=component' : (($this->runmode == _FF_RUNMODE_FRONTEND) ? $current_url : 'index.php?format=html' . (BFRequest::getCmd('tmpl', '') ? '&tmpl=' . BFRequest::getCmd('tmpl', '') : $current_url));
+            $url = ($this->inframe) ? $ff_mossite . '/index.php?format=html&tmpl=component' : (($this->runmode == _FF_RUNMODE_FRONTEND) ? $current_url : 'index.php?format=html' . (Factory::getApplication()->getInput()->getCmd('tmpl', '') ? '&tmpl=' . Factory::getApplication()->getInput()->getCmd('tmpl', '') : $current_url));
             $params = ' action="' . $url . '"' .
                 ' method="post"' .
                 ' name="' . $this->form_id . '"' .
@@ -1031,8 +1036,7 @@ trait bfProcessorRendering
                       $input->set('cbCleanVar', $recordEntry->value);
                       $recordEntry->value = $input->getHtml('cbCleanVar'); */
 
-                    BFRequest::setVar('bfCleanVar', $recordEntry->value, 'POST');
-                    $recordEntry->value = BFRequest::getVar('bfCleanVar', '', 'POST', 'HTML', BFREQUEST_ALLOWHTML);
+                    $recordEntry->value = InputFilter::getInstance([], [], 1, 1)->clean((string) $recordEntry->value, 'html');
 
                     switch ($recordEntry->type) {
                         case 'Textarea':
@@ -1129,8 +1133,7 @@ trait bfProcessorRendering
                       $input->set('cbCleanVar', $cbEntry->recValue);
                       $cbEntry->recValue = $input->getHtml('cbCleanVar'); */
 
-                    BFRequest::setVar('bfCleanVar', $cbEntry->recValue, 'POST');
-                    $cbEntry->recValue = BFRequest::getVar('bfCleanVar', '', 'POST', 'HTML', BFREQUEST_ALLOWHTML);
+                    $cbEntry->recValue = InputFilter::getInstance([], [], 1, 1)->clean((string) $cbEntry->recValue, 'html');
 
                     switch ($cbEntry->recType) {
                         case 'File Upload':
@@ -2159,10 +2162,10 @@ trait bfProcessorRendering
 
         switch ($this->runmode) {
             case _FF_RUNMODE_FRONTEND:
-                echo indentc(1) . '<input type="hidden" name="ff_contentid" value="' . BFRequest::getInt('ff_contentid', 0) . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_applic" value="' . BFRequest::getWord('ff_applic', '') . '"/>' . nl() .
+                echo indentc(1) . '<input type="hidden" name="ff_contentid" value="' . Factory::getApplication()->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
+                    indentc(1) . '<input type="hidden" name="ff_applic" value="' . Factory::getApplication()->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->record_id . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_module_id" value="' . BFRequest::getInt('ff_module_id', 0) . '"/>' . nl();
+                    indentc(1) . '<input type="hidden" name="ff_module_id" value="' . Factory::getApplication()->getInput()->getInt('ff_module_id', 0) . '"/>' . nl();
                 echo indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities($this->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
                     indentc(1) . \Joomla\CMS\HTML\HTMLHelper::_('form.token') . nl();
@@ -2183,19 +2186,19 @@ trait bfProcessorRendering
                 foreach ($ff_otherparams as $prop => $val) {
                     echo indentc(1) . '<input type="hidden" name="' . htmlentities($prop, ENT_QUOTES, 'UTF-8') . '" value="' . htmlentities(urlencode($val), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                 }
-                if (BFRequest::getInt('cb_form_id', 0)) {
-                    echo '<input type="hidden" name="cb_form_id" value="' . BFRequest::getInt('cb_form_id', 0) . '"/>' . nl();
-                    if (BFRequest::getInt('cb_record_id', 0)) {
-                        echo '<input type="hidden" name="cb_record_id" value="' . BFRequest::getInt('cb_record_id', 0) . '"/>' . nl();
+                if (Factory::getApplication()->getInput()->getInt('cb_form_id', 0)) {
+                    echo '<input type="hidden" name="cb_form_id" value="' . Factory::getApplication()->getInput()->getInt('cb_form_id', 0) . '"/>' . nl();
+                    if (Factory::getApplication()->getInput()->getInt('cb_record_id', 0)) {
+                        echo '<input type="hidden" name="cb_record_id" value="' . Factory::getApplication()->getInput()->getInt('cb_record_id', 0) . '"/>' . nl();
                     }
-                    if (BFRequest::getBool('cbIsNew')) {
+                    if (Factory::getApplication()->getInput()->getBool('cbIsNew', false)) {
                         echo '<input type="hidden" name="cbIsNew" value="1"/>' . nl();
                     }
                 }
-                if (BFRequest::getVar('return', '') !== '') {
-                    echo '<input type="hidden" name="return" value="' . htmlentities(BFRequest::getVar('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                if (Factory::getApplication()->getInput()->getString('return', '') !== '') {
+                    echo '<input type="hidden" name="return" value="' . htmlentities(Factory::getApplication()->getInput()->getString('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                 }
-                if (BFRequest::getVar('tmpl') == 'component') {
+                if (Factory::getApplication()->getInput()->getString('tmpl', '') == 'component') {
                     echo '<input type="hidden" name="tmpl" value="component"/>' . nl();
                 }
                 echo '</form>' . nl();
@@ -2207,10 +2210,10 @@ trait bfProcessorRendering
                     indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities($this->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
                     indentc(1) . \Joomla\CMS\HTML\HTMLHelper::_('form.token') . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_contentid" value="' . BFRequest::getInt('ff_contentid', 0) . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_applic" value="' . BFRequest::getWord('ff_applic', '') . '"/>' . nl() .
+                    indentc(1) . '<input type="hidden" name="ff_contentid" value="' . Factory::getApplication()->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
+                    indentc(1) . '<input type="hidden" name="ff_applic" value="' . Factory::getApplication()->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->record_id . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_module_id" value="' . BFRequest::getInt('ff_module_id', 0) . '"/>' . nl() .
+                    indentc(1) . '<input type="hidden" name="ff_module_id" value="' . Factory::getApplication()->getInput()->getInt('ff_module_id', 0) . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_runmode" value="' . htmlentities($this->runmode, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                 if ($this->target > 1)
                     echo indentc(1) . '<input type="hidden" name="ff_target" value="' . htmlentities($this->target, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
@@ -2224,20 +2227,20 @@ trait bfProcessorRendering
                     echo indentc(1) . '<input type="hidden" name="ff_align" value="' . htmlentities($this->align, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                 if ($this->top != 0)
                     echo indentc(1) . '<input type="hidden" name="ff_top" value="' . htmlentities($this->top, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if (BFRequest::getInt('cb_form_id', 0)) {
-                    echo '<input type="hidden" name="cb_form_id" value="' . BFRequest::getInt('cb_form_id', 0) . '"/>' . nl();
-                    if (BFRequest::getInt('cb_record_id', 0)) {
-                        echo '<input type="hidden" name="cb_record_id" value="' . BFRequest::getInt('cb_record_id', 0) . '"/>' . nl();
+                if (Factory::getApplication()->getInput()->getInt('cb_form_id', 0)) {
+                    echo '<input type="hidden" name="cb_form_id" value="' . Factory::getApplication()->getInput()->getInt('cb_form_id', 0) . '"/>' . nl();
+                    if (Factory::getApplication()->getInput()->getInt('cb_record_id', 0)) {
+                        echo '<input type="hidden" name="cb_record_id" value="' . Factory::getApplication()->getInput()->getInt('cb_record_id', 0) . '"/>' . nl();
                     }
-                    if (BFRequest::getBool('cbIsNew')) {
+                    if (Factory::getApplication()->getInput()->getBool('cbIsNew', false)) {
                         echo '<input type="hidden" name="cbIsNew" value="1"/>' . nl();
                     }
                 }
-                if (BFRequest::getVar('return', '') !== '') {
-                    echo '<input type="hidden" name="return" value="' . htmlentities(BFRequest::getVar('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                if (Factory::getApplication()->getInput()->getString('return', '') !== '') {
+                    echo '<input type="hidden" name="return" value="' . htmlentities(Factory::getApplication()->getInput()->getString('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                 }
-                //echo '<input type="hidden" name="tmpl" value="' . BFRequest::getCmd('tmpl', '') . '"/>' . nl();
-                if (BFRequest::getVar('tmpl') == 'component') {
+                //echo '<input type="hidden" name="tmpl" value="' . Factory::getApplication()->getInput()->getCmd('tmpl', '') . '"/>' . nl();
+                if (Factory::getApplication()->getInput()->getString('tmpl', '') == 'component') {
                     echo '<input type="hidden" name="tmpl" value="component"/>' . nl();
                 }
                 echo '</form>' . nl();
@@ -2250,26 +2253,26 @@ trait bfProcessorRendering
                         indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities($this->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
                         indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
                     indentc(1) . \Joomla\CMS\HTML\HTMLHelper::_('form.token') . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_contentid" value="' . BFRequest::getInt('ff_contentid', 0) . '"/>' . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_applic" value="' . BFRequest::getWord('ff_applic', '') . '"/>' . nl() .
+                        indentc(1) . '<input type="hidden" name="ff_contentid" value="' . Factory::getApplication()->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
+                        indentc(1) . '<input type="hidden" name="ff_applic" value="' . Factory::getApplication()->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
                         indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->record_id . '"/>' . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_module_id" value="' . BFRequest::getInt('ff_module_id', 0) . '"/>' . nl() .
+                        indentc(1) . '<input type="hidden" name="ff_module_id" value="' . Factory::getApplication()->getInput()->getInt('ff_module_id', 0) . '"/>' . nl() .
                         indentc(1) . '<input type="hidden" name="ff_runmode" value="' . htmlentities($this->runmode, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                     if ($this->page != 1)
                         echo indentc(1) . '<input type="hidden" name="ff_page" value="' . htmlentities($this->page, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                    if (BFRequest::getInt('cb_form_id', 0)) {
-                        echo '<input type="hidden" name="cb_form_id" value="' . BFRequest::getInt('cb_form_id', 0) . '"/>' . nl();
-                        if (BFRequest::getInt('cb_record_id', 0)) {
-                            echo '<input type="hidden" name="cb_record_id" value="' . BFRequest::getInt('cb_record_id', 0) . '"/>' . nl();
+                    if (Factory::getApplication()->getInput()->getInt('cb_form_id', 0)) {
+                        echo '<input type="hidden" name="cb_form_id" value="' . Factory::getApplication()->getInput()->getInt('cb_form_id', 0) . '"/>' . nl();
+                        if (Factory::getApplication()->getInput()->getInt('cb_record_id', 0)) {
+                            echo '<input type="hidden" name="cb_record_id" value="' . Factory::getApplication()->getInput()->getInt('cb_record_id', 0) . '"/>' . nl();
                         }
-                        if (BFRequest::getBool('cbIsNew')) {
+                        if (Factory::getApplication()->getInput()->getBool('cbIsNew', false)) {
                             echo '<input type="hidden" name="cbIsNew" value="1"/>' . nl();
                         }
                     }
-                    if (BFRequest::getVar('return', '') !== '') {
-                        echo '<input type="hidden" name="return" value="' . htmlentities(BFRequest::getVar('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                    if (Factory::getApplication()->getInput()->getString('return', '') !== '') {
+                        echo '<input type="hidden" name="return" value="' . htmlentities(Factory::getApplication()->getInput()->getString('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                     }
-                    if (BFRequest::getVar('tmpl') == 'component') {
+                    if (Factory::getApplication()->getInput()->getString('tmpl', '') == 'component') {
                         echo '<input type="hidden" name="tmpl" value="component"/>' . nl();
                     }
                     echo '</form>' . nl();

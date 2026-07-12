@@ -31,7 +31,7 @@
 - [x] Frontend moteur formulaires — dispatcher, config, routeur SEF et `HTML_facileFormsProcessor` (8 907 lignes) décomposés en services/traits Joomla 6 (Phase 8)
 - [x] `BFRequest` → `Input` Joomla natif (Phase 9a, 326 appels convertis ; ne reste que dans les 4 rendus `BFQuickMode*`, cf. Phase 9c)
 - [x] Rendus `BFQuickMode*` — migration `BFRequest` (Phase 9c, 33 appels convertis ; la réécriture native complète du rendu reste un chantier séparé, hors périmètre `BFRequest`)
-- [ ] `BFIntegrate` → service typé (Phase 9b — chantier de fond, voir détail en bas de document)
+- [x] `BFIntegrate` → requêtes préparées (Phase 9b, 2026-07-12 — SQL par concaténation remplacé par `quoteName()`/`bind()`, vérifié en conditions réelles insert/update/repli)
 
 ---
 
@@ -474,6 +474,25 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
   des requêtes préparées (`$db->quoteName()` sur les identifiants, liaison des valeurs).
 - Cible proposée : `Site\Service\Integrator\IntegratorRuntime`, en conservant les méthodes publiques `field()` et
   `commit()` pour limiter l'impact sur les deux appelants.
+
+> **Fait (2026-07-12)** : la classe reste `BFIntegrate` (nom conservé, pas de renommage/déplacement — les deux
+> appelants n'ont pas eu besoin d'être modifiés), mais son intérieur est entièrement réécrit avec le query builder
+> Joomla : `quoteName()` sur chaque identifiant (table, colonnes), `bind()` sur chaque valeur avec un paramètre nommé
+> à la place de la concaténation `$db->quote()`. `commit()` découpé en `commitInsert()`/`commitUpdate()`/
+> `executeInsert()`/`buildCriteriaClauses()` pour la lisibilité. Point d'attention conservé fidèlement : chaque
+> critère porte son propre `andor` (ET/OU) qui le relie au critère *précédent*, pouvant mélanger ET/OU librement
+> entre les trois groupes de critères (formulaire/Joomla/valeur fixe) — `QueryBuilder::where()` n'admettant qu'un
+> seul glue uniforme entre plusieurs conditions, ce fragment reste construit comme une seule chaîne brute liée par
+> `bind()`, exactement comme le faisait la concaténation historique. Le modèle de confiance n'a pas changé :
+> `eval()` reste (retirer l'exécution de code stocké supprimerait la fonctionnalité, pas seulement le risque),
+> les noms de table/colonne et le code restent de la configuration Super User, pas de la saisie utilisateur.
+>
+> Vérifié en conditions réelles avec une table jetable (`#__bf_integrator_test`) et une vraie règle Intégrateur
+> insérée en base : (1) règle `insert` → ligne créée avec les bonnes valeurs ; (2) règle `update` avec un critère
+> correspondant → la même ligne est mise à jour au lieu d'être dupliquée ; (3) règle `update` sans ligne
+> correspondante → repli sur l'insertion, comme en legacy. Toutes les données de test (règle, items, critère,
+> table jetable, 3 enregistrements de formulaire) supprimées après vérification. Journal Joomla surveillé, aucune
+> entrée liée à ce changement.
 
 ### 9c. Rendus `BFQuickMode*` → un composant de rendu par thème
 

@@ -9,7 +9,6 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Callback;
 
 \defined('_JEXEC') or die;
 
-use BFRequest;
 use Joomla\CMS\Factory;
 use Vcmb\Component\BreezingformsNG\Site\Service\Support\RedirectHelper;
 use Joomla\CMS\HTML\HTMLHelper;
@@ -31,7 +30,6 @@ class PayPalCallback
         $db = $database;
 
 
-    BFRequest::setVar('format', 'html');
 
     $input = Factory::getApplication()->getInput();
     $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($input->getInt('form_id', -1)));
@@ -198,7 +196,6 @@ class PayPalCallback
         $db = $database;
 
 
-    BFRequest::setVar('format', 'html');
 
     $input = Factory::getApplication()->getInput();
     $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($input->getInt('form_id', -1)));
@@ -394,7 +391,6 @@ class PayPalCallback
         $db = $database;
 
 
-    BFRequest::setVar('format', 'raw');
 
     $input = Factory::getApplication()->getInput();
     $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($input->getInt('form', -1)));
@@ -489,7 +485,6 @@ class PayPalCallback
         $db = $database;
 
 
-    BFRequest::setVar('format', 'html');
 
     $style = '<link rel="stylesheet" href="' . Uri::root() . 'templates/' . $mainframe->getTemplate() . '/css/template.css" type="text/css" />';
 

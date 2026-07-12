@@ -9,7 +9,6 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Callback;
 
 \defined('_JEXEC') or die;
 
-use BFRequest;
 use Joomla\CMS\Factory;
 use Vcmb\Component\BreezingformsNG\Site\Service\Support\RedirectHelper;
 use Joomla\CMS\HTML\HTMLHelper;
@@ -32,7 +31,6 @@ class SofortCallback
         $db = $database;
 
 
-    BFRequest::setVar('format', 'html');
 
     $input = Factory::getApplication()->getInput();
     $tx_token = $input->getString('tx', '');
@@ -117,7 +115,6 @@ class SofortCallback
         $db = $database;
 
 
-    BFRequest::setVar('format', 'raw');
 
     $input = Factory::getApplication()->getInput();
     $formId = $input->getInt('user_variable_0', -1);
@@ -273,7 +270,6 @@ class SofortCallback
         $db = $database;
 
 
-    BFRequest::setVar('format', 'raw');
 
     $input = Factory::getApplication()->getInput();
     $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($input->getInt('form', -1)));

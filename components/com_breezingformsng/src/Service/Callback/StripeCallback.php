@@ -9,7 +9,6 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Callback;
 
 \defined('_JEXEC') or die;
 
-use BFRequest;
 use Joomla\CMS\Factory;
 use Vcmb\Component\BreezingformsNG\Site\Service\Support\RedirectHelper;
 use Joomla\CMS\HTML\HTMLHelper;
@@ -30,7 +29,6 @@ class StripeCallback
         $db = $database;
 
 
-    BFRequest::setVar('format', 'html');
 
     $input = Factory::getApplication()->getInput();
     $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($input->getInt('form_id', -1)));
@@ -213,7 +211,6 @@ class StripeCallback
         $db = $database;
 
 
-    BFRequest::setVar('format', 'raw');
 
     $input = Factory::getApplication()->getInput();
     $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($input->getInt('form', -1)));

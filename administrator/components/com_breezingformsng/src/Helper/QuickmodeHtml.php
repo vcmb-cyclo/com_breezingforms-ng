@@ -21,6 +21,7 @@ use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Language\LanguageHelper;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Session\Session;
 
 require_once JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php';
 
@@ -91,6 +92,7 @@ final class QuickmodeHtml
             'formEmailntf' => \in_array((int) $formEmailntf, [1, 2], true),
             'elementScripts' => $elementScripts,
             'labels' => $labels,
+            'csrfToken' => Session::getFormToken(),
         ];
 
         // dataObject is a raw JSON document produced by the legacy exporter; legacy

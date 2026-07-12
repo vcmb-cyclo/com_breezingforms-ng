@@ -13,8 +13,8 @@ use Joomla\CMS\Router\Route;
 
 /**
  * Renders the "BreezingForms NG / Section / Item" page title as a breadcrumb:
- * every ancestor segment is a link back to that level, the current (last)
- * segment stays plain text.
+ * intermediate ancestors link back to their level; the component root and
+ * the current (last) segment stay plain text.
  */
 final class BreadcrumbHelper
 {
@@ -31,7 +31,7 @@ final class BreadcrumbHelper
             $url = $segment['url'] ?? null;
 
             // Route::_() already HTML-encodes the URL (xhtml=true); do not re-escape it.
-            $parts[] = ($url !== null && $i !== $last)
+            $parts[] = ($url !== null && $i > 0 && $i !== $last)
                 ? '<a href="' . Route::_($url) . '">' . $label . '</a>'
                 : $label;
         }

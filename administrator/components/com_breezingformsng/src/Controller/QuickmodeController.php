@@ -32,6 +32,8 @@ class QuickmodeController extends BaseController
      */
     public function doAjaxSave(): void
     {
+        $this->checkToken('post');
+
         $app   = Factory::getApplication();
         $input = $app->getInput();
 

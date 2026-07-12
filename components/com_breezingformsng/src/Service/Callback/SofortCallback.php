@@ -1,0 +1,351 @@
+<?php
+/**
+ * @package BreezingFormsNG
+ * @copyright Copyright (C) 2024-2026 by XDA+GIL
+ * @license GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
+namespace Vcmb\Component\BreezingformsNG\Site\Service\Callback;
+
+\defined('_JEXEC') or die;
+
+use BFRequest;
+use BFText;
+use Joomla\CMS\Factory;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Uri\Uri;
+use Joomla\Filesystem\File;
+
+/**
+ * Sofortueberweisung payment callbacks: success page, server-side
+ * confirmation and paid-file download.
+ */
+class SofortCallback
+{
+    public function success(): void
+    {
+        global $database, $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
+
+        $mainframe = Factory::getApplication();
+        $db = $database;
+
+
+    BFRequest::setVar('format', 'html');
+
+    $tx_token = BFRequest::getVar('tx', '');
+    if ($tx_token == '') {
+        $msg = Text::_("This transaction id is empty!");
+        require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
+    } else {
+
+        $formId = BFRequest::getInt('user_variable_0', '');
+        $recordId = BFRequest::getInt('user_variable_1', '');
+
+        if ($formId != '' && $recordId != '') {
+
+
+            $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($formId));
+            $list = $db->loadObjectList();
+            if (count($list) == 0) {
+                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
+                exit;
+            }
+
+            $form = $list[0];
+
+            $areas = json_decode($form->template_areas, true);
+            if (!is_array($areas)) {
+                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_SU_DATA'));
+            }
+
+            foreach ($areas as $area) {
+                foreach ($area['elements'] as $element) {
+                    if ($element['internalType'] == 'bfSofortueberweisung') {
+                        $options = $element['options'];
+                        if ($options['downloadableFile']) {
+                            $tx_token = BFRequest::getVar('tx', '');
+                            $tries = $options['downloadTries'];
+
+                            $db->setQuery("
+									Select paypal_download_tries From 
+										#__facileforms_records 
+									Where 
+										id = '" . $recordId . "'
+									And
+										paypal_tx_id = " . $db->Quote('Sofortüberweisung: ' . BFRequest::getVar('tx', '')) . "
+									");
+
+                            $downloads = $db->loadObjectList();
+
+                            $confirmed = false;
+                            if (count($downloads) == 1) {
+                                $confirmed = true;
+                            }
+
+                            require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/sofort_download.php');
+                        } else {
+                            if ($options['thankYouPage'] != '') {
+                                BFRedirect($options['thankYouPage']);
+                            } else {
+                                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_PAYING_WITH_SU'));
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+        } else {
+            $msg = Text::_("COM_BREEZINGFORMSNG_MISSING_PAYMENT_INFORMATION");
+            $tx_token = Text::_("COM_BREEZINGFORMSNG_NOT_AVAILABLE");
+            if (BFRequest::getVar('tx', '') != '') {
+                $tx_token = BFRequest::getVar('tx', '');
+            }
+            require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
+        }
+    }
+    }
+
+    public function confirm(): void
+    {
+        global $database, $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
+
+        $mainframe = Factory::getApplication();
+        $db = $database;
+
+
+    BFRequest::setVar('format', 'raw');
+
+    $formId = BFRequest::getInt('user_variable_0', -1);
+    $recordId = BFRequest::getInt('user_variable_1', -1);
+
+
+    $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($formId));
+    $list = $db->loadObjectList();
+    if (count($list) == 0) {
+        exit;
+    }
+
+    $form = $list[0];
+
+    $areas = json_decode($form->template_areas, true);
+    if (!is_array($areas)) {
+        exit;
+    }
+
+    foreach ($areas as $area) {
+        foreach ($area['elements'] as $element) {
+            if ($element['internalType'] == 'bfSofortueberweisung') {
+
+                $options = $element['options'];
+
+                $data = array(
+                    'transaction' => BFRequest::getVar('transaction', ''),
+                    'user_id' => BFRequest::getVar('user_id', ''),
+                    'project_id' => BFRequest::getVar('project_id', ''),
+                    'sender_holder' => BFRequest::getVar('sender_holder', ''),
+                    'sender_account_number' => BFRequest::getVar('sender_account_number', ''),
+                    'sender_bank_code' => BFRequest::getVar('sender_bank_code', ''),
+                    'sender_bank_name' => BFRequest::getVar('sender_bank_name', ''),
+                    'sender_bank_bic' => BFRequest::getVar('sender_bank_bic', ''),
+                    'sender_iban' => BFRequest::getVar('sender_iban', ''),
+                    'sender_country_id' => BFRequest::getVar('sender_country_id', ''),
+                    'recipient_holder' => BFRequest::getVar('recipient_holder', ''),
+                    'recipient_account_number' => BFRequest::getVar('recipient_account_number', ''),
+                    'recipient_bank_code' => BFRequest::getVar('recipient_bank_code', ''),
+                    'recipient_bank_name' => BFRequest::getVar('recipient_bank_name', ''),
+                    'recipient_bank_bic' => BFRequest::getVar('recipient_bank_bic', ''),
+                    'recipient_iban' => BFRequest::getVar('recipient_iban', ''),
+                    'recipient_country_id' => BFRequest::getVar('recipient_country_id', ''),
+                    'international_transaction' => BFRequest::getVar('international_transaction', ''),
+                    'amount' => BFRequest::getVar('amount', ''),
+                    'currency_id' => BFRequest::getVar('currency_id', ''),
+                    'reason_1' => BFRequest::getVar('reason_1', ''),
+                    'reason_2' => BFRequest::getVar('reason_2', ''),
+                    'security_criteria' => BFRequest::getVar('security_criteria', ''),
+                    'user_variable_0' => BFRequest::getVar('user_variable_0', ''),
+                    'user_variable_1' => BFRequest::getVar('user_variable_1', ''),
+                    'user_variable_2' => BFRequest::getVar('user_variable_2', ''),
+                    'user_variable_3' => BFRequest::getVar('user_variable_3', ''),
+                    'user_variable_4' => BFRequest::getVar('user_variable_4', ''),
+                    'user_variable_5' => BFRequest::getVar('user_variable_5', ''),
+                    'created' => BFRequest::getVar('created', ''),
+                    'project_password' => $options['project_password']
+                );
+
+                $data_implode = implode('|', $data);
+                $hash = sha1($data_implode);
+
+                $query = "SELECT * FROM #__facileforms_records WHERE id = '" . $recordId . "' And paypal_tx_id = '' LIMIT 1";
+                $db->setQuery($query);
+                $txid = $db->loadObjectList();
+
+                if ($hash == BFRequest::getVar('hash', '')) {
+
+                    if (count($txid) != 0) {
+
+                        if ($txid[0]->paypal_tx_id == '') {
+
+                            $db->setQuery("
+										Update 
+											#__facileforms_records 
+										Set 
+											paypal_tx_id = " . $db->Quote('Sofortüberweisung: ' . BFRequest::getVar('transaction', '')) . ", 
+											paypal_payment_date = " . $db->Quote(date('Y-m-d H:i:s', strtotime(BFRequest::getVar('created', '')))) . ",
+											paypal_testaccount = 0,
+											paypal_download_tries = 0
+										Where 
+											id = '" . $recordId . "'
+											");
+
+                            $db->execute();
+
+                            $recipients = explode('###', BFRequest::getVar('user_variable_2', ''));
+                            $recipientsSize = count($recipients);
+                            $mailer = Factory::getMailer();
+                            $mailer->Subject = BFText::_('COM_BREEZINGFORMSNG_YOUR_PAYMENT_AT_SU');
+                            $mailer->Body = BFText::_('COM_BREEZINGFORMSNG_HALLO') . "\n\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_YOUR_PAYMENT_SUCCEEDED') . "\n\n";
+                            $mailer->Body .= '--------------------------------------' . "\n\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_REASON1') . ': ' . BFRequest::getVar('reason_1', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_REASON2') . ': ' . BFRequest::getVar('reason_2', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_AMOUNT') . ': ' . str_replace('.', ',', BFRequest::getVar('amount', '')) . ' ' . BFRequest::getVar('currency_id', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_TRANSACTION') . ': ' . BFRequest::getVar('transaction', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_ACCOUNT_HOLDER') . ': ' . BFRequest::getVar('sender_holder', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_ACCOUNT_NUMBER') . ': ' . BFRequest::getVar('sender_account_number', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_BANK_CODE') . ': ' . BFRequest::getVar('recipient_bank_code', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_BANK_NAME') . ': ' . BFRequest::getVar('sender_bank_name', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_BIC') . ': ' . BFRequest::getVar('sender_bank_bic', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_IBAN') . ': ' . BFRequest::getVar('sender_iban', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_PAYMENT_DATE') . ': ' . BFRequest::getVar('created', '') . "\n\n";
+
+                            $mailer->Body .= '--------------------------------------' . "\n\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_RECEIPT_FOR_YOUR_PAYMENT') . "\n\n";
+                            $mailer->Body .= '--------------------------------------' . "\n\n";
+
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_ACCOUNT_HOLDER') . ': ' . BFRequest::getVar('recipient_holder', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_ACCOUNT_NUMBER') . ': ' . BFRequest::getVar('recipient_account_number', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_BANK_CODE') . ': ' . BFRequest::getVar('recipient_bank_code', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_BANK_NAME') . ': ' . BFRequest::getVar('recipient_bank_name', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_BIC') . ': ' . BFRequest::getVar('recipient_bank_bic', '') . "\n";
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_IBAN') . ': ' . BFRequest::getVar('recipient_iban', '') . "\n\n";
+
+                            $mailer->Body .= '--------------------------------------' . "\n\n";
+
+                            $mailer->Body .= BFText::_('COM_BREEZINGFORMSNG_PAYMENT_GATEWAY_SU');
+
+                            for ($i = 0; $i < $recipientsSize; $i++) {
+                                if (bf_is_email($recipients[$i])) {
+                                    $mailer->AddAddress($recipients[$i]);
+                                    $mailer->Send();
+                                }
+                            }
+
+                            // trigger a script after succeeded payment?
+                            if (file_exists(JPATH_SITE . '/bf_sofortueberweisung_success.php')) {
+                                require_once (JPATH_SITE . '/bf_sofortueberweisung_success.php');
+                            }
+
+                            // send mail after succeeded payment?
+                            if (isset($options['sendNotificationAfterPayment']) && $options['sendNotificationAfterPayment']) {
+                                bf_sendNotificationByPaymentCache($formId, $recordId, 'admin');
+                                bf_sendNotificationByPaymentCache($formId, $recordId, 'mailback');
+                            }
+                        }
+                    }
+                }
+
+                break;
+            }
+        }
+    }
+    }
+
+    public function download(): void
+    {
+        global $database, $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
+
+        $mainframe = Factory::getApplication();
+        $db = $database;
+
+
+    BFRequest::setVar('format', 'raw');
+
+
+    $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote(BFRequest::getInt('form', -1)));
+    $list = $db->loadObjectList();
+    if (count($list) == 0) {
+        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
+        exit;
+    }
+
+    $form = $list[0];
+
+    $areas = json_decode($form->template_areas, true);
+    if (!is_array($areas)) {
+        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYMENT_DATA'));
+    }
+
+    foreach ($areas as $area) {
+        foreach ($area['elements'] as $element) {
+            if ($element['internalType'] == 'bfSofortueberweisung') {
+
+                $options = $element['options'];
+
+                if ($options['downloadableFile']) {
+
+                    $file = $options['filepath'];
+
+                    $db->setQuery("
+									Select paypal_download_tries From 
+										#__facileforms_records 
+									Where 
+										id = '" . BFRequest::getInt('record_id', -1) . "'
+									And
+										paypal_tx_id = " . $db->Quote('Sofortüberweisung: ' . BFRequest::getVar('tx', '')) . "
+									");
+
+                    $downloads = $db->loadObjectList();
+
+                    if (count($downloads) == 1) {
+
+                        if ($downloads[0]->paypal_download_tries < $options['downloadTries']) {
+
+                            $db->setQuery("
+											Update 
+												#__facileforms_records 
+											Set
+												paypal_download_tries = paypal_download_tries + 1 
+											Where 
+												id = '" . BFRequest::getInt('record_id', -1) . "'
+											And
+												paypal_tx_id = " . $db->Quote('Sofortüberweisung: ' . BFRequest::getVar('tx', '')) . "
+											");
+
+                            $db->execute();
+
+                            if (!file_exists($file)) {
+                                BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_DOWNLOAD_FILE'));
+                            }
+
+                            \Vcmb\Component\BreezingformsNG\Site\Service\Support\DownloadHelper::stream($file);
+                        } else {
+
+                            BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_MAX_DOWNLOAD_TRIES_REACHED'));
+                        }
+                    } else {
+
+                        BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_DOWNLOAD_NOT_POSSIBLE'));
+                    }
+                } else {
+
+                    BFRedirect(Uri::root(), BFText::_('COM_BREEZINGFORMSNG_NO_DOWNLOADABLE_PRODUCT'));
+                }
+
+                break;
+            }
+        }
+    }
+    }
+}

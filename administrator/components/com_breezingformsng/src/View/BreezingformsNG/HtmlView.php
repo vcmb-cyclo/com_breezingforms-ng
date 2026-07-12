@@ -2,6 +2,7 @@
 /**
  * @package BreezingFormsNG
  * @author      Markus Bopp
+ * @author      XDA+GIL
  * @link        https://breezingforms-ng.vcmb.fr
  * @copyright Copyright (C) 2024-2026 by XDA+GIL
  * @license     GNU/GPL
@@ -83,14 +84,14 @@ class HtmlView extends BaseHtmlView
         $act = $input->getCmd('act', '');
 
         return match (true) {
-            $view === 'scripts', $act === 'managescripts' => \Text::_('COM_BREEZINGFORMSNG_MANAGESCRIPTS'),
-            $view === 'pieces', $act === 'managepieces' => \Text::_('COM_BREEZINGFORMSNG_MANAGEPIECES'),
-            $view === 'records', $act === 'managerecs', $act === 'recordmanagement' => $this->withRecordIdSuffix(\Text::_('COM_BREEZINGFORMSNG_RECORDS_SECTION_TITLE')),
-	            $view === 'forms', $act === 'manageforms', $act === 'quickmode' => \Text::_('COM_BREEZINGFORMSNG_MANAGEFORMS'),
-            $view === 'menus', $act === 'managemenus' => \Text::_('COM_BREEZINGFORMSNG_MANAGEMENUS'),
-            $act === 'integrate' => \Text::_('COM_BREEZINGFORMSNG_INTEGRATOR'),
-            $act === 'configuration' => \Text::_('COM_BREEZINGFORMSNG_CONFIG'),
-            $view === 'about' => \Text::_('COM_BREEZINGFORMSNG_ABOUT'),
+            $view === 'scripts', $act === 'managescripts' => Text::_('COM_BREEZINGFORMSNG_MANAGESCRIPTS'),
+            $view === 'pieces', $act === 'managepieces' => Text::_('COM_BREEZINGFORMSNG_MANAGEPIECES'),
+            $view === 'records', $act === 'managerecs', $act === 'recordmanagement' => $this->withRecordIdSuffix(Text::_('COM_BREEZINGFORMSNG_RECORDS_SECTION_TITLE')),
+	            $view === 'forms', $act === 'manageforms', $act === 'quickmode' => Text::_('COM_BREEZINGFORMSNG_MANAGEFORMS'),
+            $view === 'menus', $act === 'managemenus' => Text::_('COM_BREEZINGFORMSNG_MANAGEMENUS'),
+            $act === 'integrate' => Text::_('COM_BREEZINGFORMSNG_INTEGRATOR'),
+            $act === 'configuration' => Text::_('COM_BREEZINGFORMSNG_CONFIG'),
+            $view === 'about' => Text::_('COM_BREEZINGFORMSNG_ABOUT'),
             default => '',
         };
     }

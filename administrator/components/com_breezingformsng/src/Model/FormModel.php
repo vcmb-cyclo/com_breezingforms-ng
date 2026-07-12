@@ -114,7 +114,7 @@ class FormModel extends BaseModel
 
         $title = trim((string) ($data['title'] ?? ''));
         if ($title === '') {
-            throw new \RuntimeException(\Joomla\CMS\Language\Text::_('COM_BREEZINGFORMSNG_FORMS_TITLEEMPTY'));
+            throw new \RuntimeException(\Joomla\CMS\LanguageText::_('COM_BREEZINGFORMSNG_FORMS_TITLEEMPTY'));
         }
 
         $cols = [

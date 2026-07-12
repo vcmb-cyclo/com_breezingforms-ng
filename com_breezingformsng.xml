@@ -44,10 +44,10 @@
 		<filename>breezingformsng.php</filename>
 		<filename>facileforms.class.php</filename>
 		<filename>facileforms.process.php</filename>
-		<filename>facileforms.xml.php</filename>
 		<folder>downloadtpl</folder>
 		<folder>exports</folder>
 		<folder>language</folder>
+		<folder>legacy</folder>
 		<folder>libraries</folder>
 		<folder>src</folder>
 		<folder>themes</folder>

@@ -149,7 +149,7 @@ class BFQuickModeBootstrap
             'form-select' => 'form-select'
         );
 
-        if (BFRequest::getVar('ff_applic', '') != 'mod_facileforms' && BFRequest::getVar('ff_applic', '') != 'plg_facileforms') {
+        if (Factory::getApplication()->getInput()->getString('ff_applic', '') != 'mod_facileforms' && Factory::getApplication()->getInput()->getString('ff_applic', '') != 'plg_facileforms') {
             /* translatables */
             if (isset($this->rootMdata['title_translation' . $this->language_tag]) && $this->rootMdata['title_translation' . $this->language_tag] != '') {
                 $this->rootMdata['title'] = $this->rootMdata['title_translation' . $this->language_tag];
@@ -446,11 +446,11 @@ class BFQuickModeBootstrap
                 }
 
                 $display = ' style="display:none;"';
-                if (BFRequest::getInt('ff_form_submitted', 0) == 0 && BFRequest::getInt('ff_page', 1) == $parentPage['pageNumber']) {
+                if (Factory::getApplication()->getInput()->getInt('ff_form_submitted', 0) == 0 && Factory::getApplication()->getInput()->getInt('ff_page', 1) == $parentPage['pageNumber']) {
                     $display = '';
-                } else if (BFRequest::getInt('ff_form_submitted', 0) == 1 && $this->rootMdata['lastPageThankYou'] && $parentPage['pageNumber'] == count($this->dataObject['children'])) {
+                } else if (Factory::getApplication()->getInput()->getInt('ff_form_submitted', 0) == 1 && $this->rootMdata['lastPageThankYou'] && $parentPage['pageNumber'] == count($this->dataObject['children'])) {
                     $display = '';
-                } else if (BFRequest::getInt('ff_form_submitted', 0) == 1 && false == $this->rootMdata['lastPageThankYou'] && $parentPage['pageNumber'] == 1) {
+                } else if (Factory::getApplication()->getInput()->getInt('ff_form_submitted', 0) == 1 && false == $this->rootMdata['lastPageThankYou'] && $parentPage['pageNumber'] == 1) {
                     $display = '';
                 }
 
@@ -1142,7 +1142,7 @@ class BFQuickModeBootstrap
                                                                         container: 'bfUploadContainer" . $mdata['dbId'] . "',
                                                                         file_data_name: 'Filedata',
                                                                         multipart_params: { form: " . $this->p->form . ", itemName : '" . $mdata['bfName'] . "', bfFlashUploadTicket: '" . $this->flashUploadTicket . "', option: 'com_breezingformsng', format: 'html', flashUpload: 'true', Itemid: 0 },
-                                                                        url : '" . $base . (Factory::getApplication()->getConfig()->get('sef') && !Factory::getApplication()->getConfig()->get('sef_rewrite') ? 'index.php/' : '') . (BFRequest::getCmd('lang', '') && Factory::getApplication()->getConfig()->get('sef') ? (Factory::getApplication()->getConfig()->get('sef_rewrite') ? 'index.php' : '') : 'index.php') . "',
+                                                                        url : '" . $base . (Factory::getApplication()->getConfig()->get('sef') && !Factory::getApplication()->getConfig()->get('sef_rewrite') ? 'index.php/' : '') . (Factory::getApplication()->getInput()->getCmd('lang', '') && Factory::getApplication()->getConfig()->get('sef') ? (Factory::getApplication()->getConfig()->get('sef_rewrite') ? 'index.php' : '') : 'index.php') . "',
                                                                         flash_swf_url : '" . $base . "components/com_breezingformsng/libraries/jquery/plupload/Moxie.swf',
                                                                         filters : [
                                                                                 {title : '" . addslashes(Text::_('COM_BREEZINGFORMSNG_CHOOSE_FILE')) . "', extensions : '" . $exts . "'}
@@ -1351,7 +1351,7 @@ class BFQuickModeBootstrap
 
                                 $http = 'https';
 
-                                $lang = BFRequest::getVar('lang', '');
+                                $lang = Factory::getApplication()->getInput()->getString('lang', '');
 
                                 $getLangTag = Factory::getApplication()->getLanguage()->getTag();
                                 $getLangSlug = explode('-', $getLangTag);
@@ -1402,7 +1402,7 @@ class BFQuickModeBootstrap
 
                                     $http = 'https';
 
-                                    $lang = BFRequest::getVar('lang', '');
+                                    $lang = Factory::getApplication()->getInput()->getString('lang', '');
                                     if ($lang != '') {
                                         $lang = ',lang: ' . json_encode($lang) . '';
                                     }

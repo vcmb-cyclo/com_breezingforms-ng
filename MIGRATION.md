@@ -352,13 +352,17 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > conservés tels quels** (import `use BFRequest;` gardé dans `StripeCallback`, `PayPalCallback`, `SofortCallback`) :
 > ce sont les mutations d'état décrites dans le piège ci-dessous, et le dispatcher `breezingformsng.php` qui les
 > consomme n'est pas encore converti — les remplacer aurait cassé la lecture `format` en aval. `php -l` propre sur
-> les 6 fichiers ; formulaire testé en rendu (`tmpl=component`, HTTP 200, aucune fatale) et journal Joomla surveillé
-> pendant les tests HTTP sans aucune entrée d'erreur liée à `BFRequest`/`Callback`. **Non vérifié en conditions
-> réelles** : le déclenchement HTTP direct de `optOut`/`checkCaptcha` etc. butait sur un problème de routage
-> préexistant et sans rapport (voir note de bas de Phase 9) ; à confirmer manuellement (soumettre un vrai paiement
-> Stripe/PayPal/Sofort de test, ou un lien de désinscription réel) avant de considérer ces 6 fichiers définitivement
-> clos. Prochaine étape : les traits `legacy/processor/bfProcessor*`, puis `breezingformsng.php`/`FormRenderer.php`
-> (à ce moment-là les `setVar()` restants pourront être convertis aussi), puis les rendus `BFQuickMode*`.
+> les 6 fichiers. **Vérifié en conditions réelles le 2026-07-12** une fois le site de dev réparé (cf. note de bas de
+> Phase 9) : `optOut` déclenché via un vrai lien de désinscription (`.../bf-contactez-le-vcmb.html?opt_out=true&id=…&token=…`)
+> renvoie le message de confirmation attendu (« Merci de vous être désinscrit… ») sans erreur ; `checkCaptcha`
+> (`?checkCaptcha=1&value=test`) renvoie `capResult=>false` comme attendu pour un code invalide, avec pour seul bruit
+> deux avertissements PHP 8 de dépréciation de propriété dynamique dans la librairie tierce vendorée `Securimage`
+> (`media/com_breezingformsng/images/site/captcha/securimage.php`, sans rapport avec ce changement — nettoyage
+> possible mais hors périmètre de la Phase 9). Journal Joomla surveillé sur toute la fenêtre de test : aucune entrée
+> liée à `BFRequest`/`Callback`. `Stripe`/`PayPal`/`Sofort` restent à confirmer avec un vrai paiement de test (accès
+> à un compte sandbox nécessaire, non disponible dans cette session). Prochaine étape : les traits
+> `legacy/processor/bfProcessor*`, puis `breezingformsng.php`/`FormRenderer.php` (à ce moment-là les `setVar()`
+> restants pourront être convertis aussi), puis les rendus `BFQuickMode*`.
 
 - **393 appels** répartis sur 19 fichiers. Par volume décroissant :
   1. `components/com_breezingformsng/src/Service/Callback/SofortCallback.php` — 69
@@ -428,12 +432,9 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
   Composants → BreezingForms NG → Droits → choisir un groupe → Autoriser/Refuser une action → Enregistrer →
   rouvrir l'écran et confirmer que la valeur a persisté.
 
-- **Site de dev (`joomla6-joomla-1`) — panne préexistante et sans rapport, observée le 2026-07-12** : toute page
-  du site qui déclenche le rendu complet du template (menu de site, pages d'erreur 404 comprises) répond en
-  HTTP 500, y compris pour une URL totalement étrangère au composant (`/this-page-does-not-exist-xyz`). Cause :
-  `com_contentbuilderng` (une extension distincte installée sur ce même site) a un
-  `services/provider.php` qui référence une classe `ContentbuilderngComponent` introuvable ; `mod_menu` tente de
-  construire une route vers un de ses éléments de menu à chaque rendu de template, ce qui fait planter n'importe
-  quelle page. Seules les réponses avec `tmpl=component` (qui court-circuitent le template/module de menu du site)
-  restent fiables pour tester le frontend de BreezingForms NG sur ce site tant que ContentBuilderNG n'est pas
-  réparé. Ne pas confondre avec une régression de ce composant.
+- ~~Site de dev (`joomla6-joomla-1`) — panne préexistante et sans rapport, observée le 2026-07-12~~ **Corrigée par
+  l'utilisateur le 2026-07-12** : `com_contentbuilderng` (extension distincte installée sur le même site) faisait
+  planter en HTTP 500 toute page déclenchant le rendu complet du template (menu de site, y compris les pages
+  d'erreur 404) via une classe `ContentbuilderngComponent` introuvable dans son `services/provider.php`. Le site
+  répond de nouveau normalement (404 sur une URL inconnue, rendu complet sans `tmpl=component` nécessaire) ; les
+  callbacks `optOut`/`checkCaptcha` ont pu être revérifiés en HTTP réel dans la foulée (cf. note Phase 9a ci-dessus).

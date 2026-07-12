@@ -201,6 +201,14 @@
     },
 
     {
+      "name": "com_breezingformsng.admin-form-dirty",
+      "type": "script",
+      "uri": "com_breezingformsng/js/admin/admin-form-dirty.js",
+      "dependencies": ["com_breezingformsng.admin-form"],
+      "version": "auto"
+    },
+
+    {
       "name": "com_breezingformsng.quickmode-editor",
       "type": "script",
       "uri": "com_breezingformsng/js/admin/quickmode-editor.js",

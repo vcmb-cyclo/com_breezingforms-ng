@@ -909,18 +909,21 @@
             } // createActionCode
 
             function postTheStuff() {
+                var postData = {
+                    option: 'com_breezingformsng',
+                    task: "quickmode.doAjaxSave",
+                    form: document.adminForm.form.value,
+                    chunksLength: chunks.length,
+                    chunkIdx: chunki,
+                    chunk: chunks[chunki],
+                    rndAdd: rndAdd
+                };
+                postData[BFQMConfig.csrfToken] = '1';
+
                 JQuery.ajax({
                     type: 'POST',
                     url: 'index.php',
-                    data: {
-                        option: 'com_breezingformsng',
-                        task: "quickmode.doAjaxSave",
-                        form: document.adminForm.form.value,
-                        chunksLength: chunks.length,
-                        chunkIdx: chunki,
-                        chunk: chunks[chunki],
-                        rndAdd: rndAdd
-                    },
+                    data: postData,
                     success: function (data) {
 
                         if (data != '' && data != 0 && !isNaN(data)) {

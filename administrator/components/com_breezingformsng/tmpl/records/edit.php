@@ -66,4 +66,13 @@ $formSelection = Factory::getApplication()->getInput()->getInt('form_selection',
   <?= HTMLHelper::_('form.token'); ?>
 </form>
 
-<?php Factory::getApplication()->getDocument()->getWebAssetManager()->useScript('com_breezingformsng.admin-form'); ?>
+<?php
+$document = Factory::getApplication()->getDocument();
+Text::script('COM_BREEZINGFORMSNG_TEST_NO_CHANGES');
+Text::script('COM_BREEZINGFORMSNG_CONFIRM_DISCARD_CHANGES');
+$document->addScriptOptions('com_breezingformsng.admin-form', [
+    'cancelTask' => 'records.display',
+    'saveTask' => 'records.save',
+]);
+$document->getWebAssetManager()->useScript('com_breezingformsng.admin-form-dirty');
+?>

@@ -21,5 +21,6 @@ Joomla.submitbutton = function (task) {
 	if (task !== '') {
 		form.querySelector('[name="task"]').value = task;
 	}
+	form.dispatchEvent(new CustomEvent('breezingformsng:form-submit'));
 	form.submit();
 };

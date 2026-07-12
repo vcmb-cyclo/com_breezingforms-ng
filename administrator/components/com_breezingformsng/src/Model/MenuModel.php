@@ -152,7 +152,7 @@ class MenuModel extends BaseModel
         $pub     = (int) ($data['published'] ?? 1);
 
         if ($title === '') {
-            throw new \RuntimeException(\Joomla\CMS\Language\Text::_('COM_BREEZINGFORMSNG_MENUS_TITLEEMPTY'));
+            throw new \RuntimeException(\Joomla\CMS\LanguageText::_('COM_BREEZINGFORMSNG_MENUS_TITLEEMPTY'));
         }
 
         if ($id > 0) {

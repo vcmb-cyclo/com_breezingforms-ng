@@ -22,7 +22,7 @@ HTMLHelper::_('bootstrap.tab');
 function bfSel(array $list, string $name, int $current, string $extra = ''): string
 {
     $out = '<select class="form-select" name="' . htmlspecialchars($name) . '" ' . $extra . '>';
-    $out .= '<option value="0">' . htmlspecialchars(\Joomla\CMS\Language\Text::_('COM_BREEZINGFORMSNG_FORMS_NONE')) . '</option>';
+    $out .= '<option value="0">' . htmlspecialchars(\Joomla\CMS\LanguageText::_('COM_BREEZINGFORMSNG_FORMS_NONE')) . '</option>';
     foreach ($list as $item) {
         $sel  = (int) $item->id === (int) $current ? ' selected' : '';
         $out .= '<option value="' . (int) $item->id . '"' . $sel . '>' . htmlspecialchars($item->text) . '</option>';

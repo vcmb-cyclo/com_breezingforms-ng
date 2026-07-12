@@ -118,7 +118,7 @@ class PiecesController extends BaseController
 
     private function prepareDocument(): void
     {
-        $title = Text::_('COM_BREEZINGFORMSNG') . ' / ' . \Text::_('COM_BREEZINGFORMSNG_MANAGEPIECES');
+        $title = Text::_('COM_BREEZINGFORMSNG') . ' / ' . Text::_('COM_BREEZINGFORMSNG_MANAGEPIECES');
 
         $document = Factory::getApplication()->getDocument();
         $document->setTitle($title);

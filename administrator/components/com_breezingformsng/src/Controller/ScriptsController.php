@@ -106,7 +106,7 @@ class ScriptsController extends BaseController
 
     private function prepareDocument(): void
     {
-        $title = Text::_('COM_BREEZINGFORMSNG') . ' / ' . \Text::_('COM_BREEZINGFORMSNG_MANAGESCRIPTS');
+        $title = Text::_('COM_BREEZINGFORMSNG') . ' / ' . Text::_('COM_BREEZINGFORMSNG_MANAGESCRIPTS');
 
         $document = Factory::getApplication()->getDocument();
         $document->setTitle($title);

@@ -1,0 +1,964 @@
+<?php
+/**
+ * BreezingForms NG - A Joomla Forms Application
+ *
+ * @package BreezingFormsNG
+ * @copyright Copyright (C) 2008-2020 by Markus Bopp
+ * @copyright Copyright (C) 2024-2026 by XDA+GIL
+ * @license GNU General Public License version 2 or later; see LICENSE.txt
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ **/
+
+defined('_JEXEC') or die('Direct Access to this location is not allowed.');
+
+use Joomla\CMS\Factory;
+use Joomla\Database\DatabaseInterface;
+use Joomla\Event\Event;
+use Joomla\Event\EventInterface;
+use Joomla\CMS\Uri\Uri;
+use Joomla\Filesystem\Folder;
+use Joomla\Filesystem\File;
+use Joomla\CMS\Router\Route;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Language\LanguageHelper;
+use Joomla\Filesystem\Path;
+use Joomla\CMS\Environment\Browser;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Plugin\PluginHelper;
+use Joomla\CMS\Log\Log;
+use CB\Component\Contentbuilderng\Administrator\Helper\ContentbuilderngHelper;
+use CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory;
+use CB\Component\Contentbuilderng\Administrator\Service\ArticleService;
+use CB\Component\Contentbuilderng\Administrator\Service\ListSupportService;
+use CB\Component\Contentbuilderng\Administrator\Service\PermissionService;
+
+/**
+ * Pieces, scripts, query columns, builtin JS library and code linking.
+ */
+trait bfProcessorScripting
+{
+    function getPieceById($id, $name = null)
+    {
+        if ($this->dying)
+            return '';
+
+        $this->database->setQuery(
+            'select code, name from #__facileforms_pieces ' .
+            'where id=' . $id . ' and published=1 '
+        );
+        $rows = $this->database->loadObjectList();
+        if ($rows && count($rows)) {
+            $name = $rows[0]->name;
+            return $rows[0]->code;
+        } // if
+        return '';
+    }
+
+    // getPieceById
+
+    function getPieceByName($name, $id = null)
+    {
+        if ($this->dying)
+            return '';
+        $this->database->setQuery(
+            'select id, code from #__facileforms_pieces ' .
+            'where name=\'' . $name . '\' and published=1 ' .
+            'order by id desc'
+        );
+        $rows = $this->database->loadObjectList();
+        if ($rows && count($rows)) {
+            $id = $rows[0]->id;
+            return $rows[0]->code;
+        } // if
+        return '';
+    }
+
+    // getPieceByName
+
+    function execPiece($code, $name, $type, $id, $pane)
+    {
+        $ret = '';
+        if ($this->prepareEvalCode($code, $name, $type, $id, $pane)) {
+            $this->traceEval($name);
+            try {
+                $ret = eval($code);
+            } catch (Error $e) {
+                $this->app->enqueueMessage($e->getMessage() . " in $name.", 'error');
+                if (\defined('JDEBUG') && JDEBUG) {
+                    Log::add( "PHP piece '$name' : " .$e->getMessage(), Log::DEBUG, 'BF Piece');
+                }
+            }
+        } // if
+        return $ret;
+    }
+
+    // execPiece
+
+    function execPieceById($id)
+    {
+        $name = null;
+        $code = $this->getPieceById($id, $name);
+        return $this->execPiece($code, BFText::_('COM_BREEZINGFORMSNG_PROCESS_PIECE') . " $name", 'p', $id, null);
+    }
+
+    // execPieceById
+
+    function execPieceByName($name)
+    {
+        $id = null;
+        $code = $this->getPieceByName($name, $id);
+        return $this->execPiece($code, BFText::_('COM_BREEZINGFORMSNG_PROCESS_PIECE') . " $name", 'p', $id, null);
+    }
+
+    // execPieceByName
+
+    function replaceCode($code, $name, $type, $id, $pane)
+    {
+
+        if ($this->dying)
+            return '';
+        $p1 = 0;
+        $l = strlen($code);
+        $c = '';
+        $n = 0;
+        while ($p1 < $l) {
+            $p2 = strpos($code, '<?php', $p1);
+            if ($p2 === false)
+                $p2 = $l;
+            $c .= substr($code, $p1, $p2 - $p1);
+            $p1 = $p2;
+            if ($p1 < $l) {
+                $p1 += 5;
+                $p2 = strpos($code, '?>', $p1);
+                if ($p2 === false)
+                    $p2 = $l;
+                $n++;
+                $c .= $this->execPiece(substr($code, $p1, $p2 - $p1), $name . "[$n]", $type, $id, $pane);
+                if ($this->dying)
+                    return '';
+                $p1 = $p2 + 2;
+            } // if
+        } // while
+        return str_replace($this->findtags, $this->replacetags, $c);
+    }
+
+    // replaceCode
+
+    function compileQueryCol(&$elem, &$coldef)
+    {
+        $coldef->comp = array();
+        if ($this->trim(str_replace($this->findtags, $this->replacetags, $coldef->value))) {
+            $c = $p1 = 0;
+            $l = strlen($coldef->value);
+            while ($p1 < $l) {
+                $p2 = strpos($coldef->value, '<?php', $p1);
+                if ($p2 === false)
+                    $p2 = $l;
+                $coldef->comp[$c] = array(
+                    false,
+                    str_replace(
+                        $this->findtags,
+                        $this->replacetags,
+                        trim(substr($coldef->value, $p1, $p2 - $p1))
+                    )
+                );
+                if ($this->trim($coldef->comp[$c][1]))
+                    $c++;
+                $p1 = $p2;
+                if ($p1 < $l) {
+                    $p1 += 5;
+                    $p2 = strpos($coldef->value, '?>', $p1);
+                    if ($p2 === false)
+                        $p2 = $l;
+                    $coldef->comp[$c] = array(true, substr($coldef->value, $p1, $p2 - $p1));
+                    if (
+                        $this->prepareEvalCode(
+                            $coldef->comp[$c][1],
+                            BFText::_('COM_BREEZINGFORMSNG_PROCESS_QVALUEOF') . " " . $elem->name . "::" . $coldef->name,
+                            'e',
+                            $elem->id,
+                            2
+                        )
+                    )
+                        $c++;
+                    $p1 = $p2 + 2;
+                } // if
+            } // while
+            if ($c > count($coldef->comp))
+                array_pop($coldef->comp);
+        } // if non-empty
+    }
+
+    // compileQueryCol
+
+    function execQueryValue($code, &$elem, &$row, &$coldef, $value)
+    {
+        $this->traceEval(BFText::_('COM_BREEZINGFORMSNG_PROCESS_QVALUEOF') . " " . $elem->name . "::" . $coldef->name);
+        try {
+            return eval($code);
+        } catch (Error $e) {
+            if (\defined('JDEBUG') && JDEBUG) {
+                $this->app->enqueueMessage($e->getMessage() . " in $name.", 'error');
+                Log::add( "Piece PHP '$name' invalid :"  . $e->getMessage(), Log::DEBUG, 'BF Piece');
+            }
+        }
+    }
+
+    // execQueryValue
+
+    function execQuery(&$elem, &$valrows, &$coldefs)
+    {
+        $ret = null;
+        $code = $elem->data2;
+        if ($this->prepareEvalCode($code, BFText::_('COM_BREEZINGFORMSNG_PROCESS_QPIECEOF') . " " . $elem->name, 'e', $elem->id, 1)) {
+            $rows = array();
+            $this->traceEval(BFText::_('COM_BREEZINGFORMSNG_PROCESS_QPIECEOF') . " " . $elem->name);
+
+            try {
+                eval($code);
+            } catch (Error $e) {
+                if (\defined('JDEBUG') && JDEBUG) {
+                    $this->app->enqueueMessage($e->getMessage() . " in $name.", 'error');
+                    Log::add( "PHP piece '$name' : " .$e->getMessage(), Log::DEBUG, 'BF Piece');
+                }
+            }
+
+            $rcnt = count($rows);
+            $ccnt = count($coldefs);
+            $valrows = array();
+            for ($r = 0; $r < $rcnt; $r++) {
+                $row = &$rows[$r];
+                $valrow = array();
+                for ($c = 0; $c < $ccnt; $c++) {
+                    $coldef = &$coldefs[$c];
+                    $cname = $coldef->name;
+                    $value = isset($row->$cname) ? str_replace($this->findtags, $this->replacetags, $row->$cname) : '';
+                    $xcnt = count($coldef->comp);
+                    if (!$xcnt)
+                        $valrow[] = $value;
+                    else {
+                        $val = '';
+                        for ($x = 0; $x < $xcnt; $x++) {
+                            $val .= $coldef->comp[$x][0] ? $this->execQueryValue($coldef->comp[$x][1], $elem, $row, $coldef, $value) : $coldef->comp[$x][1];
+                            if ($this->dying)
+                                break;
+                        } // for
+                        $valrow[] = str_replace($this->findtags, $this->replacetags, $val);
+                    } // if
+                    unset($coldef);
+                    if ($this->dying)
+                        break;
+                } // for
+                $valrows[] = $valrow;
+                unset($row);
+                if ($this->dying)
+                    break;
+            } // for
+            $rows = null;
+        } // if
+    }
+
+    // execQuery
+
+    function script2clause(&$row)
+    {
+        if ($this->dying)
+            return '';
+        
+        $funcname = '';
+        switch ($row->script2cond) {
+            case 1:
+                $this->database->setQuery(
+                    "select name from #__facileforms_scripts " .
+                    "where id=" . $row->script2id . " and published=1 "
+                );
+                $funcname = $this->database->loadResult();
+                break;
+            case 2:
+                $funcname = 'ff_' . $row->name . '_action';
+                break;
+            default:
+                break;
+        } // switch
+        $attribs = '';
+        if ($funcname != '') {
+            if ($row->script2flag1)
+                $attribs .= ' onclick="' . $funcname . '(this,\'click\');"';
+            if ($row->script2flag2)
+                $attribs .= ' onblur="' . $funcname . '(this,\'blur\');"';
+            if ($row->script2flag3)
+                $attribs .= ' onchange="' . $funcname . '(this,\'change\');"';
+            if ($row->script2flag4)
+                $attribs .= ' onfocus="' . $funcname . '(this,\'focus\');"';
+            if ($row->script2flag5)
+                $attribs .= ' onselect="' . $funcname . '(this,\'select\');"';
+        } // if
+        return $attribs;
+    }
+
+    // script2clause
+
+    function loadBuiltins(&$library)
+    {
+        global $ff_config, $ff_request;
+        if ($this->dying)
+            return;
+        $library[] = array('FF_STATUS_OK', 'var FF_STATUS_OK = ' . _FF_STATUS_OK . ';');
+        $library[] = array('FF_STATUS_UNPUBLISHED', 'var FF_STATUS_UNPUBLISHED = ' . _FF_STATUS_UNPUBLISHED . ';');
+        $library[] = array('FF_STATUS_SAVERECORD_FAILED', 'var FF_STATUS_SAVERECORD_FAILED = ' . _FF_STATUS_SAVERECORD_FAILED . ';');
+        $library[] = array('FF_STATUS_SAVESUBRECORD_FAILED', 'var FF_STATUS_SAVESUBRECORD_FAILED = ' . _FF_STATUS_SAVESUBRECORD_FAILED . ';');
+        $library[] = array('FF_STATUS_UPLOAD_FAILED', 'var FF_STATUS_UPLOAD_FAILED = ' . _FF_STATUS_UPLOAD_FAILED . ';');
+        $library[] = array('FF_STATUS_SENDMAIL_FAILED', 'var FF_STATUS_SENDMAIL_FAILED = ' . _FF_STATUS_SENDMAIL_FAILED . ';');
+        $library[] = array('FF_STATUS_ATTACHMENT_FAILED', 'var FF_STATUS_ATTACHMENT_FAILED = ' . _FF_STATUS_ATTACHMENT_FAILED . ';');
+
+        $library[] = array('ff_homepage', "var ff_homepage = '" . $this->homepage . "';");
+        $library[] = array('ff_currentpage', "var ff_currentpage = " . $this->page . ";");
+        $library[] = array('ff_lastpage', "var ff_lastpage = " . $this->formrow->pages . ";");
+        $library[] = array('ff_images', "var ff_images = '" . $this->images . "';");
+        $library[] = array('ff_validationFocusName', "var ff_validationFocusName = '';");
+        $library[] = array('ff_currentheight', "var ff_currentheight = 0;");
+
+        $code = "var ff_elements = [" . nl();
+        for ($i = 0; $i < $this->rowcount; $i++) {
+            $row = $this->rows[$i];
+            $endline = "," . nl();
+            if ($i == $this->rowcount - 1)
+                $endline = nl();
+            switch ($row->type) {
+                case "Hidden Input":
+                    $code .= "    ['ff_elem" . $row->id . "', 'ff_elem" . $row->id . "', '" . $row->name . "', " . $row->page . ", " . $row->id . "]" . $endline;
+                    break;
+                case "Static Text":
+                case "Rectangle":
+                case "Tooltip":
+                case "Icon":
+                    $code .= "    ['ff_div" . $row->id . "', 'ff_div" . $row->id . "', '" . $row->name . "', " . $row->page . ", " . $row->id . "]" . $endline;
+                    break;
+                default:
+                    $code .= "    ['ff_elem" . $row->id . "', 'ff_div" . $row->id . "', '" . $row->name . "', " . $row->page . ", " . $row->id . "]" . $endline;
+            } // switch
+        } // for
+        $code .= "];";
+        $library[] = array('ff_elements', $code);
+
+        $code = "var ff_param = new Object();";
+        // reset($ff_request);
+        foreach ($ff_request as $prop => $val) {
+            if (substr($prop, 0, 9) == 'ff_param_')
+                $code .= nl() . "ff_param." . substr($prop, 9) . " = '" . $val . "';";
+        }
+        // while (list($prop, $val) = each($ff_request))
+
+        $library[] = array('ff_param', $code);
+
+        $library[] = array(
+            'ff_getElementByIndex',
+            "function ff_getElementByIndex(index)" . nl() .
+            "{" . nl() .
+            "    if (index >= 0 && index < ff_elements.length)" . nl() .
+            "        return eval('document." . $this->form_id . ".'+ff_elements[index][0]);" . nl() .
+            "    return null;" . nl() .
+            "} // ff_getElementByIndex"
+        );
+
+        $library[] = array(
+            'ff_getElementByName',
+            "function ff_getElementByName(name)" . nl() .
+            "{" . nl() .
+            "    if (name.substr(0,6) == 'ff_nm_') name = name.substring(6,name.length-2);" . nl() .
+            "    for (var i = 0; i < ff_elements.length; i++)" . nl() .
+            "        if (ff_elements[i][2]==name)" . nl() .
+            "            return eval('document." . $this->form_id . ".'+ff_elements[i][0]);" . nl() .
+            "    return null;" . nl() .
+            "} // ff_getElementByName"
+        );
+
+        $library[] = array(
+            'ff_getPageByName',
+            "function ff_getPageByName(name)" . nl() .
+            "{" . nl() .
+            "    if (name.substr(0,6) == 'ff_nm_') name = name.substring(6,name.length-2);" . nl() .
+            "    for (var i = 0; i < ff_elements.length; i++)" . nl() .
+            "        if (ff_elements[i][2]==name)" . nl() .
+            "            return ff_elements[i][3];" . nl() .
+            "    return 0;" . nl() .
+            "} // ff_getPageByName"
+        );
+
+        $library[] = array(
+            'ff_getDivByName',
+            "function ff_getDivByName(name)" . nl() .
+            "{" . nl() .
+            "    if (name.substr(0,6) == 'ff_nm_') name = name.substring(6,name.length-2);" . nl() .
+            "    for (var i = 0; i < ff_elements.length; i++)" . nl() .
+            "        if (ff_elements[i][2]==name)" . nl() .
+            "            return document.getElementById(ff_elements[i][1]);" . nl() .
+            "    return null;" . nl() .
+            "} // ff_getDivByName"
+        );
+
+        $library[] = array(
+            'ff_getIdByName',
+            "function ff_getIdByName(name)" . nl() .
+            "{" . nl() .
+            "    if (name.substr(0,6) == 'ff_nm_') name = name.substring(6,name.length-2);" . nl() .
+            "    for (var i = 0; i < ff_elements.length; i++)" . nl() .
+            "        if (ff_elements[i][2]==name)" . nl() .
+            "            return ff_elements[i][4];" . nl() .
+            "    return null;" . nl() .
+            "} // ff_getIdByName"
+        );
+
+        $library[] = array(
+            'ff_getForm',
+            "function ff_getForm()" . nl() .
+            "{" . nl() .
+            "    return document." . $this->form_id . ";" . nl() .
+            "} // ff_getForm"
+        );
+
+        $code = "function ff_submitForm()" . nl() .
+            "{if(document.getElementById('bfSubmitButton')){document.getElementById('bfSubmitButton').disabled = true;} if(typeof JQuery != 'undefined'){JQuery('.bfCustomSubmitButton').prop('disabled', true);} bfCheckCaptcha();}" . nl();
+        $code .= "function ff_submitForm2()" . nl() .
+            "{if(document.getElementById('bfSubmitButton')){document.getElementById('bfSubmitButton').disabled = true;} if(typeof JQuery != 'undefined'){JQuery('.bfCustomSubmitButton').prop('disabled', true);} " . nl();
+        if ($this->inline)
+            $code .= " if(typeof bf_ajax_submit != 'undefined') { bf_ajax_submit() } else { submitform('submit'); }" . nl();
+        else
+            $code .= " if(typeof bf_ajax_submit != 'undefined') { bf_ajax_submit() } else { document." . $this->form_id . ".submit(); }" . nl();
+        $code .= "} // ff_submitForm";
+        $library[] = array('ff_submitForm', $code);
+
+        $library[] = array(
+            'ff_validationFocus',
+            "function ff_validationFocus(name)" . nl() .
+            "{" . nl() .
+            "    if (name==undefined || name=='') {" . nl() .
+            "        // set focus if name of first failing element was set" . nl() .
+            "        if (ff_validationFocusName!='') {" . nl() .
+            "            ff_switchpage(ff_getPageByName(ff_validationFocusName));" . nl() .
+            "            if(ff_getElementByName(ff_validationFocusName).focus){" . nl() .
+            "	            ff_getElementByName(ff_validationFocusName).focus();" . nl() .
+            "			 }" . nl() .
+            "        } // if" . nl() .
+            "    } else {" . nl() .
+            "        // store name if this is the first failing element" . nl() .
+            "        if (ff_validationFocusName=='')" . nl() .
+            "            ff_validationFocusName = name;" . nl() .
+            "    } // if" . nl() .
+            "} // ff_validationFocus"
+        );
+
+        $code = "function ff_validation(page)" . nl() .
+            "{" . nl() .
+            "    if(typeof inlineErrorElements != 'undefined') inlineErrorElements = new Array();" . nl() .
+            "    error = '';" . nl() .
+            "    ff_validationFocusName = '';" . nl();
+        $curr = -1;
+        for ($i = 0; $i < $this->rowcount; $i++) {
+            $row = $this->rows[$i];
+            $funcname = '';
+            switch ($row->script3cond) {
+                case 1:
+                    $this->database->setQuery(
+                        "select name from #__facileforms_scripts " .
+                        "where id=" . $row->script3id . " and published=1 "
+                    );
+                    $funcname = $this->database->loadResult();
+                    break;
+                case 2:
+                    $funcname = 'ff_' . $row->name . '_validation';
+                    break;
+                default:
+                    break;
+            } // switch
+            if ($funcname != '') {
+                if ($row->page != $curr) {
+                    if ($curr > 0)
+                        $code .= "    } // if" . nl();
+                    $code .= "    if (page==" . $row->page . " || page==0) {" . nl();
+                    $curr = $row->page;
+                } // if
+                if ($this->trim($row->script3msg)) {
+                    $msg = addslashes($row->script3msg) . "\\n";
+                    $res_msg = '';
+                    $this->getFieldTranslated('validationMessage', $row->name, $res_msg);
+                    if ($res_msg != '') {
+                        $msg = $res_msg . "\\n";
+                    }
+                } else {
+                    $msg = "";
+                }
+                $code .= " if( typeof bfDeactivateField == 'undefined' || !bfDeactivateField['ff_nm_" . $row->name . "[]'] ){ " . nl();
+                $code .= "        errorout = " . $funcname . "(document." . $this->form_id . "['ff_nm_" . $row->name . "[]'],\"" . $msg . "\");" . nl();
+                $code .= "        error += errorout" . nl();
+                $code .= "        if(typeof inlineErrorElements != 'undefined'){" . nl();
+                $code .= "             inlineErrorElements.push([\"" . $row->name . "\",errorout]);" . nl();
+                $code .= "        }" . nl();
+                $code .= "}" . nl();
+            } // if
+        } // for
+        if ($curr > 0)
+            $code .= "    } // if" . nl();
+        $code .= 'if(error != "" && document.getElementById(\'ff_capimgValue\')){
+                 document.getElementById(\'ff_capimgValue\').src = \'' . Uri::root(true) . ($this->app->isClient('administrator') ? '/administrator' : '') . '/media/com_breezingformsng/images/site/captcha/securimage_show.php?bfMathRandom=\' + Math.random();
+                 document.getElementById(\'bfCaptchaEntry\').value = "";
+            }';
+        $code .= 'if(error!="" && document.getElementById("bfSubmitButton")){document.getElementById("bfSubmitButton").disabled = false;}' . nl();
+        $code .= 'if(error!="" && typeof JQuery != "undefined"){JQuery(".bfCustomSubmitButton").prop("disabled", false);}' . nl();
+        $code .= "    return error;" . nl() .
+            "} // ff_validation";
+        $library[] = array('ff_validation', $code);
+
+        // ff_initialize
+        $code = "function ff_initialize(condition)" . nl() .
+            "{" . nl();
+        $formentry = false;
+        $funcname = '';
+        switch ($this->formrow->script1cond) {
+            case 1:
+                $this->database->setQuery(
+                    "select name from #__facileforms_scripts " .
+                    "where id=" . $this->formrow->script1id . " and published=1 "
+                );
+                $funcname = $this->database->loadResult();
+                break;
+            case 2:
+                $funcname = 'ff_' . $this->formrow->name . '_init';
+                break;
+            default:
+                break;
+        } // switch
+        if ($funcname != '') {
+            $code .= "    if (condition=='formentry') {" . nl() .
+                "        " . $funcname . "();" . nl();
+            $formentry = true;
+        } // if
+        for ($i = 0; $i < $this->rowcount; $i++) {
+            $row = $this->rows[$i];
+            $funcname = '';
+            switch ($row->script1cond) {
+                case 1:
+                    $this->database->setQuery(
+                        "select name from #__facileforms_scripts " .
+                        "where id=" . $row->script1id . " and published=1 "
+                    );
+                    $funcname = $this->database->loadResult();
+                    break;
+                case 2:
+                    $funcname = 'ff_' . $row->name . '_init';
+                    break;
+                default:
+                    break;
+            } // switch
+            if ($funcname != '') {
+                if ($row->script1flag1) {
+                    if (!$formentry) {
+                        $code .= "    if (condition=='formentry') {" . nl();
+                        $formentry = true;
+                    } // if
+                    $code .= "        " . $funcname . "(document." . $this->form_id . "['ff_nm_" . $row->name . "[]'], condition);" . nl();
+                } // if
+            } // if
+        } // for
+        $pageentry = false;
+        $curr = -1;
+        for ($i = 0; $i < $this->rowcount; $i++) {
+            $row = $this->rows[$i];
+            $funcname = '';
+            switch ($row->script1cond) {
+                case 1:
+                    $this->database->setQuery(
+                        "select name from #__facileforms_scripts " .
+                        "where id=" . $row->script1id . " and published=1 "
+                    );
+                    $funcname = $this->database->loadResult();
+                    break;
+                case 2:
+                    $funcname = 'ff_' . $row->name . '_init';
+                    break;
+                default:
+                    break;
+            } // switch
+            if ($funcname != '') {
+                if ($row->script1flag2) { // page entry
+                    if ($formentry) {
+                        $code .= "    } else" . nl();
+                        $formentry = false;
+                    } // if
+                    if (!$pageentry) {
+                        $code .= "    if (condition=='pageentry') {" . nl();
+                        $pageentry = true;
+                    } // if
+                    if ($curr != $row->page) {
+                        if ($curr > 0)
+                            $code .= "        } // if" . nl();
+                        $code .= "        if (ff_currentpage==" . $row->page . ") {" . nl();
+                        $curr = $row->page;
+                    } // if
+                    $code .= "            " . $funcname . "(document." . $this->form_id . ".ff_elem" . $row->id . ", condition);" . nl();
+                } // if
+            } // if
+        } // for
+        if ($curr > 0)
+            $code .= "        } // if" . nl();
+        if ($formentry || $pageentry)
+            $code .= "    } // if" . nl();
+        $code .= "} // ff_initialize";
+        $library[] = array('ff_initialize', $code);
+
+        if ($this->showgrid) {
+            if ($this->formrow->widthmode)
+                $width = $this->formrow->prevwidth;
+            else
+                $width = $this->formrow->width;
+            $library[] = array(
+                'ff_showgrid',
+                "var ff_gridvcnt = 0;" . nl() .
+                "var ff_gridhcnt = 0;" . nl() .
+                "var ff_gridheight = " . $this->formrow->height . ";" . nl() .
+                nl() .
+                "function ff_showgrid()" . nl() .
+                "{" . nl() .
+                "   var i, e, s;" . nl() .
+                "   var hcnt = parseInt(ff_gridheight / " . $ff_config->gridsize . ")+1;" . nl() .
+                "   var vcnt = parseInt(" . $width . " / " . $ff_config->gridsize . ")+1;" . nl() .
+                "   var formdiv = document.getElementById('ff_formdiv" . $this->form . "');" . nl() .
+                "   var firstelem = formdiv.firstChild;" . nl() .
+                "   for (i = ff_gridhcnt; i < hcnt; i++) {" . nl() .
+                "       e = document.createElement('div');" . nl() .
+                "       e.id = 'ff_gridh'+i;" . nl() .
+                "       s = e.style;" . nl() .
+                "       s.position = 'absolute';" . nl() .
+                "       s.left = '0px';" . nl() .
+                "       s.top = (i*" . $ff_config->gridsize . ")+'px';" . nl() .
+                "       s.width = '" . $width . "px';" . nl() .
+                "       s.fontSize = '0px';" . nl() .
+                "       s.lineHeight = '1px';" . nl() .
+                "       s.height = '1px';" . nl() .
+                "       if (i % 2)" . nl() .
+                "           s.background = '" . $ff_config->gridcolor2 . "';" . nl() .
+                "       else" . nl() .
+                "           s.background = '" . $ff_config->gridcolor1 . "';" . nl() .
+                "       formdiv.insertBefore(e,firstelem);" . nl() .
+                "   } // for" . nl() .
+                "   if (hcnt > ff_gridhcnt) ff_gridhcnt = hcnt;" . nl() .
+                "   for (i = 0; i < ff_gridvcnt; i++)" . nl() .
+                "       document.getElementById('ff_gridv'+i).style.height = ff_gridheight+'px';" . nl() .
+                "   for (i = ff_gridvcnt; i < vcnt; i++) {" . nl() .
+                "       e = document.createElement('div');" . nl() .
+                "       e.id = 'ff_gridv'+i;" . nl() .
+                "       s = e.style;" . nl() .
+                "       s.position = 'absolute';" . nl() .
+                "       s.left = (i*" . $ff_config->gridsize . ")+'px';" . nl() .
+                "       s.top = '0px';" . nl() .
+                "       s.width = '1px';" . nl() .
+                "       s.height = ff_gridheight+'px';" . nl() .
+                "       if (i % 2)" . nl() .
+                "           s.background = '" . $ff_config->gridcolor2 . "';" . nl() .
+                "       else" . nl() .
+                "           s.background = '" . $ff_config->gridcolor1 . "';" . nl() .
+                "       formdiv.insertBefore(e,firstelem);" . nl() .
+                "   } // for" . nl() .
+                "   if (vcnt > ff_gridvcnt) ff_gridvcnt = vcnt;" . nl() .
+                "} // ff_showgrid"
+            );
+        } // if
+        // ff_resizePage
+        $code = "function ff_resizepage(mode, value)" . nl() .
+            "{" . nl() .
+            "    var height = 0;" . nl() .
+            "    if (mode > 0) {" . nl() .
+            "        for (var i = 0; i < ff_elements.length; i++) {" . nl() .
+            "            if (mode==2 || ff_elements[i][3]==ff_currentpage) {" . nl() .
+            "                e = document.getElementById(ff_elements[i][1]);" . nl() .
+            "                if(e){" . nl() .
+            "                	h = e.offsetTop+e.offsetHeight;" . nl() .
+            "                	if (h > height) height = h;" . nl() .
+            "                }" . nl() .
+            "            } // if" . nl() .
+            "        } // for" . nl() .
+            "    } // if" . nl() .
+            "    var totheight = height+value;" . nl() .
+            "    if ((mode==2 && totheight>ff_currentheight) || (mode!=2 && totheight!=ff_currentheight)) {" . nl();
+        if ($this->inframe) {
+            $fn = ($this->runmode == _FF_RUNMODE_PREVIEW) ? 'ff_prevframe' : ('ff_frame' . $this->form);
+            $code .= "        parent.document.getElementById('" . $fn . "').style.height = totheight+'px';" . nl() .
+                "        parent.window.scrollTo(0,0);" . nl() .
+                "        document.getElementById('ff_formdiv" . $this->form . "').style.height = height+'px';" . nl() .
+                "        window.scrollTo(0,0);" . nl();
+        } // if
+        else
+            $code .= "        document.getElementById('ff_formdiv" . $this->form . "').style.height = totheight+'px';" . nl() .
+                "        window.scrollTo(0,0);" . nl();
+        $code .= "        ff_currentheight = totheight;" . nl();
+        if ($this->showgrid) {
+            $code .= "        ff_gridheight = totheight;" . nl() .
+                "        ff_showgrid();" . nl();
+        } // if
+        $code .= "    } // if" . nl() .
+            "} // ff_resizepage";
+        $library[] = array('ff_resizepage', $code);
+
+        if ($this->formrow->template_code_processed == '') {
+
+            // ff_switchpage
+            $code = "function ff_switchpage(page)" . nl() .
+                "{;" . nl() .
+                "    if (page>=1 && page<=ff_lastpage && page!=ff_currentpage) {" . nl() .
+                "        vis = 'visible';" . nl();
+            $curr = -1;
+            for ($i = 0; $i < $this->rowcount; $i++) {
+                $row = $this->rows[$i];
+                if ($row->type != "Hidden Input") {
+                    if ($row->page != $curr) {
+                        if ($curr >= 1)
+                            $code .= "        } // if" . nl();
+                        $code .= "        if (page==" . $row->page . " || ff_currentpage==" . $row->page . ") {" . nl() .
+                            "            if (page==" . $row->page . ") vis = 'visible';  else vis = 'hidden';" . nl();
+                        $curr = $row->page;
+                    } // if
+                    $code .= "            document.getElementById('ff_div" . $row->id . "').style.visibility=vis;" . nl();
+                } // if
+            } // for
+            if ($curr >= 1)
+                $code .= "        } // if" . nl();
+            $code .= "        ff_currentpage = page;" . nl();
+            if ($this->formrow->heightmode == 1)
+                $code .= "        ff_resizepage(" . $this->formrow->heightmode . ", " . $this->formrow->height . ");" . nl();
+            $code .= "        ff_initialize('pageentry');" . nl() .
+                "    } // if" . nl() .
+                "} // ff_switchpage";
+        } else {
+            $visPages = '';
+            $pagesSize = isset($this->formrow->pages) ? intval($this->formrow->pages) : 1;
+            for ($pageCnt = 1; $pageCnt <= $pagesSize; $pageCnt++) {
+                $visPages .= 'if(document.getElementById("bfPage' . $pageCnt . '"))document.getElementById("bfPage' . $pageCnt . '").style.display = "none";';
+            }
+
+            $code = 'function ff_switchpage(page){
+				' . $visPages . '
+				if(document.getElementById("bfPage"+page))document.getElementById("bfPage"+page).style.display = "";
+				ff_currentpage = page;
+				' . ($this->formrow->heightmode == 1 ? "ff_resizepage(" . $this->formrow->heightmode . ", " . $this->formrow->height . ");" : "") . '
+				ff_initialize("pageentry");
+			}';
+        }
+
+        $library[] = array('ff_switchpage', $code);
+    }
+
+    // loadBuiltins
+
+    function loadScripts(&$library)
+    {
+        if ($this->dying)
+            return;
+        $this->database->setQuery(
+            "select id, name, code from #__facileforms_scripts " .
+            "where published=1 " .
+            "order by type, title, name, id desc"
+        );
+        $rows = $this->database->loadObjectList();
+        $cnt = count($rows);
+        for ($i = 0; $i < $cnt; $i++) {
+            $row = $rows[$i];
+            $library[] = array(trim($row->name), $row->code, 's', $row->id, null);
+        } // if
+    }
+
+    // loadScripts
+
+    function compressJavascript($str)
+    {
+        if ($this->dying)
+            return '';
+        $str = str_replace("\r", "", $str);
+        $lines = explode("\n", $str);
+        $code = '';
+        $skip = '';
+        $lcnt = 0;
+        if (count($lines))
+            foreach ($lines as $line) {
+                $ll = strlen($line);
+                $quote = '';
+                $ws = false;
+                $escape = false;
+                for ($j = 0; $j < $ll; $j++) {
+                    $c = substr($line, $j, 1);
+                    $d = substr($line, $j, 2);
+                    if ($quote != '') {
+                        // in literal
+                        if ($escape) {
+                            $code .= $c;
+                            $lcnt++;
+                            $escape = false;
+                        } else
+                            if ($c == "\\") {
+                                $code .= $c;
+                                $lcnt++;
+                                $escape = true;
+                            } else
+                                if ($d == $quote . $quote) {
+                                    $code .= $d;
+                                    $lcnt += 2;
+                                    $j += 2;
+                                } else {
+                                    $code .= $c;
+                                    $lcnt++;
+                                    if ($c == $quote)
+                                        $quote = '';
+                                } // if
+                    } else {
+                        // not in literal
+                        if ($d == $skip) {
+                            $skip = '';
+                            $j += 2;
+                        } else
+                            if ($skip == '') {
+                                if ($d == '/*') {
+                                    $skip = '*/';
+                                    $j += 2;
+                                } else
+                                    if ($d == '//')
+                                        break;
+                                    else
+                                        switch ($c) {
+                                            case ' ':
+                                            case "\t":
+                                            case "\n":
+                                                if ($lcnt)
+                                                    $ws = true;
+                                                break;
+                                            case '"':
+                                            case "'":
+                                                if ($ws) {
+                                                    $b = substr($code, strlen($code) - 1, 1);
+                                                    if ($b == '_' || ($b >= '0' && $b <= '9') || ($b >= 'a' && $b <= 'z') || ($b >= 'A' && $b <= 'Z')) {
+                                                        $code .= ' ';
+                                                        $lcnt++;
+                                                    } // if
+                                                    $ws = false;
+                                                } // if
+                                                $quote = $c;
+                                                $code .= $c;
+                                                $lcnt++;
+                                                break;
+                                            default:
+                                                if ($ws) {
+                                                    if ($c == '_' || ($c >= '0' && $c <= '9') || ($c >= 'a' && $c <= 'z') || ($c >= 'A' && $c <= 'Z')) {
+                                                        $b = substr($code, strlen($code) - 1, 1);
+                                                        if ($b == '_' || ($b >= '0' && $b <= '9') || ($b >= 'a' && $b <= 'z') || ($b >= 'A' && $b <= 'Z')) {
+                                                            $code .= ' ';
+                                                            $lcnt++;
+                                                        } // if
+                                                    } // if
+                                                    $ws = false;
+                                                } // if
+                                                $code .= $c;
+                                                $lcnt++;
+                                        } // switch
+                            } // if
+                    } // else
+                } // for
+                if ($lcnt) {
+                    if ($lcnt > _FF_PACKBREAKAFTER) {
+                        $code .= nl();
+                        $lcnt = 0;
+                    } else {
+                        if (strpos(',;:{}=[(+-*%', substr($code, strlen($code) - 1, 1)) === false) {
+                            $code .= nl();
+                            $lcnt = 0;
+                        } // if
+                    } // if
+                } // if
+            } // foreach
+        if ($lcnt)
+            $code .= nl();
+        return $code;
+    }
+
+    // compressJavascript
+
+    function linkcode($func, &$library, &$linked, $code, $type = null, $id = null, $pane = null)
+    {
+        global $ff_config;
+
+        if ($this->dying)
+            return;
+        if ($func != '#scanonly') {
+            // check if function allready linked
+            if (in_array($func, $linked))
+                return;
+            // remember me
+            $linked[] = $func;
+        } // if
+        // scan the code for library identifiers
+        preg_match_all("/[A-Za-z0-9_]+/s", $code, $matches, PREG_PATTERN_ORDER);
+        $idents = $matches[0];
+        $cnt = count($library);
+        for ($i = 0; $i < $cnt; $i++) {
+            $libname = $library[$i][0];
+            if ($libname != '' && in_array($libname, $idents)) {
+                $library[$i][0] = ''; // invalidate
+                $ltype = $lid = $lpane = null;
+                if (count($library[$i]) > 4) {
+                    $ltype = $library[$i][2];
+                    $lid = $library[$i][3];
+                    $lpane = $library[$i][4];
+                } // if
+                $this->linkcode($libname, $library, $linked, $library[$i][1], $ltype, $lid, $lpane);
+                if ($this->dying)
+                    return '';
+            } // if
+        } // for
+
+        if ($func != '#scanonly') {
+            // emit the code
+            if ($ff_config->compress)
+                echo $this->compressJavascript(
+                    $this->replaceCode($code, BFText::_('COM_BREEZINGFORMSNG_PROCESS_SCRIPT') . " $func", $type, $id, $pane)
+                );
+            else
+                echo $this->replaceCode($code, BFText::_('COM_BREEZINGFORMSNG_PROCESS_SCRIPT') . " $func", $type, $id, $pane) . nl() . nl();
+        } // if
+    }
+
+    // linkcode
+
+    function addFunction($cond, $id, $name, $code, &$library, &$linked, $type, $rowid, $pane)
+    {
+        if ($this->dying)
+            return;
+        switch ($cond) {
+            case 1:
+                $this->database->setQuery(
+                    "select name, code from #__facileforms_scripts " .
+                    "where id=" . $this->database->Quote($id) . " and published=1"
+                );
+                $rows = $this->database->loadObjectList();
+                if (count($rows) > 0) {
+                    $row = $rows[0];
+                    if ($this->trim($row->name) && $this->nonblank($row->code)) {
+                        $this->linkcode($row->name, $library, $linked, $row->code, 's', $id, null);
+                        if ($this->dying)
+                            return;
+                    } // if
+                } // if
+                break;
+            case 2:
+                if ($this->trim($name) && $this->nonblank($code)) {
+                    $this->linkcode($name, $library, $linked, $code, $type, $rowid, $pane);
+                    if ($this->dying)
+                        return;
+                } // if
+                break;
+            default:
+                break;
+        } // switch
+    }
+
+    // addFunction
+
+}

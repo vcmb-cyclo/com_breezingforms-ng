@@ -12,6 +12,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Forms;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Pagination\Pagination;
+use Joomla\CMS\Session\Session;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\FormModel;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\FormsModel;
@@ -77,6 +78,21 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
             ToolbarHelper::apply('forms.save');
             ToolbarHelper::cancel('forms.cancel', $id > 0 ? 'JTOOLBAR_CLOSE' : 'JTOOLBAR_CANCEL');
         } else {
+            $document = Factory::getApplication()->getDocument();
+            $document->getWebAssetManager()->registerAndUseScript(
+                'com_breezingformsng.forms-toggle-published',
+                'media/com_breezingformsng/js/admin/admin-toggle-published.js',
+                ['version' => '6.1.0-rc3.1'],
+                ['defer' => true],
+                ['core']
+            );
+            $document->addScriptOptions(
+                'com_breezingformsng.admin-toggle-published',
+                ['csrfToken' => Session::getFormToken()]
+            );
+            Text::script('JPUBLISHED');
+            Text::script('JUNPUBLISHED');
+
             $session = Factory::getApplication()->getSession();
             $pkgIn   = $input->getString('pkg', '__unset__');
             $this->pkg   = $listModel->resolvedPkg($pkgIn);

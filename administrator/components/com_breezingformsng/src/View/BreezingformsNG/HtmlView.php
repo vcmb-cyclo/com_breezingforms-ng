@@ -27,6 +27,7 @@ class HtmlView extends BaseHtmlView
     {
         $doc = Factory::getApplication()->getDocument();
         $doc->setTitle($this->getPageTitle());
+        $doc->getWebAssetManager()->getRegistry()->addExtensionRegistryFile('com_breezingformsng');
         $doc->getWebAssetManager()->addInlineStyle(
             '.icon-logo_left{
                 background-image:url(' . Uri::root(true) . '/media/com_breezingformsng/images/logo_left.png);

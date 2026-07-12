@@ -1,6 +1,6 @@
 var __bfToggleOpts = Joomla.getOptions('com_breezingformsng.admin-toggle-published') || {};
 
-function bfTogglePublished(id, view, link) {
+window.bfTogglePublished = function (id, view, link) {
 	var span = link.querySelector('span');
 	var isPublished = span.classList.contains('icon-publish');
 	var newState = isPublished ? 0 : 1;
@@ -21,4 +21,4 @@ function bfTogglePublished(id, view, link) {
 			}
 		}
 	});
-}
+};

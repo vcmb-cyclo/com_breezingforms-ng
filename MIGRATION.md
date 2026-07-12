@@ -32,7 +32,9 @@
 - [x] `BFRequest` → `Input` Joomla natif (Phase 9a, 326 appels convertis ; ne reste que dans les 4 rendus `BFQuickMode*`, cf. Phase 9c)
 - [x] Rendus `BFQuickMode*` — migration `BFRequest` (Phase 9c, 33 appels convertis ; la réécriture native complète du rendu reste un chantier séparé, hors périmètre `BFRequest`)
 - [x] `BFIntegrate` → requêtes préparées (Phase 9b, 2026-07-12 — SQL par concaténation remplacé par `quoteName()`/`bind()`, vérifié en conditions réelles insert/update/repli)
-- [x] SDK PHP externes historiques → `RemoteApiClient` Joomla natif (2026-07-12 — reCAPTCHA, Mailchimp API v3, Dropbox API v2 et Salesforce login SOAP/API REST ; anciens SDK embarqués supprimés)
+- [x] SDK PHP externes historiques → services Joomla natifs typés (2026-07-12 — `RecaptchaVerifier`,
+  `DropboxUploader`, `MailchimpClient` et `SalesforceClient`, chacun avec client HTTP injectable ; ancien
+  `RemoteApiClient` conservé dans l'historique source et SDK embarqués supprimés)
 - [x] Stripe PHP `17.6.0` → `20.3.1` (2026-07-12 — classes utilisées et package Joomla 6 vérifiés)
 - [x] PDF : TCPDF maintenu en `6.11.3` tant que PHP 8.1 reste supporté ; `tc-lib-pdf 8.x` exige PHP 8.2 minimum
 - [x] Audit About enrichi depuis les concepts CBNG (2026-07-12) : rapport persistant sur un affichage, inventaire des

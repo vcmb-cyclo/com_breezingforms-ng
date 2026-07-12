@@ -11,6 +11,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Pagination\Pagination;
+use Joomla\CMS\Session\Session;
 
 $pkg = $this->pkg;
 
@@ -80,17 +81,10 @@ $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
             <td class="text-center"><?= (int) $form->pages; ?></td>
             <td><?= $form->modified ? htmlspecialchars(substr((string) $form->modified, 0, 10)) : '—'; ?></td>
             <td class="text-center">
-              <?php if ($form->published): ?>
-                <button type="button" class="tbody-icon active border-0 bg-transparent" title="<?= Text::_('JPUBLISHED'); ?>"
-                        onclick="this.form.action_id.value='<?= (int) $form->id; ?>';Joomla.submitbutton('forms.unpublish');">
-                  <span class="icon-publish" aria-hidden="true"></span>
-                </button>
-              <?php else: ?>
-                <button type="button" class="tbody-icon border-0 bg-transparent" title="<?= Text::_('JUNPUBLISHED'); ?>"
-                        onclick="this.form.action_id.value='<?= (int) $form->id; ?>';Joomla.submitbutton('forms.publish');">
-                  <span class="icon-unpublish" aria-hidden="true"></span>
-                </button>
-              <?php endif; ?>
+              <a href="#" onclick="bfTogglePublished(<?= (int) $form->id; ?>, 'forms', this); return false;"
+                 title="<?= $form->published ? Text::_('JPUBLISHED') : Text::_('JUNPUBLISHED'); ?>">
+                <span class="<?= $form->published ? 'icon-publish' : 'icon-unpublish'; ?>" aria-hidden="true"></span>
+              </a>
             </td>
             <td class="text-center">
               <button type="button" class="btn btn-link p-0 border-0" title="<?= Text::_('JLIB_HTML_MOVE_UP'); ?>"
@@ -130,4 +124,9 @@ $bfDocument = Factory::getApplication()->getDocument();
 $bfDocument->getWebAssetManager()->useScript('com_breezingformsng.admin-form');
 $bfDocument->addScriptOptions('com_breezingformsng.admin-form', ['confirmDeleteTask' => 'forms.remove']);
 Text::script('JGLOBAL_CONFIRM_DELETE');
+
+$bfDocument->getWebAssetManager()->useScript('com_breezingformsng.admin-toggle-published');
+$bfDocument->addScriptOptions('com_breezingformsng.admin-toggle-published', ['csrfToken' => Session::getFormToken()]);
+Text::script('JPUBLISHED');
+Text::script('JUNPUBLISHED');
 ?>

@@ -24,6 +24,10 @@ final class DropboxUploader
 
     public function upload(string $accessToken, string $remotePath, string $localFile): void
     {
+        if (!is_file($localFile) || !is_readable($localFile)) {
+            throw new RuntimeException('Unable to read the Dropbox upload source.');
+        }
+
         $contents = file_get_contents($localFile);
         if ($contents === false) {
             throw new RuntimeException('Unable to read the Dropbox upload source.');

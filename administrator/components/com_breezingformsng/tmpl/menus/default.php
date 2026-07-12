@@ -62,17 +62,10 @@ $pkg = $this->pkg;
             <td><?= $row->parent > 0 ? htmlspecialchars($parentIndex[$row->parent] ?? '—') : '—'; ?></td>
             <td><?= htmlspecialchars($row->package); ?></td>
             <td class="text-center">
-              <?php if ($row->published): ?>
-                <a href="index.php?option=com_breezingformsng&task=menus.unpublish&cid[]=<?= (int) $row->id; ?>&pkg=<?= rawurlencode($pkg); ?>&<?= Session::getFormToken(); ?>=1"
-                   class="tbody-icon active" title="<?= Text::_('JPUBLISHED'); ?>">
-                  <span class="icon-publish" aria-hidden="true"></span>
-                </a>
-              <?php else: ?>
-                <a href="index.php?option=com_breezingformsng&task=menus.publish&cid[]=<?= (int) $row->id; ?>&pkg=<?= rawurlencode($pkg); ?>&<?= Session::getFormToken(); ?>=1"
-                   class="tbody-icon" title="<?= Text::_('JUNPUBLISHED'); ?>">
-                  <span class="icon-unpublish" aria-hidden="true"></span>
-                </a>
-              <?php endif; ?>
+              <a href="#" onclick="bfTogglePublished(<?= (int) $row->id; ?>, 'menus', this); return false;"
+                 title="<?= $row->published ? Text::_('JPUBLISHED') : Text::_('JUNPUBLISHED'); ?>">
+                <span class="<?= $row->published ? 'icon-publish' : 'icon-unpublish'; ?>" aria-hidden="true"></span>
+              </a>
             </td>
             <td class="text-center">
               <a href="index.php?option=com_breezingformsng&task=menus.orderup&cid[]=<?= (int) $row->id; ?>&pkg=<?= rawurlencode($pkg); ?>&<?= Session::getFormToken(); ?>=1"
@@ -100,4 +93,9 @@ $bfDocument = Factory::getApplication()->getDocument();
 $bfDocument->getWebAssetManager()->useScript('com_breezingformsng.admin-form');
 $bfDocument->addScriptOptions('com_breezingformsng.admin-form', ['confirmDeleteTask' => 'menus.remove']);
 Text::script('JGLOBAL_CONFIRM_DELETE');
+
+$bfDocument->getWebAssetManager()->useScript('com_breezingformsng.admin-toggle-published');
+$bfDocument->addScriptOptions('com_breezingformsng.admin-toggle-published', ['csrfToken' => Session::getFormToken()]);
+Text::script('JPUBLISHED');
+Text::script('JUNPUBLISHED');
 ?>

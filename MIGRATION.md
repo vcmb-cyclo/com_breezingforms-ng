@@ -28,7 +28,8 @@
 - [x] Gestionnaire de formulaires (`admin/form.class.php` + `form.html.php` — migré Phase 5)
 - [x] QuickMode (`admin/quickmode.class.php` + `.html.php` + `.js` — migré Phase 7)
 - [x] Import paquets (`admin/import.class.php` → `src/Model/ImportModel.php`, SimpleXML + transactions ; bibliothèques scripts/pièces uniquement, les paquets contenant formulaires/menus sont refusés ; export de paquets abandonné avec l'UI legacy)
-- [ ] Frontend moteur formulaires (`facileforms.process.php` — **448 KB**, hors périmètre immédiat)
+- [x] Frontend moteur formulaires — dispatcher, config, routeur SEF et `HTML_facileFormsProcessor` (8 907 lignes) décomposés en services/traits Joomla 6 (Phase 8)
+- [ ] Réécriture native des dernières classes crosstec du moteur : `BFRequest`, `BFIntegrate`, rendus `BFQuickMode*` (Phase 9 — chantier de fond, voir détail en bas de document)
 
 ---
 
@@ -328,3 +329,82 @@
   `Administrator\Service\PdfDocument`. Les deux classes globales ont été supprimées. Export administrateur vérifié
   dans Joomla 6 le 2026-07-12 : PDF 1.7 valide généré avec les en-têtes de téléchargement attendus.*
 - [x] Migrer `router.php` vers `RouterInterface` Joomla 6 *(fait le 2026-07-11 : `Site\Service\Router extends RouterBase`, `RouterFactory` au provider, `RouterServiceInterface` sur l'extension ; `router.php` supprimé du paquet et nettoyé des sites installés par `script.php::removeObsoleteComponentFiles()` ; pages de formulaires SEF vérifiées en front)*
+
+---
+
+## Phase 9 — Réécriture native du moteur de soumission (chantier de fond)
+
+**Priorité : élevée à moyen terme, mais hors périmètre d'une session de migration classique.**
+**Ce n'est pas un portage mécanique** (renommage de classe, ajout de namespace) : les trois éléments ci-dessous
+portent de la logique métier et des effets de bord qui doivent être réécrits, pas simplement déplacés.
+Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
+
+### 9a. `BFRequest` → `Input` Joomla natif
+
+- **393 appels** répartis sur 19 fichiers. Par volume décroissant :
+  1. `components/com_breezingformsng/src/Service/Callback/SofortCallback.php` — 69
+  2. `components/com_breezingformsng/legacy/processor/bfProcessorRendering.php` — 54
+  3. `components/com_breezingformsng/legacy/processor/bfProcessorSubmission.php` — 45
+  4. `components/com_breezingformsng/src/Service/FormRenderer.php` — 35
+  5. `components/com_breezingformsng/src/Service/Callback/PayPalCallback.php` — 30
+  6. `components/com_breezingformsng/breezingformsng.php` — 29
+  7. `components/com_breezingformsng/src/Service/Callback/StripeCallback.php` — 16
+  8. `components/com_breezingformsng/legacy/processor/bfProcessorExports.php` — 15
+  9. `components/com_breezingformsng/legacy/processor/bfProcessorNotifications.php` — 13
+  10. `BFQuickModeMobile.php` / `BFQuickModeBootstrap.php` — 7 chacun
+  11. `components/com_breezingformsng/src/Service/Callback/FlashUploadCallback.php` — 6
+  12. `BFQuickMode.php` / `BFQuickModeOnePage.php` — 6 chacun
+  13. Reste (`OptCallback.php`, `BFRequest.php` lui-même, `CaptchaCallback.php`, `legacy/Helper/route.php`, `legacy/functions.php`, `bfProcessorUploads.php`) — 1 à 5 chacun
+- **Piège** : `BFRequest` n'est pas un simple wrapper de lecture. Il maintient des caches dans `$GLOBALS` et sa
+  méthode `setVar()` **mute les superglobales** `$_POST`/`$_GET` (comportement hérité de `JRequest` Joomla 1.5/2.5).
+  Remplacer un appel par `Input::get()` sans vérifier si le site appelant dépend ensuite de cette mutation
+  (relecture directe de `$_POST` plus loin dans le même flux) peut casser silencieusement un flux de soumission.
+- **Ordre recommandé** (du risque le plus faible au plus élevé) :
+  1. Les services `Site\Service\Callback\*` — déjà isolés par famille de paiement/notification, flux courts et testables unitairement (Stripe, PayPal, Sofort, Captcha, FlashUpload, Opt).
+  2. Les traits `legacy/processor/bfProcessor*` — plus gros mais déjà découpés par responsabilité (Phase 8).
+  3. `breezingformsng.php` (dispatcher) et `FormRenderer.php` — cœur du rendu/soumission, à traiter une fois les couches au-dessus stabilisées.
+  4. Les rendus `BFQuickMode*` en dernier (cf. 9c) — le plus gros volume, mais le moins risqué car isolé au rendu d'un thème donné.
+
+### 9b. `BFIntegrate` → service typé
+
+- `administrator/components/com_breezingformsng/libraries/crosstec/classes/BFIntegrate.php` — 445 lignes.
+- Appelants : `components/com_breezingformsng/breezingformsng.php` (bootstrap moteur) et
+  `components/com_breezingformsng/legacy/processor/bfProcessorExports.php` (`field()` à chaque champ soumis, `commit()` en fin de soumission).
+- Construit des requêtes SQL par **concaténation de chaînes** (nom de table/colonne de référence, valeurs de critère)
+  et exécute du code PHP stocké en base via `@eval()` (`handleCode()` / `handleFinalizeCode()`, code saisi dans
+  l'écran Intégrateur, réservé aux Super Users). Ce modèle de confiance (code admin de confiance) existe déjà en
+  legacy et ne doit pas être élargi par la réécriture ; en revanche la concaténation SQL doit être remplacée par
+  des requêtes préparées (`$db->quoteName()` sur les identifiants, liaison des valeurs).
+- Cible proposée : `Site\Service\Integrator\IntegratorRuntime`, en conservant les méthodes publiques `field()` et
+  `commit()` pour limiter l'impact sur les deux appelants.
+
+### 9c. Rendus `BFQuickMode*` → un composant de rendu par thème
+
+- 4 fichiers, **11 097 lignes cumulées** dans `libraries/crosstec/classes/` :
+  `BFQuickMode.php` (2 587 l., thème classique), `BFQuickModeBootstrap.php` (2 874 l.),
+  `BFQuickModeMobile.php` (2 541 l.), `BFQuickModeOnePage.php` (3 095 l.).
+- Utilisés uniquement par `breezingformsng.php` et `legacy/processor/bfProcessorRendering.php`, pour le rendu
+  frontend d'un formulaire créé avec QuickMode — un fichier par thème de rendu (classique / Bootstrap / mobile /
+  une page). Aucun usage côté admin (le QuickMode admin passe par `src/Helper/QuickmodeHtml.php`, déjà migré Phase 7).
+- Poste le plus lourd de la Phase 9. À traiter thème par thème, en commençant par `BFQuickMode.php` (le plus
+  petit, thème par défaut) comme preuve de concept avant de reproduire l'approche sur les 3 autres.
+
+### Vérification (à la complétion de la Phase 9)
+
+- [ ] Chaque service qui remplace un fichier crosstec repasse les scénarios déjà validés dans ce document :
+  rendu de formulaire (tous thèmes QuickMode), soumission SEF, callbacks de paiement (Stripe/PayPal/Sofort),
+  upload, `commit()` Intégrateur — sans régression.
+- [ ] `grep -rl "BFRequest\|BFIntegrate\|BFQuickMode" --include="*.php" .` ne retourne plus rien.
+- [ ] Suppression des 6 fichiers `libraries/crosstec/classes/BF{Request,Integrate,QuickMode,QuickModeBootstrap,QuickModeMobile,QuickModeOnePage}.php`
+  et du répertoire `libraries/crosstec/` s'il devient vide.
+
+---
+
+## Reliquat hors Phase 9
+
+- [ ] **Phase 2 — Permissions ACL** : la modification effective d'une règle (Autoriser/Refuser puis Enregistrer)
+  n'a pas pu être testée par un agent — tentative bloquée le 2026-07-12 par le classificateur de permissions de
+  l'environnement (modification de droits ACL jugée sensible, même sur le site de dev). Nécessite soit une
+  confirmation explicite de l'utilisateur avant qu'un agent retente, soit une vérification manuelle directe :
+  Composants → BreezingForms NG → Droits → choisir un groupe → Autoriser/Refuser une action → Enregistrer →
+  rouvrir l'écran et confirmer que la valeur a persisté.

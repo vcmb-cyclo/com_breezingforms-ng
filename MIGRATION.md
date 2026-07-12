@@ -300,5 +300,11 @@
   `facileforms.process.php` ramené à 706 lignes (bootstrap, traces, constructeur) ; méthodes réparties dans
   `legacy/processor/bfProcessor{CodeTools,Scripting,Rendering,Exports,Notifications,Uploads,Submission}.php`.
   Vérifié sur le conteneur : rendu normal + `tmpl=component`, soumission SEF du formulaire 4 → enregistrement créé puis nettoyé)*
-- [ ] Réécriture native du moteur (remplacer les traits legacy par de vrais services typés) — chantier de fond restant
+- [x] Éliminer les wrappers crosstec triviaux *(fait le 2026-07-12 : `BFText` → `Text` natif (68 fichiers, langue chargée
+  au bootstrap du moteur) ; `BFFile::read` → `file_get_contents` et suppression de `BFFactory`/`BFDbo` (sans appelant) ;
+  `BFRedirect()` → `Site\Service\Support\RedirectHelper`. Fichiers purgés des sites installés via `removeObsoleteComponentFiles()`)*
+- [ ] Réécriture native du moteur (remplacer les traits legacy par de vrais services typés) — chantier de fond restant.
+  Restent côté crosstec : `BFRequest` (387 appels — portage de JRequest avec caches `$GLOBALS` et `setVar` mutant les
+  superglobales : à traiter lors de la réécriture, pas par substitution), `BFPDF`, `BFIntegrate`, `BFJoomlaConfig`
+  et les rendus `BFQuickMode*`
 - [x] Migrer `router.php` vers `RouterInterface` Joomla 6 *(fait le 2026-07-11 : `Site\Service\Router extends RouterBase`, `RouterFactory` au provider, `RouterServiceInterface` sur l'extension ; `router.php` supprimé du paquet et nettoyé des sites installés par `script.php::removeObsoleteComponentFiles()` ; pages de formulaires SEF vérifiées en front)*

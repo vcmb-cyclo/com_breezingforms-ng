@@ -11,6 +11,7 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Callback;
 
 use BFRequest;
 use Joomla\CMS\Factory;
+use Vcmb\Component\BreezingformsNG\Site\Service\Support\RedirectHelper;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
@@ -36,7 +37,7 @@ class StripeCallback
     $list = $db->loadObjectList();
 
     if (count($list) == 0) {
-        BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
+        RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
         exit;
     }
 
@@ -45,7 +46,7 @@ class StripeCallback
     $areas = json_decode($form->template_areas, true);
 
     if (!is_array($areas)) {
-        BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_STRIPE_DATA'));
+        RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_STRIPE_DATA'));
         exit;
     }
 
@@ -84,7 +85,7 @@ class StripeCallback
 
                         /* XDA if( Factory::getApplication()->getSession()->get('bf_stripe_last_payment_amount'.$record_id, null) == null ){
 
-            BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_STRIPE_AMOUNT'));
+            RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_STRIPE_AMOUNT'));
             exit;
                                 } XDA */
 
@@ -186,9 +187,9 @@ class StripeCallback
                         } else {
 
                             if ($options['thankYouPage'] != '') {
-                                BFRedirect($options['thankYouPage']);
+                                RedirectHelper::to($options['thankYouPage']);
                             } else {
-                                BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_PAYING_WITH_STRIPE'));
+                                RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_PAYING_WITH_STRIPE'));
                             }
                         }
                     }
@@ -218,7 +219,7 @@ class StripeCallback
     $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote(BFRequest::getInt('form', -1)));
     $list = $db->loadObjectList();
     if (count($list) == 0) {
-        BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
+        RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
         exit;
     }
 
@@ -226,7 +227,7 @@ class StripeCallback
 
     $areas = json_decode($form->template_areas, true);
     if (!is_array($areas)) {
-        BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYMENT_DATA'));
+        RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYMENT_DATA'));
     }
 
     foreach ($areas as $area) {
@@ -268,21 +269,21 @@ class StripeCallback
                             $db->execute();
 
                             if (!file_exists($file)) {
-                                BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_DOWNLOAD_FILE'));
+                                RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_DOWNLOAD_FILE'));
                             }
 
                             \Vcmb\Component\BreezingformsNG\Site\Service\Support\DownloadHelper::stream($file);
                         } else {
 
-                            BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_MAX_DOWNLOAD_TRIES_REACHED'));
+                            RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_MAX_DOWNLOAD_TRIES_REACHED'));
                         }
                     } else {
 
-                        BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_DOWNLOAD_NOT_POSSIBLE'));
+                        RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_DOWNLOAD_NOT_POSSIBLE'));
                     }
                 } else {
 
-                    BFRedirect(Uri::root(), Text::_('COM_BREEZINGFORMSNG_NO_DOWNLOADABLE_PRODUCT'));
+                    RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_NO_DOWNLOADABLE_PRODUCT'));
                 }
 
                 break;

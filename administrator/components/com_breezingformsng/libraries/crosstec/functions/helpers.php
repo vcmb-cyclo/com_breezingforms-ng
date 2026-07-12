@@ -807,9 +807,3 @@ function bf_is_email($email, $checkDNS = false)
 	}
 }
 
-function BFRedirect($link, $msg = null)
-{
-	$mainframe = Factory::getApplication();
-	$mainframe->enqueueMessage($msg);
-	$mainframe->redirect($link);
-}

@@ -131,4 +131,15 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
 
         parent::display($tpl);
     }
+
+    protected function getDetailLabel(): ?string
+    {
+        if ($this->form === null) {
+            return null;
+        }
+
+        $title = trim((string) $this->form->title);
+
+        return $title !== '' ? $title : Text::_('COM_BREEZINGFORMSNG_INSTALLER_UNKNOWN');
+    }
 }

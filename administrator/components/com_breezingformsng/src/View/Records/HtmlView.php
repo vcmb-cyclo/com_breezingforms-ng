@@ -36,6 +36,8 @@ class HtmlView extends BaseHtmlView
     public ?\stdClass $record = null;
     public array $recordRows = [];
 
+    private string $layout = 'default';
+
     private const ALLOWED_SORTS = [
         'records.id', 'records.submitted', 'forms.title',
         'records.ip', 'records.username',
@@ -47,6 +49,7 @@ class HtmlView extends BaseHtmlView
         $app = Factory::getApplication();
         $input = $app->getInput();
         $layout = $input->getCmd('layout', 'default');
+        $this->layout = $layout;
 
         HTMLHelper::_('behavior.keepalive');
 
@@ -176,5 +179,20 @@ class HtmlView extends BaseHtmlView
     private function prepareImportToolbar(): void
     {
         ToolbarHelper::cancel('records.display', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_CANCEL'));
+    }
+
+    protected function getDetailLabel(): ?string
+    {
+        if ($this->layout === 'edit') {
+            $recordId = Factory::getApplication()->getInput()->getInt('record_id', 0);
+
+            return $recordId > 0 ? (string) $recordId : null;
+        }
+
+        if ($this->layout === 'csvimport') {
+            return Text::_('COM_BREEZINGFORMSNG_BTN_IMPORT_CSV');
+        }
+
+        return null;
     }
 }

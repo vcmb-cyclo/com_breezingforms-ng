@@ -21,6 +21,7 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Toolbar\ToolbarHelper;
+use Vcmb\Component\BreezingformsNG\Administrator\Helper\BreadcrumbHelper;
 
 class Renderer
 {
@@ -53,11 +54,11 @@ class Renderer
 		global $ff_mossite, $ff_admsite, $ff_config;
 		$action = $row->id ? Text::_('COM_BREEZINGFORMSNG_PIECES_EDITPIECE') : Text::_('COM_BREEZINGFORMSNG_PIECES_ADDPIECE');
 
-		$sectionTitle = Text::_('COM_BREEZINGFORMSNG_MANAGEPIECES');
-		if ($row->id && $row->name !== '') {
-			$sectionTitle .= ' / ' . htmlspecialchars((string) $row->name, ENT_QUOTES, 'UTF-8');
-		}
-		$pageTitle = Text::_('COM_BREEZINGFORMSNG') . ' / ' . $sectionTitle;
+		$pageTitle = BreadcrumbHelper::render([
+			['label' => Text::_('COM_BREEZINGFORMSNG'), 'url' => 'index.php?option=com_breezingformsng'],
+			['label' => Text::_('COM_BREEZINGFORMSNG_MANAGEPIECES'), 'url' => 'index.php?option=com_breezingformsng&view=pieces'],
+			['label' => $row->id && $row->name !== '' ? (string) $row->name : Text::_('COM_BREEZINGFORMSNG_PIECES_ADDPIECE')],
+		]);
 		Factory::getApplication()->getDocument()->setTitle(strip_tags($pageTitle));
 		ToolbarHelper::title($pageTitle, 'logo_left');
 

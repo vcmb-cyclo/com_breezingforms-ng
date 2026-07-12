@@ -20,6 +20,7 @@ use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Toolbar\ToolbarHelper;
+use Vcmb\Component\BreezingformsNG\Administrator\Helper\BreadcrumbHelper;
 
 class Renderer
 {
@@ -82,11 +83,11 @@ class Renderer
 		global $ff_mossite, $ff_admsite, $ff_config;
 		$action = $row->id ? Text::_('COM_BREEZINGFORMSNG_SCRIPTS_EDITSCRIPT') : Text::_('COM_BREEZINGFORMSNG_SCRIPTS_ADDSCRIPT');
 
-		$sectionTitle = Text::_('COM_BREEZINGFORMSNG_MANAGESCRIPTS');
-		if ($row->id && $row->name !== '') {
-			$sectionTitle .= ' / ' . htmlspecialchars((string) $row->name, ENT_QUOTES, 'UTF-8');
-		}
-		$pageTitle = Text::_('COM_BREEZINGFORMSNG') . ' / ' . $sectionTitle;
+		$pageTitle = BreadcrumbHelper::render([
+			['label' => Text::_('COM_BREEZINGFORMSNG'), 'url' => 'index.php?option=com_breezingformsng'],
+			['label' => Text::_('COM_BREEZINGFORMSNG_MANAGESCRIPTS'), 'url' => 'index.php?option=com_breezingformsng&view=scripts'],
+			['label' => $row->id && $row->name !== '' ? (string) $row->name : Text::_('COM_BREEZINGFORMSNG_SCRIPTS_ADDSCRIPT')],
+		]);
 		Factory::getApplication()->getDocument()->setTitle(strip_tags($pageTitle));
 		ToolbarHelper::title($pageTitle, 'logo_left');
 

@@ -51,17 +51,9 @@ class HtmlView extends BaseHtmlView
         HTMLHelper::_('behavior.keepalive');
 
         if ($layout === 'edit') {
-
-            $input->set('hidemainmenu', 1);
-
-        }
-
-
-        if ($layout === 'edit') {
             $this->prepareEditData($input);
             $this->prepareEditToolbar();
         } elseif ($layout === 'csvimport') {
-            $input->set('hidemainmenu', 1);
             $this->formSelection = $input->getInt('form_selection', 0);
             $this->prepareImportToolbar();
         } else {

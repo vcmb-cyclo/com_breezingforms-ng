@@ -1041,7 +1041,7 @@
                             jQuery('#adminForm').get(0).onsubmit = function () {
                                 return false;
                             };
-                            jQuery('#bfPreviewModal').modal('show');
+                            bootstrap.Modal.getOrCreateInstance(document.getElementById('bfPreviewModal')).show();
 
                             break;
                         case 'preview_site':
@@ -1049,7 +1049,7 @@
                             jQuery('#adminForm').get(0).onsubmit = function () {
                                 return false;
                             };
-                            jQuery('#bfPreviewModal2').modal('show');
+                            bootstrap.Modal.getOrCreateInstance(document.getElementById('bfPreviewModal2')).show();
 
                             break;
                     }

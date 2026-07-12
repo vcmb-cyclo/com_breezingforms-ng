@@ -234,7 +234,7 @@ use Joomla\CMS\Language\Text;
                                                     }
                                                     $themesbootstrap_path = JPATH_SITE . '/media/breezingforms/' . $folder . '/' . $themeboostrapfolder . '/';
                                                     if (is_dir($themesbootstrap_path) && file_exists($themesbootstrap_path . 'vars.txt')) {
-                                                        $varscontent = htmlentities(BFFile::read($themesbootstrap_path . 'vars.txt'), ENT_QUOTES, 'UTF-8');
+                                                        $varscontent = htmlentities(file_get_contents($themesbootstrap_path . 'vars.txt'), ENT_QUOTES, 'UTF-8');
                                                         if ($varscontent) {
                                                             echo '<br/>
                                                                 <div class="bfPropertyWrap">

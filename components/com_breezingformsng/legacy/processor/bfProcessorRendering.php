@@ -1188,7 +1188,7 @@ trait bfProcessorRendering
 
                             if (strlen($cbEntry->recValue) > 0 && file_exists($sig_path . $cbEntry->recValue)) {
 
-                                $sig_encoded = bf_b64enc(BFFile::read($sig_path . $cbEntry->recValue));
+                                $sig_encoded = bf_b64enc(file_get_contents($sig_path . $cbEntry->recValue));
 
                                 $base = 'ba' . 'se' . '64';
 

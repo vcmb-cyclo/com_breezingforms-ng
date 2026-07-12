@@ -9,7 +9,6 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Callback;
 
 \defined('_JEXEC') or die;
 
-use BFFile;
 use BFRequest;
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
@@ -79,7 +78,7 @@ class FlashUploadCallback
 
                 if (@File::upload($tempFile, $targetFile)) {
 
-                    $chunky = @BFFile::read($targetFile);
+                    $chunky = @file_get_contents($targetFile);
 
                     // ok, here we try native PHP file operation
                     // to prevent opening and readin the file
@@ -95,7 +94,7 @@ class FlashUploadCallback
                         // php memory limit
                         $final = '';
                         if (@file_exists($finaltargetFile)) {
-                            $final = @BFFile::read($finaltargetFile);
+                            $final = @file_get_contents($finaltargetFile);
                         }
                         $newbuf = $final . $chunky;
                         @File::write($finaltargetFile, $newbuf);

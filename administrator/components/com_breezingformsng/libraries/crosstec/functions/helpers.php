@@ -497,7 +497,7 @@ function bf_sendNotificationByPaymentCache($formId, $recordId, $type = 'admin')
 				$parts = explode('_', $file);
 				if (count($parts) == 4) {
 					if ($parts[0] == intval($formId) && $parts[1] == intval($recordId) && $parts[2] == $type) {
-						$contents = unserialize(BFFile::read($sourcePath . $file));
+						$contents = unserialize(file_get_contents($sourcePath . $file));
 						File::delete($sourcePath . $file);
 						break;
 					}

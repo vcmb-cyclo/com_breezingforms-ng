@@ -12,8 +12,6 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Helper;
 final class LegacyClassLoader
 {
     private const CLASS_PATHS = [
-        'BFFactory' => 'libraries/crosstec/classes/BFFactory.php',
-        'BFFile' => 'libraries/crosstec/classes/BFFactory.php',
         'BFIntegrate' => 'libraries/crosstec/classes/BFIntegrate.php',
         'BFJoomlaConfig' => 'libraries/crosstec/classes/BFJoomlaConfig.php',
         'BFPDF' => 'libraries/crosstec/classes/BFPDF.php',

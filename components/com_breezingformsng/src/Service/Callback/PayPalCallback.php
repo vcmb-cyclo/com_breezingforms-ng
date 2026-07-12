@@ -33,8 +33,8 @@ class PayPalCallback
 
     BFRequest::setVar('format', 'html');
 
-
-    $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote(BFRequest::getInt('form_id', -1)));
+    $input = Factory::getApplication()->getInput();
+    $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($input->getInt('form_id', -1)));
     $list = $db->loadObjectList();
     if (count($list) == 0) {
         header("Status: 200 OK");
@@ -65,7 +65,7 @@ class PayPalCallback
 
                 $req = 'cmd=_notify-validate';
 
-                $tx_token = BFRequest::getVar('txn_id', 0);
+                $tx_token = $input->getString('txn_id', '0');
                 foreach ($_POST as $key => $value) {
                     $value = urlencode(stripslashes($value));
                     $req .= "&$key=$value";
@@ -110,7 +110,7 @@ class PayPalCallback
 
                 if (strcmp($lines[0], "VERIFIED") == 0) {
 
-                    $query = "SELECT * FROM #__facileforms_records WHERE id = '" . BFRequest::getInt('record_id', -1) . "' LIMIT 1";
+                    $query = "SELECT * FROM #__facileforms_records WHERE id = '" . $input->getInt('record_id', -1) . "' LIMIT 1";
                     $db->setQuery($query);
                     $txid = $db->loadObjectList();
 
@@ -127,7 +127,7 @@ class PayPalCallback
 											paypal_testaccount = " . $db->Quote($options['testaccount'] ? 1 : 0) . ",
 											paypal_download_tries = 0
 										Where
-											id = '" . BFRequest::getInt('record_id', -1) . "'
+											id = '" . $input->getInt('record_id', -1) . "'
 											");
 
                             $db->execute();
@@ -139,8 +139,8 @@ class PayPalCallback
 
                             // send mail after succeeded payment?
                             if (isset($options['sendNotificationAfterPayment']) && $options['sendNotificationAfterPayment']) {
-                                bf_sendNotificationByPaymentCache(BFRequest::getInt('form_id', -1), BFRequest::getInt('record_id', -1), 'admin');
-                                bf_sendNotificationByPaymentCache(BFRequest::getInt('form_id', -1), BFRequest::getInt('record_id', -1), 'mailback');
+                                bf_sendNotificationByPaymentCache($input->getInt('form_id', -1), $input->getInt('record_id', -1), 'admin');
+                                bf_sendNotificationByPaymentCache($input->getInt('form_id', -1), $input->getInt('record_id', -1), 'mailback');
                             }
                         }
 
@@ -150,7 +150,7 @@ class PayPalCallback
                     header("Status: 200 OK");
                 } else if (strcmp($lines[0], "INVALID") == 0) {
 
-                    $query = "SELECT * FROM #__facileforms_records WHERE id = '" . BFRequest::getInt('record_id', -1) . "' LIMIT 1";
+                    $query = "SELECT * FROM #__facileforms_records WHERE id = '" . $input->getInt('record_id', -1) . "' LIMIT 1";
                     $db->setQuery($query);
                     $txid = $db->loadObjectList();
 
@@ -165,7 +165,7 @@ class PayPalCallback
 											paypal_testaccount = " . $db->Quote($options['testaccount'] ? 1 : 0) . ",
 											paypal_download_tries = 0
 										Where
-											id = '" . BFRequest::getInt('record_id', -1) . "'
+											id = '" . $input->getInt('record_id', -1) . "'
 											");
 
                         $db->execute();
@@ -200,8 +200,8 @@ class PayPalCallback
 
     BFRequest::setVar('format', 'html');
 
-
-    $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote(BFRequest::getInt('form_id', -1)));
+    $input = Factory::getApplication()->getInput();
+    $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($input->getInt('form_id', -1)));
     $list = $db->loadObjectList();
     if (count($list) == 0) {
         RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
@@ -238,7 +238,7 @@ class PayPalCallback
 
                 $req = 'cmd=_notify-synch';
 
-                $tx_token = BFRequest::getVar('tx', 0);
+                $tx_token = $input->getString('tx', '0');
                 $req .= "&tx=" . urlencode($tx_token) . "&at=" . urlencode($auth_token);
 
                 $header = "POST /cgi-bin/webscr HTTP/1.0\r\n";
@@ -294,7 +294,7 @@ class PayPalCallback
                         require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
                     } else {
 
-                        $query = "SELECT * FROM #__facileforms_records WHERE id = '" . BFRequest::getInt('record_id', -1) . "' LIMIT 1";
+                        $query = "SELECT * FROM #__facileforms_records WHERE id = '" . $input->getInt('record_id', -1) . "' LIMIT 1";
                         $db->setQuery($query);
                         $txid = $db->loadObjectList();
 
@@ -311,7 +311,7 @@ class PayPalCallback
 											paypal_testaccount = " . $db->Quote($options['testaccount'] ? 1 : 0) . ",
 											paypal_download_tries = 0
 										Where 
-											id = '" . BFRequest::getInt('record_id', -1) . "'
+											id = '" . $input->getInt('record_id', -1) . "'
 											");
 
                                 $db->execute();
@@ -323,15 +323,15 @@ class PayPalCallback
 
                                 // send mail after succeeded payment?
                                 if (isset($options['sendNotificationAfterPayment']) && $options['sendNotificationAfterPayment']) {
-                                    bf_sendNotificationByPaymentCache(BFRequest::getInt('form_id', -1), BFRequest::getInt('record_id', -1), 'admin');
-                                    bf_sendNotificationByPaymentCache(BFRequest::getInt('form_id', -1), BFRequest::getInt('record_id', -1), 'mailback');
+                                    bf_sendNotificationByPaymentCache($input->getInt('form_id', -1), $input->getInt('record_id', -1), 'admin');
+                                    bf_sendNotificationByPaymentCache($input->getInt('form_id', -1), $input->getInt('record_id', -1), 'mailback');
                                 }
 
                                 if ($options['downloadableFile']) {
 
-                                    $record_id = BFRequest::getInt('record_id', -1);
+                                    $record_id = $input->getInt('record_id', -1);
                                     $tries = $options['downloadTries'];
-                                    $form_id = BFRequest::getInt('form_id', -1);
+                                    $form_id = $input->getInt('form_id', -1);
                                     require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/download.php');
                                 } else {
 
@@ -346,9 +346,9 @@ class PayPalCallback
                             } else {
                                 if ($options['downloadableFile']) {
 
-                                    $record_id = BFRequest::getInt('record_id', -1);
+                                    $record_id = $input->getInt('record_id', -1);
                                     $tries = $options['downloadTries'];
-                                    $form_id = BFRequest::getInt('form_id', -1);
+                                    $form_id = $input->getInt('form_id', -1);
                                     require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/download.php');
                                 } else {
                                     if ($options['useIpn']) {
@@ -396,8 +396,8 @@ class PayPalCallback
 
     BFRequest::setVar('format', 'raw');
 
-
-    $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote(BFRequest::getInt('form', -1)));
+    $input = Factory::getApplication()->getInput();
+    $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($input->getInt('form', -1)));
     $list = $db->loadObjectList();
     if (count($list) == 0) {
         RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
@@ -425,12 +425,12 @@ class PayPalCallback
 									Select paypal_download_tries From 
 										#__facileforms_records 
 									Where 
-										id = '" . BFRequest::getInt('record_id', -1) . "'
+										id = '" . $input->getInt('record_id', -1) . "'
 									And
 										( 
-                                                                                    paypal_tx_id = " . $db->Quote('PayPal: ' . BFRequest::getVar('tx', '')) . "
+                                                                                    paypal_tx_id = " . $db->Quote('PayPal: ' . $input->getString('tx', '')) . "
                                                                                   Or
-                                                                                    paypal_tx_id = " . $db->Quote('PayPal: ' . BFRequest::getVar('tx', '') . ' (VALID)') . "
+                                                                                    paypal_tx_id = " . $db->Quote('PayPal: ' . $input->getString('tx', '') . ' (VALID)') . "
                                                                                 )
 									");
 
@@ -446,12 +446,12 @@ class PayPalCallback
 											Set
 												paypal_download_tries = paypal_download_tries + 1 
 											Where 
-												id = '" . BFRequest::getInt('record_id', -1) . "'
+												id = '" . $input->getInt('record_id', -1) . "'
 											And
 												(
-                                                                                                    paypal_tx_id = " . $db->Quote('PayPal: ' . BFRequest::getVar('tx', '')) . "
+                                                                                                    paypal_tx_id = " . $db->Quote('PayPal: ' . $input->getString('tx', '')) . "
                                                                                                   Or
-                                                                                                    paypal_tx_id = " . $db->Quote('PayPal: ' . BFRequest::getVar('tx', '') . ' (VALID)') . "
+                                                                                                    paypal_tx_id = " . $db->Quote('PayPal: ' . $input->getString('tx', '') . ' (VALID)') . "
                                                                                                 )
 											");
 

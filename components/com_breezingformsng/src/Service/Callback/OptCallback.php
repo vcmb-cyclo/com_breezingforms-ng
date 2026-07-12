@@ -9,7 +9,6 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Callback;
 
 \defined('_JEXEC') or die;
 
-use BFRequest;
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
@@ -34,8 +33,8 @@ class OptCallback
     $jinput = Factory::getApplication()->getInput();
     $ip = $jinput->server->get('REMOTE_ADDR');
 
-    $userSubmitedID = BFRequest::getVar('id');
-    $token = BFRequest::getVar('token');
+    $userSubmitedID = $jinput->getString('id', '');
+    $token = $jinput->getString('token', '');
     $database->setQuery("UPDATE #__facileforms_records SET opted=1, opt_ip = " . $database->quote($ip) . ", opt_date = " . $database->quote(HTMLHelper::date('now', 'Y-m-d H:i:s')) . " WHERE opt_token = " . $database->quote($token) . " And id=" . $database->quote($userSubmitedID) . " And opted = 0");
     $database->execute();
 
@@ -55,8 +54,8 @@ class OptCallback
     $jinput = Factory::getApplication()->getInput();
     $ip = $jinput->server->get('REMOTE_ADDR');
 
-    $userSubmitedID = BFRequest::getVar('id');
-    $token = BFRequest::getVar('token');
+    $userSubmitedID = $jinput->getString('id', '');
+    $token = $jinput->getString('token', '');
     $database->setQuery("UPDATE #__facileforms_records SET opted=0, opt_ip = " . $database->quote($ip) . ", opt_date = " . $database->quote(HTMLHelper::date('now', 'Y-m-d H:i:s')) . " WHERE opt_token = " . $database->quote($token) . " And id=" . $database->quote($userSubmitedID) . " And opted = 1");
     $database->execute();
 

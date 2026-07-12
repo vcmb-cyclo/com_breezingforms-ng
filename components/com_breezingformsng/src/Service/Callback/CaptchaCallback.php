@@ -9,7 +9,6 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Callback;
 
 \defined('_JEXEC') or die;
 
-use BFRequest;
 use Securimage;
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
@@ -34,7 +33,8 @@ class CaptchaCallback
 
     require_once (JPATH_SITE . '/media/com_breezingformsng/images/site/captcha/securimage.php');
     $securimage = new Securimage();
-    if (!$securimage->check(str_replace('?', '', BFRequest::getVar('value', '')))) {
+    $capValue = Factory::getApplication()->getInput()->getString('value', '');
+    if (!$securimage->check(str_replace('?', '', $capValue))) {
         echo 'capResult=>false';
     } else {
         echo 'capResult=>true';

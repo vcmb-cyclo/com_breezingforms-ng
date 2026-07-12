@@ -32,8 +32,8 @@ class StripeCallback
 
     BFRequest::setVar('format', 'html');
 
-
-    $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote(BFRequest::getInt('form_id', -1)));
+    $input = Factory::getApplication()->getInput();
+    $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($input->getInt('form_id', -1)));
     $list = $db->loadObjectList();
 
     if (count($list) == 0) {
@@ -50,8 +50,8 @@ class StripeCallback
         exit;
     }
 
-    $tx_token = BFRequest::getVar('token');
-    $record_id = BFRequest::getInt('record_id');
+    $tx_token = $input->getString('token', '');
+    $record_id = $input->getInt('record_id', 0);
 
     foreach ($areas as $area) {
 
@@ -161,8 +161,8 @@ class StripeCallback
                                                                                         paypal_payment_date = " . $db->Quote(date('Y-m-d H:i:s', $stripe_pi_create)) . ",
                                                                                         paypal_testaccount = " . $db->Quote(!$stripe_pi->livemode ? 1 : 0) . ",
                                                                                         paypal_download_tries = 0
-                                                                                Where 
-                                                                                        id = '" . BFRequest::getInt('record_id', -1) . "'
+                                                                                Where
+                                                                                        id = '" . $input->getInt('record_id', -1) . "'
 											");
 
                         $db->execute();
@@ -174,15 +174,15 @@ class StripeCallback
 
                         // send mail after succeeded payment?
                         if (isset($options['sendNotificationAfterPayment']) && $options['sendNotificationAfterPayment']) {
-                            bf_sendNotificationByPaymentCache(BFRequest::getInt('form_id', -1), BFRequest::getInt('record_id', -1), 'admin');
-                            bf_sendNotificationByPaymentCache(BFRequest::getInt('form_id', -1), BFRequest::getInt('record_id', -1), 'mailback');
+                            bf_sendNotificationByPaymentCache($input->getInt('form_id', -1), $input->getInt('record_id', -1), 'admin');
+                            bf_sendNotificationByPaymentCache($input->getInt('form_id', -1), $input->getInt('record_id', -1), 'mailback');
                         }
 
                         if ($options['downloadableFile']) {
 
-                            $record_id = BFRequest::getInt('record_id', -1);
+                            $record_id = $input->getInt('record_id', -1);
                             $tries = $options['downloadTries'];
-                            $form_id = BFRequest::getInt('form_id', -1);
+                            $form_id = $input->getInt('form_id', -1);
                             require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/stripe_download.php');
                         } else {
 
@@ -215,8 +215,8 @@ class StripeCallback
 
     BFRequest::setVar('format', 'raw');
 
-
-    $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote(BFRequest::getInt('form', -1)));
+    $input = Factory::getApplication()->getInput();
+    $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($input->getInt('form', -1)));
     $list = $db->loadObjectList();
     if (count($list) == 0) {
         RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
@@ -244,9 +244,9 @@ class StripeCallback
 									Select paypal_download_tries From 
 										#__facileforms_records 
 									Where 
-										id = '" . BFRequest::getInt('record_id', -1) . "'
+										id = '" . $input->getInt('record_id', -1) . "'
 									And
-										paypal_tx_id = " . $db->Quote('Stripe: ' . BFRequest::getVar('token', '')) . "
+										paypal_tx_id = " . $db->Quote('Stripe: ' . $input->getString('token', '')) . "
 									");
 
                     $downloads = $db->loadObjectList();
@@ -261,9 +261,9 @@ class StripeCallback
 											Set
 												paypal_download_tries = paypal_download_tries + 1 
 											Where 
-												id = '" . BFRequest::getInt('record_id', -1) . "'
+												id = '" . $input->getInt('record_id', -1) . "'
 											And
-												paypal_tx_id = " . $db->Quote('Stripe: ' . BFRequest::getVar('token', '')) . "
+												paypal_tx_id = " . $db->Quote('Stripe: ' . $input->getString('token', '')) . "
 											");
 
                             $db->execute();

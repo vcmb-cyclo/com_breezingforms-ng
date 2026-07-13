@@ -481,6 +481,16 @@ class RecordsController extends BaseController
         $ids = $input->get('cid', [], 'post', 'array');
         ArrayHelper::toInteger($ids);
         $this->getRecordModel()->setFlagsBatch($ids, $column, $value);
+
+        $keyBases = [
+            'viewed'   => $value ? 'COM_BREEZINGFORMSNG_RECORDS_N_MARKED_VIEWED' : 'COM_BREEZINGFORMSNG_RECORDS_N_UNMARKED_VIEWED',
+            'exported' => $value ? 'COM_BREEZINGFORMSNG_RECORDS_N_MARKED_EXPORTED' : 'COM_BREEZINGFORMSNG_RECORDS_N_UNMARKED_EXPORTED',
+            'archived' => $value ? 'COM_BREEZINGFORMSNG_RECORDS_N_MARKED_ARCHIVED' : 'COM_BREEZINGFORMSNG_RECORDS_N_UNMARKED_ARCHIVED',
+        ];
+        if (isset($keyBases[$column])) {
+            $app->enqueueMessage(Text::plural($keyBases[$column], count($ids)), 'message');
+        }
+
         $app->redirect($this->listUrl($input));
     }
 

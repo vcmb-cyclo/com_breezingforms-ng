@@ -141,6 +141,9 @@ class Renderer
 					</td>
 					<td nowrap>
 						<?php echo Text::_('COM_BREEZINGFORMSNG_SCRIPTS_TYPE'); ?>:
+						<?php
+						echo '<span><span title="' . HTMLHelper::tooltipText(Text::_('COM_BREEZINGFORMSNG_SCRIPTS_TIPTYPE')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
+						?>
 						<select id="type" name="type" class="inputbox" size="1">
 							<?php
 							for ($t = 0; $t < count($typelist); $t++) {
@@ -162,6 +165,9 @@ class Renderer
 					<td nowrap>
 						<input type="text" size="30" maxlength="30" id="package" name="package"
 							value="<?php echo $row->package; ?>" class="inputbox" />
+						<?php
+						echo '<span><span title="' . HTMLHelper::tooltipText(Text::_('COM_BREEZINGFORMSNG_SCRIPTS_TIPPACKAGE')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
+						?>
 					</td>
 					<td></td>
 				</tr>
@@ -180,12 +186,18 @@ class Renderer
 					<td nowrap>
 						<?php echo Text::_('COM_BREEZINGFORMSNG_SCRIPTS_PUBLISHED'); ?>:
 						<?php echo HTMLHelper::_('select.booleanlist', "published", "", $row->published); ?>
+						<?php
+						echo '<span><span title="' . HTMLHelper::tooltipText(Text::_('COM_BREEZINGFORMSNG_SCRIPTS_TIPPUBLISHED')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
+						?>
 					</td>
 				</tr>
 				<tr>
 					<td></td>
 					<td nowrap colspan="3">
 						<?php echo Text::_('COM_BREEZINGFORMSNG_SCRIPTS_DESCRIPTION'); ?>:
+						<?php
+						echo '<span><span title="' . HTMLHelper::tooltipText(Text::_('COM_BREEZINGFORMSNG_SCRIPTS_TIPDESCRIPTION')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
+						?>
 						<a href="javascript:void(0);"
 							onClick="textAreaResize('description',<?php echo $ff_config->areasmall; ?>);">[
 							<?php echo $ff_config->areasmall; ?>]
@@ -208,6 +220,9 @@ class Renderer
 					<td></td>
 					<td nowrap colspan="3">
 						<?php echo Text::_('COM_BREEZINGFORMSNG_SCRIPTS_CODE'); ?>:
+						<?php
+						echo '<span><span title="' . HTMLHelper::tooltipText(Text::_('COM_BREEZINGFORMSNG_SCRIPTS_TIPCODE')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
+						?>
 						<br />
 
 						<?php

@@ -112,6 +112,9 @@ class Renderer
 					</td>
 					<td nowrap>
 						<?php echo Text::_('COM_BREEZINGFORMSNG_PIECES_TYPE'); ?>:
+						<?php
+						echo '<span><span title="' . HTMLHelper::tooltipText(Text::_('COM_BREEZINGFORMSNG_PIECES_TIPTYPE')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
+						?>
 						<select id="type" name="type" class="inputbox" size="1">
 							<?php
 							for ($t = 0; $t < count($typelist); $t++) {
@@ -133,6 +136,9 @@ class Renderer
 					<td nowrap>
 						<input type="text" size="30" maxlength="30" id="package" name="package"
 							value="<?php echo $row->package; ?>" class="inputbox" />
+						<?php
+						echo '<span><span title="' . HTMLHelper::tooltipText(Text::_('COM_BREEZINGFORMSNG_PIECES_TIPPACKAGE')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
+						?>
 					</td>
 					<td></td>
 				</tr>
@@ -151,12 +157,18 @@ class Renderer
 					<td nowrap>
 						<?php echo Text::_('COM_BREEZINGFORMSNG_PIECES_PUBLISHED'); ?>:
 						<?php echo HTMLHelper::_('select.booleanlist', "published", "", $row->published); ?>
+						<?php
+						echo '<span><span title="' . HTMLHelper::tooltipText(Text::_('COM_BREEZINGFORMSNG_PIECES_TIPPUBLISHED')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
+						?>
 					</td>
 				</tr>
 				<tr>
 					<td></td>
 					<td nowrap colspan="3">
 						<?php echo Text::_('COM_BREEZINGFORMSNG_PIECES_DESCRIPTION'); ?>:
+						<?php
+						echo '<span><span title="' . HTMLHelper::tooltipText(Text::_('COM_BREEZINGFORMSNG_PIECES_TIPDESCRIPTION')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
+						?>
 						<br />
 						<?php
 						$params = array('syntax' => 'html');
@@ -169,6 +181,9 @@ class Renderer
 					<td></td>
 					<td nowrap colspan="3">
 						<?php echo Text::_('COM_BREEZINGFORMSNG_PIECES_CODE'); ?>:
+						<?php
+						echo '<span><span title="' . HTMLHelper::tooltipText(Text::_('COM_BREEZINGFORMSNG_PIECES_TIPCODE')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
+						?>
 						<br />
 
 						<?php

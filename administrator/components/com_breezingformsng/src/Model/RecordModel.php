@@ -116,6 +116,15 @@ class RecordModel extends BaseModel
             $this->saveElementValue($recordId, $element, (string) $values[$elementId]);
         }
 
+        $user = Factory::getApplication()->getIdentity();
+        $db->setQuery(
+            $db->getQuery(true)
+                ->update($db->quoteName('#__facileforms_records'))
+                ->set($db->quoteName('modified') . ' = ' . $db->quote((new \Joomla\CMS\Date\Date())->toSql()))
+                ->set($db->quoteName('modified_by') . ' = ' . $db->quote((string) $user->username))
+                ->set($db->quoteName('modified_user_id') . ' = ' . (int) $user->id)
+                ->where($db->quoteName('id') . ' = ' . $recordId)
+        )->execute();
     }
 
     private function saveElementValue(int $recordId, array $element, string $value): void

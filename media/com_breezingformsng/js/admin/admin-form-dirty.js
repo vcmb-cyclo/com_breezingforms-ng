@@ -15,7 +15,7 @@ function bfDirtySyncSaveButton(form) {
 		return;
 	}
 
-	var button = document.querySelector('[onclick*="' + __bfOpts.saveTask + '"]');
+	var button = document.querySelector('joomla-toolbar-button[task="' + __bfOpts.saveTask + '"] button, [onclick*="' + __bfOpts.saveTask + '"]');
 	if (!button) {
 		return;
 	}

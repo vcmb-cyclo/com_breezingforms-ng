@@ -170,9 +170,51 @@ class HtmlView extends BaseHtmlView
         $child->standardButton('exportXml')->text(Text::_('COM_BREEZINGFORMSNG_XML'))->task('records.exportXml')->icon('icon-download')->listCheck(false);
 
         ToolbarHelper::custom('records.csvImport', 'upload', 'upload', Text::_('COM_BREEZINGFORMSNG_BTN_IMPORT_CSV'), false);
-        ToolbarHelper::custom('records.viewed', 'eye-open', 'eye-open', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_VIEW'), false);
-        ToolbarHelper::custom('records.exported', 'share', 'share', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_EXPORT'), false);
-        ToolbarHelper::custom('records.archived', 'archive', 'archive', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_ARCHIVE'), false);
+
+        $markDropdown = Toolbar::getInstance()
+            ->dropdownButton('mark-options')
+            ->text(Text::_('COM_BREEZINGFORMSNG_TOOLBAR_MARK'))
+            ->toggleSplit(false)
+            ->icon('icon-check')
+            ->buttonClass('btn btn-action');
+        $markChild = $markDropdown->getChildToolbar();
+        $markChild->standardButton('markViewed')
+            ->text(Text::_('COM_BREEZINGFORMSNG_TOOLBAR_MARK_VIEWED'))
+            ->task('records.viewed')
+            ->icon('icon-eye-open')
+            ->attributes(['title' => Text::_('COM_BREEZINGFORMSNG_TOOLBAR_MARK_VIEWED_DESC')])
+            ->listCheck(true);
+        $markChild->standardButton('unmarkViewed')
+            ->text(Text::_('COM_BREEZINGFORMSNG_TOOLBAR_UNMARK_VIEWED'))
+            ->task('records.unviewed')
+            ->icon('icon-eye-close')
+            ->attributes(['title' => Text::_('COM_BREEZINGFORMSNG_TOOLBAR_UNMARK_VIEWED_DESC')])
+            ->listCheck(true);
+        $markChild->standardButton('markExported')
+            ->text(Text::_('COM_BREEZINGFORMSNG_TOOLBAR_MARK_EXPORTED'))
+            ->task('records.exported')
+            ->icon('icon-share')
+            ->attributes(['title' => Text::_('COM_BREEZINGFORMSNG_TOOLBAR_MARK_EXPORTED_DESC')])
+            ->listCheck(true);
+        $markChild->standardButton('unmarkExported')
+            ->text(Text::_('COM_BREEZINGFORMSNG_TOOLBAR_UNMARK_EXPORTED'))
+            ->task('records.unexported')
+            ->icon('icon-cancel-circle')
+            ->attributes(['title' => Text::_('COM_BREEZINGFORMSNG_TOOLBAR_UNMARK_EXPORTED_DESC')])
+            ->listCheck(true);
+        $markChild->standardButton('markArchived')
+            ->text(Text::_('COM_BREEZINGFORMSNG_TOOLBAR_MARK_ARCHIVED'))
+            ->task('records.archived')
+            ->icon('icon-archive')
+            ->attributes(['title' => Text::_('COM_BREEZINGFORMSNG_TOOLBAR_MARK_ARCHIVED_DESC')])
+            ->listCheck(true);
+        $markChild->standardButton('unmarkArchived')
+            ->text(Text::_('COM_BREEZINGFORMSNG_TOOLBAR_UNMARK_ARCHIVED'))
+            ->task('records.unarchived')
+            ->icon('icon-out-2')
+            ->attributes(['title' => Text::_('COM_BREEZINGFORMSNG_TOOLBAR_UNMARK_ARCHIVED_DESC')])
+            ->listCheck(true);
+
         ToolbarHelper::custom('records.remove', 'delete', 'delete', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_DELETE'), false);
         Toolbar::getInstance()
             ->popupButton('help', 'JHELP')
@@ -188,6 +230,29 @@ class HtmlView extends BaseHtmlView
     {
         ToolbarHelper::custom('records.save', 'save', 'save', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_SAVE'), false);
         ToolbarHelper::cancel('records.display', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_CANCEL'));
+
+        $document = Factory::getApplication()->getDocument();
+        $wa       = $document->getWebAssetManager();
+        $wa->registerAndUseScript(
+            'com_breezingformsng.admin-form',
+            'media/com_breezingformsng/js/admin/admin-form.js',
+            ['version' => 'auto'],
+            ['defer' => true],
+            ['core']
+        );
+        $wa->registerAndUseScript(
+            'com_breezingformsng.admin-form-dirty',
+            'media/com_breezingformsng/js/admin/admin-form-dirty.js',
+            ['version' => 'auto'],
+            ['defer' => true],
+            ['com_breezingformsng.admin-form']
+        );
+        $document->addScriptOptions('com_breezingformsng.admin-form', [
+            'cancelTask' => 'records.display',
+            'saveTask'   => 'records.save',
+        ]);
+        Text::script('COM_BREEZINGFORMSNG_TEST_NO_CHANGES');
+        Text::script('COM_BREEZINGFORMSNG_CONFIRM_DISCARD_CHANGES');
     }
 
     private function prepareImportToolbar(): void

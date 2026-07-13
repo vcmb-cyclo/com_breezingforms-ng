@@ -232,7 +232,7 @@ class RecordModel extends BaseModel
         $db->execute();
     }
 
-    public function setFlagsBatch(array $ids, string $column): void
+    public function setFlagsBatch(array $ids, string $column, int $value = 1): void
     {
         if (!in_array($column, ['viewed', 'exported', 'archived'], true)) {
             return;
@@ -242,7 +242,10 @@ class RecordModel extends BaseModel
             return;
         }
         $db = Factory::getContainer()->get(DatabaseInterface::class);
-        $db->setQuery("Update #__facileforms_records Set `" . $column . "` = 1 Where id In (" . implode(',', $ids) . ")");
+        $db->setQuery(
+            "Update #__facileforms_records Set `" . $column . "` = " . ($value ? 1 : 0)
+            . " Where id In (" . implode(',', $ids) . ")"
+        );
         $db->execute();
     }
 

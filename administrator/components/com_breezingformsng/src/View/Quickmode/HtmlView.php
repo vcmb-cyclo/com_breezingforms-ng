@@ -99,6 +99,7 @@ class HtmlView extends BaseHtmlView
         $wa->useScript('com_breezingformsng.scroll');
         $wa->useScript('com_breezingformsng.quickmode-elements');
         $wa->useScript('com_breezingformsng.quickmode-app');
+        $wa->useScript('com_breezingformsng.quickmode-yesno-switch');
         $wa->useScript('com_breezingformsng.jquery-restore');
         ToolbarHelper::title($pageTitle, 'logo_left');
 

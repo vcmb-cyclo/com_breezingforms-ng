@@ -374,8 +374,21 @@
   `bfProcessorRendering` vers `Site\Service\Upload\TokenizedDirectoryResolver`, avec création récursive via l'API
   Joomla `Folder`. Le bloc JavaScript d'état `ff_processor` est rendu par
   `Site\Service\Rendering\ProcessorHeaderRenderer`, avec le compresseur historique injecté uniquement lorsqu'il est
-  activé. Restent l'orchestration de
-  `facileforms.process.php` et les responsabilités encore portées par les sept traits `legacy/processor`. Les six classes Crosstec protégées
+  activé. La collecte des métadonnées de requête (IP, agent, plateforme et fournisseur) quitte également le
+  constructeur monolithique pour `Site\Service\Runtime\RequestMetadataResolver` ; le chargement conditionnel de la
+  classe Joomla historique a été supprimé puisque `Browser` est nativement autoloadée par Joomla 6. L'horodatage
+  des soumissions et la résolution des variables de chemins `{ff_*}`/`{cbsite}` sont maintenant assurés par
+  `SubmissionTimestampFactory` et `FormPathResolver`. Le calcul du contexte frontend/backend/prévisualisation
+  (URL d'action, identifiant HTML, template, grille et autorisation d'exécution) est isolé dans
+  `FormDisplayContextResolver`. La recherche récursive des traductions de titres et champs QuickMode quitte le
+  trait Notifications pour `Site\Service\QuickMode\TranslationResolver`, les méthodes historiques restant des
+  façades publiques. L'envoi des notifications quitte le helper global `bf_createMail()` pour
+  `Site\Service\Notification\MailSender`, fondé sur `MailerFactoryInterface` Joomla 6 ; `sendMail()` reste la
+  façade publique du processeur. La conversion d'horodatage dupliquée dans les exports PDF/CSV/XML est centralisée
+  dans `Site\Service\Runtime\SubmissionTimestampFormatter` sans modifier les formats ni le double passage du masque
+  PDF. Les six conversions identiques des notifications administrateur et mailback utilisent le même service. Restent
+  l'orchestration de `facileforms.process.php` et les responsabilités encore portées par les sept traits
+  `legacy/processor`. Les six classes Crosstec protégées
   (`BFRequest`, `BFIntegrate` et les quatre rendus `BFQuickMode*`) restent volontairement disponibles comme API externe.
   `BFJoomlaConfig` a été remplacé par `Factory::getConfig()` ; `BFPDF` a été migré vers le service namespacé
   `Administrator\Service\PdfDocument`. Les deux classes globales ont été supprimées. Export administrateur vérifié

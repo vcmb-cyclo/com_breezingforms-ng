@@ -30,6 +30,8 @@ use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Log\Log;
 use Vcmb\Component\BreezingformsNG\Site\Service\Integration\MailchimpClient;
 use Vcmb\Component\BreezingformsNG\Site\Service\Integration\SalesforceClient;
+use Vcmb\Component\BreezingformsNG\Site\Service\QuickMode\TranslationResolver;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampFormatter;
 use CB\Component\Contentbuilderng\Administrator\Helper\ContentbuilderngHelper;
 use CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory;
 use CB\Component\Contentbuilderng\Administrator\Service\ArticleService;
@@ -41,6 +43,9 @@ use CB\Component\Contentbuilderng\Administrator\Service\PermissionService;
  */
 trait bfProcessorNotifications
 {
+    private ?TranslationResolver $quickModeTranslationResolverService = null;
+    private ?SubmissionTimestampFormatter $notificationTimestampFormatterService = null;
+
     function sendEmailNotification()
     {
         global $ff_config;
@@ -209,20 +214,7 @@ trait bfProcessorNotifications
 
                 $PROCESS_SUBMITTEDAT = Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT');
 
-                $tz = 'UTC';
-                $tz = new DateTimeZone($this->app->get('offset'));
-
-                $SUBMITTED = $this->submitted;
-                $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
-                $offset = $date_->getOffsetFromGMT();
-                if ($offset > 0) {
-                    $date_->add(new DateInterval('PT' . $offset . 'S'));
-                } else if ($offset < 0) {
-                    $offset = $offset * -1;
-                    $date_->sub(new DateInterval('PT' . $offset . 'S'));
-                }
-
-                $SUBMITTED = $date_->format('Y-m-d H:i:s', true);
+                $SUBMITTED = $this->formattedNotificationTimestamp();
 
                 $PROCESS_SUBMITTERIP = Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP');
                 $IP = $this->ip;
@@ -269,20 +261,7 @@ trait bfProcessorNotifications
             } else {
                 // fallback if no template exists
 
-                $tz = 'UTC';
-                $tz = new DateTimeZone($this->app->get('offset'));
-
-                $submitted = $this->submitted;
-                $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
-                $offset = $date_->getOffsetFromGMT();
-                if ($offset > 0) {
-                    $date_->add(new DateInterval('PT' . $offset . 'S'));
-                } else if ($offset < 0) {
-                    $offset = $offset * -1;
-                    $date_->sub(new DateInterval('PT' . $offset . 'S'));
-                }
-
-                $submitted = $date_->format('Y-m-d H:i:s', true);
+                $submitted = $this->formattedNotificationTimestamp();
 
                 if ($this->record_id != '')
                     $body .= Text::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID') . " " . $this->record_id . nl() . nl();
@@ -319,21 +298,7 @@ trait bfProcessorNotifications
             $FORM = $this->form;
             $TITLE = $this->formrow->title;
             $FORMNAME = $this->formrow->name;
-            $SUBMITTED = $this->submitted;
-
-            $tz = 'UTC';
-            $tz = new DateTimeZone($this->app->get('offset'));
-
-            $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
-            $offset = $date_->getOffsetFromGMT();
-            if ($offset > 0) {
-                $date_->add(new DateInterval('PT' . $offset . 'S'));
-            } else if ($offset < 0) {
-                $offset = $offset * -1;
-                $date_->sub(new DateInterval('PT' . $offset . 'S'));
-            }
-
-            $SUBMITTED = $date_->format('Y-m-d H:i:s', true);
+            $SUBMITTED = $this->formattedNotificationTimestamp();
 
             $IP = $this->ip;
             $PROVIDER = $this->provider;
@@ -654,17 +619,15 @@ trait bfProcessorNotifications
     {
         if (trim($this->formrow->template_code_processed) == 'QuickMode') {
             $dataObject = json_decode(bf_b64dec($this->formrow->template_code), true);
-            $rootMdata = $dataObject['properties'];
-
             $default = ComponentHelper::getParams('com_languages')->get('site');
-            $language_tag = $this->app->getLanguage()->getTag() != $default ? $this->app->getLanguage()->getTag() : 'zz-ZZ';
 
-            /* translatables */
-            if (isset($rootMdata['title_translation' . $language_tag]) && $rootMdata['title_translation' . $language_tag] != '') {
-                return $rootMdata['title_translation' . $language_tag];
-            }
-            /* translatables end */
-            return '';
+            return is_array($dataObject)
+                ? $this->quickModeTranslationResolver()->formTitle(
+                    $dataObject,
+                    $this->app->getLanguage()->getTag(),
+                    (string) $default
+                )
+                : '';
         }
     }
 
@@ -675,29 +638,48 @@ trait bfProcessorNotifications
             return;
         }
 
-        if (trim($this->formrow->template_code_processed) == 'QuickMode') {
-            if ($dataObject === null && $childrenLength == 0) {
-                $dataObject = json_decode(bf_b64dec($this->formrow->template_code), true);
-            }
-
-            if (isset($dataObject['attributes']) && isset($dataObject['properties'])) {
-                if ($dataObject['properties']['type'] == 'element' && isset($dataObject['properties']['bfName'])) {
-                    $language_tag = '';
-                    $default = ComponentHelper::getParams('com_languages')->get('site');
-                    $language_tag = $this->app->getLanguage()->getTag() != $default ? $this->app->getLanguage()->getTag() : 'zz-ZZ';
-                    if (trim($name) == trim($dataObject['properties']['bfName']) && isset($dataObject['properties'][$field . '_translation' . $language_tag]) && $dataObject['properties'][$field . '_translation' . $language_tag] != '') {
-                        $res = addslashes($dataObject['properties'][$field . '_translation' . $language_tag]);
-                        return;
-                    }
-                }
-            }
-            if (isset($dataObject['children']) && count($dataObject['children']) != 0) {
-                $childrenAmount = count($dataObject['children']);
-                for ($i = 0; $i < $childrenAmount; $i++) {
-                    $this->getFieldTranslated($field, $name, $res, $dataObject['children'][$i], $childrenAmount);
-                }
-            }
+        if (trim($this->formrow->template_code_processed) != 'QuickMode') {
+            return;
         }
+
+        if ($dataObject === null && $childrenLength == 0) {
+            $dataObject = json_decode(bf_b64dec($this->formrow->template_code), true);
+        }
+
+        if (!is_array($dataObject)) {
+            return;
+        }
+
+        $default = ComponentHelper::getParams('com_languages')->get('site');
+        $translation = $this->quickModeTranslationResolver()->field(
+            $dataObject,
+            (string) $field,
+            (string) $name,
+            $this->app->getLanguage()->getTag(),
+            (string) $default
+        );
+
+        if ($translation !== null) {
+            $res = addslashes($translation);
+        }
+    }
+
+    private function quickModeTranslationResolver(): TranslationResolver
+    {
+        return $this->quickModeTranslationResolverService ??= new TranslationResolver();
+    }
+
+    private function formattedNotificationTimestamp(): string
+    {
+        return $this->notificationTimestampFormatter()->format(
+            (string) $this->submitted,
+            (string) $this->app->get('offset')
+        )->submittedAt;
+    }
+
+    private function notificationTimestampFormatter(): SubmissionTimestampFormatter
+    {
+        return $this->notificationTimestampFormatterService ??= new SubmissionTimestampFormatter();
     }
 
     function sendMailbackNotification()
@@ -961,21 +943,7 @@ trait bfProcessorNotifications
                 $NAME = $this->formrow->name;
 
                 $PROCESS_SUBMITTEDAT = Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT');
-                $SUBMITTED = $this->submitted;
-
-                $tz = 'UTC';
-                $tz = new DateTimeZone($this->app->get('offset'));
-
-                $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
-                $offset = $date_->getOffsetFromGMT();
-                if ($offset > 0) {
-                    $date_->add(new DateInterval('PT' . $offset . 'S'));
-                } else if ($offset < 0) {
-                    $offset = $offset * -1;
-                    $date_->sub(new DateInterval('PT' . $offset . 'S'));
-                }
-
-                $SUBMITTED = $date_->format('Y-m-d H:i:s', true);
+                $SUBMITTED = $this->formattedNotificationTimestamp();
 
                 $PROCESS_SUBMITTERIP = Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP');
                 $IP = $this->ip;
@@ -1037,20 +1005,7 @@ trait bfProcessorNotifications
 
                 $form_title_translated = $this->getFormTitleTranslated();
 
-                $tz = 'UTC';
-                $tz = new DateTimeZone($this->app->get('offset'));
-
-                $submitted = $this->submitted;
-                $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
-                $offset = $date_->getOffsetFromGMT();
-                if ($offset > 0) {
-                    $date_->add(new DateInterval('PT' . $offset . 'S'));
-                } else if ($offset < 0) {
-                    $offset = $offset * -1;
-                    $date_->sub(new DateInterval('PT' . $offset . 'S'));
-                }
-
-                $submitted = $date_->format('Y-m-d H:i:s', true);
+                $submitted = $this->formattedNotificationTimestamp();
 
                 $body .= Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMID') . ": " . $this->form . nl() .
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMTITLE') . ": " . ($form_title_translated != '' ? $form_title_translated : $this->formrow->title) . nl() .
@@ -1097,22 +1052,7 @@ trait bfProcessorNotifications
 
             $TITLE = $form_title_translated != '' ? $form_title_translated : $this->formrow->title;
             $FORMNAME = $this->formrow->name;
-            $SUBMITTED = $this->submitted;
-
-            $tz = 'UTC';
-            $tz = new DateTimeZone($this->app->get('offset'));
-
-            $submitted = $this->submitted;
-            $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
-            $offset = $date_->getOffsetFromGMT();
-            if ($offset > 0) {
-                $date_->add(new DateInterval('PT' . $offset . 'S'));
-            } else if ($offset < 0) {
-                $offset = $offset * -1;
-                $date_->sub(new DateInterval('PT' . $offset . 'S'));
-            }
-
-            $SUBMITTED = $date_->format('Y-m-d H:i:s', true);
+            $SUBMITTED = $this->formattedNotificationTimestamp();
 
             $IP = $this->ip;
             $PROVIDER = $this->provider;

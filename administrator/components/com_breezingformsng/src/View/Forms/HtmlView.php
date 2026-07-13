@@ -79,10 +79,21 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
             ToolbarHelper::cancel('forms.cancel', $id > 0 ? 'JTOOLBAR_CLOSE' : 'JTOOLBAR_CANCEL');
         } else {
             $document = Factory::getApplication()->getDocument();
-            $document->getWebAssetManager()->registerAndUseScript(
-                'com_breezingformsng.forms-toggle-published',
+            $wa       = $document->getWebAssetManager();
+            $wa->registerAndUseScript(
+                'com_breezingformsng.admin-form',
+                'media/com_breezingformsng/js/admin/admin-form.js',
+                ['version' => 'auto'],
+                ['defer' => true],
+                ['core']
+            );
+            $document->addScriptOptions('com_breezingformsng.admin-form', ['confirmDeleteTask' => 'forms.remove']);
+            Text::script('JGLOBAL_CONFIRM_DELETE');
+
+            $wa->registerAndUseScript(
+                'com_breezingformsng.admin-toggle-published',
                 'media/com_breezingformsng/js/admin/admin-toggle-published.js',
-                ['version' => '6.1.0-rc3.1'],
+                ['version' => 'auto'],
                 ['defer' => true],
                 ['core']
             );

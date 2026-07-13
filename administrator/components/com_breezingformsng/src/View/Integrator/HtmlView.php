@@ -13,6 +13,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Integrator;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Session\Session;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\IntegratorModel;
 
@@ -57,6 +58,29 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
         $this->rules = $model->getRules();
         ToolbarHelper::addNew('integrator.edit');
         ToolbarHelper::deleteList('', 'integrator.remove');
+
+        $document = Factory::getApplication()->getDocument();
+        $wa       = $document->getWebAssetManager();
+        $wa->registerAndUseScript(
+            'com_breezingformsng.admin-form',
+            'media/com_breezingformsng/js/admin/admin-form.js',
+            ['version' => 'auto'],
+            ['defer' => true],
+            ['core']
+        );
+        $document->addScriptOptions('com_breezingformsng.admin-form', ['confirmDeleteTask' => 'integrator.remove']);
+        Text::script('JGLOBAL_CONFIRM_DELETE');
+
+        $wa->registerAndUseScript(
+            'com_breezingformsng.admin-toggle-published',
+            'media/com_breezingformsng/js/admin/admin-toggle-published.js',
+            ['version' => 'auto'],
+            ['defer' => true],
+            ['core']
+        );
+        $document->addScriptOptions('com_breezingformsng.admin-toggle-published', ['csrfToken' => Session::getFormToken()]);
+        Text::script('JPUBLISHED');
+        Text::script('JUNPUBLISHED');
     }
 
     private function prepareEdit(IntegratorModel $model, \Joomla\Input\Input $input): void

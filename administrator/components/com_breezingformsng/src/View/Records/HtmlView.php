@@ -62,6 +62,20 @@ class HtmlView extends BaseHtmlView
         } else {
             $this->prepareListData($app, $input);
             $this->prepareListToolbar();
+
+            $document = $app->getDocument();
+            $document->getWebAssetManager()->registerAndUseScript(
+                'com_breezingformsng.records-list',
+                'media/com_breezingformsng/js/admin/records-list.js',
+                ['version' => 'auto'],
+                ['defer' => true],
+                ['core']
+            );
+            $document->addScriptOptions(
+                'com_breezingformsng.records-list',
+                ['csrfToken' => \Joomla\CMS\Session\Session::getFormToken()]
+            );
+            Text::script('COM_BREEZINGFORMSNG_CONFIRM_DELETE_RECORDS');
         }
 
         parent::display($tpl);

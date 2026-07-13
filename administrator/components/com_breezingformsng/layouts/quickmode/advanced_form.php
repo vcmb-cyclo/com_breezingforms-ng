@@ -18,7 +18,7 @@ use Joomla\CMS\Language\Text;
                                                 <?php echo Text::_('COM_BREEZINGFORMSNG_ADVANCED_FORM_OPTIONS'); ?>
                                             </legend>
                                             <?php if ($formId != 0) { ?>
-                                                <a href="index.php?option=com_breezingformsng&task=forms.edit&id=<?php echo $formId ?>&pkg=QuickModeForms"
+                                                <a href="index.php?option=com_breezingformsng&task=forms.edit&id=<?php echo $formId ?>&pkg=QuickModeForms&advanced=1"
                                                     title="<?php echo Text::_('COM_BREEZINGFORMSNG_MORE_OPTIONS'); ?>">
                                                     <?php echo htmlentities(Text::_('COM_BREEZINGFORMSNG_MORE_OPTIONS'), ENT_QUOTES, 'UTF-8') ?>
                                                 </a>

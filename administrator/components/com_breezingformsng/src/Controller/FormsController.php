@@ -25,11 +25,12 @@ class FormsController extends BaseController
 
     public function edit(): void
     {
-        $input = Factory::getApplication()->getInput();
-        $id    = $input->getInt('id', 0);
-        $pkg   = $input->getString('pkg', '');
+        $input    = Factory::getApplication()->getInput();
+        $id       = $input->getInt('id', 0);
+        $pkg      = $input->getString('pkg', '');
+        $advanced = $input->getBool('advanced', false);
 
-        if ($id > 0) {
+        if ($id > 0 && !$advanced) {
             Factory::getApplication()->redirect(Route::_(
                 'index.php?option=com_breezingformsng&task=quickmode.display&form=' . $id . '&pkg=' . rawurlencode($pkg),
                 false
@@ -38,7 +39,8 @@ class FormsController extends BaseController
         }
 
         Factory::getApplication()->redirect(Route::_(
-            'index.php?option=com_breezingformsng&act=manageforms&view=forms&layout=edit&id=' . $id . '&pkg=' . rawurlencode($pkg),
+            'index.php?option=com_breezingformsng&act=manageforms&view=forms&layout=edit&id=' . $id . '&pkg=' . rawurlencode($pkg)
+                . ($advanced ? '&advanced=1' : ''),
             false
         ));
     }

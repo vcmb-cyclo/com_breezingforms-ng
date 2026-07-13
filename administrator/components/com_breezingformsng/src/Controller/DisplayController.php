@@ -66,7 +66,7 @@ class DisplayController extends BaseController
         if ($act === 'manageforms' || ($task === '' && $view === 'forms')) {
             $input->set('view', 'forms');
             $input->set('act', '');
-            if ($task === '' && $input->getCmd('layout', '') === 'edit' && $input->getInt('id', 0) > 0) {
+            if ($task === '' && $input->getCmd('layout', '') === 'edit' && $input->getInt('id', 0) > 0 && !$input->getBool('advanced', false)) {
                 Factory::getApplication()->redirect(
                     'index.php?option=com_breezingformsng&task=quickmode.display'
                     . '&form=' . $input->getInt('id', 0)

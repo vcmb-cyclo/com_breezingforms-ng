@@ -117,10 +117,11 @@ class RecordModel extends BaseModel
         }
 
         $user = Factory::getApplication()->getIdentity();
+        $now  = (new \Joomla\CMS\Date\Date('now', $this->tz))->format('Y-m-d H:i:s', true);
         $db->setQuery(
             $db->getQuery(true)
                 ->update($db->quoteName('#__facileforms_records'))
-                ->set($db->quoteName('modified') . ' = ' . $db->quote((new \Joomla\CMS\Date\Date())->toSql()))
+                ->set($db->quoteName('modified') . ' = ' . $db->quote($now))
                 ->set($db->quoteName('modified_by') . ' = ' . $db->quote((string) $user->username))
                 ->set($db->quoteName('modified_user_id') . ' = ' . (int) $user->id)
                 ->where($db->quoteName('id') . ' = ' . $recordId)

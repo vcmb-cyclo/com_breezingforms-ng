@@ -119,8 +119,6 @@ $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
 </form>
 
 <?php
-$bfDocument = Factory::getApplication()->getDocument();
-$bfDocument->getWebAssetManager()->useScript('com_breezingformsng.admin-form');
-$bfDocument->addScriptOptions('com_breezingformsng.admin-form', ['confirmDeleteTask' => 'forms.remove']);
-Text::script('JGLOBAL_CONFIRM_DELETE');
+// Web assets for this view are registered in Forms\HtmlView::display() —
+// useScript() calls placed in the template body do not take effect here.
 ?>

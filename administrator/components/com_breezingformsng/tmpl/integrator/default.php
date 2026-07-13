@@ -61,13 +61,6 @@ use Joomla\CMS\Session\Session;
 </form>
 
 <?php
-$bfDocument = Factory::getApplication()->getDocument();
-$bfDocument->getWebAssetManager()->useScript('com_breezingformsng.admin-form');
-$bfDocument->addScriptOptions('com_breezingformsng.admin-form', ['confirmDeleteTask' => 'integrator.remove']);
-Text::script('JGLOBAL_CONFIRM_DELETE');
-
-$bfDocument->getWebAssetManager()->useScript('com_breezingformsng.admin-toggle-published');
-$bfDocument->addScriptOptions('com_breezingformsng.admin-toggle-published', ['csrfToken' => Session::getFormToken()]);
-Text::script('JPUBLISHED');
-Text::script('JUNPUBLISHED');
+// Web assets for this view are registered in Integrator\HtmlView::display() —
+// useScript() calls placed in the template body do not take effect here.
 ?>

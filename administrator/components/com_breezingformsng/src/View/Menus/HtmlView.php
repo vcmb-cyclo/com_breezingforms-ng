@@ -11,6 +11,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Menus;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Session\Session;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\MenuModel;
 
@@ -64,6 +65,29 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
             ToolbarHelper::unpublish('menus.unpublish', 'JUNPUBLISH', true);
             ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'menus.remove');
             ToolbarHelper::custom('menus.sync', 'refresh', '', 'COM_BREEZINGFORMSNG_MENUS_SYNC', false);
+
+            $document = Factory::getApplication()->getDocument();
+            $wa       = $document->getWebAssetManager();
+            $wa->registerAndUseScript(
+                'com_breezingformsng.admin-form',
+                'media/com_breezingformsng/js/admin/admin-form.js',
+                ['version' => 'auto'],
+                ['defer' => true],
+                ['core']
+            );
+            $document->addScriptOptions('com_breezingformsng.admin-form', ['confirmDeleteTask' => 'menus.remove']);
+            Text::script('JGLOBAL_CONFIRM_DELETE');
+
+            $wa->registerAndUseScript(
+                'com_breezingformsng.admin-toggle-published',
+                'media/com_breezingformsng/js/admin/admin-toggle-published.js',
+                ['version' => 'auto'],
+                ['defer' => true],
+                ['core']
+            );
+            $document->addScriptOptions('com_breezingformsng.admin-toggle-published', ['csrfToken' => Session::getFormToken()]);
+            Text::script('JPUBLISHED');
+            Text::script('JUNPUBLISHED');
         }
 
         parent::display($tpl);

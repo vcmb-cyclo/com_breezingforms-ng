@@ -177,10 +177,6 @@ $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key)
 </form>
 
 <?php
-$bfDocument = Factory::getApplication()->getDocument();
-$bfDocument->getWebAssetManager()->useScript('com_breezingformsng.records-list');
-$bfDocument->addScriptOptions('com_breezingformsng.records-list', [
-    'csrfToken' => Session::getFormToken(),
-]);
-Text::script('COM_BREEZINGFORMSNG_CONFIRM_DELETE_RECORDS');
+// Web assets for this view are registered in Records\HtmlView::display() —
+// useScript() calls placed in the template body do not take effect here.
 ?>

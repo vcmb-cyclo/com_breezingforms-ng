@@ -546,6 +546,44 @@ class com_breezingformsngInstallerScript
         return $manifest && isset($manifest->version) ? trim((string) $manifest->version) : '';
     }
 
+    private function getLogTimestamp(): string
+    {
+        try {
+            $offset = (string) Factory::getApplication()->get('offset', 'UTC');
+            $date   = new \DateTime('now', new \DateTimeZone($offset !== '' ? $offset : 'UTC'));
+
+            return $date->format('Y-m-d H:i:s');
+        } catch (\Throwable) {
+            return date('Y-m-d H:i:s');
+        }
+    }
+
+    private function rotateLogIfNeeded(string $logPath): void
+    {
+        $maxBytes = 1024 * 1024;
+
+        try {
+            if (!is_file($logPath) || filesize($logPath) < $maxBytes) {
+                return;
+            }
+
+            $rotatedPath = $logPath . '.' . date('Y-m-d_His') . '.bak';
+            @rename($logPath, $rotatedPath);
+
+            $keepFiles = 10;
+            $rotatedFiles = glob($logPath . '.*.bak') ?: [];
+            sort($rotatedFiles);
+
+            $excess = count($rotatedFiles) - $keepFiles;
+
+            for ($i = 0; $i < $excess; $i++) {
+                @unlink($rotatedFiles[$i]);
+            }
+        } catch (\Throwable) {
+            // Best-effort log rotation only.
+        }
+    }
+
     private function log(string $message, int $priority = Log::INFO): void
     {
         if ($priority === Log::ERROR) {
@@ -566,7 +604,9 @@ class com_breezingformsngInstallerScript
             Folder::create(dirname($logPath));
         }
 
-        $timestamp = date('Y-m-d H:i:s');
+        $this->rotateLogIfNeeded($logPath);
+
+        $timestamp = $this->getLogTimestamp();
         $line = "[{$timestamp}] [] {$message}" . PHP_EOL;
 
         file_put_contents($logPath, $line, FILE_APPEND | LOCK_EX);
@@ -682,11 +722,13 @@ class com_breezingformsngInstallerScript
             $this->log("Autoload cache cleared ({$deleted} file(s)) during {$context}.");
         }
 
+        $cacheGroups = ['_system', 'com_installer', 'com_plugins', 'com_breezingformsng'];
+
         try {
             $cacheFactory = Factory::getContainer()->get(CacheControllerFactoryInterface::class);
 
             if (is_object($cacheFactory)) {
-                foreach (['_system', 'com_installer', 'com_plugins', 'com_breezingformsng'] as $group) {
+                foreach ($cacheGroups as $group) {
                     try {
                         $cacheFactory->createCacheController('callback', [
                             'defaultgroup' => $group,
@@ -1199,6 +1241,42 @@ class com_breezingformsngInstallerScript
 
             $alias = $preferredAlias . '-' . $suffix;
             $suffix++;
+        }
+    }
+
+    /**
+     * The #__menu root row (id=1) is the anchor every nested-set menu
+     * computation below relies on (reading its rgt to compute new lft/rgt
+     * values). Rather than guessing at a repair insert for a core Joomla
+     * table, just detect a missing/corrupt root and skip the menu-repair
+     * routines entirely when it can't be trusted.
+     */
+    private function ensureAdminMenuRootNodeExists(): bool
+    {
+        try {
+            $db = Factory::getContainer()->get(DatabaseInterface::class);
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->select($db->quoteName(['id', 'lft', 'rgt']))
+                    ->from($db->quoteName('#__menu'))
+                    ->where($db->quoteName('id') . ' = 1')
+            );
+            $root = $db->loadAssoc();
+
+            if ($root === null) {
+                $this->log('#__menu root node (id=1) is missing; skipping admin menu repair to avoid computing invalid nested-set values.', Log::WARNING);
+                return false;
+            }
+
+            if ((int) $root['rgt'] <= (int) $root['lft']) {
+                $this->log('#__menu root node (id=1) has invalid lft/rgt values; skipping admin menu repair.', Log::WARNING);
+                return false;
+            }
+
+            return true;
+        } catch (\Throwable $e) {
+            $this->log('Unable to verify #__menu root node: ' . $e->getMessage(), Log::WARNING);
+            return false;
         }
     }
 
@@ -1766,9 +1844,12 @@ class com_breezingformsngInstallerScript
     private function cleanupLegacyBreezingFormsAfterInstall(): void
     {
         $this->normalizeJoomlaComponentReferences();
-        $this->ensureAdministrationMainMenuEntry();
-        $this->migrateStaleMenuLinks();
-        $this->ensureAdministrationSubmenuEntries();
+
+        if ($this->ensureAdminMenuRootNodeExists()) {
+            $this->ensureAdministrationMainMenuEntry();
+            $this->migrateStaleMenuLinks();
+            $this->ensureAdministrationSubmenuEntries();
+        }
         $this->deduplicateBreezingFormsComponentRows();
         $this->removeLegacyBreezingFormsComponentRows();
         $this->removeLegacyBreezingFormsComponentDirectories();
@@ -2218,9 +2299,16 @@ class com_breezingformsngInstallerScript
         if ($finishedWithFailure) {
             $summary = $this->getCriticalFailureSummary();
             $this->log('BreezingForms installation/update process finished with critical issue(s)' . ($summary !== '' ? ': ' . $summary : '.'), Log::ERROR);
-        } else {
-            $this->log('BreezingForms installation/update process finished successfully.');
+
+            // Actually fail the installer instead of silently reporting success -
+            // logging alone left Joomla showing "Installation Successful" even
+            // when a critical step failed.
+            throw new \RuntimeException(
+                'BreezingForms NG postflight failed' . ($summary !== '' ? ': ' . $summary : '.')
+            );
         }
+
+        $this->log('BreezingForms installation/update process finished successfully.');
     }
 
     function getPlugins()

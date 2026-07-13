@@ -217,6 +217,14 @@
     },
 
     {
+      "name": "com_breezingformsng.quickmode-yesno-switch",
+      "type": "script",
+      "uri": "media/com_breezingformsng/js/admin/quickmode-yesno-switch.js",
+      "dependencies": ["core"],
+      "version": "auto"
+    },
+
+    {
       "name": "com_breezingformsng.quickmode-editor",
       "type": "script",
       "uri": "com_breezingformsng/js/admin/quickmode-editor.js",

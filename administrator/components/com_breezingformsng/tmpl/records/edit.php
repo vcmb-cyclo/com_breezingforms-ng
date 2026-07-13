@@ -54,7 +54,7 @@ $formSelection = Factory::getApplication()->getInput()->getInt('form_selection',
               id="element_<?= (int) $row['element_id']; ?>"
               name="element[<?= (int) $row['element_id']; ?>]"
               class="form-control"
-              rows="<?= (substr_count($row['value'], "\n") > 0) ? min(10, substr_count($row['value'], "\n") + 2) : 2; ?>"
+              rows="<?= (substr_count($row['value'], "\n") > 0) ? min(10, substr_count($row['value'], "\n") + 2) : 1; ?>"
             ><?= htmlspecialchars($row['value']); ?></textarea>
           </div>
         </div>

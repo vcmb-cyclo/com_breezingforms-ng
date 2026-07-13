@@ -214,6 +214,15 @@ main input[type=radio]:not(old) {
     cursor: pointer !important;
 }
 
+/* The custom skin above expects an immediate <label><span> sibling to draw the
+   visible control; the QuickMode editor's own Yes/No property toggles don't
+   follow that markup, so they'd otherwise render fully invisible (opacity: 0
+   with nothing drawn in its place). Exempt them. */
+.bfPropertyWrap input[type=checkbox],
+.bfPropertyWrap input[type=radio] {
+    opacity: 1 !important;
+}
+
 main input[type=checkbox]:not(old) + label,
 main input[type=radio]:not(old) + label {
     display: inline-block;

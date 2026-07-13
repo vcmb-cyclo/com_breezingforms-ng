@@ -93,11 +93,12 @@ $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key)
         <th class="text-center" title="<?= $headerTitle('COM_BREEZINGFORMSNG_ARCHIVED_DESC'); ?>"><a href="<?= $sortUrl('records.archived'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_ARCHIVED_DESC'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_ARCHIVED'); ?><?= $sortIcon('records.archived'); ?></a></th>
         <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_ACTIONS_DESC'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_ACTIONS'); ?></th>
         <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_SUBMITTED_DESC'); ?>"><a href="<?= $sortUrl('records.submitted'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_SUBMITTED_DESC'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_SUBMITTED'); ?><?= $sortIcon('records.submitted'); ?></a></th>
+        <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_MODIFIED_DESC'); ?>"><a href="<?= $sortUrl('records.modified'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_MODIFIED_DESC'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_MODIFIED'); ?><?= $sortIcon('records.modified'); ?></a></th>
       </tr>
     </thead>
     <tbody>
       <?php if (empty($this->records)): ?>
-        <tr><td colspan="10" class="text-center"><?= Text::_('COM_BREEZINGFORMSNG_NO_RECORDS_FOUND'); ?></td></tr>
+        <tr><td colspan="11" class="text-center"><?= Text::_('COM_BREEZINGFORMSNG_NO_RECORDS_FOUND'); ?></td></tr>
       <?php else: ?>
         <?php foreach ($this->records as $i => $rec): ?>
           <?php $recId = (int) $rec['id']; ?>
@@ -127,11 +128,12 @@ $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key)
               </a>
             </td>
             <td>
-              <a class="btn btn-sm btn-secondary" href="index.php?option=com_breezingformsng&act=managerecs&view=records&layout=edit&record_id=<?= $recId; ?>&form_selection=<?= $this->formSelection; ?>" title="<?= $headerTitle('JACTION_EDIT'); ?>" aria-label="<?= $headerTitle('JACTION_EDIT'); ?>">
+              <a href="index.php?option=com_breezingformsng&act=managerecs&view=records&layout=edit&record_id=<?= $recId; ?>&form_selection=<?= $this->formSelection; ?>" title="<?= $headerTitle('JACTION_EDIT'); ?>" aria-label="<?= $headerTitle('JACTION_EDIT'); ?>">
                 <span class="icon-edit" aria-hidden="true"></span>
               </a>
             </td>
             <td><?= htmlspecialchars((string) $rec['submitted']); ?></td>
+            <td><?= $rec['modified'] ? htmlspecialchars((string) $rec['modified']) : '—'; ?></td>
           </tr>
         <?php endforeach; ?>
       <?php endif; ?>
@@ -168,7 +170,6 @@ $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key)
   <input type="hidden" name="task" value="">
   <input type="hidden" name="view" value="records">
   <input type="hidden" name="boxchecked" value="0">
-  <input type="hidden" name="form_selection" value="<?= $this->formSelection; ?>">
   <input type="hidden" name="searchterm" value="<?= htmlspecialchars($this->searchTerm); ?>">
   <input type="hidden" name="filter_order" value="<?= htmlspecialchars($listOrder); ?>">
   <input type="hidden" name="filter_order_Dir" value="<?= htmlspecialchars($listDirn); ?>">

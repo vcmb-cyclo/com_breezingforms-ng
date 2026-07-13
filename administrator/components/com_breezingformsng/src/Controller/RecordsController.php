@@ -67,9 +67,12 @@ class RecordsController extends BaseController
         $app->redirect($this->listUrl($input));
     }
 
-    public function viewed(): void   { $this->batchFlag('viewed'); }
-    public function exported(): void { $this->batchFlag('exported'); }
-    public function archived(): void { $this->batchFlag('archived'); }
+    public function viewed(): void     { $this->batchFlag('viewed', 1); }
+    public function unviewed(): void   { $this->batchFlag('viewed', 0); }
+    public function exported(): void   { $this->batchFlag('exported', 1); }
+    public function unexported(): void { $this->batchFlag('exported', 0); }
+    public function archived(): void   { $this->batchFlag('archived', 1); }
+    public function unarchived(): void { $this->batchFlag('archived', 0); }
 
     public function setFlag(): void
     {
@@ -469,7 +472,7 @@ class RecordsController extends BaseController
         $app->close();
     }
 
-    private function batchFlag(string $column): void
+    private function batchFlag(string $column, int $value = 1): void
     {
         $this->checkToken();
 
@@ -477,7 +480,7 @@ class RecordsController extends BaseController
         $input = $app->getInput();
         $ids = $input->get('cid', [], 'post', 'array');
         ArrayHelper::toInteger($ids);
-        $this->getRecordModel()->setFlagsBatch($ids, $column);
+        $this->getRecordModel()->setFlagsBatch($ids, $column, $value);
         $app->redirect($this->listUrl($input));
     }
 

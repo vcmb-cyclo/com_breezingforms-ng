@@ -24,6 +24,7 @@ class RecordsModel extends BaseModel
         'records.viewed'    => 'records.viewed',
         'records.exported'  => 'records.exported',
         'records.archived'  => 'records.archived',
+        'records.modified'  => 'records.modified',
     ];
 
     public function getForms(): array
@@ -52,7 +53,7 @@ class RecordsModel extends BaseModel
 
         $db = Factory::getContainer()->get(DatabaseInterface::class);
         $db->setQuery(
-            'Select records.id, records.submitted, records.ip, records.user_id, records.username, records.user_full_name,'
+            'Select records.id, records.submitted, records.modified, records.ip, records.user_id, records.username, records.user_full_name,'
             . ' records.viewed, records.exported, records.archived, records.paypal_tx_id,'
             . ' forms.title As form_title, forms.name As form_name, forms.id As form_id'
             . ' From #__facileforms_records As records'

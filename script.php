@@ -59,18 +59,59 @@ class com_breezingformsngInstallerScript
     private $utf8mb4CapabilityAnnounced = false;
     private $criticalFailureDetected = false;
     private $criticalFailureMessages = [];
+    private $logRotationChecked = false;
 
     public function __construct()
     {
         $this->installStartedAt = microtime(true);
+        $this->applyJoomlaTimezoneForLogging();
         $this->currentInstalledVersion = $this->getCurrentInstalledVersion();
+    }
+
+    /**
+     * Sets PHP's default timezone to the site's configured one, once, so
+     * that Joomla's own Log::add() calls (including the bootstrap ones at
+     * the top of this file, executed before this class even exists) and
+     * any other date()-based code in this request use the correct offset,
+     * not just this script's own custom log line.
+     */
+    private function applyJoomlaTimezoneForLogging(): void
+    {
+        try {
+            $offset = (string) Factory::getApplication()->get('offset', 'UTC');
+            new \DateTimeZone($offset !== '' ? $offset : 'UTC');
+            date_default_timezone_set($offset !== '' ? $offset : 'UTC');
+        } catch (\Throwable) {
+            // Leave PHP's default timezone untouched if it can't be resolved.
+        }
+    }
+
+    /**
+     * Translated installer message with an untranslated-fallback sprintf,
+     * matching this project's rule of routing user-facing strings through
+     * translation keys even in the installer script.
+     */
+    private function installerText(string $key, string $fallback, ...$args): string
+    {
+        try {
+            $translated = $args === [] ? Text::_($key) : Text::sprintf($key, ...$args);
+        } catch (\Throwable) {
+            $translated = $key;
+        }
+
+        return $translated === $key ? sprintf($fallback, ...$args) : $translated;
     }
 
     private function checkRequirements(): bool
     {
         if (!version_compare(PHP_VERSION, self::MINIMUM_PHP, '>=')) {
             $this->log(
-                sprintf('PHP %s is too old. Requires PHP %s or later.', PHP_VERSION, self::MINIMUM_PHP),
+                $this->installerText(
+                    'COM_BREEZINGFORMSNG_INSTALLER_ERROR_PHP_REQUIRES',
+                    'PHP %s is too old. Requires PHP %s or later.',
+                    PHP_VERSION,
+                    self::MINIMUM_PHP
+                ),
                 Log::ERROR
             );
 
@@ -79,7 +120,12 @@ class com_breezingformsngInstallerScript
 
         if (defined('JVERSION') && !version_compare(JVERSION, self::MINIMUM_JOOMLA, '>=')) {
             $this->log(
-                sprintf('Joomla %s is too old. Requires Joomla %s or later.', JVERSION, self::MINIMUM_JOOMLA),
+                $this->installerText(
+                    'COM_BREEZINGFORMSNG_INSTALLER_ERROR_JOOMLA_REQUIRES',
+                    'Joomla %s is too old. Requires Joomla %s or later.',
+                    JVERSION,
+                    self::MINIMUM_JOOMLA
+                ),
                 Log::ERROR
             );
 
@@ -560,6 +606,13 @@ class com_breezingformsngInstallerScript
 
     private function rotateLogIfNeeded(string $logPath): void
     {
+        // Checked once per installer run (mirrors cbng's boot-time check),
+        // rather than re-stat'ing the log file on every single log() call.
+        if ($this->logRotationChecked) {
+            return;
+        }
+        $this->logRotationChecked = true;
+
         $maxBytes = 1024 * 1024;
 
         try {
@@ -691,10 +744,38 @@ class com_breezingformsngInstallerScript
             $version = method_exists($db, 'getVersion') ? trim((string) $db->getVersion()) : '';
             $prefix = method_exists($db, 'getPrefix') ? (string) $db->getPrefix() : '';
 
+            $this->checkDatabaseSessionCharset($db);
+
             return trim($serverType . ' ' . $version) . ($prefix !== '' ? ' (prefix: ' . $prefix . ')' : '');
         } catch (\Throwable $e) {
             $this->log('Unable to detect database runtime information: ' . $e->getMessage(), Log::WARNING);
             return 'unknown';
+        }
+    }
+
+    /**
+     * Complements the existing table/column utf8mb4 conversion logic: even
+     * with every table and column correctly converted, data can still be
+     * mangled on write/read if the DB *connection itself* isn't negotiating
+     * utf8mb4 (e.g. a driver/config defaulting the session to latin1).
+     */
+    private function checkDatabaseSessionCharset(DatabaseInterface $db): void
+    {
+        try {
+            $db->setQuery('SELECT @@character_set_connection, @@collation_connection');
+            $row = $db->loadAssoc() ?: [];
+            $charset = strtolower((string) ($row['@@character_set_connection'] ?? ''));
+            $collation = (string) ($row['@@collation_connection'] ?? '');
+
+            if ($charset !== '' && $charset !== 'utf8mb4') {
+                $this->log(
+                    "Database session charset is '{$charset}' (collation '{$collation}'), not utf8mb4 - "
+                    . 'the connection may not be negotiating utf8mb4 even if tables/columns are converted.',
+                    Log::WARNING
+                );
+            }
+        } catch (\Throwable) {
+            // Best-effort diagnostic only; not every driver exposes these session variables.
         }
     }
 
@@ -720,6 +801,18 @@ class com_breezingformsngInstallerScript
 
         if ($deleted > 0) {
             $this->log("Autoload cache cleared ({$deleted} file(s)) during {$context}.");
+        }
+
+        try {
+            $app = Factory::getApplication();
+            if (method_exists($app, 'createExtensionNamespaceMap')) {
+                $app->createExtensionNamespaceMap();
+                $this->log("Extension namespace map rebuilt during {$context}.");
+            }
+        } catch (\Throwable) {
+            // Without this, a stale in-memory namespace map from earlier in
+            // the same installer request could fail to autoload classes
+            // that were just added/renamed by this same install/update.
         }
 
         $cacheGroups = ['_system', 'com_installer', 'com_plugins', 'com_breezingformsng'];

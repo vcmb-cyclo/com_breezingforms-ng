@@ -265,7 +265,8 @@ function bf_is_mobile()
 function bf_getFieldSelectorList($form_id, $element_target_id)
 {
 	$db = Factory::getContainer()->get(DatabaseInterface::class);
-	$db->setQuery("Select `name` From #__facileforms_elements Where form = " . intval($form_id) . " And `name` Not In ('bfFakeName','bfFakeName2','bfFakeName3','bfFakeName4','bfFakeName5','bfFakeName6') Order by `ordering`");
+	$formId = (int) $form_id;
+	$db->setQuery($db->getQuery(true)->select($db->quoteName('name'))->from($db->quoteName('#__facileforms_elements'))->where($db->quoteName('form') . ' = :formId')->whereNotIn($db->quoteName('name'), ['bfFakeName','bfFakeName2','bfFakeName3','bfFakeName4','bfFakeName5','bfFakeName6'], \Joomla\Database\ParameterType::STRING)->order($db->quoteName('ordering'))->bind(':formId', $formId, \Joomla\Database\ParameterType::INTEGER));
 
 	$rows = $db->loadColumn();
 	$out = '<script type="text/javascript">
@@ -306,7 +307,8 @@ myField.value += myValue;
 function bf_getFieldSelectorListEditor($form_id, $element_target_id)
 {
 	$db = Factory::getContainer()->get(DatabaseInterface::class);
-	$db->setQuery("Select `name` From #__facileforms_elements Where form = " . intval($form_id) . " And `name` Not In ('bfFakeName','bfFakeName2','bfFakeName3','bfFakeName4','bfFakeName5','bfFakeName6') Order by `ordering`");
+	$formId = (int) $form_id;
+	$db->setQuery($db->getQuery(true)->select($db->quoteName('name'))->from($db->quoteName('#__facileforms_elements'))->where($db->quoteName('form') . ' = :formId')->whereNotIn($db->quoteName('name'), ['bfFakeName','bfFakeName2','bfFakeName3','bfFakeName4','bfFakeName5','bfFakeName6'], \Joomla\Database\ParameterType::STRING)->order($db->quoteName('ordering'))->bind(':formId', $formId, \Joomla\Database\ParameterType::INTEGER));
 	$rows = $db->loadColumn();
 	$out = '<script type="text/javascript">
     function insertAtCursor_' . $element_target_id . '_Editor(myValue) {
@@ -331,7 +333,8 @@ function bf_getFieldSelectorListEditor($form_id, $element_target_id)
 function bf_getFieldSelectorListHTML($form_id, $editor, $element_target_id)
 {
 	$db = Factory::getContainer()->get(DatabaseInterface::class);
-	$db->setQuery("Select `name` From #__facileforms_elements Where form = " . intval($form_id) . " And `name` Not In ('bfFakeName','bfFakeName2','bfFakeName3','bfFakeName4','bfFakeName5','bfFakeName6') Order by `ordering`");
+	$formId = (int) $form_id;
+	$db->setQuery($db->getQuery(true)->select($db->quoteName('name'))->from($db->quoteName('#__facileforms_elements'))->where($db->quoteName('form') . ' = :formId')->whereNotIn($db->quoteName('name'), ['bfFakeName','bfFakeName2','bfFakeName3','bfFakeName4','bfFakeName5','bfFakeName6'], \Joomla\Database\ParameterType::STRING)->order($db->quoteName('ordering'))->bind(':formId', $formId, \Joomla\Database\ParameterType::INTEGER));
 	$rows = $db->loadColumn();
 	$out = '<script type="text/javascript">
     function insert_' . $element_target_id . 'HTML(myValue) {

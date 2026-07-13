@@ -14,6 +14,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\BaseModel;
 use Joomla\Database\DatabaseInterface;
+use Joomla\Database\ParameterType;
 
 class IntegratorModel extends BaseModel
 {
@@ -27,29 +28,39 @@ class IntegratorModel extends BaseModel
     public function getRules(): array
     {
         $db = $this->db();
-        $db->setQuery(
-            'SELECT rules.*, rules.id AS id,'
-            . " CONCAT('" . $db->getPrefix() . "', rules.reference_table) AS reference_table,"
-            . ' forms.name AS form_name, forms.id AS form_id'
-            . ' FROM #__facileforms_integrator_rules AS rules'
-            . ' JOIN #__facileforms_forms AS forms ON rules.form_id = forms.id'
-            . ' GROUP BY rules.id ORDER BY rules.id'
-        );
+        $query = $db->getQuery(true)
+            ->select([
+                'rules.*',
+                'rules.id AS id',
+                "CONCAT(" . $db->quote($db->getPrefix()) . ", rules.reference_table) AS reference_table",
+                'forms.name AS form_name',
+                'forms.id AS form_id',
+            ])
+            ->from($db->quoteName('#__facileforms_integrator_rules', 'rules'))
+            ->join('INNER', $db->quoteName('#__facileforms_forms', 'forms') . ' ON rules.form_id = forms.id')
+            ->group('rules.id')
+            ->order('rules.id');
+        $db->setQuery($query);
         return $db->loadObjectList() ?: [];
     }
 
     public function getRule(int $id): ?\stdClass
     {
         $db = $this->db();
-        $db->setQuery(
-            'SELECT rules.*, rules.id AS id,'
-            . " CONCAT('" . $db->getPrefix() . "', rules.reference_table) AS reference_table,"
-            . ' forms.name AS form_name, forms.id AS form_id'
-            . ' FROM #__facileforms_integrator_rules AS rules'
-            . ' JOIN #__facileforms_forms AS forms ON rules.form_id = forms.id'
-            . ' WHERE rules.id = ' . $id
-            . ' GROUP BY rules.id'
-        );
+        $query = $db->getQuery(true)
+            ->select([
+                'rules.*',
+                'rules.id AS id',
+                "CONCAT(" . $db->quote($db->getPrefix()) . ", rules.reference_table) AS reference_table",
+                'forms.name AS form_name',
+                'forms.id AS form_id',
+            ])
+            ->from($db->quoteName('#__facileforms_integrator_rules', 'rules'))
+            ->join('INNER', $db->quoteName('#__facileforms_forms', 'forms') . ' ON rules.form_id = forms.id')
+            ->where('rules.id = :id')
+            ->group('rules.id')
+            ->bind(':id', $id, ParameterType::INTEGER);
+        $db->setQuery($query);
         $rows = $db->loadObjectList();
         return count($rows) === 1 ? $rows[0] : null;
     }
@@ -57,13 +68,15 @@ class IntegratorModel extends BaseModel
     public function getItems(int $ruleId): array
     {
         $db = $this->db();
-        $db->setQuery(
-            'SELECT items.*, elements.name AS element_name, elements.type AS element_type'
-            . ' FROM #__facileforms_integrator_items AS items'
-            . ' JOIN #__facileforms_elements AS elements ON elements.id = items.element_id'
-            . ' WHERE items.rule_id = ' . $ruleId
-            . ' GROUP BY items.id ORDER BY items.id DESC'
-        );
+        $query = $db->getQuery(true)
+            ->select(['items.*', 'elements.name AS element_name', 'elements.type AS element_type'])
+            ->from($db->quoteName('#__facileforms_integrator_items', 'items'))
+            ->join('INNER', $db->quoteName('#__facileforms_elements', 'elements') . ' ON elements.id = items.element_id')
+            ->where('items.rule_id = :ruleId')
+            ->group('items.id')
+            ->order('items.id DESC')
+            ->bind(':ruleId', $ruleId, ParameterType::INTEGER);
+        $db->setQuery($query);
         return $db->loadObjectList() ?: [];
     }
 
@@ -84,19 +97,29 @@ class IntegratorModel extends BaseModel
     public function getForms(string $filter = 'all'): array
     {
         $db    = $this->db();
-        $where = match ($filter) {
-            'published'   => ' WHERE forms.published = 1',
-            'unpublished' => ' WHERE forms.published = 0',
-            default       => '',
+        $query = $db->getQuery(true)
+            ->select(['id', 'name', 'published'])
+            ->from($db->quoteName('#__facileforms_forms', 'forms'));
+
+        match ($filter) {
+            'published'   => $query->where('forms.published = 1'),
+            'unpublished' => $query->where('forms.published = 0'),
+            default       => null,
         };
-        $db->setQuery('SELECT id, name, published FROM #__facileforms_forms AS forms' . $where);
+
+        $db->setQuery($query);
         return $db->loadObjectList() ?: [];
     }
 
     public function getFormElements(int $formId): array
     {
         $db = $this->db();
-        $db->setQuery('SELECT id, name, type FROM #__facileforms_elements WHERE form = ' . $formId);
+        $query = $db->getQuery(true)
+            ->select(['id', 'name', 'type'])
+            ->from($db->quoteName('#__facileforms_elements'))
+            ->where('form = :formId')
+            ->bind(':formId', $formId, ParameterType::INTEGER);
+        $db->setQuery($query);
         return $db->loadObjectList() ?: [];
     }
 
@@ -107,28 +130,27 @@ class IntegratorModel extends BaseModel
         $tbl = str_starts_with($referenceTable, $pfx)
             ? substr($referenceTable, \strlen($pfx))
             : $referenceTable;
+        $type = \in_array($type, ['insert', 'update'], true) ? $type : 'insert';
 
         $query = $db->getQuery(true)
             ->insert($db->quoteName('#__facileforms_integrator_rules'))
             ->columns($db->quoteName(['name', 'form_id', 'reference_table', 'type']))
-            ->values(
-                $db->quote($name) . ','
-                . (int) $formId . ','
-                . $db->quote($tbl) . ','
-                . $db->quote(\in_array($type, ['insert', 'update'], true) ? $type : 'insert')
-            );
+            ->values(':name, :formId, :referenceTable, :type')
+            ->bind(':name', $name, ParameterType::STRING)
+            ->bind(':formId', $formId, ParameterType::INTEGER)
+            ->bind(':referenceTable', $tbl, ParameterType::STRING)
+            ->bind(':type', $type, ParameterType::STRING);
         $db->setQuery($query)->execute();
         return (int) $db->insertid();
     }
 
     public function deleteRules(array $ids): void
     {
-        $ids = array_filter(array_map('intval', $ids));
+        $ids = array_values(array_filter(array_map('intval', $ids)));
         if (empty($ids)) {
             return;
         }
         $db = $this->db();
-        $in = implode(',', $ids);
         foreach ([
             ['#__facileforms_integrator_rules', 'id'],
             ['#__facileforms_integrator_items', 'rule_id'],
@@ -136,27 +158,37 @@ class IntegratorModel extends BaseModel
             ['#__facileforms_integrator_criteria_joomla', 'rule_id'],
             ['#__facileforms_integrator_criteria_fixed', 'rule_id'],
         ] as [$tbl, $col]) {
-            $db->setQuery("DELETE FROM {$tbl} WHERE {$col} IN ({$in})")->execute();
+            $query = $db->getQuery(true)
+                ->delete($db->quoteName($tbl))
+                ->whereIn($db->quoteName($col), $ids, ParameterType::INTEGER);
+            $db->setQuery($query)->execute();
         }
     }
 
     public function publishRule(int $id, int $state): void
     {
-        $this->db()->setQuery(
-            'UPDATE #__facileforms_integrator_rules SET published = ' . ($state ? 1 : 0) . ' WHERE id = ' . $id
-        )->execute();
+        $db    = $this->db();
+        $query = $db->getQuery(true)
+            ->update($db->quoteName('#__facileforms_integrator_rules'))
+            ->set($db->quoteName('published') . ' = :state')
+            ->where($db->quoteName('id') . ' = :id')
+            ->bind(':state', $state, ParameterType::INTEGER)
+            ->bind(':id', $id, ParameterType::INTEGER);
+        $db->setQuery($query)->execute();
     }
 
     public function getCriteria(int $ruleId): array
     {
         $db = $this->db();
-        $db->setQuery(
-            'SELECT crit.*, elements.name AS element_name, elements.type AS element_type'
-            . ' FROM #__facileforms_integrator_criteria_form AS crit'
-            . ' JOIN #__facileforms_elements AS elements ON elements.id = crit.element_id'
-            . ' WHERE crit.rule_id = ' . $ruleId
-            . ' GROUP BY crit.id ORDER BY crit.id DESC'
-        );
+        $query = $db->getQuery(true)
+            ->select(['crit.*', 'elements.name AS element_name', 'elements.type AS element_type'])
+            ->from($db->quoteName('#__facileforms_integrator_criteria_form', 'crit'))
+            ->join('INNER', $db->quoteName('#__facileforms_elements', 'elements') . ' ON elements.id = crit.element_id')
+            ->where('crit.rule_id = :ruleId')
+            ->group('crit.id')
+            ->order('crit.id DESC')
+            ->bind(':ruleId', $ruleId, ParameterType::INTEGER);
+        $db->setQuery($query);
         return $db->loadObjectList() ?: [];
     }
 
@@ -165,35 +197,41 @@ class IntegratorModel extends BaseModel
         if (!\in_array($operator, self::ALLOWED_OPERATORS, true)) {
             return;
         }
+        $andor = \in_array($andor, ['AND', 'OR'], true) ? $andor : 'AND';
         $db    = $this->db();
         $query = $db->getQuery(true)
             ->insert($db->quoteName('#__facileforms_integrator_criteria_form'))
             ->columns($db->quoteName(['rule_id', 'operator', 'reference_column', 'element_id', 'andor']))
-            ->values(
-                $ruleId . ','
-                . $db->quote($operator) . ','
-                . $db->quote($referenceColumn) . ','
-                . $elementId . ','
-                . $db->quote(\in_array($andor, ['AND', 'OR'], true) ? $andor : 'AND')
-            );
+            ->values(':ruleId, :operator, :referenceColumn, :elementId, :andor')
+            ->bind(':ruleId', $ruleId, ParameterType::INTEGER)
+            ->bind(':operator', $operator, ParameterType::STRING)
+            ->bind(':referenceColumn', $referenceColumn, ParameterType::STRING)
+            ->bind(':elementId', $elementId, ParameterType::INTEGER)
+            ->bind(':andor', $andor, ParameterType::STRING);
         $db->setQuery($query)->execute();
     }
 
     public function removeCriteria(int $id): void
     {
-        $this->db()->setQuery(
-            'DELETE FROM #__facileforms_integrator_criteria_form WHERE id = ' . $id
-        )->execute();
+        $db    = $this->db();
+        $query = $db->getQuery(true)
+            ->delete($db->quoteName('#__facileforms_integrator_criteria_form'))
+            ->where($db->quoteName('id') . ' = :id')
+            ->bind(':id', $id, ParameterType::INTEGER);
+        $db->setQuery($query)->execute();
     }
 
     public function getCriteriaJoomla(int $ruleId): array
     {
         $db = $this->db();
-        $db->setQuery(
-            'SELECT crit.* FROM #__facileforms_integrator_criteria_joomla AS crit'
-            . ' WHERE crit.rule_id = ' . $ruleId
-            . ' GROUP BY crit.id ORDER BY crit.id DESC'
-        );
+        $query = $db->getQuery(true)
+            ->select('crit.*')
+            ->from($db->quoteName('#__facileforms_integrator_criteria_joomla', 'crit'))
+            ->where('crit.rule_id = :ruleId')
+            ->group('crit.id')
+            ->order('crit.id DESC')
+            ->bind(':ruleId', $ruleId, ParameterType::INTEGER);
+        $db->setQuery($query);
         return $db->loadObjectList() ?: [];
     }
 
@@ -203,35 +241,42 @@ class IntegratorModel extends BaseModel
             return;
         }
         $allowed = ['Userid', 'Username', 'Language', 'Date'];
+        $joomlaObject = \in_array($joomlaObject, $allowed, true) ? $joomlaObject : 'Userid';
+        $andor = \in_array($andor, ['AND', 'OR'], true) ? $andor : 'AND';
         $db      = $this->db();
         $query   = $db->getQuery(true)
             ->insert($db->quoteName('#__facileforms_integrator_criteria_joomla'))
             ->columns($db->quoteName(['rule_id', 'operator', 'reference_column', 'joomla_object', 'andor']))
-            ->values(
-                $ruleId . ','
-                . $db->quote($operator) . ','
-                . $db->quote($referenceColumn) . ','
-                . $db->quote(\in_array($joomlaObject, $allowed, true) ? $joomlaObject : 'Userid') . ','
-                . $db->quote(\in_array($andor, ['AND', 'OR'], true) ? $andor : 'AND')
-            );
+            ->values(':ruleId, :operator, :referenceColumn, :joomlaObject, :andor')
+            ->bind(':ruleId', $ruleId, ParameterType::INTEGER)
+            ->bind(':operator', $operator, ParameterType::STRING)
+            ->bind(':referenceColumn', $referenceColumn, ParameterType::STRING)
+            ->bind(':joomlaObject', $joomlaObject, ParameterType::STRING)
+            ->bind(':andor', $andor, ParameterType::STRING);
         $db->setQuery($query)->execute();
     }
 
     public function removeCriteriaJoomla(int $id): void
     {
-        $this->db()->setQuery(
-            'DELETE FROM #__facileforms_integrator_criteria_joomla WHERE id = ' . $id
-        )->execute();
+        $db    = $this->db();
+        $query = $db->getQuery(true)
+            ->delete($db->quoteName('#__facileforms_integrator_criteria_joomla'))
+            ->where($db->quoteName('id') . ' = :id')
+            ->bind(':id', $id, ParameterType::INTEGER);
+        $db->setQuery($query)->execute();
     }
 
     public function getCriteriaFixed(int $ruleId): array
     {
         $db = $this->db();
-        $db->setQuery(
-            'SELECT crit.* FROM #__facileforms_integrator_criteria_fixed AS crit'
-            . ' WHERE crit.rule_id = ' . $ruleId
-            . ' GROUP BY crit.id ORDER BY crit.id DESC'
-        );
+        $query = $db->getQuery(true)
+            ->select('crit.*')
+            ->from($db->quoteName('#__facileforms_integrator_criteria_fixed', 'crit'))
+            ->where('crit.rule_id = :ruleId')
+            ->group('crit.id')
+            ->order('crit.id DESC')
+            ->bind(':ruleId', $ruleId, ParameterType::INTEGER);
+        $db->setQuery($query);
         return $db->loadObjectList() ?: [];
     }
 
@@ -240,25 +285,28 @@ class IntegratorModel extends BaseModel
         if (!\in_array($operator, self::ALLOWED_OPERATORS, true)) {
             return;
         }
+        $andor = \in_array($andor, ['AND', 'OR'], true) ? $andor : 'AND';
         $db    = $this->db();
         $query = $db->getQuery(true)
             ->insert($db->quoteName('#__facileforms_integrator_criteria_fixed'))
             ->columns($db->quoteName(['rule_id', 'operator', 'reference_column', 'fixed_value', 'andor']))
-            ->values(
-                $ruleId . ','
-                . $db->quote($operator) . ','
-                . $db->quote($referenceColumn) . ','
-                . $db->quote($fixedValue) . ','
-                . $db->quote(\in_array($andor, ['AND', 'OR'], true) ? $andor : 'AND')
-            );
+            ->values(':ruleId, :operator, :referenceColumn, :fixedValue, :andor')
+            ->bind(':ruleId', $ruleId, ParameterType::INTEGER)
+            ->bind(':operator', $operator, ParameterType::STRING)
+            ->bind(':referenceColumn', $referenceColumn, ParameterType::STRING)
+            ->bind(':fixedValue', $fixedValue, ParameterType::STRING)
+            ->bind(':andor', $andor, ParameterType::STRING);
         $db->setQuery($query)->execute();
     }
 
     public function removeCriteriaFixed(int $id): void
     {
-        $this->db()->setQuery(
-            'DELETE FROM #__facileforms_integrator_criteria_fixed WHERE id = ' . $id
-        )->execute();
+        $db    = $this->db();
+        $query = $db->getQuery(true)
+            ->delete($db->quoteName('#__facileforms_integrator_criteria_fixed'))
+            ->where($db->quoteName('id') . ' = :id')
+            ->bind(':id', $id, ParameterType::INTEGER);
+        $db->setQuery($query)->execute();
     }
 
     public function addItem(int $ruleId, int $elementId, string $referenceColumn): void
@@ -267,15 +315,21 @@ class IntegratorModel extends BaseModel
         $query = $db->getQuery(true)
             ->insert($db->quoteName('#__facileforms_integrator_items'))
             ->columns($db->quoteName(['rule_id', 'element_id', 'reference_column']))
-            ->values($ruleId . ',' . $elementId . ',' . $db->quote($referenceColumn));
+            ->values(':ruleId, :elementId, :referenceColumn')
+            ->bind(':ruleId', $ruleId, ParameterType::INTEGER)
+            ->bind(':elementId', $elementId, ParameterType::INTEGER)
+            ->bind(':referenceColumn', $referenceColumn, ParameterType::STRING);
         $db->setQuery($query)->execute();
     }
 
     public function removeItem(int $id): void
     {
-        $this->db()->setQuery(
-            'DELETE FROM #__facileforms_integrator_items WHERE id = ' . $id
-        )->execute();
+        $db    = $this->db();
+        $query = $db->getQuery(true)
+            ->delete($db->quoteName('#__facileforms_integrator_items'))
+            ->where($db->quoteName('id') . ' = :id')
+            ->bind(':id', $id, ParameterType::INTEGER);
+        $db->setQuery($query)->execute();
     }
 
     public function saveCode(int $itemId, int $ruleId, string $code): void
@@ -283,25 +337,36 @@ class IntegratorModel extends BaseModel
         $db    = $this->db();
         $query = $db->getQuery(true)
             ->update($db->quoteName('#__facileforms_integrator_items'))
-            ->set($db->quoteName('code') . ' = ' . $db->quote($code))
-            ->where($db->quoteName('id') . ' = ' . $itemId)
-            ->where($db->quoteName('rule_id') . ' = ' . $ruleId);
+            ->set($db->quoteName('code') . ' = :code')
+            ->where($db->quoteName('id') . ' = :itemId')
+            ->where($db->quoteName('rule_id') . ' = :ruleId')
+            ->bind(':code', $code, ParameterType::STRING)
+            ->bind(':itemId', $itemId, ParameterType::INTEGER)
+            ->bind(':ruleId', $ruleId, ParameterType::INTEGER);
         $db->setQuery($query)->execute();
     }
 
     public function saveFinalizeCode(int $ruleId, string $code): void
     {
-        $db = $this->db();
-        $db->setQuery(
-            'UPDATE #__facileforms_integrator_rules SET finalize_code = '
-            . $db->quote($code) . ' WHERE id = ' . $ruleId
-        )->execute();
+        $db    = $this->db();
+        $query = $db->getQuery(true)
+            ->update($db->quoteName('#__facileforms_integrator_rules'))
+            ->set($db->quoteName('finalize_code') . ' = :code')
+            ->where($db->quoteName('id') . ' = :ruleId')
+            ->bind(':code', $code, ParameterType::STRING)
+            ->bind(':ruleId', $ruleId, ParameterType::INTEGER);
+        $db->setQuery($query)->execute();
     }
 
     public function publishItem(int $id, int $state): void
     {
-        $this->db()->setQuery(
-            'UPDATE #__facileforms_integrator_items SET published = ' . ($state ? 1 : 0) . ' WHERE id = ' . $id
-        )->execute();
+        $db    = $this->db();
+        $query = $db->getQuery(true)
+            ->update($db->quoteName('#__facileforms_integrator_items'))
+            ->set($db->quoteName('published') . ' = :state')
+            ->where($db->quoteName('id') . ' = :id')
+            ->bind(':state', $state, ParameterType::INTEGER)
+            ->bind(':id', $id, ParameterType::INTEGER);
+        $db->setQuery($query)->execute();
     }
 }

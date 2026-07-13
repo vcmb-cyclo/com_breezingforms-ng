@@ -31,7 +31,9 @@ final class DatabaseAuditService
         'facileforms_integrator_rules',
     ];
 
-    private const TARGET_COLLATION = 'utf8mb4_unicode_ci';
+    private const FALLBACK_COLLATION = 'utf8mb4_unicode_ci';
+
+    private ?string $resolvedTargetCollation = null;
 
     public function __construct(private readonly DatabaseInterface $db)
     {
@@ -39,12 +41,16 @@ final class DatabaseAuditService
 
     public function run(): array
     {
+        $targetCollation = $this->resolveTargetCollation();
         $tableList = $this->db->getTableList();
         $tables = [];
         $missingTables = [];
         $collationIssues = [];
+        $columnCollationIssues = [];
         $duplicateIndexes = [];
         $totalRows = 0;
+        $totalDataBytes = 0;
+        $totalIndexBytes = 0;
 
         foreach (self::EXPECTED_TABLES as $table) {
             $physicalTable = $this->db->getPrefix() . $table;
@@ -58,21 +64,29 @@ final class DatabaseAuditService
             $status = $this->getTableStatus($physicalTable);
             $rows = (int) ($status['TABLE_ROWS'] ?? 0);
             $collation = (string) ($status['TABLE_COLLATION'] ?? '');
+            $dataBytes = (int) ($status['DATA_LENGTH'] ?? 0);
+            $indexBytes = (int) ($status['INDEX_LENGTH'] ?? 0);
             $totalRows += $rows;
+            $totalDataBytes += $dataBytes;
+            $totalIndexBytes += $indexBytes;
             $tables[] = [
                 'table' => $alias,
                 'rows' => $rows,
                 'engine' => (string) ($status['ENGINE'] ?? ''),
                 'collation' => $collation,
-                'size_bytes' => (int) ($status['DATA_LENGTH'] ?? 0) + (int) ($status['INDEX_LENGTH'] ?? 0),
+                'size_bytes' => $dataBytes + $indexBytes,
             ];
 
-            if (strcasecmp($collation, self::TARGET_COLLATION) !== 0) {
+            if (strcasecmp($collation, $targetCollation) !== 0) {
                 $collationIssues[] = [
                     'table' => $alias,
                     'collation' => $collation,
-                    'expected' => self::TARGET_COLLATION,
+                    'expected' => $targetCollation,
                 ];
+            }
+
+            foreach ($this->findColumnCollationIssues($physicalTable, $alias, $targetCollation) as $columnIssue) {
+                $columnCollationIssues[] = $columnIssue;
             }
 
             foreach ($this->findDuplicateIndexes($physicalTable, $alias) as $duplicate) {
@@ -80,16 +94,20 @@ final class DatabaseAuditService
             }
         }
 
+        $collationHistogram = $this->buildCollationHistogram($tables);
         $orphanChecks = $this->findOrphans($tableList);
         $orphanRows = array_sum(array_column($orphanChecks, 'count'));
-        $issuesTotal = count($missingTables) + count($collationIssues) + count($duplicateIndexes) + $orphanRows;
+        $issuesTotal = count($missingTables) + count($collationIssues) + count($columnCollationIssues)
+            + count($duplicateIndexes) + $orphanRows;
 
         return [
             'generated_at' => (new Date())->toSql(),
-            'target_collation' => self::TARGET_COLLATION,
+            'target_collation' => $targetCollation,
             'tables' => $tables,
             'missing_tables' => $missingTables,
             'collation_issues' => $collationIssues,
+            'column_collation_issues' => $columnCollationIssues,
+            'collation_histogram' => $collationHistogram,
             'duplicate_indexes' => $duplicateIndexes,
             'orphan_checks' => $orphanChecks,
             'summary' => [
@@ -97,12 +115,103 @@ final class DatabaseAuditService
                 'scanned_tables' => count($tables),
                 'missing_tables' => count($missingTables),
                 'total_rows' => $totalRows,
+                'total_data_bytes' => $totalDataBytes,
+                'total_index_bytes' => $totalIndexBytes,
                 'collation_issues' => count($collationIssues),
+                'column_collation_issues' => count($columnCollationIssues),
+                'mixed_collations' => count($collationHistogram) > 1,
                 'duplicate_index_groups' => count($duplicateIndexes),
                 'orphan_rows' => $orphanRows,
                 'issues_total' => $issuesTotal,
             ],
         ];
+    }
+
+    /**
+     * Prefer the server's modern utf8mb4 collation (e.g. utf8mb4_0900_ai_ci on
+     * MySQL 8) over a hardcoded one, so tables that are already correctly
+     * configured for this server aren't perpetually flagged as mismatched.
+     */
+    private function resolveTargetCollation(): string
+    {
+        if ($this->resolvedTargetCollation !== null) {
+            return $this->resolvedTargetCollation;
+        }
+
+        $preferred = ['utf8mb4_0900_ai_ci', 'utf8mb4_unicode_520_ci', self::FALLBACK_COLLATION];
+
+        foreach ($preferred as $candidate) {
+            if ($this->isCollationSupported($candidate)) {
+                return $this->resolvedTargetCollation = $candidate;
+            }
+        }
+
+        return $this->resolvedTargetCollation = self::FALLBACK_COLLATION;
+    }
+
+    private function isCollationSupported(string $collation): bool
+    {
+        try {
+            $query = $this->db->getQuery(true)
+                ->select('COLLATION_NAME')
+                ->from($this->db->quoteName('information_schema.COLLATIONS'))
+                ->where($this->db->quoteName('COLLATION_NAME') . ' = :collation')
+                ->bind(':collation', $collation);
+            $this->db->setQuery($query);
+
+            return (bool) $this->db->loadResult();
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    /**
+     * Catches columns that stayed on a stale collation even after the table's
+     * own default was fixed (ALTER TABLE ... CONVERT TO CHARACTER SET only
+     * changes new/altered columns going forward on some MySQL versions when
+     * a column had an explicit COLLATE override).
+     */
+    private function findColumnCollationIssues(string $physicalTable, string $alias, string $targetCollation): array
+    {
+        $query = $this->db->getQuery(true)
+            ->select(['COLUMN_NAME', 'COLLATION_NAME'])
+            ->from($this->db->quoteName('information_schema.COLUMNS'))
+            ->where('TABLE_SCHEMA = DATABASE()')
+            ->where($this->db->quoteName('TABLE_NAME') . ' = :table')
+            ->where($this->db->quoteName('COLLATION_NAME') . ' IS NOT NULL')
+            ->bind(':table', $physicalTable);
+        $this->db->setQuery($query);
+        $columns = $this->db->loadAssocList() ?: [];
+
+        $issues = [];
+        foreach ($columns as $column) {
+            $collation = (string) ($column['COLLATION_NAME'] ?? '');
+            if ($collation !== '' && strcasecmp($collation, $targetCollation) !== 0) {
+                $issues[] = [
+                    'table' => $alias,
+                    'column' => (string) ($column['COLUMN_NAME'] ?? ''),
+                    'collation' => $collation,
+                    'expected' => $targetCollation,
+                ];
+            }
+        }
+
+        return $issues;
+    }
+
+    private function buildCollationHistogram(array $tables): array
+    {
+        $histogram = [];
+        foreach ($tables as $table) {
+            $collation = (string) ($table['collation'] ?? '');
+            if ($collation === '') {
+                continue;
+            }
+            $histogram[$collation] = ($histogram[$collation] ?? 0) + 1;
+        }
+        arsort($histogram);
+
+        return $histogram;
     }
 
     private function getTableStatus(string $physicalTable): array

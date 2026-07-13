@@ -307,6 +307,8 @@ $auditSummary = (array) ($auditReport['summary'] ?? array());
 $auditTables = (array) ($auditReport['tables'] ?? array());
 $auditMissingTables = (array) ($auditReport['missing_tables'] ?? array());
 $auditCollationIssues = (array) ($auditReport['collation_issues'] ?? array());
+$auditColumnCollationIssues = (array) ($auditReport['column_collation_issues'] ?? array());
+$auditCollationHistogram = (array) ($auditReport['collation_histogram'] ?? array());
 $auditDuplicateIndexes = (array) ($auditReport['duplicate_indexes'] ?? array());
 $auditOrphanChecks = array_values(array_filter(
     (array) ($auditReport['orphan_checks'] ?? array()),
@@ -442,6 +444,33 @@ $aboutDescription = str_replace(
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($auditColumnCollationIssues !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_COLUMN_COLLATIONS'); ?></h4>
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead><tr><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_TABLE'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_COLUMN'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_CURRENT'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_EXPECTED'); ?></th></tr></thead>
+                                <tbody>
+                                <?php foreach ($auditColumnCollationIssues as $issue) : ?>
+                                    <tr class="table-warning"><td><code><?php echo htmlspecialchars((string) ($issue['table'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code></td><td><code><?php echo htmlspecialchars((string) ($issue['column'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code></td><td><?php echo htmlspecialchars((string) ($issue['collation'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td><td><?php echo htmlspecialchars((string) ($issue['expected'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td></tr>
+                                <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (count($auditCollationHistogram) > 1) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_MIXED_COLLATIONS'); ?></h4>
+                        <ul class="mb-0">
+                            <?php foreach ($auditCollationHistogram as $collationName => $count) : ?>
+                                <li><code><?php echo htmlspecialchars((string) $collationName, ENT_QUOTES, 'UTF-8'); ?></code>: <?php echo (int) $count; ?></li>
+                            <?php endforeach; ?>
+                        </ul>
                     </div>
                 <?php endif; ?>
 

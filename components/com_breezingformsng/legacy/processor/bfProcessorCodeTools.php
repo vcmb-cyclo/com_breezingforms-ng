@@ -12,180 +12,63 @@
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
-use Joomla\CMS\Factory;
-use Joomla\Database\DatabaseInterface;
-use Joomla\Event\Event;
-use Joomla\Event\EventInterface;
-use Joomla\CMS\Uri\Uri;
-use Joomla\Filesystem\Folder;
-use Joomla\Filesystem\File;
-use Joomla\CMS\Router\Route;
-use Joomla\CMS\Language\Text;
-use Joomla\CMS\Component\ComponentHelper;
-use Joomla\CMS\Language\LanguageHelper;
-use Joomla\Filesystem\Path;
-use Joomla\CMS\Environment\Browser;
-use Joomla\CMS\HTML\HTMLHelper;
-use Joomla\CMS\Plugin\PluginHelper;
-use Joomla\CMS\Log\Log;
-use CB\Component\Contentbuilderng\Administrator\Helper\ContentbuilderngHelper;
-use CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory;
-use CB\Component\Contentbuilderng\Administrator\Service\ArticleService;
-use CB\Component\Contentbuilderng\Administrator\Service\ListSupportService;
-use CB\Component\Contentbuilderng\Administrator\Service\PermissionService;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ClassNameResolver;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\JavascriptValueExporter;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\CodeStringTools;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\TraceModeFormatter;
 
 /**
  * Tracing display and legacy code patching/eval preparation.
  */
 trait bfProcessorCodeTools
 {
+    private ?ClassNameResolver $classNameResolverService = null;
+    private ?JavascriptValueExporter $javascriptValueExporterService = null;
+    private ?CodeStringTools $codeStringToolsService = null;
+    private ?TraceModeFormatter $traceModeFormatterService = null;
+
     function dispTraceMode($mode)
     {
-        if (!is_int($mode))
-            return $mode;
-        $m = '(';
-        if ($mode & _FF_TRACEMODE_FIRST)
-            $m .= 'first ';
-        $m .= ($mode & _FF_TRACEMODE_DIRECT ? 'direct' : ($mode & _FF_TRACEMODE_APPEND ? 'append' : 'popup'));
-        if ($mode & _FF_TRACEMODE_DISABLE)
-            $m .= ' disable';
-        else {
-            switch ($mode & _FF_TRACEMODE_PRIORITY) {
-                case 0:
-                    $m .= ' minimum';
-                    break;
-                case 1:
-                    $m .= ' low';
-                    break;
-                case 2:
-                    $m .= ' normal';
-                    break;
-                case 3:
-                    $m .= ' high';
-                    break;
-                default:
-                    $m .= ' maximum';
-                    break;
-            } // switch
-            $m .= $mode & _FF_TRACEMODE_LOCAL ? ' local' : ' global';
-            switch ($mode & _FF_TRACEMODE_TOPIC) {
-                case 0:
-                    $m .= ' none';
-                    break;
-                case _FF_TRACEMODE_TOPIC:
-                    $m .= ' all';
-                    break;
-                default:
-                    if ($mode & _FF_TRACEMODE_EVAL)
-                        $m .= ' eval';
-                    if ($mode & _FF_TRACEMODE_PIECE)
-                        $m .= ' piece';
-                    if ($mode & _FF_TRACEMODE_FUNCTION)
-                        $m .= ' function';
-                    if ($mode & _FF_TRACEMODE_MESSAGE)
-                        $m .= ' message';
-            } // switch
-        } // if
-        return $m . ')';
+        return $this->traceModeFormatter()->format($mode);
     }
 
     // dispTraceMode
 
     function trim(&$code)
     {
-        $len = strlen($code);
-        if (!$len)
-            return false;
-        if (strpos(" \t\r\n", $code[0]) === false && strpos(" \t\r\n", $code[$len - 1]) === false)
-            return true;
-        $code = trim($code);
-        return $code != '';
+        return $this->codeStringTools()->trimInPlace($code);
     }
 
     // trim
 
     function nonblank(&$code)
     {
-        return preg_match("/[^\\s]+/si", $code);
+        return $this->codeStringTools()->containsNonWhitespace((string) $code) ? 1 : 0;
     }
 
     // nonblank
 
     function getClassName($classdef)
     {
-        $name = '';
-        if (strpos($classdef, ';') === false)
-            $name = $classdef;
-        else {
-            $defs = explode(';', $classdef);
-            $name = $defs[$this->template];
-        } // if
-        if ($this->trim($name))
-            $name .= $this->suffix;
-        return $name;
+        return $this->classNameResolver()->resolve(
+            (string) $classdef,
+            (int) $this->template,
+            (string) $this->suffix
+        );
     }
 
     // getClassName
 
     function expJsValue($mixed, $indent = '')
     {
-        if (is_null($mixed))
-            return $indent . 'null';
-
-        if (is_bool($mixed))
-            return $mixed ? $indent . 'true' : $indent . 'false';
-
-        if (is_numeric($mixed))
-            return $indent . $mixed;
-
-        if (is_string($mixed))
-            return
-                $indent . "'" .
-                str_replace(
-                    array("\\", "'", "\r", "<", "\n"),
-                    array("\\\\", "\\'", "\\r", "\\074", "\\n'+" . nl() . $indent . "'"),
-                    $mixed
-                ) .
-                "'";
-
-        if (is_array($mixed)) {
-            $dst = $indent . '[' . nl();
-            $next = false;
-            foreach ($mixed as $value) {
-                if ($next)
-                    $dst .= "," . nl();
-                else
-                    $next = true;
-                $dst .= $this->expJsValue($value, $indent . "\t");
-            } // foreach
-            return $dst . nl() . $indent . ']';
-        } // if
-
-        if (is_object($mixed)) {
-            $dst = $indent . '{' . nl();
-            $arr = get_object_vars($mixed);
-            $next = false;
-            foreach ($arr as $key => $value) {
-                if ($next)
-                    $dst .= "," . nl();
-                else
-                    $next = true;
-                $dst .= $indent . $key . ":" . nl() . $this->expJsValue($value, $indent . "\t");
-            } // foreach
-            return $dst . nl() . $indent . '}';
-        } // if
-        // not supported types
-        if (is_resource($mixed))
-            return $indent . "'" . Text::_('COM_BREEZINGFORMSNG_PROCESS_RESOURCE') . "'";
-
-        return $indent . "'" . Text::_('COM_BREEZINGFORMSNG_PROCESS_UNKNOWN') . "'";
+        return $this->javascriptValueExporter()->exportValue($mixed, (string) $indent);
     }
 
     // expJsValue
 
     function expJsVar($name, $mixed)
     {
-        return $name . ' = ' . $this->expJsValue($mixed) . ';' . nl();
+        return $this->javascriptValueExporter()->exportVariable((string) $name, $mixed);
     }
 
     // expJsVar
@@ -635,6 +518,26 @@ trait bfProcessorCodeTools
         } // if trace not disabled
         $code = str_replace($this->findtags, $this->replacetags, $code);
         return true;
+    }
+
+    private function classNameResolver(): ClassNameResolver
+    {
+        return $this->classNameResolverService ??= new ClassNameResolver();
+    }
+
+    private function javascriptValueExporter(): JavascriptValueExporter
+    {
+        return $this->javascriptValueExporterService ??= new JavascriptValueExporter();
+    }
+
+    private function codeStringTools(): CodeStringTools
+    {
+        return $this->codeStringToolsService ??= new CodeStringTools();
+    }
+
+    private function traceModeFormatter(): TraceModeFormatter
+    {
+        return $this->traceModeFormatterService ??= new TraceModeFormatter();
     }
 
     // prepareEvalCode

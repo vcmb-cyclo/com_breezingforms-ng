@@ -34,139 +34,94 @@ use CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory;
 use CB\Component\Contentbuilderng\Administrator\Service\ArticleService;
 use CB\Component\Contentbuilderng\Administrator\Service\ListSupportService;
 use CB\Component\Contentbuilderng\Administrator\Service\PermissionService;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\JavascriptValueExporter;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ProcessorHeaderRenderer;
+use Vcmb\Component\BreezingformsNG\Site\Service\Upload\TokenizedDirectoryResolver;
 
 /**
  * Page header, ContentBuilder path handling and form view rendering.
  */
 trait bfProcessorRendering
 {
+    private ?TokenizedDirectoryResolver $tokenizedDirectoryResolverService = null;
+    private ?ProcessorHeaderRenderer $processorHeaderRendererService = null;
+
     function header()
     {
-        global $ff_comsite, $ff_config;
-        $code = 'ff_processor = new Object();' . nl() .
-            $this->expJsVar('ff_processor.okrun      ', $this->okrun) .
-            $this->expJsVar('ff_processor.ip         ', $this->ip) .
-            $this->expJsVar('ff_processor.agent      ', $this->agent) .
-            $this->expJsVar('ff_processor.browser    ', $this->browser) .
-            $this->expJsVar('ff_processor.opsys      ', $this->opsys) .
-            $this->expJsVar('ff_processor.provider   ', $this->provider) .
-            $this->expJsVar('ff_processor.submitted  ', $this->submitted) .
-            $this->expJsVar('ff_processor.form       ', $this->form) .
-            $this->expJsVar('ff_processor.form_id    ', $this->form_id) .
-            $this->expJsVar('ff_processor.page       ', $this->page) .
-            $this->expJsVar('ff_processor.target     ', $this->target) .
-            $this->expJsVar('ff_processor.runmode    ', $this->runmode) .
-            $this->expJsVar('ff_processor.inframe    ', $this->inframe) .
-            $this->expJsVar('ff_processor.inline     ', $this->inline) .
-            $this->expJsVar('ff_processor.template   ', $this->template) .
-            $this->expJsVar('ff_processor.homepage   ', $this->homepage) .
-            $this->expJsVar('ff_processor.mossite    ', $this->mossite) .
-            //$this->expJsVar('ff_processor.mospath    ', $this->mospath).
-            $this->expJsVar('ff_processor.images     ', $this->images) .
-            //$this->expJsVar('ff_processor.uploads    ', $this->uploads).
-            $this->expJsVar('ff_processor.border     ', $this->border) .
-            $this->expJsVar('ff_processor.align      ', $this->align) .
-            $this->expJsVar('ff_processor.top        ', $this->top) .
-            $this->expJsVar('ff_processor.suffix     ', $this->suffix) .
-            $this->expJsVar('ff_processor.status     ', $this->status) .
-            $this->expJsVar('ff_processor.message    ', $this->message) .
-            $this->expJsVar('ff_processor.record_id  ', $this->record_id) .
-            $this->expJsVar('ff_processor.showgrid   ', $this->showgrid) .
-            $this->expJsVar('ff_processor.traceBuffer', $this->traceBuffer);
-        return
-            '<script type="text/javascript">' . nl() .
-            '<!--' . nl() .
-            ($ff_config->compress ? $this->compressJavascript($code) : $code) .
-            '//-->' . nl() .
-            '</script>' . nl() .
-            '<script type="text/javascript" src="' . Uri::root(true) . '/media/com_breezingformsng/js/facileforms.js"></script>' . nl();
+        global $ff_config;
+
+        return $this->processorHeaderRenderer()->render(
+            [
+                'ff_processor.okrun      ' => $this->okrun,
+                'ff_processor.ip         ' => $this->ip,
+                'ff_processor.agent      ' => $this->agent,
+                'ff_processor.browser    ' => $this->browser,
+                'ff_processor.opsys      ' => $this->opsys,
+                'ff_processor.provider   ' => $this->provider,
+                'ff_processor.submitted  ' => $this->submitted,
+                'ff_processor.form       ' => $this->form,
+                'ff_processor.form_id    ' => $this->form_id,
+                'ff_processor.page       ' => $this->page,
+                'ff_processor.target     ' => $this->target,
+                'ff_processor.runmode    ' => $this->runmode,
+                'ff_processor.inframe    ' => $this->inframe,
+                'ff_processor.inline     ' => $this->inline,
+                'ff_processor.template   ' => $this->template,
+                'ff_processor.homepage   ' => $this->homepage,
+                'ff_processor.mossite    ' => $this->mossite,
+                'ff_processor.images     ' => $this->images,
+                'ff_processor.border     ' => $this->border,
+                'ff_processor.align      ' => $this->align,
+                'ff_processor.top        ' => $this->top,
+                'ff_processor.suffix     ' => $this->suffix,
+                'ff_processor.status     ' => $this->status,
+                'ff_processor.message    ' => $this->message,
+                'ff_processor.record_id  ' => $this->record_id,
+                'ff_processor.showgrid   ' => $this->showgrid,
+                'ff_processor.traceBuffer' => $this->traceBuffer,
+            ],
+            (bool) $ff_config->compress,
+            fn (string $code): string => $this->compressJavascript($code)
+        );
     }
 
     // header
 
     function cbCreatePathByTokens($path, array $rows, $field_name)
     {
+        $identity = $this->app->getIdentity();
 
-        if (strpos(strtolower($path), '{cbsite}') === 0) {
-            $path = str_replace(array('{cbsite}', '{CBSite}'), array(JPATH_SITE, JPATH_SITE), $path);
-        }
-
-        $path = str_replace($this->findtags, $this->replacetags, $path);
-
-        if (strpos($path, '|') === false) {
-            return $path;
-        }
-
-        $after = str_replace('|', '', stristr($path, '|'));
-        $path = stristr($path, '|', true) . '|';
-        $path = str_replace('|', '/', $path);
-
-        foreach ($rows as $row) {
-            $rawValue = Factory::getApplication()->getInput()->post->get('ff_nm_' . $row->name, [], 'raw');
-            $permissiveFilter = InputFilter::getInstance([], [], 1, 1);
-            $value = \is_array($rawValue)
-                ? array_map(static fn ($v) => $permissiveFilter->clean((string) $v, 'html'), $rawValue)
-                : [];
-
-            $value = implode('/', $value);
-            if (trim($value) == '') {
-                $value = '_empty_';
-            }
-            $path = str_replace('{' . strtolower($row->name) . ':value}', trim($value), $path);
-        }
-
-        foreach ($rows as $row) {
-            $path = str_replace('{field:' . strtolower($row->name) . '}', strtolower($row->name), $path);
-        }
-
-        $path = str_replace('{userid}', Factory::getApplication()->getIdentity()->get('id', 0), $path);
-        $path = str_replace('{username}', Factory::getApplication()->getIdentity()->get('username', 'anonymous') . '_' . Factory::getApplication()->getIdentity()->get('id', 0), $path);
-        $path = str_replace('{name}', Factory::getApplication()->getIdentity()->get('name', 'Anonymous') . '_' . Factory::getApplication()->getIdentity()->get('id', 0), $path);
-        $path = str_replace('{field}', File::makeSafe(strtolower(trim($field_name))), $path);
-
-        $tz = 'UTC';
-        $tz = new DateTimeZone($this->app->get('offset'));
-
-        $date_stamp1 = date('Y_m_d');
-        $date_stamp2 = date('H_i_s');
-        $date_stamp3 = date('Y_m_d_H_i_s');
-
-        $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
-        $offset = $date_->getOffsetFromGMT();
-        if ($offset > 0) {
-            $date_->add(new DateInterval('PT' . $offset . 'S'));
-        } else if ($offset < 0) {
-            $offset = $offset * -1;
-            $date_->sub(new DateInterval('PT' . $offset . 'S'));
-        }
-        $date_stamp1 = $date_->format('Y_m_d', true);
-        $date_stamp2 = $date_->format('H_i_s', true);
-        $date_stamp3 = $date_->format('Y_m_d_H_i_s', true);
-
-        $_now = new \Joomla\CMS\Date\Date();
-        $path = str_replace('{date}', $date_stamp1, $path);
-        $path = str_replace('{time}', $date_stamp2, $path);
-        $path = str_replace('{datetime}', $date_stamp3, $path);
-
-        $endpath = $this->makeSafeFolder($path);
-
-        $parts = explode('/', $endpath);
-        $inner_path = '';
-        foreach ($parts as $part) {
-            if (!is_dir($inner_path . $part)) {
-                $inner_path .= '/';
-            }
-            Folder::create($inner_path . $part);
-            $inner_path .= $part;
-        }
-        return $endpath . $after;
+        return $this->tokenizedDirectoryResolver()->resolve(
+            (string) $path,
+            $rows,
+            (string) $field_name,
+            $this->findtags,
+            $this->replacetags,
+            [
+                'username' => $identity->get('username', 'anonymous'),
+                'id' => $identity->get('id', 0),
+                'name' => $identity->get('name', 'Anonymous'),
+            ],
+            (string) $this->submitted,
+            (string) $this->app->get('offset')
+        );
     }
 
     function makeSafeFolder($path)
     {
-        //$ds = ('/' == '\\') ? '\\/' : '/';
-        $regex = array('#[^A-Za-z0-9{}\.:_\\\/-]#');
-        return preg_replace($regex, '_', $path);
+        return $this->tokenizedDirectoryResolver()->makeSafeFolder((string) $path);
+    }
+
+    private function tokenizedDirectoryResolver(): TokenizedDirectoryResolver
+    {
+        return $this->tokenizedDirectoryResolverService ??=
+            new TokenizedDirectoryResolver($this->app->getInput());
+    }
+
+    private function processorHeaderRenderer(): ProcessorHeaderRenderer
+    {
+        return $this->processorHeaderRendererService ??=
+            new ProcessorHeaderRenderer(new JavascriptValueExporter());
     }
 
     function cbCheckPermissions()

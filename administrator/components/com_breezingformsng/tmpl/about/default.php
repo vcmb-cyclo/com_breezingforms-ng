@@ -333,6 +333,8 @@ if ($licenseValue === '' || in_array(strtolower($licenseValue), $genericLicenseV
 $licenseUrl = 'https://www.gnu.org/licenses/gpl-2.0.html';
 $vcmbUrl = 'https://breezingforms-ng.vcmb.fr';
 $githubUrl = 'https://github.com/vcmb-cyclo/com_breezingformsng';
+$githubOwner = 'vcmb-cyclo';
+$githubRepo = 'com_breezingformsng';
 $logFileName = (string) ($logReport['file'] ?? $notAvailable);
 $logSize = (int) ($logReport['size'] ?? 0);
 $logLoadedAt = (string) ($logReport['loaded_at'] ?? $notAvailable);
@@ -385,6 +387,16 @@ $aboutDescription = str_replace(
             <div class="bf-about-intro-links">
                 <a class="bf-about-intro-link bf-about-intro-link--vcmb" href="<?php echo htmlspecialchars($vcmbUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer"><?php echo Text::_('COM_BREEZINGFORMSNG_VCMB_LINK'); ?></a>
                 <a class="bf-about-intro-link bf-about-intro-link--github" href="<?php echo htmlspecialchars($githubUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer"><?php echo Text::_('COM_BREEZINGFORMSNG_GITHUB_LINK'); ?></a>
+                <iframe
+                    src="<?php echo htmlspecialchars('https://ghbtns.com/github-btn.html?user=' . $githubOwner . '&repo=' . $githubRepo . '&type=star&count=true&size=large', ENT_QUOTES, 'UTF-8'); ?>"
+                    frameborder="0"
+                    scrolling="0"
+                    width="170"
+                    height="30"
+                    title="<?php echo htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_GITHUB_STARS'), ENT_QUOTES, 'UTF-8'); ?>"
+                    style="display:block;align-self:center;"
+                    loading="lazy"
+                ></iframe>
                 <a class="bf-about-intro-link bf-about-intro-link--license" href="<?php echo htmlspecialchars($licenseUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer"><?php echo Text::_('COM_BREEZINGFORMSNG_LICENSE_LINK'); ?></a>
                 <a class="bf-about-intro-link bf-about-intro-link--log" href="#bf-about-log"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_SHOW_LOG'); ?></a>
             </div>

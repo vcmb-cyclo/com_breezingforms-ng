@@ -10,6 +10,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Service;
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Date\Date;
+use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 
 final class DatabaseAuditService
@@ -97,23 +98,31 @@ final class DatabaseAuditService
         $collationHistogram = $this->buildCollationHistogram($tables);
         $orphanChecks = $this->findOrphans($tableList);
         $orphanRows = array_sum(array_column($orphanChecks, 'count'));
+        $unexpectedTables = $this->findUnexpectedTables($tableList);
+        $staleLanguageFiles = $this->findStaleLanguageFiles();
+        $staleInstallerTempDirs = $this->findStaleInstallerTempDirectories();
         $issuesTotal = count($missingTables) + count($collationIssues) + count($columnCollationIssues)
-            + count($duplicateIndexes) + $orphanRows;
+            + count($duplicateIndexes) + $orphanRows + count($unexpectedTables)
+            + count($staleLanguageFiles) + count($staleInstallerTempDirs);
 
         return [
             'generated_at' => (new Date())->toSql(),
             'target_collation' => $targetCollation,
             'tables' => $tables,
             'missing_tables' => $missingTables,
+            'unexpected_tables' => $unexpectedTables,
             'collation_issues' => $collationIssues,
             'column_collation_issues' => $columnCollationIssues,
             'collation_histogram' => $collationHistogram,
             'duplicate_indexes' => $duplicateIndexes,
             'orphan_checks' => $orphanChecks,
+            'stale_language_files' => $staleLanguageFiles,
+            'stale_installer_temp_dirs' => $staleInstallerTempDirs,
             'summary' => [
                 'expected_tables' => count(self::EXPECTED_TABLES),
                 'scanned_tables' => count($tables),
                 'missing_tables' => count($missingTables),
+                'unexpected_tables' => count($unexpectedTables),
                 'total_rows' => $totalRows,
                 'total_data_bytes' => $totalDataBytes,
                 'total_index_bytes' => $totalIndexBytes,
@@ -122,6 +131,8 @@ final class DatabaseAuditService
                 'mixed_collations' => count($collationHistogram) > 1,
                 'duplicate_index_groups' => count($duplicateIndexes),
                 'orphan_rows' => $orphanRows,
+                'stale_language_files' => count($staleLanguageFiles),
+                'stale_installer_temp_dirs' => count($staleInstallerTempDirs),
                 'issues_total' => $issuesTotal,
             ],
         ];
@@ -267,7 +278,12 @@ final class DatabaseAuditService
             }
 
             sort($names, SORT_NATURAL | SORT_FLAG_CASE);
-            $duplicates[] = ['table' => $alias, 'indexes' => $names];
+            $duplicates[] = [
+                'table' => $alias,
+                'indexes' => $names,
+                'keep' => $names[0],
+                'drop' => array_slice($names, 1),
+            ];
         }
 
         return $duplicates;
@@ -297,5 +313,105 @@ final class DatabaseAuditService
         }
 
         return $result;
+    }
+
+    /**
+     * Flags any facileforms_ or breezingforms_ table on this prefix that
+     * isn't in EXPECTED_TABLES - leftovers from an old install, a removed
+     * feature, or a botched uninstall that a fresh EXPECTED_TABLES scan
+     * alone would never surface (it only looks for tables it expects).
+     */
+    private function findUnexpectedTables(array $tableList): array
+    {
+        $prefix = $this->db->getPrefix();
+        $expectedPhysical = array_map(
+            static fn (string $table): string => $prefix . $table,
+            self::EXPECTED_TABLES
+        );
+
+        $unexpected = [];
+        foreach ($tableList as $physicalTable) {
+            if (in_array($physicalTable, $expectedPhysical, true)) {
+                continue;
+            }
+
+            $withoutPrefix = str_starts_with($physicalTable, $prefix)
+                ? substr($physicalTable, strlen($prefix))
+                : $physicalTable;
+
+            if (preg_match('/^(facileforms|breezingforms)_?/i', $withoutPrefix) === 1) {
+                $unexpected[] = '#__' . $withoutPrefix;
+            }
+        }
+
+        sort($unexpected, SORT_NATURAL | SORT_FLAG_CASE);
+
+        return $unexpected;
+    }
+
+    /**
+     * Scans both the admin and site language folders for leftover files
+     * from this component's older naming (com_breezingforms, no "ng"),
+     * which a straightforward Joomla update never removes on its own.
+     */
+    private function findStaleLanguageFiles(): array
+    {
+        $stale = [];
+        $roots = [
+            JPATH_ADMINISTRATOR . '/language',
+            JPATH_SITE . '/language',
+        ];
+
+        foreach ($roots as $root) {
+            if (!is_dir($root)) {
+                continue;
+            }
+
+            $matches = glob($root . '/*/com_breezingforms.*') ?: [];
+            foreach ($matches as $match) {
+                $stale[] = str_replace(JPATH_ROOT, '', $match);
+            }
+        }
+
+        sort($stale, SORT_NATURAL | SORT_FLAG_CASE);
+
+        return $stale;
+    }
+
+    /**
+     * Leftover administrator/components/com_breezingformsng-named temp
+     * folders under Joomla's configured tmp_path, from an install/update
+     * that was interrupted before cleanup.
+     */
+    private function findStaleInstallerTempDirectories(): array
+    {
+        try {
+            $tmpPath = (string) Factory::getApplication()->get('tmp_path', JPATH_ROOT . '/tmp');
+        } catch (\Throwable) {
+            return [];
+        }
+
+        if (!is_dir($tmpPath)) {
+            return [];
+        }
+
+        $matches = glob($tmpPath . '/install_*', GLOB_ONLYDIR) ?: [];
+        $stale = [];
+
+        foreach ($matches as $match) {
+            // Joomla names these folders with a random suffix, not the
+            // extension name, so check the extracted contents instead of
+            // the folder name itself.
+            $manifestMatches = glob($match . '/*com_breezingformsng*.xml') ?: [];
+            if ($manifestMatches === []) {
+                continue;
+            }
+
+            $stale[] = str_replace(JPATH_ROOT, '', $match);
+        }
+
+        sort($stale, SORT_NATURAL | SORT_FLAG_CASE);
+
+        return $stale;
     }
 }

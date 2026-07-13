@@ -29,18 +29,24 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Log\Log;
 use Joomla\CMS\Cache\CacheControllerFactoryInterface;
+use Joomla\CMS\Mail\MailerFactoryInterface;
 use CB\Component\Contentbuilderng\Administrator\Helper\ContentbuilderngHelper;
 use CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory;
 use CB\Component\Contentbuilderng\Administrator\Service\ArticleService;
 use CB\Component\Contentbuilderng\Administrator\Service\ListSupportService;
 use CB\Component\Contentbuilderng\Administrator\Service\PermissionService;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\PdfDocument;
+use Vcmb\Component\BreezingformsNG\Site\Service\Notification\MailSender;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampFormatter;
 
 /**
  * Database logging, mailing primitives and PDF/CSV/XML exports.
  */
 trait bfProcessorExports
 {
+    private ?MailSender $mailSenderService = null;
+    private ?SubmissionTimestampFormatter $submissionTimestampFormatterService = null;
+
     function logToDatabase($cbResult = null)
     { // CONTENTBUILDER
         global $ff_config;
@@ -436,62 +442,48 @@ trait bfProcessorExports
     {
         if ($this->dying)
             return;
-        $mail = bf_createMail($from, $fromname, $subject, $body, $alt_sender);
 
         try {
-
-            if (is_array($recipient))
-                foreach ($recipient as $to)
-                    $mail->AddAddress($to);
-            else
-                $mail->AddAddress($recipient);
-
-            if ($attachment) {
-                if (is_array($attachment)) {
-                    $attCnt = count($attachment);
-                    for ($i = 0; $i < $attCnt; $i++) {
-                        if (trim($attachment[$i]) != '') {
-                            $mail->AddAttachment($attachment[$i]);
-                        }
-                    }
-                } else {
-                    if ($attachment != '') {
-                        $mail->AddAttachment($attachment);
-                    }
-                }
-            } // if
-            //***************************************************
-
-            if (isset($html))
-                $mail->IsHTML($html);
-
-            if (isset($cc)) {
-                if (is_array($cc))
-                    foreach ($cc as $to)
-                        $mail->AddCC($to);
-                else
-                    $mail->AddCC($cc);
-            } // if
-
-            if (isset($bcc)) {
-                if (is_array($bcc))
-                    foreach ($bcc as $to)
-                        $mail->AddBCC($to);
-                else
-                    $mail->AddBCC($bcc);
-            } // if
-
-            if (!$mail->Send()) {
-                $this->status = _FF_STATUS_SENDMAIL_FAILED;
-                $this->message = $mail->ErrorInfo;
-            } // if
-        } catch (Exception $e) {
-
-            $this->app->enqueueMessage($e->getMessage(), 'error');
+            $this->mailSender()->send(
+                (string) $from,
+                (string) $fromname,
+                $this->normalizeMailList($recipient),
+                (string) $subject,
+                (string) $body,
+                $this->normalizeMailList($attachment),
+                isset($html) ? (bool) $html : null,
+                $this->normalizeMailList($cc),
+                $this->normalizeMailList($bcc),
+                (string) $alt_sender
+            );
+        } catch (Throwable $e) {
+            $this->status = _FF_STATUS_SENDMAIL_FAILED;
+            $this->message = $e->getMessage();
+            $this->app->enqueueMessage($this->message, 'error');
         }
     }
 
     // sendMail
+
+    private function mailSender(): MailSender
+    {
+        return $this->mailSenderService ??= new MailSender(
+            Factory::getContainer()->get(MailerFactoryInterface::class),
+            $this->app->getConfig()
+        );
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function normalizeMailList(mixed $values): array
+    {
+        if ($values === null || $values === false) {
+            return [];
+        }
+
+        return array_map('strval', is_array($values) ? array_values($values) : [$values]);
+    }
 
     function endsWith($haystack, $needle)
     {
@@ -542,29 +534,17 @@ trait bfProcessorExports
             }
         }
 
-        $date_stamp = date('YmdHis');
         $submitted = $this->submitted;
-        $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
-        $offset = $date_->getOffsetFromGMT();
-        if ($offset > 0) {
-            $date_->add(new DateInterval('PT' . $offset . 'S'));
-        } else if ($offset < 0) {
-            $offset = $offset * -1;
-            $date_->sub(new DateInterval('PT' . $offset . 'S'));
-        }
-        $this->submitted = $date_->format('Y-m-d H:i:s', true);
-        $date_stamp = $date_->format('YmdHis', true);
-
-        $date_stamp2 = date('Ymd');
-        $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
-        $offset = $date_->getOffsetFromGMT();
-        if ($offset > 0) {
-            $date_->add(new DateInterval('PT' . $offset . 'S'));
-        } else if ($offset < 0) {
-            $offset = $offset * -1;
-            $date_->sub(new DateInterval('PT' . $offset . 'S'));
-        }
-        $date_stamp2 = $date_->format('YmdHis', true);
+        $timestamp = $this->submissionTimestampFormatter()->format(
+            (string) $this->submitted,
+            (string) $this->app->get('offset')
+        );
+        $this->submitted = $timestamp->submittedAt;
+        $date_stamp = $timestamp->fileStamp;
+        $date_stamp2 = $this->submissionTimestampFormatter()->format(
+            (string) $this->submitted,
+            (string) $this->app->get('offset')
+        )->fileStamp;
 
         $this->submitted = $submitted;
 
@@ -707,9 +687,6 @@ trait bfProcessorExports
 
         $inverted = isset($ff_config->csvinverted) ? $ff_config->csvinverted : false;
 
-        $tz = 'UTC';
-        $tz = new DateTimeZone($this->app->get('offset'));
-
         $csvdelimiter = stripslashes($ff_config->csvdelimiter);
         $csvquote = stripslashes($ff_config->csvquote);
         $cellnewline = $ff_config->cellnewline == 0 ? "\n" : "\\n";
@@ -727,18 +704,12 @@ trait bfProcessorExports
 
         $lines[$lineNum]['ZZZ_A_FORM'][] = $this->form;
 
-        $date_stamp = date('YmdHis');
-        $submitted = $this->submitted;
-        $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
-        $offset = $date_->getOffsetFromGMT();
-        if ($offset > 0) {
-            $date_->add(new DateInterval('PT' . $offset . 'S'));
-        } else if ($offset < 0) {
-            $offset = $offset * -1;
-            $date_->sub(new DateInterval('PT' . $offset . 'S'));
-        }
-        $submitted = $date_->format('Y-m-d H:i:s', true);
-        $date_stamp = $date_->format('YmdHis', true);
+        $timestamp = $this->submissionTimestampFormatter()->format(
+            (string) $this->submitted,
+            (string) $this->app->get('offset')
+        );
+        $submitted = $timestamp->submittedAt;
+        $date_stamp = $timestamp->fileStamp;
 
         $lines[$lineNum]['ZZZ_B_SUBMITTED'][] = $submitted;
         $lines[$lineNum]['ZZZ_C_IP'][] = $this->ip;
@@ -816,22 +787,12 @@ trait bfProcessorExports
     {
         global $ff_compath, $ff_version, $mosConfig_fileperms;
 
-        $tz = 'UTC';
-        $tz = new DateTimeZone($this->app->get('offset'));
-
-        $date_stamp = date('YmdHis');
-        $submitted = $this->submitted;
-        $date_file = date('Y-m-d H:i:s');
-        $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
-        $offset = $date_->getOffsetFromGMT();
-        if ($offset > 0) {
-            $date_->add(new DateInterval('PT' . $offset . 'S'));
-        } else if ($offset < 0) {
-            $offset = $offset * -1;
-            $date_->sub(new DateInterval('PT' . $offset . 'S'));
-        }
-        $submitted = $date_->format('Y-m-d H:i:s', true);
-        $date_stamp = $date_->format('YmdHis', true);
+        $timestamp = $this->submissionTimestampFormatter()->format(
+            (string) $this->submitted,
+            (string) $this->app->get('offset')
+        );
+        $submitted = $timestamp->submittedAt;
+        $date_stamp = $timestamp->fileStamp;
         $date_file = $submitted;
 
         if ($this->dying)
@@ -898,5 +859,10 @@ trait bfProcessorExports
     }
 
     // expxml
+
+    private function submissionTimestampFormatter(): SubmissionTimestampFormatter
+    {
+        return $this->submissionTimestampFormatterService ??= new SubmissionTimestampFormatter();
+    }
 
 }

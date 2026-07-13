@@ -24,6 +24,10 @@ use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Language\LanguageHelper;
 use Joomla\Filesystem\Path;
 use Joomla\CMS\Environment\Browser;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\FormDisplayContextResolver;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\FormPathResolver;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RequestMetadataResolver;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampFactory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Log\Log;
@@ -578,35 +582,20 @@ class HTML_facileFormsProcessor
         $this->editable_override = $editable_override;
         $this->app = Factory::getApplication();
 
-        if (!class_exists('Joomla\CMS\Environment\Browser')) {
-            require_once(JPATH_SITE . '/libraries/joomla/environment/browser.php');
-        }
-        $this->ip = $_SERVER['REMOTE_ADDR'];
-        if ($ff_config->disable_ip == "1") {
-            $this->ip = 0;
-        }
-        $this->agent = Browser::getInstance()->getAgentString();
-
-        $this->browser = Browser::getInstance()->getAgentString();
-
-        $jbrowserInstance = Browser::getInstance();
-        $this->opsys = $jbrowserInstance->getPlatform();
-
-        if ($ff_config->getprovider == 0)
-            $this->provider = Text::_('COM_BREEZINGFORMSNG_PROCESS_UNKNOWN');
-        else {
-            $host = @GetHostByAddr($this->ip);
-            $this->provider = preg_replace('/^./', '', strchr($host, '.'));
-        } // if
+        $requestMetadata = (new RequestMetadataResolver(Browser::getInstance()))->resolve(
+            $this->app->getInput()->server->getString('REMOTE_ADDR', ''),
+            (string) $ff_config->disable_ip === '1',
+            (int) $ff_config->getprovider !== 0,
+            Text::_('COM_BREEZINGFORMSNG_PROCESS_UNKNOWN')
+        );
+        $this->ip = $requestMetadata->ip;
+        $this->agent = $requestMetadata->agent;
+        $this->browser = $requestMetadata->browser;
+        $this->opsys = $requestMetadata->platform;
+        $this->provider = $requestMetadata->provider;
 
 
-        $tz = 'UTC';
-        $tz = new DateTimeZone($this->app->get('offset'));
-
-        $submitted = new \Joomla\CMS\Date\Date();
-        $submitted = new \Joomla\CMS\Date\Date('now', $tz);
-
-        $this->submitted = $submitted->format('Y-m-d H:i:s');
+        $this->submitted = (new SubmissionTimestampFactory())->create((string) $this->app->get('offset'));
 
         /*
           $format = Text::_('DATE_FORMAT_LC2');
@@ -632,70 +621,40 @@ class HTML_facileFormsProcessor
             $this->rows = $this->database->loadObjectList();
             $this->rowcount = count($this->rows);
         } // if
-        $this->inline = 0;
-        $this->template = 0;
-        $this->form_id = "ff_form" . $form;
-        if ($runmode == _FF_RUNMODE_FRONTEND) {
-            $this->homepage = $ff_mossite;
-        } else {
-            if ($this->inframe) {
-                $this->homepage = $ff_mossite . '/administrator/index.php?tmpl=component';
-                if ($this->formrow->runmode == 2)
-                    $this->template++;
-            } else {
-                $this->template++;
-                if ($runmode == _FF_RUNMODE_PREVIEW) {
-                    $this->inline = 1;
-                    $this->form_id = "adminForm";
-                } // if
-                $this->homepage = 'index.php?tmpl=component';
-            } // if
-        } // if
+        $displayContext = (new FormDisplayContextResolver())->resolve(
+            (int) $runmode,
+            (bool) $this->inframe,
+            (int) $form,
+            (int) $this->formrow->runmode,
+            (bool) $this->formrow->published,
+            (int) $this->formrow->prevmode,
+            (int) $ff_config->gridshow === 1,
+            (int) $ff_config->gridsize,
+            (string) $ff_mossite
+        );
+        $this->inline = $displayContext->inline;
+        $this->template = $displayContext->template;
+        $this->form_id = $displayContext->formId;
+        $this->homepage = $displayContext->homepage;
         $this->mospath = $ff_mospath;
         $this->mossite = $ff_mossite;
-        $this->findtags = array(
-            '{ff_currentpage}',
-            '{ff_lastpage}',
-            '{ff_name}',
-            '{ff_title}',
-            '{ff_homepage}',
-            '{mospath}',
-            '{mossite}'
+        $formPaths = (new FormPathResolver())->resolve(
+            (int) $this->page,
+            (int) $this->formrow->pages,
+            (string) $this->formrow->name,
+            (string) $this->formrow->title,
+            (string) $this->homepage,
+            (string) $this->mospath,
+            (string) $this->mossite,
+            (string) $ff_config->images,
+            (string) $ff_config->uploads
         );
-        $this->replacetags = array(
-            $this->page,
-            $this->formrow->pages,
-            $this->formrow->name,
-            $this->formrow->title,
-            $this->homepage,
-            $this->mospath,
-            $this->mossite
-        );
-        $this->images = str_replace($this->findtags, $this->replacetags, $ff_config->images);
-        $this->findtags[] = '{ff_images}';
-        $this->replacetags[] = $this->images;
-        $this->uploads = str_replace($this->findtags, $this->replacetags, $ff_config->uploads);
-        $this->findtags[] = '{ff_uploads}';
-        $this->replacetags[] = $this->uploads;
-        // CONTENTBUILDER
-        $this->findtags[] = '{CBSite}';
-        $this->replacetags[] = JPATH_SITE;
-        $this->findtags[] = '{cbsite}';
-        $this->replacetags[] = JPATH_SITE;
-        $this->showgrid = $runmode == _FF_RUNMODE_PREVIEW && $this->formrow->prevmode > 0 && $ff_config->gridshow == 1 && $ff_config->gridsize > 1;
-        $this->okrun = $this->formrow->published;
-
-        if ($this->okrun)
-            switch ($this->runmode) {
-                case _FF_RUNMODE_FRONTEND:
-                    $this->okrun = ($this->formrow->runmode == 0 || $this->formrow->runmode == 1);
-                    break;
-                case _FF_RUNMODE_BACKEND:
-                    $this->okrun = ($this->formrow->runmode == 0 || $this->formrow->runmode == 2);
-                    break;
-                default:
-                    ;
-            } // switch
+        $this->findtags = $formPaths->tokens;
+        $this->replacetags = $formPaths->values;
+        $this->images = $formPaths->images;
+        $this->uploads = $formPaths->uploads;
+        $this->showgrid = $displayContext->showGrid;
+        $this->okrun = $displayContext->canRun;
         $this->traceMode = _FF_TRACEMODE_FIRST;
         $this->traceStack = array();
         $this->traceBuffer = null;

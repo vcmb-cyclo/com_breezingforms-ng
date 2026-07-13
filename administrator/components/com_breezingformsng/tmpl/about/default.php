@@ -306,6 +306,9 @@ $auditReport = is_array($this->auditReport ?? null) ? $this->auditReport : array
 $auditSummary = (array) ($auditReport['summary'] ?? array());
 $auditTables = (array) ($auditReport['tables'] ?? array());
 $auditMissingTables = (array) ($auditReport['missing_tables'] ?? array());
+$auditUnexpectedTables = (array) ($auditReport['unexpected_tables'] ?? array());
+$auditStaleLanguageFiles = (array) ($auditReport['stale_language_files'] ?? array());
+$auditStaleInstallerTempDirs = (array) ($auditReport['stale_installer_temp_dirs'] ?? array());
 $auditCollationIssues = (array) ($auditReport['collation_issues'] ?? array());
 $auditColumnCollationIssues = (array) ($auditReport['column_collation_issues'] ?? array());
 $auditCollationHistogram = (array) ($auditReport['collation_histogram'] ?? array());
@@ -431,6 +434,39 @@ $aboutDescription = str_replace(
                     </div>
                 <?php endif; ?>
 
+                <?php if ($auditUnexpectedTables !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_UNEXPECTED_TABLES'); ?></h4>
+                        <ul class="mb-0">
+                            <?php foreach ($auditUnexpectedTables as $table) : ?>
+                                <li><code><?php echo htmlspecialchars((string) $table, ENT_QUOTES, 'UTF-8'); ?></code></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($auditStaleLanguageFiles !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_STALE_LANGUAGE_FILES'); ?></h4>
+                        <ul class="mb-0">
+                            <?php foreach ($auditStaleLanguageFiles as $file) : ?>
+                                <li><code><?php echo htmlspecialchars((string) $file, ENT_QUOTES, 'UTF-8'); ?></code></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($auditStaleInstallerTempDirs !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_STALE_INSTALLER_TEMP'); ?></h4>
+                        <ul class="mb-0">
+                            <?php foreach ($auditStaleInstallerTempDirs as $dir) : ?>
+                                <li><code><?php echo htmlspecialchars((string) $dir, ENT_QUOTES, 'UTF-8'); ?></code></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
                 <?php if ($auditCollationIssues !== array()) : ?>
                     <div class="bf-audit-section-block mb-3">
                         <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_COLLATIONS'); ?></h4>
@@ -479,7 +515,18 @@ $aboutDescription = str_replace(
                         <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_INDEXES'); ?></h4>
                         <ul class="mb-0">
                             <?php foreach ($auditDuplicateIndexes as $issue) : ?>
-                                <li><code><?php echo htmlspecialchars((string) ($issue['table'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code>: <?php echo htmlspecialchars(implode(', ', (array) ($issue['indexes'] ?? array())), ENT_QUOTES, 'UTF-8'); ?></li>
+                                <li>
+                                    <code><?php echo htmlspecialchars((string) ($issue['table'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code>:
+                                    <?php echo htmlspecialchars(implode(', ', (array) ($issue['indexes'] ?? array())), ENT_QUOTES, 'UTF-8'); ?>
+                                    <?php if (($issue['keep'] ?? '') !== '' && (array) ($issue['drop'] ?? array()) !== array()) : ?>
+                                        &mdash;
+                                        <?php echo Text::sprintf(
+                                            'COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_INDEX_HINT',
+                                            htmlspecialchars((string) $issue['keep'], ENT_QUOTES, 'UTF-8'),
+                                            htmlspecialchars(implode(', ', (array) $issue['drop']), ENT_QUOTES, 'UTF-8')
+                                        ); ?>
+                                    <?php endif; ?>
+                                </li>
                             <?php endforeach; ?>
                         </ul>
                     </div>

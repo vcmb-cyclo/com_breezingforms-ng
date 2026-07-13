@@ -306,7 +306,7 @@
 
 > Projet de refonte dédié. Ne pas commencer avant que les phases 1–6 soient validées.
 
-- [ ] Décomposer `facileforms.process.php` (448 KB) en services :  
+- [x] Décomposer le `facileforms.process.php` monolithique en services et traits fonctionnels :
   `FormRenderer`, `FormProcessor`, `SubmissionHandler`, intégrations (Stripe, Mailchimp, Dropbox…)
 - [x] Squelette MVC site (2026-07-11) : `DisplayController` (vue par défaut `form`, **contrôle CSRF sur `ff_task=submit`**),
   `View/Form/HtmlView`, `tmpl/form/default.php` (délègue encore au moteur legacy), métadonnées de menu modernisées
@@ -362,8 +362,21 @@
 - [x] Retirer le helper mort `bf_ToolTip()` fondé sur l'ancien service `HTMLHelper::_('tooltip')` et supprimer
   l'initialisation Bootstrap répétée dans les 293 appels à `bf_tooltipText()` *(tooltip initialisé une fois par QuickMode)*
 - [ ] Réécriture native du moteur (remplacer les traits legacy par de vrais services typés) — chantier de fond restant.
-  Restent côté crosstec : `BFRequest` (387 appels — portage de JRequest avec caches `$GLOBALS` et `setVar` mutant les
-  superglobales : à traiter lors de la réécriture, pas par substitution), `BFIntegrate` et les rendus `BFQuickMode*`.
+  Le stockage physique, le traitement d'images, la résolution des chemins/masques et la recherche d'éléments QuickMode du trait
+  `bfProcessorUploads` sont extraits dans les services typés `Site\Service\Upload\ImageResizer`,
+  `UploadPathResolver`, `UploadStorage` (résultat et erreurs typés) et `Site\Service\QuickMode\ElementFinder`
+  (2026-07-13) ; les méthodes publiques historiques délèguent aux services pour préserver les appels issus de code
+  personnalisé. La sérialisation des valeurs JavaScript et la résolution des classes CSS de `bfProcessorCodeTools`
+  sont également extraites dans `Site\Service\Rendering\JavascriptValueExporter` et `ClassNameResolver`, avec une
+  sortie vérifiée octet pour octet contre l'algorithme historique. Les opérations de chaînes et le formatage des
+  modes de trace passent par `Site\Service\Runtime\CodeStringTools` et `TraceModeFormatter` (parité vérifiée sur les
+  4 096 combinaisons de bits). La construction des répertoires avec jetons (`cbCreatePathByTokens`) est déplacée de
+  `bfProcessorRendering` vers `Site\Service\Upload\TokenizedDirectoryResolver`, avec création récursive via l'API
+  Joomla `Folder`. Le bloc JavaScript d'état `ff_processor` est rendu par
+  `Site\Service\Rendering\ProcessorHeaderRenderer`, avec le compresseur historique injecté uniquement lorsqu'il est
+  activé. Restent l'orchestration de
+  `facileforms.process.php` et les responsabilités encore portées par les sept traits `legacy/processor`. Les six classes Crosstec protégées
+  (`BFRequest`, `BFIntegrate` et les quatre rendus `BFQuickMode*`) restent volontairement disponibles comme API externe.
   `BFJoomlaConfig` a été remplacé par `Factory::getConfig()` ; `BFPDF` a été migré vers le service namespacé
   `Administrator\Service\PdfDocument`. Les deux classes globales ont été supprimées. Export administrateur vérifié
   dans Joomla 6 le 2026-07-12 : PDF 1.7 valide généré avec les en-têtes de téléchargement attendus.*

@@ -14,6 +14,7 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Support\RedirectHelper;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
+use Joomla\Database\ParameterType;
 use Joomla\Filesystem\File;
 
 /**
@@ -32,7 +33,13 @@ class PayPalCallback
 
 
     $input = Factory::getApplication()->getInput();
-    $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($input->getInt('form_id', -1)));
+    $formId = $input->getInt('form_id', -1);
+    $query = $db->getQuery(true)
+        ->select('*')
+        ->from($db->quoteName('#__facileforms_forms'))
+        ->where($db->quoteName('id') . ' = :formId')
+        ->bind(':formId', $formId, ParameterType::INTEGER);
+    $db->setQuery($query);
     $list = $db->loadObjectList();
     if (count($list) == 0) {
         header("Status: 200 OK");
@@ -108,25 +115,35 @@ class PayPalCallback
 
                 if (strcmp($lines[0], "VERIFIED") == 0) {
 
-                    $query = "SELECT * FROM #__facileforms_records WHERE id = '" . $input->getInt('record_id', -1) . "' LIMIT 1";
-                    $db->setQuery($query);
+                    $recordId = $input->getInt('record_id', -1);
+                    $recordQuery = $db->getQuery(true)
+                        ->select('*')
+                        ->from($db->quoteName('#__facileforms_records'))
+                        ->where($db->quoteName('id') . ' = :recordId')
+                        ->setLimit(1)
+                        ->bind(':recordId', $recordId, ParameterType::INTEGER);
+                    $db->setQuery($recordQuery);
                     $txid = $db->loadObjectList();
 
                     if (count($txid) != 0) {
 
                         if ($txid[0]->paypal_tx_id == '') {
 
-                            $db->setQuery("
-										Update
-											#__facileforms_records
-										Set
-											paypal_tx_id = " . $db->Quote('PayPal: ' . $tx_token . ' (VALID)') . ",
-											paypal_payment_date = " . $db->Quote(date('Y-m-d H:i:s')) . ",
-											paypal_testaccount = " . $db->Quote($options['testaccount'] ? 1 : 0) . ",
-											paypal_download_tries = 0
-										Where
-											id = '" . $input->getInt('record_id', -1) . "'
-											");
+                            $paypalTxId = 'PayPal: ' . $tx_token . ' (VALID)';
+                            $paymentDate = date('Y-m-d H:i:s');
+                            $testaccount = $options['testaccount'] ? 1 : 0;
+                            $updateQuery = $db->getQuery(true)
+                                ->update($db->quoteName('#__facileforms_records'))
+                                ->set($db->quoteName('paypal_tx_id') . ' = :paypalTxId')
+                                ->set($db->quoteName('paypal_payment_date') . ' = :paymentDate')
+                                ->set($db->quoteName('paypal_testaccount') . ' = :testaccount')
+                                ->set($db->quoteName('paypal_download_tries') . ' = 0')
+                                ->where($db->quoteName('id') . ' = :recordId')
+                                ->bind(':paypalTxId', $paypalTxId, ParameterType::STRING)
+                                ->bind(':paymentDate', $paymentDate, ParameterType::STRING)
+                                ->bind(':testaccount', $testaccount, ParameterType::INTEGER)
+                                ->bind(':recordId', $recordId, ParameterType::INTEGER);
+                            $db->setQuery($updateQuery);
 
                             $db->execute();
 
@@ -148,23 +165,33 @@ class PayPalCallback
                     header("Status: 200 OK");
                 } else if (strcmp($lines[0], "INVALID") == 0) {
 
-                    $query = "SELECT * FROM #__facileforms_records WHERE id = '" . $input->getInt('record_id', -1) . "' LIMIT 1";
-                    $db->setQuery($query);
+                    $recordId = $input->getInt('record_id', -1);
+                    $recordQuery = $db->getQuery(true)
+                        ->select('*')
+                        ->from($db->quoteName('#__facileforms_records'))
+                        ->where($db->quoteName('id') . ' = :recordId')
+                        ->setLimit(1)
+                        ->bind(':recordId', $recordId, ParameterType::INTEGER);
+                    $db->setQuery($recordQuery);
                     $txid = $db->loadObjectList();
 
                     if (count($txid) != 0) {
 
-                        $db->setQuery("
-										Update
-											#__facileforms_records
-										Set
-											paypal_tx_id = " . $db->Quote('PayPal: ' . $tx_token . ' (INVALID)') . ",
-											paypal_payment_date = " . $db->Quote(date('Y-m-d H:i:s')) . ",
-											paypal_testaccount = " . $db->Quote($options['testaccount'] ? 1 : 0) . ",
-											paypal_download_tries = 0
-										Where
-											id = '" . $input->getInt('record_id', -1) . "'
-											");
+                        $paypalTxId = 'PayPal: ' . $tx_token . ' (INVALID)';
+                        $paymentDate = date('Y-m-d H:i:s');
+                        $testaccount = $options['testaccount'] ? 1 : 0;
+                        $updateQuery = $db->getQuery(true)
+                            ->update($db->quoteName('#__facileforms_records'))
+                            ->set($db->quoteName('paypal_tx_id') . ' = :paypalTxId')
+                            ->set($db->quoteName('paypal_payment_date') . ' = :paymentDate')
+                            ->set($db->quoteName('paypal_testaccount') . ' = :testaccount')
+                            ->set($db->quoteName('paypal_download_tries') . ' = 0')
+                            ->where($db->quoteName('id') . ' = :recordId')
+                            ->bind(':paypalTxId', $paypalTxId, ParameterType::STRING)
+                            ->bind(':paymentDate', $paymentDate, ParameterType::STRING)
+                            ->bind(':testaccount', $testaccount, ParameterType::INTEGER)
+                            ->bind(':recordId', $recordId, ParameterType::INTEGER);
+                        $db->setQuery($updateQuery);
 
                         $db->execute();
                     }
@@ -198,7 +225,13 @@ class PayPalCallback
 
 
     $input = Factory::getApplication()->getInput();
-    $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($input->getInt('form_id', -1)));
+    $formId = $input->getInt('form_id', -1);
+    $query = $db->getQuery(true)
+        ->select('*')
+        ->from($db->quoteName('#__facileforms_forms'))
+        ->where($db->quoteName('id') . ' = :formId')
+        ->bind(':formId', $formId, ParameterType::INTEGER);
+    $db->setQuery($query);
     $list = $db->loadObjectList();
     if (count($list) == 0) {
         RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
@@ -291,25 +324,35 @@ class PayPalCallback
                         require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
                     } else {
 
-                        $query = "SELECT * FROM #__facileforms_records WHERE id = '" . $input->getInt('record_id', -1) . "' LIMIT 1";
-                        $db->setQuery($query);
+                        $recordId = $input->getInt('record_id', -1);
+                        $recordQuery = $db->getQuery(true)
+                            ->select('*')
+                            ->from($db->quoteName('#__facileforms_records'))
+                            ->where($db->quoteName('id') . ' = :recordId')
+                            ->setLimit(1)
+                            ->bind(':recordId', $recordId, ParameterType::INTEGER);
+                        $db->setQuery($recordQuery);
                         $txid = $db->loadObjectList();
 
                         if (count($txid) != 0) {
 
                             if ($txid[0]->paypal_tx_id == '') {
 
-                                $db->setQuery("
-										Update 
-											#__facileforms_records 
-										Set 
-											paypal_tx_id = " . $db->Quote('PayPal: ' . $tx_token) . ", 
-											paypal_payment_date = " . $db->Quote(date('Y-m-d H:i:s', strtotime($keyarray["payment_date"]))) . ",
-											paypal_testaccount = " . $db->Quote($options['testaccount'] ? 1 : 0) . ",
-											paypal_download_tries = 0
-										Where 
-											id = '" . $input->getInt('record_id', -1) . "'
-											");
+                                $paypalTxId = 'PayPal: ' . $tx_token;
+                                $paymentDate = date('Y-m-d H:i:s', strtotime($keyarray["payment_date"]));
+                                $testaccount = $options['testaccount'] ? 1 : 0;
+                                $updateQuery = $db->getQuery(true)
+                                    ->update($db->quoteName('#__facileforms_records'))
+                                    ->set($db->quoteName('paypal_tx_id') . ' = :paypalTxId')
+                                    ->set($db->quoteName('paypal_payment_date') . ' = :paymentDate')
+                                    ->set($db->quoteName('paypal_testaccount') . ' = :testaccount')
+                                    ->set($db->quoteName('paypal_download_tries') . ' = 0')
+                                    ->where($db->quoteName('id') . ' = :recordId')
+                                    ->bind(':paypalTxId', $paypalTxId, ParameterType::STRING)
+                                    ->bind(':paymentDate', $paymentDate, ParameterType::STRING)
+                                    ->bind(':testaccount', $testaccount, ParameterType::INTEGER)
+                                    ->bind(':recordId', $recordId, ParameterType::INTEGER);
+                                $db->setQuery($updateQuery);
 
                                 $db->execute();
 
@@ -393,7 +436,13 @@ class PayPalCallback
 
 
     $input = Factory::getApplication()->getInput();
-    $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($input->getInt('form', -1)));
+    $formIdForDownload = $input->getInt('form', -1);
+    $query = $db->getQuery(true)
+        ->select('*')
+        ->from($db->quoteName('#__facileforms_forms'))
+        ->where($db->quoteName('id') . ' = :formIdForDownload')
+        ->bind(':formIdForDownload', $formIdForDownload, ParameterType::INTEGER);
+    $db->setQuery($query);
     $list = $db->loadObjectList();
     if (count($list) == 0) {
         RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
@@ -417,18 +466,22 @@ class PayPalCallback
 
                     $file = $options['filepath'];
 
-                    $db->setQuery("
-									Select paypal_download_tries From 
-										#__facileforms_records 
-									Where 
-										id = '" . $input->getInt('record_id', -1) . "'
-									And
-										( 
-                                                                                    paypal_tx_id = " . $db->Quote('PayPal: ' . $input->getString('tx', '')) . "
-                                                                                  Or
-                                                                                    paypal_tx_id = " . $db->Quote('PayPal: ' . $input->getString('tx', '') . ' (VALID)') . "
-                                                                                )
-									");
+                    $downloadRecordId = $input->getInt('record_id', -1);
+                    $txPlain = 'PayPal: ' . $input->getString('tx', '');
+                    $txValid = 'PayPal: ' . $input->getString('tx', '') . ' (VALID)';
+
+                    $selectQuery = $db->getQuery(true)
+                        ->select($db->quoteName('paypal_download_tries'))
+                        ->from($db->quoteName('#__facileforms_records'))
+                        ->where($db->quoteName('id') . ' = :downloadRecordId')
+                        ->extendWhere('AND', [
+                            $db->quoteName('paypal_tx_id') . ' = :txPlain',
+                            $db->quoteName('paypal_tx_id') . ' = :txValid',
+                        ], 'OR')
+                        ->bind(':downloadRecordId', $downloadRecordId, ParameterType::INTEGER)
+                        ->bind(':txPlain', $txPlain, ParameterType::STRING)
+                        ->bind(':txValid', $txValid, ParameterType::STRING);
+                    $db->setQuery($selectQuery);
 
                     $downloads = $db->loadObjectList();
 
@@ -436,20 +489,18 @@ class PayPalCallback
 
                         if ($downloads[0]->paypal_download_tries < $options['downloadTries']) {
 
-                            $db->setQuery("
-											Update 
-												#__facileforms_records 
-											Set
-												paypal_download_tries = paypal_download_tries + 1 
-											Where 
-												id = '" . $input->getInt('record_id', -1) . "'
-											And
-												(
-                                                                                                    paypal_tx_id = " . $db->Quote('PayPal: ' . $input->getString('tx', '')) . "
-                                                                                                  Or
-                                                                                                    paypal_tx_id = " . $db->Quote('PayPal: ' . $input->getString('tx', '') . ' (VALID)') . "
-                                                                                                )
-											");
+                            $updateQuery = $db->getQuery(true)
+                                ->update($db->quoteName('#__facileforms_records'))
+                                ->set($db->quoteName('paypal_download_tries') . ' = ' . $db->quoteName('paypal_download_tries') . ' + 1')
+                                ->where($db->quoteName('id') . ' = :downloadRecordId')
+                                ->extendWhere('AND', [
+                                    $db->quoteName('paypal_tx_id') . ' = :txPlain',
+                                    $db->quoteName('paypal_tx_id') . ' = :txValid',
+                                ], 'OR')
+                                ->bind(':downloadRecordId', $downloadRecordId, ParameterType::INTEGER)
+                                ->bind(':txPlain', $txPlain, ParameterType::STRING)
+                                ->bind(':txValid', $txValid, ParameterType::STRING);
+                            $db->setQuery($updateQuery);
 
                             $db->execute();
 

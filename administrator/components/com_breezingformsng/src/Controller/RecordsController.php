@@ -12,6 +12,8 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\Database\DatabaseInterface;
+use Joomla\Database\ParameterType;
 use Joomla\Utilities\ArrayHelper;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\RecordModel;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\PdfDocument;
@@ -140,14 +142,7 @@ class RecordsController extends BaseController
         $tz = $model->getTimezone();
         $db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
-        if ($ids) {
-            $db->setQuery("Select * From #__facileforms_records Where id In (" . implode(',', $ids) . ") Order By submitted Desc");
-        } elseif ($formSelection) {
-            $db->setQuery("Select * From #__facileforms_records Where form = " . $formSelection . " Order By submitted Desc");
-        } else {
-            $db->setQuery("Select * From #__facileforms_records Order By submitted Desc");
-        }
-        $recs = $db->loadObjectList();
+        $recs = $this->fetchRecords($db, $ids, $formSelection);
 
         $formName = ($formSelection && $recs) ? ($recs[0]->name ?? '') : '';
 
@@ -193,6 +188,10 @@ class RecordsController extends BaseController
         $pdf = new PdfDocument();
         $pdf->setFormName($formName);
         $pdf->setWhich('export');
+
+        // Site-customised PDF templates under media/breezingforms/pdftpl/ can
+        // predate the BFText -> Text migration and still call BFText::_().
+        require_once JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFText.php';
 
         @ob_end_clean();
         ob_start();
@@ -271,21 +270,17 @@ class RecordsController extends BaseController
         $quote = stripslashes((string) $config->csvquote);
         $cellNewline = ((int) $config->cellnewline === 0) ? "\n" : "\\n";
 
+        $recs = $this->fetchRecords($db, $ids, $formSelection);
+
         if ($ids) {
-            $db->setQuery("Select * From #__facileforms_records Where id In (" . implode(',', $ids) . ") Order By submitted Desc");
-            $recs = $db->loadObjectList();
             $formIds = array_unique(array_map(fn($r) => (int) $r->form, $recs));
-            $db->setQuery("Select Distinct * From #__facileforms_elements Where form In (" . implode(',', $formIds) . ") And published = 1 And `name` Not In ('bfFakeName','bfFakeName2','bfFakeName3','bfFakeName4','bfFakeName5') Order By ordering");
         } elseif ($formSelection) {
-            $db->setQuery("Select * From #__facileforms_records Where form = " . $formSelection . " Order By submitted Desc");
-            $recs = $db->loadObjectList();
-            $db->setQuery("Select Distinct * From #__facileforms_elements Where form = " . $formSelection . " And published = 1 And `name` Not In ('bfFakeName','bfFakeName2','bfFakeName3','bfFakeName4','bfFakeName5') Order By ordering");
+            $formIds = [$formSelection];
         } else {
-            $db->setQuery("Select * From #__facileforms_records Order By submitted Desc");
-            $recs = $db->loadObjectList();
-            $db->setQuery("Select Distinct * From #__facileforms_elements Where published = 1 And `name` Not In ('bfFakeName','bfFakeName2','bfFakeName3','bfFakeName4','bfFakeName5')");
+            $formIds = [];
         }
-        $elementFields = $db->loadObjectList();
+
+        $elementFields = $this->fetchElementFields($db, $formIds);
         $formName = ($formSelection && $recs) ? ($recs[0]->name ?? '') : '';
 
         $headKeys = [];
@@ -383,14 +378,7 @@ class RecordsController extends BaseController
         $tz = $model->getTimezone();
         $db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
-        if ($ids) {
-            $db->setQuery("Select * From #__facileforms_records Where id In (" . implode(',', $ids) . ") Order By submitted Desc");
-        } elseif ($formSelection) {
-            $db->setQuery("Select * From #__facileforms_records Where form = " . $formSelection . " Order By submitted Desc");
-        } else {
-            $db->setQuery("Select * From #__facileforms_records Order By submitted Desc");
-        }
-        $recs = $db->loadObjectList();
+        $recs = $this->fetchRecords($db, $ids, $formSelection);
         $formName = ($formSelection && $recs) ? ($recs[0]->name ?? '') : '';
 
         $datestamp = new \Joomla\CMS\Date\Date('now', $tz);
@@ -500,6 +488,50 @@ class RecordsController extends BaseController
             ->bootComponent('com_breezingformsng')
             ->getMVCFactory()
             ->createModel('Record', 'Administrator');
+    }
+
+    /**
+     * Shared by exportPdf()/exportCsv()/exportXml(): fetch the records
+     * matching either an explicit id selection, a form filter, or all
+     * records, always ordered by submission date descending.
+     */
+    private function fetchRecords(DatabaseInterface $db, array $ids, int $formSelection): array
+    {
+        $query = $db->getQuery(true)
+            ->select('*')
+            ->from($db->quoteName('#__facileforms_records'))
+            ->order($db->quoteName('submitted') . ' DESC');
+
+        if ($ids) {
+            $query->whereIn($db->quoteName('id'), $ids, ParameterType::INTEGER);
+        } elseif ($formSelection) {
+            $query->where($db->quoteName('form') . ' = :formSelection')
+                ->bind(':formSelection', $formSelection, ParameterType::INTEGER);
+        }
+
+        $db->setQuery($query);
+        return $db->loadObjectList();
+    }
+
+    /**
+     * Shared by exportCsv(): the distinct published element fields for the
+     * form(s) covered by the current export selection.
+     */
+    private function fetchElementFields(DatabaseInterface $db, array $formIds): array
+    {
+        $query = $db->getQuery(true)
+            ->select('DISTINCT *')
+            ->from($db->quoteName('#__facileforms_elements'))
+            ->where($db->quoteName('published') . ' = 1')
+            ->whereNotIn($db->quoteName('name'), ['bfFakeName', 'bfFakeName2', 'bfFakeName3', 'bfFakeName4', 'bfFakeName5'], ParameterType::STRING)
+            ->order($db->quoteName('ordering'));
+
+        if ($formIds) {
+            $query->whereIn($db->quoteName('form'), $formIds, ParameterType::INTEGER);
+        }
+
+        $db->setQuery($query);
+        return $db->loadObjectList();
     }
 
     private function listUrl(\Joomla\Input\Input $input): string

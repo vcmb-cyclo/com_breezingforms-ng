@@ -15,6 +15,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
+use Joomla\Database\ParameterType;
 use Joomla\Filesystem\File;
 
 /**
@@ -188,10 +189,14 @@ $ff_request = array();
     // load form
     $ok = true;
     if (is_numeric($formid)) {
-        $database->setQuery(
-            "select * from #__facileforms_forms " .
-            "where id=" . intval($formid) . " and published=1"
-        );
+        $formIdInt = (int) $formid;
+        $query = $database->getQuery(true)
+            ->select('*')
+            ->from($database->quoteName('#__facileforms_forms'))
+            ->where($database->quoteName('id') . ' = :formIdInt')
+            ->where($database->quoteName('published') . ' = 1')
+            ->bind(':formIdInt', $formIdInt, ParameterType::INTEGER);
+        $database->setQuery($query);
         $forms = $database->loadObjectList();
         if (count($forms) < 1) {
             echo '[Form ' . intval($formid) . ' not found!]';
@@ -200,11 +205,14 @@ $ff_request = array();
             $form = $forms[0];
     } else
         if ($formname != null) {
-            $database->setQuery(
-                "select * from #__facileforms_forms " .
-                "where name=" . $database->Quote($formname) . " and published=1 " .
-                "order by ordering, id"
-            );
+            $query = $database->getQuery(true)
+                ->select('*')
+                ->from($database->quoteName('#__facileforms_forms'))
+                ->where($database->quoteName('name') . ' = :formname')
+                ->where($database->quoteName('published') . ' = 1')
+                ->order([$database->quoteName('ordering'), $database->quoteName('id')])
+                ->bind(':formname', $formname, ParameterType::STRING);
+            $database->setQuery($query);
             $forms = $database->loadObjectList();
             if (count($forms) < 1) {
                 echo '[Form ' . htmlentities($formname, ENT_QUOTES, 'UTF-8') . ' not found!]';
@@ -359,7 +367,13 @@ $ff_request = array();
             // process inline
             $myUser = Factory::getApplication()->getIdentity();
 
-            $database->setQuery("select id from #__users where lower(username)=lower('" . $myUser->get('username', '') . "')");
+            $username = (string) $myUser->get('username', '');
+            $query = $database->getQuery(true)
+                ->select($database->quoteName('id'))
+                ->from($database->quoteName('#__users'))
+                ->where('LOWER(' . $database->quoteName('username') . ') = LOWER(:username)')
+                ->bind(':username', $username, ParameterType::STRING);
+            $database->setQuery($query);
             $id = $database->loadResult();
             if ($id)
                 $myUser->get('id', -1);

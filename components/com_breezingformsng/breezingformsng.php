@@ -62,6 +62,7 @@ $cache->setCaching(false);
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/constants.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFRequest.php');
+require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFText.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFFactory.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFIntegrate.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickMode.php');

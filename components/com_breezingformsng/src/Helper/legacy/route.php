@@ -12,6 +12,7 @@ defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
+use Joomla\Database\ParameterType;
 
 require_once JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFRequest.php';
 
@@ -28,10 +29,29 @@ abstract class BreezingformsNGHelperRoute
         if (Factory::getApplication()->getConfig()->get('sef')) {
             $menu = 'menuitemid';
             $db = Factory::getContainer()->get(DatabaseInterface::class);
-            $db->setQuery("Select `name` From #__facileforms_forms Where id = " . intval($the_id[0]));
+            $formId = (int) $the_id[0];
+            $query = $db->getQuery(true)
+                ->select($db->quoteName('name'))
+                ->from($db->quoteName('#__facileforms_forms'))
+                ->where($db->quoteName('id') . ' = :formId')
+                ->bind(':formId', $formId, ParameterType::INTEGER);
+            $db->setQuery($query);
             $formname = $db->loadResult();
             if ($formname) {
-                $db->setQuery("Select id From #__menu Where published = 1 And link = 'index.php?option=com_breezingformsng&view=form' And ( params Like " . $db->Quote('%ff_com_name=' . $formname . '%') . " Or params Like " . $db->Quote('%"ff_com_name":"' . $formname . '"%') . " )");
+                $likeEquals = '%ff_com_name=' . $formname . '%';
+                $likeJson = '%"ff_com_name":"' . $formname . '"%';
+                $query = $db->getQuery(true)
+                    ->select('id')
+                    ->from($db->quoteName('#__menu'))
+                    ->where($db->quoteName('published') . ' = 1')
+                    ->where($db->quoteName('link') . ' = ' . $db->quote('index.php?option=com_breezingformsng&view=form'))
+                    ->extendWhere('AND', [
+                        $db->quoteName('params') . ' LIKE :likeEquals',
+                        $db->quoteName('params') . ' LIKE :likeJson',
+                    ], 'OR')
+                    ->bind(':likeEquals', $likeEquals, ParameterType::STRING)
+                    ->bind(':likeJson', $likeJson, ParameterType::STRING);
+                $db->setQuery($query);
                 $_itemid = $db->loadResult();
                 if ($_itemid) {
                     $itemid = $_itemid;

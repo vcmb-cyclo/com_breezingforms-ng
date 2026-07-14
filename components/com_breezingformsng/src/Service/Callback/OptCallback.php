@@ -13,6 +13,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
+use Joomla\Database\ParameterType;
 use Joomla\Filesystem\File;
 
 /**
@@ -35,7 +36,20 @@ class OptCallback
 
     $userSubmitedID = $jinput->getString('id', '');
     $token = $jinput->getString('token', '');
-    $database->setQuery("UPDATE #__facileforms_records SET opted=1, opt_ip = " . $database->quote($ip) . ", opt_date = " . $database->quote(HTMLHelper::date('now', 'Y-m-d H:i:s')) . " WHERE opt_token = " . $database->quote($token) . " And id=" . $database->quote($userSubmitedID) . " And opted = 0");
+    $optDate = HTMLHelper::date('now', 'Y-m-d H:i:s');
+    $query = $database->getQuery(true)
+        ->update($database->quoteName('#__facileforms_records'))
+        ->set($database->quoteName('opted') . ' = 1')
+        ->set($database->quoteName('opt_ip') . ' = :ip')
+        ->set($database->quoteName('opt_date') . ' = :optDate')
+        ->where($database->quoteName('opt_token') . ' = :token')
+        ->where($database->quoteName('id') . ' = :userSubmitedID')
+        ->where($database->quoteName('opted') . ' = 0')
+        ->bind(':ip', $ip, ParameterType::STRING)
+        ->bind(':optDate', $optDate, ParameterType::STRING)
+        ->bind(':token', $token, ParameterType::STRING)
+        ->bind(':userSubmitedID', $userSubmitedID, ParameterType::STRING);
+    $database->setQuery($query);
     $database->execute();
 
     echo Text::_("COM_BREEZINGFORMSNG_FORMS_DOUBLE_OPT_EMAIL_THANK_YOU");
@@ -56,7 +70,20 @@ class OptCallback
 
     $userSubmitedID = $jinput->getString('id', '');
     $token = $jinput->getString('token', '');
-    $database->setQuery("UPDATE #__facileforms_records SET opted=0, opt_ip = " . $database->quote($ip) . ", opt_date = " . $database->quote(HTMLHelper::date('now', 'Y-m-d H:i:s')) . " WHERE opt_token = " . $database->quote($token) . " And id=" . $database->quote($userSubmitedID) . " And opted = 1");
+    $optDate = HTMLHelper::date('now', 'Y-m-d H:i:s');
+    $query = $database->getQuery(true)
+        ->update($database->quoteName('#__facileforms_records'))
+        ->set($database->quoteName('opted') . ' = 0')
+        ->set($database->quoteName('opt_ip') . ' = :ip')
+        ->set($database->quoteName('opt_date') . ' = :optDate')
+        ->where($database->quoteName('opt_token') . ' = :token')
+        ->where($database->quoteName('id') . ' = :userSubmitedID')
+        ->where($database->quoteName('opted') . ' = 1')
+        ->bind(':ip', $ip, ParameterType::STRING)
+        ->bind(':optDate', $optDate, ParameterType::STRING)
+        ->bind(':token', $token, ParameterType::STRING)
+        ->bind(':userSubmitedID', $userSubmitedID, ParameterType::STRING);
+    $database->setQuery($query);
     $database->execute();
 
     echo Text::_("COM_BREEZINGFORMSNG_FORMS_DOUBLE_OPT_OUT_EMAIL_THANK_YOU");

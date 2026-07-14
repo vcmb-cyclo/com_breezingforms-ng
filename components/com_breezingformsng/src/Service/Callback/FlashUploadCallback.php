@@ -13,6 +13,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
+use Joomla\Database\ParameterType;
 use Joomla\Filesystem\File;
 
 /**
@@ -59,7 +60,19 @@ class FlashUploadCallback
     $input = Factory::getApplication()->getInput();
     if (is_numeric($input->getString('form', '')) && !empty($_FILES) && $input->getString('bfFlashUploadTicket', '') != '') {
 
-        $db->setQuery("Select form.id, form.template_code_processed, form.template_code From #__facileforms_forms as form, #__facileforms_elements as element Where form.id = " . $db->Quote($input->getInt('form', -1)) . " And element.name = " . $db->Quote($input->getString('itemName', '')) . " And element.form = " . $db->Quote($input->getInt('form', -1)));
+        $formId = $input->getInt('form', -1);
+        $itemName = $input->getString('itemName', '');
+        $query = $db->getQuery(true)
+            ->select(['form.id', 'form.template_code_processed', 'form.template_code'])
+            ->from($db->quoteName('#__facileforms_forms', 'form'))
+            ->from($db->quoteName('#__facileforms_elements', 'element'))
+            ->where('form.id = :formId')
+            ->where('element.name = :itemName')
+            ->where('element.form = :formId2')
+            ->bind(':formId', $formId, ParameterType::INTEGER)
+            ->bind(':itemName', $itemName, ParameterType::STRING)
+            ->bind(':formId2', $formId, ParameterType::INTEGER);
+        $db->setQuery($query);
         $objectList = $db->loadObjectList();
         $formIdCount = count($objectList);
         if ($formIdCount > 0) {

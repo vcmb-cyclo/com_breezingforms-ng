@@ -386,8 +386,17 @@
   `Site\Service\Notification\MailSender`, fondé sur `MailerFactoryInterface` Joomla 6 ; `sendMail()` reste la
   façade publique du processeur. La conversion d'horodatage dupliquée dans les exports PDF/CSV/XML est centralisée
   dans `Site\Service\Runtime\SubmissionTimestampFormatter` sans modifier les formats ni le double passage du masque
-  PDF. Les six conversions identiques des notifications administrateur et mailback utilisent le même service. Restent
-  l'orchestration de `facileforms.process.php` et les responsabilités encore portées par les sept traits
+  PDF. Les six conversions identiques des notifications administrateur et mailback utilisent le même service.
+  Le traitement des uploads Flash réutilise également ce formateur pour les masques `Y_m_d_H_i_s` et `Y_m_d`,
+  supprimant deux blocs de conversion supplémentaires. Le nettoyage HTML du trait Submission est déplacé dans
+  `Site\Service\Security\HtmlSanitizer` ; la façade publique historique est conservée et la suppression répétée de
+  balises interdites ne dépend plus d'une `DOMNodeList` modifiée pendant une boucle indexée. Restent l'orchestration
+  de `facileforms.process.php`. La compression JavaScript quitte le trait Scripting pour
+  `Site\Service\Rendering\JavascriptCompressor` ; la longueur de coupure et la fin de ligne sont désormais des
+  dépendances explicites, tandis que `compressJavascript()` reste la façade publique. Les lectures des pièces et
+  scripts publiés passent par `Site\Service\Scripting\Repository`, avec Query Builder Joomla, paramètres liés et
+  résultats `StoredCode` typés ; les méthodes historiques restent des façades. Restent les
+  responsabilités encore portées par les sept traits
   `legacy/processor`. Les six classes Crosstec protégées
   (`BFRequest`, `BFIntegrate` et les quatre rendus `BFQuickMode*`) restent volontairement disponibles comme API externe.
   `BFJoomlaConfig` a été remplacé par `Factory::getConfig()` ; `BFPDF` a été migré vers le service namespacé

@@ -19,6 +19,21 @@ final class SubmissionTimestampFormatter
 {
     public function format(string $submittedAt, string $timezone): FormattedTimestamp
     {
+        $date = $this->adjustedDate($submittedAt, $timezone);
+
+        return new FormattedTimestamp(
+            $date->format('Y-m-d H:i:s', true),
+            $date->format('YmdHis', true)
+        );
+    }
+
+    public function formatPattern(string $submittedAt, string $timezone, string $pattern): string
+    {
+        return $this->adjustedDate($submittedAt, $timezone)->format($pattern, true);
+    }
+
+    private function adjustedDate(string $submittedAt, string $timezone): Date
+    {
         $date = new Date($submittedAt, new DateTimeZone($timezone));
         $offset = $date->getOffsetFromGMT();
 
@@ -28,9 +43,6 @@ final class SubmissionTimestampFormatter
             $date->sub(new DateInterval('PT' . abs($offset) . 'S'));
         }
 
-        return new FormattedTimestamp(
-            $date->format('Y-m-d H:i:s', true),
-            $date->format('YmdHis', true)
-        );
+        return $date;
     }
 }

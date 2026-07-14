@@ -33,27 +33,31 @@ use CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory;
 use CB\Component\Contentbuilderng\Administrator\Service\ArticleService;
 use CB\Component\Contentbuilderng\Administrator\Service\ListSupportService;
 use CB\Component\Contentbuilderng\Administrator\Service\PermissionService;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\JavascriptCompressor;
+use Vcmb\Component\BreezingformsNG\Site\Service\Scripting\Repository as ScriptingRepository;
 
 /**
  * Pieces, scripts, query columns, builtin JS library and code linking.
  */
 trait bfProcessorScripting
 {
+    private ?JavascriptCompressor $javascriptCompressorService = null;
+    private ?ScriptingRepository $scriptingRepositoryService = null;
+
     function getPieceById($id, $name = null)
     {
         if ($this->dying)
             return '';
 
-        $this->database->setQuery(
-            'select code, name from #__facileforms_pieces ' .
-            'where id=' . $id . ' and published=1 '
-        );
-        $rows = $this->database->loadObjectList();
-        if ($rows && count($rows)) {
-            $name = $rows[0]->name;
-            return $rows[0]->code;
-        } // if
-        return '';
+        $piece = $this->scriptingRepository()->findPublishedPieceById((int) $id);
+
+        if ($piece === null) {
+            return '';
+        }
+
+        $name = $piece->name;
+
+        return $piece->code;
     }
 
     // getPieceById
@@ -62,17 +66,15 @@ trait bfProcessorScripting
     {
         if ($this->dying)
             return '';
-        $this->database->setQuery(
-            'select id, code from #__facileforms_pieces ' .
-            'where name=\'' . $name . '\' and published=1 ' .
-            'order by id desc'
-        );
-        $rows = $this->database->loadObjectList();
-        if ($rows && count($rows)) {
-            $id = $rows[0]->id;
-            return $rows[0]->code;
-        } // if
-        return '';
+        $piece = $this->scriptingRepository()->findPublishedPieceByName((string) $name);
+
+        if ($piece === null) {
+            return '';
+        }
+
+        $id = $piece->id;
+
+        return $piece->code;
     }
 
     // getPieceByName
@@ -270,11 +272,8 @@ trait bfProcessorScripting
         $funcname = '';
         switch ($row->script2cond) {
             case 1:
-                $this->database->setQuery(
-                    "select name from #__facileforms_scripts " .
-                    "where id=" . $row->script2id . " and published=1 "
-                );
-                $funcname = $this->database->loadResult();
+                $funcname = $this->scriptingRepository()
+                    ->findPublishedScriptById((int) $row->script2id)?->name ?? '';
                 break;
             case 2:
                 $funcname = 'ff_' . $row->name . '_action';
@@ -461,11 +460,8 @@ trait bfProcessorScripting
             $funcname = '';
             switch ($row->script3cond) {
                 case 1:
-                    $this->database->setQuery(
-                        "select name from #__facileforms_scripts " .
-                        "where id=" . $row->script3id . " and published=1 "
-                    );
-                    $funcname = $this->database->loadResult();
+                    $funcname = $this->scriptingRepository()
+                        ->findPublishedScriptById((int) $row->script3id)?->name ?? '';
                     break;
                 case 2:
                     $funcname = 'ff_' . $row->name . '_validation';
@@ -518,11 +514,8 @@ trait bfProcessorScripting
         $funcname = '';
         switch ($this->formrow->script1cond) {
             case 1:
-                $this->database->setQuery(
-                    "select name from #__facileforms_scripts " .
-                    "where id=" . $this->formrow->script1id . " and published=1 "
-                );
-                $funcname = $this->database->loadResult();
+                $funcname = $this->scriptingRepository()
+                    ->findPublishedScriptById((int) $this->formrow->script1id)?->name ?? '';
                 break;
             case 2:
                 $funcname = 'ff_' . $this->formrow->name . '_init';
@@ -540,11 +533,8 @@ trait bfProcessorScripting
             $funcname = '';
             switch ($row->script1cond) {
                 case 1:
-                    $this->database->setQuery(
-                        "select name from #__facileforms_scripts " .
-                        "where id=" . $row->script1id . " and published=1 "
-                    );
-                    $funcname = $this->database->loadResult();
+                    $funcname = $this->scriptingRepository()
+                        ->findPublishedScriptById((int) $row->script1id)?->name ?? '';
                     break;
                 case 2:
                     $funcname = 'ff_' . $row->name . '_init';
@@ -569,11 +559,8 @@ trait bfProcessorScripting
             $funcname = '';
             switch ($row->script1cond) {
                 case 1:
-                    $this->database->setQuery(
-                        "select name from #__facileforms_scripts " .
-                        "where id=" . $row->script1id . " and published=1 "
-                    );
-                    $funcname = $this->database->loadResult();
+                    $funcname = $this->scriptingRepository()
+                        ->findPublishedScriptById((int) $row->script1id)?->name ?? '';
                     break;
                 case 2:
                     $funcname = 'ff_' . $row->name . '_init';
@@ -755,17 +742,9 @@ trait bfProcessorScripting
     {
         if ($this->dying)
             return;
-        $this->database->setQuery(
-            "select id, name, code from #__facileforms_scripts " .
-            "where published=1 " .
-            "order by type, title, name, id desc"
-        );
-        $rows = $this->database->loadObjectList();
-        $cnt = count($rows);
-        for ($i = 0; $i < $cnt; $i++) {
-            $row = $rows[$i];
-            $library[] = array(trim($row->name), $row->code, 's', $row->id, null);
-        } // if
+        foreach ($this->scriptingRepository()->getPublishedScripts() as $script) {
+            $library[] = [trim($script->name), $script->code, 's', $script->id, null];
+        }
     }
 
     // loadScripts
@@ -774,109 +753,17 @@ trait bfProcessorScripting
     {
         if ($this->dying)
             return '';
-        $str = str_replace("\r", "", $str);
-        $lines = explode("\n", $str);
-        $code = '';
-        $skip = '';
-        $lcnt = 0;
-        if (count($lines))
-            foreach ($lines as $line) {
-                $ll = strlen($line);
-                $quote = '';
-                $ws = false;
-                $escape = false;
-                for ($j = 0; $j < $ll; $j++) {
-                    $c = substr($line, $j, 1);
-                    $d = substr($line, $j, 2);
-                    if ($quote != '') {
-                        // in literal
-                        if ($escape) {
-                            $code .= $c;
-                            $lcnt++;
-                            $escape = false;
-                        } else
-                            if ($c == "\\") {
-                                $code .= $c;
-                                $lcnt++;
-                                $escape = true;
-                            } else
-                                if ($d == $quote . $quote) {
-                                    $code .= $d;
-                                    $lcnt += 2;
-                                    $j += 2;
-                                } else {
-                                    $code .= $c;
-                                    $lcnt++;
-                                    if ($c == $quote)
-                                        $quote = '';
-                                } // if
-                    } else {
-                        // not in literal
-                        if ($d == $skip) {
-                            $skip = '';
-                            $j += 2;
-                        } else
-                            if ($skip == '') {
-                                if ($d == '/*') {
-                                    $skip = '*/';
-                                    $j += 2;
-                                } else
-                                    if ($d == '//')
-                                        break;
-                                    else
-                                        switch ($c) {
-                                            case ' ':
-                                            case "\t":
-                                            case "\n":
-                                                if ($lcnt)
-                                                    $ws = true;
-                                                break;
-                                            case '"':
-                                            case "'":
-                                                if ($ws) {
-                                                    $b = substr($code, strlen($code) - 1, 1);
-                                                    if ($b == '_' || ($b >= '0' && $b <= '9') || ($b >= 'a' && $b <= 'z') || ($b >= 'A' && $b <= 'Z')) {
-                                                        $code .= ' ';
-                                                        $lcnt++;
-                                                    } // if
-                                                    $ws = false;
-                                                } // if
-                                                $quote = $c;
-                                                $code .= $c;
-                                                $lcnt++;
-                                                break;
-                                            default:
-                                                if ($ws) {
-                                                    if ($c == '_' || ($c >= '0' && $c <= '9') || ($c >= 'a' && $c <= 'z') || ($c >= 'A' && $c <= 'Z')) {
-                                                        $b = substr($code, strlen($code) - 1, 1);
-                                                        if ($b == '_' || ($b >= '0' && $b <= '9') || ($b >= 'a' && $b <= 'z') || ($b >= 'A' && $b <= 'Z')) {
-                                                            $code .= ' ';
-                                                            $lcnt++;
-                                                        } // if
-                                                    } // if
-                                                    $ws = false;
-                                                } // if
-                                                $code .= $c;
-                                                $lcnt++;
-                                        } // switch
-                            } // if
-                    } // else
-                } // for
-                if ($lcnt) {
-                    if ($lcnt > _FF_PACKBREAKAFTER) {
-                        $code .= nl();
-                        $lcnt = 0;
-                    } else {
-                        if (strpos(',;:{}=[(+-*%', substr($code, strlen($code) - 1, 1)) === false) {
-                            $code .= nl();
-                            $lcnt = 0;
-                        } // if
-                    } // if
-                } // if
-            } // foreach
-        if ($lcnt)
-            $code .= nl();
-        return $code;
+        return $this->javascriptCompressor()->compress((string) $str, _FF_PACKBREAKAFTER, nl());
+    }
+
+    private function javascriptCompressor(): JavascriptCompressor
+    {
+        return $this->javascriptCompressorService ??= new JavascriptCompressor();
+    }
+
+    private function scriptingRepository(): ScriptingRepository
+    {
+        return $this->scriptingRepositoryService ??= new ScriptingRepository($this->database);
     }
 
     // compressJavascript
@@ -933,15 +820,13 @@ trait bfProcessorScripting
             return;
         switch ($cond) {
             case 1:
-                $this->database->setQuery(
-                    "select name, code from #__facileforms_scripts " .
-                    "where id=" . $this->database->Quote($id) . " and published=1"
-                );
-                $rows = $this->database->loadObjectList();
-                if (count($rows) > 0) {
-                    $row = $rows[0];
-                    if ($this->trim($row->name) && $this->nonblank($row->code)) {
-                        $this->linkcode($row->name, $library, $linked, $row->code, 's', $id, null);
+                $script = $this->scriptingRepository()->findPublishedScriptById((int) $id);
+                if ($script !== null) {
+                    $scriptName = $script->name;
+                    $scriptCode = $script->code;
+
+                    if ($this->trim($scriptName) && $this->nonblank($scriptCode)) {
+                        $this->linkcode($scriptName, $library, $linked, $scriptCode, 's', $id, null);
                         if ($this->dying)
                             return;
                     } // if

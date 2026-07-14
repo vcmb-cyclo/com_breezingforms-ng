@@ -14,6 +14,7 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Support\RedirectHelper;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
+use Joomla\Database\ParameterType;
 use Joomla\Filesystem\File;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 
@@ -45,7 +46,13 @@ class SofortCallback
         if ($formId != '' && $recordId != '') {
 
 
-            $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($formId));
+            $formIdInt = (int) $formId;
+            $formQuery = $db->getQuery(true)
+                ->select('*')
+                ->from($db->quoteName('#__facileforms_forms'))
+                ->where($db->quoteName('id') . ' = :formIdInt')
+                ->bind(':formIdInt', $formIdInt, ParameterType::INTEGER);
+            $db->setQuery($formQuery);
             $list = $db->loadObjectList();
             if (count($list) == 0) {
                 RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
@@ -67,14 +74,16 @@ class SofortCallback
                             $tx_token = $input->getString('tx', '');
                             $tries = $options['downloadTries'];
 
-                            $db->setQuery("
-									Select paypal_download_tries From 
-										#__facileforms_records 
-									Where 
-										id = '" . $recordId . "'
-									And
-										paypal_tx_id = " . $db->Quote('Sofortüberweisung: ' . $input->getString('tx', '')) . "
-									");
+                            $recordIdInt = (int) $recordId;
+                            $sofortTx = 'Sofortüberweisung: ' . $input->getString('tx', '');
+                            $downloadsQuery = $db->getQuery(true)
+                                ->select($db->quoteName('paypal_download_tries'))
+                                ->from($db->quoteName('#__facileforms_records'))
+                                ->where($db->quoteName('id') . ' = :recordIdInt')
+                                ->where($db->quoteName('paypal_tx_id') . ' = :sofortTx')
+                                ->bind(':recordIdInt', $recordIdInt, ParameterType::INTEGER)
+                                ->bind(':sofortTx', $sofortTx, ParameterType::STRING);
+                            $db->setQuery($downloadsQuery);
 
                             $downloads = $db->loadObjectList();
 
@@ -121,7 +130,13 @@ class SofortCallback
     $recordId = $input->getInt('user_variable_1', -1);
 
 
-    $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($formId));
+    $formIdInt = (int) $formId;
+    $formQuery = $db->getQuery(true)
+        ->select('*')
+        ->from($db->quoteName('#__facileforms_forms'))
+        ->where($db->quoteName('id') . ' = :formIdInt')
+        ->bind(':formIdInt', $formIdInt, ParameterType::INTEGER);
+    $db->setQuery($formQuery);
     $list = $db->loadObjectList();
     if (count($list) == 0) {
         exit;
@@ -177,8 +192,15 @@ class SofortCallback
                 $data_implode = implode('|', $data);
                 $hash = sha1($data_implode);
 
-                $query = "SELECT * FROM #__facileforms_records WHERE id = '" . $recordId . "' And paypal_tx_id = '' LIMIT 1";
-                $db->setQuery($query);
+                $recordIdInt = (int) $recordId;
+                $txidQuery = $db->getQuery(true)
+                    ->select('*')
+                    ->from($db->quoteName('#__facileforms_records'))
+                    ->where($db->quoteName('id') . ' = :recordIdInt')
+                    ->where($db->quoteName('paypal_tx_id') . " = ''")
+                    ->setLimit(1)
+                    ->bind(':recordIdInt', $recordIdInt, ParameterType::INTEGER);
+                $db->setQuery($txidQuery);
                 $txid = $db->loadObjectList();
 
                 if ($hash == $input->getString('hash', '')) {
@@ -187,17 +209,20 @@ class SofortCallback
 
                         if ($txid[0]->paypal_tx_id == '') {
 
-                            $db->setQuery("
-										Update 
-											#__facileforms_records 
-										Set 
-											paypal_tx_id = " . $db->Quote('Sofortüberweisung: ' . $input->getString('transaction', '')) . ", 
-											paypal_payment_date = " . $db->Quote(date('Y-m-d H:i:s', strtotime($input->getString('created', '')))) . ",
-											paypal_testaccount = 0,
-											paypal_download_tries = 0
-										Where 
-											id = '" . $recordId . "'
-											");
+                            $sofortRecordId = (int) $recordId;
+                            $sofortTxId = 'Sofortüberweisung: ' . $input->getString('transaction', '');
+                            $sofortPaymentDate = date('Y-m-d H:i:s', strtotime($input->getString('created', '')));
+                            $updateQuery = $db->getQuery(true)
+                                ->update($db->quoteName('#__facileforms_records'))
+                                ->set($db->quoteName('paypal_tx_id') . ' = :sofortTxId')
+                                ->set($db->quoteName('paypal_payment_date') . ' = :sofortPaymentDate')
+                                ->set($db->quoteName('paypal_testaccount') . ' = 0')
+                                ->set($db->quoteName('paypal_download_tries') . ' = 0')
+                                ->where($db->quoteName('id') . ' = :sofortRecordId')
+                                ->bind(':sofortTxId', $sofortTxId, ParameterType::STRING)
+                                ->bind(':sofortPaymentDate', $sofortPaymentDate, ParameterType::STRING)
+                                ->bind(':sofortRecordId', $sofortRecordId, ParameterType::INTEGER);
+                            $db->setQuery($updateQuery);
 
                             $db->execute();
 
@@ -272,7 +297,13 @@ class SofortCallback
 
 
     $input = Factory::getApplication()->getInput();
-    $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($input->getInt('form', -1)));
+    $formIdForDownload = $input->getInt('form', -1);
+    $formQueryForDownload = $db->getQuery(true)
+        ->select('*')
+        ->from($db->quoteName('#__facileforms_forms'))
+        ->where($db->quoteName('id') . ' = :formIdForDownload')
+        ->bind(':formIdForDownload', $formIdForDownload, ParameterType::INTEGER);
+    $db->setQuery($formQueryForDownload);
     $list = $db->loadObjectList();
     if (count($list) == 0) {
         RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
@@ -296,14 +327,16 @@ class SofortCallback
 
                     $file = $options['filepath'];
 
-                    $db->setQuery("
-									Select paypal_download_tries From 
-										#__facileforms_records 
-									Where 
-										id = '" . $input->getInt('record_id', -1) . "'
-									And
-										paypal_tx_id = " . $db->Quote('Sofortüberweisung: ' . $input->getString('tx', '')) . "
-									");
+                    $downloadRecordId = $input->getInt('record_id', -1);
+                    $sofortDownloadTx = 'Sofortüberweisung: ' . $input->getString('tx', '');
+                    $selectQuery = $db->getQuery(true)
+                        ->select($db->quoteName('paypal_download_tries'))
+                        ->from($db->quoteName('#__facileforms_records'))
+                        ->where($db->quoteName('id') . ' = :downloadRecordId')
+                        ->where($db->quoteName('paypal_tx_id') . ' = :sofortDownloadTx')
+                        ->bind(':downloadRecordId', $downloadRecordId, ParameterType::INTEGER)
+                        ->bind(':sofortDownloadTx', $sofortDownloadTx, ParameterType::STRING);
+                    $db->setQuery($selectQuery);
 
                     $downloads = $db->loadObjectList();
 
@@ -311,16 +344,14 @@ class SofortCallback
 
                         if ($downloads[0]->paypal_download_tries < $options['downloadTries']) {
 
-                            $db->setQuery("
-											Update 
-												#__facileforms_records 
-											Set
-												paypal_download_tries = paypal_download_tries + 1 
-											Where 
-												id = '" . $input->getInt('record_id', -1) . "'
-											And
-												paypal_tx_id = " . $db->Quote('Sofortüberweisung: ' . $input->getString('tx', '')) . "
-											");
+                            $updateQuery = $db->getQuery(true)
+                                ->update($db->quoteName('#__facileforms_records'))
+                                ->set($db->quoteName('paypal_download_tries') . ' = ' . $db->quoteName('paypal_download_tries') . ' + 1')
+                                ->where($db->quoteName('id') . ' = :downloadRecordId')
+                                ->where($db->quoteName('paypal_tx_id') . ' = :sofortDownloadTx')
+                                ->bind(':downloadRecordId', $downloadRecordId, ParameterType::INTEGER)
+                                ->bind(':sofortDownloadTx', $sofortDownloadTx, ParameterType::STRING);
+                            $db->setQuery($updateQuery);
 
                             $db->execute();
 

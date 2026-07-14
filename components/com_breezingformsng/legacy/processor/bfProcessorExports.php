@@ -14,6 +14,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
+use Joomla\Database\ParameterType;
 use Joomla\Event\Event;
 use Joomla\Event\EventInterface;
 use Joomla\CMS\Uri\Uri;
@@ -54,12 +55,31 @@ trait bfProcessorExports
             return;
 
         if (!is_object($cbResult['form']) && $this->editable && $this->editable_override) {
-            $this->database->setQuery("Select id From #__facileforms_records Where form = " . $this->database->Quote($this->form) . " And user_id = " . $this->database->Quote(Factory::getApplication()->getIdentity()->get('id', 0)) . " And user_id <> 0");
+            $editableFormValue = $this->form;
+            $editableUserId = Factory::getApplication()->getIdentity()->get('id', 0);
+            $recordsQuery = $this->database->getQuery(true)
+                ->select('id')
+                ->from($this->database->quoteName('#__facileforms_records'))
+                ->where($this->database->quoteName('form') . ' = :editableFormValue')
+                ->where($this->database->quoteName('user_id') . ' = :editableUserId')
+                ->where($this->database->quoteName('user_id') . ' <> 0')
+                ->bind(':editableFormValue', $editableFormValue, ParameterType::STRING)
+                ->bind(':editableUserId', $editableUserId, ParameterType::INTEGER);
+            $this->database->setQuery($recordsQuery);
             $records = $this->database->loadObjectList();
             foreach ($records as $record) {
-                $this->database->setQuery("Delete From #__facileforms_subrecords Where record = " . $record->id);
+                $recordIdToDelete = (int) $record->id;
+                $delSubrecordsQuery = $this->database->getQuery(true)
+                    ->delete($this->database->quoteName('#__facileforms_subrecords'))
+                    ->where($this->database->quoteName('record') . ' = :recordIdToDelete')
+                    ->bind(':recordIdToDelete', $recordIdToDelete, ParameterType::INTEGER);
+                $this->database->setQuery($delSubrecordsQuery);
                 $this->database->execute();
-                $this->database->setQuery("Delete From #__facileforms_records Where id = " . $record->id);
+                $delRecordQuery = $this->database->getQuery(true)
+                    ->delete($this->database->quoteName('#__facileforms_records'))
+                    ->where($this->database->quoteName('id') . ' = :recordIdToDelete')
+                    ->bind(':recordIdToDelete', $recordIdToDelete, ParameterType::INTEGER);
+                $this->database->setQuery($delRecordQuery);
                 $this->database->execute();
             }
         }
@@ -100,13 +120,44 @@ trait bfProcessorExports
                 $last_update = new \Joomla\CMS\Date\Date();
                 $last_update = $last_update->toSql();
                 $db = Factory::getContainer()->get(DatabaseInterface::class);
-                $db->setQuery("Select id From #__contentbuilderng_records Where `type` = 'com_breezingformsng' And `reference_id` = " . $db->Quote($this->form) . " And record_id = " . $db->Quote($record_return));
+                $cbFormValue = $this->form;
+                $cbRecordReturn = $record_return;
+                $existsQuery = $db->getQuery(true)
+                    ->select('id')
+                    ->from($db->quoteName('#__contentbuilderng_records'))
+                    ->where($db->quoteName('type') . ' = ' . $db->quote('com_breezingformsng'))
+                    ->where($db->quoteName('reference_id') . ' = :cbFormValue')
+                    ->where($db->quoteName('record_id') . ' = :cbRecordReturn')
+                    ->bind(':cbFormValue', $cbFormValue, ParameterType::STRING)
+                    ->bind(':cbRecordReturn', $cbRecordReturn, ParameterType::STRING);
+                $db->setQuery($existsQuery);
                 $res = $db->loadResult();
                 if (!$res) {
-                    $db->setQuery("Insert Into #__contentbuilderng_records (session_id,`type`,last_update, published, record_id, reference_id) Values ('" . $this->app->getSession()->getId() . "','com_breezingformsng'," . $db->Quote($last_update) . ",0, " . $db->Quote($record_return) . ", " . $db->Quote($this->form) . ")");
+                    $sessionId = $this->app->getSession()->getId();
+                    $cbType = 'com_breezingformsng';
+                    $insertQuery = $db->getQuery(true)
+                        ->insert($db->quoteName('#__contentbuilderng_records'))
+                        ->columns($db->quoteName(['session_id', 'type', 'last_update', 'published', 'record_id', 'reference_id']))
+                        ->values(':sessionId, :cbType, :lastUpdate, 0, :cbRecordReturn, :cbFormValue')
+                        ->bind(':sessionId', $sessionId, ParameterType::STRING)
+                        ->bind(':cbType', $cbType, ParameterType::STRING)
+                        ->bind(':lastUpdate', $last_update, ParameterType::STRING)
+                        ->bind(':cbRecordReturn', $cbRecordReturn, ParameterType::STRING)
+                        ->bind(':cbFormValue', $cbFormValue, ParameterType::STRING);
+                    $db->setQuery($insertQuery);
                     $db->execute();
                 } else {
-                    $db->setQuery("Update #__contentbuilderng_records Set last_update = " . $db->Quote($last_update) . ",edited = edited + 1 Where `type` = 'com_breezingformsng' And `reference_id` = " . $db->Quote($this->form) . " And record_id = " . $db->Quote($record_return));
+                    $updateQuery = $db->getQuery(true)
+                        ->update($db->quoteName('#__contentbuilderng_records'))
+                        ->set($db->quoteName('last_update') . ' = :lastUpdate')
+                        ->set($db->quoteName('edited') . ' = ' . $db->quoteName('edited') . ' + 1')
+                        ->where($db->quoteName('type') . ' = ' . $db->quote('com_breezingformsng'))
+                        ->where($db->quoteName('reference_id') . ' = :cbFormValue')
+                        ->where($db->quoteName('record_id') . ' = :cbRecordReturn')
+                        ->bind(':lastUpdate', $last_update, ParameterType::STRING)
+                        ->bind(':cbFormValue', $cbFormValue, ParameterType::STRING)
+                        ->bind(':cbRecordReturn', $cbRecordReturn, ParameterType::STRING);
+                    $db->setQuery($updateQuery);
                     $db->execute();
                 }
             }
@@ -125,7 +176,14 @@ trait bfProcessorExports
             if (is_object($cbResult['form'])) {
 
                 $db = Factory::getContainer()->get(DatabaseInterface::class);
-                $db->setQuery('Select SQL_CALC_FOUND_ROWS * From #__contentbuilderng_forms Where id = ' . Factory::getApplication()->getInput()->getInt('cb_form_id', 0) . ' And published = 1');
+                $cbFormIdInput = Factory::getApplication()->getInput()->getInt('cb_form_id', 0);
+                $cbFormQuery = $db->getQuery(true)
+                    ->select('SQL_CALC_FOUND_ROWS *')
+                    ->from($db->quoteName('#__contentbuilderng_forms'))
+                    ->where($db->quoteName('id') . ' = :cbFormIdInput')
+                    ->where($db->quoteName('published') . ' = 1')
+                    ->bind(':cbFormIdInput', $cbFormIdInput, ParameterType::INTEGER);
+                $db->setQuery($cbFormQuery);
                 $_settings = $db->loadObject();
 
                 $_record = $cbResult['form']->getRecord(Factory::getApplication()->getInput()->getInt('record_id', 0), $_settings->published_only, $cbResult['frontend'] ? ($_settings->own_only_fe ? Factory::getApplication()->getIdentity()->get('id', 0) : -1) : ($_settings->own_only ? Factory::getApplication()->getIdentity()->get('id', 0) : -1), true);
@@ -285,7 +343,14 @@ trait bfProcessorExports
                 $record_return = $cbResult['form']->saveRecord(Factory::getApplication()->getInput()->getInt('cb_record_id', 0), $values);
 
                 $db = Factory::getContainer()->get(DatabaseInterface::class);
-                $db->setQuery('Select SQL_CALC_FOUND_ROWS * From #__contentbuilderng_forms Where id = ' . Factory::getApplication()->getInput()->getInt('cb_form_id', 0) . ' And published = 1');
+                $cbFormIdInput = Factory::getApplication()->getInput()->getInt('cb_form_id', 0);
+                $cbFormQuery = $db->getQuery(true)
+                    ->select('SQL_CALC_FOUND_ROWS *')
+                    ->from($db->quoteName('#__contentbuilderng_forms'))
+                    ->where($db->quoteName('id') . ' = :cbFormIdInput')
+                    ->where($db->quoteName('published') . ' = 1')
+                    ->bind(':cbFormIdInput', $cbFormIdInput, ParameterType::INTEGER);
+                $db->setQuery($cbFormQuery);
                 $cbData = $db->loadObject();
 
                 if ($record_return) {
@@ -296,7 +361,14 @@ trait bfProcessorExports
                     $ignore_lang_code = '*';
                     if ($cbResult['data']['default_lang_code_ignore']) {
 
-                        $db->setQuery("Select lang_code From #__languages Where published = 1 And sef = " . $db->Quote(trim(Factory::getApplication()->getInput()->getCmd('lang', ''))));
+                        $langSef = trim(Factory::getApplication()->getInput()->getCmd('lang', ''));
+                        $langQuery = $db->getQuery(true)
+                            ->select($db->quoteName('lang_code'))
+                            ->from($db->quoteName('#__languages'))
+                            ->where($db->quoteName('published') . ' = 1')
+                            ->where($db->quoteName('sef') . ' = :langSef')
+                            ->bind(':langSef', $langSef, ParameterType::STRING);
+                        $db->setQuery($langQuery);
                         $ignore_lang_code = $db->loadResult();
                         if (!$ignore_lang_code) {
                             $ignore_lang_code = '*';
@@ -310,7 +382,14 @@ trait bfProcessorExports
                             $sef = '';
                         }
                     } else {
-                        $db->setQuery("Select sef From #__languages Where published = 1 And lang_code = " . $db->Quote($cbResult['data']['default_lang_code']));
+                        $defaultLangCode = (string) $cbResult['data']['default_lang_code'];
+                        $sefQuery = $db->getQuery(true)
+                            ->select($db->quoteName('sef'))
+                            ->from($db->quoteName('#__languages'))
+                            ->where($db->quoteName('published') . ' = 1')
+                            ->where($db->quoteName('lang_code') . ' = :defaultLangCode')
+                            ->bind(':defaultLangCode', $defaultLangCode, ParameterType::STRING);
+                        $db->setQuery($sefQuery);
                         $sef = $db->loadResult();
                     }
 
@@ -333,12 +412,56 @@ trait bfProcessorExports
                             $created_down = $date->toSql();
                         }
 
-                        $db->setQuery("Insert Into #__contentbuilderng_records (session_id,`type`,last_update,is_future,lang_code, sef, published, record_id, reference_id, publish_up, publish_down) Values ('" . $this->app->getSession()->getId() . "','com_breezingformsng'," . $db->Quote($last_update) . ",$is_future, " . $db->Quote($language) . "," . $db->Quote(trim($sef)) . "," . $db->Quote($cbData->auto_publish && !$is_future ? 1 : 0) . ", " . $db->Quote($record_return) . ", " . $db->Quote($cbResult['form']->getReferenceId()) . ", " . $db->Quote($created_up) . ", " . $db->Quote($created_down) . ")");
+                        $langSessionId = $this->app->getSession()->getId();
+                        $langType = 'com_breezingformsng';
+                        $langPublished = $cbData->auto_publish && !$is_future ? 1 : 0;
+                        $langReferenceId = $cbResult['form']->getReferenceId();
+                        $langSefTrimmed = trim($sef);
+                        $insertRecordQuery = $db->getQuery(true)
+                            ->insert($db->quoteName('#__contentbuilderng_records'))
+                            ->columns($db->quoteName([
+                                'session_id', 'type', 'last_update', 'is_future', 'lang_code', 'sef',
+                                'published', 'record_id', 'reference_id', 'publish_up', 'publish_down',
+                            ]))
+                            ->values(
+                                ':langSessionId, :langType, :lastUpdate2, :isFuture, :language, :langSefTrimmed,'
+                                . ' :langPublished, :recordReturn, :langReferenceId, :createdUp, :createdDown'
+                            )
+                            ->bind(':langSessionId', $langSessionId, ParameterType::STRING)
+                            ->bind(':langType', $langType, ParameterType::STRING)
+                            ->bind(':lastUpdate2', $last_update, ParameterType::STRING)
+                            ->bind(':isFuture', $is_future, ParameterType::INTEGER)
+                            ->bind(':language', $language, ParameterType::STRING)
+                            ->bind(':langSefTrimmed', $langSefTrimmed, ParameterType::STRING)
+                            ->bind(':langPublished', $langPublished, ParameterType::INTEGER)
+                            ->bind(':recordReturn', $record_return, ParameterType::STRING)
+                            ->bind(':langReferenceId', $langReferenceId, ParameterType::STRING)
+                            ->bind(':createdUp', $created_up, ParameterType::STRING)
+                            ->bind(':createdDown', $created_down, ParameterType::STRING);
+                        $db->setQuery($insertRecordQuery);
                         $db->execute();
 
                     } else {
 
-                        $db->setQuery("Update #__contentbuilderng_records Set last_update = " . $db->Quote($last_update) . ",lang_code = " . $db->Quote($language) . ", sef = " . $db->Quote(trim($sef)) . ", edited = edited + 1 Where `type` = 'com_breezingformsng' And `reference_id` = " . $db->Quote($cbResult['form']->getReferenceId()) . " And record_id = " . $db->Quote($record_return));
+                        $langType = 'com_breezingformsng';
+                        $langReferenceId = $cbResult['form']->getReferenceId();
+                        $langSefTrimmed = trim($sef);
+                        $updateRecordQuery = $db->getQuery(true)
+                            ->update($db->quoteName('#__contentbuilderng_records'))
+                            ->set($db->quoteName('last_update') . ' = :lastUpdate2')
+                            ->set($db->quoteName('lang_code') . ' = :language')
+                            ->set($db->quoteName('sef') . ' = :langSefTrimmed')
+                            ->set($db->quoteName('edited') . ' = ' . $db->quoteName('edited') . ' + 1')
+                            ->where($db->quoteName('type') . ' = :langType')
+                            ->where($db->quoteName('reference_id') . ' = :langReferenceId')
+                            ->where($db->quoteName('record_id') . ' = :recordReturn')
+                            ->bind(':lastUpdate2', $last_update, ParameterType::STRING)
+                            ->bind(':language', $language, ParameterType::STRING)
+                            ->bind(':langSefTrimmed', $langSefTrimmed, ParameterType::STRING)
+                            ->bind(':langType', $langType, ParameterType::STRING)
+                            ->bind(':langReferenceId', $langReferenceId, ParameterType::STRING)
+                            ->bind(':recordReturn', $record_return, ParameterType::STRING);
+                        $db->setQuery($updateRecordQuery);
                         $db->execute();
                     }
                 }
@@ -364,11 +487,20 @@ trait bfProcessorExports
                     $cbData->labels = $cbResult['form']->getElementLabels();
                     $ids = array();
                     foreach ($cbData->labels as $reference_id => $label) {
-                        $ids[] = $db->Quote($reference_id);
+                        $ids[] = $reference_id;
                     }
                     $cbData->labels = array();
                     if (count($ids)) {
-                        $db->setQuery("Select Distinct `label`, reference_id From #__contentbuilderng_elements Where form_id = " . Factory::getApplication()->getInput()->getInt('cb_form_id', 0) . " And reference_id In (" . implode(',', $ids) . ") And published = 1 Order By ordering");
+                        $cbFormIdForLabels = Factory::getApplication()->getInput()->getInt('cb_form_id', 0);
+                        $labelsQuery = $db->getQuery(true)
+                            ->select('DISTINCT ' . $db->quoteName('label') . ', ' . $db->quoteName('reference_id'))
+                            ->from($db->quoteName('#__contentbuilderng_elements'))
+                            ->where($db->quoteName('form_id') . ' = :cbFormIdForLabels')
+                            ->whereIn($db->quoteName('reference_id'), $ids, ParameterType::STRING)
+                            ->where($db->quoteName('published') . ' = 1')
+                            ->order($db->quoteName('ordering'))
+                            ->bind(':cbFormIdForLabels', $cbFormIdForLabels, ParameterType::INTEGER);
+                        $db->setQuery($labelsQuery);
                         $rows = $db->loadAssocList();
                         $ids = array();
                         foreach ($rows as $row) {

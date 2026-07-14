@@ -50,10 +50,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		toggle.addEventListener('change', function () {
 			var active = toggle.checked ? yesInput : noInput;
+			var inactive = toggle.checked ? noInput : yesInput;
+			inactive.checked = false;
 			active.checked = true;
 			if (typeof active.onclick === 'function') {
 				active.onclick();
 			}
+			// The properties panel tracks field state via native click/change
+			// events on the underlying radios (delegated or direct); setting
+			// .checked in JS alone doesn't fire those, so the panel's own
+			// model never learns about the change until some other field is
+			// touched - at which point it resyncs from its still-stale copy
+			// and this switch appears to silently revert. Dispatch the same
+			// events a real click would have produced.
+			active.dispatchEvent(new Event('click', { bubbles: true }));
+			active.dispatchEvent(new Event('change', { bubbles: true }));
 		});
 	});
 });

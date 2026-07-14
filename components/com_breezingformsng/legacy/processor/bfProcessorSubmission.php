@@ -15,6 +15,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 use Joomla\CMS\Factory;
 use Joomla\CMS\Filter\InputFilter;
 use Joomla\Database\DatabaseInterface;
+use Joomla\Database\ParameterType;
 use Joomla\Event\Event;
 use Joomla\Event\EventInterface;
 use Joomla\CMS\Uri\Uri;
@@ -32,6 +33,8 @@ use Joomla\CMS\Log\Log;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 use Vcmb\Component\BreezingformsNG\Site\Service\Integration\DropboxUploader;
 use Vcmb\Component\BreezingformsNG\Site\Service\Integration\RecaptchaVerifier;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampFormatter;
+use Vcmb\Component\BreezingformsNG\Site\Service\Security\HtmlSanitizer;
 use CB\Component\Contentbuilderng\Administrator\Helper\ContentbuilderngHelper;
 use CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory;
 use CB\Component\Contentbuilderng\Administrator\Service\ArticleService;
@@ -43,6 +46,9 @@ use CB\Component\Contentbuilderng\Administrator\Service\PermissionService;
  */
 trait bfProcessorSubmission
 {
+    private ?SubmissionTimestampFormatter $uploadTimestampFormatterService = null;
+    private ?HtmlSanitizer $htmlSanitizerService = null;
+
     function collectSubmitdata($cbResult = null)
     {
         if ($this->dying || $this->submitdata)
@@ -158,30 +164,17 @@ trait bfProcessorSubmission
                                     $sourcePath = JPATH_SITE . '/components/com_breezingformsng/uploads/';
                                     if (@file_exists($sourcePath) && @is_readable($sourcePath) && @is_dir($sourcePath)) {
 
-                                        $tz = 'UTC';
-                                        $tz = new DateTimeZone($this->app->get('offset'));
-
-                                        $date_stamp = date('Y_m_d_H_i_s');
-                                        $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
-                                        $offset = $date_->getOffsetFromGMT();
-                                        if ($offset > 0) {
-                                            $date_->add(new DateInterval('PT' . $offset . 'S'));
-                                        } else if ($offset < 0) {
-                                            $offset = $offset * -1;
-                                            $date_->sub(new DateInterval('PT' . $offset . 'S'));
-                                        }
-                                        $date_stamp = $date_->format('Y_m_d_H_i_s', true);
-
-                                        $date_stamp2 = date('Y_m_d');
-                                        $date_ = new \Joomla\CMS\Date\Date($this->submitted, $tz);
-                                        $offset = $date_->getOffsetFromGMT();
-                                        if ($offset > 0) {
-                                            $date_->add(new DateInterval('PT' . $offset . 'S'));
-                                        } else if ($offset < 0) {
-                                            $offset = $offset * -1;
-                                            $date_->sub(new DateInterval('PT' . $offset . 'S'));
-                                        }
-                                        $date_stamp2 = $date_->format('Y_m_d', true);
+                                        $timezone = (string) $this->app->get('offset');
+                                        $date_stamp = $this->uploadTimestampFormatter()->formatPattern(
+                                            (string) $this->submitted,
+                                            $timezone,
+                                            'Y_m_d_H_i_s'
+                                        );
+                                        $date_stamp2 = $this->uploadTimestampFormatter()->formatPattern(
+                                            (string) $this->submitted,
+                                            $timezone,
+                                            'Y_m_d'
+                                        );
 
                                         // trying glob instead of readdir()
 
@@ -734,10 +727,14 @@ trait bfProcessorSubmission
 
             switch ($this->formrow->piece3cond) {
                 case 1: // library
-                    $this->database->setQuery(
-                        "select name, code from #__facileforms_pieces " .
-                        "where id=" . $this->formrow->piece3id . " and published=1 "
-                    );
+                    $piece3id = (int) $this->formrow->piece3id;
+                    $query = $this->database->getQuery(true)
+                        ->select(['name', 'code'])
+                        ->from($this->database->quoteName('#__facileforms_pieces'))
+                        ->where($this->database->quoteName('id') . ' = :piece3id')
+                        ->where($this->database->quoteName('published') . ' = 1')
+                        ->bind(':piece3id', $piece3id, ParameterType::INTEGER);
+                    $this->database->setQuery($query);
                     $rows = $this->database->loadObjectList();
                     if (count($rows))
                         echo $this->execPiece(
@@ -853,7 +850,20 @@ trait bfProcessorSubmission
 
                 if (bf_is_email($recipient)) {
 
-                    $this->database->setQuery("Select s.record From #__facileforms_subrecords As s, #__facileforms_records As r Where r.form = " . $this->database->quote($this->form) . " And r.id = s.record And s.`name` = " . $this->database->quote($email_field_name) . " And s.`value` = " . $this->database->quote($recipient) . " And r.`opted` = 1");
+                    $formValue = $this->form;
+                    $existsQuery = $this->database->getQuery(true)
+                        ->select('s.record')
+                        ->from($this->database->quoteName('#__facileforms_subrecords', 's'))
+                        ->from($this->database->quoteName('#__facileforms_records', 'r'))
+                        ->where('r.form = :formValue')
+                        ->where('r.id = s.record')
+                        ->where($this->database->quoteName('s.name') . ' = :emailFieldName')
+                        ->where($this->database->quoteName('s.value') . ' = :recipient')
+                        ->where($this->database->quoteName('r.opted') . ' = 1')
+                        ->bind(':formValue', $formValue, ParameterType::STRING)
+                        ->bind(':emailFieldName', $email_field_name, ParameterType::STRING)
+                        ->bind(':recipient', $recipient, ParameterType::STRING);
+                    $this->database->setQuery($existsQuery);
                     $exists = $this->database->loadResult();
 
                     if (!$exists) {
@@ -866,7 +876,14 @@ trait bfProcessorSubmission
 
                         $lastID = $this->record_id;
                         $token = $this->random_str(20);
-                        $this->database->setQuery("UPDATE #__facileforms_records SET opt_token=" . $this->database->quote(bf_b64enc($token)) . " WHERE id=" . $this->database->quote($lastID));
+                        $optToken = bf_b64enc($token);
+                        $updateQuery = $this->database->getQuery(true)
+                            ->update($this->database->quoteName('#__facileforms_records'))
+                            ->set($this->database->quoteName('opt_token') . ' = :optToken')
+                            ->where($this->database->quoteName('id') . ' = :lastID')
+                            ->bind(':optToken', $optToken, ParameterType::STRING)
+                            ->bind(':lastID', $lastID, ParameterType::STRING);
+                        $this->database->setQuery($updateQuery);
                         $this->database->execute();
 
                         $opt_in_link = $domainAddress . '?option=com_breezingformsng&opt_in=true&id=' . $lastID . '&' . 'token=' . bf_b64enc($token);
@@ -890,7 +907,10 @@ trait bfProcessorSubmission
 
             // DOUBLE OPT-INT END
 
-            $this->database->setQuery("SELECT MAX(id) FROM #__facileforms_records");
+            $maxIdQuery = $this->database->getQuery(true)
+                ->select('MAX(id)')
+                ->from($this->database->quoteName('#__facileforms_records'));
+            $this->database->setQuery($maxIdQuery);
             $lastid = $this->database->loadResult();
             $_SESSION['virtuemart_bf_id'] = $lastid;
             $session = $this->app->getSession();
@@ -899,10 +919,14 @@ trait bfProcessorSubmission
             $code = '';
             switch ($this->formrow->piece4cond) {
                 case 1: // library
-                    $this->database->setQuery(
-                        "select name, code from #__facileforms_pieces " .
-                        "where id=" . $this->formrow->piece4id . " and published=1 "
-                    );
+                    $piece4id = (int) $this->formrow->piece4id;
+                    $query = $this->database->getQuery(true)
+                        ->select(['name', 'code'])
+                        ->from($this->database->quoteName('#__facileforms_pieces'))
+                        ->where($this->database->quoteName('id') . ' = :piece4id')
+                        ->where($this->database->quoteName('published') . ' = 1')
+                        ->bind(':piece4id', $piece4id, ParameterType::INTEGER);
+                    $this->database->setQuery($query);
                     $rows = $this->database->loadObjectList();
                     if (count($rows))
                         echo $this->execPiece(
@@ -1651,6 +1675,11 @@ transition: box-shadow .15s linear;
         );
     }
 
+    private function uploadTimestampFormatter(): SubmissionTimestampFormatter
+    {
+        return $this->uploadTimestampFormatterService ??= new SubmissionTimestampFormatter();
+    }
+
     private function getEvent(string $name): EventInterface
     {
 
@@ -1659,63 +1688,12 @@ transition: box-shadow .15s linear;
 
     function removeDangerousHtml($value)
     {
+        return $this->htmlSanitizer()->sanitize((string) $value);
+    }
 
-        if (trim($value) == '')
-            return '';
-
-        $doc = new DOMDocument();
-        $ret = @$doc->loadHTML('<div>' . $value . '</div>');
-
-        if ($ret) {
-
-            $script_tags = $doc->getElementsByTagName('script');
-            $length = $script_tags->length;
-            for ($ii = 0; $ii < $length; $ii++) {
-                $script_tags->item($ii)->parentNode->removeChild($script_tags->item($ii));
-            }
-            $style_tags = $doc->getElementsByTagName('style');
-            $length = $style_tags->length;
-            for ($ii = 0; $ii < $length; $ii++) {
-                $style_tags->item($ii)->parentNode->removeChild($style_tags->item($ii));
-            }
-            $iframe_tags = $doc->getElementsByTagName('iframe');
-            $length = $iframe_tags->length;
-            for ($ii = 0; $ii < $length; $ii++) {
-                $iframe_tags->item($ii)->parentNode->removeChild($iframe_tags->item($ii));
-            }
-            $applet_tags = $doc->getElementsByTagName('applet');
-            $length = $applet_tags->length;
-            for ($ii = 0; $ii < $length; $ii++) {
-                $applet_tags->item($ii)->parentNode->removeChild($applet_tags->item($ii));
-            }
-            $link_tags = $doc->getElementsByTagName('link');
-            $length = $link_tags->length;
-            for ($ii = 0; $ii < $length; $ii++) {
-                $link_tags->item($ii)->parentNode->removeChild($link_tags->item($ii));
-            }
-
-            $mock = new DOMDocument;
-            $body = $doc->getElementsByTagName('body')->item(0);
-            foreach ($body->childNodes as $child) {
-                $mock->appendChild($mock->importNode($child, true));
-            }
-
-            $container = $mock->getElementsByTagName('div')->item(0);
-
-            $container = $container->parentNode->removeChild($container);
-
-            while ($mock->firstChild) {
-                $mock->removeChild($mock->firstChild);
-            }
-
-            while ($container->firstChild) {
-                $mock->appendChild($container->firstChild);
-            }
-
-            return $mock->saveHTML();
-        }
-
-        return strip_tags($value);
+    private function htmlSanitizer(): HtmlSanitizer
+    {
+        return $this->htmlSanitizerService ??= new HtmlSanitizer();
     }
 
     // submit

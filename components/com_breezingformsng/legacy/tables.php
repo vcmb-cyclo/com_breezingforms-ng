@@ -15,6 +15,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 use Joomla\CMS\Table\Table;
 use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
+use Joomla\Database\ParameterType;
 
 // Legacy table classes of the form engine (global names, used across the processor).
 class facileFormsMenus extends Table
@@ -41,7 +42,13 @@ class facileFormsMenus extends Table
 	{
 		global $database;
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
-		$database->setQuery("select * from #__facileforms_compmenus where id = $id");
+		$idInt = (int) $id;
+		$query = $database->getQuery(true)
+			->select('*')
+			->from($database->quoteName('#__facileforms_compmenus'))
+			->where($database->quoteName('id') . ' = :idInt')
+			->bind(':idInt', $idInt, ParameterType::INTEGER);
+		$database->setQuery($query);
 		$rows = $database->loadObjectList();
 		if ($rows) {
 			$row = $rows[0];
@@ -159,7 +166,13 @@ class facileFormsForms extends Table
 	{
 		global $database;
 
-		$database->setQuery("select * from #__facileforms_forms where id = $id");
+		$idInt = (int) $id;
+		$query = $database->getQuery(true)
+			->select('*')
+			->from($database->quoteName('#__facileforms_forms'))
+			->where($database->quoteName('id') . ' = :idInt')
+			->bind(':idInt', $idInt, ParameterType::INTEGER);
+		$database->setQuery($query);
 		$rows = $database->loadObjectList();
 
 		if ($rows) {
@@ -268,7 +281,13 @@ Query List Settings: border / cellspacing / cellpadding / <tr(h)>class / <tr(1)>
 	{
 		global $database;
 
-		$database->setQuery("select * from #__facileforms_elements where id = $id");
+		$idInt = (int) $id;
+		$query = $database->getQuery(true)
+			->select('*')
+			->from($database->quoteName('#__facileforms_elements'))
+			->where($database->quoteName('id') . ' = :idInt')
+			->bind(':idInt', $idInt, ParameterType::INTEGER);
+		$database->setQuery($query);
 		$rows = $database->loadObjectList();
 		if ($rows) {
 			$row = $rows[0];
@@ -308,7 +327,13 @@ class facileFormsScripts extends Table
 	{
 		global $database;
 
-		$database->setQuery("select * from #__facileforms_scripts where id = $id");
+		$idInt = (int) $id;
+		$query = $database->getQuery(true)
+			->select('*')
+			->from($database->quoteName('#__facileforms_scripts'))
+			->where($database->quoteName('id') . ' = :idInt')
+			->bind(':idInt', $idInt, ParameterType::INTEGER);
+		$database->setQuery($query);
 		$rows = $database->loadObjectList();
 		if ($rows) {
 			$row = $rows[0];
@@ -355,7 +380,13 @@ class facileFormsPieces extends Table
 	{
 		global $database;
 
-		$database->setQuery("select * from #__facileforms_pieces where id = $id");
+		$idInt = (int) $id;
+		$query = $database->getQuery(true)
+			->select('*')
+			->from($database->quoteName('#__facileforms_pieces'))
+			->where($database->quoteName('id') . ' = :idInt')
+			->bind(':idInt', $idInt, ParameterType::INTEGER);
+		$database->setQuery($query);
 		$rows = $database->loadObjectList();
 		if ($rows) {
 			$row = $rows[0];
@@ -405,7 +436,13 @@ class facileFormsRecords extends Table
 	{
 		global $database;
 
-		$database->setQuery("select * from #__facileforms_records where id = $id");
+		$idInt = (int) $id;
+		$query = $database->getQuery(true)
+			->select('*')
+			->from($database->quoteName('#__facileforms_records'))
+			->where($database->quoteName('id') . ' = :idInt')
+			->bind(':idInt', $idInt, ParameterType::INTEGER);
+		$database->setQuery($query);
 		$rows = $database->loadObjectList();
 		if ($rows) {
 			$row = $rows[0];
@@ -438,7 +475,13 @@ class facileFormsSubrecords extends Table
 	{
 		global $database;
 
-		$database->setQuery("select * from #__facileforms_subrecords where id = $id");
+		$idInt = (int) $id;
+		$query = $database->getQuery(true)
+			->select('*')
+			->from($database->quoteName('#__facileforms_subrecords'))
+			->where($database->quoteName('id') . ' = :idInt')
+			->bind(':idInt', $idInt, ParameterType::INTEGER);
+		$database->setQuery($query);
 		$rows = $database->loadObjectList();
 		if ($rows) {
 			$row = $rows[0];

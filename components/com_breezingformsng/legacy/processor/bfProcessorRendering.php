@@ -15,6 +15,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 use Joomla\CMS\Factory;
 use Joomla\CMS\Filter\InputFilter;
 use Joomla\Database\DatabaseInterface;
+use Joomla\Database\ParameterType;
 use Joomla\Event\Event;
 use Joomla\Event\EventInterface;
 use Joomla\CMS\Uri\Uri;
@@ -148,7 +149,15 @@ trait bfProcessorRendering
 
             $db = Factory::getContainer()->get(DatabaseInterface::class);
 
-            $db->setQuery("Select `id` From #__contentbuilderng_forms Where `type` = 'com_breezingformsng' And `reference_id` = " . intval($this->form) . " And published = 1");
+            $referenceId = (int) $this->form;
+            $query = $db->getQuery(true)
+                ->select($db->quoteName('id'))
+                ->from($db->quoteName('#__contentbuilderng_forms'))
+                ->where($db->quoteName('type') . ' = ' . $db->quote('com_breezingformsng'))
+                ->where($db->quoteName('reference_id') . ' = :referenceId')
+                ->where($db->quoteName('published') . ' = 1')
+                ->bind(':referenceId', $referenceId, ParameterType::INTEGER);
+            $db->setQuery($query);
 
             $cbForms = $db->loadColumn();
 
@@ -188,7 +197,14 @@ trait bfProcessorRendering
                     (new PermissionService())->checkPermissions('new', Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_NEW_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
                 }
 
-                $db->setQuery("Select * From #__contentbuilderng_forms Where id = " . Factory::getApplication()->getInput()->getInt('cb_form_id', 0) . " And published = 1");
+                $cbFormId = Factory::getApplication()->getInput()->getInt('cb_form_id', 0);
+                $query = $db->getQuery(true)
+                    ->select('*')
+                    ->from($db->quoteName('#__contentbuilderng_forms'))
+                    ->where($db->quoteName('id') . ' = :cbFormId')
+                    ->where($db->quoteName('published') . ' = 1')
+                    ->bind(':cbFormId', $cbFormId, ParameterType::INTEGER);
+                $db->setQuery($query);
                 $cbData = $db->loadAssoc();
                 if (is_array($cbData)) {
                     $permissionService = new PermissionService();
@@ -306,10 +322,14 @@ trait bfProcessorRendering
         $code = '';
         switch ($this->formrow->piece1cond) {
             case 1: // library
-                $this->database->setQuery(
-                    'select name, code from #__facileforms_pieces ' .
-                    'where id=' . $this->formrow->piece1id . ' and published=1 '
-                );
+                $piece1id = (int) $this->formrow->piece1id;
+                $query = $this->database->getQuery(true)
+                    ->select(['name', 'code'])
+                    ->from($this->database->quoteName('#__facileforms_pieces'))
+                    ->where($this->database->quoteName('id') . ' = :piece1id')
+                    ->where($this->database->quoteName('published') . ' = 1')
+                    ->bind(':piece1id', $piece1id, ParameterType::INTEGER);
+                $this->database->setQuery($query);
                 $rows = $this->database->loadObjectList();
                 if (count($rows))
                     echo $this->execPiece($rows[0]->code, Text::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECE') . " " . $rows[0]->name, 'p', $this->formrow->piece1id, null);
@@ -604,10 +624,14 @@ trait bfProcessorRendering
             $funcname = "";
             switch ($this->formrow->script2cond) {
                 case 1:
-                    $this->database->setQuery(
-                        "select name from #__facileforms_scripts " .
-                        "where id=" . $this->formrow->script2id . " and published=1 "
-                    );
+                    $script2id = (int) $this->formrow->script2id;
+                    $query = $this->database->getQuery(true)
+                        ->select('name')
+                        ->from($this->database->quoteName('#__facileforms_scripts'))
+                        ->where($this->database->quoteName('id') . ' = :script2id')
+                        ->where($this->database->quoteName('published') . ' = 1')
+                        ->bind(':script2id', $script2id, ParameterType::INTEGER);
+                    $this->database->setQuery($query);
                     $funcname = $this->database->loadResult();
                     break;
                 case 2:
@@ -975,11 +999,29 @@ trait bfProcessorRendering
 
         if ($this->editable && $cbRecord === null) {
             $db = Factory::getContainer()->get(DatabaseInterface::class);
-            $db->setQuery("Select id, form From #__facileforms_records Where form = " . $db->Quote($this->form) . " And user_id = " . $db->Quote(Factory::getApplication()->getIdentity()->get('id', -1)) . " And user_id <> 0 And archived = 0 Order By id Desc Limit 1");
+            $formValue = $this->form;
+            $userId = Factory::getApplication()->getIdentity()->get('id', -1);
+            $query = $db->getQuery(true)
+                ->select(['id', 'form'])
+                ->from($db->quoteName('#__facileforms_records'))
+                ->where($db->quoteName('form') . ' = :formValue')
+                ->where($db->quoteName('user_id') . ' = :userId')
+                ->where($db->quoteName('user_id') . ' <> 0')
+                ->where($db->quoteName('archived') . ' = 0')
+                ->order($db->quoteName('id') . ' DESC')
+                ->bind(':formValue', $formValue, ParameterType::STRING)
+                ->bind(':userId', $userId, ParameterType::INTEGER);
+            $db->setQuery($query, 0, 1);
             $recordsResult = $db->loadObjectList();
             if (count($recordsResult) != 0) {
                 $this->record_id = $recordsResult[0]->id;
-                $db->setQuery("Select * From #__facileforms_subrecords Where record = " . $recordsResult[0]->id . "");
+                $recordId = (int) $recordsResult[0]->id;
+                $subrecordsQuery = $db->getQuery(true)
+                    ->select('*')
+                    ->from($db->quoteName('#__facileforms_subrecords'))
+                    ->where($db->quoteName('record') . ' = :recordId')
+                    ->bind(':recordId', $recordId, ParameterType::INTEGER);
+                $db->setQuery($subrecordsQuery);
                 $recordEntries = $db->loadObjectList();
                 $js = '';
                 foreach ($recordEntries as $recordEntry) {
@@ -2238,10 +2280,14 @@ trait bfProcessorRendering
 
         switch ($this->formrow->piece2cond) {
             case 1: // library
-                $this->database->setQuery(
-                    "select name, code from #__facileforms_pieces " .
-                    "where id=" . intval($this->formrow->piece2id) . " and published=1 "
-                );
+                $piece2id = (int) $this->formrow->piece2id;
+                $query = $this->database->getQuery(true)
+                    ->select(['name', 'code'])
+                    ->from($this->database->quoteName('#__facileforms_pieces'))
+                    ->where($this->database->quoteName('id') . ' = :piece2id')
+                    ->where($this->database->quoteName('published') . ' = 1')
+                    ->bind(':piece2id', $piece2id, ParameterType::INTEGER);
+                $this->database->setQuery($query);
                 $rows = $this->database->loadObjectList();
                 if (count($rows))
                     echo $this->execPiece(

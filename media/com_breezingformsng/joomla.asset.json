@@ -74,7 +74,7 @@
       "name": "com_breezingformsng.quickmode-compat",
       "type": "script",
       "uri": "media/com_breezingformsng/js/admin/quickmode-compat.js",
-      "dependencies": ["com_breezingformsng.jquery-alias"],
+      "dependencies": ["com_breezingformsng.jquery-alias", "com_breezingformsng.jtree-lib"],
       "version": "auto"
     },
 

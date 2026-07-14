@@ -14,6 +14,7 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Support\RedirectHelper;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
+use Joomla\Database\ParameterType;
 use Joomla\Filesystem\File;
 
 /**
@@ -31,7 +32,13 @@ class StripeCallback
 
 
     $input = Factory::getApplication()->getInput();
-    $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($input->getInt('form_id', -1)));
+    $formId = $input->getInt('form_id', -1);
+    $query = $db->getQuery(true)
+        ->select('*')
+        ->from($db->quoteName('#__facileforms_forms'))
+        ->where($db->quoteName('id') . ' = :formId')
+        ->bind(':formId', $formId, ParameterType::INTEGER);
+    $db->setQuery($query);
     $list = $db->loadObjectList();
 
     if (count($list) == 0) {
@@ -68,14 +75,15 @@ class StripeCallback
                 try {
 
 
-                    $db->setQuery("
-									Select paypal_tx_id From 
-										#__facileforms_records 
-									Where 
-										id = '" . $record_id . "'
-									And
-										paypal_tx_id like 'Stripe:%'
-									");
+                    $stripePrefix = 'Stripe:%';
+                    $existsQuery = $db->getQuery(true)
+                        ->select($db->quoteName('paypal_tx_id'))
+                        ->from($db->quoteName('#__facileforms_records'))
+                        ->where($db->quoteName('id') . ' = :recordId')
+                        ->where($db->quoteName('paypal_tx_id') . ' LIKE :stripePrefix')
+                        ->bind(':recordId', $record_id, ParameterType::INTEGER)
+                        ->bind(':stripePrefix', $stripePrefix, ParameterType::STRING);
+                    $db->setQuery($existsQuery);
 
                     $exists = $db->loadResult();
 
@@ -151,17 +159,22 @@ class StripeCallback
                         // Stripe Payment Intent updates to complete its description from pi_xxx to BF item Name - pi_xxx
                         $stripe->paymentIntents->update($stripe_pi_id, ['description' => $options['itemname']]);
                         // XDA END
-                        $db->setQuery("
-                                                                                Update 
-                                                                                        #__facileforms_records 
-                                                                                Set 
-                                                                                        paypal_tx_id = " . $db->Quote('Stripe: ' . strip_tags($stripe_pi_id)) . ", 
-                                                                                        paypal_payment_date = " . $db->Quote(date('Y-m-d H:i:s', $stripe_pi_create)) . ",
-                                                                                        paypal_testaccount = " . $db->Quote(!$stripe_pi->livemode ? 1 : 0) . ",
-                                                                                        paypal_download_tries = 0
-                                                                                Where
-                                                                                        id = '" . $input->getInt('record_id', -1) . "'
-											");
+                        $stripeRecordId = $input->getInt('record_id', -1);
+                        $stripeTxId = 'Stripe: ' . strip_tags($stripe_pi_id);
+                        $stripePaymentDate = date('Y-m-d H:i:s', $stripe_pi_create);
+                        $stripeTestaccount = !$stripe_pi->livemode ? 1 : 0;
+                        $updateQuery = $db->getQuery(true)
+                            ->update($db->quoteName('#__facileforms_records'))
+                            ->set($db->quoteName('paypal_tx_id') . ' = :stripeTxId')
+                            ->set($db->quoteName('paypal_payment_date') . ' = :stripePaymentDate')
+                            ->set($db->quoteName('paypal_testaccount') . ' = :stripeTestaccount')
+                            ->set($db->quoteName('paypal_download_tries') . ' = 0')
+                            ->where($db->quoteName('id') . ' = :stripeRecordId')
+                            ->bind(':stripeTxId', $stripeTxId, ParameterType::STRING)
+                            ->bind(':stripePaymentDate', $stripePaymentDate, ParameterType::STRING)
+                            ->bind(':stripeTestaccount', $stripeTestaccount, ParameterType::INTEGER)
+                            ->bind(':stripeRecordId', $stripeRecordId, ParameterType::INTEGER);
+                        $db->setQuery($updateQuery);
 
                         $db->execute();
 
@@ -213,7 +226,13 @@ class StripeCallback
 
 
     $input = Factory::getApplication()->getInput();
-    $db->setQuery("Select * From #__facileforms_forms Where id = " . $db->Quote($input->getInt('form', -1)));
+    $formIdForDownload = $input->getInt('form', -1);
+    $query = $db->getQuery(true)
+        ->select('*')
+        ->from($db->quoteName('#__facileforms_forms'))
+        ->where($db->quoteName('id') . ' = :formIdForDownload')
+        ->bind(':formIdForDownload', $formIdForDownload, ParameterType::INTEGER);
+    $db->setQuery($query);
     $list = $db->loadObjectList();
     if (count($list) == 0) {
         RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
@@ -237,14 +256,16 @@ class StripeCallback
 
                     $file = $options['filepath'];
 
-                    $db->setQuery("
-									Select paypal_download_tries From 
-										#__facileforms_records 
-									Where 
-										id = '" . $input->getInt('record_id', -1) . "'
-									And
-										paypal_tx_id = " . $db->Quote('Stripe: ' . $input->getString('token', '')) . "
-									");
+                    $downloadRecordId = $input->getInt('record_id', -1);
+                    $stripeToken = 'Stripe: ' . $input->getString('token', '');
+                    $selectQuery = $db->getQuery(true)
+                        ->select($db->quoteName('paypal_download_tries'))
+                        ->from($db->quoteName('#__facileforms_records'))
+                        ->where($db->quoteName('id') . ' = :downloadRecordId')
+                        ->where($db->quoteName('paypal_tx_id') . ' = :stripeToken')
+                        ->bind(':downloadRecordId', $downloadRecordId, ParameterType::INTEGER)
+                        ->bind(':stripeToken', $stripeToken, ParameterType::STRING);
+                    $db->setQuery($selectQuery);
 
                     $downloads = $db->loadObjectList();
 
@@ -252,16 +273,14 @@ class StripeCallback
 
                         if ($downloads[0]->paypal_download_tries < $options['downloadTries']) {
 
-                            $db->setQuery("
-											Update 
-												#__facileforms_records 
-											Set
-												paypal_download_tries = paypal_download_tries + 1 
-											Where 
-												id = '" . $input->getInt('record_id', -1) . "'
-											And
-												paypal_tx_id = " . $db->Quote('Stripe: ' . $input->getString('token', '')) . "
-											");
+                            $updateQuery = $db->getQuery(true)
+                                ->update($db->quoteName('#__facileforms_records'))
+                                ->set($db->quoteName('paypal_download_tries') . ' = ' . $db->quoteName('paypal_download_tries') . ' + 1')
+                                ->where($db->quoteName('id') . ' = :downloadRecordId')
+                                ->where($db->quoteName('paypal_tx_id') . ' = :stripeToken')
+                                ->bind(':downloadRecordId', $downloadRecordId, ParameterType::INTEGER)
+                                ->bind(':stripeToken', $stripeToken, ParameterType::STRING);
+                            $db->setQuery($updateQuery);
 
                             $db->execute();
 

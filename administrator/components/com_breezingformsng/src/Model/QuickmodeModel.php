@@ -14,6 +14,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\BaseModel;
 use Joomla\Database\DatabaseInterface;
+use Joomla\Database\ParameterType;
 use Joomla\Filesystem\File;
 
 class QuickmodeModel extends BaseModel
@@ -37,10 +38,14 @@ class QuickmodeModel extends BaseModel
         // Inject submit-related fake elements from published scripts.
         $fakes = ['ff_validate_submit', 'ff_resetForm', 'ff_validate_prevpage', 'ff_validate_nextpage'];
         foreach ($fakes as $idx => $scriptName) {
-            $this->db->setQuery(
-                'SELECT id FROM #__facileforms_scripts WHERE published=1 AND name = ' . $this->db->quote($scriptName) .
-                ' ORDER BY type, title, name, id DESC'
-            );
+            $query = $this->db->getQuery(true)
+                ->select('id')
+                ->from($this->db->quoteName('#__facileforms_scripts'))
+                ->where($this->db->quoteName('published') . ' = 1')
+                ->where($this->db->quoteName('name') . ' = :scriptName')
+                ->order(['type', 'title', 'name', 'id DESC'])
+                ->bind(':scriptName', $scriptName, ParameterType::STRING);
+            $this->db->setQuery($query);
             $rows = $this->db->loadObjectList();
             if (!empty($rows)) {
                 $n  = $idx === 0 ? '' : (string) ($idx + 1);
@@ -69,10 +74,12 @@ class QuickmodeModel extends BaseModel
 
     public function getFormOptions(int $form): ?\stdClass
     {
-        $this->db->setQuery(
-            'SELECT package, name, title, description, emailntf, emailadr FROM #__facileforms_forms WHERE id = ' .
-            $this->db->quote($form)
-        );
+        $query = $this->db->getQuery(true)
+            ->select(['package', 'name', 'title', 'description', 'emailntf', 'emailadr'])
+            ->from($this->db->quoteName('#__facileforms_forms'))
+            ->where($this->db->quoteName('id') . ' = :form')
+            ->bind(':form', $form, ParameterType::INTEGER);
+        $this->db->setQuery($query);
         $list = $this->db->loadObjectList();
 
         return count($list) === 1 ? $list[0] : null;
@@ -80,9 +87,12 @@ class QuickmodeModel extends BaseModel
 
     public function getTemplateCode(int $form): string
     {
-        $this->db->setQuery(
-            'SELECT template_code FROM #__facileforms_forms WHERE id = ' . $this->db->quote($form)
-        );
+        $query = $this->db->getQuery(true)
+            ->select('template_code')
+            ->from($this->db->quoteName('#__facileforms_forms'))
+            ->where($this->db->quoteName('id') . ' = :form')
+            ->bind(':form', $form, ParameterType::INTEGER);
+        $this->db->setQuery($query);
         $list = $this->db->loadObjectList();
 
         return count($list) === 1 ? (string) base64_decode($list[0]->template_code) : '';
@@ -93,10 +103,13 @@ class QuickmodeModel extends BaseModel
         $result = [];
 
         foreach (['Element Validation' => 'validation', 'Element Action' => 'action', 'Element Init' => 'init'] as $type => $key) {
-            $this->db->setQuery(
-                'SELECT id, package, name, title, description, type FROM #__facileforms_scripts' .
-                ' WHERE published = 1 AND type = ' . $this->db->quote($type)
-            );
+            $query = $this->db->getQuery(true)
+                ->select(['id', 'package', 'name', 'title', 'description', 'type'])
+                ->from($this->db->quoteName('#__facileforms_scripts'))
+                ->where($this->db->quoteName('published') . ' = 1')
+                ->where($this->db->quoteName('type') . ' = :type')
+                ->bind(':type', $type, ParameterType::STRING);
+            $this->db->setQuery($query);
             $result[$key] = $this->db->loadObjectList();
         }
 
@@ -439,49 +452,86 @@ class QuickmodeModel extends BaseModel
         $now        = (new \Joomla\CMS\Date\Date())->toSql();
         $userId     = (string) Factory::getApplication()->getIdentity()->username;
 
-        $this->db->setQuery('SELECT id FROM #__facileforms_forms WHERE id = ' . $this->db->quote($form));
+        $existsQuery = $this->db->getQuery(true)
+            ->select('id')
+            ->from($this->db->quoteName('#__facileforms_forms'))
+            ->where($this->db->quoteName('id') . ' = :form')
+            ->bind(':form', $form, ParameterType::INTEGER);
+        $this->db->setQuery($existsQuery);
 
         if (count($this->db->loadObjectList()) === 0) {
             // INSERT new form
-            $scriptCond1 = '';
-            $scriptCond2 = '';
-            if (($mdata['submittedScriptCondidtion'] ?? -1) != -1) {
-                $scriptCond1 = ', script2cond, script2code';
-                $scriptCond2 = ', ' . $this->db->quote($mdata['submittedScriptCondidtion']) .
-                               ', ' . $this->db->quote($mdata['submittedScriptCode']);
+            $hasScriptCond = ($mdata['submittedScriptCondidtion'] ?? -1) != -1;
+            $templateAreas = (string) json_encode($areas);
+            $emailntf      = ($mdata['mailNotification'] ?? false) ? 2 : 0;
+            $mailRecipient = (string) ($mdata['mailRecipient'] ?? '');
+
+            $columns = [
+                'package', 'template_code', 'template_areas', 'published', 'name', 'title', 'description',
+                'class1', 'width', 'height', 'pages', 'emailntf', 'emailadr',
+            ];
+            $placeholders = [
+                ':package', ':templateCode', ':templateAreas', ':published', ':name', ':title', ':description',
+                ':class1', ':width', ':height', ':pages', ':emailntf', ':emailadr',
+            ];
+
+            if ($hasScriptCond) {
+                $columns[]      = 'script2cond';
+                $columns[]      = 'script2code';
+                $placeholders[] = ':script2cond';
+                $placeholders[] = ':script2code';
             }
 
-            $this->db->setQuery(
-                "INSERT INTO #__facileforms_forms
-                 (package, template_code, template_areas, published, name, title, description,
-                  class1, width, height, pages, emailntf, emailadr
-                  {$scriptCond1}, created, created_by, modified, modified_by)
-                 VALUES
-                 ('QuickModeForms',
-                  " . trim($this->db->quote($templateCode), "\t, ,\n,\r") . ",
-                  " . $this->db->quote((string) json_encode($areas)) . ",
-                  '1',
-                  " . trim($this->db->quote($formName), "\t, ,\n,\r") . ",
-                  " . trim($this->db->quote($formTitle), "\t, ,\n,\r") . ",
-                  " . trim($this->db->quote($formDesc), "\t, ,\n,\r") . ",
-                  '', '400', '500',
-                  " . $this->db->quote($pages) . ",
-                  " . $this->db->quote(($mdata['mailNotification'] ?? false) ? 2 : 0) . ",
-                  " . $this->db->quote($mdata['mailRecipient'] ?? '') . "
-                  {$scriptCond2},
-                  " . $this->db->quote($now) . ', ' . $this->db->quote($userId) . ',
-                  ' . $this->db->quote($now) . ', ' . $this->db->quote($userId) . ')'
-            );
-            $this->db->execute();
+            $columns[]      = 'created';
+            $columns[]      = 'created_by';
+            $columns[]      = 'modified';
+            $columns[]      = 'modified_by';
+            $placeholders[] = ':created';
+            $placeholders[] = ':createdBy';
+            $placeholders[] = ':modified';
+            $placeholders[] = ':modifiedBy';
+
+            $package    = 'QuickModeForms';
+            $published  = 1;
+            $class1     = '';
+            $width      = 400;
+            $height     = 500;
+
+            $query = $this->db->getQuery(true)
+                ->insert($this->db->quoteName('#__facileforms_forms'))
+                ->columns($this->db->quoteName($columns))
+                ->values(implode(', ', $placeholders))
+                ->bind(':package', $package, ParameterType::STRING)
+                ->bind(':templateCode', $templateCode, ParameterType::STRING)
+                ->bind(':templateAreas', $templateAreas, ParameterType::STRING)
+                ->bind(':published', $published, ParameterType::INTEGER)
+                ->bind(':name', $formName, ParameterType::STRING)
+                ->bind(':title', $formTitle, ParameterType::STRING)
+                ->bind(':description', $formDesc, ParameterType::STRING)
+                ->bind(':class1', $class1, ParameterType::STRING)
+                ->bind(':width', $width, ParameterType::INTEGER)
+                ->bind(':height', $height, ParameterType::INTEGER)
+                ->bind(':pages', $pages, ParameterType::INTEGER)
+                ->bind(':emailntf', $emailntf, ParameterType::INTEGER)
+                ->bind(':emailadr', $mailRecipient, ParameterType::STRING)
+                ->bind(':created', $now, ParameterType::STRING)
+                ->bind(':createdBy', $userId, ParameterType::STRING)
+                ->bind(':modified', $now, ParameterType::STRING)
+                ->bind(':modifiedBy', $userId, ParameterType::STRING);
+
+            if ($hasScriptCond) {
+                $submittedScriptCond = $mdata['submittedScriptCondidtion'];
+                $submittedScriptCode = (string) $mdata['submittedScriptCode'];
+                $query->bind(':script2cond', $submittedScriptCond, ParameterType::STRING)
+                    ->bind(':script2code', $submittedScriptCode, ParameterType::STRING);
+            }
+
+            $this->db->setQuery($query)->execute();
             $form = (int) $this->db->insertid();
         } else {
             // UPDATE — split template_code into 60 KB chunks to avoid MySQL gone-away errors
-            $chunks     = $this->chunkString($templateCode, 60000);
-            $scriptCond = '';
-            if (($mdata['submittedScriptCondidtion'] ?? -1) != -1) {
-                $scriptCond = ', script2cond = ' . $this->db->quote($mdata['submittedScriptCondidtion']) .
-                              ', script2code = ' . $this->db->quote($mdata['submittedScriptCode']);
-            }
+            $chunks        = $this->chunkString($templateCode, 60000);
+            $templateAreas = (string) json_encode($areas);
 
             $emailntf  = 0;
             $recipient = trim((string) ($mdata['mailRecipient'] ?? ''));
@@ -490,88 +540,74 @@ class QuickmodeModel extends BaseModel
             } elseif (!empty($mdata['mailNotification']) && $recipient !== '') {
                 $emailntf = 2;
             }
+            $mailRecipient = (string) ($mdata['mailRecipient'] ?? '');
 
-            $this->db->setQuery(
-                'UPDATE #__facileforms_forms SET
-                 template_code = \'\',
-                 template_areas = ' . $this->db->quote((string) json_encode($areas)) . ',
-                 name = ' . trim($this->db->quote($formName), "\t, ,\n,\r") . ',
-                 title = ' . trim($this->db->quote($formTitle), "\t, ,\n,\r") . ',
-                 description = ' . trim($this->db->quote($formDesc), "\t, ,\n,\r") . ',
-                 pages = ' . $this->db->quote($pages) . ',
-                 emailntf = ' . $this->db->quote($emailntf) . ',
-                 emailadr = ' . $this->db->quote($mdata['mailRecipient'] ?? '') . "
-                 {$scriptCond},
-                 modified = " . $this->db->quote($now) . ',
-                 modified_by = ' . $this->db->quote($userId) . '
-                 WHERE id = ' . $this->db->quote($form)
-            );
-            $this->db->execute();
+            $query = $this->db->getQuery(true)
+                ->update($this->db->quoteName('#__facileforms_forms'))
+                ->set($this->db->quoteName('template_code') . " = ''")
+                ->set($this->db->quoteName('template_areas') . ' = :templateAreas')
+                ->set($this->db->quoteName('name') . ' = :name')
+                ->set($this->db->quoteName('title') . ' = :title')
+                ->set($this->db->quoteName('description') . ' = :description')
+                ->set($this->db->quoteName('pages') . ' = :pages')
+                ->set($this->db->quoteName('emailntf') . ' = :emailntf')
+                ->set($this->db->quoteName('emailadr') . ' = :emailadr')
+                ->set($this->db->quoteName('modified') . ' = :modified')
+                ->set($this->db->quoteName('modified_by') . ' = :modifiedBy')
+                ->where($this->db->quoteName('id') . ' = :form')
+                ->bind(':templateAreas', $templateAreas, ParameterType::STRING)
+                ->bind(':name', $formName, ParameterType::STRING)
+                ->bind(':title', $formTitle, ParameterType::STRING)
+                ->bind(':description', $formDesc, ParameterType::STRING)
+                ->bind(':pages', $pages, ParameterType::INTEGER)
+                ->bind(':emailntf', $emailntf, ParameterType::INTEGER)
+                ->bind(':emailadr', $mailRecipient, ParameterType::STRING)
+                ->bind(':modified', $now, ParameterType::STRING)
+                ->bind(':modifiedBy', $userId, ParameterType::STRING)
+                ->bind(':form', $form, ParameterType::INTEGER);
+
+            if (($mdata['submittedScriptCondidtion'] ?? -1) != -1) {
+                $submittedScriptCond = $mdata['submittedScriptCondidtion'];
+                $submittedScriptCode = (string) $mdata['submittedScriptCode'];
+                $query->set($this->db->quoteName('script2cond') . ' = :script2cond')
+                    ->set($this->db->quoteName('script2code') . ' = :script2code')
+                    ->bind(':script2cond', $submittedScriptCond, ParameterType::STRING)
+                    ->bind(':script2code', $submittedScriptCode, ParameterType::STRING);
+            }
+
+            $this->db->setQuery($query)->execute();
 
             foreach ($chunks as $chunk) {
-                $this->db->setQuery(
-                    'UPDATE #__facileforms_forms SET template_code = CONCAT(template_code, ' .
-                    $this->db->quote($chunk) . ') WHERE id = ' . $this->db->quote($form)
-                );
-                $this->db->execute();
+                $appendQuery = $this->db->getQuery(true)
+                    ->update($this->db->quoteName('#__facileforms_forms'))
+                    ->set($this->db->quoteName('template_code') . " = CONCAT(" . $this->db->quoteName('template_code') . ', :chunk)')
+                    ->where($this->db->quoteName('id') . ' = :form')
+                    ->bind(':chunk', $chunk, ParameterType::STRING)
+                    ->bind(':form', $form, ParameterType::INTEGER);
+                $this->db->setQuery($appendQuery)->execute();
             }
         }
 
         // Sync elements
-        $notRemoveIds = '';
+        $keepIds      = [];
         $elementCount = 0;
 
         foreach ($areas[0]['elements'] as $element) {
             $elementId = -1;
+            $fields = $this->elementFields($element, $form, $elementCount);
 
             if ($element['dbId'] == 0) {
-                $this->db->setQuery(
-                    'INSERT INTO #__facileforms_elements
-                     (mailback, mailbackfile, form, page, published, ordering, name, title, type,
-                      class1, class2, logging, posx, posxmode, posy, posymode, width, widthmode,
-                      height, heightmode, flag1, flag2, data1, data2, data3,
-                      script1cond, script1id, script1code, script1flag1, script1flag2,
-                      script2cond, script2id, script2code,
-                      script2flag1, script2flag2, script2flag3, script2flag4, script2flag5,
-                      script3cond, script3id, script3code, script3msg)
-                     VALUES (' .
-                    $this->db->quote($element['mailback']) . ',' .
-                    $this->db->quote($element['mailbackfile']) . ',' .
-                    $this->db->quote($form) . ',' .
-                    $this->db->quote($element['page'] ?? 1) . ',' .
-                    "'1'," .
-                    $this->db->quote($element['orderNumber']) . ',' .
-                    $this->db->quote($element['name']) . ',' .
-                    $this->db->quote($element['title']) . ',' .
-                    $this->db->quote($element['bfType']) . ",'','','" .
-                    (int) ($element['logging'] ?? 1) . "','0','0','" . (40 * $elementCount) . "','0','20','0','20','0'," .
-                    $this->db->quote($element['flag1']) . ',' .
-                    $this->db->quote($element['flag2']) . ',' .
-                    $this->db->quote($element['data1']) . ',' .
-                    $this->db->quote($element['data2']) . ',' .
-                    $this->db->quote($element['data3']) . ',' .
-                    $this->db->quote($element['script1cond']) . ',' .
-                    $this->db->quote($element['script1id']) . ',' .
-                    $this->db->quote($element['script1code']) . ',' .
-                    $this->db->quote($element['script1flag1']) . ',' .
-                    $this->db->quote($element['script1flag2']) . ',' .
-                    $this->db->quote($element['script2cond']) . ',' .
-                    $this->db->quote($element['script2id']) . ',' .
-                    $this->db->quote($element['script2code']) . ',' .
-                    $this->db->quote($element['script2flag1']) . ',' .
-                    $this->db->quote($element['script2flag2']) . ',' .
-                    $this->db->quote($element['script2flag3']) . ',' .
-                    $this->db->quote($element['script2flag4']) . ',' .
-                    $this->db->quote($element['script2flag5']) . ',' .
-                    $this->db->quote($element['script3cond']) . ',' .
-                    $this->db->quote($element['script3id']) . ',' .
-                    $this->db->quote($element['script3code']) . ',' .
-                    $this->db->quote($element['script3msg']) . ')'
-                );
+                $columns = array_keys($fields);
+                $placeholders = array_map(static fn (string $col): string => ':' . $col, $columns);
+                $query = $this->db->getQuery(true)
+                    ->insert($this->db->quoteName('#__facileforms_elements'))
+                    ->columns($this->db->quoteName($columns))
+                    ->values(implode(', ', $placeholders));
+                $this->bindFields($query, $fields);
 
                 $bError = false;
                 try {
-                    $this->db->execute();
+                    $this->db->setQuery($query)->execute();
                 } catch (\InvalidArgumentException $e) {
                     $bError = true;
                 }
@@ -583,10 +619,15 @@ class QuickmodeModel extends BaseModel
                 }
             } else {
                 // Fix ids of copied elements
-                $this->db->setQuery(
-                    'SELECT id FROM #__facileforms_elements WHERE name = ' . $this->db->quote($element['name']) .
-                    ' AND form = ' . $this->db->quote($form)
-                );
+                $elementName = (string) $element['name'];
+                $checkQuery = $this->db->getQuery(true)
+                    ->select('id')
+                    ->from($this->db->quoteName('#__facileforms_elements'))
+                    ->where($this->db->quoteName('name') . ' = :name')
+                    ->where($this->db->quoteName('form') . ' = :form')
+                    ->bind(':name', $elementName, ParameterType::STRING)
+                    ->bind(':form', $form, ParameterType::INTEGER);
+                $this->db->setQuery($checkQuery);
 
                 $elementCheck = [];
                 try {
@@ -600,52 +641,21 @@ class QuickmodeModel extends BaseModel
                         $element['dbId'] = (int) $check->id;
                         $areas[0]['elements'][$elementCount]['dbId'] = (int) $check->id;
                         $this->updateDbId($dataObject, $areas[0]['elements'][$elementCount]['qId'], (int) $check->id);
+                        $fields = $this->elementFields($element, $form, $elementCount);
                     }
                 }
 
-                $this->db->setQuery(
-                    'UPDATE #__facileforms_elements SET' .
-                    ' mailback=' . $this->db->quote($element['mailback']) . ',' .
-                    ' mailbackfile=' . $this->db->quote($element['mailbackfile']) . ',' .
-                    ' form=' . $this->db->quote($form) . ',' .
-                    ' page=' . $this->db->quote($element['page'] ?? 1) . ',' .
-                    " published='1'," .
-                    ' ordering=' . $this->db->quote($element['orderNumber']) . ',' .
-                    ' name=' . $this->db->quote($element['name']) . ',' .
-                    ' title=' . $this->db->quote($element['title']) . ',' .
-                    ' type=' . $this->db->quote($element['bfType']) . "," .
-                    " class1='',class2=''," .
-                    ' logging=' . $this->db->quote((int) ($element['logging'] ?? 1)) . ',' .
-                    " posx='0',posxmode='0'," .
-                    " posy='" . (40 * $elementCount) . "',posymode='0'," .
-                    " width='20',widthmode='0',height='20',heightmode='0'," .
-                    ' flag1=' . $this->db->quote($element['flag1']) . ',' .
-                    ' flag2=' . $this->db->quote($element['flag2']) . ',' .
-                    ' data1=' . $this->db->quote($element['data1']) . ',' .
-                    ' data2=' . $this->db->quote($element['data2']) . ',' .
-                    ' data3=' . $this->db->quote($element['data3']) . ',' .
-                    ' script1cond=' . $this->db->quote($element['script1cond']) . ',' .
-                    ' script1id=' . $this->db->quote($element['script1id']) . ',' .
-                    ' script1code=' . $this->db->quote($element['script1code']) . ',' .
-                    ' script1flag1=' . $this->db->quote($element['script1flag1']) . ',' .
-                    ' script1flag2=' . $this->db->quote($element['script1flag2']) . ',' .
-                    ' script2cond=' . $this->db->quote($element['script2cond']) . ',' .
-                    ' script2id=' . $this->db->quote($element['script2id']) . ',' .
-                    ' script2code=' . $this->db->quote($element['script2code']) . ',' .
-                    ' script2flag1=' . $this->db->quote($element['script2flag1']) . ',' .
-                    ' script2flag2=' . $this->db->quote($element['script2flag2']) . ',' .
-                    ' script2flag3=' . $this->db->quote($element['script2flag3']) . ',' .
-                    ' script2flag4=' . $this->db->quote($element['script2flag4']) . ',' .
-                    ' script2flag5=' . $this->db->quote($element['script2flag5']) . ',' .
-                    ' script3cond=' . $this->db->quote($element['script3cond']) . ',' .
-                    ' script3id=' . $this->db->quote($element['script3id']) . ',' .
-                    ' script3code=' . $this->db->quote($element['script3code']) . ',' .
-                    ' script3msg=' . $this->db->quote($element['script3msg']) .
-                    ' WHERE id = ' . $this->db->quote($element['dbId'])
-                );
+                $dbId = (int) $element['dbId'];
+                $query = $this->db->getQuery(true)->update($this->db->quoteName('#__facileforms_elements'));
+                foreach (array_keys($fields) as $col) {
+                    $query->set($this->db->quoteName($col) . ' = :' . $col);
+                }
+                $query->where($this->db->quoteName('id') . ' = :dbId')
+                    ->bind(':dbId', $dbId, ParameterType::INTEGER);
+                $this->bindFields($query, $fields);
 
                 try {
-                    $this->db->execute();
+                    $this->db->setQuery($query)->execute();
                 } catch (\InvalidArgumentException $e) {
                     // ignore
                 }
@@ -653,38 +663,118 @@ class QuickmodeModel extends BaseModel
                 $elementId = (int) $element['dbId'];
             }
 
-            $notRemoveIds .= ' id <> ' . $this->db->quote($elementId) . ' AND ';
+            $keepIds[] = $elementId;
             $elementCount++;
         }
 
         // Delete elements not in the current save set
-        if ($notRemoveIds !== '') {
-            $this->db->setQuery('DELETE FROM #__facileforms_elements WHERE ' . $notRemoveIds . 'form = ' . $this->db->quote($form));
-        } else {
-            $this->db->setQuery('DELETE FROM #__facileforms_elements WHERE form = ' . $this->db->quote($form));
+        $deleteQuery = $this->db->getQuery(true)
+            ->delete($this->db->quoteName('#__facileforms_elements'))
+            ->where($this->db->quoteName('form') . ' = :form')
+            ->bind(':form', $form, ParameterType::INTEGER);
+        if ($keepIds !== []) {
+            $deleteQuery->whereNotIn($this->db->quoteName('id'), $keepIds, ParameterType::INTEGER);
         }
-        $this->db->execute();
+        $this->db->setQuery($deleteQuery)->execute();
 
         // Write final template_code (chunked)
-        $finalCode   = base64_encode((string) json_encode($dataObject));
-        $finalChunks = $this->chunkString($finalCode, 60000);
+        $finalCode     = base64_encode((string) json_encode($dataObject));
+        $finalChunks   = $this->chunkString($finalCode, 60000);
+        $templateAreas = (string) json_encode($areas);
 
-        $this->db->setQuery(
-            "UPDATE #__facileforms_forms SET template_code = '', template_code_processed = 'QuickMode'," .
-            ' template_areas = ' . $this->db->quote((string) json_encode($areas)) .
-            ' WHERE id = ' . $this->db->quote($form)
-        );
-        $this->db->execute();
+        $finalQuery = $this->db->getQuery(true)
+            ->update($this->db->quoteName('#__facileforms_forms'))
+            ->set($this->db->quoteName('template_code') . " = ''")
+            ->set($this->db->quoteName('template_code_processed') . " = 'QuickMode'")
+            ->set($this->db->quoteName('template_areas') . ' = :templateAreas')
+            ->where($this->db->quoteName('id') . ' = :form')
+            ->bind(':templateAreas', $templateAreas, ParameterType::STRING)
+            ->bind(':form', $form, ParameterType::INTEGER);
+        $this->db->setQuery($finalQuery)->execute();
 
         foreach ($finalChunks as $chunk) {
-            $this->db->setQuery(
-                'UPDATE #__facileforms_forms SET template_code = CONCAT(template_code, ' .
-                $this->db->quote($chunk) . ') WHERE id = ' . $this->db->quote($form)
-            );
-            $this->db->execute();
+            $appendQuery = $this->db->getQuery(true)
+                ->update($this->db->quoteName('#__facileforms_forms'))
+                ->set($this->db->quoteName('template_code') . " = CONCAT(" . $this->db->quoteName('template_code') . ', :chunk)')
+                ->where($this->db->quoteName('id') . ' = :form')
+                ->bind(':chunk', $chunk, ParameterType::STRING)
+                ->bind(':form', $form, ParameterType::INTEGER);
+            $this->db->setQuery($appendQuery)->execute();
         }
 
         return $form;
+    }
+
+    /**
+     * Column => value map shared by the element INSERT and UPDATE branches
+     * of save2().
+     */
+    private function elementFields(array $element, int $form, int $elementCount): array
+    {
+        return [
+            'mailback'     => $element['mailback'],
+            'mailbackfile' => $element['mailbackfile'],
+            'form'         => $form,
+            'page'         => $element['page'] ?? 1,
+            'published'    => 1,
+            'ordering'     => $element['orderNumber'],
+            'name'         => $element['name'],
+            'title'        => $element['title'],
+            'type'         => $element['bfType'],
+            'class1'       => '',
+            'class2'       => '',
+            'logging'      => (int) ($element['logging'] ?? 1),
+            'posx'         => 0,
+            'posxmode'     => 0,
+            'posy'         => 40 * $elementCount,
+            'posymode'     => 0,
+            'width'        => 20,
+            'widthmode'    => 0,
+            'height'       => 20,
+            'heightmode'   => 0,
+            'flag1'        => $element['flag1'],
+            'flag2'        => $element['flag2'],
+            'data1'        => $element['data1'],
+            'data2'        => $element['data2'],
+            'data3'        => $element['data3'],
+            'script1cond'  => $element['script1cond'],
+            'script1id'    => $element['script1id'],
+            'script1code'  => $element['script1code'],
+            'script1flag1' => $element['script1flag1'],
+            'script1flag2' => $element['script1flag2'],
+            'script2cond'  => $element['script2cond'],
+            'script2id'    => $element['script2id'],
+            'script2code'  => $element['script2code'],
+            'script2flag1' => $element['script2flag1'],
+            'script2flag2' => $element['script2flag2'],
+            'script2flag3' => $element['script2flag3'],
+            'script2flag4' => $element['script2flag4'],
+            'script2flag5' => $element['script2flag5'],
+            'script3cond'  => $element['script3cond'],
+            'script3id'    => $element['script3id'],
+            'script3code'  => $element['script3code'],
+            'script3msg'   => $element['script3msg'],
+        ];
+    }
+
+    /**
+     * Binds a column => value map built by elementFields() onto a query
+     * using ":<column>" as the placeholder name for each column.
+     */
+    private function bindFields(\Joomla\Database\DatabaseQuery $query, array $fields): void
+    {
+        // Bind directly against each array slot (not a shared loop-local
+        // scalar) since Joomla's bind() takes the variable by reference -
+        // reusing one variable across iterations would leave every
+        // placeholder pointing at whatever the last iteration wrote to it.
+        foreach ($fields as $col => $value) {
+            $type = match (true) {
+                is_int($value), is_bool($value) => ParameterType::INTEGER,
+                default => ParameterType::STRING,
+            };
+            $fields[$col] = is_bool($value) ? (int) $value : (string) $value;
+            $query->bind(':' . $col, $fields[$col], $type);
+        }
     }
 
     private function chunkString(string $str, int $size): array

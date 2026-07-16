@@ -55,7 +55,7 @@ input[type="color"],
     transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s !important;
 }
 
-main input:focus {
+main input:focus:not([type=checkbox]):not([type=radio]) {
     background: #f8f8f8 none repeat scroll 0 0 !important;
     border-color: #3f51b5 !important;
     box-shadow: none !important;

@@ -638,8 +638,11 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 - [x] **Audit des doublons `#__extensions`** (fait le 2026-07-16, `07e39701`) : lignes dupliquées (même
   `type`+`element`+`folder`+`client_id`) et entrées legacy résiduelles signalées dans l'écran About
   (garder/redondants) ; le dédoublonnage côté réparation reste à faire si des doublons apparaissent un jour.
-- [ ] **Retitrage des entrées de menu legacy** : reprise de la logique cbng qui renomme/retitre les entrées de
-  menu d'administration héritées de l'ancien composant.
+- [x] **Retitrage/modernisation des entrées de menu legacy** (fait le 2026-07-17, `814612a6`) : les titres
+  étaient déjà tous en `COM_BREEZINGFORMSNG_*` (rien à retitrer) ; en revanche les **liens** du sous-menu admin
+  utilisaient encore les routes pontées `act=managerecs`/`act=manageforms`/`act=integrate` — modernisés en
+  `view=records`/`view=forms`/`view=integrator` (+ quicktasks `forms.edit`/`integrator.edit`) dans `script.php`
+  (`ensureAdministrationSubmenuEntries()` + `migrateStaleMenuLinks()`) et appliqués à la base de dev.
 - [x] ~~Audit des permissions frontend (`FrontendPermissionAuditHelper`)~~ **Non transposable** : le modèle de
   données BF NG (`facileforms_forms`) n'a pas de permissions frontend par formulaire (`permissions_fe`,
   `own_only_fe`…) contrairement à cbng — pas d'équivalent à auditer.
@@ -658,10 +661,13 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 
 ### Données à investiguer (observé le 2026-07-16 sur la base de dev)
 
-- [ ] `#__facileforms_forms` contient de **nombreuses copies** des mêmes formulaires (mêmes noms —
-  `Vcmb_Check`, `TestEddyElements`, `hash_password`, `newsletter`… — sous des dizaines d'ids différents,
-  probablement des reliquats d'imports/paquets répétés). À investiguer : est-ce le fonctionnement normal des
-  paquets BF ou des données orphelines à intégrer à l'audit/nettoyage ?
+- [x] **Investigué le 2026-07-17** (`814612a6`) : les copies de `#__facileforms_forms` sont bien des reliquats
+  d'imports de paquet répétés (ex. `hash_password` : original de février avec 11 enregistrements + 4 copies
+  créées en 12 minutes le 25/03, toutes à 0 enregistrement) — 12 groupes, 44 lignes en trop sur la base de dev.
+  Nuisible car les menus du site résolvent les formulaires **par nom**. Nouvel audit « Formulaires en double »
+  dans l'écran About (garde la ligne portant des enregistrements, sinon la plus ancienne ; signalement
+  uniquement, pas de suppression automatique). La suppression assistée côté réparation reste une évolution
+  possible.
 
 ### Chantiers de fond déjà décrits plus haut
 

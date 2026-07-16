@@ -615,3 +615,68 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
   d'erreur 404) via une classe `ContentbuilderngComponent` introuvable dans son `services/provider.php`. Le site
   répond de nouveau normalement (404 sur une URL inconnue, rendu complet sans `tmpl=component` nécessaire) ; les
   callbacks `optOut`/`checkCaptcha` ont pu être revérifiés en HTTP réel dans la foulée (cf. note Phase 9a ci-dessus).
+
+---
+
+## Points restants à faire (état au 2026-07-16)
+
+### Vérifications bloquées ou manuelles
+
+- [ ] **Callbacks de paiement en conditions réelles** : `Stripe`/`PayPal`/`Sofort` convertis en QueryBuilder et
+  validés par `php -l` + revue, mais jamais confirmés par un vrai paiement de test — accès à un compte sandbox
+  nécessaire, non disponible en session agent (cf. notes Phase 9a).
+- [ ] **Phase 2 — Permissions ACL** : test de persistance d'une règle Autoriser/Refuser à faire manuellement
+  (détail au point « Reliquat hors Phase 9 » ci-dessus).
+
+### Portages depuis cbng (`~/workspaces/vcmb/com_contentbuilderng`, la copie moderne de référence)
+
+- [ ] **Audit des menus frontaux** (adapter `MenuViewAuditHelper`) : détecter les éléments de menu de site
+  (`client_id=0`, `type=component`, lien `option=com_breezingformsng`) dont le `ff_com_name` des params est vide,
+  ne correspond à aucun formulaire `#__facileforms_forms`, ou pointe sur un formulaire dépublié ; signaler aussi
+  les menus pointant encore sur l'ancien `option=com_breezingforms` (sans NG). Particularité BF : le formulaire
+  est référencé par **nom** (`ff_com_name`), pas par id.
+- [ ] **Audit des doublons `#__extensions`** : lignes dupliquées (même `type`+`element`+`folder`+`client_id`)
+  et entrées legacy résiduelles (`com_breezingforms`, plugins/modules crosstec) à signaler dans l'écran About,
+  avec dédoublonnage côté réparation.
+- [ ] **Retitrage des entrées de menu legacy** : reprise de la logique cbng qui renomme/retitre les entrées de
+  menu d'administration héritées de l'ancien composant.
+- [x] ~~Audit des permissions frontend (`FrontendPermissionAuditHelper`)~~ **Non transposable** : le modèle de
+  données BF NG (`facileforms_forms`) n'a pas de permissions frontend par formulaire (`permissions_fe`,
+  `own_only_fe`…) contrairement à cbng — pas d'équivalent à auditer.
+- [x] Widget étoiles GitHub sur l'écran About (`6bb49254`) — iframe ghbtns.com, libellé traduit en/fr/de.
+- [x] Logique du script d'installation cbng reprise (sessions précédentes).
+- [x] Audits déjà portés dans `DatabaseAuditService` : collation cible résolue (`utf8mb4_0900_ai_ci` →
+  `utf8mb4_unicode_520_ci` → `utf8mb4_unicode_ci`), collations de colonnes, histogramme, index dupliqués
+  (garder/supprimer), tables inattendues, fichiers de langue périmés, répertoires `tmp/install_*` obsolètes.
+
+### Réparation (écran About)
+
+- [ ] Vérifier que le workflow de réparation d'`AboutController` utilise bien la **collation cible résolue**
+  (pas une valeur codée en dur) et couvre les tables `records`/`subrecords`/`config` — identifié lors de la
+  recherche cbng, état actuel à confirmer avant correction.
+
+### Données à investiguer (observé le 2026-07-16 sur la base de dev)
+
+- [ ] `#__facileforms_forms` contient de **nombreuses copies** des mêmes formulaires (mêmes noms —
+  `Vcmb_Check`, `TestEddyElements`, `hash_password`, `newsletter`… — sous des dizaines d'ids différents,
+  probablement des reliquats d'imports/paquets répétés). À investiguer : est-ce le fonctionnement normal des
+  paquets BF ou des données orphelines à intégrer à l'audit/nettoyage ?
+
+### Chantiers de fond déjà décrits plus haut
+
+- [ ] **Phase 8 — Frontend** : réécriture native `FormRenderer`/`FormProcessor`/`SubmissionHandler` (hors
+  périmètre immédiat, cf. section Phase 8).
+- [ ] **Phase 9b/9c** : `BFIntegrate` déjà réécrit en interne (2026-07-12) ; restent les 4 rendus
+  `BFQuickMode*` (~11 100 lignes), à traiter thème par thème en commençant par `BFQuickMode.php`.
+- [ ] **Vérification finale Phase 9** : repasse complète des scénarios (rendu tous thèmes, soumission SEF,
+  callbacks paiement, upload, `commit()` Intégrateur).
+
+### Rappels permanents
+
+- Ne jamais supprimer les classes crosstec (`BFRequest`, `BFFactory`, `BFText`, `BFJoomlaConfig`, `BFPDF`,
+  `BFIntegrate`, `BFQuickMode*`) sur la seule foi d'un grep du dépôt : du PHP stocké en base
+  (`facileforms_pieces.code`, `forms.piece*code`) peut les appeler à l'exécution.
+- Déployer les fichiers de langue aux **deux** emplacements (`administrator/components/…/language/` et
+  `administrator/language/`) puis vider `administrator/cache/language/` — l'agent `deploy` l'encode.
+- Toute chaîne utilisateur passe par les trois langues en-GB/fr-FR/de-DE simultanément (skill
+  `joomla-translations`).

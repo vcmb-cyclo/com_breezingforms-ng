@@ -2042,7 +2042,7 @@
                     mdata.description = JQuery('#bfFormDescription').val();
                     mdata.mailRecipient = JQuery('#bfFormMailRecipient').val();
                     mdata.mailNotification = JQuery('#bfFormMailNotification').attr('checked');
-                    mdata.submitInclude = JQuery('#bfSubmitIncludeYes').attr('checked');
+                    mdata.submitInclude = JQuery('#bfSubmitIncludeYes').prop('checked');
                     mdata.themebootstrapLabelTop = JQuery('#bfThemeBootstrapLabelTopYes').attr('checked');
                     mdata.themeusebootstraplegacy = typeof JQuery('#bfThemeBootstrapUseLegacyYes').get(0) != "undefined" ? JQuery('#bfThemeBootstrapUseLegacyYes').attr('checked') : false;
                     mdata.themebootstrapUseHeroUnit = JQuery('#bfThemeBootstrapUseHeroUnitYes').attr('checked');
@@ -2059,12 +2059,12 @@
                     mdata.submitLabel = JQuery('#bfFormSubmitLabel').val();
                     mdata['submitLabel_translation'+BFQMConfig.lang] = JQuery('#bfFormSubmitLabelTrans').val();
 
-                    mdata.cancelInclude = JQuery('#bfCancelIncludeYes').attr('checked');
+                    mdata.cancelInclude = JQuery('#bfCancelIncludeYes').prop('checked');
 
                     mdata.cancelLabel = JQuery('#bfFormCancelLabel').val();
                     mdata['cancelLabel_translation'+BFQMConfig.lang] = JQuery('#bfFormCancelLabelTrans').val();
 
-                    mdata.pagingInclude = JQuery('#bfPagingIncludeYes').attr('checked');
+                    mdata.pagingInclude = JQuery('#bfPagingIncludeYes').prop('checked');
 
                     mdata.pagingNextLabel = JQuery('#bfFormPagingNextLabel').val();
                     mdata['pagingNextLabel_translation'+BFQMConfig.lang] = JQuery('#bfFormPagingNextLabelTrans').val();
@@ -2131,11 +2131,11 @@
                         JQuery('#bfElementAdvancedUseDefaultErrors').attr('checked', mdata.useDefaultErrors);
                         JQuery('#bfElementAdvancedUseBalloonErrors').attr('checked', mdata.useBalloonErrors);
                         if (mdata.submitInclude) {
-                            JQuery('#bfSubmitIncludeYes').attr('checked', true);
-                            JQuery('#bfSubmitIncludeNo').attr('checked', false);
+                            JQuery('#bfSubmitIncludeYes').prop('checked', true).trigger('change');
+                            JQuery('#bfSubmitIncludeNo').prop('checked', false);
                         } else {
-                            JQuery('#bfSubmitIncludeYes').attr('checked', false);
-                            JQuery('#bfSubmitIncludeNo').attr('checked', true);
+                            JQuery('#bfSubmitIncludeYes').prop('checked', false).trigger('change');
+                            JQuery('#bfSubmitIncludeNo').prop('checked', true);
                         }
                         if (mdata.themebootstrapLabelTop) {
                             JQuery('#bfThemeBootstrapLabelTopYes').attr('checked', true);
@@ -2227,22 +2227,22 @@
                         JQuery('#bfFormSubmitLabelTrans').val(typeof mdata['submitLabel_translation'+BFQMConfig.lang] != "undefined" ? mdata['submitLabel_translation'+BFQMConfig.lang] : "");
 
                         if (mdata.cancelInclude) {
-                            JQuery('#bfCancelIncludeYes').attr('checked', true);
-                            JQuery('#bfCancelIncludeNo').attr('checked', false);
+                            JQuery('#bfCancelIncludeYes').prop('checked', true).trigger('change');
+                            JQuery('#bfCancelIncludeNo').prop('checked', false);
                         } else {
-                            JQuery('#bfCancelIncludeYes').attr('checked', false);
-                            JQuery('#bfCancelIncludeNo').attr('checked', true);
+                            JQuery('#bfCancelIncludeYes').prop('checked', false).trigger('change');
+                            JQuery('#bfCancelIncludeNo').prop('checked', true);
                         }
 
                         JQuery('#bfFormCancelLabel').val(mdata.cancelLabel);
                         JQuery('#bfFormCancelLabelTrans').val(typeof mdata['cancelLabel_translation'+BFQMConfig.lang] != "undefined" ? mdata['cancelLabel_translation'+BFQMConfig.lang] : "");
 
                         if (mdata.pagingInclude) {
-                            JQuery('#bfPagingIncludeYes').attr('checked', true);
-                            JQuery('#bfPagingIncludeNo').attr('checked', false);
+                            JQuery('#bfPagingIncludeYes').prop('checked', true).trigger('change');
+                            JQuery('#bfPagingIncludeNo').prop('checked', false);
                         } else {
-                            JQuery('#bfPagingIncludeYes').attr('checked', false);
-                            JQuery('#bfPagingIncludeNo').attr('checked', true);
+                            JQuery('#bfPagingIncludeYes').prop('checked', false).trigger('change');
+                            JQuery('#bfPagingIncludeNo').prop('checked', true);
                         }
 
                         JQuery('#bfFormPagingNextLabel').val(mdata.pagingNextLabel);

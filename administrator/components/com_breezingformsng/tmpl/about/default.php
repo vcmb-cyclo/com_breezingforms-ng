@@ -313,6 +313,9 @@ $auditCollationIssues = (array) ($auditReport['collation_issues'] ?? array());
 $auditColumnCollationIssues = (array) ($auditReport['column_collation_issues'] ?? array());
 $auditCollationHistogram = (array) ($auditReport['collation_histogram'] ?? array());
 $auditDuplicateIndexes = (array) ($auditReport['duplicate_indexes'] ?? array());
+$auditMenuIssues = (array) ($auditReport['menu_issues'] ?? array());
+$auditExtensionDuplicates = (array) ($auditReport['extension_duplicates'] ?? array());
+$auditExtensionLegacy = (array) ($auditReport['extension_legacy'] ?? array());
 $auditOrphanChecks = array_values(array_filter(
     (array) ($auditReport['orphan_checks'] ?? array()),
     static fn(array $check): bool => (int) ($check['count'] ?? 0) > 0
@@ -474,6 +477,66 @@ $aboutDescription = str_replace(
                         <ul class="mb-0">
                             <?php foreach ($auditStaleInstallerTempDirs as $dir) : ?>
                                 <li><code><?php echo htmlspecialchars((string) $dir, ENT_QUOTES, 'UTF-8'); ?></code></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($auditMenuIssues !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_MENU_ISSUES'); ?></h4>
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead><tr><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_MENU'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_MENU_FORM'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_ISSUE'); ?></th></tr></thead>
+                                <tbody>
+                                <?php foreach ($auditMenuIssues as $issue) : ?>
+                                    <tr class="table-warning">
+                                        <td><?php echo htmlspecialchars((string) ($issue['title'] ?? ''), ENT_QUOTES, 'UTF-8'); ?> <span class="text-muted">(#<?php echo (int) ($issue['menu_id'] ?? 0); ?>)</span></td>
+                                        <td><code><?php echo htmlspecialchars((string) ($issue['form_name'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code></td>
+                                        <td>
+                                            <?php foreach ((array) ($issue['issues'] ?? array()) as $code) : ?>
+                                                <?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_MENU_' . strtoupper((string) $code)); ?><br />
+                                            <?php endforeach; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($auditExtensionDuplicates !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_EXTENSION_DUPLICATES'); ?></h4>
+                        <ul class="mb-0">
+                            <?php foreach ($auditExtensionDuplicates as $group) : ?>
+                                <li>
+                                    <code><?php echo htmlspecialchars((string) ($group['keep']['type'] ?? '') . '/' . (string) ($group['keep']['element'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code>
+                                    &mdash;
+                                    <?php echo Text::sprintf(
+                                        'COM_BREEZINGFORMSNG_ABOUT_AUDIT_EXTENSION_DUPLICATE_HINT',
+                                        (int) ($group['keep']['extension_id'] ?? 0),
+                                        htmlspecialchars(implode(', ', array_map(
+                                            static fn(array $entry): string => '#' . (int) ($entry['extension_id'] ?? 0),
+                                            (array) ($group['drop'] ?? array())
+                                        )), ENT_QUOTES, 'UTF-8')
+                                    ); ?>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($auditExtensionLegacy !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_EXTENSION_LEGACY'); ?></h4>
+                        <ul class="mb-0">
+                            <?php foreach ($auditExtensionLegacy as $entry) : ?>
+                                <li>
+                                    <code><?php echo htmlspecialchars((string) ($entry['type'] ?? '') . '/' . ((string) ($entry['folder'] ?? '') !== '' ? (string) $entry['folder'] . '/' : '') . (string) ($entry['element'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code>
+                                    <span class="text-muted">(#<?php echo (int) ($entry['extension_id'] ?? 0); ?>)</span>
+                                </li>
                             <?php endforeach; ?>
                         </ul>
                     </div>

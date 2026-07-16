@@ -664,10 +664,9 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 
 ### Chantiers de fond déjà décrits plus haut
 
-- [ ] **Phase 8 — Frontend** : réécriture native `FormRenderer`/`FormProcessor`/`SubmissionHandler` (hors
-  périmètre immédiat, cf. section Phase 8).
-- [ ] **Phase 9b/9c** : `BFIntegrate` déjà réécrit en interne (2026-07-12) ; restent les 4 rendus
-  `BFQuickMode*` (~11 100 lignes), à traiter thème par thème en commençant par `BFQuickMode.php`.
+- [ ] **Phase 9c** : la réécriture native des 4 rendus frontend `BFQuickMode*` (~11 100 lignes cumulées) est le
+  dernier gros chantier « Joomla 6 pur ». À traiter thème par thème en commençant par `BFQuickMode.php`
+  (le plus petit, thème par défaut). Les Phases 1–8 et 9a/9b sont terminées.
 - [ ] **Vérification finale Phase 9** : repasse complète des scénarios (rendu tous thèmes, soumission SEF,
   callbacks paiement, upload, `commit()` Intégrateur).
 

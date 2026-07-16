@@ -651,9 +651,10 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 
 ### Réparation (écran About)
 
-- [ ] Vérifier que le workflow de réparation d'`AboutController` utilise bien la **collation cible résolue**
-  (pas une valeur codée en dur) et couvre les tables `records`/`subrecords`/`config` — identifié lors de la
-  recherche cbng, état actuel à confirmer avant correction.
+- [x] **Vérifié le 2026-07-17** : le workflow de réparation d'`AboutController::startRepairWorkflow()` utilise
+  bien la collation cible résolue par `DatabaseAuditService` (`$report['target_collation']`, jamais codée en
+  dur) et couvre `config`/`records`/`subrecords` via `ADDITIONAL_REPAIR_TABLES` en plus des 11 tables de
+  configuration. Rien à corriger.
 
 ### Données à investiguer (observé le 2026-07-16 sur la base de dev)
 

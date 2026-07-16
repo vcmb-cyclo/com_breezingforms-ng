@@ -1567,13 +1567,13 @@ class com_breezingformsngInstallerScript
             }
 
             $items = [
-                ['COM_BREEZINGFORMSNG_MANAGE_RECORDS', 'breezingformsng-records', 'act=managerecs', []],
+                ['COM_BREEZINGFORMSNG_MANAGE_RECORDS', 'breezingformsng-records', 'view=records', []],
                 [
                     'COM_BREEZINGFORMSNG_MANAGE_FORMS',
                     'breezingformsng-forms',
-                    'act=manageforms',
+                    'view=forms',
                     [
-                        'menu-quicktask' => 'index.php?option=' . self::TARGET_COMPONENT . '&act=manageforms&task=quickmode',
+                        'menu-quicktask' => 'index.php?option=' . self::TARGET_COMPONENT . '&task=forms.edit',
                         'menu-quicktask-title' => 'COM_BREEZINGFORMSNG_MENUS_NEW_FORM',
                         'menu-quicktask-icon' => 'plus',
                     ],
@@ -1601,9 +1601,9 @@ class com_breezingformsngInstallerScript
                 [
                     'COM_BREEZINGFORMSNG_INTEGRATOR',
                     'breezingformsng-integrator',
-                    'act=integrate',
+                    'view=integrator',
                     [
-                        'menu-quicktask' => 'index.php?option=' . self::TARGET_COMPONENT . '&act=integrate&task=add',
+                        'menu-quicktask' => 'index.php?option=' . self::TARGET_COMPONENT . '&task=integrator.edit',
                         'menu-quicktask-title' => 'COM_BREEZINGFORMSNG_MENUS_NEW_INTEGRATION',
                         'menu-quicktask-icon' => 'plus',
                     ],
@@ -1910,7 +1910,13 @@ class com_breezingformsngInstallerScript
             'index.php?option=' . self::TARGET_COMPONENT . '&act=about'
                 => 'index.php?option=' . self::TARGET_COMPONENT . '&task=about.display&view=about',
             'index.php?option=' . self::TARGET_COMPONENT . '&task=integrate.display&view=integrate'
-                => 'index.php?option=' . self::TARGET_COMPONENT . '&act=integrate',
+                => 'index.php?option=' . self::TARGET_COMPONENT . '&view=integrator',
+            'index.php?option=' . self::TARGET_COMPONENT . '&act=integrate'
+                => 'index.php?option=' . self::TARGET_COMPONENT . '&view=integrator',
+            'index.php?option=' . self::TARGET_COMPONENT . '&act=managerecs'
+                => 'index.php?option=' . self::TARGET_COMPONENT . '&view=records',
+            'index.php?option=' . self::TARGET_COMPONENT . '&act=manageforms'
+                => 'index.php?option=' . self::TARGET_COMPONENT . '&view=forms',
         ];
 
         foreach ($replacements as $oldLink => $newLink) {

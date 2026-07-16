@@ -101,9 +101,12 @@ final class DatabaseAuditService
         $unexpectedTables = $this->findUnexpectedTables($tableList);
         $staleLanguageFiles = $this->findStaleLanguageFiles();
         $staleInstallerTempDirs = $this->findStaleInstallerTempDirectories();
+        $menuIssues = $this->findMenuIssues();
+        $extensionIssues = $this->findExtensionIssues();
         $issuesTotal = count($missingTables) + count($collationIssues) + count($columnCollationIssues)
             + count($duplicateIndexes) + $orphanRows + count($unexpectedTables)
-            + count($staleLanguageFiles) + count($staleInstallerTempDirs);
+            + count($staleLanguageFiles) + count($staleInstallerTempDirs)
+            + count($menuIssues) + count($extensionIssues['duplicates']) + count($extensionIssues['legacy']);
 
         return [
             'generated_at' => (new Date())->toSql(),
@@ -118,6 +121,9 @@ final class DatabaseAuditService
             'orphan_checks' => $orphanChecks,
             'stale_language_files' => $staleLanguageFiles,
             'stale_installer_temp_dirs' => $staleInstallerTempDirs,
+            'menu_issues' => $menuIssues,
+            'extension_duplicates' => $extensionIssues['duplicates'],
+            'extension_legacy' => $extensionIssues['legacy'],
             'summary' => [
                 'expected_tables' => count(self::EXPECTED_TABLES),
                 'scanned_tables' => count($tables),
@@ -133,6 +139,9 @@ final class DatabaseAuditService
                 'orphan_rows' => $orphanRows,
                 'stale_language_files' => count($staleLanguageFiles),
                 'stale_installer_temp_dirs' => count($staleInstallerTempDirs),
+                'menu_issues' => count($menuIssues),
+                'extension_duplicates' => count($extensionIssues['duplicates']),
+                'extension_legacy' => count($extensionIssues['legacy']),
                 'issues_total' => $issuesTotal,
             ],
         ];
@@ -413,5 +422,141 @@ final class DatabaseAuditService
         sort($stale, SORT_NATURAL | SORT_FLAG_CASE);
 
         return $stale;
+    }
+
+    /**
+     * Site menu items pointing at this component whose target form (referenced
+     * by name via the ff_com_name menu parameter, not by id) is missing,
+     * unpublished, or not configured at all - plus menus still linking to the
+     * pre-NG option=com_breezingforms component.
+     */
+    private function findMenuIssues(): array
+    {
+        $issues = [];
+
+        try {
+            $query = $this->db->getQuery(true)
+                ->select($this->db->quoteName(['id', 'title', 'link', 'published', 'params']))
+                ->from($this->db->quoteName('#__menu'))
+                ->where($this->db->quoteName('client_id') . ' = 0')
+                ->where($this->db->quoteName('type') . ' = ' . $this->db->quote('component'))
+                ->where($this->db->quoteName('link') . ' LIKE ' . $this->db->quote('%option=com_breezingforms%'))
+                ->order($this->db->quoteName('id') . ' ASC');
+            $this->db->setQuery($query);
+            $menus = $this->db->loadAssocList() ?: [];
+
+            $query = $this->db->getQuery(true)
+                ->select($this->db->quoteName(['name', 'published']))
+                ->from($this->db->quoteName('#__facileforms_forms'));
+            $this->db->setQuery($query);
+            $formRows = $this->db->loadAssocList() ?: [];
+        } catch (\Throwable) {
+            return [];
+        }
+
+        $publishedByName = [];
+        foreach ($formRows as $formRow) {
+            $name = trim((string) ($formRow['name'] ?? ''));
+            if ($name === '') {
+                continue;
+            }
+            $publishedByName[$name] = ($publishedByName[$name] ?? false) || (int) ($formRow['published'] ?? 0) === 1;
+        }
+
+        foreach ($menus as $menu) {
+            $link = trim((string) ($menu['link'] ?? ''));
+            $linkQuery = [];
+            parse_str((string) parse_url($link, PHP_URL_QUERY), $linkQuery);
+            $option = (string) ($linkQuery['option'] ?? '');
+            $menuIssues = [];
+            $formName = '';
+
+            if ($option === 'com_breezingforms') {
+                $menuIssues[] = 'legacy_component_link';
+            } elseif ($option === 'com_breezingformsng') {
+                $params = json_decode((string) ($menu['params'] ?? ''), true);
+                $formName = trim((string) (is_array($params) ? ($params['ff_com_name'] ?? '') : ''));
+
+                if ($formName === '') {
+                    $menuIssues[] = 'no_form_configured';
+                } elseif (!array_key_exists($formName, $publishedByName)) {
+                    $menuIssues[] = 'form_missing';
+                } elseif (!$publishedByName[$formName]) {
+                    $menuIssues[] = 'form_unpublished';
+                }
+            }
+
+            if ($menuIssues !== []) {
+                $issues[] = [
+                    'menu_id' => (int) ($menu['id'] ?? 0),
+                    'title' => trim((string) ($menu['title'] ?? '')),
+                    'published' => (int) ($menu['published'] ?? 0),
+                    'link' => $link,
+                    'form_name' => $formName,
+                    'issues' => $menuIssues,
+                ];
+            }
+        }
+
+        return $issues;
+    }
+
+    /**
+     * Duplicate #__extensions registrations (same type/element/folder/client)
+     * left behind by repeated discover-installs, and leftover rows from the
+     * pre-NG crosstec extensions that an update never removes.
+     */
+    private function findExtensionIssues(): array
+    {
+        try {
+            $query = $this->db->getQuery(true)
+                ->select($this->db->quoteName(['extension_id', 'name', 'type', 'element', 'folder', 'client_id', 'enabled']))
+                ->from($this->db->quoteName('#__extensions'))
+                ->where($this->db->quoteName('element') . ' LIKE ' . $this->db->quote('%breezingforms%'))
+                ->order($this->db->quoteName('extension_id') . ' ASC');
+            $this->db->setQuery($query);
+            $rows = $this->db->loadAssocList() ?: [];
+        } catch (\Throwable) {
+            return ['duplicates' => [], 'legacy' => []];
+        }
+
+        $byKey = [];
+        $legacy = [];
+
+        foreach ($rows as $row) {
+            $element = strtolower(trim((string) ($row['element'] ?? '')));
+            $entry = [
+                'extension_id' => (int) ($row['extension_id'] ?? 0),
+                'name' => (string) ($row['name'] ?? ''),
+                'type' => (string) ($row['type'] ?? ''),
+                'element' => (string) ($row['element'] ?? ''),
+                'folder' => (string) ($row['folder'] ?? ''),
+                'enabled' => (int) ($row['enabled'] ?? 0),
+            ];
+
+            // The NG component and its system plugin are the only expected rows.
+            $isExpected = ($entry['type'] === 'component' && $element === 'com_breezingformsng')
+                || ($entry['type'] === 'plugin' && $element === 'sysbreezingforms' && $entry['folder'] === 'system');
+
+            if (!$isExpected && !str_contains($element, 'breezingformsng')) {
+                $legacy[] = $entry;
+            }
+
+            $key = implode('|', [$entry['type'], $element, strtolower($entry['folder']), (int) ($row['client_id'] ?? 0)]);
+            $byKey[$key][] = $entry;
+        }
+
+        $duplicates = [];
+        foreach ($byKey as $entries) {
+            if (count($entries) > 1) {
+                // Keep the first registration; every later row is redundant.
+                $duplicates[] = [
+                    'keep' => $entries[0],
+                    'drop' => array_slice($entries, 1),
+                ];
+            }
+        }
+
+        return ['duplicates' => $duplicates, 'legacy' => $legacy];
     }
 }

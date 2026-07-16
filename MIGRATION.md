@@ -630,14 +630,14 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 
 ### Portages depuis cbng (`~/workspaces/vcmb/com_contentbuilderng`, la copie moderne de référence)
 
-- [ ] **Audit des menus frontaux** (adapter `MenuViewAuditHelper`) : détecter les éléments de menu de site
+- [x] **Audit des menus frontaux** (adapté de `MenuViewAuditHelper`, fait le 2026-07-16, `07e39701`) : détecte les éléments de menu de site
   (`client_id=0`, `type=component`, lien `option=com_breezingformsng`) dont le `ff_com_name` des params est vide,
   ne correspond à aucun formulaire `#__facileforms_forms`, ou pointe sur un formulaire dépublié ; signaler aussi
   les menus pointant encore sur l'ancien `option=com_breezingforms` (sans NG). Particularité BF : le formulaire
   est référencé par **nom** (`ff_com_name`), pas par id.
-- [ ] **Audit des doublons `#__extensions`** : lignes dupliquées (même `type`+`element`+`folder`+`client_id`)
-  et entrées legacy résiduelles (`com_breezingforms`, plugins/modules crosstec) à signaler dans l'écran About,
-  avec dédoublonnage côté réparation.
+- [x] **Audit des doublons `#__extensions`** (fait le 2026-07-16, `07e39701`) : lignes dupliquées (même
+  `type`+`element`+`folder`+`client_id`) et entrées legacy résiduelles signalées dans l'écran About
+  (garder/redondants) ; le dédoublonnage côté réparation reste à faire si des doublons apparaissent un jour.
 - [ ] **Retitrage des entrées de menu legacy** : reprise de la logique cbng qui renomme/retitre les entrées de
   menu d'administration héritées de l'ancien composant.
 - [x] ~~Audit des permissions frontend (`FrontendPermissionAuditHelper`)~~ **Non transposable** : le modèle de

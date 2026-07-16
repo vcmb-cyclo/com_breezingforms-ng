@@ -103,10 +103,12 @@ final class DatabaseAuditService
         $staleInstallerTempDirs = $this->findStaleInstallerTempDirectories();
         $menuIssues = $this->findMenuIssues();
         $extensionIssues = $this->findExtensionIssues();
+        $duplicateForms = $this->findDuplicateForms();
         $issuesTotal = count($missingTables) + count($collationIssues) + count($columnCollationIssues)
             + count($duplicateIndexes) + $orphanRows + count($unexpectedTables)
             + count($staleLanguageFiles) + count($staleInstallerTempDirs)
-            + count($menuIssues) + count($extensionIssues['duplicates']) + count($extensionIssues['legacy']);
+            + count($menuIssues) + count($extensionIssues['duplicates']) + count($extensionIssues['legacy'])
+            + count($duplicateForms);
 
         return [
             'generated_at' => (new Date())->toSql(),
@@ -124,6 +126,7 @@ final class DatabaseAuditService
             'menu_issues' => $menuIssues,
             'extension_duplicates' => $extensionIssues['duplicates'],
             'extension_legacy' => $extensionIssues['legacy'],
+            'duplicate_forms' => $duplicateForms,
             'summary' => [
                 'expected_tables' => count(self::EXPECTED_TABLES),
                 'scanned_tables' => count($tables),
@@ -142,6 +145,7 @@ final class DatabaseAuditService
                 'menu_issues' => count($menuIssues),
                 'extension_duplicates' => count($extensionIssues['duplicates']),
                 'extension_legacy' => count($extensionIssues['legacy']),
+                'duplicate_forms' => count($duplicateForms),
                 'issues_total' => $issuesTotal,
             ],
         ];
@@ -558,5 +562,64 @@ final class DatabaseAuditService
         }
 
         return ['duplicates' => $duplicates, 'legacy' => $legacy];
+    }
+
+    /**
+     * Forms sharing the same name within the same package - typically leftovers
+     * from a package being imported several times. Genuinely harmful here
+     * because site menu items reference forms by name (ff_com_name), so
+     * duplicated names make that resolution ambiguous. The row to keep is the
+     * one holding submitted records (or the oldest when none has any).
+     */
+    private function findDuplicateForms(): array
+    {
+        try {
+            $query = $this->db->getQuery(true)
+                ->select($this->db->quoteName(['f.id', 'f.name', 'f.package', 'f.published']))
+                ->select('COUNT(' . $this->db->quoteName('r.id') . ') AS ' . $this->db->quoteName('record_count'))
+                ->from($this->db->quoteName('#__facileforms_forms', 'f'))
+                ->join('LEFT', $this->db->quoteName('#__facileforms_records', 'r'), 'r.form = f.id')
+                ->group($this->db->quoteName('f.id'))
+                ->order($this->db->quoteName('f.id') . ' ASC');
+            $this->db->setQuery($query);
+            $rows = $this->db->loadAssocList() ?: [];
+        } catch (\Throwable) {
+            return [];
+        }
+
+        $byKey = [];
+        foreach ($rows as $row) {
+            $name = trim((string) ($row['name'] ?? ''));
+            if ($name === '') {
+                continue;
+            }
+            $byKey[$name . '|' . trim((string) ($row['package'] ?? ''))][] = [
+                'id' => (int) ($row['id'] ?? 0),
+                'name' => $name,
+                'package' => trim((string) ($row['package'] ?? '')),
+                'published' => (int) ($row['published'] ?? 0),
+                'record_count' => (int) ($row['record_count'] ?? 0),
+            ];
+        }
+
+        $duplicates = [];
+        foreach ($byKey as $entries) {
+            if (count($entries) < 2) {
+                continue;
+            }
+
+            // Prefer the row that actually holds records; ties go to the oldest id.
+            usort($entries, static fn(array $a, array $b): int =>
+                [$b['record_count'], $a['id']] <=> [$a['record_count'], $b['id']]);
+
+            $duplicates[] = [
+                'name' => $entries[0]['name'],
+                'package' => $entries[0]['package'],
+                'keep' => $entries[0],
+                'drop' => array_slice($entries, 1),
+            ];
+        }
+
+        return $duplicates;
     }
 }

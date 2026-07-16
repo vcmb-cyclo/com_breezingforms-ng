@@ -314,6 +314,7 @@ $auditColumnCollationIssues = (array) ($auditReport['column_collation_issues'] ?
 $auditCollationHistogram = (array) ($auditReport['collation_histogram'] ?? array());
 $auditDuplicateIndexes = (array) ($auditReport['duplicate_indexes'] ?? array());
 $auditMenuIssues = (array) ($auditReport['menu_issues'] ?? array());
+$auditDuplicateForms = (array) ($auditReport['duplicate_forms'] ?? array());
 $auditExtensionDuplicates = (array) ($auditReport['extension_duplicates'] ?? array());
 $auditExtensionLegacy = (array) ($auditReport['extension_legacy'] ?? array());
 $auditOrphanChecks = array_values(array_filter(
@@ -503,6 +504,33 @@ $aboutDescription = str_replace(
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($auditDuplicateForms !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_FORMS'); ?></h4>
+                        <p class="text-muted small mb-2"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_FORMS_DESC'); ?></p>
+                        <ul class="mb-0">
+                            <?php foreach ($auditDuplicateForms as $group) : ?>
+                                <li>
+                                    <code><?php echo htmlspecialchars((string) ($group['name'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code>
+                                    <?php if ((string) ($group['package'] ?? '') !== '') : ?>
+                                        <span class="text-muted">(<?php echo htmlspecialchars((string) $group['package'], ENT_QUOTES, 'UTF-8'); ?>)</span>
+                                    <?php endif; ?>
+                                    &mdash;
+                                    <?php echo Text::sprintf(
+                                        'COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_FORMS_HINT',
+                                        (int) ($group['keep']['id'] ?? 0),
+                                        (int) ($group['keep']['record_count'] ?? 0),
+                                        htmlspecialchars(implode(', ', array_map(
+                                            static fn(array $entry): string => '#' . (int) ($entry['id'] ?? 0),
+                                            (array) ($group['drop'] ?? array())
+                                        )), ENT_QUOTES, 'UTF-8')
+                                    ); ?>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
                     </div>
                 <?php endif; ?>
 

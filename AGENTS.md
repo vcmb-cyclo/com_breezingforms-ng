@@ -27,9 +27,11 @@
 - Preserve a non-AJAX fallback when practical.
 
 ## Translations
-- Update `en-GB`, `fr-FR`, and `de-DE` together for every translation change.
+- Update `en-GB`, `fr-FR`, `de-DE`, `it-IT`, `es-ES`, `hu-HU`, `nl-NL`, and `tr-TR` together for every translation change.
 - Keep wording aligned across languages.
 - French must use correct spelling, grammar, typography, and accents.
+- Italian must use correct spelling, grammar, typography, and accents.
+- Spanish, Hungarian, Dutch, and Turkish must use correct spelling, grammar, typography, and accents.
 
 ## Output
 - Return final code directly when coding is requested.

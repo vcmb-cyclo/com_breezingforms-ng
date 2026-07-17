@@ -223,6 +223,14 @@ main input[type=radio]:not(old) {
     opacity: 1 !important;
 }
 
+.bfPropertyWrap .form-switch {
+    padding-left: 0;
+}
+
+.bfPropertyWrap .form-switch .form-check-input {
+    margin-left: 0;
+}
+
 main input[type=checkbox]:not(old) + label,
 main input[type=radio]:not(old) + label {
     display: inline-block;
@@ -1978,6 +1986,10 @@ Mobile view
 		#bfQuickModeWrapper textarea,
 		#bfQuickModeWrapper select {
 			width:100%;
+		}
+		.bfPropertyWrap .form-switch {
+			clear: both;
+			display: block !important;
 		}
 	}
     @media (max-width:767px) {

@@ -4,15 +4,14 @@ description: >
   Use this agent for Joomla 6 language/translation work: adding or updating
   any user-facing string (admin field labels/descriptions, form/XML labels,
   toolbar buttons, error/success messages, tooltips, Text::script() strings,
-  email templates) across en-GB, fr-FR, and de-DE .ini files. Runs on a
-  cheaper model since translation work is well-specified and doesn't need
+  email templates) across en-GB, fr-FR, de-DE, es-ES, hu-HU, it-IT, nl-NL and tr-TR .ini files. Runs on a cheaper model since translation work is well-specified and doesn't need
   deep reasoning. Give it the exact key(s), context (what the string is for,
   which file references it), and English source text if already decided.
 model: haiku
 tools: Read, Edit, Write, Grep, Glob
 ---
 
-# Traductions Joomla 6 (en-GB / fr-FR / de-DE)
+# Traductions Joomla 6 (en-GB / fr-FR / de-DE / es-ES / hu-HU / it-IT / nl-NL / tr-TR)
 
 ## Quand s'applique cet agent
 Dès qu'une chaîne destinée à l'utilisateur est créée ou modifiée :
@@ -22,7 +21,7 @@ chaînes exposées au JS via `Text::script()`.
 
 ## Règle d'or
 **Une clé de langue ne doit jamais être ajoutée ou modifiée dans une seule
-langue.** Les trois fichiers `en-GB`, `fr-FR`, `de-DE` sont édités dans le
+langue.** Les huit fichiers `en-GB`, `fr-FR`, `de-DE`, `es-ES`, `hu-HU`, `it-IT`, `nl-NL`, `tr-TR` sont édités dans le
 même tour de modification, avec un sens strictement équivalent.
 
 ## 1. Emplacement des fichiers
@@ -34,10 +33,22 @@ administrator/components/com_xxx/language/fr-FR/com_xxx.ini
 administrator/components/com_xxx/language/fr-FR/com_xxx.sys.ini
 administrator/components/com_xxx/language/de-DE/com_xxx.ini
 administrator/components/com_xxx/language/de-DE/com_xxx.sys.ini
+administrator/components/com_xxx/language/es-ES/com_xxx.ini
+administrator/components/com_xxx/language/es-ES/com_xxx.sys.ini
+administrator/components/com_xxx/language/hu-HU/com_xxx.ini
+administrator/components/com_xxx/language/hu-HU/com_xxx.sys.ini
+administrator/components/com_xxx/language/it-IT/com_xxx.ini
+administrator/components/com_xxx/language/it-IT/com_xxx.sys.ini
+administrator/components/com_xxx/language/nl-NL/com_xxx.ini
+administrator/components/com_xxx/language/nl-NL/com_xxx.sys.ini
+administrator/components/com_xxx/language/tr-TR/com_xxx.ini
+administrator/components/com_xxx/language/tr-TR/com_xxx.sys.ini
+
 
 components/com_xxx/language/en-GB/com_xxx.ini   (chaînes front-end, si différentes)
 components/com_xxx/language/fr-FR/com_xxx.ini
 components/com_xxx/language/de-DE/com_xxx.ini
+components/com_xxx/language/es-ES/com_xxx.ini
 ```
 
 - `*.sys.ini` : uniquement le nom et la description visibles dans le

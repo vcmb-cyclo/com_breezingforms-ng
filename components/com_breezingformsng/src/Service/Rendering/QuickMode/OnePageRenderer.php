@@ -192,62 +192,16 @@ class OnePageRenderer
         if ($this->hasFlashUpload) {
             Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/plupload/moxie.js');
             Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/plupload/plupload.js');
-            $pluploadCompat = <<<JS
-(function() {
-    function bfEnsurePluploadCompat() {
-        if (window.moxie) {
-            if (!window.mOxie) {
-                window.mOxie = window.moxie;
-            }
-            if (!window.ctplupload) {
-                window.ctplupload = {};
-            }
-            var imageCtor = (window.moxie.image && window.moxie.image.Image) || window.moxie.Image;
-            if (imageCtor && !window.ctplupload.Image) {
-                window.ctplupload.Image = imageCtor;
-            }
-        }
-        if (window.plupload && window.plupload.Uploader && !window.plupload.Uploader.prototype.removeFileById) {
-            window.plupload.Uploader.prototype.removeFileById = function(id) {
-                return this.removeFile(id);
-            };
-        }
-    }
-    bfEnsurePluploadCompat();
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', bfEnsurePluploadCompat);
-    }
-    setTimeout(bfEnsurePluploadCompat, 0);
-    setTimeout(bfEnsurePluploadCompat, 500);
-})();
-JS;
-            Factory::getApplication()->getDocument()->addScriptDeclaration($pluploadCompat);
+            Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-plupload-compat.js');
         }
 
-        Factory::getApplication()->getDocument()->addStyleDeclaration('
-
-.bfClearfix:after {
-content: ".";
-display: block;
-height: 0;
-clear: both;
-visibility: hidden;
-}
-
-.bfFadingClass{
-display:none;
-}
-');
+        Factory::getApplication()->getDocument()->addStyleSheet(Uri::root(true) . '/media/com_breezingformsng/css/site/quickmode-runtime.css');
 
         // force jquery to be loaded after mootools but before any other js (since J! 3.4)
         HTMLHelper::_('bootstrap.framework');
         HTMLHelper::_('jquery.framework');
         HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
-        Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('
-                jQuery(document).ready(function()
-                {
-                        jQuery(".hasTooltip").tooltip({"html": true,"container": "body"});
-                });');
+        Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-tooltip-init.js');
 
         $jQuery = '';
         if (isset($this->rootMdata['disableJQuery']) && $this->rootMdata['disableJQuery']) {

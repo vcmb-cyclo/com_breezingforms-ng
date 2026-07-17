@@ -2215,19 +2215,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
             echo "<div style=\"visibility:hidden;display:none;\" id=\"bfSubmitMessage\">" . Text::_('COM_BREEZINGFORMSNG_SUBMIT_MESSAGE') . "</div>";
         }
         echo '<noscript>Please turn on javascript to submit your data. Thank you!</noscript>' . "\n";
-        echo '<script type="text/javascript">
-                <!--
-                function ff_switchpage(page){
-                    for( var i = page; i > 0; i-- ){
-                        JQuery("#bfPage"+i).css("pointer-events","auto");
-                        JQuery("#bfPage"+i).css("opacity","1.0");
-                    }
-                    ff_currentpage = page;
-                    ff_initialize("pageentry");
-                    JQuery("#bfPage"+page).ScrollTo({offsetTop: 50});
-                }
-                //-->
-                </script>';
+        Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-onepage-switchpage.js');
         if ($this->rootMdata['lastPageThankYou']) {
             echo '
                         <div class="remodal" data-remodal-id="modal">

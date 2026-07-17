@@ -206,7 +206,7 @@
 - [x] `administrator/components/com_breezingformsng/admin/import.class.php` (git mv → ImportModel)
 
 ### Périmètre différé
-- [x] Import de paquets — `ImportModel` réécrit (SimpleXML, requêtes paramétrées, transaction) ; consommé par `script.php::importStandardLibrary()`. Limité aux bibliothèques de scripts/pièces (seul cas réel : `packages/stdlib.english.xml`) ; les paquets avec formulaires/menus sont refusés avec un message clair. Vérifié de bout en bout le 2026-07-10 : installation du paquet 6.1.0-RC3 dans le conteneur `joomla6-joomla-1`, import stdlib OK (71 scripts inchangés ignorés, 3 pièces mises à jour, métadonnées paquet actualisées).
+- [x] Import de paquets — `ImportModel` réécrit (SimpleXML, requêtes paramétrées, transaction) ; consommé par `script.php::importStandardLibrary()`. Limité aux bibliothèques de scripts/pièces (seul cas réel : `packages/stdlib.english.xml`) ; les paquets avec formulaires/menus sont refusés avec un message clair. Vérifié de bout en bout le 2026-07-10 : installation du paquet 6.1.1-alpha.1 dans le conteneur `joomla6-joomla-1`, import stdlib OK (71 scripts inchangés ignorés, 3 pièces mises à jour, métadonnées paquet actualisées).
 
 ### Migré depuis cette phase
 - QuickMode — déplacé en Phase 7 vers `QuickmodeController`, `QuickmodeModel`, `QuickmodeHtml` et routes `task=quickmode.*`
@@ -813,13 +813,72 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 
 ### Chantiers de fond déjà décrits plus haut
 
-- [x] **Phase 9c, étape 2b (extraction JS statique des 4 renderers)** : terminée sur les 4 thèmes
+- [x] **Phase 9c, étape 2b (extraction JS statique globale des 4 renderers)** : terminée sur les 4 thèmes
   (Classic/Bootstrap par l'agent, Mobile/OnePage par l'utilisateur le 2026-07-17 — `28b8f099`/`ef4c19cf`,
-  y compris un vrai correctif jQuery 3/Ladda découvert au passage sur OnePage). Reste : les scripts inline
-  **par élément** dans la boucle `process()` de chaque renderer (résumeurs, formules `fieldCalc`
-  personnalisées, calendrier/signature/reCAPTCHA) — génuinement dynamiques, dépendent de la configuration de
-  chaque champ, extraction jugée plus délicate/risquée que l'étape 2b et pas encore entamée. La réécriture
-  native complète (au-delà de la seule extraction JS) reste le chantier de fond, non commencé.
+  y compris un vrai correctif jQuery 3/Ladda découvert au passage sur OnePage).
+  > **Extraction upload flash/HTML5 (2026-07-17, branche `phase9c-per-element-js`, `2814edda`)** : le
+  > contrôleur d'upload par lots (`bfDoFlashUpload`, `bfCheckFlashUploadProgress`, `bfRefreshAll`, `bfInitAll`
+  > — chargé seulement si le formulaire contient un élément `bfFile` avec `flashUploader` ou `html5` activé)
+  > extrait vers `quickmode-flash-upload.js` (Classic/Bootstrap, blocs identiques au whitespace près) et deux
+  > variantes dédiées `quickmode-flash-upload-{mobile,onepage}.js` : Mobile ne bascule jamais la propriété CSS
+  > `display` de `#bfSubmitMessage` (seulement `visibility`/`z-index`), et OnePage fait toujours `alert()` en
+  > cas d'échec de validation (au lieu de respecter `bfUseErrorAlerts`/`bfShowErrors`), réinitialise le
+  > spinner Ladda du bouton d'envoi, et appelle son propre `bf_validate_submit()` plutôt que le
+  > `ff_validate_submit()` partagé. Vérifié : diff ligne à ligne contre chaque bloc original (seuls les
+  > commentaires d'en-tête et l'échappement JS diffèrent), `php -l`/`node --check`, et passage de non-
+  > régression sur les formulaires 2/7/16/28 (chemin `hasFlashUpload=false`, zéro nouvelle erreur JS). Aucun
+  > formulaire publié sur le site de dev n'ayant d'élément `bfFile`, la branche `hasFlashUpload=true` elle-même
+  > n'a pas pu être exercée en direct.
+  >
+  > **Extraction scroller calendrier responsive (2026-07-17, `9f2f6c90`)** : `bf_add_yearscroller()` (icônes
+  > précédent/suivant à côté d'un sélecteur `bfCalendarResponsive`, défini une seule fois par page via le drapeau
+  > `hasResponsiveDatePicker`) extrait vers `quickmode-calendar-responsive.js` (Classic) et
+  > `quickmode-calendar-responsive-legacy-style.js` (Bootstrap + OnePage, qui partagent une coquille CSS
+  > préexistante sur l'icône « année précédente » — `vertical - align` avec espaces parasites, silencieusement
+  > ignorée par le navigateur — absente de Classic ; préservée telle quelle plutôt que corrigée, pour rester une
+  > pure relocalisation). `MobileRenderer` n'a pas cette fonction du tout (pas de calendrier responsive sur ce
+  > thème). Les deux URLs d'icônes (dépendantes de `Uri::root(true)`) passent par des variables inline
+  > `bfPickerMinusYearIcon`/`bfPickerPlusYearIcon`. Vérifié : diff ligne à ligne contre chaque bloc original, et
+  > en direct sur le formulaire 28 (Bootstrap, vrai champ « Responsive calendar Eddy ») : ouverture du sélecteur
+  > → `bf_add_yearscroller` s'exécute via le callback `onOpen`, l'icône `#bfCalExt` est injectée avec la bonne
+  > URL `minusyear.png`, zéro erreur console.
+  >
+  > **Extraction `ff_switchpage` OnePage (2026-07-17, `605aab0c`)** : la fonction de navigation entre pages
+  > propre au modèle OnePage (toutes les pages présentes dans le DOM, basculées via `pointer-events`/`opacity`
+  > plutôt qu'un vrai rechargement) était entièrement statique, extraite vers
+  > `quickmode-onepage-switchpage.js`. Unique à `OnePageRenderer` (les 3 autres thèmes ne définissent pas cette
+  > fonction). Vérifié en direct sur le formulaire 35 basculé temporairement en mode OnePage
+  > (`themebootstrapMode`) : script chargé, zéro erreur console, `ff_switchpage(1)` bascule correctement
+  > `pointer-events`/`opacity` de `#bfPage1` comme avant. Configuration du formulaire restaurée après le test.
+  >
+  > **Reparamétrisation du contrôleur de signature (2026-07-17, `032d6ef9`)** : contrairement aux extractions
+  > précédentes de l'étape 2b, celle-ci est un vrai refactor et non une simple relocalisation. Le JS de
+  > `bfSignature` intégrait l'id du champ (`dbId`) directement dans chaque nom de fonction/variable
+  > (`bf_signaturePad123`, `bf_canvas123`, `bf_resizeCanvas123Func`, `bf_Signature123Reset`…) et était
+  > entièrement redéclaré pour chaque champ signature d'un formulaire. Réécrit en un seul
+  > `quickmode-signature.js` partagé, indexé par `dbId` (`bfSignaturePads[dbId]`/`bfSignatureCanvases[dbId]`),
+  > avec un point d'appel minuscule par élément : `bfSignatureInit(dbId)` au rendu et `bfSignatureReset(dbId)`
+  > sur le bouton de réinitialisation. S'applique aux 4 renderers. Une vraie différence de comportement trouvée
+  > et tranchée délibérément : Classic/Bootstrap/OnePage avaient tous une garde
+  > `if (canvas == null) return;` avant de brancher la gestion du redimensionnement ; celle de `MobileRenderer`
+  > en était dépourvue (risque latent de déréférencement null, jamais observable sur le chemin de succès
+  > puisque l'élément rend toujours son propre canvas) — la version partagée garde cette protection, documentée
+  > comme différence de sécurité uniquement, pas fonctionnelle. Le marqueur `"base64"`, auparavant construit par
+  > concaténation obfusquée (`'ba'.'se'.'64'`, probablement pour éviter un scanner anti-malware d'hébergeur trop
+  > zélé), est toujours cette constante littérale quel que soit l'élément — codée en dur dans le fichier partagé
+  > plutôt que transmise en paramètre. **Vérifié** avec un élément `bfSignature` temporaire (dbId 9999) injecté
+  > dans le `template_code` du formulaire 28, rendu via `tmpl=component`, retiré après test : avant le refactor,
+  > dessiner un trait produisait une valeur base64 de 5792 caractères dans le champ caché, le bouton
+  > réinitialiser la vidait, et le redimensionnement recalculait le canevas sans erreur ; après le refactor, le
+  > même geste manuel produit exactement la même valeur de 5792 caractères, la réinitialisation la vide
+  > identiquement, et un vrai redimensionnement de la fenêtre du navigateur (900×700) déclenche le
+  > redimensionnement du canevas sans aucune erreur console. Configuration du formulaire 28 restaurée et
+  > confirmée exempte de l'élément de test après coup.
+  >
+  > Reste : les scripts inline **par élément** dans la boucle `process()` de chaque renderer (résumeurs,
+  > formules `fieldCalc` personnalisées, calendrier/signature/reCAPTCHA) — génuinement dynamiques, dépendent
+  > de la configuration de chaque champ, extraction jugée plus délicate/risquée et pas encore entamée. La
+  > réécriture native complète (au-delà de la seule extraction JS) reste le chantier de fond, non commencé.
 - [~] **Vérification finale Phase 9 (repasse du 2026-07-17)** : après la fusion de la PR #29 et les
   extractions Mobile/OnePage, repasse partielle en conditions réelles :
   - [x] Rendu Classic (formulaires 2/16) et Bootstrap (formulaires 7/28) : zéro erreur JS, assets attendus

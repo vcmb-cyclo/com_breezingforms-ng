@@ -685,6 +685,51 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > temporairement en Mobile et un UA iPhone : le nouvel asset et jQuery Mobile sont chargés, le rendu est présent et
 > aucune erreur JavaScript n'est émise ; la configuration originale a ensuite été restaurée octet pour octet.
 
+> **Étape 2b, initialiseur OnePage (2026-07-17)** : le bloc statique `document.ready` de `OnePageRenderer` est
+> déplacé vers `quickmode-post-init-onepage.js`. Il reste distinct de l'asset Classic/Bootstrap car ce renderer
+> n'appelle pas le hook `bfSetElemWrapBg`. Vérifié avec le formulaire 35 basculé temporairement en
+> `themebootstrapMode` : le nouvel asset est chargé. Chrome signale une exception jQuery/Ladda
+> `target must be string or object`, mais le même scénario rejoué avec le renderer pré-extraction produit
+> exactement la même exception à la même ligne ; elle est donc préexistante et indépendante de cette extraction.
+> La configuration originale du formulaire et le renderer modifié ont été restaurés après la comparaison.
+
+> **Étape 2b, erreurs OnePage (2026-07-17)** : `OnePageRenderer::bfShowErrors()` réutilise désormais
+> `quickmode-error-alerts-bootstrap.js`. La différence historique est modélisée par `bfErrorPageScoped` : `false`
+> pour Bootstrap/Mobile conserve l'affichage global existant, `true` pour OnePage limite le `fadeIn` au bloc
+> `#bfPage<ff_currentpage>`. Vérifié dans Chrome sur le formulaire 35 en Bootstrap normal (aucune erreur) puis en
+> OnePage (asset et configuration ciblée chargés ; seule subsiste l'exception jQuery/Ladda préexistante démontrée
+> au lot précédent). La configuration du formulaire a été restaurée après le test.
+
+> **Correctif Joomla 6/jQuery 3 (2026-07-17)** : l'exception OnePage préexistante provenait de
+> `JQuery("#bfSubmitButton").ladda("bind")` : le plugin Ladda jQuery vendoré transmet l'ancienne propriété
+> `jQuery(...).selector`, supprimée de jQuery 3, à `Ladda.bind()` qui reçoit donc `undefined`. Les deux bindings
+> (initialisation et restauration du bouton) utilisent désormais directement l'API native déjà chargée
+> `Ladda.bind("#bfSubmitButton")` ; la gestion de l'instance par le plugin reste inchangée. Le scénario OnePage du
+> formulaire 35 qui produisait systématiquement l'exception a été rejoué dans Chrome headless : OnePage, Ladda et
+> le ciblage d'erreurs sont chargés, avec zéro exception JavaScript. Le formulaire a ensuite été restauré.
+
+> **Étape 2a, garde Joomla 6 achevée (2026-07-17)** : les gardes restants
+> `method_exists($document, 'addCustomTag')` de `BootstrapRenderer` et `OnePageRenderer`, toujours vrais avec le
+> document HTML Joomla 6, sont supprimés. Le chargement du CSS système, des thèmes et de leurs scripts reste
+> strictement inchangé. Vérifié dans Chrome headless sur le formulaire 35 en Bootstrap puis en OnePage : CSS
+> système et renderers chargés, zéro erreur JavaScript ; configuration OnePage temporaire restaurée ensuite.
+
+> **Étape 2b, helpers Mobile (2026-07-17)** : `bfCheckMaxlength`, `bfRegisterSummarize`, `bfField` et
+> `populateSummarizers` quittent `MobileRenderer` pour `quickmode-core-helpers-mobile.js`. Cet asset reprend la
+> variante Bootstrap sans le cas `bfNumberInput`, absent du comportement Mobile historique ; l'identifiant de
+> formulaire et le libellé traduit « chars left » utilisent les globals déjà établis `ff_processor.form_id` et
+> `bfCharsLeftLabel`. Vérifié avec le formulaire 35 activé temporairement en Mobile et un UA iPhone : renderer,
+> asset et libellé chargés, zéro erreur JavaScript ; configuration originale restaurée ensuite. Ce formulaire
+> n'utilisant ni maxlength ni summarizer, ces chemins restent validés par parité de code plutôt que par interaction.
+
+> **Étape 2b, helpers OnePage (2026-07-17)** : les quatre mêmes helpers quittent `OnePageRenderer` pour
+> `quickmode-field-helpers-bootstrap.js`, sous-bloc strictement identique à la variante Bootstrap avec
+> `bfNumberInput`. La navigation AJAX `bf_validate_nextpage`/`bf_validate_prevpage` reste inline et n'est pas
+> écrasée par cet asset volontairement limité aux champs, maxlength et summarizers. Vérifié sur le formulaire 35
+> activé temporairement en OnePage : asset et libellé chargés, navigation spécifique toujours présente, zéro erreur
+> JavaScript ; configuration originale restaurée ensuite. Aucun summarizer/maxlength n'étant configuré sur ce
+> formulaire, ces chemins restent validés par parité de code plutôt que par interaction.
+
 ### Vérification (à la complétion de la Phase 9)
 
 - [ ] Chaque service qui remplace un fichier crosstec repasse les scénarios déjà validés dans ce document :

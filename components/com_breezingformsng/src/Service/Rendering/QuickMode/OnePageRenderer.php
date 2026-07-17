@@ -306,6 +306,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 			var bfSummarizers = new Array();
 			var bfDeactivateField = new Array();
 			var bfDeactivateSection = new Array();
+			var bfCharsLeftLabel = ' . json_encode(Text::_('COM_BREEZINGFORMSNG_CHARS_LEFT')) . ';
                         var ladda_button = null;
                         var orig_submit_button = null;
 
@@ -316,7 +317,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                             orig_submit_button = JQuery( "#bfSubmitButton" ).clone(true);
                             JQuery(orig_submit_button).attr("id","bfSubmitButtonTmp");
                             ladda_button = JQuery( "#bfSubmitButton" ).ladda();
-                            JQuery( "#bfSubmitButton" ).ladda( "bind" );
+                            Ladda.bind("#bfSubmitButton");
                         });
 
                         function bf_ajax_submit(){
@@ -375,7 +376,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                             JQuery(cloned_submit).attr("id","bfSubmitButton");
 
                             ladda_button = JQuery( "#bfSubmitButton" ).ladda();
-                            JQuery( "#bfSubmitButton" ).ladda( "bind" );
+                            Ladda.bind("#bfSubmitButton");
                         }
 
                         function bf_validate_submit(element, action)
@@ -477,229 +478,20 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                             }
                         } // ff_validate_prevpage
 
-			function bfCheckMaxlength(id, maxlength, showMaxlength){
-				if( JQuery("#ff_elem"+id).val().length > maxlength ){
-					JQuery("#ff_elem"+id).val( JQuery("#ff_elem"+id).val().substring(0, maxlength) );
-				}
-				if(showMaxlength){
-					JQuery("#bfMaxLengthCounter"+id).text( "(" + (maxlength - JQuery("#ff_elem"+id).val().length) + " ' . Text::_('COM_BREEZINGFORMSNG_CHARS_LEFT') . ')" );
-				}
-			}
-			function bfRegisterSummarize(id, connectWith, type, emptyMessage, hideIfEmpty){
-				bfSummarizers.push( { id : id, connectWith : connectWith, type : type, emptyMessage : emptyMessage, hideIfEmpty : hideIfEmpty } );
-			}
-			function bfField(name){
-				var value = "";
-				switch(ff_getElementByName(name).type){
-					case "radio":
-						if(JQuery("[name=\""+ff_getElementByName(name).name+"\"]:checked").val() != "" && typeof JQuery("[name=\""+ff_getElementByName(name).name+"\"]:checked").val() != "undefined"){
-							value = JQuery("[name=\""+ff_getElementByName(name).name+"\"]:checked").val();
-							if(!isNaN(value)){
-								value = Number(value);
-							}
-						}
-						break;
-					case "checkbox":
-					case "select-one":
-					case "select-multiple":
-						var nodeList = document["' . $this->p->form_id . '"][""+ff_getElementByName(name).name+""];
-						if(ff_getElementByName(name).type == "checkbox" && typeof nodeList.length == "undefined"){
-							if(typeof JQuery("[name=\""+ff_getElementByName(name).name+"\"]:checked").val() != "undefined"){
-								value = JQuery("[name=\""+ff_getElementByName(name).name+"\"]:checked").val();
-								if(!isNaN(value)){
-									value = Number(value);
-								}
-							}
-						} else {
-							var val = "";
-							for(var j = 0; j < nodeList.length; j++){
-								if(nodeList[j].checked || nodeList[j].selected){
-									val += nodeList[j].value + ", ";
-								}
-							}
-							if(val != ""){
-								value = val.substr(0, val.length - 2);
-								if(!isNaN(value)){
-									value = Number(value);
-								}
-							}
-						}
-						break;
-					default:
-						if(!isNaN(ff_getElementByName(name).value)){
-							value = Number(ff_getElementByName(name).value);
-						} else {
-							value = ff_getElementByName(name).value;
-						}
-				}
-				return value;
-			}
-			function populateSummarizers(){
-				// cleaning first
-
-				for(var i = 0; i < bfSummarizers.length; i++){
-					JQuery("#"+bfSummarizers[i].id).parent().css("display", "");
-					JQuery("#"+bfSummarizers[i].id).html("<span class=\"bfNotAvailable\">"+bfSummarizers[i].emptyMessage+"</span>");
-				}
-				for(var i = 0; i < bfSummarizers.length; i++){
-					var summVal = "";
-					switch(bfSummarizers[i].type){
-						case "bfTextfield":
-						case "bfTextarea":
-						case "bfNumberInput":
-						case "bfHidden":
-						case "bfCalendar":
-                                                case "bfCalendarResponsive":
-						case "bfFile":
-							if(JQuery("[name=\"ff_nm_"+bfSummarizers[i].connectWith+"[]\"]").val() != ""){
-								JQuery("#"+bfSummarizers[i].id).text( JQuery("[name=\"ff_nm_"+bfSummarizers[i].connectWith+"[]\"]").val() ).html();
-								var breakableText = JQuery("#"+bfSummarizers[i].id).html().replace(/\\r/g, "").replace(/\\n/g, "<br/>");
-
-								if(breakableText != ""){
-									var calc = null;
-									eval( "calc = typeof bfFieldCalc"+bfSummarizers[i].id+" != \"undefined\" ? bfFieldCalc"+bfSummarizers[i].id+" : null" );
-									if(calc){
-										breakableText = calc(breakableText);
-									}
-								}
-
-								JQuery("#"+bfSummarizers[i].id).html(breakableText);
-								summVal = breakableText;
-							}
-						break;
-						case "bfRadioGroup":
-						case "bfCheckbox":
-							if(JQuery("[name=\"ff_nm_"+bfSummarizers[i].connectWith+"[]\"]:checked").val() != "" && typeof JQuery("[name=\"ff_nm_"+bfSummarizers[i].connectWith+"[]\"]:checked").val() != "undefined"){
-								var theText = JQuery("[name=\"ff_nm_"+bfSummarizers[i].connectWith+"[]\"]:checked").val();
-								if(theText != ""){
-									var calc = null;
-									eval( "calc = typeof bfFieldCalc"+bfSummarizers[i].id+" != \"undefined\" ? bfFieldCalc"+bfSummarizers[i].id+" : null" );
-									if(calc){
-										theText = calc(theText);
-									}
-								}
-								JQuery("#"+bfSummarizers[i].id).html( theText );
-								summVal = theText;
-							}
-						break;
-						case "bfCheckboxGroup":
-						case "bfSelect":
-							var val = "";
-							var nodeList = document["' . $this->p->form_id . '"]["ff_nm_"+bfSummarizers[i].connectWith+"[]"];
-
-							for(var j = 0; j < nodeList.length; j++){
-								if(nodeList[j].checked || nodeList[j].selected){
-									val += nodeList[j].value + ", ";
-								}
-							}
-							if(val != ""){
-								var theText = val.substr(0, val.length - 2);
-								if(theText != ""){
-									var calc = null;
-									eval( "calc = typeof bfFieldCalc"+bfSummarizers[i].id+" != \"undefined\" ? bfFieldCalc"+bfSummarizers[i].id+" : null" );
-									if(calc){
-										theText = calc(theText);
-									}
-								}
-								JQuery("#"+bfSummarizers[i].id).html( theText );
-								summVal = theText;
-							}
-						break;
-					}
-
-					if( ( bfSummarizers[i].hideIfEmpty && summVal == "" ) || ( typeof bfDeactivateField != "undefined" && bfDeactivateField["ff_nm_"+bfSummarizers[i].connectWith+"[]"] ) ){
-                        JQuery("#"+bfSummarizers[i].id).closest(".bfElemWrap").css("display", "none");
-					} else {
-					    JQuery("#"+bfSummarizers[i].id).closest(".bfElemWrap").css("display", "block");
-					}
-				}
-			}
 '
         );
 
+        Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-field-helpers-bootstrap.js');
+
         if ($this->fading || !$this->useErrorAlerts || $this->rollover) {
             if (!$this->useErrorAlerts) {
-                $defaultErrors = '';
-                if ($this->useDefaultErrors || (!$this->useDefaultErrors && !$this->useBalloonErrors)) {
-                    $defaultErrors = 'JQuery(".bfErrorMessage").html("");
-					JQuery(".bfErrorMessage").css("display","none");
-					JQuery("#bfPage"+ff_currentpage+" .bfErrorMessage").fadeIn(1500);
-					var allErrors = "";
-					var errors = error.split("\n");
-					for(var i = 0; i < errors.length; i++){
-						allErrors += "<div class=\"bfError\">" + errors[i] + "</div>";
-					}
-					JQuery(".bfErrorMessage").html(allErrors);';
-                }
-                Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('var bfUseErrorAlerts = false;' . "\n");
-                Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('
-				function bfShowErrors(error){
-                                        ' . $defaultErrors . '
-
-                                        if(JQuery.bfvalidationEngine)
-                                        {
-                                            JQuery("#' . $this->p->form_id . '").bfvalidationEngine({
-                                              promptPosition: "bottomLeft",
-                                              success :  false,
-                                              failure : function() {}
-                                            });
-
-                                            for(var i = 0; i < inlineErrorElements.length; i++)
-                                            {
-                                                if(inlineErrorElements[i][1] != "")
-                                                {
-                                                    var prompt = null;
-
-                                                    if(inlineErrorElements[i][0] == "bfCaptchaEntry"){
-                                                        prompt = JQuery.bfvalidationEngine.buildPrompt("#bfCaptchaEntry",inlineErrorElements[i][1],"error");
-                                                    }
-                                                    else if(inlineErrorElements[i][0] == "bfReCaptchaEntry"){
-                                                        // nothing here yet for recaptcha, alert is default
-                                                        alert(inlineErrorElements[i][1]);
-                                                    }
-                                                    else if(typeof JQuery("#bfUploader"+inlineErrorElements[i][0]).get(0) != "undefined")
-                                                    {
-                                                        alert(inlineErrorElements[i][1]);
-                                                        //prompt = JQuery.bfvalidationEngine.buildPrompt("#"+JQuery("#bfUploader"+inlineErrorElements[i][0]).val(),inlineErrorElements[i][1],"error");
-                                                    }
-                                                    else
-                                                    {
-                                                        if(ff_getElementByName(inlineErrorElements[i][0])){
-                                                            prompt = JQuery.bfvalidationEngine.buildPrompt("#"+ff_getElementByName(inlineErrorElements[i][0]).id,inlineErrorElements[i][1],"error");
-                                                        }else{
-                                                            alert(inlineErrorElements[i][1]);
-                                                        }
-                                                    }
-
-                                                    JQuery(prompt).mouseover(
-                                                        function(){
-                                                            var inlineError = JQuery(this).attr("class").split(" ");
-                                                            if(inlineError && inlineError.length && inlineError.length == 2){
-                                                                var result = inlineError[1].split("formError");
-                                                                if(result && result.length && result.length >= 1){
-                                                                    JQuery.bfvalidationEngine.closePrompt("#"+result[0]);
-                                                                }
-                                                            }
-                                                        }
-                                                    );
-                                                }
-                                                else
-                                                {
-                                                    if(typeof JQuery("#bfUploader"+inlineErrorElements[i][0]).get(0) != "undefined")
-                                                    {
-                                                        //JQuery.bfvalidationEngine.closePrompt("#"+JQuery("#bfUploader"+inlineErrorElements[i][0]).val());
-                                                    }
-                                                    else
-                                                    {
-                                                        if(ff_getElementByName(inlineErrorElements[i][0])){
-                                                            JQuery.bfvalidationEngine.closePrompt("#"+ff_getElementByName(inlineErrorElements[i][0]).id);
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            inlineErrorElements = new Array();
-                                        }
-				}');
+                $showDefaultErrors = $this->useDefaultErrors || (!$this->useDefaultErrors && !$this->useBalloonErrors);
+                Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript(
+                    'var bfUseErrorAlerts = false;' . "\n"
+                    . 'var bfShowDefaultErrors = ' . ($showDefaultErrors ? 'true' : 'false') . ';' . "\n"
+                    . 'var bfErrorPageScoped = true;' . "\n"
+                );
+                Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-error-alerts-bootstrap.js');
             }
             if ($this->fading) {
                 $this->fadingClass = ' bfFadingClass';
@@ -711,44 +503,8 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                 // removed in bootstrap
             }
         }
-        Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('
-		    bfToggleFieldsLoaded = false;
-		    bfSectionFieldsDeactivated = false;
-			JQuery(document).ready(function() {
-				if(typeof bfFade != "undefined")bfFade();
-				if(typeof bfRollover != "undefined")bfRollover();
-				if(typeof bfRollover2 != "undefined")bfRollover2();
-				if(typeof bfRegisterToggleFields != "undefined"){ 
-				    bfRegisterToggleFields(); 
-                }else{
-                    bfToggleFieldsLoaded = true;
-                }
-				if(typeof bfDeactivateSectionFields != "undefined"){ 
-				    bfDeactivateSectionFields(); 
-				}else{
-				    bfSectionFieldsDeactivated = true;
-				}
-                if(JQuery.bfvalidationEngine)
-                {
-                    JQuery.bfvalidationEngineLanguage.newLang();
-                    JQuery(".ff_elem").change(
-                        function(){
-                            JQuery.bfvalidationEngine.closePrompt(this);
-                        }
-                    );
-                }
-				JQuery(".bfQuickMode .hasTip").css("color","inherit"); // fixing label text color issue
-				JQuery(".bfQuickMode .bfTooltip").css("color","inherit"); // fixing label text color issue
-                JQuery("input[type=text]").bind("keypress", function(evt) {
-                    if(evt.keyCode == 13) {
-                        evt.preventDefault();
-                    }
-                });
-			});
-		');
+        Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-post-init-onepage.js');
         // loading system css
-
-        if (method_exists($obj = Factory::getApplication()->getDocument(), 'addCustomTag')) {
 
             $stylelink = '<link rel="stylesheet" href="' . Uri::root(true) . '/components/com_breezingformsng/themes/quickmode-bootstrap' . $this->bsVersion . '/system.css" />' . "\n";
             Factory::getApplication()->getDocument()->addCustomTag($stylelink);
@@ -799,7 +555,6 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                     }
                 }
             }
-        }
     }
 
     public function process(&$dataObject, $parent = null, $parentPage = null, $index = 0, $childrenLength = 0, $parentFull = null)

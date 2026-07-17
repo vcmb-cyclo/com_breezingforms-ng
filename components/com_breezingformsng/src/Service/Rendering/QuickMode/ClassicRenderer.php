@@ -252,102 +252,17 @@ display:none;
 			if ($this->fading) {
 				$this->fadingClass = ' bfFadingClass';
 				$this->fadingCall = 'bfFade();';
-				Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('
-					function bfFade(){
-						JQuery(".bfPageIntro").fadeIn(1000);
-						var size = 0;
-						JQuery(".bfFadingClass").each(function(i,val){
-							var t = this;
-							setTimeout(function(){JQuery(t).fadeIn(1000)}, (i*100));
-							size = i;
-						});
-						setTimeout(\'JQuery(".bfSubmitButton").fadeIn(1000)\', size * 100);
-						setTimeout(\'JQuery(".bfPrevButton").fadeIn(1000)\', size * 100);
-						setTimeout(\'JQuery(".bfNextButton").fadeIn(1000)\', size * 100);
-						setTimeout(\'JQuery(".bfCancelButton").fadeIn(1000)\', size * 100);
-					}
-				');
+				Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-fade.js');
 			}
 
 			if ($this->rollover && trim($this->rolloverColor) != '') {
-				Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('
-					var bfElemWrapBg = "";
-					function bfSetElemWrapBg(){
-						bfElemWrapBg = JQuery(".bfElemWrap").css("background-color");
-					}
-					function bfRollover() {
-						JQuery(".ff_elem").focus(
-							function(){
-							    if(!JQuery(this).closest(".bfElemWrap").find(".js-calendar").is(":visible")){
-								    var parent = JQuery(this).closest(".bfElemWrap");
-								    parent.css("background","' . $this->rolloverColor . '");
-                                    parent.addClass("bfRolloverBg");
-                                }
-							}
-						).blur(
-							function(){
-								var parent = JQuery(this).closest(".bfElemWrap");
-								parent.css("background",bfElemWrapBg);
-                                parent.removeClass("bfRolloverBg");
-							}
-						);
-					}
-					function bfRollover2() {
-						JQuery(".bfElemWrap").mouseover(
-							function(e){
-							    if(!JQuery(this).find(".js-calendar").is(":visible")){
-								    JQuery(this).css("background","' . $this->rolloverColor . '");
-                                    JQuery(this).addClass("bfRolloverBg");
-                                }
-							}
-						);
-						JQuery(".bfElemWrap").mouseout(
-							function(e){
-							    if(JQuery(e.currentTarget).hasClass("js-calendar")) return;
-								JQuery(this).css("background",bfElemWrapBg);
-                                JQuery(this).removeClass("bfRolloverBg");
-							}
-						);
-					}
-				');
+				Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript(
+					'var bfRolloverColor = ' . json_encode($this->rolloverColor) . ';'
+				);
+				Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-rollover.js');
 			}
 		}
-		Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('
-		    bfToggleFieldsLoaded = false;
-		    bfSectionFieldsDeactivated = false;
-			JQuery(document).ready(function() {
-				if(typeof bfFade != "undefined")bfFade();
-				if(typeof bfSetElemWrapBg != "undefined")bfSetElemWrapBg();
-				if(typeof bfRollover != "undefined")bfRollover();
-				if(typeof bfRollover2 != "undefined")bfRollover2();
-				if(typeof bfRegisterToggleFields != "undefined"){ 
-				    bfRegisterToggleFields(); 
-                }else{
-                    bfToggleFieldsLoaded = true;
-                }
-				if(typeof bfDeactivateSectionFields != "undefined"){ 
-				    bfDeactivateSectionFields(); 
-				}else{
-				    bfSectionFieldsDeactivated = true;
-				}
-                if(JQuery.bfvalidationEngine)
-                {
-                    JQuery.bfvalidationEngineLanguage.newLang();
-                    JQuery(".ff_elem").change(
-                        function(){
-                            JQuery.bfvalidationEngine.closePrompt(this);
-                        }
-                    );
-                }
-				JQuery(".bfQuickMode .hasTip").css("color","inherit"); // fixing label text color issue
-				JQuery(".bfQuickMode .bfTooltip").css("color","inherit"); // fixing label text color issue
-                JQuery("input[type=text]").bind("keypress", function(evt) {
-                    if(evt.keyCode == 13) {
-                        evt.preventDefault();
-                    }
-                });
-			});
-		');
+		Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-post-init.js');
 		// loading system css
 		$document = Factory::getApplication()->getDocument();
 		$stylelink = '<link rel="stylesheet" href="' . Uri::root(true) . '/components/com_breezingformsng/themes/quickmode/system.css" />' . "\n";

@@ -12,6 +12,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Quickmode;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
+use Joomla\CMS\Session\Session;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
 use Vcmb\Component\BreezingformsNG\Administrator\Helper\BreadcrumbHelper;
@@ -24,6 +25,8 @@ class HtmlView extends BaseHtmlView
     public string $formDesc   = '';
     public int    $formId     = 0;
     public int    $emailntf   = 1;
+    public int    $published  = 1;
+    public int    $debugMode  = 0;
     public string $emailadr   = '';
     public string $templateCode = '';
     public array  $elementScripts = [];
@@ -53,12 +56,16 @@ class HtmlView extends BaseHtmlView
             $this->emailntf  = 1;
             $this->emailadr  = '';
             $this->formDesc  = '';
+            $this->published = 1;
+            $this->debugMode = 0;
         } else {
             $this->formName  = (string) $options->name;
             $this->formTitle = (string) $options->title;
             $this->emailntf  = (int) $options->emailntf;
             $this->emailadr  = (string) $options->emailadr;
             $this->formDesc  = (string) $options->description;
+            $this->published = (int) $options->published;
+            $this->debugMode = (int) $options->debug_mode;
         }
 
         $this->formId          = $formId;
@@ -100,7 +107,22 @@ class HtmlView extends BaseHtmlView
         $wa->useScript('com_breezingformsng.quickmode-elements');
         $wa->useScript('com_breezingformsng.quickmode-app');
         $wa->useScript('com_breezingformsng.quickmode-yesno-switch');
+        $wa->registerAndUseScript(
+            'com_breezingformsng.quickmode-form-state',
+            'media/com_breezingformsng/js/admin/admin-toggle-published.js',
+            ['version' => 'auto'],
+            ['defer' => true],
+            ['core']
+        );
         $wa->useScript('com_breezingformsng.jquery-restore');
+        $doc->addScriptOptions('com_breezingformsng.admin-toggle-published', [
+            'csrfToken' => Session::getFormToken(),
+        ]);
+        Text::script('JPUBLISHED');
+        Text::script('JUNPUBLISHED');
+        Text::script('COM_BREEZINGFORMSNG_DEBUG_MODE_ENABLED');
+        Text::script('COM_BREEZINGFORMSNG_DEBUG_MODE_DISABLED');
+        Text::script('COM_BREEZINGFORMSNG_AJAX_STATE_ERROR');
         ToolbarHelper::title($pageTitle, 'logo_left');
 
         parent::display($tpl);

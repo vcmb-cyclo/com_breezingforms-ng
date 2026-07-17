@@ -221,17 +221,12 @@ class FormsController extends BaseController
 
     public function setPublished(): void
     {
-        $this->checkToken();
+        $this->setAjaxState('published');
+    }
 
-        @ob_end_clean();
-        $input = Factory::getApplication()->getInput();
-        $id    = $input->getInt('id', 0);
-        $state = $input->getInt('state', 0);
-        if ($id > 0) {
-            $this->getFormModel()->publish([$id], $state);
-        }
-        echo json_encode(['Result' => 'OK']);
-        Factory::getApplication()->close();
+    public function setDebug(): void
+    {
+        $this->setAjaxState('debug');
     }
 
     private function togglePublish(int $state): void
@@ -249,6 +244,36 @@ class FormsController extends BaseController
         }
 
         $app->redirect(Route::_($this->listUrl($input->getString('pkg', '')), false));
+    }
+
+    private function setAjaxState(string $property): void
+    {
+        $app = Factory::getApplication();
+
+        @ob_end_clean();
+
+        if (!$this->checkToken('post')) {
+            echo json_encode(['Result' => 'ERROR', 'Message' => Text::_('JINVALID_TOKEN')]);
+            $app->close();
+        }
+
+        $input = $app->getInput();
+        $id    = $input->post->getInt('id', 0);
+        $state = min(1, max(0, $input->post->getInt('state', 0)));
+
+        if ($id <= 0) {
+            echo json_encode(['Result' => 'ERROR', 'Message' => Text::_('JERROR_AN_ERROR_HAS_OCCURRED')]);
+            $app->close();
+        }
+
+        if ($property === 'debug') {
+            $this->getFormModel()->setDebugMode($id, $state);
+        } else {
+            $this->getFormModel()->publish([$id], $state);
+        }
+
+        echo json_encode(['Result' => 'OK', 'State' => $state]);
+        $app->close();
     }
 
     private function moveOrder(int $inc): void

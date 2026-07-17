@@ -123,7 +123,7 @@ final class QuickmodeHtml
             . '; window.BFQMConfig.dataObject = ' . $dataObjectJson . ';';
     }
 
-    public static function showApplication($formId, $formName, $formTitle, $formDesc, $formEmailntf, $formEmailadr, $dataObjectString, $elementScripts, $themes, $themesbootstrap, $themesbootstrap3)
+    public static function showApplication($formId, $formName, $formTitle, $formDesc, $formEmailntf, $formEmailadr, $published, $debugMode, $dataObjectString, $elementScripts, $themes, $themesbootstrap, $themesbootstrap3)
     {
         $active_language_code = htmlentities(
             Factory::getApplication()->getInput()->getString('active_language_code', ''),
@@ -221,23 +221,32 @@ final class QuickmodeHtml
             . ($showTranslations ? 'block' : 'none') . '"); });'
         );
 
-        if ($formId > 0 && count($languages) > 1) {
+        if ($formId > 0) {
             ?>
-            <div onclick="location.href = 'index.php?option=com_breezingformsng&format=html&task=quickmode.display&formName=translationtest&form=<?php echo $formId ?>&active_language_code='"
-                class="bfLanguageButton<?php echo $active_language_code == $default || $active_language_code == '' ? ' bfLanguageButtonActive' : '' ?>">
-                <?php echo $default; ?>
+            <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                <div class="d-flex flex-wrap align-items-center gap-1">
+                <?php if (count($languages) > 1) : ?>
+                <div onclick="location.href = 'index.php?option=com_breezingformsng&format=html&task=quickmode.display&formName=translationtest&form=<?php echo $formId ?>&active_language_code='"
+                    class="bfLanguageButton<?php echo $active_language_code == $default || $active_language_code == '' ? ' bfLanguageButtonActive' : '' ?>">
+                    <?php echo $default; ?>
+                </div>
+                <?php
+                foreach ($languages as $languageCode) {
+                    if ($languageCode !== $default) {
+                        ?>
+                        <div onclick="location.href = 'index.php?option=com_breezingformsng&format=html&task=quickmode.display&formName=translationtest&form=<?php echo $formId ?>&active_language_code=<?php echo rawurlencode($languageCode); ?>'"
+                            class="bfLanguageButton<?php echo $active_language_code === $languageCode ? ' bfLanguageButtonActive' : '' ?>">
+                            <?php echo htmlspecialchars($languageCode, ENT_QUOTES, 'UTF-8'); ?>
+                        </div>
+                        <?php
+                    }
+                }
+                ?>
+                <?php endif; ?>
+                </div>
+                <?php self::renderSection('form_state_actions', get_defined_vars()); ?>
             </div>
             <?php
-            foreach ($languages as $languageCode) {
-                if ($languageCode !== $default) {
-                    ?>
-                    <div onclick="location.href = 'index.php?option=com_breezingformsng&format=html&task=quickmode.display&formName=translationtest&form=<?php echo $formId ?>&active_language_code=<?php echo rawurlencode($languageCode); ?>'"
-                        class="bfLanguageButton<?php echo $active_language_code === $languageCode ? ' bfLanguageButtonActive' : '' ?>">
-                        <?php echo htmlspecialchars($languageCode, ENT_QUOTES, 'UTF-8'); ?>
-                    </div>
-                    <?php
-                }
-            }
         }
         ?>
         <div style="display:none;visibility:hidden;" id="bfSaveQueue"></div>

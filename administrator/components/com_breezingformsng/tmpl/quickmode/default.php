@@ -11,6 +11,8 @@ use Joomla\CMS\Uri\Uri;
 use Vcmb\Component\BreezingformsNG\Administrator\Helper\QuickmodeHtml;
 
 $iconBase = Uri::root() . 'media/com_breezingformsng/images/quickmode/';
+$published = $this->published;
+$debugMode = $this->debugMode;
 
 // Build root JSON node when creating a new form (no saved template_code yet).
 if ($this->formId === 0 || $this->templateCode === '') {
@@ -75,6 +77,8 @@ echo QuickmodeHtml::showApplication(
     $this->formDesc,
     $this->emailntf,
     $this->emailadr,
+    $this->published,
+    $this->debugMode,
     $o,
     $this->elementScripts,
     $this->themes,

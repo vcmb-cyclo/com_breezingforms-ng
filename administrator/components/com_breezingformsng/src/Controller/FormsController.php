@@ -25,12 +25,22 @@ class FormsController extends BaseController
 
     public function edit(): void
     {
-        $input = Factory::getApplication()->getInput();
-        $id    = $input->getInt('id', 0);
-        $pkg   = $input->getString('pkg', '');
+        $input    = Factory::getApplication()->getInput();
+        $id       = $input->getInt('id', 0);
+        $pkg      = $input->getString('pkg', '');
+        $advanced = $input->getBool('advanced', false);
+
+        if ($id > 0 && !$advanced) {
+            Factory::getApplication()->redirect(Route::_(
+                'index.php?option=com_breezingformsng&task=quickmode.display&form=' . $id . '&pkg=' . rawurlencode($pkg),
+                false
+            ));
+            return;
+        }
 
         Factory::getApplication()->redirect(Route::_(
-            'index.php?option=com_breezingformsng&view=forms&layout=edit&id=' . $id . '&pkg=' . rawurlencode($pkg),
+            'index.php?option=com_breezingformsng&act=manageforms&view=forms&layout=edit&id=' . $id . '&pkg=' . rawurlencode($pkg)
+                . ($advanced ? '&advanced=1' : ''),
             false
         ));
     }
@@ -82,7 +92,6 @@ class FormsController extends BaseController
             'mb_emailntf'              => 'INT',
             'mb_emaillog'              => 'INT',
             'mb_emailxml'              => 'INT',
-            'mb_emailadr'              => 'STRING',
             'mb_custom_mail_subject'   => 'STRING',
             'mb_alt_mailfrom'          => 'STRING',
             'mb_alt_fromname'          => 'STRING',
@@ -104,7 +113,7 @@ class FormsController extends BaseController
 
         // Override PHP code fields with raw (unfiltered) values
         foreach (['piece1code', 'piece2code', 'piece3code', 'piece4code',
-                  'script1code', 'script2code', 'script3code',
+                  'script1code', 'script2code',
                   'email_custom_template', 'mb_email_custom_template'] as $field) {
             $data[$field] = $post[$field] ?? '';
         }
@@ -114,7 +123,7 @@ class FormsController extends BaseController
             $pkg = (string) ($data['package'] ?? '');
             $app->enqueueMessage(Text::_('JLIB_APPLICATION_SAVE_SUCCESS'), 'message');
             $app->redirect(Route::_(
-                'index.php?option=com_breezingformsng&act=manageforms&task=quickmode&form=' . $id
+                'index.php?option=com_breezingformsng&task=quickmode.display&form=' . $id
                 . ($pkg !== '' ? '&pkg=' . rawurlencode($pkg) : ''),
                 false
             ));
@@ -123,7 +132,7 @@ class FormsController extends BaseController
             $id  = (int) ($data['id'] ?? 0);
             $pkg = (string) ($data['package'] ?? '');
             $app->redirect(Route::_(
-                'index.php?option=com_breezingformsng&view=forms&layout=edit&id=' . $id . '&pkg=' . rawurlencode($pkg),
+                'index.php?option=com_breezingformsng&act=manageforms&view=forms&layout=edit&id=' . $id . '&pkg=' . rawurlencode($pkg),
                 false
             ));
         }
@@ -143,7 +152,7 @@ class FormsController extends BaseController
         if (!$this->checkToken()) {
             $app->enqueueMessage(Text::_('JINVALID_TOKEN'), 'error');
         } else {
-            $ids = (array) $input->get('cid', [], 'INT');
+            $ids = $this->selectedIds($input);
             if (!empty($ids)) {
                 $this->getFormModel()->deleteItems($ids);
                 $app->enqueueMessage(Text::_('JLIB_APPLICATION_DELETE_SUCCESS'), 'message');
@@ -161,7 +170,7 @@ class FormsController extends BaseController
         if (!$this->checkToken()) {
             $app->enqueueMessage(Text::_('JINVALID_TOKEN'), 'error');
         } else {
-            $ids = (array) $input->get('cid', [], 'INT');
+            $ids = $this->selectedIds($input);
             if (!empty($ids)) {
                 $this->getFormModel()->copyItems($ids);
                 $app->enqueueMessage(
@@ -210,6 +219,21 @@ class FormsController extends BaseController
         ));
     }
 
+    public function setPublished(): void
+    {
+        $this->checkToken();
+
+        @ob_end_clean();
+        $input = Factory::getApplication()->getInput();
+        $id    = $input->getInt('id', 0);
+        $state = $input->getInt('state', 0);
+        if ($id > 0) {
+            $this->getFormModel()->publish([$id], $state);
+        }
+        echo json_encode(['Result' => 'OK']);
+        Factory::getApplication()->close();
+    }
+
     private function togglePublish(int $state): void
     {
         $app   = Factory::getApplication();
@@ -218,7 +242,7 @@ class FormsController extends BaseController
         if (!$this->checkToken()) {
             $app->enqueueMessage(Text::_('JINVALID_TOKEN'), 'error');
         } else {
-            $ids = (array) $input->get('cid', [], 'INT');
+            $ids = $this->selectedIds($input);
             if (!empty($ids)) {
                 $this->getFormModel()->publish($ids, $state);
             }
@@ -235,7 +259,7 @@ class FormsController extends BaseController
         if (!$this->checkToken()) {
             $app->enqueueMessage(Text::_('JINVALID_TOKEN'), 'error');
         } else {
-            $ids = (array) $input->get('cid', [], 'INT');
+            $ids = $this->selectedIds($input);
             $pkg = $input->getString('pkg', '');
             if (!empty($ids)) {
                 $this->getFormModel()->moveOrder((int) $ids[0], $inc, $pkg);
@@ -247,8 +271,22 @@ class FormsController extends BaseController
 
     private function listUrl(string $pkg): string
     {
-        return 'index.php?option=com_breezingformsng&view=forms'
+        return 'index.php?option=com_breezingformsng&act=manageforms&view=forms'
             . ($pkg !== '' ? '&pkg=' . rawurlencode($pkg) : '');
+    }
+
+    private function selectedIds(\Joomla\Input\Input $input): array
+    {
+        $ids = array_values(array_filter(array_map('intval', (array) $input->get('cid', [], 'array'))));
+
+        if ($ids === []) {
+            $actionId = $input->getInt('action_id', 0);
+            if ($actionId > 0) {
+                $ids[] = $actionId;
+            }
+        }
+
+        return $ids;
     }
 
     private function getFormModel(): FormModel

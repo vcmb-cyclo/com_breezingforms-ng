@@ -44,17 +44,19 @@ $formSelection = Factory::getApplication()->getInput()->getInt('form_selection',
     </div>
     <div class="card-body">
       <?php foreach ($this->recordRows as $row): ?>
-        <div class="mb-3">
-          <label class="form-label" for="element_<?= (int) $row['element_id']; ?>">
+        <div class="row mb-3">
+          <label class="col-sm-3 col-form-label" for="element_<?= (int) $row['element_id']; ?>">
             <strong><?= htmlspecialchars($row['title']); ?></strong>
             <small class="text-muted">(<?= htmlspecialchars($row['name']); ?>)</small>
           </label>
-          <textarea
-            id="element_<?= (int) $row['element_id']; ?>"
-            name="element[<?= (int) $row['element_id']; ?>]"
-            class="form-control"
-            rows="<?= (substr_count($row['value'], "\n") > 0) ? min(10, substr_count($row['value'], "\n") + 2) : 2; ?>"
-          ><?= htmlspecialchars($row['value']); ?></textarea>
+          <div class="col-sm-9">
+            <textarea
+              id="element_<?= (int) $row['element_id']; ?>"
+              name="element[<?= (int) $row['element_id']; ?>]"
+              class="form-control"
+              rows="<?= (substr_count($row['value'], "\n") > 0) ? min(10, substr_count($row['value'], "\n") + 2) : 1; ?>"
+            ><?= htmlspecialchars($row['value']); ?></textarea>
+          </div>
         </div>
       <?php endforeach; ?>
     </div>
@@ -66,9 +68,7 @@ $formSelection = Factory::getApplication()->getInput()->getInt('form_selection',
   <?= HTMLHelper::_('form.token'); ?>
 </form>
 
-<script>
-Joomla.submitbutton = function (task) {
-  document.getElementById('adminForm').querySelector('input[name="task"]').value = task;
-  document.getElementById('adminForm').submit();
-};
-</script>
+<?php
+// Web assets for this view are registered in Records\HtmlView::prepareEditToolbar() —
+// useScript() calls placed in the template body do not take effect here.
+?>

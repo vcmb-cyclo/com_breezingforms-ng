@@ -7,10 +7,12 @@
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Session\Session;
 ?>
-<form action="index.php?option=com_breezingformsng" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_breezingformsng&amp;act=integrate&amp;view=integrator" method="post" name="adminForm" id="adminForm">
 
   <table class="table table-striped table-hover">
     <thead>
@@ -33,7 +35,7 @@ use Joomla\CMS\Language\Text;
           <tr>
             <td class="text-center"><?= HTMLHelper::_('grid.id', $i, $rule->id); ?></td>
             <td>
-              <a href="index.php?option=com_breezingformsng&view=integrator&layout=edit&id=<?= (int) $rule->id; ?>">
+              <a href="index.php?option=com_breezingformsng&act=integrate&view=integrator&layout=edit&id=<?= (int) $rule->id; ?>">
                 <?= htmlspecialchars($rule->name); ?>
               </a>
             </td>
@@ -41,17 +43,10 @@ use Joomla\CMS\Language\Text;
             <td><?= htmlspecialchars($rule->form_name); ?></td>
             <td><?= htmlspecialchars($rule->reference_table); ?></td>
             <td class="text-center">
-              <?php if ($rule->published): ?>
-                <a href="index.php?option=com_breezingformsng&task=integrator.unpublish&publish_id=<?= (int) $rule->id; ?>&<?= \Joomla\CMS\Session\Session::getFormToken(); ?>=1"
-                   class="tbody-icon active" title="<?= Text::_('JPUBLISHED'); ?>">
-                  <span class="icon-publish" aria-hidden="true"></span>
-                </a>
-              <?php else: ?>
-                <a href="index.php?option=com_breezingformsng&task=integrator.publish&publish_id=<?= (int) $rule->id; ?>&<?= \Joomla\CMS\Session\Session::getFormToken(); ?>=1"
-                   class="tbody-icon" title="<?= Text::_('JUNPUBLISHED'); ?>">
-                  <span class="icon-unpublish" aria-hidden="true"></span>
-                </a>
-              <?php endif; ?>
+              <a href="#" onclick="bfTogglePublished(<?= (int) $rule->id; ?>, 'integrator', this); return false;"
+                 title="<?= $rule->published ? Text::_('JPUBLISHED') : Text::_('JUNPUBLISHED'); ?>">
+                <span class="<?= $rule->published ? 'icon-publish' : 'icon-unpublish'; ?>" aria-hidden="true"></span>
+              </a>
             </td>
           </tr>
         <?php endforeach; ?>
@@ -60,16 +55,12 @@ use Joomla\CMS\Language\Text;
   </table>
 
   <input type="hidden" name="task" value="">
+  <input type="hidden" name="publish_id" value="0">
   <input type="hidden" name="boxchecked" value="0">
   <?= HTMLHelper::_('form.token'); ?>
 </form>
 
-<script>
-Joomla.submitbutton = function (task) {
-  if (task === 'integrator.remove') {
-    if (!confirm(<?= json_encode(Text::_('JGLOBAL_CONFIRM_DELETE')); ?>)) return false;
-  }
-  document.getElementById('adminForm').querySelector('[name="task"]').value = task;
-  document.getElementById('adminForm').submit();
-};
-</script>
+<?php
+// Web assets for this view are registered in Integrator\HtmlView::display() —
+// useScript() calls placed in the template body do not take effect here.
+?>

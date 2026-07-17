@@ -12,6 +12,8 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\BaseModel;
 use Joomla\Database\DatabaseInterface;
+use Joomla\Database\ParameterType;
+use Joomla\Database\QueryInterface;
 
 class RecordsModel extends BaseModel
 {
@@ -24,23 +26,29 @@ class RecordsModel extends BaseModel
         'records.viewed'    => 'records.viewed',
         'records.exported'  => 'records.exported',
         'records.archived'  => 'records.archived',
+        'records.modified'  => 'records.modified',
     ];
 
     public function getForms(): array
     {
         $db = Factory::getContainer()->get(DatabaseInterface::class);
-        $db->setQuery("Select id, title, name From #__facileforms_forms Order By `title`");
+        $query = $db->getQuery(true)
+            ->select(['id', 'title', 'name'])
+            ->from($db->quoteName('#__facileforms_forms'))
+            ->order($db->quoteName('title'));
+        $db->setQuery($query);
         return $db->loadAssocList();
     }
 
     public function getTotal(int $formSelection, string $searchTerm): int
     {
         $db = Factory::getContainer()->get(DatabaseInterface::class);
-        $db->setQuery(
-            'Select Count(*) From #__facileforms_records As records'
-            . ' Inner Join #__facileforms_forms As forms On forms.id = records.form'
-            . $this->buildWhere($db, $formSelection, $searchTerm)
-        );
+        $query = $db->getQuery(true)
+            ->select('COUNT(*)')
+            ->from($db->quoteName('#__facileforms_records', 'records'))
+            ->join('INNER', $db->quoteName('#__facileforms_forms', 'forms') . ' ON forms.id = records.form');
+        $this->applyWhere($query, $db, $formSelection, $searchTerm);
+        $db->setQuery($query);
         return (int) $db->loadResult();
     }
 
@@ -51,39 +59,53 @@ class RecordsModel extends BaseModel
         $orderSql = $orderCol . ' ' . $dir . ($orderCol !== 'records.id' ? ', records.id ' . $dir : '');
 
         $db = Factory::getContainer()->get(DatabaseInterface::class);
-        $db->setQuery(
-            'Select records.id, records.submitted, records.ip, records.user_id, records.username, records.user_full_name,'
-            . ' records.viewed, records.exported, records.archived, records.paypal_tx_id,'
-            . ' forms.title As form_title, forms.name As form_name, forms.id As form_id'
-            . ' From #__facileforms_records As records'
-            . ' Inner Join #__facileforms_forms As forms On forms.id = records.form'
-            . $this->buildWhere($db, $formSelection, $searchTerm)
-            . ' Order By ' . $orderSql,
-            $limitStart,
-            $limit
-        );
+        $query = $db->getQuery(true)
+            ->select([
+                'records.id', 'records.submitted', 'records.modified', 'records.ip',
+                'records.user_id', 'records.username', 'records.user_full_name',
+                'records.viewed', 'records.exported', 'records.archived', 'records.paypal_tx_id',
+                'forms.title AS form_title', 'forms.name AS form_name', 'forms.id AS form_id',
+            ])
+            ->from($db->quoteName('#__facileforms_records', 'records'))
+            ->join('INNER', $db->quoteName('#__facileforms_forms', 'forms') . ' ON forms.id = records.form')
+            ->order($orderSql);
+        $this->applyWhere($query, $db, $formSelection, $searchTerm);
+        $db->setQuery($query, $limitStart, $limit);
         return $db->loadAssocList();
     }
 
-    private function buildWhere($db, int $formSelection, string $searchTerm): string
+    private function applyWhere(QueryInterface $query, DatabaseInterface $db, int $formSelection, string $searchTerm): void
     {
-        $where = [];
         if ($formSelection > 0) {
-            $where[] = 'records.form = ' . $formSelection;
+            $query->where('records.form = :formSelection')
+                ->bind(':formSelection', $formSelection, ParameterType::INTEGER);
         }
+
         if ($searchTerm !== '') {
-            $q = $db->quote('%' . $searchTerm . '%');
-            $exact = $db->quote($searchTerm);
-            $where[] = '('
-                . 'records.id = ' . $exact
-                . ' Or records.ip Like ' . $q
-                . ' Or records.username Like ' . $q
-                . ' Or records.user_full_name Like ' . $q
-                . ' Or forms.title Like ' . $q
-                . ' Or forms.name Like ' . $q
-                . ' Or records.paypal_tx_id Like ' . $q
-                . ')';
+            $like = '%' . $searchTerm . '%';
+            $conditions = [
+                'records.id = :searchExact',
+                $db->quoteName('records.ip') . ' LIKE :searchLike1',
+                $db->quoteName('records.username') . ' LIKE :searchLike2',
+                $db->quoteName('records.user_full_name') . ' LIKE :searchLike3',
+                $db->quoteName('forms.title') . ' LIKE :searchLike4',
+                $db->quoteName('forms.name') . ' LIKE :searchLike5',
+                $db->quoteName('records.paypal_tx_id') . ' LIKE :searchLike6',
+            ];
+
+            if ($formSelection > 0) {
+                $query->extendWhere('AND', $conditions, 'OR');
+            } else {
+                $query->where($conditions, 'OR');
+            }
+
+            $query->bind(':searchExact', $searchTerm, ParameterType::STRING)
+                ->bind(':searchLike1', $like, ParameterType::STRING)
+                ->bind(':searchLike2', $like, ParameterType::STRING)
+                ->bind(':searchLike3', $like, ParameterType::STRING)
+                ->bind(':searchLike4', $like, ParameterType::STRING)
+                ->bind(':searchLike5', $like, ParameterType::STRING)
+                ->bind(':searchLike6', $like, ParameterType::STRING);
         }
-        return $where ? ' Where ' . implode(' And ', $where) : '';
     }
 }

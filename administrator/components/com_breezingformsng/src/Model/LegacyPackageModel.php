@@ -20,6 +20,7 @@ abstract class LegacyPackageModel extends ListModel
     public static function create(): static
     {
         $model = new static([
+            'dbo' => null,
             'filter_fields' => [
                 'a.description',
                 'a.id',

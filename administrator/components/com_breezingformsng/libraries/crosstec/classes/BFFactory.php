@@ -12,6 +12,16 @@
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
+/**
+ * Reintroduced 2026-07-12 (production incident): a repo-wide grep found no
+ * internal caller and this was removed, but production Pieces and a form's
+ * "Before Form" code — PHP stored in the database, evaluated at runtime, not
+ * part of this source tree — call BFFactory::getDbo()/getDBO() directly:
+ * ff_databaseToSelect, ff_query, ff_select, ff_selectValue (admin Pieces) and
+ * the hash_password form's piece1code. Do not remove this file again on the
+ * strength of a source-tree grep alone; check facileforms_pieces.code and
+ * facileforms_forms.piece*code in the live database first.
+ */
 use Joomla\Filesystem\File;
 use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;

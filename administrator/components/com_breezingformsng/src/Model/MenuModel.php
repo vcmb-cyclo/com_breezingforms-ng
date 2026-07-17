@@ -9,6 +9,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\BaseModel;
 use Joomla\Database\DatabaseInterface;
 
@@ -16,7 +17,7 @@ class MenuModel extends BaseModel
 {
     private function db(): DatabaseInterface
     {
-        return $this->getDatabase();
+        return Factory::getContainer()->get(DatabaseInterface::class);
     }
 
     public function getPackages(): array
@@ -35,14 +36,14 @@ class MenuModel extends BaseModel
         $db = $this->db();
         $q  = $db->getQuery(true)
             ->select([
-                $db->quoteName('m', 'id'),
-                $db->quoteName('m', 'package'),
-                $db->quoteName('m', 'parent'),
-                $db->quoteName('m', 'ordering'),
-                $db->quoteName('m', 'published'),
-                $db->quoteName('m', 'title'),
-                $db->quoteName('m', 'name'),
-                $db->quoteName('m', 'page'),
+                $db->quoteName('m.id'),
+                $db->quoteName('m.package'),
+                $db->quoteName('m.parent'),
+                $db->quoteName('m.ordering'),
+                $db->quoteName('m.published'),
+                $db->quoteName('m.title'),
+                $db->quoteName('m.name'),
+                $db->quoteName('m.page'),
             ])
             ->from($db->quoteName('#__facileforms_compmenus', 'm'))
             ->order([$db->quoteName('m.parent') . ' ASC', $db->quoteName('m.ordering') . ' ASC']);
@@ -151,7 +152,7 @@ class MenuModel extends BaseModel
         $pub     = (int) ($data['published'] ?? 1);
 
         if ($title === '') {
-            throw new \RuntimeException(\Joomla\CMS\Language\Text::_('COM_BREEZINGFORMSNG_MENUS_TITLEEMPTY'));
+            throw new \RuntimeException(\Joomla\CMS\LanguageText::_('COM_BREEZINGFORMSNG_MENUS_TITLEEMPTY'));
         }
 
         if ($id > 0) {

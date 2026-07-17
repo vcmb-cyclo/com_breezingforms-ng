@@ -8,10 +8,7 @@
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Uri\Uri;
-
-// QuickModeHtml is a legacy renderer loaded via LegacyClassLoader.
-// Trigger autoload so the class is available.
-class_exists('QuickModeHtml', true);
+use Vcmb\Component\BreezingformsNG\Administrator\Helper\QuickmodeHtml;
 
 $iconBase = Uri::root() . 'media/com_breezingformsng/images/quickmode/';
 
@@ -71,7 +68,7 @@ if ($this->formId === 0 || $this->templateCode === '') {
     $o = $this->templateCode;
 }
 
-echo QuickModeHtml::showApplication(
+echo QuickmodeHtml::showApplication(
     $this->formId,
     $this->formName,
     $this->formTitle,

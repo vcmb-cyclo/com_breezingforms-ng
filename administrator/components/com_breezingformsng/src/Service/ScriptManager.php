@@ -16,15 +16,15 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Service;
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
-use BFRequest;
-use BFText;
 use facileFormsScripts;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 use RuntimeException;
+use Throwable;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\ScriptModel;
 use Vcmb\Component\BreezingformsNG\Administrator\View\Scripts\Renderer;
+use Joomla\CMS\Language\Text;
 
 class ScriptManager
 {
@@ -33,12 +33,12 @@ class ScriptManager
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
 		ArrayHelper::toInteger($ids);
 		$typelist = array();
-		$typelist[] = array('Untyped', BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_UNTYPED'));
-		$typelist[] = array('Element Init', BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_ELEMENTINIT'));
-		$typelist[] = array('Element Action', BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_ELEMENTACTION'));
-		$typelist[] = array('Element Validation', BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_ELEMENTVALID'));
-		$typelist[] = array('Form Init', BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_FORMINIT'));
-		$typelist[] = array('Form Submitted', BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_FORMSUBMIT'));
+		$typelist[] = array('Untyped', Text::_('COM_BREEZINGFORMSNG_SCRIPTS_UNTYPED'));
+		$typelist[] = array('Element Init', Text::_('COM_BREEZINGFORMSNG_SCRIPTS_ELEMENTINIT'));
+		$typelist[] = array('Element Action', Text::_('COM_BREEZINGFORMSNG_SCRIPTS_ELEMENTACTION'));
+		$typelist[] = array('Element Validation', Text::_('COM_BREEZINGFORMSNG_SCRIPTS_ELEMENTVALID'));
+		$typelist[] = array('Form Init', Text::_('COM_BREEZINGFORMSNG_SCRIPTS_FORMINIT'));
+		$typelist[] = array('Form Submitted', Text::_('COM_BREEZINGFORMSNG_SCRIPTS_FORMSUBMIT'));
 		$row = new facileFormsScripts($database);
 		if (count($ids)) {
 			$row->load($ids[0]);
@@ -70,37 +70,40 @@ class ScriptManager
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
 		$row      = new facileFormsScripts($database);
 
-		// bind du reste
-		if (!$row->bind($_POST)) {
-			echo "<script> alert('" . $row->getError() . "'); window.history.go(-1); </script>\n";
-			exit();
-		}
-
-		// Forcer code non filtré
-		$row->code = $code;
-		$row->unit_tests = $unitTests;
-
-		$now = Factory::getDate()->toSql();
-		$userId = (string) Factory::getApplication()->getIdentity()->username;
-
-		if (empty($row->id)) {
-			if (empty($row->created)) {
-				$row->created = $now;
+		try {
+			if (!$row->bind($_POST)) {
+				throw new RuntimeException(Text::_('COM_BREEZINGFORMSNG_SCRIPTS_SAVE_FAILED'));
 			}
-			if (empty($row->created_by)) {
-				$row->created_by = $userId;
+
+			// Forcer code non filtré
+			$row->code = $code;
+			$row->unit_tests = $unitTests;
+
+			$now = (new \Joomla\CMS\Date\Date())->toSql();
+			$userId = (string) Factory::getApplication()->getIdentity()->username;
+
+			if (empty($row->id)) {
+				if (empty($row->created)) {
+					$row->created = $now;
+				}
+				if (empty($row->created_by)) {
+					$row->created_by = $userId;
+				}
 			}
+
+			$row->modified = $now;
+			$row->modified_by = $userId;
+
+			if (!$row->store()) {
+				throw new RuntimeException(Text::_('COM_BREEZINGFORMSNG_SCRIPTS_SAVE_FAILED'));
+			}
+		} catch (Throwable $exception) {
+			$app->enqueueMessage($exception->getMessage(), 'error');
+			$app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
+			return;
 		}
 
-		$row->modified = $now;
-		$row->modified_by = $userId;
-
-		if (!$row->store()) {
-			echo "<script> alert('" . $row->getError() . "'); window.history.go(-1); </script>\n";
-			exit();
-		}
-
-		$app->enqueueMessage(BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_SAVED'));
+		$app->enqueueMessage(Text::_('COM_BREEZINGFORMSNG_SCRIPTS_SAVED'));
 		$app->redirect("index.php?option=$option&task=scripts.edit&pkg=$pkg&ids[]=" . (int) $row->id);
 	}
 
@@ -118,13 +121,13 @@ class ScriptManager
 		if (count($ids)) foreach ($ids as $id) {
 			$row->load(intval($id));
 			$row->id       = NULL;
-			$row->created = Factory::getDate()->toSql();
+			$row->created = (new \Joomla\CMS\Date\Date())->toSql();
 			$row->created_by = (string) Factory::getApplication()->getIdentity()->username;
 			$row->modified = $row->created;
 			$row->modified_by = $row->created_by;
 			$row->store();
 		} // foreach
-		$msg = $total . ' ' . BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_SUCCOPIED');
+		$msg = $total . ' ' . Text::_('COM_BREEZINGFORMSNG_SCRIPTS_SUCCOPIED');
 		Factory::getApplication()->enqueueMessage($msg);
 		Factory::getApplication()->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 	} // copy
@@ -136,13 +139,13 @@ class ScriptManager
 		try {
 			$total = $model->deleteByIds($ids);
 		} catch (RuntimeException $e) {
-			echo "<script> alert('" . $e->getMessage() . "'); window.history.go(-1); </script>\n";
-			return;
+			Factory::getApplication()->enqueueMessage($e->getMessage(), 'error');
+			Factory::getApplication()->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 		}
 
 		if ($total) {
 			Factory::getApplication()->enqueueMessage(
-				$total . ' ' . BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_SUCCDELETED'),
+				$total . ' ' . Text::_('COM_BREEZINGFORMSNG_SCRIPTS_SUCCDELETED'),
 				'message'
 			);
 		}
@@ -154,8 +157,8 @@ class ScriptManager
 		try {
 			ScriptModel::create()->publishByIds($ids, (bool) $publish);
 		} catch (RuntimeException $e) {
-			echo "<script> alert('" . $e->getMessage() . "'); window.history.go(-1); </script>\n";
-			exit();
+			Factory::getApplication()->enqueueMessage($e->getMessage(), 'error');
+			Factory::getApplication()->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 		}
 
 		Factory::getApplication()->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
@@ -164,6 +167,7 @@ class ScriptManager
 	static function listitems($option, $pkg)
 	{
 		$app = Factory::getApplication();
+		$input = $app->getInput();
 		$session = $app->getSession();
 
 		try {
@@ -182,7 +186,7 @@ class ScriptManager
 		$pkglist = array();
 		$pkglist[] = array($pkg == '', '');
 		if (count($pkgs)) foreach ($pkgs as $p) $pkglist[] = array($p->name == $pkg, $p->name);
-		$searchReq = BFRequest::getVar('search', null);
+		$searchReq = $input->get('search', null, 'string');
 		if ($searchReq === null) {
 			$search = (string) $session->get('bf.scripts_search', '');
 		} else {
@@ -190,8 +194,8 @@ class ScriptManager
 			$session->set('bf.scripts_search', $search);
 		}
 
-		$sortReq = BFRequest::getVar('sort', null);
-		$dirReq = BFRequest::getVar('dir', null);
+		$sortReq = $input->get('sort', null, 'string');
+		$dirReq = $input->get('dir', null, 'cmd');
 
 		if ($sortReq === null) {
 			$sort = (string) $session->get('bf.scripts_sort', 'name');
@@ -209,7 +213,7 @@ class ScriptManager
 
 		$dir = $dir === 'DESC' ? 'DESC' : 'ASC';
 		$pageSizes = array(10, 25, 50, 100, 250, 500, 1000, 5000, 10000, 100000);
-		$limitReq = BFRequest::getInt('limit', -1);
+		$limitReq = $input->getInt('limit', -1);
 
 		if ($limitReq > 0 && in_array($limitReq, $pageSizes, true)) {
 			$limit = $limitReq;
@@ -222,7 +226,7 @@ class ScriptManager
 			}
 		}
 
-		$limitstartReq = BFRequest::getInt('limitstart', -1);
+		$limitstartReq = $input->getInt('limitstart', -1);
 
 		if ($limitstartReq >= 0) {
 			$limitstart = $limitstartReq;
@@ -255,7 +259,7 @@ class ScriptManager
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
 		ArrayHelper::toInteger($ids);
 		if (!count($ids)) {
-			$id = BFRequest::getInt('id', 0);
+			$id = $app->getInput()->getInt('id', 0);
 			if ($id) {
 				$ids = array($id);
 			}
@@ -287,7 +291,7 @@ class ScriptManager
 			}
 			$autoRun = $allDefaults;
 		}
-		$testMode = BFRequest::getCmd('test_mode', '');
+		$testMode = $app->getInput()->getCmd('test_mode', '');
 		Renderer::test($option, $pkg, $row, $functionName, $params, $paramDefaults, $autoRun, $testMode);
 	}
 
@@ -307,7 +311,7 @@ class ScriptManager
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
 		ArrayHelper::toInteger($ids);
 		if (!count($ids)) {
-			$id = BFRequest::getInt('id', 0);
+			$id = $app->getInput()->getInt('id', 0);
 			if ($id) {
 				$ids = array($id);
 			}
@@ -349,8 +353,8 @@ class ScriptManager
 			}
 		}
 
-		$testContext = BFRequest::getInt('test_context', 0);
-		$testMode = BFRequest::getCmd('test_mode', '');
+		$testContext = $app->getInput()->getInt('test_context', 0);
+		$testMode = $app->getInput()->getCmd('test_mode', '');
 		if ($testContext) {
 			$testModeQuery = $testMode !== '' ? '&test_mode=' . urlencode($testMode) : '';
 			$app->redirect("index.php?option=$option&task=scripts.test&pkg=$pkg&ids[]=" . $targetId . $testModeQuery);

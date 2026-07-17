@@ -12,6 +12,8 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Integrator;
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Session\Session;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\IntegratorModel;
 
@@ -36,6 +38,13 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
         $model  = $this->getIntegratorModel();
 
         if ($layout === 'edit') {
+
+            $input->set('hidemainmenu', 1);
+
+        }
+
+
+        if ($layout === 'edit') {
             $this->prepareEdit($model, $input);
         } else {
             $this->prepareList($model);
@@ -49,9 +58,32 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
         $this->rules = $model->getRules();
         ToolbarHelper::addNew('integrator.edit');
         ToolbarHelper::deleteList('', 'integrator.remove');
+
+        $document = Factory::getApplication()->getDocument();
+        $wa       = $document->getWebAssetManager();
+        $wa->registerAndUseScript(
+            'com_breezingformsng.admin-form',
+            'media/com_breezingformsng/js/admin/admin-form.js',
+            ['version' => 'auto'],
+            ['defer' => true],
+            ['core']
+        );
+        $document->addScriptOptions('com_breezingformsng.admin-form', ['confirmDeleteTask' => 'integrator.remove']);
+        Text::script('JGLOBAL_CONFIRM_DELETE');
+
+        $wa->registerAndUseScript(
+            'com_breezingformsng.admin-toggle-published',
+            'media/com_breezingformsng/js/admin/admin-toggle-published.js',
+            ['version' => 'auto'],
+            ['defer' => true],
+            ['core']
+        );
+        $document->addScriptOptions('com_breezingformsng.admin-toggle-published', ['csrfToken' => Session::getFormToken()]);
+        Text::script('JPUBLISHED');
+        Text::script('JUNPUBLISHED');
     }
 
-    private function prepareEdit(IntegratorModel $model, \Joomla\CMS\Input\Input $input): void
+    private function prepareEdit(IntegratorModel $model, \Joomla\Input\Input $input): void
     {
         $id         = $input->getInt('id', 0);
         $this->rule = $id > 0 ? $model->getRule($id) : null;
@@ -73,6 +105,17 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
             ToolbarHelper::save('integrator.save');
         }
         ToolbarHelper::cancel('integrator.display', 'JTOOLBAR_CLOSE');
+    }
+
+    protected function getDetailLabel(): ?string
+    {
+        if ($this->rule === null) {
+            return null;
+        }
+
+        $name = trim((string) $this->rule->name);
+
+        return $name !== '' ? $name : Text::_('COM_BREEZINGFORMSNG_INSTALLER_UNKNOWN');
     }
 
     private function getIntegratorModel(): IntegratorModel

@@ -14,6 +14,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
+use Vcmb\Component\BreezingformsNG\Administrator\Helper\BreadcrumbHelper;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\QuickmodeModel;
 
 class HtmlView extends BaseHtmlView
@@ -32,11 +33,12 @@ class HtmlView extends BaseHtmlView
 
     public function display($tpl = null): void
     {
+        Factory::getApplication()->getInput()->set('hidemainmenu', 1);
         $input  = Factory::getApplication()->getInput();
         $layout = $input->getCmd('layout', '');
 
         if ($layout === 'editor') {
-            parent::display('editor');
+            parent::display($tpl);
             return;
         }
 
@@ -67,11 +69,11 @@ class HtmlView extends BaseHtmlView
         $this->themesBootstrap4 = $model->getThemesBootstrap4();
 
         // Toolbar
-        $sectionTitle = Text::_('COM_BREEZINGFORMSNG_MANAGEFORMS');
-        if ($this->formTitle !== '') {
-            $sectionTitle .= ' / ' . htmlspecialchars($this->formTitle, ENT_QUOTES, 'UTF-8');
-        }
-        $pageTitle = Text::_('COM_BREEZINGFORMSNG') . ' / ' . $sectionTitle;
+        $pageTitle = BreadcrumbHelper::render([
+            ['label' => Text::_('COM_BREEZINGFORMSNG'), 'url' => 'index.php?option=com_breezingformsng'],
+            ['label' => Text::_('COM_BREEZINGFORMSNG_MANAGEFORMS'), 'url' => 'index.php?option=com_breezingformsng&view=forms'],
+            ['label' => $this->formTitle !== '' ? $this->formTitle : Text::_('COM_BREEZINGFORMSNG_INSTALLER_UNKNOWN')],
+        ]);
 
         $doc = Factory::getApplication()->getDocument();
         $doc->setTitle(strip_tags($pageTitle));
@@ -82,6 +84,23 @@ class HtmlView extends BaseHtmlView
                 display:inline-block;width:48px;height:48px;vertical-align:middle;
             }'
         );
+        $wa = $doc->getWebAssetManager();
+        $wa->useStyle('com_breezingformsng.quickmode-style');
+        $wa->useStyle('com_breezingformsng.jtree-style');
+        $wa->useStyle('com_breezingformsng.admin-style');
+        $wa->useStyle('com_breezingformsng.custom-style');
+        $wa->useScript('com_breezingformsng.jquery-alias');
+        $wa->useScript('com_breezingformsng.jtree');
+        $wa->useScript('com_breezingformsng.jq-ui');
+        $wa->useScript('com_breezingformsng.base64');
+        $wa->useScript('com_breezingformsng.json-plugin');
+        $wa->useScript('com_breezingformsng.md5');
+        $wa->useScript('com_breezingformsng.center');
+        $wa->useScript('com_breezingformsng.scroll');
+        $wa->useScript('com_breezingformsng.quickmode-elements');
+        $wa->useScript('com_breezingformsng.quickmode-app');
+        $wa->useScript('com_breezingformsng.quickmode-yesno-switch');
+        $wa->useScript('com_breezingformsng.jquery-restore');
         ToolbarHelper::title($pageTitle, 'logo_left');
 
         parent::display($tpl);

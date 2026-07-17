@@ -118,7 +118,7 @@ class PiecesController extends BaseController
 
     private function prepareDocument(): void
     {
-        $title = Text::_('COM_BREEZINGFORMSNG') . ' / ' . \BFText::_('COM_BREEZINGFORMSNG_MANAGEPIECES');
+        $title = Text::_('COM_BREEZINGFORMSNG') . ' / ' . Text::_('COM_BREEZINGFORMSNG_MANAGEPIECES');
 
         $document = Factory::getApplication()->getDocument();
         $document->setTitle($title);
@@ -168,15 +168,14 @@ class PiecesController extends BaseController
         global $ff_mospath, $ff_admpath, $ff_compath;
         global $ff_mossite, $ff_admsite, $ff_admicon, $ff_comsite;
         global $ff_config, $ff_compatible, $ff_install;
-        global $task;
+        global $database, $task;
 
-        Factory::getApplication()->getDocument()->getWebAssetManager()
-            ->getRegistry()
-            ->addRegistryFile('administrator/components/com_breezingformsng/joomla.asset.json');
 
         if (isset($ff_config)) {
             return;
         }
+
+        $database = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
         $task       = '';
         $comppath   = '/components/com_breezingformsng';

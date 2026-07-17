@@ -53,6 +53,21 @@ class IntegratorController extends BaseController
         $this->setRedirect($this->listUrl());
     }
 
+    public function setPublished(): void
+    {
+        $this->checkToken();
+
+        @ob_end_clean();
+        $input = Factory::getApplication()->getInput();
+        $id    = $input->getInt('id', 0);
+        $state = $input->getInt('state', 0);
+        if ($id > 0) {
+            $this->getIntegratorModel()->publishRule($id, $state);
+        }
+        echo json_encode(['Result' => 'OK']);
+        Factory::getApplication()->close();
+    }
+
     public function publish(): void
     {
         $this->checkToken();
@@ -85,6 +100,8 @@ class IntegratorController extends BaseController
 
     public function removeItem(): void
     {
+        $this->checkToken();
+
         $input  = Factory::getApplication()->getInput();
         $ruleId = $input->getInt('id', 0);
         $this->getIntegratorModel()->removeItem($input->getInt('itemId', 0));
@@ -133,6 +150,8 @@ class IntegratorController extends BaseController
 
     public function removeCriteria(): void
     {
+        $this->checkToken();
+
         $input  = Factory::getApplication()->getInput();
         $ruleId = $input->getInt('id', 0);
         $this->getIntegratorModel()->removeCriteria($input->getInt('criteriaId', 0));
@@ -156,6 +175,8 @@ class IntegratorController extends BaseController
 
     public function removeCriteriaJoomla(): void
     {
+        $this->checkToken();
+
         $input  = Factory::getApplication()->getInput();
         $ruleId = $input->getInt('id', 0);
         $this->getIntegratorModel()->removeCriteriaJoomla($input->getInt('criteriaId', 0));
@@ -179,6 +200,8 @@ class IntegratorController extends BaseController
 
     public function removeCriteriaFixed(): void
     {
+        $this->checkToken();
+
         $input  = Factory::getApplication()->getInput();
         $ruleId = $input->getInt('id', 0);
         $this->getIntegratorModel()->removeCriteriaFixed($input->getInt('criteriaId', 0));
@@ -205,12 +228,12 @@ class IntegratorController extends BaseController
 
     private function editUrl(int $id): string
     {
-        return 'index.php?option=com_breezingformsng&view=integrator&layout=edit&id=' . $id;
+        return 'index.php?option=com_breezingformsng&act=integrate&view=integrator&layout=edit&id=' . $id;
     }
 
     private function listUrl(): string
     {
-        return 'index.php?option=com_breezingformsng&view=integrator';
+        return 'index.php?option=com_breezingformsng&act=integrate&view=integrator';
     }
 
     private function getIntegratorModel(): IntegratorModel

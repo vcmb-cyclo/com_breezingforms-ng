@@ -10,14 +10,12 @@
 use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\Session\Session;
 
 $rule        = $this->rule;
 $ruleId      = $rule ? (int) $rule->id : 0;
 $isNew       = ($ruleId === 0);
-$token       = Session::getFormToken();
-$baseUrl     = 'index.php?option=com_breezingformsng';
-$editUrl     = $baseUrl . '&view=integrator&layout=edit&id=' . $ruleId;
+$baseUrl     = 'index.php?option=com_breezingformsng&act=integrate&view=integrator';
+$editUrl     = $baseUrl . '&layout=edit&id=' . $ruleId;
 
 $operators = [
     '='     => 'equals',
@@ -33,6 +31,15 @@ $operators = [
 
 $fakeName = static fn(string $n): bool => \in_array($n, ['bfFakeName', 'bfFakeName2', 'bfFakeName3', 'bfFakeName4'], true);
 ?>
+
+<form action="<?= $baseUrl; ?>" method="post" id="integratorActionForm">
+  <input type="hidden" name="task" value="">
+  <input type="hidden" name="id" value="<?= $ruleId; ?>">
+  <input type="hidden" name="itemId" value="0">
+  <input type="hidden" name="criteriaId" value="0">
+  <input type="hidden" name="publish_id" value="0">
+  <?= HTMLHelper::_('form.token'); ?>
+</form>
 
 <?php /* ── Base data card ── */ ?>
 <div class="card mb-3">
@@ -170,17 +177,18 @@ $fakeName = static fn(string $n): bool => \in_array($n, ['bfFakeName', 'bfFakeNa
                   <?= Text::_('COM_BREEZINGFORMSNG_CODE'); ?>
                 </a>
                 &nbsp;|&nbsp;
-                <a href="<?= $baseUrl; ?>&task=integrator.removeItem&itemId=<?= (int) $item->id; ?>&id=<?= $ruleId; ?>" class="text-danger">
+                <button type="button" class="btn btn-link text-danger p-0 border-0 align-baseline"
+                        onclick="var f=document.getElementById('integratorActionForm');f.task.value='integrator.removeItem';f.itemId.value='<?= (int) $item->id; ?>';f.submit();">
                   <?= Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_REMOVE'); ?>
-                </a>
+                </button>
               </td>
               <td class="text-center">
                 <?php if ($item->published): ?>
-                  <a href="<?= $baseUrl; ?>&task=integrator.unpublishItem&publish_id=<?= (int) $item->id; ?>&id=<?= $ruleId; ?>&<?= $token; ?>=1"
-                     class="tbody-icon active"><span class="icon-publish" aria-hidden="true"></span></a>
+                  <button type="button" class="tbody-icon active border-0 bg-transparent"
+                          onclick="var f=document.getElementById('integratorActionForm');f.task.value='integrator.unpublishItem';f.publish_id.value='<?= (int) $item->id; ?>';f.submit();"><span class="icon-publish" aria-hidden="true"></span></button>
                 <?php else: ?>
-                  <a href="<?= $baseUrl; ?>&task=integrator.publishItem&publish_id=<?= (int) $item->id; ?>&id=<?= $ruleId; ?>&<?= $token; ?>=1"
-                     class="tbody-icon"><span class="icon-unpublish" aria-hidden="true"></span></a>
+                  <button type="button" class="tbody-icon border-0 bg-transparent"
+                          onclick="var f=document.getElementById('integratorActionForm');f.task.value='integrator.publishItem';f.publish_id.value='<?= (int) $item->id; ?>';f.submit();"><span class="icon-unpublish" aria-hidden="true"></span></button>
                 <?php endif; ?>
               </td>
             </tr>
@@ -250,9 +258,10 @@ $fakeName = static fn(string $n): bool => \in_array($n, ['bfFakeName', 'bfFakeNa
               <td><?= htmlspecialchars($crit->element_name); ?> (<?= htmlspecialchars($crit->element_type); ?>)</td>
               <td><?= htmlspecialchars($crit->andor); ?></td>
               <td>
-                <a href="<?= $baseUrl; ?>&task=integrator.removeCriteria&criteriaId=<?= (int) $crit->id; ?>&id=<?= $ruleId; ?>" class="text-danger">
+                <button type="button" class="btn btn-link text-danger p-0 border-0 align-baseline"
+                        onclick="var f=document.getElementById('integratorActionForm');f.task.value='integrator.removeCriteria';f.criteriaId.value='<?= (int) $crit->id; ?>';f.submit();">
                   <?= Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_REMOVE'); ?>
-                </a>
+                </button>
               </td>
             </tr>
           <?php endforeach; ?>
@@ -311,9 +320,10 @@ $fakeName = static fn(string $n): bool => \in_array($n, ['bfFakeName', 'bfFakeNa
               <td><?= htmlspecialchars($crit->joomla_object); ?></td>
               <td><?= htmlspecialchars($crit->andor); ?></td>
               <td>
-                <a href="<?= $baseUrl; ?>&task=integrator.removeCriteriaJoomla&criteriaId=<?= (int) $crit->id; ?>&id=<?= $ruleId; ?>" class="text-danger">
+                <button type="button" class="btn btn-link text-danger p-0 border-0 align-baseline"
+                        onclick="var f=document.getElementById('integratorActionForm');f.task.value='integrator.removeCriteriaJoomla';f.criteriaId.value='<?= (int) $crit->id; ?>';f.submit();">
                   <?= Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_REMOVE'); ?>
-                </a>
+                </button>
               </td>
             </tr>
           <?php endforeach; ?>
@@ -365,9 +375,10 @@ $fakeName = static fn(string $n): bool => \in_array($n, ['bfFakeName', 'bfFakeNa
               <td><?= htmlspecialchars($crit->fixed_value); ?></td>
               <td><?= htmlspecialchars($crit->andor); ?></td>
               <td>
-                <a href="<?= $baseUrl; ?>&task=integrator.removeCriteriaFixed&criteriaId=<?= (int) $crit->id; ?>&id=<?= $ruleId; ?>" class="text-danger">
+                <button type="button" class="btn btn-link text-danger p-0 border-0 align-baseline"
+                        onclick="var f=document.getElementById('integratorActionForm');f.task.value='integrator.removeCriteriaFixed';f.criteriaId.value='<?= (int) $crit->id; ?>';f.submit();">
                   <?= Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_REMOVE'); ?>
-                </a>
+                </button>
               </td>
             </tr>
           <?php endforeach; ?>

@@ -1,0 +1,606 @@
+var __bfOpts = Joomla.getOptions('com_breezingformsng.scripts-edit') || {};
+
+function checkIdentifier(value, name)
+						{
+							var invalidChars = /\W/;
+							var error = '';
+							if (value == '')
+								error += Joomla.Text._('COM_BREEZINGFORMSNG_SCRIPTS_ENTERNAME') + "\n";
+							else
+			if (invalidChars.test(value))
+				error += Joomla.Text._('COM_BREEZINGFORMSNG_SCRIPTS_ENTERIDENT') + "\n";
+			return error;
+						} // checkIdentifier
+
+			function submitbutton(pressbutton) {
+				var form = document.adminForm;
+				var error = '';
+				if ((pressbutton == 'test' || pressbutton == 'prev' || pressbutton == 'next') && isEditTestBlocked()) {
+					alert(Joomla.Text._('COM_BREEZINGFORMSNG_TEST_SAVE_SCRIPT_BEFORE_CONTINUE'));
+					return;
+				}
+				if (pressbutton != 'cancel' && pressbutton != 'prev' && pressbutton != 'next' && pressbutton != 'test') {
+					error += checkIdentifier(form.name.value, 'name');
+					if (form.title.value == '') error += Joomla.Text._('COM_BREEZINGFORMSNG_SCRIPTS_ENTTITLE') + "\n";
+				} // if
+				if (error != '')
+					alert(error);
+				else
+					var task = pressbutton === 'new' ? 'add' : (pressbutton === 'prev' ? 'previous' : pressbutton);
+					Joomla.submitform('scripts.' + task);
+			} // submitbutton
+			Joomla.submitbutton = submitbutton;
+			window.submitbutton = submitbutton;
+
+			function createCode() {
+				form = document.adminForm;
+				name = form.name.value;
+				if (name == '') {
+					alert(Joomla.Text._('COM_BREEZINGFORMSNG_SCRIPTS_ENTNAMEFIRST'));
+					return;
+				} // if
+				stype = form.type.value;
+				code = '';
+				switch (stype) {
+
+					case 'Element Action':
+						if (!confirm(Joomla.Text._('COM_BREEZINGFORMSNG_SCRIPTS_CREATEACTCODE') + "\n" + Joomla.Text._('COM_BREEZINGFORMSNG_SCRIPTS_EXISTAPP'))) return;
+						code =
+							"function " + name + "(element, action)\n" +
+							"{\n" +
+							"    switch (action) {\n" +
+							"        case 'click':\n" +
+							"            break;\n" +
+							"        case 'blur':\n" +
+							"            break;\n" +
+							"        case 'change':\n" +
+							"            break;\n" +
+							"        case 'focus':\n" +
+							"            break;\n" +
+							"        case 'select':\n" +
+							"            break;\n" +
+							"        default:;\n" +
+							"    } // switch\n" +
+							"} // " + name + "\n";
+						break;
+
+					case 'Element Init':
+						if (!confirm(Joomla.Text._('COM_BREEZINGFORMSNG_SCRIPTS_CREATEINICODE') + "\n" + Joomla.Text._('COM_BREEZINGFORMSNG_SCRIPTS_EXISTAPP'))) return;
+						code =
+							"function " + name + "(element, condition)\n" +
+							"{\n" +
+							"} // " + name + "\n";
+						break;
+
+					case 'Element Validation':
+						if (!confirm(Joomla.Text._('COM_BREEZINGFORMSNG_SCRIPTS_CREATEVALCODE') + "\n" + Joomla.Text._('COM_BREEZINGFORMSNG_SCRIPTS_EXISTAPP'))) return;
+						code =
+							"function " + name + "(element, message)\n" +
+							"{\n" +
+							"    if (element_fails_my_test) {\n" +
+							"        if (message=='') message = element.name+\" faild in my test.\\n\"\n" +
+							"        ff_validationFocus(element.name);\n" +
+							"        return message;\n" +
+							"    } // if\n" +
+							"    return '';\n" +
+							"} // " + name + "\n";
+						break;
+
+					case 'Form Init':
+						if (!confirm(Joomla.Text._('COM_BREEZINGFORMSNG_SCRIPTS_CREATEFINICODE') + "\n" + Joomla.Text._('COM_BREEZINGFORMSNG_SCRIPTS_EXISTAPP'))) return;
+						code =
+							"function " + name + "()\n" +
+							"{\n" +
+							"} // " + name + "\n";
+						break;
+
+					case 'Form Submitted':
+						if (!confirm(Joomla.Text._('COM_BREEZINGFORMSNG_SCRIPTS_CREATESUBCODE') + "\n" + Joomla.Text._('COM_BREEZINGFORMSNG_SCRIPTS_EXISTAPP'))) return;
+						code =
+							"function " + name + "(status, message)\n" +
+							"{\n" +
+							"    switch (status) {\n" +
+							"        case FF_STATUS_OK:\n" +
+							"           // do whatever desired on success\n" +
+							"           break;\n" +
+							"        case FF_STATUS_UNPUBLISHED:\n" +
+							"        case FF_STATUS_SAVERECORD_FAILED:\n" +
+							"        case FF_STATUS_SAVESUBRECORD_FAILED:\n" +
+							"        case FF_STATUS_UPLOAD_FAILED:\n" +
+							"        case FF_STATUS_ATTACHMENT_FAILED:\n" +
+							"        case FF_STATUS_SENDMAIL_FAILED:\n" +
+							"        default:\n" +
+							"           alert(message);\n" +
+							"    } // switch\n" +
+							"} // " + name + "\n";
+						break;
+
+					case 'Untyped':
+						if (!confirm(Joomla.Text._('COM_BREEZINGFORMSNG_SCRIPTS_CREATEUNTCODE') + "\n" + Joomla.Text._('COM_BREEZINGFORMSNG_SCRIPTS_EXISTAPP'))) return;
+						code =
+							"function " + name + "()\n" +
+							"{\n" +
+							"} // " + name + "\n";
+						break;
+
+					default:
+						alert(Joomla.Text._('COM_BREEZINGFORMSNG_SCRIPTS_UNKNOWNTYPE') + " " + stype);
+
+				} // switch
+				oldcode = form.code.value;
+				if (oldcode != '')
+					form.code.value =
+						code +
+						"\n// -------------- " + Joomla.Text._('COM_BREEZINGFORMSNG_SCRIPTS_OLDBELOW') + " --------------\n\n" +
+						oldcode;
+				else
+					form.code.value = code;
+			} // createCode
+
+			onload = function () {
+				document.adminForm.title.focus();
+			} // onload
+
+			function getEditTestToolbarButton() {
+				return findToolbarButton('test', ['test']);
+			}
+
+			function getEditTestToolbarButtons() {
+				return findToolbarButtons('test', ['test']);
+			}
+
+			function getEditSaveToolbarButton() {
+				return findToolbarButton('save', ['save', 'enregistrer']);
+			}
+
+			function getEditPrevToolbarButton() {
+				return findToolbarButton('prev', ['prev', 'precedent']);
+			}
+
+			function getEditNextToolbarButton() {
+				return findToolbarButton('next', ['next', 'suivant']);
+			}
+
+			function findToolbarButton(taskName, textHints) {
+				var buttons = findToolbarButtons(taskName, textHints);
+				return buttons.length ? buttons[0] : null;
+			}
+
+			function findToolbarButtons(taskName, textHints) {
+				var toolbarRoots = document.querySelectorAll('#toolbar, .toolbar, .subhead, .btn-toolbar, joomla-toolbar, .joomla-toolbar-button');
+				var matches = [];
+				var seen = [];
+				function pushMatch(node) {
+					if (!node || node.id === 'bf-edit-unit-tests-button') {
+						return;
+					}
+					var target = node.closest ? (node.closest('button, a, [role="button"], li, .btn, .toolbar-item') || node) : node;
+					if (seen.indexOf(target) === -1) {
+						seen.push(target);
+						matches.push(target);
+					}
+				}
+				var selectors = [
+					'#toolbar-' + taskName,
+					'.toolbar-' + taskName,
+					'.button-' + taskName,
+					'[data-task="' + taskName + '"]',
+					"[onclick*='" + taskName + "']",
+					"[href*='" + taskName + "']"
+				];
+				for (var r = 0; r < toolbarRoots.length; r++) {
+					for (var s = 0; s < selectors.length; s++) {
+						var scopedMatches = toolbarRoots[r].querySelectorAll(selectors[s]);
+						for (var m = 0; m < scopedMatches.length; m++) {
+							pushMatch(scopedMatches[m]);
+						}
+					}
+				}
+				for (var s = 0; s < selectors.length; s++) {
+					var directMatches = document.querySelectorAll(selectors[s]);
+					for (var d = 0; d < directMatches.length; d++) {
+						pushMatch(directMatches[d]);
+					}
+				}
+				var candidates = document.querySelectorAll('#toolbar button, #toolbar a, .toolbar button, .toolbar a, .subhead button, .subhead a, .btn-toolbar button, .btn-toolbar a, joomla-toolbar button, joomla-toolbar a, .joomla-toolbar-button button, .joomla-toolbar-button a');
+				if (!candidates.length) {
+					candidates = document.querySelectorAll('button, a, [role="button"]');
+				}
+				for (var i = 0; i < candidates.length; i++) {
+					var candidate = candidates[i];
+					var haystack = [
+						candidate.id || '',
+						candidate.className || '',
+						candidate.getAttribute('data-task') || '',
+						candidate.getAttribute('onclick') || '',
+						candidate.getAttribute('href') || '',
+						candidate.textContent || '',
+						candidate.title || '',
+						candidate.getAttribute('aria-label') || ''
+					].join(' ').toLowerCase();
+					if (haystack.indexOf(taskName.toLowerCase()) !== -1) {
+						pushMatch(candidate);
+					}
+					for (var h = 0; h < textHints.length; h++) {
+						if (haystack.indexOf(String(textHints[h]).toLowerCase()) !== -1) {
+							pushMatch(candidate);
+						}
+					}
+				}
+				return matches;
+			}
+
+			function normalizeUnitTestsValue(value) {
+				return String(value || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+			}
+
+			function getCodeMirrorInstance(field) {
+				if (!field || !field.parentNode) {
+					return null;
+				}
+				var sibling = field.nextElementSibling;
+				while (sibling) {
+					if (sibling.CodeMirror) {
+						return sibling.CodeMirror;
+					}
+					sibling = sibling.nextElementSibling;
+				}
+				var wrappers = field.parentNode.querySelectorAll('.CodeMirror');
+				for (var i = 0; i < wrappers.length; i++) {
+					if (field.compareDocumentPosition(wrappers[i]) & Node.DOCUMENT_POSITION_FOLLOWING) {
+						return wrappers[i].CodeMirror || null;
+					}
+				}
+				return null;
+			}
+
+			function getFieldValue(fieldId) {
+				var field = document.getElementById(fieldId);
+				if (!field && document.adminForm && document.adminForm.elements && document.adminForm.elements[fieldId]) {
+					field = document.adminForm.elements[fieldId];
+				}
+				if (!field) {
+					return '';
+				}
+				if (typeof RadioNodeList !== 'undefined' && field instanceof RadioNodeList) {
+					return field.value;
+				}
+				if (field.length && typeof field.value !== 'undefined' && !field.tagName) {
+					return field.value;
+				}
+				if (window.Joomla && Joomla.editors && Joomla.editors.instances && Joomla.editors.instances[fieldId] && typeof Joomla.editors.instances[fieldId].getValue === 'function') {
+					return Joomla.editors.instances[fieldId].getValue();
+				}
+				if (typeof field.value !== 'undefined') {
+					var codeMirrorInstance = getCodeMirrorInstance(field);
+					if (codeMirrorInstance) {
+						return codeMirrorInstance.getValue();
+					}
+					return field.value;
+				}
+				return '';
+			}
+
+			function getCurrentEditState() {
+				return {
+					title: getFieldValue('title'),
+					type: getFieldValue('type'),
+					package: getFieldValue('package'),
+					name: getFieldValue('name'),
+					published: getFieldValue('published'),
+					description: getFieldValue('description'),
+					code: getFieldValue('code'),
+					unit_tests: getFieldValue('unit_tests')
+				};
+			}
+
+			function isEditDirty() {
+				var initialState = __bfOpts.initialState || {};
+				var currentState = getCurrentEditState();
+				var keys = Object.keys(initialState);
+				for (var i = 0; i < keys.length; i++) {
+					var key = keys[i];
+					if (normalizeUnitTestsValue(currentState[key]) !== normalizeUnitTestsValue(initialState[key])) {
+						return true;
+					}
+				}
+				return false;
+			}
+
+			function isEditTestBlocked() {
+				return isEditDirty();
+			}
+
+			function syncEditSaveToolbarButton() {
+				var button = getEditSaveToolbarButton();
+				if (!button) {
+					return;
+				}
+				var isDirty = isEditDirty();
+				button.classList.toggle('disabled', !isDirty);
+				button.setAttribute('aria-disabled', isDirty ? 'false' : 'true');
+				button.style.pointerEvents = isDirty ? '' : 'none';
+				button.style.opacity = isDirty ? '' : '0.5';
+				if (button.tagName === 'BUTTON') {
+					button.disabled = !isDirty;
+				}
+				if (!isDirty) {
+					button.setAttribute('tabindex', '-1');
+					button.title = Joomla.Text._('COM_BREEZINGFORMSNG_TEST_NO_CHANGES');
+				} else {
+					button.removeAttribute('tabindex');
+					button.title = '';
+				}
+			}
+
+			function syncEditTestToolbarButton() {
+				var buttons = getEditTestToolbarButtons();
+				if (!buttons.length) {
+					return;
+				}
+				var isBlocked = isEditTestBlocked();
+				for (var i = 0; i < buttons.length; i++) {
+					var button = buttons[i];
+					button.classList.toggle('disabled', isBlocked);
+					button.setAttribute('aria-disabled', isBlocked ? 'true' : 'false');
+					button.style.pointerEvents = isBlocked ? 'none' : '';
+					button.style.opacity = isBlocked ? '0.5' : '';
+					if (button.tagName === 'BUTTON') {
+						button.disabled = isBlocked;
+					}
+					if (isBlocked) {
+						button.setAttribute('tabindex', '-1');
+						button.title = Joomla.Text._('COM_BREEZINGFORMSNG_TEST_SAVE_SCRIPT_BEFORE_TESTS');
+					} else {
+						button.removeAttribute('tabindex');
+						button.title = '';
+					}
+				}
+			}
+
+			function syncEditNavigationToolbarButton(button, title) {
+				if (!button) {
+					return;
+				}
+				var isBlocked = isEditDirty();
+				button.classList.toggle('disabled', isBlocked);
+				button.setAttribute('aria-disabled', isBlocked ? 'true' : 'false');
+				button.style.pointerEvents = isBlocked ? 'none' : '';
+				button.style.opacity = isBlocked ? '0.5' : '';
+				if (button.tagName === 'BUTTON') {
+					button.disabled = isBlocked;
+				}
+				if (isBlocked) {
+					button.setAttribute('tabindex', '-1');
+					button.title = title;
+				} else {
+					button.removeAttribute('tabindex');
+					button.title = '';
+				}
+			}
+
+			function syncEditPrevNextToolbarButtons() {
+				syncEditNavigationToolbarButton(getEditPrevToolbarButton(), Joomla.Text._('COM_BREEZINGFORMSNG_TEST_SAVE_SCRIPT_BEFORE_NAVIGATION'));
+				syncEditNavigationToolbarButton(getEditNextToolbarButton(), Joomla.Text._('COM_BREEZINGFORMSNG_TEST_SAVE_SCRIPT_BEFORE_NAVIGATION'));
+			}
+
+			function syncEditUnitTestsButton() {
+				var button = document.getElementById('bf-edit-unit-tests-button');
+				var field = document.getElementById('unit_tests');
+				if (!button || !field) {
+					return;
+				}
+
+				var persistedValue = __bfOpts.persistedUnitTests;
+				var currentValue = String(field.value || '');
+				var hasTests = currentValue.trim() !== '';
+				var isDirty = isEditTestBlocked();
+				var enabled = hasTests && __bfOpts.hasSavedRecord && !isDirty;
+				button.disabled = !enabled;
+				button.classList.toggle('disabled', !enabled);
+				button.setAttribute('aria-disabled', enabled ? 'false' : 'true');
+				if (!__bfOpts.hasSavedRecord) {
+					button.title = Joomla.Text._('COM_BREEZINGFORMSNG_TEST_SAVE_FIRST_SCRIPT');
+				} else if (isDirty) {
+					button.title = Joomla.Text._('COM_BREEZINGFORMSNG_TEST_SAVE_SCRIPT_BEFORE_UNIT_TESTS');
+				} else {
+					button.title = enabled ? '' : Joomla.Text._('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS_NONE');
+				}
+			}
+
+			function runUnitTestsFromEdit() {
+				var button = document.getElementById('bf-edit-unit-tests-button');
+				if (button && button.disabled) {
+					return false;
+				}
+
+				var codeField = document.getElementById('code');
+				var unitTestsField = document.getElementById('unit_tests');
+				var resultBox = document.getElementById('bf-edit-script-unit-tests-status');
+				var summary = document.getElementById('bf-edit-script-unit-tests-summary');
+				var detailsWrap = document.getElementById('bf-edit-script-unit-tests-details-wrap');
+				var details = document.getElementById('bf-edit-script-unit-tests-details');
+				var functionField = document.getElementById('name');
+
+				if (!codeField || !unitTestsField || !resultBox || !summary || !detailsWrap || !details) {
+					return false;
+				}
+
+				function parseValue(raw) {
+					var value = String(raw || '').trim();
+					if (value === '') return '';
+					var lower = value.toLowerCase();
+					if (lower === 'null') return null;
+					if (lower === 'true') return true;
+					if (lower === 'false') return false;
+					if (/^-?\d+(\.\d+)?$/.test(value)) {
+						return value.indexOf('.') !== -1 ? parseFloat(value) : parseInt(value, 10);
+					}
+					var startsLikeJson = (value.charAt(0) === '{' && value.charAt(value.length - 1) === '}') ||
+						(value.charAt(0) === '[' && value.charAt(value.length - 1) === ']');
+					if (startsLikeJson) {
+						try {
+							return JSON.parse(value);
+						} catch (e) {}
+					}
+					var quoted = (value.charAt(0) === '"' && value.charAt(value.length - 1) === '"') ||
+						(value.charAt(0) === "'" && value.charAt(value.length - 1) === "'");
+					if (quoted && value.length >= 2) {
+						return value.slice(1, -1);
+					}
+					return value;
+				}
+
+				function formatValue(value) {
+					if (typeof value === 'undefined') return 'undefined';
+					if (typeof value === 'string') return value;
+					try {
+						return JSON.stringify(value, null, 2);
+					} catch (e) {
+						return String(value);
+					}
+				}
+
+				function valuesEqual(actual, expected) {
+					if (actual === expected) return true;
+					try {
+						return JSON.stringify(actual) === JSON.stringify(expected);
+					} catch (e) {
+						return false;
+					}
+				}
+
+				function parseUnitTestLine(line, lineNumber) {
+					var trimmedLine = String(line || '').trim();
+					if (!trimmedLine || trimmedLine.indexOf('//') === 0 || trimmedLine.indexOf('#') === 0) {
+						return null;
+					}
+					var arrowIndex = trimmedLine.indexOf('->');
+					if (arrowIndex === -1) {
+						throw new Error('Ligne ' + lineNumber + ' invalide: separateur -> manquant.');
+					}
+					var inputText = trimmedLine.slice(0, arrowIndex).trim();
+					var expectedText = trimmedLine.slice(arrowIndex + 2).trim();
+					if (inputText === '' || expectedText === '') {
+						throw new Error('Ligne ' + lineNumber + ' invalide: entree ou resultat attendu manquant.');
+					}
+					var inputValue = parseValue(inputText);
+					return {
+						lineNumber: lineNumber,
+						inputText: inputText,
+						args: Array.isArray(inputValue) ? inputValue.slice() : [inputValue],
+						expectedValue: parseValue(expectedText)
+					};
+				}
+
+				var functionName = String((functionField && functionField.value) || '').trim();
+				if (!functionName) {
+					resultBox.style.display = 'block';
+					resultBox.className = 'alert alert-danger';
+					summary.textContent = Joomla.Text._('COM_BREEZINGFORMSNG_TEST_ENTER_FUNCTION_NAME');
+					detailsWrap.style.display = 'none';
+					details.textContent = '';
+					return false;
+				}
+
+				var lines = String(unitTestsField.value || '').split(/\r?\n/);
+				var tests = [];
+				try {
+					for (var i = 0; i < lines.length; i++) {
+						var parsed = parseUnitTestLine(lines[i], i + 1);
+						if (parsed) tests.push(parsed);
+					}
+				} catch (e) {
+					resultBox.style.display = 'block';
+					resultBox.className = 'alert alert-danger';
+					summary.textContent = e && e.message ? e.message : String(e);
+					detailsWrap.style.display = 'none';
+					details.textContent = '';
+					return false;
+				}
+
+				if (!tests.length) {
+					resultBox.style.display = 'block';
+					resultBox.className = 'alert alert-warning';
+					summary.textContent = Joomla.Text._('COM_BREEZINGFORMSNG_TEST_NO_UNIT_TEST_DEFINED');
+					detailsWrap.style.display = 'none';
+					details.textContent = '';
+					return false;
+				}
+
+				var consoleLines = [];
+				var fakeConsole = {
+					log: function () { consoleLines.push(Array.prototype.slice.call(arguments).map(formatValue).join(' ')); },
+					info: function () { consoleLines.push(Array.prototype.slice.call(arguments).map(formatValue).join(' ')); },
+					warn: function () { consoleLines.push(Array.prototype.slice.call(arguments).map(formatValue).join(' ')); },
+					error: function () { consoleLines.push(Array.prototype.slice.call(arguments).map(formatValue).join(' ')); }
+				};
+				var failures = [];
+				var passedCount = 0;
+
+				try {
+					var runner = new Function(
+						'console',
+						'"use strict";\n' + String(codeField.value || '') + '\nif (typeof ' + functionName + ' !== "function") { throw new Error("Fonction introuvable: ' + functionName + '"); }\nreturn ' + functionName + ';'
+					);
+					var fn = runner(fakeConsole);
+					for (var t = 0; t < tests.length; t++) {
+						var test = tests[t];
+						try {
+							var actualValue = fn.apply(window, test.args);
+							if (valuesEqual(actualValue, test.expectedValue)) {
+								passedCount++;
+							} else {
+								failures.push('Ligne ' + test.lineNumber + ' | entree: ' + test.inputText + ' | attendu: ' + formatValue(test.expectedValue) + ' | obtenu: ' + formatValue(actualValue));
+							}
+						} catch (testError) {
+							failures.push('Ligne ' + test.lineNumber + ' | entree: ' + test.inputText + ' | erreur: ' + (testError && testError.message ? testError.message : String(testError)));
+						}
+					}
+				} catch (e) {
+					resultBox.style.display = 'block';
+					resultBox.className = 'alert alert-danger';
+					summary.textContent = e && e.message ? e.message : String(e);
+					detailsWrap.style.display = consoleLines.length ? 'block' : 'none';
+					details.textContent = consoleLines.join('\n');
+					return false;
+				}
+
+				resultBox.style.display = 'block';
+				resultBox.className = failures.length ? 'alert alert-warning' : 'alert alert-success';
+				summary.textContent = passedCount + '/' + tests.length + ' ' + Joomla.Text._('COM_BREEZINGFORMSNG_TEST_PASSED_SHORT');
+				var detailParts = failures.slice();
+				if (consoleLines.length) detailParts.push(Joomla.Text._('COM_BREEZINGFORMSNG_TEST_OUTPUT') + ':\n' + consoleLines.join('\n'));
+				if (detailParts.length) {
+					detailsWrap.style.display = 'block';
+					details.textContent = detailParts.join('\n\n');
+				} else {
+					detailsWrap.style.display = 'none';
+					details.textContent = '';
+				}
+				return false;
+			}
+
+			window.addEventListener('load', function () {
+				var form = document.getElementById('adminForm');
+				syncEditUnitTestsButton();
+				syncEditSaveToolbarButton();
+				syncEditTestToolbarButton();
+				syncEditPrevNextToolbarButtons();
+				if (form) {
+					['input', 'change'].forEach(function (eventName) {
+						form.addEventListener(eventName, function () {
+							syncEditUnitTestsButton();
+							syncEditSaveToolbarButton();
+							syncEditTestToolbarButton();
+							syncEditPrevNextToolbarButtons();
+						});
+					});
+					window.setInterval(function () {
+						syncEditUnitTestsButton();
+						syncEditSaveToolbarButton();
+						syncEditTestToolbarButton();
+						syncEditPrevNextToolbarButtons();
+					}, 500);
+				}
+			});

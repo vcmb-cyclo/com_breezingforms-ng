@@ -7,16 +7,16 @@
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Pagination\Pagination;
-use Joomla\CMS\Session\Session;
 
 $pkg = $this->pkg;
 
 $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
 ?>
-<form action="index.php?option=com_breezingformsng" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_breezingformsng&amp;act=manageforms&amp;view=forms" method="post" name="adminForm" id="adminForm">
   <input type="hidden" name="view" value="forms">
 
   <div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
@@ -42,7 +42,7 @@ $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
              placeholder="<?= Text::_('JSEARCH'); ?>">
       <button type="submit" class="btn btn-primary"><?= Text::_('JSEARCH'); ?></button>
       <?php if ($this->search !== ''): ?>
-        <a href="index.php?option=com_breezingformsng&view=forms&search=&pkg=<?= rawurlencode($pkg); ?>"
+        <a href="index.php?option=com_breezingformsng&act=manageforms&view=forms&search=&pkg=<?= rawurlencode($pkg); ?>"
            class="btn btn-secondary"><?= Text::_('JSEARCH_RESET'); ?></a>
       <?php endif; ?>
     </div>
@@ -72,7 +72,7 @@ $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
           <tr>
             <td class="text-center"><?= HTMLHelper::_('grid.id', $i, $form->id); ?></td>
             <td>
-              <a href="index.php?option=com_breezingformsng&view=forms&layout=edit&id=<?= (int) $form->id; ?>&pkg=<?= rawurlencode($pkg); ?>">
+              <a href="index.php?option=com_breezingformsng&task=quickmode.display&form=<?= (int) $form->id; ?>&pkg=<?= rawurlencode($pkg); ?>">
                 <?= htmlspecialchars($form->title); ?>
               </a>
             </td>
@@ -80,30 +80,23 @@ $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
             <td class="text-center"><?= (int) $form->pages; ?></td>
             <td><?= $form->modified ? htmlspecialchars(substr((string) $form->modified, 0, 10)) : '—'; ?></td>
             <td class="text-center">
-              <?php if ($form->published): ?>
-                <a href="index.php?option=com_breezingformsng&task=forms.unpublish&cid[]=<?= (int) $form->id; ?>&pkg=<?= rawurlencode($pkg); ?>&<?= Session::getFormToken(); ?>=1"
-                   class="tbody-icon active" title="<?= Text::_('JPUBLISHED'); ?>">
-                  <span class="icon-publish" aria-hidden="true"></span>
-                </a>
-              <?php else: ?>
-                <a href="index.php?option=com_breezingformsng&task=forms.publish&cid[]=<?= (int) $form->id; ?>&pkg=<?= rawurlencode($pkg); ?>&<?= Session::getFormToken(); ?>=1"
-                   class="tbody-icon" title="<?= Text::_('JUNPUBLISHED'); ?>">
-                  <span class="icon-unpublish" aria-hidden="true"></span>
-                </a>
-              <?php endif; ?>
+              <a href="#" onclick="bfTogglePublished(<?= (int) $form->id; ?>, 'forms', this); return false;"
+                 title="<?= $form->published ? Text::_('JPUBLISHED') : Text::_('JUNPUBLISHED'); ?>">
+                <span class="<?= $form->published ? 'icon-publish' : 'icon-unpublish'; ?>" aria-hidden="true"></span>
+              </a>
             </td>
             <td class="text-center">
-              <a href="index.php?option=com_breezingformsng&task=forms.orderup&cid[]=<?= (int) $form->id; ?>&pkg=<?= rawurlencode($pkg); ?>&<?= Session::getFormToken(); ?>=1"
-                 title="<?= Text::_('JLIB_HTML_MOVE_UP'); ?>">
+              <button type="button" class="btn btn-link p-0 border-0" title="<?= Text::_('JLIB_HTML_MOVE_UP'); ?>"
+                      onclick="this.form.action_id.value='<?= (int) $form->id; ?>';Joomla.submitbutton('forms.orderup');">
                 <span class="icon-arrow-up-2" aria-hidden="true"></span>
-              </a>
-              <a href="index.php?option=com_breezingformsng&task=forms.orderdown&cid[]=<?= (int) $form->id; ?>&pkg=<?= rawurlencode($pkg); ?>&<?= Session::getFormToken(); ?>=1"
-                 title="<?= Text::_('JLIB_HTML_MOVE_DOWN'); ?>">
+              </button>
+              <button type="button" class="btn btn-link p-0 border-0" title="<?= Text::_('JLIB_HTML_MOVE_DOWN'); ?>"
+                      onclick="this.form.action_id.value='<?= (int) $form->id; ?>';Joomla.submitbutton('forms.orderdown');">
                 <span class="icon-arrow-down-2" aria-hidden="true"></span>
-              </a>
+              </button>
             </td>
             <td class="text-center">
-              <a href="index.php?option=com_breezingformsng&act=manageforms&task=quickmode&form=<?= (int) $form->id; ?>&pkg=<?= rawurlencode($pkg); ?>"
+              <a href="index.php?option=com_breezingformsng&task=quickmode.display&form=<?= (int) $form->id; ?>&pkg=<?= rawurlencode($pkg); ?>"
                  class="btn btn-sm btn-outline-secondary" title="<?= Text::_('COM_BREEZINGFORMSNG_FORMS_OPEN_EDITOR'); ?>">
                 <span class="icon-edit" aria-hidden="true"></span>
               </a>
@@ -121,15 +114,11 @@ $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
   <input type="hidden" name="filter_order_Dir" value="<?= htmlspecialchars($this->listDirn); ?>">
   <input type="hidden" name="pkg" value="<?= htmlspecialchars($pkg); ?>">
   <input type="hidden" name="boxchecked" value="0">
+  <input type="hidden" name="action_id" value="0">
   <?= HTMLHelper::_('form.token'); ?>
 </form>
 
-<script>
-Joomla.submitbutton = function (task) {
-  if (task === 'forms.remove') {
-    if (!confirm(<?= json_encode(Text::_('JGLOBAL_CONFIRM_DELETE')); ?>)) return false;
-  }
-  document.getElementById('adminForm').querySelector('[name="task"]').value = task;
-  document.getElementById('adminForm').submit();
-};
-</script>
+<?php
+// Web assets for this view are registered in Forms\HtmlView::display() —
+// useScript() calls placed in the template body do not take effect here.
+?>

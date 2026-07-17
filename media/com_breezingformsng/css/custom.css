@@ -55,7 +55,7 @@ input[type="color"],
     transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s !important;
 }
 
-main input:focus {
+main input:focus:not([type=checkbox]):not([type=radio]) {
     background: #f8f8f8 none repeat scroll 0 0 !important;
     border-color: #3f51b5 !important;
     box-shadow: none !important;
@@ -212,6 +212,15 @@ main input[type=radio]:not(old) {
     font-size: 1em !important;
     opacity: 0 !important;
     cursor: pointer !important;
+}
+
+/* The custom skin above expects an immediate <label><span> sibling to draw the
+   visible control; the QuickMode editor's own Yes/No property toggles don't
+   follow that markup, so they'd otherwise render fully invisible (opacity: 0
+   with nothing drawn in its place). Exempt them. */
+.bfPropertyWrap input[type=checkbox],
+.bfPropertyWrap input[type=radio] {
+    opacity: 1 !important;
 }
 
 main input[type=checkbox]:not(old) + label,

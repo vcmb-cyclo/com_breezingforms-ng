@@ -2,7 +2,7 @@
 <config>
     <fieldset
         name="general"
-        label="JGLOBAL_FIELDSET_BASIC_OPTIONS"
+        label="COM_BREEZINGFORMSNG_CONFIG_FIELDSET_GENERAL"
     >
         <field
             name="disable_ip"

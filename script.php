@@ -13,116 +13,13 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\Filesystem\File;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use Joomla\Database\DatabaseInterface;
 use Joomla\CMS\Installer\Installer;
 use Joomla\CMS\Language\Text;
 use Joomla\Filesystem\Folder;
 use Joomla\CMS\Log\Log;
 use Joomla\CMS\Table\Menu;
-
-if (!function_exists('_ff_query')) {
-    function _ff_query($sql, $insert = 0)
-    {
-        $database = Factory::getContainer()->get(DatabaseInterface::class);
-        $database->setQuery($sql);
-        $database->execute();
-
-        return $insert ? $database->insertid() : null;
-    }
-}
-
-if (!function_exists('_ff_select')) {
-    function _ff_select($sql)
-    {
-        $database = Factory::getContainer()->get(DatabaseInterface::class);
-        $database->setQuery($sql);
-
-        return $database->loadObjectList();
-    }
-}
-
-if (!function_exists('_ff_selectValue')) {
-    function _ff_selectValue($sql)
-    {
-        $database = Factory::getContainer()->get(DatabaseInterface::class);
-        $database->setQuery($sql);
-
-        return $database->loadResult();
-    }
-}
-
-if (!function_exists('savePackage')) {
-    function savePackage($id, $name, $title, $version, $created, $author, $email, $url, $description, $copyright)
-    {
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
-        $cnt = _ff_selectValue("select count(*) from #__facileforms_packages where id=" . $db->quote($id));
-
-        if (!$cnt) {
-            _ff_query(
-                "insert into #__facileforms_packages " .
-                "(id, name, title, version, created, author, email, url, description, copyright) " .
-                "values (" . $db->quote($id) . ", " . $db->quote($name) . ", " . $db->quote($title) . ", " .
-                $db->quote($version) . ", " . $db->quote($created) . ", " . $db->quote($author) . ", " .
-                $db->quote($email) . ", " . $db->quote($url) . ", " . $db->quote($description) . ", " .
-                $db->quote($copyright) . ")"
-            );
-        } else {
-            _ff_query(
-                "update #__facileforms_packages " .
-                "set name=" . $db->quote($name) . ", title=" . $db->quote($title) . ", version=" . $db->quote($version) . ", " .
-                "created=" . $db->quote($created) . ", author=" . $db->quote($author) . ", email=" . $db->quote($email) . ", " .
-                "url=" . $db->quote($url) . ", description=" . $db->quote($description) . ", " .
-                "copyright=" . $db->quote($copyright) . " where id = " . $db->quote($id)
-            );
-        }
-    }
-}
-
-if (!function_exists('relinkScripts')) {
-    function relinkScripts(&$oldscripts)
-    {
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
-
-        if ($oldscripts != null && count($oldscripts)) {
-            foreach ($oldscripts as $row) {
-                $newid = _ff_selectValue("select max(id) from #__facileforms_scripts where name = " . $db->quote($row->name));
-                if ($newid) {
-                    _ff_query("update #__facileforms_forms set script1id=$newid where script1id=$row->id");
-                    _ff_query("update #__facileforms_forms set script2id=$newid where script2id=$row->id");
-                    _ff_query("update #__facileforms_elements set script1id=$newid where script1id=$row->id");
-                    _ff_query("update #__facileforms_elements set script2id=$newid where script2id=$row->id");
-                    _ff_query("update #__facileforms_elements set script3id=$newid where script3id=$row->id");
-                }
-            }
-        }
-    }
-}
-
-if (!function_exists('relinkPieces')) {
-    function relinkPieces(&$oldpieces)
-    {
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
-
-        if ($oldpieces != null && count($oldpieces)) {
-            foreach ($oldpieces as $row) {
-                $newid = _ff_selectValue("select max(id) from #__facileforms_pieces where name = " . $db->quote($row->name));
-                if ($newid) {
-                    _ff_query("update #__facileforms_forms set piece1id=$newid where piece1id=$row->id");
-                    _ff_query("update #__facileforms_forms set piece2id=$newid where piece2id=$row->id");
-                    _ff_query("update #__facileforms_forms set piece3id=$newid where piece3id=$row->id");
-                    _ff_query("update #__facileforms_forms set piece4id=$newid where piece4id=$row->id");
-                }
-            }
-        }
-    }
-}
-
-if (!function_exists('updateComponentMenus')) {
-    function updateComponentMenus($copy = false)
-    {
-        return '';
-    }
-}
 
 Log::addLogger(
     [
@@ -144,6 +41,8 @@ Log::add('User Agent: ' . ($_SERVER['HTTP_USER_AGENT'] ?? 'CLI') . '.', Log::INF
 class com_breezingformsngInstallerScript
 {
     private const TARGET_COMPONENT = 'com_breezingformsng';
+    private const MINIMUM_PHP = '8.1';
+    private const MINIMUM_JOOMLA = '6.0';
     private const LEGACY_COMPONENT_ALIASES = [
         'breezingforms',
         'com_breezingforms',
@@ -158,11 +57,178 @@ class com_breezingformsngInstallerScript
     private $utf8mb4Collation = 'utf8mb4_general_ci';
     private $utf8mb4CheckPerformed = false;
     private $utf8mb4CapabilityAnnounced = false;
+    private $criticalFailureDetected = false;
+    private $criticalFailureMessages = [];
+    private $logRotationChecked = false;
 
     public function __construct()
     {
         $this->installStartedAt = microtime(true);
+        $this->applyJoomlaTimezoneForLogging();
         $this->currentInstalledVersion = $this->getCurrentInstalledVersion();
+    }
+
+    /**
+     * Sets PHP's default timezone to the site's configured one, once, so
+     * that Joomla's own Log::add() calls (including the bootstrap ones at
+     * the top of this file, executed before this class even exists) and
+     * any other date()-based code in this request use the correct offset,
+     * not just this script's own custom log line.
+     */
+    private function applyJoomlaTimezoneForLogging(): void
+    {
+        try {
+            $offset = (string) Factory::getApplication()->get('offset', 'UTC');
+            new \DateTimeZone($offset !== '' ? $offset : 'UTC');
+            date_default_timezone_set($offset !== '' ? $offset : 'UTC');
+        } catch (\Throwable) {
+            // Leave PHP's default timezone untouched if it can't be resolved.
+        }
+    }
+
+    /**
+     * Translated installer message with an untranslated-fallback sprintf,
+     * matching this project's rule of routing user-facing strings through
+     * translation keys even in the installer script.
+     */
+    private function installerText(string $key, string $fallback, ...$args): string
+    {
+        try {
+            $translated = $args === [] ? Text::_($key) : Text::sprintf($key, ...$args);
+        } catch (\Throwable) {
+            $translated = $key;
+        }
+
+        return $translated === $key ? sprintf($fallback, ...$args) : $translated;
+    }
+
+    private function checkRequirements(): bool
+    {
+        if (!version_compare(PHP_VERSION, self::MINIMUM_PHP, '>=')) {
+            $this->log(
+                $this->installerText(
+                    'COM_BREEZINGFORMSNG_INSTALLER_ERROR_PHP_REQUIRES',
+                    'PHP %s is too old. Requires PHP %s or later.',
+                    PHP_VERSION,
+                    self::MINIMUM_PHP
+                ),
+                Log::ERROR
+            );
+
+            return false;
+        }
+
+        if (defined('JVERSION') && !version_compare(JVERSION, self::MINIMUM_JOOMLA, '>=')) {
+            $this->log(
+                $this->installerText(
+                    'COM_BREEZINGFORMSNG_INSTALLER_ERROR_JOOMLA_REQUIRES',
+                    'Joomla %s is too old. Requires Joomla %s or later.',
+                    JVERSION,
+                    self::MINIMUM_JOOMLA
+                ),
+                Log::ERROR
+            );
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private function checkInstalledFilePermissionsBeforeCopy(): bool
+    {
+        $paths = $this->getInstalledWritableCheckPaths();
+        $blocked = [];
+
+        foreach ($paths as $path) {
+            if (!file_exists($path)) {
+                continue;
+            }
+
+            $blocked = array_merge($blocked, $this->collectNonWritablePaths($path, 25 - count($blocked)));
+
+            if (count($blocked) >= 25) {
+                break;
+            }
+        }
+
+        if ($blocked === []) {
+            $this->log('Existing BreezingForms NG files are writable for this update.');
+
+            return true;
+        }
+
+        $sample = array_slice($blocked, 0, 10);
+        $lines = array_map(
+            static fn(string $path): string => '<li><code>' . htmlspecialchars($path, ENT_QUOTES, 'UTF-8') . '</code></li>',
+            $sample
+        );
+        $remaining = max(0, count($blocked) - count($sample));
+
+        if ($remaining > 0) {
+            $lines[] = '<li>... +' . $remaining . ' more</li>';
+        }
+
+        $this->log(
+            'BreezingForms NG update cannot copy files because some installed files or directories are not writable by Joomla.'
+            . '<br>Fix ownership/permissions before reinstalling.'
+            . '<br>Examples of blocked paths:<ul>' . implode('', $lines) . '</ul>',
+            Log::ERROR
+        );
+
+        return false;
+    }
+
+    private function getInstalledWritableCheckPaths(): array
+    {
+        return [
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng',
+            JPATH_ROOT . '/components/com_breezingformsng',
+            JPATH_ROOT . '/media/com_breezingformsng',
+            JPATH_ROOT . '/plugins/system/sysbreezingforms',
+        ];
+    }
+
+    private function collectNonWritablePaths(string $path, int $limit): array
+    {
+        if ($limit <= 0) {
+            return [];
+        }
+
+        if (!is_writable($path)) {
+            return [$path];
+        }
+
+        if (!is_dir($path)) {
+            return [];
+        }
+
+        $blocked = [];
+
+        try {
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS),
+                \RecursiveIteratorIterator::SELF_FIRST
+            );
+
+            foreach ($iterator as $item) {
+                $itemPath = $item instanceof \SplFileInfo ? $item->getPathname() : (string) $item;
+
+                if ($itemPath !== '' && !is_writable($itemPath)) {
+                    $blocked[] = $itemPath;
+
+                    if (count($blocked) >= $limit) {
+                        break;
+                    }
+                }
+            }
+        } catch (\Throwable) {
+            if (!is_readable($path)) {
+                $blocked[] = $path;
+            }
+        }
+
+        return $blocked;
     }
 
     private function detectUtf8mb4Support(): void
@@ -380,49 +446,51 @@ class com_breezingformsngInstallerScript
         return ' COLLATE ' . $this->utf8mb4Collation;
     }
 
+    private function migrateLegacyConfig(): void
+    {
+        $admPath = JPATH_ADMINISTRATOR . '/components/com_breezingformsng';
+
+        require_once $admPath . '/src/Model/ConfigModel.php';
+
+        try {
+            $migrated = (new \Vcmb\Component\BreezingformsNG\Administrator\Model\ConfigModel())->migrateFromLegacy();
+        } catch (\Throwable $e) {
+            $this->log('Legacy config migration failed: ' . $e->getMessage(), Log::WARNING);
+            return;
+        }
+
+        if ($migrated !== []) {
+            $this->log('Legacy config migrated to component params: ' . implode(', ', $migrated));
+        }
+    }
+
     private function importStandardLibrary(): void
     {
-        global $ff_admpath, $ff_compath, $errors, $errmode;
-
-        $ff_admpath = str_replace('\\', '/', JPATH_ADMINISTRATOR . '/components/com_breezingformsng');
-        $ff_compath = str_replace('\\', '/', JPATH_SITE . '/components/com_breezingformsng');
-        $xmlFile = $ff_admpath . '/packages/stdlib.english.xml';
+        $admPath = JPATH_ADMINISTRATOR . '/components/com_breezingformsng';
+        $xmlFile = $admPath . '/packages/stdlib.english.xml';
 
         if (!File::exists($xmlFile)) {
             $this->log("Standard library package not found: {$xmlFile}", Log::WARNING);
             return;
         }
 
-        require_once $ff_admpath . '/libraries/crosstec/classes/BFText.php';
-        require_once $ff_compath . '/facileforms.class.php';
-        require_once $ff_admpath . '/admin/import.class.php';
+        require_once $admPath . '/src/Model/ImportModel.php';
 
-        $errors = [];
-        $errmode = 'log';
-
-        $importer = new ff_importPackage();
+        $importer = new \Vcmb\Component\BreezingformsNG\Administrator\Model\ImportModel();
         $importer->reinstallOnlyIfChanged = true;
 
-        if (!$importer->import($xmlFile)) {
-            $details = [];
-
-            if (!empty($errors)) {
-                $details = $errors;
-            } elseif (!empty($importer->error)) {
-                $details[] = $importer->error;
-            }
-
-            $detailText = empty($details) ? 'Unknown import error.' : implode(' | ', $details);
-            $this->log('Standard library import failed. ' . $detailText, Log::ERROR);
-            $this->announce('BreezingForms standard pieces import failed: ' . $detailText, 'error', Log::ERROR);
+        try {
+            $importer->import($xmlFile);
+        } catch (\Throwable $e) {
+            $this->log('Standard library import failed. ' . $e->getMessage(), Log::ERROR);
+            $this->announce('BreezingForms standard pieces import failed: ' . $e->getMessage(), 'error', Log::ERROR);
             return;
         }
 
         $this->log(
             'Standard library imported successfully: ' .
             count($importer->scripts) . ' script(s), ' .
-            count($importer->pieces) . ' piece(s), ' .
-            count($importer->forms) . ' form(s).'
+            count($importer->pieces) . ' piece(s).'
         );
 
         $this->announceImportedLibraryChanges($importer);
@@ -502,6 +570,18 @@ class com_breezingformsngInstallerScript
 
     private function getIncomingVersion($parent): string
     {
+        if (is_object($parent) && method_exists($parent, 'getManifest')) {
+            $manifest = $parent->getManifest();
+
+            if ($manifest instanceof \SimpleXMLElement) {
+                $version = trim((string) ($manifest->version ?? ''));
+
+                if ($version !== '') {
+                    return $version;
+                }
+            }
+        }
+
         $installer = is_object($parent) && method_exists($parent, 'getParent')
             ? $parent->getParent()
             : null;
@@ -509,11 +589,65 @@ class com_breezingformsngInstallerScript
             ? $installer->getManifest()
             : null;
 
-        return $manifest && isset($manifest->version) ? (string) $manifest->version : '';
+        return $manifest && isset($manifest->version) ? trim((string) $manifest->version) : '';
+    }
+
+    private function getLogTimestamp(): string
+    {
+        try {
+            $offset = (string) Factory::getApplication()->get('offset', 'UTC');
+            $date   = new \DateTime('now', new \DateTimeZone($offset !== '' ? $offset : 'UTC'));
+
+            return $date->format('Y-m-d H:i:s');
+        } catch (\Throwable) {
+            return date('Y-m-d H:i:s');
+        }
+    }
+
+    private function rotateLogIfNeeded(string $logPath): void
+    {
+        // Checked once per installer run (mirrors cbng's boot-time check),
+        // rather than re-stat'ing the log file on every single log() call.
+        if ($this->logRotationChecked) {
+            return;
+        }
+        $this->logRotationChecked = true;
+
+        $maxBytes = 1024 * 1024;
+
+        try {
+            if (!is_file($logPath) || filesize($logPath) < $maxBytes) {
+                return;
+            }
+
+            $rotatedPath = $logPath . '.' . date('Y-m-d_His') . '.bak';
+            @rename($logPath, $rotatedPath);
+
+            $keepFiles = 10;
+            $rotatedFiles = glob($logPath . '.*.bak') ?: [];
+            sort($rotatedFiles);
+
+            $excess = count($rotatedFiles) - $keepFiles;
+
+            for ($i = 0; $i < $excess; $i++) {
+                @unlink($rotatedFiles[$i]);
+            }
+        } catch (\Throwable) {
+            // Best-effort log rotation only.
+        }
     }
 
     private function log(string $message, int $priority = Log::INFO): void
     {
+        if ($priority === Log::ERROR) {
+            $this->criticalFailureDetected = true;
+            $normalized = trim(strip_tags($message));
+
+            if ($normalized !== '' && !in_array($normalized, $this->criticalFailureMessages, true)) {
+                $this->criticalFailureMessages[] = $normalized;
+            }
+        }
+
         $message = $this->prefixMessage($message, $priority);
         Log::add($message, $priority, 'com_breezingformsng.install');
 
@@ -523,7 +657,9 @@ class com_breezingformsngInstallerScript
             Folder::create(dirname($logPath));
         }
 
-        $timestamp = date('Y-m-d H:i:s');
+        $this->rotateLogIfNeeded($logPath);
+
+        $timestamp = $this->getLogTimestamp();
         $line = "[{$timestamp}] [] {$message}" . PHP_EOL;
 
         file_put_contents($logPath, $line, FILE_APPEND | LOCK_EX);
@@ -543,6 +679,34 @@ class com_breezingformsngInstallerScript
     private function announce(string $message, string $type = 'message', int $priority = Log::INFO): void
     {
         $this->log($message, $priority);
+    }
+
+    private function resetCriticalFailures(): void
+    {
+        $this->criticalFailureDetected = false;
+        $this->criticalFailureMessages = [];
+    }
+
+    private function hasCriticalFailure(): bool
+    {
+        return $this->criticalFailureDetected;
+    }
+
+    private function getCriticalFailureSummary(int $max = 3): string
+    {
+        if ($this->criticalFailureMessages === []) {
+            return '';
+        }
+
+        $messages = array_slice($this->criticalFailureMessages, 0, $max);
+        $summary = implode(' | ', $messages);
+        $remaining = count($this->criticalFailureMessages) - count($messages);
+
+        if ($remaining > 0) {
+            $summary .= ' | +' . $remaining . ' more';
+        }
+
+        return $summary;
     }
 
     private function prefixMessage(string $message, int $priority = Log::INFO): string
@@ -580,11 +744,152 @@ class com_breezingformsngInstallerScript
             $version = method_exists($db, 'getVersion') ? trim((string) $db->getVersion()) : '';
             $prefix = method_exists($db, 'getPrefix') ? (string) $db->getPrefix() : '';
 
+            $this->checkDatabaseSessionCharset($db);
+
             return trim($serverType . ' ' . $version) . ($prefix !== '' ? ' (prefix: ' . $prefix . ')' : '');
         } catch (\Throwable $e) {
             $this->log('Unable to detect database runtime information: ' . $e->getMessage(), Log::WARNING);
             return 'unknown';
         }
+    }
+
+    /**
+     * Complements the existing table/column utf8mb4 conversion logic: even
+     * with every table and column correctly converted, data can still be
+     * mangled on write/read if the DB *connection itself* isn't negotiating
+     * utf8mb4 (e.g. a driver/config defaulting the session to latin1).
+     */
+    private function checkDatabaseSessionCharset(DatabaseInterface $db): void
+    {
+        try {
+            $db->setQuery('SELECT @@character_set_connection, @@collation_connection');
+            $row = $db->loadAssoc() ?: [];
+            $charset = strtolower((string) ($row['@@character_set_connection'] ?? ''));
+            $collation = (string) ($row['@@collation_connection'] ?? '');
+
+            if ($charset !== '' && $charset !== 'utf8mb4') {
+                $this->log(
+                    "Database session charset is '{$charset}' (collation '{$collation}'), not utf8mb4 - "
+                    . 'the connection may not be negotiating utf8mb4 even if tables/columns are converted.',
+                    Log::WARNING
+                );
+            }
+        } catch (\Throwable) {
+            // Best-effort diagnostic only; not every driver exposes these session variables.
+        }
+    }
+
+    private function purgeCaches(string $context = 'install'): void
+    {
+        $autoloadFiles = [
+            JPATH_ADMINISTRATOR . '/cache/autoload_psr4.php',
+            JPATH_ADMINISTRATOR . '/cache/autoload_classmap.php',
+            JPATH_ADMINISTRATOR . '/cache/autoload_namespaces.php',
+        ];
+
+        $deleted = 0;
+
+        foreach ($autoloadFiles as $file) {
+            try {
+                if (is_file($file) && @unlink($file)) {
+                    $deleted++;
+                }
+            } catch (\Throwable) {
+                // Best-effort cache cleanup.
+            }
+        }
+
+        if ($deleted > 0) {
+            $this->log("Autoload cache cleared ({$deleted} file(s)) during {$context}.");
+        }
+
+        try {
+            $app = Factory::getApplication();
+            if (method_exists($app, 'createExtensionNamespaceMap')) {
+                $app->createExtensionNamespaceMap();
+                $this->log("Extension namespace map rebuilt during {$context}.");
+            }
+        } catch (\Throwable) {
+            // Without this, a stale in-memory namespace map from earlier in
+            // the same installer request could fail to autoload classes
+            // that were just added/renamed by this same install/update.
+        }
+
+        $cacheGroups = ['_system', 'com_installer', 'com_plugins', 'com_breezingformsng'];
+
+        try {
+            $cacheFactory = Factory::getContainer()->get(CacheControllerFactoryInterface::class);
+
+            if (is_object($cacheFactory)) {
+                foreach ($cacheGroups as $group) {
+                    try {
+                        $cacheFactory->createCacheController('callback', [
+                            'defaultgroup' => $group,
+                            'cachebase' => JPATH_ROOT . '/cache',
+                        ])->clean();
+                    } catch (\Throwable) {
+                        // Continue with the remaining cache groups.
+                    }
+                }
+            }
+
+            $this->log("Joomla cache cleaned (best-effort) during {$context}.");
+        } catch (\Throwable $e) {
+            $this->log("Joomla cache cleanup failed during {$context}: " . $e->getMessage(), Log::WARNING);
+        }
+
+        try {
+            if (function_exists('opcache_reset')) {
+                @opcache_reset();
+                $this->log("OPcache reset attempted during {$context}.");
+            }
+        } catch (\Throwable) {
+            // Best-effort OPcache reset.
+        }
+    }
+
+    private function verifyInstalledExtensionConsistency($parent): void
+    {
+        $requiredFiles = [
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/services/provider.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/src/Extension/BreezingformsNGComponent.php',
+            JPATH_SITE . '/components/com_breezingformsng/breezingformsng.php',
+        ];
+
+        foreach ($requiredFiles as $requiredFile) {
+            if (!is_file($requiredFile)) {
+                $this->log(
+                    'Installed files inconsistent: required file missing after copy: ' . $requiredFile
+                    . '. The package files were not deployed correctly - reinstall the package.',
+                    Log::ERROR
+                );
+
+                return;
+            }
+        }
+
+        $expectedVersion = $this->getIncomingVersion($parent);
+
+        if ($expectedVersion === '') {
+            $this->log('Installed files consistency: package version unknown, version check skipped.');
+
+            return;
+        }
+
+        $installedVersion = $this->getCurrentInstalledVersion();
+
+        if ($installedVersion !== '0.0.0' && $installedVersion !== $expectedVersion) {
+            $this->log(
+                'Installed files inconsistent: extension manifest cache reports version "' . $installedVersion
+                . '" but the installed package is "' . $expectedVersion
+                . '". The package files may not have been deployed correctly.',
+                Log::ERROR
+            );
+
+            return;
+        }
+
+        $this->log('Installed files consistency verified.');
     }
 
     private function getCurrentInstalledVersion()
@@ -694,7 +999,7 @@ class com_breezingformsngInstallerScript
 
         try {
             if (File::delete($logFile)) {
-                $this->log('Component log file removed: com_contentbuilderng.log');
+                $this->log('Component log file removed: com_breezingformsng.log');
             }
         } catch (\Throwable $e) {
             $this->log('Unable to remove component log file during uninstall: ' . $e->getMessage(), Log::WARNING);
@@ -1032,6 +1337,42 @@ class com_breezingformsngInstallerScript
         }
     }
 
+    /**
+     * The #__menu root row (id=1) is the anchor every nested-set menu
+     * computation below relies on (reading its rgt to compute new lft/rgt
+     * values). Rather than guessing at a repair insert for a core Joomla
+     * table, just detect a missing/corrupt root and skip the menu-repair
+     * routines entirely when it can't be trusted.
+     */
+    private function ensureAdminMenuRootNodeExists(): bool
+    {
+        try {
+            $db = Factory::getContainer()->get(DatabaseInterface::class);
+            $db->setQuery(
+                $db->getQuery(true)
+                    ->select($db->quoteName(['id', 'lft', 'rgt']))
+                    ->from($db->quoteName('#__menu'))
+                    ->where($db->quoteName('id') . ' = 1')
+            );
+            $root = $db->loadAssoc();
+
+            if ($root === null) {
+                $this->log('#__menu root node (id=1) is missing; skipping admin menu repair to avoid computing invalid nested-set values.', Log::WARNING);
+                return false;
+            }
+
+            if ((int) $root['rgt'] <= (int) $root['lft']) {
+                $this->log('#__menu root node (id=1) has invalid lft/rgt values; skipping admin menu repair.', Log::WARNING);
+                return false;
+            }
+
+            return true;
+        } catch (\Throwable $e) {
+            $this->log('Unable to verify #__menu root node: ' . $e->getMessage(), Log::WARNING);
+            return false;
+        }
+    }
+
     private function ensureAdministrationMainMenuEntry(): void
     {
         $db = Factory::getContainer()->get(DatabaseInterface::class);
@@ -1226,13 +1567,13 @@ class com_breezingformsngInstallerScript
             }
 
             $items = [
-                ['COM_BREEZINGFORMSNG_MANAGE_RECORDS', 'breezingformsng-records', 'act=managerecs', []],
+                ['COM_BREEZINGFORMSNG_MANAGE_RECORDS', 'breezingformsng-records', 'view=records', []],
                 [
                     'COM_BREEZINGFORMSNG_MANAGE_FORMS',
                     'breezingformsng-forms',
-                    'act=manageforms',
+                    'view=forms',
                     [
-                        'menu-quicktask' => 'index.php?option=' . self::TARGET_COMPONENT . '&act=manageforms&task=quickmode',
+                        'menu-quicktask' => 'index.php?option=' . self::TARGET_COMPONENT . '&task=forms.edit',
                         'menu-quicktask-title' => 'COM_BREEZINGFORMSNG_MENUS_NEW_FORM',
                         'menu-quicktask-icon' => 'plus',
                     ],
@@ -1260,21 +1601,28 @@ class com_breezingformsngInstallerScript
                 [
                     'COM_BREEZINGFORMSNG_INTEGRATOR',
                     'breezingformsng-integrator',
-                    'act=integrate',
+                    'view=integrator',
                     [
-                        'menu-quicktask' => 'index.php?option=' . self::TARGET_COMPONENT . '&act=integrate&task=add',
+                        'menu-quicktask' => 'index.php?option=' . self::TARGET_COMPONENT . '&task=integrator.edit',
                         'menu-quicktask-title' => 'COM_BREEZINGFORMSNG_MENUS_NEW_INTEGRATION',
                         'menu-quicktask-icon' => 'plus',
                     ],
                 ],
-                ['COM_BREEZINGFORMSNG_CONFIGURATION', 'breezingformsng-configuration', 'act=configuration', []],
+                [
+                    'COM_BREEZINGFORMSNG_CONFIGURATION',
+                    'breezingformsng-configuration',
+                    'index.php?option=com_config&view=component&component=' . self::TARGET_COMPONENT,
+                    [],
+                ],
                 ['COM_BREEZINGFORMSNG_ABOUT', 'breezingformsng-about', 'task=about.display&view=about', []],
             ];
 
             $checked = 0;
 
             foreach ($items as [$title, $alias, $route, $params]) {
-                $link = 'index.php?option=' . self::TARGET_COMPONENT . '&' . $route;
+                $link = str_starts_with($route, 'index.php?')
+                    ? $route
+                    : 'index.php?option=' . self::TARGET_COMPONENT . '&' . $route;
 
                 $db->setQuery(
                     $db->getQuery(true)
@@ -1324,7 +1672,7 @@ class com_breezingformsngInstallerScript
                 ];
 
                 if (!$menu->bind($data) || !$menu->check() || !$menu->store()) {
-                    $this->log('Unable to ensure BFNG admin submenu entry ' . $title . ': ' . $menu->getError(), Log::WARNING);
+                    $this->log('Unable to ensure BFNG admin submenu entry ' . $title . '.', Log::WARNING);
                     continue;
                 }
 
@@ -1562,7 +1910,13 @@ class com_breezingformsngInstallerScript
             'index.php?option=' . self::TARGET_COMPONENT . '&act=about'
                 => 'index.php?option=' . self::TARGET_COMPONENT . '&task=about.display&view=about',
             'index.php?option=' . self::TARGET_COMPONENT . '&task=integrate.display&view=integrate'
-                => 'index.php?option=' . self::TARGET_COMPONENT . '&act=integrate',
+                => 'index.php?option=' . self::TARGET_COMPONENT . '&view=integrator',
+            'index.php?option=' . self::TARGET_COMPONENT . '&act=integrate'
+                => 'index.php?option=' . self::TARGET_COMPONENT . '&view=integrator',
+            'index.php?option=' . self::TARGET_COMPONENT . '&act=managerecs'
+                => 'index.php?option=' . self::TARGET_COMPONENT . '&view=records',
+            'index.php?option=' . self::TARGET_COMPONENT . '&act=manageforms'
+                => 'index.php?option=' . self::TARGET_COMPONENT . '&view=forms',
         ];
 
         foreach ($replacements as $oldLink => $newLink) {
@@ -1589,13 +1943,50 @@ class com_breezingformsngInstallerScript
     private function cleanupLegacyBreezingFormsAfterInstall(): void
     {
         $this->normalizeJoomlaComponentReferences();
-        $this->ensureAdministrationMainMenuEntry();
-        $this->migrateStaleMenuLinks();
-        $this->ensureAdministrationSubmenuEntries();
+
+        if ($this->ensureAdminMenuRootNodeExists()) {
+            $this->ensureAdministrationMainMenuEntry();
+            $this->migrateStaleMenuLinks();
+            $this->ensureAdministrationSubmenuEntries();
+        }
         $this->deduplicateBreezingFormsComponentRows();
         $this->removeLegacyBreezingFormsComponentRows();
         $this->removeLegacyBreezingFormsComponentDirectories();
+        $this->removeObsoleteComponentFiles();
         $this->log('Legacy BreezingForms component cleanup completed in safe mode; uninstall hooks intentionally skipped.');
+    }
+
+    /**
+     * Files shipped by earlier NG releases and replaced since; Joomla does
+     * not delete removed package files on update.
+     */
+    private function removeObsoleteComponentFiles(): void
+    {
+        $obsolete = [
+            JPATH_SITE . '/components/com_breezingformsng/router.php',
+            JPATH_SITE . '/components/com_breezingformsng/facileforms.xml.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/sql/create_sql.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/src/Helper/LegacyClassLoader.php',
+        ];
+
+        foreach ($obsolete as $file) {
+            if (File::exists($file) && File::delete($file)) {
+                $this->log('Obsolete file removed: ' . basename($file));
+            }
+        }
+
+        $obsoleteDirectories = [
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/dropbox/v2',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/mailchimp',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/recaptcha',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/salesforce',
+        ];
+
+        foreach ($obsoleteDirectories as $directory) {
+            if (Folder::exists($directory) && Folder::delete($directory)) {
+                $this->log('Obsolete library directory removed: ' . basename($directory));
+            }
+        }
     }
 
 
@@ -1907,12 +2298,23 @@ class com_breezingformsngInstallerScript
      * @return void
      */
 
-    public function preflight(string $type, $parent): void
+    public function preflight(string $type, $parent): bool
     {
+        $this->resetCriticalFailures();
+
         $type = strtolower((string) $type);
         $this->incomingPackageVersion = $this->getIncomingVersion($parent);
 
+        if (!$this->checkRequirements()) {
+            return false;
+        }
+
         if (in_array($type, ['install', 'update', 'discover_install'], true)) {
+            if (!$this->checkInstalledFilePermissionsBeforeCopy()) {
+                return false;
+            }
+
+            $this->purgeCaches('preflight:' . $type);
             $this->migrateLegacyBreezingFormsName();
         }
 
@@ -1938,6 +2340,7 @@ class com_breezingformsngInstallerScript
             $this->announceUtf8mb4Capability();
         }
 
+        return !$this->hasCriticalFailure();
     }
     /**
      * method to run after an install/update/uninstall method
@@ -1954,16 +2357,20 @@ class com_breezingformsngInstallerScript
 
         if (in_array($type, ['install', 'update', 'discover_install'], true)) {
             $this->ensureUtf8mb4Columns();
+            $this->migrateLegacyConfig();
             $this->importStandardLibrary();
             $this->copyComponentImageAssets();
             $this->installPlugins();
             $this->cleanupLegacyBreezingFormsAfterInstall();
             $this->removeOldUpdateSite();
             $this->cleanupOldConfig();
+            $this->purgeCaches('postflight:' . $type);
+            $this->verifyInstalledExtensionConsistency($parent);
         } elseif ($type === 'uninstall') {
             $this->removeBreezingFormsMenuEntries();
             $this->cleanupOldConfig();
             $this->cleanupComponentLogFile();
+            $this->purgeCaches('postflight:' . $type);
         }
 
         $durationSeconds = max(0.0, microtime(true) - $this->installStartedAt);
@@ -1971,14 +2378,32 @@ class com_breezingformsngInstallerScript
         $packageVersion = $this->incomingPackageVersion !== '' ? $this->incomingPackageVersion : $this->getIncomingVersion($parent);
         $installedVersion = $this->getCurrentInstalledVersion();
 
+        $finishedWithFailure = $this->hasCriticalFailure();
+        $finishMessage = ($finishedWithFailure ? '[ERROR] BreezingForms ' : '[OK] BreezingForms ')
+            . $actionLabel
+            . ($finishedWithFailure ? ' finished with critical issue(s).' : ' finished successfully.')
+            . ' Package version: <strong>' . htmlspecialchars($packageVersion !== '' ? $packageVersion : 'unknown', ENT_QUOTES, 'UTF-8') . '</strong>'
+            . ' | installed version: <strong>' . htmlspecialchars($installedVersion, ENT_QUOTES, 'UTF-8') . '</strong>'
+            . ' | duration: <strong>' . number_format($durationSeconds, 2, '.', '') . 's</strong>.';
+
         $this->announce(
-            '[OK] BreezingForms ' . $actionLabel . ' finished successfully.' .
-            ' Package version: <strong>' . htmlspecialchars($packageVersion !== '' ? $packageVersion : 'unknown', ENT_QUOTES, 'UTF-8') . '</strong>' .
-            ' | installed version: <strong>' . htmlspecialchars($installedVersion, ENT_QUOTES, 'UTF-8') . '</strong>' .
-            ' | duration: <strong>' . number_format($durationSeconds, 2, '.', '') . 's</strong>.',
-            'message',
-            Log::INFO
+            $finishMessage,
+            $finishedWithFailure ? 'error' : 'message',
+            $finishedWithFailure ? Log::ERROR : Log::INFO
         );
+
+        if ($finishedWithFailure) {
+            $summary = $this->getCriticalFailureSummary();
+            $this->log('BreezingForms installation/update process finished with critical issue(s)' . ($summary !== '' ? ': ' . $summary : '.'), Log::ERROR);
+
+            // Actually fail the installer instead of silently reporting success -
+            // logging alone left Joomla showing "Installation Successful" even
+            // when a critical step failed.
+            throw new \RuntimeException(
+                'BreezingForms NG postflight failed' . ($summary !== '' ? ': ' . $summary : '.')
+            );
+        }
+
         $this->log('BreezingForms installation/update process finished successfully.');
     }
 

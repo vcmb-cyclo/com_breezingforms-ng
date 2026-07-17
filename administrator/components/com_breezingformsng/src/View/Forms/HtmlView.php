@@ -12,6 +12,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Forms;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Pagination\Pagination;
+use Joomla\CMS\Session\Session;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\FormModel;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\FormsModel;
@@ -50,13 +51,20 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
         $formModel = $factory->createModel('Form', 'Administrator', ['ignore_request' => true]);
 
         if ($layout === 'edit') {
+
+            $input->set('hidemainmenu', 1);
+
+        }
+
+
+        if ($layout === 'edit') {
             $id         = $input->getInt('id', 0);
             $this->pkg  = $input->getString('pkg', '');
             $this->form = $id > 0 ? $formModel->getForm($id) : $formModel->getDefaultForm($this->pkg);
 
             if ($this->form === null) {
                 Factory::getApplication()->enqueueMessage(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'), 'error');
-                Factory::getApplication()->redirect('index.php?option=com_breezingformsng&view=forms');
+                Factory::getApplication()->redirect('index.php?option=com_breezingformsng&act=manageforms&view=forms');
                 return;
             }
 
@@ -70,6 +78,32 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
             ToolbarHelper::apply('forms.save');
             ToolbarHelper::cancel('forms.cancel', $id > 0 ? 'JTOOLBAR_CLOSE' : 'JTOOLBAR_CANCEL');
         } else {
+            $document = Factory::getApplication()->getDocument();
+            $wa       = $document->getWebAssetManager();
+            $wa->registerAndUseScript(
+                'com_breezingformsng.admin-form',
+                'media/com_breezingformsng/js/admin/admin-form.js',
+                ['version' => 'auto'],
+                ['defer' => true],
+                ['core']
+            );
+            $document->addScriptOptions('com_breezingformsng.admin-form', ['confirmDeleteTask' => 'forms.remove']);
+            Text::script('JGLOBAL_CONFIRM_DELETE');
+
+            $wa->registerAndUseScript(
+                'com_breezingformsng.admin-toggle-published',
+                'media/com_breezingformsng/js/admin/admin-toggle-published.js',
+                ['version' => 'auto'],
+                ['defer' => true],
+                ['core']
+            );
+            $document->addScriptOptions(
+                'com_breezingformsng.admin-toggle-published',
+                ['csrfToken' => Session::getFormToken()]
+            );
+            Text::script('JPUBLISHED');
+            Text::script('JUNPUBLISHED');
+
             $session = Factory::getApplication()->getSession();
             $pkgIn   = $input->getString('pkg', '__unset__');
             $this->pkg   = $listModel->resolvedPkg($pkgIn);
@@ -117,11 +151,22 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
 
             ToolbarHelper::addNew('forms.edit');
             ToolbarHelper::custom('forms.copy', 'copy', '', 'JLIB_HTML_BATCH_COPY', true);
-            ToolbarHelper::publish('forms.publish', 'JPUBLISH', true);
-            ToolbarHelper::unpublish('forms.unpublish', 'JUNPUBLISH', true);
+            ToolbarHelper::publish('forms.publish', 'JTOOLBAR_PUBLISH', true);
+            ToolbarHelper::unpublish('forms.unpublish', 'JTOOLBAR_UNPUBLISH', true);
             ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'forms.remove');
         }
 
         parent::display($tpl);
+    }
+
+    protected function getDetailLabel(): ?string
+    {
+        if ($this->form === null) {
+            return null;
+        }
+
+        $title = trim((string) $this->form->title);
+
+        return $title !== '' ? $title : Text::_('COM_BREEZINGFORMSNG_INSTALLER_UNKNOWN');
     }
 }

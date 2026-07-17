@@ -28,6 +28,12 @@ class DisplayController extends BaseController
         $task = $input->getCmd('task', '');
         $view = $input->getCmd('view', '');
 
+        // List screens must keep the main admin menu enabled; only the edit
+        // layouts re-enable hidemainmenu themselves (same fix as ContentBuilderNG).
+        if (!\in_array($input->getCmd('layout', ''), ['edit', 'csvimport'], true)) {
+            $input->set('hidemainmenu', 0);
+        }
+
         if ($task === '' && in_array($act, ['managepieces', 'managescripts'], true)) {
             $view = $act === 'managepieces' ? 'pieces' : 'scripts';
             $input->set('view', $view);
@@ -37,9 +43,14 @@ class DisplayController extends BaseController
             return parent::display($cachable, $urlparams);
         }
 
+        if ($task === '' && $view === 'about') {
+            return parent::display($cachable, $urlparams);
+        }
+
         if ($task === '' && (
             $view === 'records'
-            || in_array($act, ['', 'managerecs', 'recordmanagement'], true)
+            || in_array($act, ['managerecs', 'recordmanagement'], true)
+            || ($act === '' && $view === '')
         )) {
             $input->set('view', 'records');
             $input->set('act', '');
@@ -52,34 +63,17 @@ class DisplayController extends BaseController
             return parent::display($cachable, $urlparams);
         }
 
-        // QuickMode: all routes → QuickmodeController (bypasses legacy bridge entirely)
-        if ($act === 'quickmode_editor'
-            || ($act === 'quickmode' && $task !== '')
-            || ($act === 'manageforms' && in_array($task, ['quickmode', 'quickmode_editor', 'doAjaxSave'], true))
-        ) {
-            $input->set('view', 'quickmode');
-            $input->set('act', '');
-            if ($act === 'quickmode_editor' || $task === 'quickmode_editor') {
-                $input->set('task', 'quickmode.editor');
-            } elseif ($task === 'doAjaxSave') {
-                $input->set('task', 'quickmode.doAjaxSave');
-            } else {
-                $input->set('task', '');
-            }
-            return parent::display($cachable, $urlparams);
-        }
-
-        // QuickMode display (no task): act=quickmode or act=manageforms&task=quickmode (JS redirect after save)
-        if ($act === 'quickmode' && $task === '') {
-            $input->set('view', 'quickmode');
-            $input->set('act', '');
-            $input->set('task', '');
-            return parent::display($cachable, $urlparams);
-        }
-
         if ($act === 'manageforms' || ($task === '' && $view === 'forms')) {
             $input->set('view', 'forms');
             $input->set('act', '');
+            if ($task === '' && $input->getCmd('layout', '') === 'edit' && $input->getInt('id', 0) > 0 && !$input->getBool('advanced', false)) {
+                Factory::getApplication()->redirect(
+                    'index.php?option=com_breezingformsng&task=quickmode.display'
+                    . '&form=' . $input->getInt('id', 0)
+                    . '&pkg=' . rawurlencode($input->getString('pkg', ''))
+                );
+                return $this;
+            }
             if ($task === '' || $task === 'listitems') {
                 $input->set('task', '');
                 return parent::display($cachable, $urlparams);
@@ -124,11 +118,13 @@ class DisplayController extends BaseController
         global $ff_mospath, $ff_admpath, $ff_compath;
         global $ff_mossite, $ff_admsite, $ff_admicon, $ff_comsite;
         global $ff_config, $ff_compatible, $ff_install;
-        global $task;
+        global $database, $task;
 
         if (isset($ff_config)) {
             return;
         }
+
+        $database = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
 
         $task       = '';
         $comppath   = '/components/com_breezingformsng';

@@ -14,20 +14,21 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Language\Text;
 
 ?>
-<?php echo BFText::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_BUYING'); ?>
+<?php echo Text::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_BUYING'); ?>
 <br />
 <br />
-<?php echo BFText::_('COM_BREEZINGFORMSNG_YOUR_TRANSACTION_ID') ?>:
+<?php echo Text::_('COM_BREEZINGFORMSNG_YOUR_TRANSACTION_ID') ?>:
 <?php echo $tx_token; ?>
 <br />
-<?php echo BFText::_('COM_BREEZINGFORMSNG_PAYMENT_METHOD_STRIPE') ?>
+<?php echo Text::_('COM_BREEZINGFORMSNG_PAYMENT_METHOD_STRIPE') ?>
 <br />
 <br />
 <a
     href="<?php echo Uri::root() ?>index.php?raw=true&option=com_breezingformsng&amp;stripeDownload=true&amp;token=<?php echo $tx_token ?>&amp;form=<?php echo $form_id ?>&amp;record_id=<?php echo $record_id ?>">
-    <?php echo BFText::_('COM_BREEZINGFORMSNG_DOWNLOAD'); ?> (
-    <?php echo BFText::_('COM_BREEZINGFORMSNG_ALLOWED_TRIES'); ?>:
+    <?php echo Text::_('COM_BREEZINGFORMSNG_DOWNLOAD'); ?> (
+    <?php echo Text::_('COM_BREEZINGFORMSNG_ALLOWED_TRIES'); ?>:
     <?php echo $tries ?>)
 </a>

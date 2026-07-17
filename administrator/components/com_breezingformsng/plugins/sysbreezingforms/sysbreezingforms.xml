@@ -7,7 +7,7 @@
         <license>GNU/GPL v2 or later</license>
 	<authorEmail>bf@vcmb.fr</authorEmail>
 	<authorUrl>https://breezingforms-ng.vcmb.fr</authorUrl>
-	<version>6.1.0-RC2</version>
+	<version>6.1.0-RC3</version>
 	<description>PLG_SYSTEM_SYSBREEZINGFORMS_XML_DESCRIPTION</description>
 	<updateservers>
 		<server type="extension" name="sysbreezingforms" priority="1">https://breezingforms-ng.vcmb.fr/download/plg_breezingforms_update.xml</server>
@@ -19,5 +19,9 @@
 	<languages folder="language">
 		<language tag="en-GB">en-GB/plg_system_sysbreezingforms.ini</language>
 		<language tag="en-GB">en-GB/plg_system_sysbreezingforms.sys.ini</language>
+		<language tag="fr-FR">fr-FR/plg_system_sysbreezingforms.ini</language>
+		<language tag="fr-FR">fr-FR/plg_system_sysbreezingforms.sys.ini</language>
+		<language tag="de-DE">de-DE/plg_system_sysbreezingforms.ini</language>
+		<language tag="de-DE">de-DE/plg_system_sysbreezingforms.sys.ini</language>
 	</languages>
 </extension>

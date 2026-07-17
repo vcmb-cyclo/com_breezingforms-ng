@@ -36,6 +36,8 @@ class HtmlView extends BaseHtmlView
     public ?\stdClass $record = null;
     public array $recordRows = [];
 
+    private string $layout = 'default';
+
     private const ALLOWED_SORTS = [
         'records.id', 'records.submitted', 'forms.title',
         'records.ip', 'records.username',
@@ -47,6 +49,7 @@ class HtmlView extends BaseHtmlView
         $app = Factory::getApplication();
         $input = $app->getInput();
         $layout = $input->getCmd('layout', 'default');
+        $this->layout = $layout;
 
         HTMLHelper::_('behavior.keepalive');
 
@@ -59,12 +62,26 @@ class HtmlView extends BaseHtmlView
         } else {
             $this->prepareListData($app, $input);
             $this->prepareListToolbar();
+
+            $document = $app->getDocument();
+            $document->getWebAssetManager()->registerAndUseScript(
+                'com_breezingformsng.records-list',
+                'media/com_breezingformsng/js/admin/records-list.js',
+                ['version' => 'auto'],
+                ['defer' => true],
+                ['core']
+            );
+            $document->addScriptOptions(
+                'com_breezingformsng.records-list',
+                ['csrfToken' => \Joomla\CMS\Session\Session::getFormToken()]
+            );
+            Text::script('COM_BREEZINGFORMSNG_CONFIRM_DELETE_RECORDS');
         }
 
         parent::display($tpl);
     }
 
-    private function prepareListData(\Joomla\CMS\Application\CMSApplication $app, \Joomla\CMS\Input\Input $input): void
+    private function prepareListData(\Joomla\CMS\Application\CMSApplication $app, \Joomla\Input\Input $input): void
     {
         $session = $app->getSession();
 
@@ -112,13 +129,13 @@ class HtmlView extends BaseHtmlView
         $app->getDocument()->getWebAssetManager()->useScript('table.columns');
     }
 
-    private function prepareEditData(\Joomla\CMS\Input\Input $input): void
+    private function prepareEditData(\Joomla\Input\Input $input): void
     {
         $recordId = $input->getInt('record_id', 0);
         $app = Factory::getApplication();
 
         if ($recordId < 1) {
-            $app->redirect('index.php?option=com_breezingformsng&view=records');
+            $app->redirect('index.php?option=com_breezingformsng&act=managerecs&view=records');
             return;
         }
 
@@ -128,7 +145,7 @@ class HtmlView extends BaseHtmlView
 
         $this->record = $model->getRecord($recordId);
         if (!$this->record) {
-            $app->redirect('index.php?option=com_breezingformsng&view=records');
+            $app->redirect('index.php?option=com_breezingformsng&act=managerecs&view=records');
             return;
         }
 
@@ -153,25 +170,108 @@ class HtmlView extends BaseHtmlView
         $child->standardButton('exportXml')->text(Text::_('COM_BREEZINGFORMSNG_XML'))->task('records.exportXml')->icon('icon-download')->listCheck(false);
 
         ToolbarHelper::custom('records.csvImport', 'upload', 'upload', Text::_('COM_BREEZINGFORMSNG_BTN_IMPORT_CSV'), false);
-        ToolbarHelper::custom('records.viewed', 'eye-open', 'eye-open', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_VIEW'), false);
-        ToolbarHelper::custom('records.exported', 'share', 'share', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_EXPORT'), false);
-        ToolbarHelper::custom('records.archived', 'archive', 'archive', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_ARCHIVE'), false);
+
+        $markDropdown = Toolbar::getInstance()
+            ->dropdownButton('mark-options')
+            ->text(Text::_('COM_BREEZINGFORMSNG_TOOLBAR_MARK'))
+            ->toggleSplit(false)
+            ->icon('icon-check')
+            ->buttonClass('btn btn-action');
+        $markChild = $markDropdown->getChildToolbar();
+        $markChild->standardButton('markViewed')
+            ->text(Text::_('COM_BREEZINGFORMSNG_TOOLBAR_MARK_VIEWED'))
+            ->task('records.viewed')
+            ->icon('icon-eye-open')
+            ->attributes(['title' => Text::_('COM_BREEZINGFORMSNG_TOOLBAR_MARK_VIEWED_DESC')])
+            ->listCheck(true);
+        $markChild->standardButton('unmarkViewed')
+            ->text(Text::_('COM_BREEZINGFORMSNG_TOOLBAR_UNMARK_VIEWED'))
+            ->task('records.unviewed')
+            ->icon('icon-eye-close')
+            ->attributes(['title' => Text::_('COM_BREEZINGFORMSNG_TOOLBAR_UNMARK_VIEWED_DESC')])
+            ->listCheck(true);
+        $markChild->standardButton('markExported')
+            ->text(Text::_('COM_BREEZINGFORMSNG_TOOLBAR_MARK_EXPORTED'))
+            ->task('records.exported')
+            ->icon('icon-share')
+            ->attributes(['title' => Text::_('COM_BREEZINGFORMSNG_TOOLBAR_MARK_EXPORTED_DESC')])
+            ->listCheck(true);
+        $markChild->standardButton('unmarkExported')
+            ->text(Text::_('COM_BREEZINGFORMSNG_TOOLBAR_UNMARK_EXPORTED'))
+            ->task('records.unexported')
+            ->icon('icon-cancel-circle')
+            ->attributes(['title' => Text::_('COM_BREEZINGFORMSNG_TOOLBAR_UNMARK_EXPORTED_DESC')])
+            ->listCheck(true);
+        $markChild->standardButton('markArchived')
+            ->text(Text::_('COM_BREEZINGFORMSNG_TOOLBAR_MARK_ARCHIVED'))
+            ->task('records.archived')
+            ->icon('icon-archive')
+            ->attributes(['title' => Text::_('COM_BREEZINGFORMSNG_TOOLBAR_MARK_ARCHIVED_DESC')])
+            ->listCheck(true);
+        $markChild->standardButton('unmarkArchived')
+            ->text(Text::_('COM_BREEZINGFORMSNG_TOOLBAR_UNMARK_ARCHIVED'))
+            ->task('records.unarchived')
+            ->icon('icon-out-2')
+            ->attributes(['title' => Text::_('COM_BREEZINGFORMSNG_TOOLBAR_UNMARK_ARCHIVED_DESC')])
+            ->listCheck(true);
+
         ToolbarHelper::custom('records.remove', 'delete', 'delete', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_DELETE'), false);
-        ToolbarHelper::help(
-            'COM_BREEZINGFORMSNG_HELP_RECORDS_TITLE',
-            false,
-            Uri::base() . 'index.php?option=com_breezingformsng&view=help&section=records&tmpl=component'
-        );
+        Toolbar::getInstance()
+            ->popupButton('help', 'JHELP')
+            ->popupType('iframe')
+            ->url(Uri::base() . 'index.php?option=com_breezingformsng&view=help&section=records&tmpl=component')
+            ->icon('icon-question-sign')
+            ->iframeWidth(900)
+            ->iframeHeight(700)
+            ->attributes(['title' => Text::_('COM_BREEZINGFORMSNG_HELP_RECORDS_TITLE')]);
     }
 
     private function prepareEditToolbar(): void
     {
         ToolbarHelper::custom('records.save', 'save', 'save', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_SAVE'), false);
         ToolbarHelper::cancel('records.display', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_CANCEL'));
+
+        $document = Factory::getApplication()->getDocument();
+        $wa       = $document->getWebAssetManager();
+        $wa->registerAndUseScript(
+            'com_breezingformsng.admin-form',
+            'media/com_breezingformsng/js/admin/admin-form.js',
+            ['version' => 'auto'],
+            ['defer' => true],
+            ['core']
+        );
+        $wa->registerAndUseScript(
+            'com_breezingformsng.admin-form-dirty',
+            'media/com_breezingformsng/js/admin/admin-form-dirty.js',
+            ['version' => 'auto'],
+            ['defer' => true],
+            ['com_breezingformsng.admin-form']
+        );
+        $document->addScriptOptions('com_breezingformsng.admin-form', [
+            'cancelTask' => 'records.display',
+            'saveTask'   => 'records.save',
+        ]);
+        Text::script('COM_BREEZINGFORMSNG_TEST_NO_CHANGES');
+        Text::script('COM_BREEZINGFORMSNG_CONFIRM_DISCARD_CHANGES');
     }
 
     private function prepareImportToolbar(): void
     {
         ToolbarHelper::cancel('records.display', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_CANCEL'));
+    }
+
+    protected function getDetailLabel(): ?string
+    {
+        if ($this->layout === 'edit') {
+            $recordId = Factory::getApplication()->getInput()->getInt('record_id', 0);
+
+            return $recordId > 0 ? (string) $recordId : null;
+        }
+
+        if ($this->layout === 'csvimport') {
+            return Text::_('COM_BREEZINGFORMSNG_BTN_IMPORT_CSV');
+        }
+
+        return null;
     }
 }

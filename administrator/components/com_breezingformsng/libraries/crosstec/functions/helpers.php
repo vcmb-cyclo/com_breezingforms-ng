@@ -20,6 +20,7 @@ use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 use Joomla\String\StringHelper;
 use Joomla\CMS\Filter\OutputFilter;
+use Joomla\CMS\Mail\MailerFactoryInterface;
 
 function bf_sanitizeFilename($fileName, $defaultIfEmpty = 'upload', $separator = '_', $lowerCase = true)
 {
@@ -67,8 +68,6 @@ function bf_sanitizeFilename($fileName, $defaultIfEmpty = 'upload', $separator =
 
 function bf_tooltipText($title = '', $content = '', $translate = 1, $escape = 1)
 {
-	HTMLHelper::_('bootstrap.tooltip');
-
 	// Return empty in no title or content is given.
 	if ($title == '' && $content == '') {
 		return '';
@@ -266,7 +265,8 @@ function bf_is_mobile()
 function bf_getFieldSelectorList($form_id, $element_target_id)
 {
 	$db = Factory::getContainer()->get(DatabaseInterface::class);
-	$db->setQuery("Select `name` From #__facileforms_elements Where form = " . intval($form_id) . " And `name` Not In ('bfFakeName','bfFakeName2','bfFakeName3','bfFakeName4','bfFakeName5','bfFakeName6') Order by `ordering`");
+	$formId = (int) $form_id;
+	$db->setQuery($db->getQuery(true)->select($db->quoteName('name'))->from($db->quoteName('#__facileforms_elements'))->where($db->quoteName('form') . ' = :formId')->whereNotIn($db->quoteName('name'), ['bfFakeName','bfFakeName2','bfFakeName3','bfFakeName4','bfFakeName5','bfFakeName6'], \Joomla\Database\ParameterType::STRING)->order($db->quoteName('ordering'))->bind(':formId', $formId, \Joomla\Database\ParameterType::INTEGER));
 
 	$rows = $db->loadColumn();
 	$out = '<script type="text/javascript">
@@ -307,7 +307,8 @@ myField.value += myValue;
 function bf_getFieldSelectorListEditor($form_id, $element_target_id)
 {
 	$db = Factory::getContainer()->get(DatabaseInterface::class);
-	$db->setQuery("Select `name` From #__facileforms_elements Where form = " . intval($form_id) . " And `name` Not In ('bfFakeName','bfFakeName2','bfFakeName3','bfFakeName4','bfFakeName5','bfFakeName6') Order by `ordering`");
+	$formId = (int) $form_id;
+	$db->setQuery($db->getQuery(true)->select($db->quoteName('name'))->from($db->quoteName('#__facileforms_elements'))->where($db->quoteName('form') . ' = :formId')->whereNotIn($db->quoteName('name'), ['bfFakeName','bfFakeName2','bfFakeName3','bfFakeName4','bfFakeName5','bfFakeName6'], \Joomla\Database\ParameterType::STRING)->order($db->quoteName('ordering'))->bind(':formId', $formId, \Joomla\Database\ParameterType::INTEGER));
 	$rows = $db->loadColumn();
 	$out = '<script type="text/javascript">
     function insertAtCursor_' . $element_target_id . '_Editor(myValue) {
@@ -332,7 +333,8 @@ function bf_getFieldSelectorListEditor($form_id, $element_target_id)
 function bf_getFieldSelectorListHTML($form_id, $editor, $element_target_id)
 {
 	$db = Factory::getContainer()->get(DatabaseInterface::class);
-	$db->setQuery("Select `name` From #__facileforms_elements Where form = " . intval($form_id) . " And `name` Not In ('bfFakeName','bfFakeName2','bfFakeName3','bfFakeName4','bfFakeName5','bfFakeName6') Order by `ordering`");
+	$formId = (int) $form_id;
+	$db->setQuery($db->getQuery(true)->select($db->quoteName('name'))->from($db->quoteName('#__facileforms_elements'))->where($db->quoteName('form') . ' = :formId')->whereNotIn($db->quoteName('name'), ['bfFakeName','bfFakeName2','bfFakeName3','bfFakeName4','bfFakeName5','bfFakeName6'], \Joomla\Database\ParameterType::STRING)->order($db->quoteName('ordering'))->bind(':formId', $formId, \Joomla\Database\ParameterType::INTEGER));
 	$rows = $db->loadColumn();
 	$out = '<script type="text/javascript">
     function insert_' . $element_target_id . 'HTML(myValue) {
@@ -348,18 +350,6 @@ function bf_getFieldSelectorListHTML($form_id, $editor, $element_target_id)
 	}
 
 	return $out;
-}
-
-function bf_ToolTip($tooltip, $title = '', $width = '', $image = 'tooltip.png', $text = '', $href = '', $link = 1)
-{
-	// Initialize the toolips if required
-	static $init;
-	if (!$init) {
-		//HTMLHelper::_( 'bootstrap.tooltip' );
-		$init = true;
-	}
-
-	return HTMLHelper::_('tooltip', $tooltip, $title, $image, $text, $href, $link);
 }
 
 // used if copy is disabled
@@ -384,10 +374,10 @@ function bf_createMail($from, $fromname, $subject, $body, $alt_sender = '')
 	$_mailfrom = '';
 	$_fromname = '';
 
-	$_mailfrom = Factory::getConfig()->get('mailfrom', '');
-	$_fromname = Factory::getConfig()->get('fromname', '');
+	$_mailfrom = Factory::getApplication()->getConfig()->get('mailfrom', '');
+	$_fromname = Factory::getApplication()->getConfig()->get('fromname', '');
 
-	$mail = Factory::getMailer();
+	$mail = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
 
 	/*
 				try {
@@ -497,7 +487,7 @@ function bf_sendNotificationByPaymentCache($formId, $recordId, $type = 'admin')
 				$parts = explode('_', $file);
 				if (count($parts) == 4) {
 					if ($parts[0] == intval($formId) && $parts[1] == intval($recordId) && $parts[2] == $type) {
-						$contents = unserialize(BFFile::read($sourcePath . $file));
+						$contents = unserialize(file_get_contents($sourcePath . $file));
 						File::delete($sourcePath . $file);
 						break;
 					}
@@ -805,11 +795,4 @@ function bf_is_email($email, $checkDNS = false)
 		//              (Sherlock Holmes, The Sign of Four)
 		return true;
 	}
-}
-
-function BFRedirect($link, $msg = null)
-{
-	$mainframe = Factory::getApplication();
-	$mainframe->enqueueMessage($msg);
-	$mainframe->redirect($link);
 }

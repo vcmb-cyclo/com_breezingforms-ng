@@ -11,6 +11,8 @@
  **/
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
+
+use Joomla\CMS\Language\Text;
 // IMPORTANT!
 // Supported Tags: h1, h2, h3, h4, h5, h6, b, u, i, a, img, p, br, strong, em, font, blockquote, li, ul, ol, hr, td, th, tr, table, sup, sub, small
 ?>
@@ -22,7 +24,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 	</tr>
 	<tr>
 		<td>
-			<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_ID') ?>:</strong>
+			<strong><?php echo Text::_('COM_BREEZINGFORMSNG_ID') ?>:</strong>
 		</td>
 		<td>
 			<?php echo $this->form; ?>
@@ -30,7 +32,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 	</tr>
 	<tr>
 		<td>
-			<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT') ?>:</strong>
+			<strong><?php echo Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT') ?>:</strong>
 		</td>
 		<td>
 			<?php echo $this->submitted; ?>
@@ -38,7 +40,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 	</tr>
 	<tr>
 		<td>
-			<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_IP') ?>:</strong>
+			<strong><?php echo Text::_('COM_BREEZINGFORMSNG_IP') ?>:</strong>
 		</td>
 		<td>
 			<?php echo $this->ip; ?>
@@ -46,7 +48,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 	</tr>
 	<tr>
 		<td>
-			<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_BROWSER') ?>:</strong>
+			<strong><?php echo Text::_('COM_BREEZINGFORMSNG_BROWSER') ?>:</strong>
 		</td>
 		<td>
 			<?php echo htmlentities($this->browser, ENT_QUOTES, 'UTF-8');  ?>
@@ -54,7 +56,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 	</tr>
 	<tr>
         <td>
-            <strong><?php echo BFText::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS') ?>:</strong>
+            <strong><?php echo Text::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS') ?>:</strong>
         </td>
         <td>
             <?php echo htmlentities($this->opsys, ENT_QUOTES, 'UTF-8');  ?>
@@ -62,7 +64,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
     </tr>
 	<tr>
 		<td colspan="2" bgcolor="#cccccc">
-			<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_DATA') ?>:</strong>
+			<strong><?php echo Text::_('COM_BREEZINGFORMSNG_DATA') ?>:</strong>
 		</td>
 	</tr>
 	<?php

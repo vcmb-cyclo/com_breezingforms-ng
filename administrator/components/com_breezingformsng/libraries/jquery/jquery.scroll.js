@@ -1,3 +1,5 @@
+// BF legacy jQuery scope
+(function (jQuery) {
 jQuery(function(){
 	
 	var shouldDockPanel = jQuery('#triggerScrollable');
@@ -48,3 +50,5 @@ jQuery(function(){
 
 
 
+
+}(window.JQuery));

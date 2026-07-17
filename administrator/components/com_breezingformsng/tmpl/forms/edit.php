@@ -7,6 +7,7 @@
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
@@ -21,7 +22,7 @@ HTMLHelper::_('bootstrap.tab');
 function bfSel(array $list, string $name, int $current, string $extra = ''): string
 {
     $out = '<select class="form-select" name="' . htmlspecialchars($name) . '" ' . $extra . '>';
-    $out .= '<option value="0">' . htmlspecialchars(\Joomla\CMS\Language\Text::_('COM_BREEZINGFORMSNG_FORMS_NONE')) . '</option>';
+    $out .= '<option value="0">' . htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_FORMS_NONE')) . '</option>';
     foreach ($list as $item) {
         $sel  = (int) $item->id === (int) $current ? ' selected' : '';
         $out .= '<option value="' . (int) $item->id . '"' . $sel . '>' . htmlspecialchars($item->text) . '</option>';
@@ -241,11 +242,6 @@ $editor = Editor::getInstance('codemirror');
       </div>
 
       <div class="row mb-3">
-        <label class="col-sm-3 col-form-label" for="jf_mb_emailadr"><?= Text::_('COM_BREEZINGFORMSNG_FORMS_MB_EMAILADR'); ?></label>
-        <div class="col-sm-9"><input type="text" class="form-control" id="jf_mb_emailadr" name="mb_emailadr" value="<?= htmlspecialchars($f->mb_emailadr ?? ''); ?>"></div>
-      </div>
-
-      <div class="row mb-3">
         <label class="col-sm-3 col-form-label" for="jf_mb_custom_mail_subject"><?= Text::_('COM_BREEZINGFORMSNG_FORMS_MB_MAILSUBJECT'); ?></label>
         <div class="col-sm-9"><input type="text" class="form-control" id="jf_mb_custom_mail_subject" name="mb_custom_mail_subject" value="<?= htmlspecialchars($f->mb_custom_mail_subject ?? ''); ?>"></div>
       </div>
@@ -330,13 +326,6 @@ $editor = Editor::getInstance('codemirror');
       </div>
 
       <!-- Additional script code -->
-      <div class="card mb-3">
-        <div class="card-header"><?= Text::_('COM_BREEZINGFORMSNG_FORMS_SCRIPT3'); ?></div>
-        <div class="card-body">
-          <?= $editor->display('script3code', htmlspecialchars($f->script3code ?? ''), '100%', '200px', 60, 10, false, 'jf_script3code', null, null, ['syntax' => 'javascript']); ?>
-        </div>
-      </div>
-
       <?php
       $pieceLabels = [
           1 => ['COM_BREEZINGFORMSNG_FORMS_PIECE_BEFORE',       $this->pieceBefore,      'piece1cond', 'piece1id', 'piece1code', 'p1'],
@@ -380,14 +369,8 @@ $editor = Editor::getInstance('codemirror');
   <?= HTMLHelper::_('form.token'); ?>
 </form>
 
-<script>
-function bfToggle(libId, codeId, value) {
-  document.getElementById(libId).style.display  = (value === '1') ? '' : 'none';
-  document.getElementById(codeId).style.display = (value === '2') ? '' : 'none';
-}
-Joomla.submitbutton = function (task) {
-  if (task !== 'forms.cancel' && !document.getElementById('adminForm').reportValidity()) return;
-  document.getElementById('adminForm').querySelector('[name="task"]').value = task;
-  document.getElementById('adminForm').submit();
-};
-</script>
+<?php
+$bfDocument = Factory::getApplication()->getDocument();
+$bfDocument->getWebAssetManager()->useScript('com_breezingformsng.admin-form');
+$bfDocument->addScriptOptions('com_breezingformsng.admin-form', ['cancelTask' => 'forms.cancel']);
+?>

@@ -1,3 +1,5 @@
+// BF legacy jQuery scope
+(function (jQuery) {
 
 (function($){function toIntegersAtLease(n)
 {return n<10?'0'+n:n;}
@@ -35,3 +37,4 @@ return"{"+ret.join(", ")+"}";};$.compactJSON=function(o)
 {var filtered=src;filtered=filtered.replace(/\\["\\\/bfnrtu]/g,'@');filtered=filtered.replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g,']');filtered=filtered.replace(/(?:^|:|,)(?:\s*\[)+/g,'');if(/^[\],:{}\s]*$/.test(filtered))
 return eval("("+src+")");else
 throw new SyntaxError("Error parsing JSON, source is not valid.");};})(jQuery);
+}(window.JQuery));

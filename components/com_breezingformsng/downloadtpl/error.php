@@ -1,5 +1,7 @@
 <?php
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
+
+use Joomla\CMS\Language\Text;
 /**
 * BreezingForms - A Joomla Forms Application
 * @version 6.0
@@ -10,10 +12,10 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 ?>
-<?php echo BFText::_('COM_BREEZINGFORMSNG_PAYMENT_ERROR_MSG'); ?>
+<?php echo Text::_('COM_BREEZINGFORMSNG_PAYMENT_ERROR_MSG'); ?>
 <br/>
 <br/>
-<?php echo BFText::_('COM_BREEZINGFORMSNG_YOUR_TRANSACTION_ID')  ?>: <?php echo htmlentities($tx_token); ?>
+<?php echo Text::_('COM_BREEZINGFORMSNG_YOUR_TRANSACTION_ID')  ?>: <?php echo htmlentities($tx_token); ?>
 <br/>
 <br/>
-<?php echo BFText::_('COM_BREEZINGFORMSNG_ERROR')  ?>: <?php echo htmlentities($msg); ?>
+<?php echo Text::_('COM_BREEZINGFORMSNG_ERROR')  ?>: <?php echo htmlentities($msg); ?>

@@ -11,6 +11,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Menus;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Session\Session;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\MenuModel;
 
@@ -35,6 +36,13 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
         $model = $factory->createModel('Menu', 'Administrator', ['ignore_request' => true]);
 
         if ($layout === 'edit') {
+
+            $input->set('hidemainmenu', 1);
+
+        }
+
+
+        if ($layout === 'edit') {
             $id         = $input->getInt('id', 0);
             $formId     = $input->getInt('form_id', 0);
             $this->pkg  = $input->getString('pkg', '');
@@ -57,12 +65,46 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
             ToolbarHelper::unpublish('menus.unpublish', 'JUNPUBLISH', true);
             ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'menus.remove');
             ToolbarHelper::custom('menus.sync', 'refresh', '', 'COM_BREEZINGFORMSNG_MENUS_SYNC', false);
+
+            $document = Factory::getApplication()->getDocument();
+            $wa       = $document->getWebAssetManager();
+            $wa->registerAndUseScript(
+                'com_breezingformsng.admin-form',
+                'media/com_breezingformsng/js/admin/admin-form.js',
+                ['version' => 'auto'],
+                ['defer' => true],
+                ['core']
+            );
+            $document->addScriptOptions('com_breezingformsng.admin-form', ['confirmDeleteTask' => 'menus.remove']);
+            Text::script('JGLOBAL_CONFIRM_DELETE');
+
+            $wa->registerAndUseScript(
+                'com_breezingformsng.admin-toggle-published',
+                'media/com_breezingformsng/js/admin/admin-toggle-published.js',
+                ['version' => 'auto'],
+                ['defer' => true],
+                ['core']
+            );
+            $document->addScriptOptions('com_breezingformsng.admin-toggle-published', ['csrfToken' => Session::getFormToken()]);
+            Text::script('JPUBLISHED');
+            Text::script('JUNPUBLISHED');
         }
 
         parent::display($tpl);
     }
 
-    private function resolvedPkg(\Joomla\CMS\Input\Input $input, MenuModel $model): string
+    protected function getDetailLabel(): ?string
+    {
+        if ($this->item === null) {
+            return null;
+        }
+
+        $title = trim((string) $this->item->title);
+
+        return $title !== '' ? $title : Text::_('COM_BREEZINGFORMSNG_INSTALLER_UNKNOWN');
+    }
+
+    private function resolvedPkg(\Joomla\Input\Input $input, MenuModel $model): string
     {
         $session = Factory::getApplication()->getSession();
         $pkg     = $input->getString('pkg', '__unset__');

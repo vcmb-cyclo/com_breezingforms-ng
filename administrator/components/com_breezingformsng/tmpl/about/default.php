@@ -14,6 +14,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Database\DatabaseInterface;
+use Joomla\CMS\Language\Text;
 
 if (!function_exists('bf_about_read_json_file')) {
     function bf_about_read_json_file($path)
@@ -111,73 +112,6 @@ if (!function_exists('bf_about_get_version_information')) {
     }
 }
 
-if (!function_exists('bf_about_get_log_report')) {
-    function bf_about_get_log_report()
-    {
-        $paths = array(
-            JPATH_ADMINISTRATOR . '/logs/breezingforms_install2.log',
-            JPATH_ADMINISTRATOR . '/logs/breezingforms_install.log',
-        );
-
-        $latestPath = '';
-        $latestMtime = 0;
-
-        foreach ($paths as $path) {
-            if (!is_file($path)) {
-                continue;
-            }
-
-            $mtime = (int) @filemtime($path);
-
-            if ($latestPath === '' || $mtime > $latestMtime) {
-                $latestPath = $path;
-                $latestMtime = $mtime;
-            }
-        }
-
-        if ($latestPath === '') {
-            return array();
-        }
-
-        $size = (int) @filesize($latestPath);
-        $tailBytes = 65536;
-        $content = '';
-        $truncated = false;
-
-        if ($size > 0) {
-            $handle = @fopen($latestPath, 'rb');
-
-            if (is_resource($handle)) {
-                if ($size > $tailBytes) {
-                    $truncated = true;
-                    fseek($handle, -$tailBytes, SEEK_END);
-                }
-
-                $content = (string) stream_get_contents($handle);
-                fclose($handle);
-            }
-        }
-
-        $loadedAt = '';
-
-        if ($latestMtime > 0) {
-            $timezone = new DateTimeZone((string) Factory::getApplication()->get('offset', 'UTC'));
-            $loadedAt = Factory::getDate('@' . $latestMtime)
-                ->setTimezone($timezone)
-                ->format('Y-m-d H:i:s', true);
-        }
-
-        return array(
-            'file' => basename($latestPath),
-            'size' => $size,
-            'loaded_at' => $loadedAt,
-            'content' => $content,
-            'truncated' => $truncated ? 1 : 0,
-            'tail_bytes' => $tailBytes,
-        );
-    }
-}
-
 if (!function_exists('bf_about_add_php_library')) {
     function bf_about_add_php_library(&$indexedLibraries, $name, $version, $isDev)
     {
@@ -258,18 +192,9 @@ if (!function_exists('bf_about_get_php_libraries')) {
     {
         $indexedLibraries = array();
 
-        $stripeInstalled = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/administrator/libraries/stripe/vendor/composer/installed.json';
-        $dropboxInstalled = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/administrator/libraries/dropbox/v2/composer/installed.json';
-        $tcpdfComposer = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/administrator/libraries/tcpdf/composer.json';
-        $vendorComposer = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/administrator/libraries/vendor/composer.json';
+        $vendorInstalled = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/vendor/composer/installed.json';
 
-        bf_about_collect_php_libraries_from_installed_json($indexedLibraries, $stripeInstalled);
-        bf_about_collect_php_libraries_from_installed_json($indexedLibraries, $dropboxInstalled);
-        bf_about_collect_php_library_from_composer_json($indexedLibraries, $tcpdfComposer);
-
-        if (empty($indexedLibraries)) {
-            bf_about_collect_php_library_from_composer_json($indexedLibraries, $vendorComposer);
-        }
+        bf_about_collect_php_libraries_from_installed_json($indexedLibraries, $vendorInstalled);
 
         $libraries = array_values($indexedLibraries);
 
@@ -314,9 +239,9 @@ if (!function_exists('bf_about_extract_version_from_file')) {
 if (!function_exists('bf_about_get_javascript_libraries')) {
     function bf_about_get_javascript_libraries()
     {
-        $notAvailable = BFText::_('COM_BREEZINGFORMSNG_NOT_AVAILABLE');
-        $bundledSource = BFText::_('COM_BREEZINGFORMSNG_JS_LIBRARY_SOURCE_BUNDLED');
-        $basePath = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/administrator/libraries/jquery/';
+        $notAvailable = Text::_('COM_BREEZINGFORMSNG_NOT_AVAILABLE');
+        $bundledSource = Text::_('COM_BREEZINGFORMSNG_JS_LIBRARY_SOURCE_BUNDLED');
+        $basePath = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/jquery/';
         $libraries = array();
 
         $candidates = array(
@@ -376,8 +301,27 @@ if (!function_exists('bf_about_get_javascript_libraries')) {
 $versionInformation = bf_about_get_version_information();
 $phpLibraries = bf_about_get_php_libraries();
 $javascriptLibraries = bf_about_get_javascript_libraries();
-$logReport = bf_about_get_log_report();
-$notAvailable = BFText::_('COM_BREEZINGFORMSNG_NOT_AVAILABLE');
+$logReport = is_array($this->logReport ?? null) ? $this->logReport : array();
+$auditReport = is_array($this->auditReport ?? null) ? $this->auditReport : array();
+$auditSummary = (array) ($auditReport['summary'] ?? array());
+$auditTables = (array) ($auditReport['tables'] ?? array());
+$auditMissingTables = (array) ($auditReport['missing_tables'] ?? array());
+$auditUnexpectedTables = (array) ($auditReport['unexpected_tables'] ?? array());
+$auditStaleLanguageFiles = (array) ($auditReport['stale_language_files'] ?? array());
+$auditStaleInstallerTempDirs = (array) ($auditReport['stale_installer_temp_dirs'] ?? array());
+$auditCollationIssues = (array) ($auditReport['collation_issues'] ?? array());
+$auditColumnCollationIssues = (array) ($auditReport['column_collation_issues'] ?? array());
+$auditCollationHistogram = (array) ($auditReport['collation_histogram'] ?? array());
+$auditDuplicateIndexes = (array) ($auditReport['duplicate_indexes'] ?? array());
+$auditMenuIssues = (array) ($auditReport['menu_issues'] ?? array());
+$auditDuplicateForms = (array) ($auditReport['duplicate_forms'] ?? array());
+$auditExtensionDuplicates = (array) ($auditReport['extension_duplicates'] ?? array());
+$auditExtensionLegacy = (array) ($auditReport['extension_legacy'] ?? array());
+$auditOrphanChecks = array_values(array_filter(
+    (array) ($auditReport['orphan_checks'] ?? array()),
+    static fn(array $check): bool => (int) ($check['count'] ?? 0) > 0
+));
+$notAvailable = Text::_('COM_BREEZINGFORMSNG_NOT_AVAILABLE');
 
 $versionValue = $versionInformation['version'] !== '' ? $versionInformation['version'] : $notAvailable;
 $creationDateValue = $versionInformation['creationDate'] !== '' ? $versionInformation['creationDate'] : $notAvailable;
@@ -387,12 +331,14 @@ $licenseValue = trim((string) ($versionInformation['license'] ?? ''));
 $genericLicenseValues = array('gpl', 'gnu/gpl', 'gnu/gpl v2 or later');
 
 if ($licenseValue === '' || in_array(strtolower($licenseValue), $genericLicenseValues, true)) {
-    $licenseValue = BFText::_('COM_BREEZINGFORMSNG_LICENSE_FALLBACK');
+    $licenseValue = Text::_('COM_BREEZINGFORMSNG_LICENSE_FALLBACK');
 }
 
 $licenseUrl = 'https://www.gnu.org/licenses/gpl-2.0.html';
 $vcmbUrl = 'https://breezingforms-ng.vcmb.fr';
 $githubUrl = 'https://github.com/vcmb-cyclo/com_breezingformsng';
+$githubOwner = 'vcmb-cyclo';
+$githubRepo = 'com_breezingformsng';
 $logFileName = (string) ($logReport['file'] ?? $notAvailable);
 $logSize = (int) ($logReport['size'] ?? 0);
 $logLoadedAt = (string) ($logReport['loaded_at'] ?? $notAvailable);
@@ -409,7 +355,7 @@ if ($logDisplayContent !== '') {
 
 $logTruncated = (int) ($logReport['truncated'] ?? 0) === 1;
 $logTailBytes = (int) ($logReport['tail_bytes'] ?? 0);
-$aboutDescription = (string) BFText::_('COM_BREEZINGFORMSNG_ABOUT_DESC');
+$aboutDescription = (string) Text::_('COM_BREEZINGFORMSNG_ABOUT_DESC');
 $aboutDescription = str_replace(
     '<strong>BreezingForms</strong>',
     '<strong>BreezingForms NG</strong>',
@@ -426,198 +372,13 @@ $aboutDescription = str_replace(
     $aboutDescription
 );
 ?>
-<style>
-    .bf-about-intro {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-    .bf-about-intro-media {
-        flex: 0 0 auto;
-    }
-    .bf-about-intro-content {
-        flex: 1 1 auto;
-        min-width: 0;
-    }
-    .bf-about-intro-content p {
-        margin: 0;
-        padding: 0;
-        text-align: left;
-    }
-    .bf-about-intro-links {
-        margin-top: .55rem;
-        display: flex;
-        gap: .5rem;
-        flex-wrap: wrap;
-    }
-    .bf-about-intro-link {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: .35rem;
-        font-size: .78rem;
-        font-weight: 700;
-        line-height: 1;
-        letter-spacing: .01em;
-        text-decoration: none;
-        border-radius: 999px;
-        padding: .45rem .8rem;
-        transition: transform .16s ease, box-shadow .16s ease, opacity .16s ease;
-    }
-    .bf-about-intro-link:hover,
-    .bf-about-intro-link:focus {
-        transform: translateY(-1px);
-        opacity: .95;
-        text-decoration: none;
-    }
-    .bf-about-intro-link--vcmb {
-        color: var(--bs-primary-text-emphasis, #0a58ca);
-        background: var(--bs-primary-bg-subtle, #e7f1ff);
-        border: 1px solid var(--bs-primary-border-subtle, #b6d4fe);
-    }
-    .bf-about-intro-link--github {
-        color: var(--bs-secondary-text-emphasis, #41464b);
-        background: var(--bs-secondary-bg-subtle, #e2e3e5);
-        border: 1px solid var(--bs-secondary-border-subtle, #d3d6d8);
-        box-shadow: 0 .35rem .9rem rgba(15, 23, 42, .16);
-    }
-    .bf-about-intro-link--license {
-        color: var(--bs-warning-text-emphasis, #664d03);
-        background: var(--bs-warning-bg-subtle, #fff3cd);
-        border: 1px solid var(--bs-warning-border-subtle, #ffecb5);
-        box-shadow: 0 .25rem .75rem rgba(191, 144, 0, .16);
-    }
-    .bf-about-intro-link--log {
-        color: var(--bs-success-text-emphasis, #0f5132);
-        background: var(--bs-success-bg-subtle, #d1e7dd);
-        border: 1px solid var(--bs-success-border-subtle, #badbcc);
-        box-shadow: 0 .25rem .75rem rgba(25, 135, 84, .16);
-    }
-    @media (max-width: 767.98px) {
-        .bf-about-intro {
-            flex-wrap: wrap;
-        }
-    }
-    .bf-about-version-card {
-        background:
-            radial-gradient(circle at 100% 0%, rgba(13, 110, 253, .10), transparent 48%),
-            radial-gradient(circle at 0% 100%, rgba(25, 135, 84, .09), transparent 44%),
-            linear-gradient(140deg, #f8fafc 0%, #ffffff 72%);
-        border: 1px solid #dbe4ee;
-        border-radius: 1rem;
-        overflow: hidden;
-    }
-    .bf-about-version-header {
-        border-bottom: 1px dashed #d2dbe6;
-        padding-bottom: .75rem;
-    }
-    .bf-about-version-title {
-        color: #172b4d;
-        font-weight: 700;
-        letter-spacing: .01em;
-    }
-    .bf-about-version-badge {
-        background-color: #172b4d;
-        color: #ffffff;
-        border-radius: 999px;
-        font-size: .72rem;
-        letter-spacing: .04em;
-        text-transform: uppercase;
-        padding: .35rem .65rem;
-    }
-    .bf-about-version-tile {
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        gap: .35rem;
-        height: 100%;
-        border: 1px solid #dce3eb;
-        border-radius: .9rem;
-        background: linear-gradient(180deg, #ffffff 0%, #fcfdff 100%);
-        padding: 1.05rem 1.05rem .95rem;
-        box-shadow: 0 .5rem 1rem rgba(15, 23, 42, .06);
-        transition: transform .2s ease, box-shadow .2s ease;
-    }
-    .bf-about-version-tile::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: .23rem;
-        border-radius: .9rem .9rem 0 0;
-        background: var(--bf-accent-color, #0d6efd);
-    }
-    .bf-about-version-tile:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 .65rem 1.25rem rgba(15, 23, 42, .1);
-    }
-    .bf-about-version-tile--version {
-        --bf-accent-color: #0d6efd;
-    }
-    .bf-about-version-tile--date {
-        --bf-accent-color: #198754;
-    }
-    .bf-about-version-tile--author {
-        --bf-accent-color: #fd7e14;
-    }
-    .bf-about-version-tile--license {
-        --bf-accent-color: #d39e00;
-    }
-    .bf-about-version-icon {
-        width: 2rem;
-        height: 2rem;
-        border-radius: 50%;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: .72rem;
-        font-weight: 700;
-        letter-spacing: .04em;
-        background-color: #e8f1ff;
-        color: #0d6efd;
-    }
-    .bf-about-version-tile--date .bf-about-version-icon {
-        background-color: #e7f6ed;
-        color: #198754;
-    }
-    .bf-about-version-tile--author .bf-about-version-icon {
-        background-color: #fff1e8;
-        color: #fd7e14;
-    }
-    .bf-about-version-tile--license .bf-about-version-icon {
-        background-color: #fff8db;
-        color: #a56b00;
-    }
-    .bf-about-version-label {
-        margin: .15rem 0 0;
-        color: #6c757d;
-        font-size: .74rem;
-        font-weight: 700;
-        letter-spacing: .05em;
-        text-transform: uppercase;
-    }
-    .bf-about-version-value {
-        margin: 0;
-        color: #1b2a41;
-        font-size: 1.22rem;
-        font-weight: 700;
-        line-height: 1.25;
-        word-break: break-word;
-    }
-    .bf-about-version-link {
-        margin-top: .4rem;
-        font-size: .76rem;
-        font-weight: 700;
-    }
-</style>
 
 <form action="index.php?option=com_breezingformsng&task=about.display&amp;view=about" method="post" name="adminForm" id="adminForm">
     <div class="bf-about-intro mt-3 mb-3">
         <div class="bf-about-intro-media">
             <img
                 src="<?php echo htmlspecialchars(Uri::root(true) . '/media/com_breezingformsng/images/bf_logo.png', ENT_QUOTES, 'UTF-8'); ?>"
-                alt="<?php echo htmlspecialchars(BFText::_('COM_BREEZINGFORMSNG_ABOUT'), ENT_QUOTES, 'UTF-8'); ?>"
+                alt="<?php echo htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_ABOUT'), ENT_QUOTES, 'UTF-8'); ?>"
                 class="img-fluid"
                 style="max-width: 150px; height: auto;"
                 loading="lazy"
@@ -628,18 +389,284 @@ $aboutDescription = str_replace(
                 <?php echo $aboutDescription; ?>
             </p>
             <div class="bf-about-intro-links">
-                <a class="bf-about-intro-link bf-about-intro-link--vcmb" href="<?php echo htmlspecialchars($vcmbUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer"><?php echo BFText::_('COM_BREEZINGFORMSNG_VCMB_LINK'); ?></a>
-                <a class="bf-about-intro-link bf-about-intro-link--github" href="<?php echo htmlspecialchars($githubUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer"><?php echo BFText::_('COM_BREEZINGFORMSNG_GITHUB_LINK'); ?></a>
-                <a class="bf-about-intro-link bf-about-intro-link--license" href="<?php echo htmlspecialchars($licenseUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer"><?php echo BFText::_('COM_BREEZINGFORMSNG_LICENSE_LINK'); ?></a>
-                <a class="bf-about-intro-link bf-about-intro-link--log" href="#bf-about-log"><?php echo BFText::_('COM_BREEZINGFORMSNG_ABOUT_SHOW_LOG'); ?></a>
+                <a class="bf-about-intro-link bf-about-intro-link--vcmb" href="<?php echo htmlspecialchars($vcmbUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer"><?php echo Text::_('COM_BREEZINGFORMSNG_VCMB_LINK'); ?></a>
+                <a class="bf-about-intro-link bf-about-intro-link--github" href="<?php echo htmlspecialchars($githubUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer"><?php echo Text::_('COM_BREEZINGFORMSNG_GITHUB_LINK'); ?></a>
+                <iframe
+                    src="<?php echo htmlspecialchars('https://ghbtns.com/github-btn.html?user=' . $githubOwner . '&repo=' . $githubRepo . '&type=star&count=true&size=large', ENT_QUOTES, 'UTF-8'); ?>"
+                    frameborder="0"
+                    scrolling="0"
+                    width="170"
+                    height="30"
+                    title="<?php echo htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_GITHUB_STARS'), ENT_QUOTES, 'UTF-8'); ?>"
+                    style="display:block;align-self:center;"
+                    loading="lazy"
+                ></iframe>
+                <a class="bf-about-intro-link bf-about-intro-link--license" href="<?php echo htmlspecialchars($licenseUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer"><?php echo Text::_('COM_BREEZINGFORMSNG_LICENSE_LINK'); ?></a>
+                <a class="bf-about-intro-link bf-about-intro-link--log" href="#bf-about-log"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_SHOW_LOG'); ?></a>
             </div>
         </div>
     </div>
 
+    <?php if ($auditReport !== array()) : ?>
+        <div class="card mt-3" id="bf-audit-section">
+            <div class="card-body p-3 p-lg-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                    <h3 class="h5 mb-0"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_REPORT_TITLE'); ?></h3>
+                    <span class="text-muted small">
+                        <?php echo Text::sprintf(
+                            'COM_BREEZINGFORMSNG_ABOUT_AUDIT_GENERATED_AT',
+                            htmlspecialchars((string) ($auditReport['generated_at'] ?? $notAvailable), ENT_QUOTES, 'UTF-8')
+                        ); ?>
+                    </span>
+                </div>
+
+                <?php if ((int) ($auditSummary['issues_total'] ?? 0) === 0) : ?>
+                    <div class="alert alert-success bf-audit-ok-alert">
+                        <?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_REPORT_CLEAN'); ?>
+                    </div>
+                <?php else : ?>
+                    <div class="alert alert-warning bf-audit-warning-alert">
+                        <?php echo Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_REPORT_ISSUES', (int) ($auditSummary['issues_total'] ?? 0)); ?>
+                    </div>
+                <?php endif; ?>
+
+                <dl class="row mb-3">
+                    <dt class="col-sm-4"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_TABLES'); ?></dt>
+                    <dd class="col-sm-8"><?php echo (int) ($auditSummary['scanned_tables'] ?? 0); ?> / <?php echo (int) ($auditSummary['expected_tables'] ?? 0); ?></dd>
+                    <dt class="col-sm-4"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_ROWS'); ?></dt>
+                    <dd class="col-sm-8"><?php echo number_format((int) ($auditSummary['total_rows'] ?? 0), 0, '.', ' '); ?></dd>
+                    <dt class="col-sm-4"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_ORPHANS'); ?></dt>
+                    <dd class="col-sm-8"><?php echo (int) ($auditSummary['orphan_rows'] ?? 0); ?></dd>
+                </dl>
+
+                <?php if ($auditMissingTables !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_MISSING_TABLES'); ?></h4>
+                        <ul class="mb-0">
+                            <?php foreach ($auditMissingTables as $table) : ?>
+                                <li><code><?php echo htmlspecialchars((string) $table, ENT_QUOTES, 'UTF-8'); ?></code></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($auditUnexpectedTables !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_UNEXPECTED_TABLES'); ?></h4>
+                        <ul class="mb-0">
+                            <?php foreach ($auditUnexpectedTables as $table) : ?>
+                                <li><code><?php echo htmlspecialchars((string) $table, ENT_QUOTES, 'UTF-8'); ?></code></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($auditStaleLanguageFiles !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_STALE_LANGUAGE_FILES'); ?></h4>
+                        <ul class="mb-0">
+                            <?php foreach ($auditStaleLanguageFiles as $file) : ?>
+                                <li><code><?php echo htmlspecialchars((string) $file, ENT_QUOTES, 'UTF-8'); ?></code></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($auditStaleInstallerTempDirs !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_STALE_INSTALLER_TEMP'); ?></h4>
+                        <ul class="mb-0">
+                            <?php foreach ($auditStaleInstallerTempDirs as $dir) : ?>
+                                <li><code><?php echo htmlspecialchars((string) $dir, ENT_QUOTES, 'UTF-8'); ?></code></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($auditMenuIssues !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_MENU_ISSUES'); ?></h4>
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead><tr><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_MENU'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_MENU_FORM'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_ISSUE'); ?></th></tr></thead>
+                                <tbody>
+                                <?php foreach ($auditMenuIssues as $issue) : ?>
+                                    <tr class="table-warning">
+                                        <td><?php echo htmlspecialchars((string) ($issue['title'] ?? ''), ENT_QUOTES, 'UTF-8'); ?> <span class="text-muted">(#<?php echo (int) ($issue['menu_id'] ?? 0); ?>)</span></td>
+                                        <td><code><?php echo htmlspecialchars((string) ($issue['form_name'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code></td>
+                                        <td>
+                                            <?php foreach ((array) ($issue['issues'] ?? array()) as $code) : ?>
+                                                <?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_MENU_' . strtoupper((string) $code)); ?><br />
+                                            <?php endforeach; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($auditDuplicateForms !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_FORMS'); ?></h4>
+                        <p class="text-muted small mb-2"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_FORMS_DESC'); ?></p>
+                        <ul class="mb-0">
+                            <?php foreach ($auditDuplicateForms as $group) : ?>
+                                <li>
+                                    <code><?php echo htmlspecialchars((string) ($group['name'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code>
+                                    <?php if ((string) ($group['package'] ?? '') !== '') : ?>
+                                        <span class="text-muted">(<?php echo htmlspecialchars((string) $group['package'], ENT_QUOTES, 'UTF-8'); ?>)</span>
+                                    <?php endif; ?>
+                                    &mdash;
+                                    <?php echo Text::sprintf(
+                                        'COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_FORMS_HINT',
+                                        (int) ($group['keep']['id'] ?? 0),
+                                        (int) ($group['keep']['record_count'] ?? 0),
+                                        htmlspecialchars(implode(', ', array_map(
+                                            static fn(array $entry): string => '#' . (int) ($entry['id'] ?? 0),
+                                            (array) ($group['drop'] ?? array())
+                                        )), ENT_QUOTES, 'UTF-8')
+                                    ); ?>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($auditExtensionDuplicates !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_EXTENSION_DUPLICATES'); ?></h4>
+                        <ul class="mb-0">
+                            <?php foreach ($auditExtensionDuplicates as $group) : ?>
+                                <li>
+                                    <code><?php echo htmlspecialchars((string) ($group['keep']['type'] ?? '') . '/' . (string) ($group['keep']['element'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code>
+                                    &mdash;
+                                    <?php echo Text::sprintf(
+                                        'COM_BREEZINGFORMSNG_ABOUT_AUDIT_EXTENSION_DUPLICATE_HINT',
+                                        (int) ($group['keep']['extension_id'] ?? 0),
+                                        htmlspecialchars(implode(', ', array_map(
+                                            static fn(array $entry): string => '#' . (int) ($entry['extension_id'] ?? 0),
+                                            (array) ($group['drop'] ?? array())
+                                        )), ENT_QUOTES, 'UTF-8')
+                                    ); ?>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($auditExtensionLegacy !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_EXTENSION_LEGACY'); ?></h4>
+                        <ul class="mb-0">
+                            <?php foreach ($auditExtensionLegacy as $entry) : ?>
+                                <li>
+                                    <code><?php echo htmlspecialchars((string) ($entry['type'] ?? '') . '/' . ((string) ($entry['folder'] ?? '') !== '' ? (string) $entry['folder'] . '/' : '') . (string) ($entry['element'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code>
+                                    <span class="text-muted">(#<?php echo (int) ($entry['extension_id'] ?? 0); ?>)</span>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($auditCollationIssues !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_COLLATIONS'); ?></h4>
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead><tr><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_TABLE'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_CURRENT'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_EXPECTED'); ?></th></tr></thead>
+                                <tbody>
+                                <?php foreach ($auditCollationIssues as $issue) : ?>
+                                    <tr class="table-warning"><td><code><?php echo htmlspecialchars((string) ($issue['table'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code></td><td><?php echo htmlspecialchars((string) ($issue['collation'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td><td><?php echo htmlspecialchars((string) ($issue['expected'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td></tr>
+                                <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($auditColumnCollationIssues !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_COLUMN_COLLATIONS'); ?></h4>
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0">
+                                <thead><tr><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_TABLE'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_COLUMN'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_CURRENT'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_EXPECTED'); ?></th></tr></thead>
+                                <tbody>
+                                <?php foreach ($auditColumnCollationIssues as $issue) : ?>
+                                    <tr class="table-warning"><td><code><?php echo htmlspecialchars((string) ($issue['table'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code></td><td><code><?php echo htmlspecialchars((string) ($issue['column'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code></td><td><?php echo htmlspecialchars((string) ($issue['collation'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td><td><?php echo htmlspecialchars((string) ($issue['expected'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td></tr>
+                                <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                <?php endif; ?>
+
+                <?php if (count($auditCollationHistogram) > 1) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_MIXED_COLLATIONS'); ?></h4>
+                        <ul class="mb-0">
+                            <?php foreach ($auditCollationHistogram as $collationName => $count) : ?>
+                                <li><code><?php echo htmlspecialchars((string) $collationName, ENT_QUOTES, 'UTF-8'); ?></code>: <?php echo (int) $count; ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($auditDuplicateIndexes !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_INDEXES'); ?></h4>
+                        <ul class="mb-0">
+                            <?php foreach ($auditDuplicateIndexes as $issue) : ?>
+                                <li>
+                                    <code><?php echo htmlspecialchars((string) ($issue['table'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code>:
+                                    <?php echo htmlspecialchars(implode(', ', (array) ($issue['indexes'] ?? array())), ENT_QUOTES, 'UTF-8'); ?>
+                                    <?php if (($issue['keep'] ?? '') !== '' && (array) ($issue['drop'] ?? array()) !== array()) : ?>
+                                        &mdash;
+                                        <?php echo Text::sprintf(
+                                            'COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_INDEX_HINT',
+                                            htmlspecialchars((string) $issue['keep'], ENT_QUOTES, 'UTF-8'),
+                                            htmlspecialchars(implode(', ', (array) $issue['drop']), ENT_QUOTES, 'UTF-8')
+                                        ); ?>
+                                    <?php endif; ?>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($auditOrphanChecks !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3">
+                        <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_ORPHAN_REFERENCES'); ?></h4>
+                        <ul class="mb-0">
+                            <?php foreach ($auditOrphanChecks as $check) : ?>
+                                <li><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_' . strtoupper((string) ($check['id'] ?? ''))); ?>: <strong><?php echo (int) ($check['count'] ?? 0); ?></strong></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
+
+                <div class="bf-audit-section-block">
+                    <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_TABLE_INVENTORY'); ?></h4>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-striped align-middle mb-0">
+                            <thead><tr><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_TABLE'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_ROWS'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_ENGINE'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_COLLATION'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_SIZE'); ?></th></tr></thead>
+                            <tbody>
+                            <?php foreach ($auditTables as $table) : ?>
+                                <tr><td><code><?php echo htmlspecialchars((string) ($table['table'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code></td><td><?php echo number_format((int) ($table['rows'] ?? 0), 0, '.', ' '); ?></td><td><?php echo htmlspecialchars((string) ($table['engine'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td><td><?php echo htmlspecialchars((string) ($table['collation'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td><td><?php echo HTMLHelper::_('number.bytes', (int) ($table['size_bytes'] ?? 0)); ?></td></tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+
     <div class="card mt-3 bf-about-version-card">
         <div class="card-body p-3 p-lg-4">
             <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3 bf-about-version-header">
-                <h3 class="h5 mb-0 bf-about-version-title"><?php echo BFText::_('COM_BREEZINGFORMSNG_VERSION_INFORMATION'); ?></h3>
+                <h3 class="h5 mb-0 bf-about-version-title"><?php echo Text::_('COM_BREEZINGFORMSNG_VERSION_INFORMATION'); ?></h3>
                 <span class="bf-about-version-badge">BreezingForms</span>
             </div>
 
@@ -647,32 +674,32 @@ $aboutDescription = str_replace(
                 <div class="col-12 col-md-6 col-lg-2">
                     <div class="bf-about-version-tile bf-about-version-tile--version">
                         <span class="bf-about-version-icon" aria-hidden="true">VER</span>
-                        <p class="bf-about-version-label"><?php echo BFText::_('COM_BREEZINGFORMSNG_VERSION_LABEL'); ?></p>
+                        <p class="bf-about-version-label"><?php echo Text::_('COM_BREEZINGFORMSNG_VERSION_LABEL'); ?></p>
                         <p class="bf-about-version-value"><?php echo htmlspecialchars((string) $versionValue, ENT_QUOTES, 'UTF-8'); ?></p>
                     </div>
                 </div>
                 <div class="col-12 col-md-6 col-lg-2">
                     <div class="bf-about-version-tile bf-about-version-tile--date">
                         <span class="bf-about-version-icon" aria-hidden="true">DATE</span>
-                        <p class="bf-about-version-label"><?php echo BFText::_('COM_BREEZINGFORMSNG_CREATION_DATE_LABEL'); ?></p>
+                        <p class="bf-about-version-label"><?php echo Text::_('COM_BREEZINGFORMSNG_CREATION_DATE_LABEL'); ?></p>
                         <p class="bf-about-version-value"><?php echo htmlspecialchars((string) $creationDateValue, ENT_QUOTES, 'UTF-8'); ?></p>
                     </div>
                 </div>
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="bf-about-version-tile bf-about-version-tile--author">
                         <span class="bf-about-version-icon" aria-hidden="true">DEV</span>
-                        <p class="bf-about-version-label"><?php echo BFText::_('COM_BREEZINGFORMSNG_AUTHOR_LABEL'); ?></p>
+                        <p class="bf-about-version-label"><?php echo Text::_('COM_BREEZINGFORMSNG_AUTHOR_LABEL'); ?></p>
                         <p class="bf-about-version-value"><?php echo htmlspecialchars((string) $authorValue, ENT_QUOTES, 'UTF-8'); ?></p>
-                        <p class="bf-about-version-label mt-2"><?php echo BFText::_('COM_BREEZINGFORMSNG_COPYRIGHT_LABEL'); ?></p>
+                        <p class="bf-about-version-label mt-2"><?php echo Text::_('COM_BREEZINGFORMSNG_COPYRIGHT_LABEL'); ?></p>
                         <p class="bf-about-version-value"><?php echo htmlspecialchars((string) $copyrightValue, ENT_QUOTES, 'UTF-8'); ?></p>
                     </div>
                 </div>
                 <div class="col-12 col-md-12 col-lg-4">
                     <div class="bf-about-version-tile bf-about-version-tile--license">
                         <span class="bf-about-version-icon" aria-hidden="true">GPL</span>
-                        <p class="bf-about-version-label"><?php echo BFText::_('COM_BREEZINGFORMSNG_LICENSE_LABEL'); ?></p>
+                        <p class="bf-about-version-label"><?php echo Text::_('COM_BREEZINGFORMSNG_LICENSE_LABEL'); ?></p>
                         <p class="bf-about-version-value"><?php echo htmlspecialchars((string) $licenseValue, ENT_QUOTES, 'UTF-8'); ?></p>
-                        <a class="bf-about-version-link" href="<?php echo htmlspecialchars($licenseUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer"><?php echo BFText::_('COM_BREEZINGFORMSNG_LICENSE_LINK'); ?></a>
+                        <a class="bf-about-version-link" href="<?php echo htmlspecialchars($licenseUrl, ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer"><?php echo Text::_('COM_BREEZINGFORMSNG_LICENSE_LINK'); ?></a>
                     </div>
                 </div>
             </div>
@@ -681,10 +708,10 @@ $aboutDescription = str_replace(
 
     <div class="card mt-3" id="bf-about-log">
         <div class="card-body">
-            <h3 class="h6 card-title mb-3"><?php echo BFText::_('COM_BREEZINGFORMSNG_ABOUT_LOG_TITLE'); ?></h3>
+            <h3 class="h6 card-title mb-3"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_LOG_TITLE'); ?></h3>
             <p class="text-muted small mb-2">
                 <?php echo sprintf(
-                    BFText::_('COM_BREEZINGFORMSNG_ABOUT_LOG_LAST_READ'),
+                    Text::_('COM_BREEZINGFORMSNG_ABOUT_LOG_LAST_READ'),
                     htmlspecialchars($logFileName, ENT_QUOTES, 'UTF-8'),
                     number_format($logSize, 0, '.', ' '),
                     htmlspecialchars($logLoadedAt, ENT_QUOTES, 'UTF-8')
@@ -693,13 +720,13 @@ $aboutDescription = str_replace(
 
             <?php if ($logTruncated) : ?>
                 <div class="alert alert-warning py-2">
-                    <?php echo sprintf(BFText::_('COM_BREEZINGFORMSNG_ABOUT_LOG_TRUNCATED'), max(1, $logTailBytes)); ?>
+                    <?php echo sprintf(Text::_('COM_BREEZINGFORMSNG_ABOUT_LOG_TRUNCATED'), max(1, $logTailBytes)); ?>
                 </div>
             <?php endif; ?>
 
             <?php if ($logDisplayContent === '') : ?>
                 <div class="alert alert-info mb-0">
-                    <?php echo BFText::_('COM_BREEZINGFORMSNG_ABOUT_LOG_EMPTY'); ?>
+                    <?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_LOG_EMPTY'); ?>
                 </div>
             <?php else : ?>
                 <pre class="bg-body-tertiary text-body p-3 border rounded small mb-0" style="max-height: 420px; overflow: auto;"><?php echo htmlspecialchars($logDisplayContent, ENT_QUOTES, 'UTF-8'); ?></pre>
@@ -709,22 +736,22 @@ $aboutDescription = str_replace(
 
     <div class="card mt-3">
         <div class="card-body">
-            <h3 class="h6 card-title mb-3"><?php echo BFText::_('COM_BREEZINGFORMSNG_PHP_LIBRARIES'); ?></h3>
+            <h3 class="h6 card-title mb-3"><?php echo Text::_('COM_BREEZINGFORMSNG_PHP_LIBRARIES'); ?></h3>
             <?php if (empty($phpLibraries)) : ?>
                 <div class="alert alert-info mb-0">
-                    <?php echo BFText::_('COM_BREEZINGFORMSNG_PHP_LIBRARIES_NOT_AVAILABLE'); ?>
+                    <?php echo Text::_('COM_BREEZINGFORMSNG_PHP_LIBRARIES_NOT_AVAILABLE'); ?>
                 </div>
             <?php else : ?>
                 <p class="text-muted small">
-                    <?php echo sprintf(BFText::_('COM_BREEZINGFORMSNG_PHP_LIBRARIES_COUNT'), count($phpLibraries)); ?>
+                    <?php echo sprintf(Text::_('COM_BREEZINGFORMSNG_PHP_LIBRARIES_COUNT'), count($phpLibraries)); ?>
                 </p>
                 <div class="table-responsive">
                     <table class="table table-sm table-striped align-middle mb-0">
                         <thead>
                         <tr>
-                            <th scope="col"><?php echo BFText::_('COM_BREEZINGFORMSNG_PHP_LIBRARY'); ?></th>
-                            <th scope="col"><?php echo BFText::_('COM_BREEZINGFORMSNG_PHP_LIBRARY_VERSION'); ?></th>
-                            <th scope="col"><?php echo BFText::_('COM_BREEZINGFORMSNG_PHP_LIBRARY_SCOPE'); ?></th>
+                            <th scope="col"><?php echo Text::_('COM_BREEZINGFORMSNG_PHP_LIBRARY'); ?></th>
+                            <th scope="col"><?php echo Text::_('COM_BREEZINGFORMSNG_PHP_LIBRARY_VERSION'); ?></th>
+                            <th scope="col"><?php echo Text::_('COM_BREEZINGFORMSNG_PHP_LIBRARY_SCOPE'); ?></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -732,7 +759,7 @@ $aboutDescription = str_replace(
                             <tr>
                                 <td><?php echo htmlspecialchars((string) ($library['name'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td>
                                 <td><?php echo htmlspecialchars((string) (($library['version'] ?? '') !== '' ? $library['version'] : $notAvailable), ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td><?php echo BFText::_(!empty($library['is_dev']) ? 'COM_BREEZINGFORMSNG_PHP_LIBRARY_SCOPE_DEV' : 'COM_BREEZINGFORMSNG_PHP_LIBRARY_SCOPE_RUNTIME'); ?></td>
+                                <td><?php echo Text::_(!empty($library['is_dev']) ? 'COM_BREEZINGFORMSNG_PHP_LIBRARY_SCOPE_DEV' : 'COM_BREEZINGFORMSNG_PHP_LIBRARY_SCOPE_RUNTIME'); ?></td>
                             </tr>
                         <?php endforeach; ?>
                         </tbody>
@@ -744,23 +771,23 @@ $aboutDescription = str_replace(
 
     <div class="card mt-3">
         <div class="card-body">
-            <h3 class="h6 card-title mb-3"><?php echo BFText::_('COM_BREEZINGFORMSNG_JS_LIBRARIES'); ?></h3>
+            <h3 class="h6 card-title mb-3"><?php echo Text::_('COM_BREEZINGFORMSNG_JS_LIBRARIES'); ?></h3>
             <?php if (empty($javascriptLibraries)) : ?>
                 <div class="alert alert-info mb-0">
-                    <?php echo BFText::_('COM_BREEZINGFORMSNG_JS_LIBRARIES_NOT_AVAILABLE'); ?>
+                    <?php echo Text::_('COM_BREEZINGFORMSNG_JS_LIBRARIES_NOT_AVAILABLE'); ?>
                 </div>
             <?php else : ?>
                 <p class="text-muted small">
-                    <?php echo sprintf(BFText::_('COM_BREEZINGFORMSNG_JS_LIBRARIES_COUNT'), count($javascriptLibraries)); ?>
+                    <?php echo sprintf(Text::_('COM_BREEZINGFORMSNG_JS_LIBRARIES_COUNT'), count($javascriptLibraries)); ?>
                 </p>
                 <div class="table-responsive">
                     <table class="table table-sm table-striped align-middle mb-0">
                         <thead>
                         <tr>
-                            <th scope="col"><?php echo BFText::_('COM_BREEZINGFORMSNG_JS_LIBRARY'); ?></th>
-                            <th scope="col"><?php echo BFText::_('COM_BREEZINGFORMSNG_JS_LIBRARY_VERSION'); ?></th>
-                            <th scope="col"><?php echo BFText::_('COM_BREEZINGFORMSNG_JS_LIBRARY_ASSETS'); ?></th>
-                            <th scope="col"><?php echo BFText::_('COM_BREEZINGFORMSNG_JS_LIBRARY_SOURCE'); ?></th>
+                            <th scope="col"><?php echo Text::_('COM_BREEZINGFORMSNG_JS_LIBRARY'); ?></th>
+                            <th scope="col"><?php echo Text::_('COM_BREEZINGFORMSNG_JS_LIBRARY_VERSION'); ?></th>
+                            <th scope="col"><?php echo Text::_('COM_BREEZINGFORMSNG_JS_LIBRARY_ASSETS'); ?></th>
+                            <th scope="col"><?php echo Text::_('COM_BREEZINGFORMSNG_JS_LIBRARY_SOURCE'); ?></th>
                         </tr>
                         </thead>
                         <tbody>

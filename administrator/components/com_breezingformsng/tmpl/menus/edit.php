@@ -7,6 +7,7 @@
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 
@@ -127,11 +128,8 @@ $pkg  = $this->pkg;
   <?= HTMLHelper::_('form.token'); ?>
 </form>
 
-<script>
-Joomla.submitbutton = function (task) {
-  if (task === 'menus.cancel' || document.getElementById('adminForm').reportValidity()) {
-    document.getElementById('adminForm').querySelector('[name="task"]').value = task;
-    document.getElementById('adminForm').submit();
-  }
-};
-</script>
+<?php
+$bfDocument = Factory::getApplication()->getDocument();
+$bfDocument->getWebAssetManager()->useScript('com_breezingformsng.admin-form');
+$bfDocument->addScriptOptions('com_breezingformsng.admin-form', ['cancelTask' => 'menus.cancel']);
+?>

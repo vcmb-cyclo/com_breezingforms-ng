@@ -2,6 +2,7 @@
 /**
  * @package BreezingFormsNG
  * @author      Markus Bopp
+ * @author      XDA+GIL
  * @link        https://breezingforms-ng.vcmb.fr
  * @copyright Copyright (C) 2024-2026 by XDA+GIL
  * @license     GNU/GPL
@@ -15,8 +16,8 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Toolbar\ToolbarHelper;
-use Joomla\CMS\HTML\Helpers\Sidebar;
 use Joomla\CMS\Uri\Uri;
+use Vcmb\Component\BreezingformsNG\Administrator\Helper\BreadcrumbHelper;
 
 class HtmlView extends BaseHtmlView
 {
@@ -26,6 +27,7 @@ class HtmlView extends BaseHtmlView
     {
         $doc = Factory::getApplication()->getDocument();
         $doc->setTitle($this->getPageTitle());
+        $doc->getWebAssetManager()->getRegistry()->addExtensionRegistryFile('com_breezingformsng');
         $doc->getWebAssetManager()->addInlineStyle(
             '.icon-logo_left{
                 background-image:url(' . Uri::root(true) . '/media/com_breezingformsng/images/logo_left.png);
@@ -46,77 +48,6 @@ class HtmlView extends BaseHtmlView
  //       HTMLHelper::_('bootstrap.framework');
  //       $doc->addScript('media/system/js/core.js');
 
-        Sidebar::addEntry(
-            '<i class="fa fa-folder-open" aria-hidden="true"></i> ' . '<m>' .
-            \BFText::_('COM_BREEZINGFORMSNG_MANAGERECS') . '</m>',
-            'index.php?option=com_breezingformsng&view=records',
-            \BFRequest::getVar('view', '') == 'records'
-            || \BFRequest::getVar('act', '') == 'managerecs'
-            || \BFRequest::getVar('act', '') == 'recordmanagement'
-            || (\BFRequest::getVar('act', '') == '' && \BFRequest::getVar('view', '') == '')
-        );
-
-        Sidebar::addEntry(
-            '<i class="fa fa-pencil-square-o" aria-hidden="true"></i> ' . '<m>' .
-            \BFText::_('COM_BREEZINGFORMSNG_MANAGEFORMS') . '</m>',
-	            'index.php?option=com_breezingformsng&view=forms',
-	            \BFRequest::getVar('view', '') === 'forms'
-	            || \BFRequest::getVar('act', '') === 'manageforms'
-	            || \BFRequest::getVar('act', '') === 'quickmode'
-	        );
-
-        Sidebar::addEntry(
-            '<i class="fa fa-code" aria-hidden="true"></i> ' . '<m>' .
-            \BFText::_('COM_BREEZINGFORMSNG_MANAGESCRIPTS') . '</m>',
-            'index.php?option=com_breezingformsng&view=scripts',
-            \BFRequest::getVar('act', '') == 'managescripts' || \BFRequest::getVar('view', '') == 'scripts'
-        );
-
-        Sidebar::addEntry(
-            '<i class="fa fa-puzzle-piece" aria-hidden="true"></i> ' . '<m>' .
-            \BFText::_('COM_BREEZINGFORMSNG_MANAGEPIECES') . '</m>',
-            'index.php?option=com_breezingformsng&view=pieces',
-            \BFRequest::getVar('act', '') == 'managepieces' || \BFRequest::getVar('view', '') == 'pieces'
-        );
-
-        Sidebar::addEntry(
-            '<i class="fa fa-link" aria-hidden="true"></i> ' . '<m>' .
-            \BFText::_('COM_BREEZINGFORMSNG_INTEGRATOR') . '</m>',
-            'index.php?option=com_breezingformsng&view=integrator',
-            \BFRequest::getVar('view', '') === 'integrator'
-            || \BFRequest::getVar('act', '') === 'integrate'
-        );
-
-        Sidebar::addEntry(
-            '<i class="fa fa-bars" aria-hidden="true"></i> ' . '<m>' .
-            \BFText::_('COM_BREEZINGFORMSNG_MANAGEMENUS') . '</m>',
-            'index.php?option=com_breezingformsng&view=menus',
-            \BFRequest::getVar('view', '') === 'menus' || \BFRequest::getVar('act', '') === 'managemenus'
-        );
-
-        Sidebar::addEntry(
-            '<i class="fa fa-cog" aria-hidden="true"></i> ' . '<m>' .
-            \BFText::_('COM_BREEZINGFORMSNG_CONFIG') . '</m>',
-            'index.php?option=com_config&view=component&component=com_breezingformsng',
-            false
-        );
-
-        Sidebar::addEntry(
-            '<i class="fa fa-info-circle" aria-hidden="true"></i> ' . '<m>' .
-            \BFText::_('COM_BREEZINGFORMSNG_ABOUT') . '</m>',
-            'index.php?option=com_breezingformsng&task=about.display&view=about',
-            \BFRequest::getVar('view', '') == 'about'
-        );
-
-        $this->sidebar = '<div id="bf-sidebar">' . Sidebar::render() . '</div>';
-
-
-        Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('
-            jQuery(document).ready(function(){
-                jQuery("#bf-sidebar").appendTo("#wrapper");
-            });
-            ');
-
         parent::display($tpl);
     }
 
@@ -127,31 +58,82 @@ class HtmlView extends BaseHtmlView
 
     private function getToolbarTitle(): string
     {
-        $section = $this->getToolbarSectionTitle();
-
-        if ($section === '') {
-            return Text::_('COM_BREEZINGFORMSNG');
-        }
-
-        return Text::_('COM_BREEZINGFORMSNG') . ' / ' . $section;
+        return BreadcrumbHelper::render($this->getBreadcrumbSegments());
     }
 
-    private function getToolbarSectionTitle(): string
+    /**
+     * @return array<int, array{label: string, url?: ?string}>
+     */
+    private function getBreadcrumbSegments(): array
+    {
+        $segments = [
+            ['label' => Text::_('COM_BREEZINGFORMSNG'), 'url' => 'index.php?option=com_breezingformsng'],
+        ];
+
+        $section = $this->getSectionSegment();
+
+        if ($section === null) {
+            return $segments;
+        }
+
+        $segments[] = $section;
+
+        $detail = $this->getDetailLabel();
+
+        if ($detail !== null) {
+            $segments[] = ['label' => $detail, 'url' => null];
+        }
+
+        return $segments;
+    }
+
+    /**
+     * The current (deepest) breadcrumb segment, e.g. a record id or item name.
+     * Overridden by subclasses that render an edit-style layout. Returning
+     * null keeps the section segment above as the final (non-clickable) level.
+     */
+    protected function getDetailLabel(): ?string
+    {
+        return null;
+    }
+
+    /**
+     * @return array{label: string, url?: ?string}|null
+     */
+    private function getSectionSegment(): ?array
     {
         $input = Factory::getApplication()->getInput();
         $view = $input->getCmd('view', '');
         $act = $input->getCmd('act', '');
 
         return match (true) {
-            $view === 'scripts', $act === 'managescripts' => \BFText::_('COM_BREEZINGFORMSNG_MANAGESCRIPTS'),
-            $view === 'pieces', $act === 'managepieces' => \BFText::_('COM_BREEZINGFORMSNG_MANAGEPIECES'),
-            $view === 'records', $act === 'managerecs', $act === 'recordmanagement' => \BFText::_('COM_BREEZINGFORMSNG_RECORDS_SECTION_TITLE'),
-	            $view === 'forms', $act === 'manageforms', $act === 'quickmode' => \BFText::_('COM_BREEZINGFORMSNG_MANAGEFORMS'),
-            $view === 'menus', $act === 'managemenus' => \BFText::_('COM_BREEZINGFORMSNG_MANAGEMENUS'),
-            $act === 'integrate' => \BFText::_('COM_BREEZINGFORMSNG_INTEGRATOR'),
-            $act === 'configuration' => \BFText::_('COM_BREEZINGFORMSNG_CONFIG'),
-            $view === 'about' => \BFText::_('COM_BREEZINGFORMSNG_ABOUT'),
-            default => '',
+            $view === 'scripts', $act === 'managescripts' => [
+                'label' => Text::_('COM_BREEZINGFORMSNG_MANAGESCRIPTS'),
+                'url' => 'index.php?option=com_breezingformsng&view=scripts',
+            ],
+            $view === 'pieces', $act === 'managepieces' => [
+                'label' => Text::_('COM_BREEZINGFORMSNG_MANAGEPIECES'),
+                'url' => 'index.php?option=com_breezingformsng&view=pieces',
+            ],
+            $view === 'records', $act === 'managerecs', $act === 'recordmanagement' => [
+                'label' => Text::_('COM_BREEZINGFORMSNG_RECORDS_SECTION_TITLE'),
+                'url' => 'index.php?option=com_breezingformsng&view=records',
+            ],
+            $view === 'forms', $act === 'manageforms', $act === 'quickmode' => [
+                'label' => Text::_('COM_BREEZINGFORMSNG_MANAGEFORMS'),
+                'url' => 'index.php?option=com_breezingformsng&view=forms',
+            ],
+            $view === 'menus', $act === 'managemenus' => [
+                'label' => Text::_('COM_BREEZINGFORMSNG_MANAGEMENUS'),
+                'url' => 'index.php?option=com_breezingformsng&view=menus',
+            ],
+            $view === 'integrator', $act === 'integrate' => [
+                'label' => Text::_('COM_BREEZINGFORMSNG_INTEGRATOR'),
+                'url' => 'index.php?option=com_breezingformsng&view=integrator',
+            ],
+            $act === 'configuration' => ['label' => Text::_('COM_BREEZINGFORMSNG_CONFIG'), 'url' => null],
+            $view === 'about' => ['label' => Text::_('COM_BREEZINGFORMSNG_ABOUT'), 'url' => null],
+            default => null,
         };
     }
 }

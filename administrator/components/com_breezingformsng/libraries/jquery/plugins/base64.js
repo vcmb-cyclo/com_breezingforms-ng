@@ -1,3 +1,5 @@
+// BF legacy jQuery scope
+(function (jQuery) {
 	
 	/**
 	 * jQuery BASE64 functions
@@ -140,3 +142,4 @@
 			}
 		});
 	})(jQuery);
+}(window.JQuery));

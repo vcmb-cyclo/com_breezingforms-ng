@@ -15,25 +15,50 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Pieces;
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
-use BFText;
 use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Language\Text;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Toolbar\ToolbarHelper;
+use Vcmb\Component\BreezingformsNG\Administrator\Helper\BreadcrumbHelper;
 
 class Renderer
 {
+	private static function registerEditLabels(): void
+	{
+		$keys = [
+			'COM_BREEZINGFORMSNG_PIECES_ENTERIDENT',
+			'COM_BREEZINGFORMSNG_PIECES_ENTERNAME',
+			'COM_BREEZINGFORMSNG_PIECES_ENTTITLE',
+			'COM_BREEZINGFORMSNG_TEST_INVALID_SERVER_RESPONSE',
+			'COM_BREEZINGFORMSNG_TEST_NO_CHANGES',
+			'COM_BREEZINGFORMSNG_TEST_PASSED_SHORT',
+			'COM_BREEZINGFORMSNG_TEST_RUNNING',
+			'COM_BREEZINGFORMSNG_TEST_SAVE_FIRST_PIECE',
+			'COM_BREEZINGFORMSNG_TEST_SAVE_PIECE_BEFORE_CONTINUE',
+			'COM_BREEZINGFORMSNG_TEST_SAVE_PIECE_BEFORE_NAVIGATION',
+			'COM_BREEZINGFORMSNG_TEST_SAVE_PIECE_BEFORE_TESTS',
+			'COM_BREEZINGFORMSNG_TEST_SAVE_PIECE_BEFORE_UNIT_TESTS',
+			'COM_BREEZINGFORMSNG_TEST_UNIT_TESTS_NONE',
+		];
+
+		foreach ($keys as $key) {
+			Text::script($key);
+		}
+	}
+
 	static function edit($option, $pkg, &$row, &$typelist)
 	{
+		Factory::getApplication()->getInput()->set('hidemainmenu', 1);
 		global $ff_mossite, $ff_admsite, $ff_config;
-		$action = $row->id ? BFText::_('COM_BREEZINGFORMSNG_PIECES_EDITPIECE') : BFText::_('COM_BREEZINGFORMSNG_PIECES_ADDPIECE');
+		$action = $row->id ? Text::_('COM_BREEZINGFORMSNG_PIECES_EDITPIECE') : Text::_('COM_BREEZINGFORMSNG_PIECES_ADDPIECE');
 
-		$sectionTitle = BFText::_('COM_BREEZINGFORMSNG_MANAGEPIECES');
-		if ($row->id && $row->name !== '') {
-			$sectionTitle .= ' / ' . htmlspecialchars((string) $row->name, ENT_QUOTES, 'UTF-8');
-		}
-		$pageTitle = BFText::_('COM_BREEZINGFORMSNG') . ' / ' . $sectionTitle;
+		$pageTitle = BreadcrumbHelper::render([
+			['label' => Text::_('COM_BREEZINGFORMSNG'), 'url' => 'index.php?option=com_breezingformsng'],
+			['label' => Text::_('COM_BREEZINGFORMSNG_MANAGEPIECES'), 'url' => 'index.php?option=com_breezingformsng&view=pieces'],
+			['label' => $row->id && $row->name !== '' ? (string) $row->name : Text::_('COM_BREEZINGFORMSNG_PIECES_ADDPIECE')],
+		]);
 		Factory::getApplication()->getDocument()->setTitle(strip_tags($pageTitle));
 		ToolbarHelper::title($pageTitle, 'logo_left');
 
@@ -50,447 +75,46 @@ class Renderer
 			'unit_tests' => (string) $row->unit_tests
 		);
 		$safeInitialState = json_encode($initialState);
-		$unitTestsHelp = BFText::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS_HELP');
+		$unitTestsHelp = Text::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS_HELP');
 		HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
 		if ($row->id) {
-			ToolBarHelper::custom('prev', 'arrow-left', '', BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV'), false);
-			ToolBarHelper::custom('next', 'arrow-right', '', BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT'), false);
-			ToolBarHelper::custom('test', 'eye', '', BFText::_('COM_BREEZINGFORMSNG_TEST'), false);
+			ToolBarHelper::custom('prev', 'arrow-left', '', Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV'), false);
+			ToolBarHelper::custom('next', 'arrow-right', '', Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT'), false);
+			ToolBarHelper::custom('test', 'eye', '', Text::_('COM_BREEZINGFORMSNG_TEST'), false);
 		}
-		ToolBarHelper::custom('save', 'save.png', 'save_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_SAVE'), false);
-		ToolBarHelper::custom('cancel', 'cancel.png', 'cancel_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_QUICKMODE_CLOSE'), false);
+		ToolBarHelper::custom('save', 'save.png', 'save_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_SAVE'), false);
+		ToolBarHelper::custom('cancel', 'cancel.png', 'cancel_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_QUICKMODE_CLOSE'), false);
 		?>
-		<?php Factory::getApplication()->getDocument()->getWebAssetManager()->useScript('com_breezingformsng.areautils'); ?>
-		<script type="text/javascript">
-						<!--
-						function checkIdentifier(value)
-						{
-							var invalidChars = /\W/;
-							var error = '';
-							if (value == '')
-								error += "<?php echo BFText::_('COM_BREEZINGFORMSNG_PIECES_ENTERNAME'); ?>\n";
-							else
-			if (invalidChars.test(value))
-				error += "<?php echo BFText::_('COM_BREEZINGFORMSNG_PIECES_ENTERIDENT'); ?>\n";
-			return error;
-						} // checkIdentifier
-
-			function submitbutton(pressbutton) {
-				var form = document.adminForm;
-				var error = '';
-				if ((pressbutton == 'test' || pressbutton == 'prev' || pressbutton == 'next') && isEditTestBlocked()) {
-					alert('<?php echo addslashes(BFText::_('COM_BREEZINGFORMSNG_TEST_SAVE_PIECE_BEFORE_CONTINUE')); ?>');
-					return;
-				}
-				if (pressbutton != 'cancel' && pressbutton != 'test' && pressbutton != 'prev' && pressbutton != 'next') {
-					error += checkIdentifier(form.name.value, 'name');
-					if (form.title.value == '') error += "<?php echo BFText::_('COM_BREEZINGFORMSNG_PIECES_ENTTITLE'); ?>\n";
-				} // if
-				if (error != '')
-					alert(error);
-				else
-					var task = pressbutton === 'new' ? 'add' : (pressbutton === 'prev' ? 'previous' : pressbutton);
-					Joomla.submitform('pieces.' + task);
-			} // submitbutton
-			Joomla.submitbutton = submitbutton;
-			window.submitbutton = submitbutton;
-
-			onload = function () {
-				document.adminForm.title.focus();
-			} // onload
-
-			function getEditTestToolbarButton() {
-				return findToolbarButton('test', ['test']);
-			}
-
-			function getEditTestToolbarButtons() {
-				return findToolbarButtons('test', ['test']);
-			}
-
-			function getEditSaveToolbarButton() {
-				return findToolbarButton('save', ['save', 'enregistrer']);
-			}
-
-			function getEditPrevToolbarButton() {
-				return findToolbarButton('prev', ['prev', 'precedent']);
-			}
-
-			function getEditNextToolbarButton() {
-				return findToolbarButton('next', ['next', 'suivant']);
-			}
-
-			function findToolbarButton(taskName, textHints) {
-				var buttons = findToolbarButtons(taskName, textHints);
-				return buttons.length ? buttons[0] : null;
-			}
-
-			function findToolbarButtons(taskName, textHints) {
-				var toolbarRoots = document.querySelectorAll('#toolbar, .toolbar, .subhead, .btn-toolbar, joomla-toolbar, .joomla-toolbar-button');
-				var matches = [];
-				var seen = [];
-				function pushMatch(node) {
-					if (!node || node.id === 'bf-edit-piece-unit-tests-button') {
-						return;
-					}
-					var target = node.closest ? (node.closest('button, a, [role="button"], li, .btn, .toolbar-item') || node) : node;
-					if (seen.indexOf(target) === -1) {
-						seen.push(target);
-						matches.push(target);
-					}
-				}
-				var selectors = [
-					'#toolbar-' + taskName,
-					'.toolbar-' + taskName,
-					'.button-' + taskName,
-					'[data-task="' + taskName + '"]',
-					"[onclick*='" + taskName + "']",
-					"[href*='" + taskName + "']"
-				];
-				for (var r = 0; r < toolbarRoots.length; r++) {
-					for (var s = 0; s < selectors.length; s++) {
-						var scopedMatches = toolbarRoots[r].querySelectorAll(selectors[s]);
-						for (var m = 0; m < scopedMatches.length; m++) {
-							pushMatch(scopedMatches[m]);
-						}
-					}
-				}
-				for (var s = 0; s < selectors.length; s++) {
-					var directMatches = document.querySelectorAll(selectors[s]);
-					for (var d = 0; d < directMatches.length; d++) {
-						pushMatch(directMatches[d]);
-					}
-				}
-				var candidates = document.querySelectorAll('#toolbar button, #toolbar a, .toolbar button, .toolbar a, .subhead button, .subhead a, .btn-toolbar button, .btn-toolbar a, joomla-toolbar button, joomla-toolbar a, .joomla-toolbar-button button, .joomla-toolbar-button a');
-				if (!candidates.length) {
-					candidates = document.querySelectorAll('button, a, [role="button"]');
-				}
-				for (var i = 0; i < candidates.length; i++) {
-					var candidate = candidates[i];
-					var haystack = [
-						candidate.id || '',
-						candidate.className || '',
-						candidate.getAttribute('data-task') || '',
-						candidate.getAttribute('onclick') || '',
-						candidate.getAttribute('href') || '',
-						candidate.textContent || '',
-						candidate.title || '',
-						candidate.getAttribute('aria-label') || ''
-					].join(' ').toLowerCase();
-					if (haystack.indexOf(taskName.toLowerCase()) !== -1) {
-						pushMatch(candidate);
-					}
-					for (var h = 0; h < textHints.length; h++) {
-						if (haystack.indexOf(String(textHints[h]).toLowerCase()) !== -1) {
-							pushMatch(candidate);
-						}
-					}
-				}
-				return matches;
-			}
-
-			function normalizeValue(value) {
-				return String(value || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-			}
-
-			function getCodeMirrorInstance(field) {
-				if (!field || !field.parentNode) {
-					return null;
-				}
-				var sibling = field.nextElementSibling;
-				while (sibling) {
-					if (sibling.CodeMirror) {
-						return sibling.CodeMirror;
-					}
-					sibling = sibling.nextElementSibling;
-				}
-				var wrappers = field.parentNode.querySelectorAll('.CodeMirror');
-				for (var i = 0; i < wrappers.length; i++) {
-					if (field.compareDocumentPosition(wrappers[i]) & Node.DOCUMENT_POSITION_FOLLOWING) {
-						return wrappers[i].CodeMirror || null;
-					}
-				}
-				return null;
-			}
-
-			function getFieldValue(fieldId) {
-				var field = document.getElementById(fieldId);
-				if (!field && document.adminForm && document.adminForm.elements && document.adminForm.elements[fieldId]) {
-					field = document.adminForm.elements[fieldId];
-				}
-				if (!field) {
-					return '';
-				}
-				if (typeof RadioNodeList !== 'undefined' && field instanceof RadioNodeList) {
-					return field.value;
-				}
-				if (field.length && typeof field.value !== 'undefined' && !field.tagName) {
-					return field.value;
-				}
-				if (window.Joomla && Joomla.editors && Joomla.editors.instances && Joomla.editors.instances[fieldId] && typeof Joomla.editors.instances[fieldId].getValue === 'function') {
-					return Joomla.editors.instances[fieldId].getValue();
-				}
-				if (typeof field.value !== 'undefined') {
-					var codeMirrorInstance = getCodeMirrorInstance(field);
-					if (codeMirrorInstance) {
-						return codeMirrorInstance.getValue();
-					}
-					return field.value;
-				}
-				return '';
-			}
-
-			function getCurrentEditState() {
-				return {
-					title: getFieldValue('title'),
-					type: getFieldValue('type'),
-					package: getFieldValue('package'),
-					name: getFieldValue('name'),
-					published: getFieldValue('published'),
-					description: getFieldValue('description'),
-					code: getFieldValue('code'),
-					unit_tests: getFieldValue('unit_tests')
-				};
-			}
-
-			function isEditDirty() {
-				var initialState = <?php echo $safeInitialState; ?> || {};
-				var currentState = getCurrentEditState();
-				var keys = Object.keys(initialState);
-				for (var i = 0; i < keys.length; i++) {
-					var key = keys[i];
-					if (normalizeValue(currentState[key]) !== normalizeValue(initialState[key])) {
-						return true;
-					}
-				}
-				return false;
-			}
-
-			function isEditTestBlocked() {
-				return isEditDirty();
-			}
-
-			function syncEditSaveToolbarButton() {
-				var button = getEditSaveToolbarButton();
-				if (!button) {
-					return;
-				}
-				var isDirty = isEditDirty();
-				button.classList.toggle('disabled', !isDirty);
-				button.setAttribute('aria-disabled', isDirty ? 'false' : 'true');
-				button.style.pointerEvents = isDirty ? '' : 'none';
-				button.style.opacity = isDirty ? '' : '0.5';
-				if (button.tagName === 'BUTTON') {
-					button.disabled = !isDirty;
-				}
-				if (!isDirty) {
-					button.setAttribute('tabindex', '-1');
-					button.title = '<?php echo addslashes(BFText::_('COM_BREEZINGFORMSNG_TEST_NO_CHANGES')); ?>';
-				} else {
-					button.removeAttribute('tabindex');
-					button.title = '';
-				}
-			}
-
-			function syncEditTestToolbarButton() {
-				var buttons = getEditTestToolbarButtons();
-				if (!buttons.length) {
-					return;
-				}
-				var isBlocked = isEditTestBlocked();
-				for (var i = 0; i < buttons.length; i++) {
-					var button = buttons[i];
-					button.classList.toggle('disabled', isBlocked);
-					button.setAttribute('aria-disabled', isBlocked ? 'true' : 'false');
-					button.style.pointerEvents = isBlocked ? 'none' : '';
-					button.style.opacity = isBlocked ? '0.5' : '';
-					if (button.tagName === 'BUTTON') {
-						button.disabled = isBlocked;
-					}
-					if (isBlocked) {
-						button.setAttribute('tabindex', '-1');
-						button.title = '<?php echo addslashes(BFText::_('COM_BREEZINGFORMSNG_TEST_SAVE_PIECE_BEFORE_TESTS')); ?>';
-					} else {
-						button.removeAttribute('tabindex');
-						button.title = '';
-					}
-				}
-			}
-
-			function syncEditNavigationToolbarButton(button, title) {
-				if (!button) {
-					return;
-				}
-				var isBlocked = isEditDirty();
-				button.classList.toggle('disabled', isBlocked);
-				button.setAttribute('aria-disabled', isBlocked ? 'true' : 'false');
-				button.style.pointerEvents = isBlocked ? 'none' : '';
-				button.style.opacity = isBlocked ? '0.5' : '';
-				if (button.tagName === 'BUTTON') {
-					button.disabled = isBlocked;
-				}
-				if (isBlocked) {
-					button.setAttribute('tabindex', '-1');
-					button.title = title;
-				} else {
-					button.removeAttribute('tabindex');
-					button.title = '';
-				}
-			}
-
-			function syncEditPrevNextToolbarButtons() {
-				syncEditNavigationToolbarButton(getEditPrevToolbarButton(), '<?php echo addslashes(BFText::_('COM_BREEZINGFORMSNG_TEST_SAVE_PIECE_BEFORE_NAVIGATION')); ?>');
-				syncEditNavigationToolbarButton(getEditNextToolbarButton(), '<?php echo addslashes(BFText::_('COM_BREEZINGFORMSNG_TEST_SAVE_PIECE_BEFORE_NAVIGATION')); ?>');
-			}
-
-			function syncEditUnitTestsButton() {
-				var button = document.getElementById('bf-edit-piece-unit-tests-button');
-				var field = document.getElementById('unit_tests');
-				if (!button || !field) {
-					return;
-				}
-				var currentValue = String(field.value || '');
-				var hasTests = currentValue.trim() !== '';
-				var isDirty = isEditTestBlocked();
-				var enabled = hasTests && <?php echo $row->id ? 'true' : 'false'; ?> && !isDirty;
-				button.disabled = !enabled;
-				button.classList.toggle('disabled', !enabled);
-				button.setAttribute('aria-disabled', enabled ? 'false' : 'true');
-				if (!<?php echo $row->id ? 'true' : 'false'; ?>) {
-					button.title = '<?php echo addslashes(BFText::_('COM_BREEZINGFORMSNG_TEST_SAVE_FIRST_PIECE')); ?>';
-				} else if (isDirty) {
-					button.title = '<?php echo addslashes(BFText::_('COM_BREEZINGFORMSNG_TEST_SAVE_PIECE_BEFORE_UNIT_TESTS')); ?>';
-				} else {
-					button.title = enabled ? '' : '<?php echo addslashes(BFText::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS_NONE')); ?>';
-				}
-			}
-
-			function runPieceUnitTestsFromEdit() {
-				var form = document.adminForm;
-				if (!form) {
-					return false;
-				}
-				var button = document.getElementById('bf-edit-piece-unit-tests-button');
-				if (button && button.disabled) {
-					return false;
-				}
-				var resultBox = document.getElementById('bf-edit-piece-unit-tests-status');
-				var summary = document.getElementById('bf-edit-piece-unit-tests-summary');
-				var detailsWrap = document.getElementById('bf-edit-piece-unit-tests-details-wrap');
-				var details = document.getElementById('bf-edit-piece-unit-tests-details');
-				var payload = new URLSearchParams();
-				payload.set('option', form.option.value);
-				payload.set('view', 'pieces');
-				payload.set('task', 'pieces.runTestsAjax');
-				payload.set('pkg', form.pkg.value || '');
-				payload.set('id', form.id.value || '');
-				payload.set('code', document.getElementById('code').value || '');
-				payload.set('unit_tests', document.getElementById('unit_tests').value || '');
-				payload.set('test_function', document.getElementById('name').value || '');
-				payload.set('<?php echo Session::getFormToken(); ?>', '1');
-
-				resultBox.style.display = 'block';
-				resultBox.className = 'alert alert-info mt-3';
-				summary.textContent = '<?php echo addslashes(BFText::_('COM_BREEZINGFORMSNG_TEST_RUNNING')); ?>';
-				detailsWrap.style.display = 'none';
-				details.textContent = '';
-
-					fetch('index.php', {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-						},
-						body: payload.toString()
-					})
-						.then(function (response) { return response.text(); })
-						.then(function (text) {
-							var data;
-							var normalizedText = String(text || '').trim();
-							var jsonMarkers = ['{"error"', '{"warning"', '{"total"'];
-							var jsonStart = -1;
-							for (var i = 0; i < jsonMarkers.length; i++) {
-								var markerIndex = normalizedText.indexOf(jsonMarkers[i]);
-								if (markerIndex !== -1) {
-									jsonStart = markerIndex;
-									break;
-								}
-							}
-							var jsonEnd = normalizedText.lastIndexOf('}');
-							if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd >= jsonStart) {
-								normalizedText = normalizedText.slice(jsonStart, jsonEnd + 1);
-							}
-							try {
-								data = JSON.parse(normalizedText);
-							} catch (e) {
-								throw new Error(text || '<?php echo addslashes(BFText::_('COM_BREEZINGFORMSNG_TEST_INVALID_SERVER_RESPONSE')); ?>');
-							}
-							return data;
-						})
-						.then(function (data) {
-							if (data.error) {
-								resultBox.className = 'alert alert-danger mt-3';
-							summary.textContent = data.error;
-							return;
-						}
-						if (data.warning) {
-							resultBox.className = 'alert alert-warning mt-3';
-							summary.textContent = data.warning;
-							return;
-						}
-						resultBox.className = (data.failures && data.failures.length) ? 'alert alert-warning mt-3' : 'alert alert-success mt-3';
-						summary.textContent = String(data.passed || 0) + '/' + String(data.total || 0) + ' <?php echo addslashes(BFText::_('COM_BREEZINGFORMSNG_TEST_PASSED_SHORT')); ?>';
-						if (data.failures && data.failures.length) {
-							detailsWrap.style.display = 'block';
-							details.textContent = data.failures.join('\n\n');
-						}
-					})
-					.catch(function (error) {
-						resultBox.className = 'alert alert-danger mt-3';
-						summary.textContent = error && error.message ? error.message : String(error);
-					});
-				return false;
-			}
-
-			window.addEventListener('load', function () {
-				var form = document.getElementById('adminForm');
-				syncEditUnitTestsButton();
-				syncEditSaveToolbarButton();
-				syncEditTestToolbarButton();
-				syncEditPrevNextToolbarButtons();
-				if (form) {
-					['input', 'change'].forEach(function (eventName) {
-						form.addEventListener(eventName, function () {
-							syncEditUnitTestsButton();
-							syncEditSaveToolbarButton();
-							syncEditTestToolbarButton();
-							syncEditPrevNextToolbarButtons();
-						});
-					});
-					window.setInterval(function () {
-						syncEditUnitTestsButton();
-						syncEditSaveToolbarButton();
-						syncEditTestToolbarButton();
-						syncEditPrevNextToolbarButtons();
-					}, 500);
-				}
-			});
-			//-->
-		</script>
+		<?php
+		$document = Factory::getApplication()->getDocument();
+		$document->getWebAssetManager()->useScript('com_breezingformsng.areautils');
+		$document->getWebAssetManager()->useScript('com_breezingformsng.pieces-edit');
+		$document->addScriptOptions('com_breezingformsng.pieces-edit', [
+			'initialState' => $initialState,
+			'hasSavedRecord' => (bool) $row->id,
+			'csrfToken' => Session::getFormToken(),
+		]);
+		self::registerEditLabels();
+		?>
 		<form action="index.php?option=<?php echo htmlspecialchars($option, ENT_QUOTES); ?>&amp;view=pieces" method="post" name="adminForm" id="adminForm" class="adminForm">
 			<table cellpadding="4" cellspacing="1" border="0" class="adminform" style="width:100%;">
 				<tr>
 					<td></td>
 					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMSNG_PIECES_TITLE'); ?>:
+						<?php echo Text::_('COM_BREEZINGFORMSNG_PIECES_TITLE'); ?>:
 					</td>
 					<td nowrap>
 						<input type="text" size="50" maxlength="50" id="title" name="title" value="<?php echo $row->title; ?>"
 							class="inputbox" />
 						<?php
-						echo '<span><span title="' . HTMLHelper::tooltipText(BFText::_('COM_BREEZINGFORMSNG_PIECES_TIPTITLE')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
+						echo '<span><span title="' . HTMLHelper::tooltipText(Text::_('COM_BREEZINGFORMSNG_PIECES_TIPTITLE')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
 						?>
 					</td>
 					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMSNG_PIECES_TYPE'); ?>:
+						<?php echo Text::_('COM_BREEZINGFORMSNG_PIECES_TYPE'); ?>:
+						<?php
+						echo '<span><span title="' . HTMLHelper::tooltipText(Text::_('COM_BREEZINGFORMSNG_PIECES_TIPTYPE')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
+						?>
 						<select id="type" name="type" class="inputbox" size="1">
 							<?php
 							for ($t = 0; $t < count($typelist); $t++) {
@@ -507,35 +131,44 @@ class Renderer
 				<tr>
 					<td></td>
 					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMSNG_PIECES_PACKAGE'); ?>:
+						<?php echo Text::_('COM_BREEZINGFORMSNG_PIECES_PACKAGE'); ?>:
 					</td>
 					<td nowrap>
 						<input type="text" size="30" maxlength="30" id="package" name="package"
 							value="<?php echo $row->package; ?>" class="inputbox" />
+						<?php
+						echo '<span><span title="' . HTMLHelper::tooltipText(Text::_('COM_BREEZINGFORMSNG_PIECES_TIPPACKAGE')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
+						?>
 					</td>
 					<td></td>
 				</tr>
 				<tr>
 					<td></td>
 					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMSNG_PIECES_NAME'); ?>:
+						<?php echo Text::_('COM_BREEZINGFORMSNG_PIECES_NAME'); ?>:
 					</td>
 					<td nowrap>
 						<input type="text" size="30" maxlength="30" id="name" name="name" value="<?php echo $row->name; ?>"
 							class="inputbox" />
 						<?php
-						echo '<span><span title="' . HTMLHelper::tooltipText(BFText::_('COM_BREEZINGFORMSNG_PIECES_TIPNAME')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
+						echo '<span><span title="' . HTMLHelper::tooltipText(Text::_('COM_BREEZINGFORMSNG_PIECES_TIPNAME')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
 						?>
 					</td>
 					<td nowrap>
-						<?php echo BFText::_('COM_BREEZINGFORMSNG_PIECES_PUBLISHED'); ?>:
+						<?php echo Text::_('COM_BREEZINGFORMSNG_PIECES_PUBLISHED'); ?>:
 						<?php echo HTMLHelper::_('select.booleanlist', "published", "", $row->published); ?>
+						<?php
+						echo '<span><span title="' . HTMLHelper::tooltipText(Text::_('COM_BREEZINGFORMSNG_PIECES_TIPPUBLISHED')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
+						?>
 					</td>
 				</tr>
 				<tr>
 					<td></td>
 					<td nowrap colspan="3">
-						<?php echo BFText::_('COM_BREEZINGFORMSNG_PIECES_DESCRIPTION'); ?>:
+						<?php echo Text::_('COM_BREEZINGFORMSNG_PIECES_DESCRIPTION'); ?>:
+						<?php
+						echo '<span><span title="' . HTMLHelper::tooltipText(Text::_('COM_BREEZINGFORMSNG_PIECES_TIPDESCRIPTION')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
+						?>
 						<br />
 						<?php
 						$params = array('syntax' => 'html');
@@ -547,7 +180,10 @@ class Renderer
 				<tr>
 					<td></td>
 					<td nowrap colspan="3">
-						<?php echo BFText::_('COM_BREEZINGFORMSNG_PIECES_CODE'); ?>:
+						<?php echo Text::_('COM_BREEZINGFORMSNG_PIECES_CODE'); ?>:
+						<?php
+						echo '<span><span title="' . HTMLHelper::tooltipText(Text::_('COM_BREEZINGFORMSNG_PIECES_TIPCODE')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
+						?>
 						<br />
 
 						<?php
@@ -561,7 +197,7 @@ class Renderer
 				<tr>
 					<td></td>
 					<td nowrap colspan="3">
-						<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS'); ?>:
+						<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS'); ?>:
 						<?php
 						echo '<span><span title="' . htmlspecialchars($unitTestsHelp, ENT_QUOTES) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
 						?>
@@ -581,11 +217,11 @@ class Renderer
 						<textarea wrap="off" name="unit_tests" id="unit_tests" style="width:100%;" rows="8"
 							class="inputbox"><?php echo htmlspecialchars((string) $row->unit_tests, ENT_QUOTES); ?></textarea>
 						<div class="mt-2 text-muted">
-							<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS_FORMAT_HINT'); ?>:
+							<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS_FORMAT_HINT'); ?>:
 							<code>'12/ 02/2023 ' -> '12/02/2023'</code><br />
 							<code>' abc ' -> 'abc'</code><br />
 							<code>'' -> ''</code><br />
-							<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS_TYPES_HINT'); ?>
+							<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS_TYPES_HINT'); ?>
 						</div>
 						<div class="mt-3">
 							<button
@@ -593,16 +229,16 @@ class Renderer
 								id="bf-edit-piece-unit-tests-button"
 								class="btn btn-secondary"
 								onclick="return runPieceUnitTestsFromEdit();"
-								<?php echo $hasPersistedUnitTests ? '' : 'disabled="disabled" aria-disabled="true" title="' . ($row->id ? htmlspecialchars(BFText::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS_NONE'), ENT_QUOTES) : htmlspecialchars(BFText::_('COM_BREEZINGFORMSNG_TEST_SAVE_FIRST_PIECE'), ENT_QUOTES)) . '"'; ?>>
+								<?php echo $hasPersistedUnitTests ? '' : 'disabled="disabled" aria-disabled="true" title="' . ($row->id ? htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS_NONE'), ENT_QUOTES) : htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_TEST_SAVE_FIRST_PIECE'), ENT_QUOTES)) . '"'; ?>>
 								<span class="icon-play" aria-hidden="true"></span>
-								<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS'); ?>
+								<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS'); ?>
 							</button>
 						</div>
 						<div id="bf-edit-piece-unit-tests-status" class="alert mt-3" style="display:none;">
-							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS'); ?>:</strong>
+							<strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS'); ?>:</strong>
 							<div id="bf-edit-piece-unit-tests-summary"></div>
 							<div id="bf-edit-piece-unit-tests-details-wrap" style="display:none;">
-								<div><strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_DETAIL'); ?>:</strong></div>
+								<div><strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_DETAIL'); ?>:</strong></div>
 								<pre id="bf-edit-piece-unit-tests-details"></pre>
 							</div>
 						</div>
@@ -624,15 +260,15 @@ class Renderer
 	{
 		switch ($type) {
 			case 'Untyped':
-				return BFText::_('COM_BREEZINGFORMSNG_PIECES_UNTYPED');
+				return Text::_('COM_BREEZINGFORMSNG_PIECES_UNTYPED');
 			case 'Before Form':
-				return BFText::_('COM_BREEZINGFORMSNG_PIECES_BEFOREFORM');
+				return Text::_('COM_BREEZINGFORMSNG_PIECES_BEFOREFORM');
 			case 'After Form':
-				return BFText::_('COM_BREEZINGFORMSNG_PIECES_AFTERFORM');
+				return Text::_('COM_BREEZINGFORMSNG_PIECES_AFTERFORM');
 			case 'Begin Submit':
-				return BFText::_('COM_BREEZINGFORMSNG_PIECES_BEGINSUBMIT');
+				return Text::_('COM_BREEZINGFORMSNG_PIECES_BEGINSUBMIT');
 			case 'End Submit':
-				return BFText::_('COM_BREEZINGFORMSNG_PIECES_ENDSUBMIT');
+				return Text::_('COM_BREEZINGFORMSNG_PIECES_ENDSUBMIT');
 			default:
 				;
 		} // switch
@@ -641,95 +277,26 @@ class Renderer
 
 	static function listitems($option, &$rows, &$pkglist, $pkg, $showInternal, $search, $total, $limit, $limitstart, $pagination = null, $listOrder = 'a.name', $listDirn = 'asc', $filterState = '')
 	{
+		Factory::getApplication()->getInput()->set('hidemainmenu', 0);
 		global $ff_config, $ff_version;
 		$listOrder = (string) $listOrder;
 		$listDirn = strtolower((string) $listDirn);
 		$listDirn = $listDirn === 'desc' ? 'desc' : 'asc';
+		ToolBarHelper::custom('new', 'new.png', 'new_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_NEW'), false);
+		ToolBarHelper::custom('copy', 'copy.png', 'copy_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_COPY'), false);
+		ToolBarHelper::custom('publish', 'publish.png', 'publish_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_PUBLISH'), false);
+		ToolBarHelper::custom('unpublish', 'unpublish.png', 'unpublish_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_UNPUBLISH'), false);
+		ToolBarHelper::custom('remove', 'delete.png', 'delete_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_DELETE'), false);
 		?>
-			<script type="text/javascript">
-								<!--
-								function bfPiecesSyncPackage(form)
-								{
-									if (!form) {
-										return;
-									}
-									if (form.pkgsel && form.pkg) {
-										form.pkg.value = form.pkgsel.value === '' ? '- blank -' : form.pkgsel.value;
-									}
-								}
-
-								function bfPiecesSubmitList(resetLimitStart)
-								{
-									var form = document.adminForm;
-									if (!form) {
-										return false;
-									}
-									if (resetLimitStart && form.limitstart) {
-										form.limitstart.value = 0;
-									}
-									bfPiecesSyncPackage(form);
-									Joomla.submitform('', form);
-									return false;
-								}
-
-								function submitbutton(pressbutton)
-								{
-									var form = document.adminForm;
-									switch (pressbutton) {
-										case 'copy':
-										case 'publish':
-										case 'unpublish':
-										case 'remove':
-											if (form.boxchecked.value==0) {
-												alert("<?php echo BFText::_('COM_BREEZINGFORMSNG_PIECES_SELPIECESFIRST'); ?>");
-												return;
-											} // if
-											break;
-										default:
-											break;
-									} // switch
-									if (pressbutton == 'remove') {
-										if (!confirm("<?php echo BFText::_('COM_BREEZINGFORMSNG_PIECES_ASKDELETE'); ?>")) {
-											return;
-										}
-									}
-									bfPiecesSyncPackage(form);
-									var task = pressbutton === 'new' ? 'add' : pressbutton;
-									Joomla.submitform('pieces.' + task, form);
-								} // submitbutton
-								Joomla.submitbutton = submitbutton;
-
-			<?php
-
-			ToolBarHelper::custom('new', 'new.png', 'new_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_NEW'), false);
-			ToolBarHelper::custom('copy', 'copy.png', 'copy_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_COPY'), false);
-			ToolBarHelper::custom('publish', 'publish.png', 'publish_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_PUBLISH'), false);
-			ToolBarHelper::custom('unpublish', 'unpublish.png', 'unpublish_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_UNPUBLISH'), false);
-			ToolBarHelper::custom('remove', 'delete.png', 'delete_f2.png', BFText::_('COM_BREEZINGFORMSNG_TOOLBAR_DELETE'), false);
-			?>
-
-				function listItemTask(id, task) {
-					var f = document.adminForm;
-					var cb = document.getElementById(id);
-					if (cb && f) {
-					var checkboxes = f.querySelectorAll('input[type="checkbox"][id^="cb"]');
-					for (var i = 0; i < checkboxes.length; i++) {
-						checkboxes[i].checked = false;
-					}
-					cb.checked = true;
-					f.boxchecked.value = 1;
-					Joomla.submitbutton(task);
-					}
-					return false;
-				} // listItemTask
-				window.listItemTask = listItemTask;
-
-				//-->
-			</script>
+		<?php
+		Factory::getApplication()->getDocument()->getWebAssetManager()->useScript('com_breezingformsng.pieces-list');
+		Text::script('COM_BREEZINGFORMSNG_PIECES_SELPIECESFIRST');
+		Text::script('COM_BREEZINGFORMSNG_PIECES_ASKDELETE');
+		?>
 		<form action="index.php?option=<?php echo htmlspecialchars($option, ENT_QUOTES); ?>&amp;view=pieces" method="post" name="adminForm" id="adminForm">
 
 				<label class="bfPackageSelector">
-					<?php echo BFText::_('COM_BREEZINGFORMSNG_PIECES_PACKAGE'); ?>
+					<?php echo Text::_('COM_BREEZINGFORMSNG_PIECES_PACKAGE'); ?>
 					<select id="pkgsel" name="pkgsel" class="inputbox" size="1" onchange="return bfPiecesSubmitList(true);">
 					<?php
 					if (count($pkglist))
@@ -737,7 +304,7 @@ class Renderer
 							$selected = '';
 							if ($pkgEntry[0])
 								$selected = ' selected';
-							$label = $pkgEntry[1] === '' ? BFText::_('COM_BREEZINGFORMSNG_ALL_FILTER') : $pkgEntry[1];
+							$label = $pkgEntry[1] === '' ? Text::_('COM_BREEZINGFORMSNG_ALL_FILTER') : $pkgEntry[1];
 							echo '<option value="' . $pkgEntry[1] . '"' . $selected . '>' . $label . '&nbsp;</option>';
 						} // foreach
 					?>
@@ -747,10 +314,10 @@ class Renderer
 					<input type="hidden" name="show_internal" value="0" />
 					<input type="checkbox" name="show_internal" value="1" onchange="return bfPiecesSubmitList(true);"
 						<?php echo $showInternal ? 'checked' : ''; ?> />
-					<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_SHOW_INTERNAL_FUNCTIONS'); ?>
+					<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_SHOW_INTERNAL_FUNCTIONS'); ?>
 				</label>
 				<label class="bfPackageSelector bfFilterTools">
-					<?php echo BFText::_('COM_BREEZINGFORMSNG_FILTER'); ?>
+					<?php echo Text::_('COM_BREEZINGFORMSNG_FILTER'); ?>
 					<input type="text" name="search" id="search" class="inputbox"
 						value="<?php echo htmlspecialchars($search, ENT_QUOTES); ?>" onchange="return bfPiecesSubmitList(true);"
 						onkeydown="if(event.key==='Enter'){event.preventDefault();bfPiecesSubmitList(true);}" />
@@ -758,9 +325,9 @@ class Renderer
 				<label class="bfPackageSelector">
 					<select name="filter_state" id="filter_state" class="inputbox form-select form-select-sm"
 						onchange="return bfPiecesSubmitList(true);">
-						<option value=""><?php echo BFText::_('JOPTION_SELECT_PUBLISHED'); ?></option>
-						<option value="P"<?php echo $filterState === 'P' ? ' selected="selected"' : ''; ?>><?php echo BFText::_('JPUBLISHED'); ?></option>
-						<option value="U"<?php echo $filterState === 'U' ? ' selected="selected"' : ''; ?>><?php echo BFText::_('JUNPUBLISHED'); ?></option>
+						<option value=""><?php echo Text::_('JOPTION_SELECT_PUBLISHED'); ?></option>
+						<option value="P"<?php echo $filterState === 'P' ? ' selected="selected"' : ''; ?>><?php echo Text::_('JPUBLISHED'); ?></option>
+						<option value="U"<?php echo $filterState === 'U' ? ' selected="selected"' : ''; ?>><?php echo Text::_('JUNPUBLISHED'); ?></option>
 					</select>
 				</label>
 			<div style="clear: both;"></div>
@@ -799,7 +366,7 @@ class Renderer
 				</thead>
 				<tbody>
 				<?php if (count($rows) === 0) { ?>
-					<tr><td colspan="9" class="text-center text-muted py-4"><?php echo BFText::_('JGLOBAL_NO_MATCHING_RESULTS'); ?></td></tr>
+					<tr><td colspan="9" class="text-center text-muted py-4"><?php echo Text::_('JGLOBAL_NO_MATCHING_RESULTS'); ?></td></tr>
 				<?php } else {
 				for ($i = 0; $i < count($rows); $i++) {
 					$row = $rows[$i];
@@ -881,9 +448,10 @@ class Renderer
 
 	static function test($option, $pkg, &$row, $functionName, $paramNames, $paramDefaults, $paramValues = array(), $result = null, $output = '', $error = '', $safeMode = 1, $autoRun = false, $errorDetails = array(), $testMode = '', $unitTestResult = array(), $autoOpened = 0)
 	{
-		ToolBarHelper::custom('edit', 'undo', '', BFText::_('COM_BREEZINGFORMSNG_TEST_BACK'), false);
-		ToolBarHelper::custom('prev', 'arrow-left', '', BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV'), false);
-		ToolBarHelper::custom('next', 'arrow-right', '', BFText::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT'), false);
+		Factory::getApplication()->getInput()->set('hidemainmenu', 1);
+		ToolBarHelper::custom('edit', 'undo', '', Text::_('COM_BREEZINGFORMSNG_TEST_BACK'), false);
+		ToolBarHelper::custom('prev', 'arrow-left', '', Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV'), false);
+		ToolBarHelper::custom('next', 'arrow-right', '', Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT'), false);
 			$hasUnitTests = trim((string) $row->unit_tests) !== '';
 			$shouldAutoRunUnitTestsOnly = !$autoRun && $hasUnitTests && $testMode !== 'unit' && $result === null && $error === '' && empty($unitTestResult);
 			$showAutoOpenUnitWarning = ((int) $autoOpened === 1) &&
@@ -894,60 +462,27 @@ class Renderer
 				);
 			$autoOpenUnitFailureCount = !empty($unitTestResult['failures']) ? count($unitTestResult['failures']) : 0;
 			$autoOpenUnitWarningText = $autoOpenUnitFailureCount > 0
-				? $autoOpenUnitFailureCount . ' ' . BFText::_($autoOpenUnitFailureCount > 1 ? 'COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES_PLURAL' : 'COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES_SINGULAR')
-				: BFText::_('COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES_ON_OPEN');
+				? $autoOpenUnitFailureCount . ' ' . Text::_($autoOpenUnitFailureCount > 1 ? 'COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES_PLURAL' : 'COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES_SINGULAR')
+				: Text::_('COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES_ON_OPEN');
+			$document = Factory::getApplication()->getDocument();
+			$document->getWebAssetManager()->useScript('com_breezingformsng.pieces-test');
+			$document->addScriptOptions('com_breezingformsng.pieces-test', [
+				'autoSubmit' => $autoRun || $testMode === 'unit' || $shouldAutoRunUnitTestsOnly,
+				'forceUnitTestMode' => $shouldAutoRunUnitTestsOnly,
+			]);
 			?>
-		<script type="text/javascript">
-			Joomla.submitbutton = function (pressbutton) {
-				var task = pressbutton === 'prev' ? 'previous' : pressbutton;
-				Joomla.submitform('pieces.' + task, document.getElementById('adminForm'));
-			};
-			window.submitbutton = Joomla.submitbutton;
-		</script>
-		<?php if ($autoRun || $testMode === 'unit' || $shouldAutoRunUnitTestsOnly) { ?>
-			<script type="text/javascript">
-				window.addEventListener('load', function () {
-					var form = document.getElementById('adminForm');
-					if (!form) {
-						return;
-					}
-					<?php if ($shouldAutoRunUnitTestsOnly) { ?>
-					var testModeField = form.querySelector('input[name="test_mode"]');
-					if (testModeField) {
-						testModeField.value = 'unit';
-					}
-					<?php } ?>
-					var autoOpenField = form.querySelector('input[name="auto_open_tests"]');
-					if (autoOpenField) {
-						autoOpenField.value = '1';
-					}
-					form.submit();
-				});
-			</script>
-		<?php } ?>
 		<form action="index.php" method="post" name="adminForm" id="adminForm" class="adminForm">
 			<?php if ($showAutoOpenUnitWarning) { ?>
 				<div id="bf-piece-auto-unit-warning" class="alert alert-warning">
 					<span class="icon-warning text-warning" aria-hidden="true"></span>
 					<?php echo htmlspecialchars($autoOpenUnitWarningText, ENT_QUOTES); ?>
 				</div>
-				<script type="text/javascript">
-					window.addEventListener('load', function () {
-						var banner = document.getElementById('bf-piece-auto-unit-warning');
-						if (!banner) {
-							return;
-						}
-						window.setTimeout(function () {
-							banner.style.display = 'none';
-						}, 5000);
-					});
-				</script>
 			<?php } ?>
 			<div class="d-flex justify-content-between align-items-center mb-3">
-				<h2 class="m-0"><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_PHP_PIECE'); ?></h2>
+				<h2 class="m-0"><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_PHP_PIECE'); ?></h2>
 				<button type="submit" class="btn btn-primary">
 					<span class="icon-play" aria-hidden="true"></span>
-					<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_RUN'); ?>
+					<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_RUN'); ?>
 				</button>
 			</div>
 			<h3><?php echo htmlspecialchars($row->title, ENT_QUOTES); ?></h3>
@@ -955,13 +490,13 @@ class Renderer
 				<div class="card-body">
 					<div class="row">
 						<div class="col-sm-6 col-md-4">
-							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_PHP_PIECE_ID'); ?>:</strong> <?php echo (int) $row->id; ?>
+							<strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_PHP_PIECE_ID'); ?>:</strong> <?php echo (int) $row->id; ?>
 						</div>
 						<div class="col-sm-6 col-md-4">
-							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_SCRIPTS_PACKAGE'); ?>:</strong> <?php echo htmlspecialchars($row->package, ENT_QUOTES); ?>
+							<strong><?php echo Text::_('COM_BREEZINGFORMSNG_SCRIPTS_PACKAGE'); ?>:</strong> <?php echo htmlspecialchars($row->package, ENT_QUOTES); ?>
 						</div>
 						<div class="col-sm-6 col-md-4">
-							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_FUNCTION'); ?>:</strong> <?php echo htmlspecialchars($functionName, ENT_QUOTES); ?>
+							<strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_FUNCTION'); ?>:</strong> <?php echo htmlspecialchars($functionName, ENT_QUOTES); ?>
 						</div>
 					</div>
 				</div>
@@ -970,23 +505,23 @@ class Renderer
 				<div class="card-body">
 					<div class="row">
 						<div class="col-sm-6 col-md-3">
-							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_CREATED'); ?>:</strong> <?php echo $row->created ? HTMLHelper::date($row->created, 'Y-m-d H:i', true) : '-'; ?>
+							<strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_CREATED'); ?>:</strong> <?php echo $row->created ? HTMLHelper::date($row->created, 'Y-m-d H:i', true) : '-'; ?>
 						</div>
 						<div class="col-sm-6 col-md-3">
-							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_CREATED_BY'); ?>:</strong> <?php echo htmlspecialchars((string) $row->created_by, ENT_QUOTES); ?>
+							<strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_CREATED_BY'); ?>:</strong> <?php echo htmlspecialchars((string) $row->created_by, ENT_QUOTES); ?>
 						</div>
 						<div class="col-sm-6 col-md-3">
-							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_MODIFIED'); ?>:</strong> <?php echo $row->modified ? HTMLHelper::date($row->modified, 'Y-m-d H:i', true) : '-'; ?>
+							<strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_MODIFIED'); ?>:</strong> <?php echo $row->modified ? HTMLHelper::date($row->modified, 'Y-m-d H:i', true) : '-'; ?>
 						</div>
 						<div class="col-sm-6 col-md-3">
-							<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_MODIFIED_BY'); ?>:</strong> <?php echo htmlspecialchars((string) $row->modified_by, ENT_QUOTES); ?>
+							<strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_MODIFIED_BY'); ?>:</strong> <?php echo htmlspecialchars((string) $row->modified_by, ENT_QUOTES); ?>
 						</div>
 					</div>
 				</div>
 			</div>
 			<?php if (!empty($row->description)) { ?>
 				<div class="card mb-3">
-					<div class="card-header"><?php echo BFText::_('COM_BREEZINGFORMSNG_PIECES_DESCRIPTION'); ?></div>
+					<div class="card-header"><?php echo Text::_('COM_BREEZINGFORMSNG_PIECES_DESCRIPTION'); ?></div>
 					<div class="card-body">
 						<div class="form-control bg-light" style="white-space: pre-wrap;">
 							<?php echo HTMLHelper::_('content.prepare', $row->description); ?>
@@ -999,7 +534,7 @@ class Renderer
 					<h2 class="accordion-header" id="bfPieceCodeHeading">
 						<button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse"
 							data-bs-target="#bfPieceCodeCollapse" aria-expanded="false" aria-controls="bfPieceCodeCollapse">
-							<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_PIECE_CODE'); ?>
+							<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_PIECE_CODE'); ?>
 						</button>
 					</h2>
 					<div id="bfPieceCodeCollapse" class="accordion-collapse collapse" aria-labelledby="bfPieceCodeHeading"
@@ -1014,7 +549,7 @@ class Renderer
 						<h2 class="accordion-header" id="bfPieceUnitTestsHeading">
 							<button class="accordion-button collapsed bg-light" type="button" data-bs-toggle="collapse"
 								data-bs-target="#bfPieceUnitTestsCollapse" aria-expanded="false" aria-controls="bfPieceUnitTestsCollapse">
-								<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS'); ?>
+								<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS'); ?>
 							</button>
 						</h2>
 						<div id="bfPieceUnitTestsCollapse" class="accordion-collapse collapse" aria-labelledby="bfPieceUnitTestsHeading"
@@ -1027,18 +562,18 @@ class Renderer
 				<?php } ?>
 
 				<?php if (empty($functionName)) { ?>
-				<p><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_UNABLE_TO_DETECT_FUNCTION_SIGNATURE_PIECE'); ?></p>
+				<p><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_UNABLE_TO_DETECT_FUNCTION_SIGNATURE_PIECE'); ?></p>
 			<?php } else { ?>
 				<table cellpadding="4" cellspacing="1" border="0" class="adminform" style="width:100%;">
 					<tr>
-						<th align="left"><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_PARAMETER'); ?></th>
-						<th align="left"><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_VALUE'); ?></th>
+						<th align="left"><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_PARAMETER'); ?></th>
+						<th align="left"><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_VALUE'); ?></th>
 					</tr>
 					<?php
 					if (!count($paramNames)) {
 						?>
 						<tr>
-							<td><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_NO_PARAMETER'); ?></td>
+							<td><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_NO_PARAMETER'); ?></td>
 							<td>-</td>
 							<td></td>
 						</tr>
@@ -1061,7 +596,7 @@ class Renderer
 									<?php if ($i === $lastParamIndex) { ?>
 										<button type="submit" class="btn btn-primary">
 											<span class="icon-play" aria-hidden="true"></span>
-											<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_RUN'); ?>
+											<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_RUN'); ?>
 										</button>
 									<?php } ?>
 								</td>
@@ -1080,49 +615,49 @@ class Renderer
 			<?php if ($error !== '') { ?>
 				<div class="alert alert-danger bf-piece-test-alert">
 					<span class="icon-times text-danger" aria-hidden="true"></span>
-					<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_INVALID'); ?>: <?php echo htmlspecialchars($error, ENT_QUOTES); ?>
+					<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_INVALID'); ?>: <?php echo htmlspecialchars($error, ENT_QUOTES); ?>
 					<?php if ($output !== '') { ?>
-						<div><strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_OUTPUT'); ?>:</strong></div>
+						<div><strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_OUTPUT'); ?>:</strong></div>
 						<pre><?php echo htmlspecialchars($output, ENT_QUOTES); ?></pre>
 					<?php } ?>
 					<?php if ($result !== null) { ?>
-						<div><strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_RESULT'); ?>:</strong></div>
+						<div><strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_RESULT'); ?>:</strong></div>
 						<pre><?php echo htmlspecialchars(var_export($result, true), ENT_QUOTES); ?></pre>
 					<?php } ?>
 					<?php if (!empty($errorDetails)) { ?>
-						<div><strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_EXCEPTION'); ?>:</strong></div>
+						<div><strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_EXCEPTION'); ?>:</strong></div>
 						<pre><?php echo htmlspecialchars(print_r($errorDetails, true), ENT_QUOTES); ?></pre>
 					<?php } ?>
-					<div><strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_PARAMETERS'); ?>:</strong></div>
+					<div><strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_PARAMETERS'); ?>:</strong></div>
 					<pre><?php echo htmlspecialchars(print_r(array_combine($paramNames, $paramValues), true), ENT_QUOTES); ?></pre>
 				</div>
 			<?php } ?>
 			<?php if ($error === '' && $output !== '') { ?>
-				<p><strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_OUTPUT'); ?>:</strong></p>
+				<p><strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_OUTPUT'); ?>:</strong></p>
 				<pre><?php echo htmlspecialchars($output, ENT_QUOTES); ?></pre>
 			<?php } ?>
 			<?php if ($error === '' && $result !== null) { ?>
 				<div class="alert <?php echo $isEmptyResult ? 'alert-warning' : ($isSuccess ? 'alert-success' : 'alert-danger'); ?>">
-					<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_RESULT'); ?>:</strong>
+					<strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_RESULT'); ?>:</strong>
 					<pre><?php echo htmlspecialchars(var_export($result, true), ENT_QUOTES); ?></pre>
 					<?php if ($isEmptyResult) { ?>
 						<div>
 							<span class="icon-warning text-warning" aria-hidden="true"></span>
-							<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_WARNING_EMPTY_RESULT'); ?>
+							<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_WARNING_EMPTY_RESULT'); ?>
 						</div>
 					<?php } elseif ($isSuccess) { ?>
 						<div>
 							<span class="icon-check text-success" aria-hidden="true"></span>
-							<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_EXECUTED'); ?>
+							<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_EXECUTED'); ?>
 						</div>
 					<?php } else { ?>
 						<div>
 							<span class="icon-times text-danger" aria-hidden="true"></span>
-							<?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_INVALID_FALSE_RESULT'); ?>
+							<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_INVALID_FALSE_RESULT'); ?>
 						</div>
 					<?php } ?>
 					<?php if (!$isSuccess && !$isEmptyResult) { ?>
-						<div><strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_PARAMETERS'); ?>:</strong></div>
+						<div><strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_PARAMETERS'); ?>:</strong></div>
 						<pre><?php echo htmlspecialchars(print_r(array_combine($paramNames, $paramValues), true), ENT_QUOTES); ?></pre>
 					<?php } ?>
 				</div>
@@ -1132,15 +667,15 @@ class Renderer
 				$unitAlertClass = isset($unitTestResult['error']) ? 'alert-danger' : (isset($unitTestResult['warning']) ? 'alert-warning' : (empty($unitTestResult['failures']) ? 'alert-success' : 'alert-warning'));
 				?>
 				<div class="alert <?php echo $unitAlertClass; ?>">
-					<strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS'); ?>:</strong>
+					<strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS'); ?>:</strong>
 					<?php if (isset($unitTestResult['error'])) { ?>
 						<div><?php echo htmlspecialchars($unitTestResult['error'], ENT_QUOTES); ?></div>
 					<?php } elseif (isset($unitTestResult['warning'])) { ?>
 						<div><?php echo htmlspecialchars($unitTestResult['warning'], ENT_QUOTES); ?></div>
 					<?php } else { ?>
-						<div><?php echo (int) $unitTestResult['passed']; ?>/<?php echo (int) $unitTestResult['total']; ?> <?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_PASSED_SHORT'); ?></div>
+						<div><?php echo (int) $unitTestResult['passed']; ?>/<?php echo (int) $unitTestResult['total']; ?> <?php echo Text::_('COM_BREEZINGFORMSNG_TEST_PASSED_SHORT'); ?></div>
 						<?php if (!empty($unitTestResult['failures'])) { ?>
-							<div><strong><?php echo BFText::_('COM_BREEZINGFORMSNG_TEST_DETAIL'); ?>:</strong></div>
+							<div><strong><?php echo Text::_('COM_BREEZINGFORMSNG_TEST_DETAIL'); ?>:</strong></div>
 							<pre><?php echo htmlspecialchars(implode("\n\n", $unitTestResult['failures']), ENT_QUOTES); ?></pre>
 						<?php } ?>
 					<?php } ?>

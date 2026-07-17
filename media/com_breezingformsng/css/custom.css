@@ -223,6 +223,17 @@ main input[type=radio]:not(old) {
     opacity: 1 !important;
 }
 
+/* #bfQuickModeWrapper label.bfPropertyLabel floats left; wide sibling
+   fields (text inputs, textareas) naturally wrap onto their own line
+   below it because they don't fit in the remaining space next to the
+   float. The Yes/No switch's wrapper div is narrow enough to fit right
+   next to the label instead, so it stays on the same line unlike every
+   other field - force it onto its own line the same way. */
+.bfPropertyWrap .form-switch {
+    clear: both;
+    display: block !important;
+}
+
 main input[type=checkbox]:not(old) + label,
 main input[type=radio]:not(old) + label {
     display: inline-block;

@@ -274,6 +274,17 @@ class FormModel extends BaseModel
         )->execute();
     }
 
+    public function setDebugMode(int $id, int $state): void
+    {
+        $db = $this->db();
+        $db->setQuery(
+            $db->getQuery(true)
+                ->update($db->quoteName('#__facileforms_forms'))
+                ->set($db->quoteName('debug_mode') . ' = ' . $db->quote($state))
+                ->where($db->quoteName('id') . ' = ' . $db->quote($id))
+        )->execute();
+    }
+
     public function moveOrder(int $id, int $inc, string $pkg): void
     {
         $item = $this->getForm($id);

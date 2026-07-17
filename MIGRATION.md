@@ -813,13 +813,27 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 
 ### Chantiers de fond déjà décrits plus haut
 
-- [x] **Phase 9c, étape 2b (extraction JS statique des 4 renderers)** : terminée sur les 4 thèmes
+- [x] **Phase 9c, étape 2b (extraction JS statique globale des 4 renderers)** : terminée sur les 4 thèmes
   (Classic/Bootstrap par l'agent, Mobile/OnePage par l'utilisateur le 2026-07-17 — `28b8f099`/`ef4c19cf`,
-  y compris un vrai correctif jQuery 3/Ladda découvert au passage sur OnePage). Reste : les scripts inline
-  **par élément** dans la boucle `process()` de chaque renderer (résumeurs, formules `fieldCalc`
-  personnalisées, calendrier/signature/reCAPTCHA) — génuinement dynamiques, dépendent de la configuration de
-  chaque champ, extraction jugée plus délicate/risquée que l'étape 2b et pas encore entamée. La réécriture
-  native complète (au-delà de la seule extraction JS) reste le chantier de fond, non commencé.
+  y compris un vrai correctif jQuery 3/Ladda découvert au passage sur OnePage).
+  > **Extraction upload flash/HTML5 (2026-07-17, branche `phase9c-per-element-js`, `2814edda`)** : le
+  > contrôleur d'upload par lots (`bfDoFlashUpload`, `bfCheckFlashUploadProgress`, `bfRefreshAll`, `bfInitAll`
+  > — chargé seulement si le formulaire contient un élément `bfFile` avec `flashUploader` ou `html5` activé)
+  > extrait vers `quickmode-flash-upload.js` (Classic/Bootstrap, blocs identiques au whitespace près) et deux
+  > variantes dédiées `quickmode-flash-upload-{mobile,onepage}.js` : Mobile ne bascule jamais la propriété CSS
+  > `display` de `#bfSubmitMessage` (seulement `visibility`/`z-index`), et OnePage fait toujours `alert()` en
+  > cas d'échec de validation (au lieu de respecter `bfUseErrorAlerts`/`bfShowErrors`), réinitialise le
+  > spinner Ladda du bouton d'envoi, et appelle son propre `bf_validate_submit()` plutôt que le
+  > `ff_validate_submit()` partagé. Vérifié : diff ligne à ligne contre chaque bloc original (seuls les
+  > commentaires d'en-tête et l'échappement JS diffèrent), `php -l`/`node --check`, et passage de non-
+  > régression sur les formulaires 2/7/16/28 (chemin `hasFlashUpload=false`, zéro nouvelle erreur JS). Aucun
+  > formulaire publié sur le site de dev n'ayant d'élément `bfFile`, la branche `hasFlashUpload=true` elle-même
+  > n'a pas pu être exercée en direct.
+  >
+  > Reste : les scripts inline **par élément** dans la boucle `process()` de chaque renderer (résumeurs,
+  > formules `fieldCalc` personnalisées, calendrier/signature/reCAPTCHA) — génuinement dynamiques, dépendent
+  > de la configuration de chaque champ, extraction jugée plus délicate/risquée et pas encore entamée. La
+  > réécriture native complète (au-delà de la seule extraction JS) reste le chantier de fond, non commencé.
 - [~] **Vérification finale Phase 9 (repasse du 2026-07-17)** : après la fusion de la PR #29 et les
   extractions Mobile/OnePage, repasse partielle en conditions réelles :
   - [x] Rendu Classic (formulaires 2/16) et Bootstrap (formulaires 7/28) : zéro erreur JS, assets attendus

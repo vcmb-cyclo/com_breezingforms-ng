@@ -813,11 +813,31 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 
 ### Chantiers de fond déjà décrits plus haut
 
-- [ ] **Phase 9c** : la réécriture native des 4 rendus frontend `BFQuickMode*` (~11 100 lignes cumulées) est le
-  dernier gros chantier « Joomla 6 pur ». À traiter thème par thème en commençant par `BFQuickMode.php`
-  (le plus petit, thème par défaut). Les Phases 1–8 et 9a/9b sont terminées.
-- [ ] **Vérification finale Phase 9** : repasse complète des scénarios (rendu tous thèmes, soumission SEF,
-  callbacks paiement, upload, `commit()` Intégrateur).
+- [x] **Phase 9c, étape 2b (extraction JS statique des 4 renderers)** : terminée sur les 4 thèmes
+  (Classic/Bootstrap par l'agent, Mobile/OnePage par l'utilisateur le 2026-07-17 — `28b8f099`/`ef4c19cf`,
+  y compris un vrai correctif jQuery 3/Ladda découvert au passage sur OnePage). Reste : les scripts inline
+  **par élément** dans la boucle `process()` de chaque renderer (résumeurs, formules `fieldCalc`
+  personnalisées, calendrier/signature/reCAPTCHA) — génuinement dynamiques, dépendent de la configuration de
+  chaque champ, extraction jugée plus délicate/risquée que l'étape 2b et pas encore entamée. La réécriture
+  native complète (au-delà de la seule extraction JS) reste le chantier de fond, non commencé.
+- [~] **Vérification finale Phase 9 (repasse du 2026-07-17)** : après la fusion de la PR #29 et les
+  extractions Mobile/OnePage, repasse partielle en conditions réelles :
+  - [x] Rendu Classic (formulaires 2/16) et Bootstrap (formulaires 7/28) : zéro erreur JS, assets attendus
+    chargés.
+  - [x] Soumission SEF réelle (formulaire 28, page complète hors `tmpl=component`) : URL SEF changée après
+    envoi, enregistrement créé en base, supprimé après vérification.
+  - [x] Rendu Mobile et OnePage : couverts par les vérifications live déjà documentées dans les commits de
+    l'utilisateur (`28b8f099`/`ef4c19cf`, formulaire 35, Chrome headless avec UA iPhone / mode OnePage
+    temporaire) — non rejoués ici (tentative de reproduire le déclenchement mobile via un en-tête
+    `User-Agent` Playwright infructueuse : le rendu Mobile dépend de `mobileEnabled`/`forceMobile` sur le
+    formulaire **et** d'un état de session, pas seulement de l'UA de la requête ; à creuser si une
+    vérification Mobile est nécessaire dans une session future).
+  - [ ] Upload de fichier : aucun formulaire publié sur la base de dev ne contient actuellement d'élément
+    `bfFile` — non retestable en l'état sans modifier un formulaire réel ; dernière vérification connue
+    antérieure à ce lot de changements.
+  - [ ] `commit()` Intégrateur : non rejoué — hors périmètre des changements de ce lot (uniquement le JS des
+    renderers QuickMode a été touché), la vérification Phase 9b (insert/update/repli) fait toujours foi.
+  - [ ] Callbacks de paiement réels : toujours bloqué, accès sandbox nécessaire (cf. point dédié plus haut).
 
 ### Rappels permanents
 

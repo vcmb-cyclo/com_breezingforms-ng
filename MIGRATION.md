@@ -614,11 +614,22 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > Check) ; comportement fonctionnel revérifié en navigateur sur les formulaires 3 et 16 (le champ « montant
 > personnalisé » apparaît/disparaît toujours correctement selon le radio sélectionné).
 >
+> **Étape 2b, 2e extraction (2026-07-17, `29d91d9c`)** : `bf_validate_nextpage`, `bfCheckMaxlength`,
+> `bfRegisterSummarize`, `bfField`, `populateSummarizers` (~160 lignes) déplacées vers
+> `quickmode-core-helpers.js`. Deux dépendances dynamiques résolues sans plomberie nouvelle :
+> `document["<form_id>"]` → `document[ff_processor.form_id]` (déjà émis globalement par `header()`, qui
+> s'exécute toujours avant `render()`) ; le libellé traduit « chars left » → une ligne `var bfCharsLeftLabel`
+> inline, même schéma que `toggleFieldsArray`. Vérifié : rendu identique (formulaires 2/3/4/16) ; en navigateur
+> sur le formulaire 3 (Stripe), `bfField('MontantRadio')` lit bien la valeur radio réelle via
+> `document[ff_processor.form_id]`. Aucun formulaire en base n'utilise `maxlength` ou les summarizers — ces
+> deux chemins vérifiés par relecture de code uniquement (logique inchangée, seules les deux substitutions
+> ci-dessus diffèrent).
+>
 > **Étape 2b restante** — le gros du travail : `<script>` inline concaténés restants dans les 4 renderers
-> (bien plus volumineux que le bloc toggle-fields, avec de véritables dépendances aux données du formulaire —
-> extraction plus délicate), `Text::script()` pour les chaînes JS traduisibles, extraction des gabarits HTML
-> echo-és vers des layouts, typage strict. À mener bloc par bloc et renderer par renderer, en re-vérifiant le
-> rendu ET le comportement (pas seulement le HTML) par comparaison avant/après à chaque lot.
+> (bien plus volumineux, avec de véritables dépendances aux données du formulaire — extraction plus délicate),
+> `Text::script()` pour les chaînes JS traduisibles, extraction des gabarits HTML echo-és vers des layouts,
+> typage strict. À mener bloc par bloc et renderer par renderer, en re-vérifiant le rendu ET le comportement
+> (pas seulement le HTML) par comparaison avant/après à chaque lot.
 
 ### Vérification (à la complétion de la Phase 9)
 

@@ -596,10 +596,18 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > (formulaires 2, 4, 16), Bootstrap (7, 28), une page et mobile (formulaire de test 35 basculé temporairement
 > `mode=true`/`forceMobile` + UA iPhone, puis restauré).
 >
-> **Étape 2 restante** — modernisation interne des 4 renderers (contenu inchangé pour l'instant, simplement
-> déplacé) : `WebAssetManager` au lieu des `<script>` inline concaténés, `Text::script()` pour les chaînes JS,
-> extraction des gabarits HTML echo-és vers des layouts, typage strict. À mener renderer par renderer, en
-> re-vérifiant le rendu par comparaison avant/après à chaque lot.
+> **Étape 2a faite (2026-07-17, `62aa4f6f`)** — nettoyage du mort IE6/7/8 hérité, présent dans 3 des 4
+> renderers (absent de `MobileRenderer`) : détection UA `msie [1-8]` → chargement d'un polyfill html5shiv
+> (IE8 et antérieurs non supportés depuis une décennie, en plus de lire `$_SERVER['HTTP_USER_AGENT']` sans
+> garde) ; feuilles de style conditionnelles `<!--[if IE 6/7]-->` de `ClassicRenderer` (commentaires
+> conditionnels inertes dans tout navigateur depuis IE10, donc sans aucun effet) ; garde
+> `method_exists($doc, 'addCustomTag')` toujours vraie simplifiée. Vérifié octet pour octet : seuls ces
+> `<!--[if IE-->` disparaissent du rendu, rien d'autre ne change (formulaires 2/4/16 classique, 7/28 Bootstrap).
+>
+> **Étape 2b restante** — modernisation plus profonde (contenu fonctionnel inchangé pour l'instant, simplement
+> déplacé à l'étape 1) : `WebAssetManager` au lieu des `<script>` inline concaténés, `Text::script()` pour les
+> chaînes JS, extraction des gabarits HTML echo-és vers des layouts, typage strict. À mener renderer par
+> renderer, en re-vérifiant le rendu par comparaison avant/après à chaque lot.
 
 ### Vérification (à la complétion de la Phase 9)
 

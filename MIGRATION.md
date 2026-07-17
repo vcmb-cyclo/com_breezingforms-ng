@@ -824,6 +824,26 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 - Ne jamais supprimer les classes crosstec (`BFRequest`, `BFFactory`, `BFText`, `BFJoomlaConfig`, `BFPDF`,
   `BFIntegrate`, `BFQuickMode*`) sur la seule foi d'un grep du dépôt : du PHP stocké en base
   (`facileforms_pieces.code`, `forms.piece*code`) peut les appeler à l'exécution.
+  > **Incident corrigé le 2026-07-17** : `BFJoomlaConfig.php` et `BFPDF.php` avaient été supprimés du dépôt
+  > *et* ajoutés à `removeObsoleteComponentFiles()` dans `script.php` lors de la grosse PR de migration
+  > (`LegacyClassLoader.php`, l'autoloader paresseux qui les servait jusque-là, a été retiré à la même
+  > occasion sans que personne ne remarque que 2 des classes qu'il chargeait étaient encore couvertes par
+  > cette règle permanente). Restaurés + modernisés (`declare(strict_types=1)`, `Factory::getConfig()`
+  > déprécié remplacé par `Factory::getApplication()->getConfig()` pour `BFJoomlaConfig` ; `BFPDF` réduit à
+  > une façade `extends \Vcmb\Component\BreezingformsNG\Administrator\Service\PdfDocument` — l'implémentation
+  > réelle vit déjà là, exactement comme `BFQuickModeBootstrap/Mobile/OnePage extends` leurs renderers
+  > Phase 9c). **`BFText.php` souffrait du même bug** (toujours dans `removeObsoleteComponentFiles()` alors
+  > qu'il reste requis explicitement) et a été corrigé au passage. Sans autoloader générique, ces 3 classes
+  > sont maintenant chargées par des `require_once` explicites à deux endroits : `breezingformsng.php`
+  > (bootstrap frontend, couvre tout le rendu/soumission d'un formulaire) et
+  > `RecordsController::exportPdf()` (chemin d'export PDF admin, juste avant l'exécution d'un template
+  > `media/breezingforms/pdftpl/*.php` potentiellement personnalisé par le site). **Vérifié en conditions
+  > réelles** : rendu des formulaires 2/3/4/16/28 sans erreur, export PDF réel depuis l'écran Enregistrements
+  > (bouton Exporter → PDF) produisant un fichier PDF valide.
+  > **Conséquence pour les agents futurs** : avant de retirer un fichier de `libraries/crosstec/classes/`,
+  > vérifier (1) qu'aucun `require_once` explicite ne le charge encore ailleurs dans le dépôt, ET (2) que
+  > `script.php::removeObsoleteComponentFiles()` ne le liste pas déjà par erreur — les deux doivent être
+  > cohérents avec cette règle de rétention.
 - Déployer les fichiers de langue aux **deux** emplacements (`administrator/components/…/language/` et
   `administrator/language/`) puis vider `administrator/cache/language/` — l'agent `deploy` l'encode.
 - Toute chaîne utilisateur passe par les trois langues en-GB/fr-FR/de-DE simultanément (skill

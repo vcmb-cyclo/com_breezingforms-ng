@@ -56,6 +56,20 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
 
         }
 
+        if ($layout === 'edit') {
+            // edit.php's Init/Submitted script and Before/After/Begin/End
+            // Submit piece pickers call bfToggle() inline via onchange to
+            // swap which code editor is visible - defined here, not in the
+            // list-only branch below.
+            $document = Factory::getApplication()->getDocument();
+            $document->getWebAssetManager()->registerAndUseScript(
+                'com_breezingformsng.admin-form',
+                'media/com_breezingformsng/js/admin/admin-form.js',
+                ['version' => 'auto'],
+                ['defer' => true],
+                ['core']
+            );
+        }
 
         if ($layout === 'edit') {
             $id         = $input->getInt('id', 0);

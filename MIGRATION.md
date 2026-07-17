@@ -644,11 +644,25 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > `<div class="bfError">Ceci est un test</div>` et rend `.bfErrorMessage` visible, comportement identique à
 > l'original.
 >
-> **Étape 2b restante** — le gros du travail : `<script>` inline concaténés restants dans les 4 renderers
-> (bien plus volumineux, avec de véritables dépendances aux données du formulaire — extraction plus délicate),
-> `Text::script()` pour les chaînes JS traduisibles, extraction des gabarits HTML echo-és vers des layouts,
-> typage strict. À mener bloc par bloc et renderer par renderer, en re-vérifiant le rendu ET le comportement
-> (pas seulement le HTML) par comparaison avant/après à chaque lot.
+> **Étape 2b, extension à `BootstrapRenderer` (2026-07-17, `5fef6a38`)** : les blocs `headers()` globaux de
+> `BootstrapRenderer` se sont révélés **byte pour byte identiques** à ceux de `ClassicRenderer` (modulo les
+> substitutions déjà établies), donc réutilisation directe des mêmes fichiers statiques
+> (`quickmode-toggle-fields.js`, `quickmode-fade.js`, `quickmode-post-init.js`) plutôt que duplication.
+> Deux blocs différaient légèrement du thème classique et ont reçu leur propre variante Bootstrap :
+> `quickmode-core-helpers-bootstrap.js` (le masquage des summarizers utilise `.closest(".bfElemWrap")` au lieu
+> de `.parent()`) et `quickmode-error-alerts-bootstrap.js` (`bfShowErrors()` n'a jamais eu la branche
+> spécifique `bfSignature` du thème classique). Le rollover était déjà un no-op dans ce renderer
+> (`// removed in bootstrap`), laissé tel quel. Vérifié : rendu identique sur les formulaires 7 et 28 ; en
+> navigateur, aucune erreur console et `bfShowErrors()` produit le même résultat qu'avant.
+>
+> **Étape 2b restante** — `MobileRenderer` et `OnePageRenderer` n'ont pas encore reçu ce traitement (probable
+> même niveau de duplication à vérifier bloc par bloc, comme pour Bootstrap) ; dans `ClassicRenderer`/
+> `BootstrapRenderer`, il reste aussi les blocs `<script>` émis **dans la boucle de rendu par élément**
+> (calendrier, signature, reCAPTCHA, formules de calcul personnalisées) — ceux-là intègrent de la
+> configuration ou du code JS propre à chaque champ et n'ont pas la même marge d'extraction sans risque que
+> les blocs globaux déjà traités ; à évaluer au cas par cas. Reste aussi : `Text::script()` pour les chaînes
+> JS traduisibles restantes, extraction des gabarits HTML echo-és vers des layouts, typage strict. À mener
+> bloc par bloc, en re-vérifiant le rendu ET le comportement (pas seulement le HTML) à chaque lot.
 
 ### Vérification (à la complétion de la Phase 9)
 

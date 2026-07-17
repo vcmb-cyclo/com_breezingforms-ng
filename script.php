@@ -852,7 +852,7 @@ class com_breezingformsngInstallerScript
     {
         $requiredFiles = [
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/services/provider.php',
-            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/src/Extension/BreezingformsNGComponent.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/src/Extension/BreezingFormsNGComponent.php',
             JPATH_SITE . '/components/com_breezingformsng/breezingformsng.php',
         ];
 

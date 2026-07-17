@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS `#__facileforms_forms` (
   `template_areas` longtext,
   `ordering` int(11) NOT NULL DEFAULT '0',
   `published` tinyint(1) NOT NULL DEFAULT '0',
+  `debug_mode` tinyint(1) NOT NULL DEFAULT '0',
   `runmode` tinyint(1) NOT NULL DEFAULT '0',
   `name` varchar(255) NOT NULL DEFAULT '',
   `custom_mail_subject` varchar(255) NOT NULL DEFAULT '',

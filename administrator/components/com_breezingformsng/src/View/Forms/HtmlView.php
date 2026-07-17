@@ -117,6 +117,7 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
             );
             Text::script('JPUBLISHED');
             Text::script('JUNPUBLISHED');
+            Text::script('COM_BREEZINGFORMSNG_AJAX_STATE_ERROR');
 
             $session = Factory::getApplication()->getSession();
             $pkgIn   = $input->getString('pkg', '__unset__');

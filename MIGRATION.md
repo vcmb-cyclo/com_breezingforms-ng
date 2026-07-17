@@ -730,6 +730,24 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > JavaScript ; configuration originale restaurée ensuite. Aucun summarizer/maxlength n'étant configuré sur ce
 > formulaire, ces chemins restent validés par parité de code plutôt que par interaction.
 
+> **Étape 2b, compatibilité Plupload (2026-07-17)** : le shim statique identique des quatre renderers
+> (alias `mOxie`, `ctplupload.Image` et `Uploader::removeFileById`) est extrait vers
+> `quickmode-plupload-compat.js`, toujours chargé conditionnellement après `moxie.js`/`plupload.js` lorsqu'un
+> Flash Upload est présent. Aucun formulaire publié de la base de dev n'utilise Flash Upload ; le shim est donc
+> vérifié isolément sous Node avec les objets `moxie`/`plupload` simulés et les trois comportements confirmés.
+
+> **Étape 2b, tooltips Bootstrap (2026-07-17)** : l'initialiseur `document.ready` identique de
+> `BootstrapRenderer` et `OnePageRenderer` est extrait vers `quickmode-tooltip-init.js`, après le chargement natif
+> Joomla des frameworks jQuery/Bootstrap et de `bootstrap.tooltip`. Vérifié dans Chrome headless sur le formulaire
+> 35 en Bootstrap puis avec sa configuration OnePage temporaire : asset chargé et zéro erreur JavaScript dans les
+> deux cas ; configuration originale restaurée ensuite.
+
+> **Étape 2b, CSS runtime (2026-07-17)** : les règles statiques communes `.bfClearfix::after` et
+> `.bfFadingClass` de Classic/Bootstrap/OnePage sont extraites vers
+> `media/com_breezingformsng/css/site/quickmode-runtime.css`. La règle `.bfInline`, propre au thème Classic,
+> reste locale pour ne pas modifier Bootstrap/OnePage. Vérifié dans Chrome headless sur les formulaires 2
+> (Classic) et 35 (Bootstrap) : feuille chargée et zéro erreur JavaScript.
+
 ### Vérification (à la complétion de la Phase 9)
 
 - [ ] Chaque service qui remplace un fichier crosstec repasse les scénarios déjà validés dans ce document :

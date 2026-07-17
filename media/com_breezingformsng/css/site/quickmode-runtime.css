@@ -1,0 +1,12 @@
+/* Shared runtime helpers for Classic, Bootstrap and OnePage QuickMode. */
+.bfClearfix:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+
+.bfFadingClass {
+    display: none;
+}

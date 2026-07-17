@@ -588,6 +588,19 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 - Poste le plus lourd de la Phase 9. À traiter thème par thème, en commençant par `BFQuickMode.php` (le plus
   petit, thème par défaut) comme preuve de concept avant de reproduire l'approche sur les 3 autres.
 
+> **Étape 1 faite (2026-07-17, `abf36260` + `b1010c06`)** — migration structurelle : les corps des 4 classes
+> vivent désormais dans `Site\Service\Rendering\QuickMode\{Classic,Bootstrap,Mobile,OnePage}Renderer`
+> (namespace PSR-4, autoload natif) ; les fichiers crosstec `BFQuickMode*.php` sont réduits à des façades
+> vides (`class BFQuickMode extends ClassicRenderer {}`) conservées pour le PHP stocké en base et les appels
+> externes. Vérifié : rendu octet pour octet identique (hors horodatages) sur les 4 thèmes — classique
+> (formulaires 2, 4, 16), Bootstrap (7, 28), une page et mobile (formulaire de test 35 basculé temporairement
+> `mode=true`/`forceMobile` + UA iPhone, puis restauré).
+>
+> **Étape 2 restante** — modernisation interne des 4 renderers (contenu inchangé pour l'instant, simplement
+> déplacé) : `WebAssetManager` au lieu des `<script>` inline concaténés, `Text::script()` pour les chaînes JS,
+> extraction des gabarits HTML echo-és vers des layouts, typage strict. À mener renderer par renderer, en
+> re-vérifiant le rendu par comparaison avant/après à chaque lot.
+
 ### Vérification (à la complétion de la Phase 9)
 
 - [ ] Chaque service qui remplace un fichier crosstec repasse les scénarios déjà validés dans ce document :

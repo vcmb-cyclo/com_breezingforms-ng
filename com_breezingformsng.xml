@@ -36,7 +36,7 @@
 	</update>
 
 	<updateservers>
-		<server type="extension" name="BreezingForms-ng" priority="1">https://breezingforms-ng.vcmb.fr/download/com_breezingformsng_update.xml</server>
+		<server type="extension" name="BreezingForms-ng" priority="1">https://raw.githubusercontent.com/vcmb-cyclo/com_breezingformsng/main/com_breezingformsng_update.xml</server>
 	</updateservers>
 
 	<files folder="components/com_breezingformsng">

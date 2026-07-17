@@ -1,0 +1,2 @@
+.ui-wrapper { border: none /*1px dotted #000*/ !important; }
+.ui-wrapper input, .ui-wrapper textarea { border: 0 !important; }

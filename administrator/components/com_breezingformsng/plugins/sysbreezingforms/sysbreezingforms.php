@@ -1,0 +1,134 @@
+<?php
+/**
+ * @package     Joomla.Plugin
+ * @subpackage  System.log
+ *
+ * @copyright   Copyright (C) 2005 - 2015 Open Source Matters, Inc. All rights reserved.
+ * @copyright @copyright  Copyright (C) 2024-2026 by XDA+GIL
+ * @license GNU General Public License version 2 or later; see LICENSE.txt GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
+defined('_JEXEC') or die;
+
+use Joomla\CMS\Factory;
+use Joomla\Database\DatabaseInterface;
+use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Plugin\CMSPlugin;
+
+/**
+ * Joomla! System Logging Plugin.
+ *
+ * @since  1.5
+ */
+class PlgSystemSysbreezingforms extends CMSPlugin
+{
+    public function onBeforeRender()
+    {
+
+        if (!file_exists(JPATH_ADMINISTRATOR . '/components/com_breezingformsng/services/provider.php')) {
+            return;
+        }
+
+        $app = Factory::getApplication();
+        $input = $app->getInput();
+
+        try {
+                $bNotValid = Factory::getApplication()->isClient('administrator') &&
+                (
+                    (
+                        $input->getString('option') == 'com_breezingformsng' &&
+                        $input->getString('act', '') != '' &&
+                        $input->getString('act', '') != 'configuration'
+                    )
+                    ||
+                    $input->getString('option') == 'com_installer' &&
+                    $input->getString('view', '') == 'update'
+                    );
+
+//            if ($bNotValid) {
+                if (false) {
+                $message = 'Please enter your update key in the BreezingForms configuration.<br />Without this key you won\'t be able to receive future upates.<br />You can get your personal update key at Crosstec.org in the My Account => My Downloads section after login.<br />If your membership is expired, you can renew it by <a style="font-weight: bold; text-decoration: underline;" target="_blank" href="https://crosstec.org/en/downloads/joomla-forms.html">purchasing a membership</a>.';
+
+                $db = Factory::getContainer()->get(DatabaseInterface::class);
+                $db->setQuery("Select extra_query From #__update_sites Where `name` = 'BreezingForms NG' And `type` = 'extension'");
+                $query = $db->loadResult();
+
+                $exp = explode('=', $query);
+                if (isset($exp[1])) {
+                    $exp = explode('-', $exp[1]);
+
+                    if (is_numeric($exp[0])) {
+
+                        if ($exp[0] > 0) { // 0 = unlimited
+
+                            $time = strtotime(HTMLHelper::_('date', 'now', 'Y-m-d H:i:s', false));
+
+                            if ($time > $exp[0]) {
+                                $message = 'Your membership for the update key seems to be expired, you can renew it by <a style="font-weight: bold; text-decoration: underline;" target="_blank" href="https://crosstec.org/en/downloads/joomla-forms.html">purchasing a membership</a>.<br/>After purchase, please get the update key from My Account => My Downloads at Crosstec.org and enter it in the BreezingForms configuration.';
+                                $query = '';
+                            }
+                        }
+
+                    } else {
+
+                        $query = '';
+                    }
+
+                } else {
+
+                    $query = '';
+                }
+
+                if (trim($query) == '') {
+
+                    $breaks2 = '';
+                    $breaks = '';
+                    if (
+                        $input->getString('option') == 'com_installer' &&
+                        $input->getString('view', '') == 'update'
+                    ) {
+                        $breaks = '<br /><h4>BreezingForms NG</h4>';
+                        $breaks2 = '<br /><br />';
+                    }
+                    Factory::getApplication()->enqueueMessage($breaks . $message . $breaks2, 'warning');
+                }
+            }
+
+        } catch (Exception $e) {
+
+        } catch (Error $e) {
+
+        }
+    }
+
+    public function onAfterRender()
+    {
+
+        if (!file_exists(JPATH_ADMINISTRATOR . '/components/com_breezingformsng/services/provider.php')) {
+            return;
+        }
+
+        $app = Factory::getApplication();
+        $input = $app->getInput();
+
+        if ($input->getString('option') == 'com_menus' && $input->getString('view') == 'items') {
+
+            $body = Factory::getApplication()->getBody();
+            $body = str_replace('&lt;img src=../administrator/components/com_breezingformsng/images/icons/component-menu-icons/bf_icon.png width=23px; /&gt;', '', $body);
+            $body = str_replace('&lt;img src=../administrator/components/com_breezingformsng/images/icons/component-menu-icons/bf_icon.png width=23; /&gt;', '', $body);
+            Factory::getApplication()->setBody($body);
+        }
+
+        if ($input->getString('option') == 'com_cpanel' && $input->getString('dashboard') == 'components') {
+
+            $body = Factory::getApplication()->getBody();
+            $body = str_replace('&lt;img src=../administrator/components/com_breezingformsng/images/icons/component-menu-icons/folder-open.png width=17; /&gt;', '', $body);
+            $body = str_replace('&lt;img src=../administrator/components/com_breezingformsng/images/icons/component-menu-icons/pencil-square.png width=17; /&gt;', '', $body);
+            $body = str_replace('&lt;img src=../administrator/components/com_breezingformsng/images/icons/component-menu-icons/code.png width=17; /&gt;', '', $body);
+            $body = str_replace('&lt;img src=../administrator/components/com_breezingformsng/images/icons/component-menu-icons/puzzle-pieces.png width=17; /&gt;', '', $body);
+            $body = str_replace('&lt;img src=../administrator/components/com_breezingformsng/images/icons/component-menu-icons/link.png width=17; /&gt;', '', $body);
+            $body = str_replace('&lt;img src=../administrator/components/com_breezingformsng/images/icons/component-menu-icons/cog.png width=17; /&gt;', '', $body);
+            Factory::getApplication()->setBody($body);
+        }
+    }
+}

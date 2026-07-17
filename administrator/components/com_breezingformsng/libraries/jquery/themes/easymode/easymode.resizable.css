@@ -1,0 +1,20 @@
+/* This file skins resizables */
+
+.ui-resizable { position: relative !important; /*border: 1px dotted #000 !important;*/ }
+
+/* Global handle styles */
+.ui-resizable-handle { position: absolute !important; display: none; font-size: 0.1px !important; border: none !important; }
+.ui-resizable .ui-resizable-handle { display: block !important; }
+body .ui-resizable-disabled .ui-resizable-handle { display: none !important; } /* use 'body' to make it more specific (css order) */
+body .ui-resizable-autohide .ui-resizable-handle { display: none !important; } /* use 'body' to make it more specific (css order) */
+
+.ui-resizable-n { cursor: n-resize !important; height: 6px !important; width: 100% !important; top: 0px !important; left: 0px !important; background: transparent url(i/resizable-n.gif) repeat scroll center top !important; }
+.ui-resizable-s { cursor: s-resize !important; height: 6px !important; width: 100% !important; bottom: 0px !important; left: 0px !important; background: transparent url(i/resizable-s.gif) repeat scroll center top !important; }
+
+.ui-resizable-e { cursor: e-resize !important; width: 6px !important; right: 0px !important; top: 0px !important; height: 100% !important; background: transparent url(i/resizable-e.gif) repeat scroll right center !important; }
+.ui-resizable-w { cursor: w-resize !important; width: 6px !important; left: 0px !important; top: 0px !important; height: 100% !important; background: transparent url(i/resizable-w.gif) repeat scroll right center !important; }
+
+.ui-resizable-se { cursor: se-resize !important; width: 13px !important; height: 13px !important; right: 0px !important; bottom: 0px !important; background: transparent url(i/resizable-se.gif) !important; }
+.ui-resizable-sw { cursor: sw-resize !important; width: 13px !important; height: 13px !important; left: 0px !important; bottom: 0px !important; background: transparent url(i/resizable-sw.gif) !important; }
+.ui-resizable-nw { cursor: nw-resize !important; width: 13px !important; height: 13px !important; left: 0px !important; top: 0px !important; background: transparent url(i/resizable-nw.gif) !important; }
+.ui-resizable-ne { cursor: ne-resize !important; width: 13px !important; height: 13px !important; right: 0px !important; top: 0px !important; background: transparent url(i/resizable-ne.gif) !important; }

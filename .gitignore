@@ -11,7 +11,7 @@ administrator/cache/
 configuration.php
 facileforms.config.php
 .htaccess
-.codex
+.codex/settings.json
 
 administrator/.htaccess
 
@@ -24,3 +24,10 @@ administrator/error_log
 cache/
 build/
 #libraries/ 
+
+# Composer dependencies (installed at build time by scripts/build-package.sh)
+administrator/components/com_breezingformsng/vendor/
+
+# Dev tooling (PHPUnit) - repo-root composer.json, not part of the package
+/vendor/
+/.phpunit.cache/

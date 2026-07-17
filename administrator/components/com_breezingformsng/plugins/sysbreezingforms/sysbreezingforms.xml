@@ -25,5 +25,13 @@
 		<language tag="de-DE">de-DE/plg_system_sysbreezingforms.sys.ini</language>
 		<language tag="it-IT">it-IT/plg_system_sysbreezingforms.ini</language>
 		<language tag="it-IT">it-IT/plg_system_sysbreezingforms.sys.ini</language>
+		<language tag="es-ES">es-ES/plg_system_sysbreezingforms.ini</language>
+		<language tag="es-ES">es-ES/plg_system_sysbreezingforms.sys.ini</language>
+		<language tag="hu-HU">hu-HU/plg_system_sysbreezingforms.ini</language>
+		<language tag="hu-HU">hu-HU/plg_system_sysbreezingforms.sys.ini</language>
+		<language tag="nl-NL">nl-NL/plg_system_sysbreezingforms.ini</language>
+		<language tag="nl-NL">nl-NL/plg_system_sysbreezingforms.sys.ini</language>
+		<language tag="tr-TR">tr-TR/plg_system_sysbreezingforms.ini</language>
+		<language tag="tr-TR">tr-TR/plg_system_sysbreezingforms.sys.ini</language>
 	</languages>
 </extension>

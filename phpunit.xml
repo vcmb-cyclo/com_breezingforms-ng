@@ -9,4 +9,10 @@
             <directory>tests</directory>
         </testsuite>
     </testsuites>
+    <source>
+        <include>
+            <directory>administrator/components/com_breezingformsng/src</directory>
+            <directory>components/com_breezingformsng/src</directory>
+        </include>
+    </source>
 </phpunit>

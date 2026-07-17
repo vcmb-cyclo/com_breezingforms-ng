@@ -21,6 +21,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
+          tools: composer:v2
           coverage: none
 
       - name: Check PHP syntax
@@ -44,8 +45,41 @@ jobs:
           }
           '
 
+      - name: Check translations
+        run: python3 scripts/check-translations.py
+
+      - name: Audit composer dependencies
+        working-directory: administrator/components/com_breezingformsng
+        run: composer audit --locked --no-interaction
+
+  unit-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup PHP with coverage
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+          coverage: pcov
+
+      - name: Install test dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Run unit tests and measure coverage
+        run: vendor/bin/phpunit --coverage-clover=coverage.xml --coverage-text
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v7
+        with:
+          name: phpunit-coverage
+          path: coverage.xml
+
   package:
-    needs: quality
+    needs: [quality, unit-tests]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -53,6 +87,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
 
       - name: Resolve package version
         id: version
@@ -72,8 +112,17 @@ jobs:
         id: package
         run: echo "archive=$(scripts/build-package.sh)" >> "$GITHUB_OUTPUT"
 
+      - name: Calculate package checksum
+        id: checksum
+        run: |
+          sha256="$(sha256sum "${{ steps.package.outputs.archive }}" | awk '{print $1}')"
+          echo "sha256=${sha256}" >> "$GITHUB_OUTPUT"
+
       - name: Validate package contents
         run: scripts/validate-package.sh "${{ steps.package.outputs.archive }}"
+
+      - name: Test installation and update on Joomla
+        run: scripts/joomla-install-smoke.sh "${{ steps.package.outputs.archive }}"
 
       - name: Upload installation package
         uses: actions/upload-artifact@v7
@@ -89,4 +138,5 @@ jobs:
           gh release create "${GITHUB_REF_NAME}" \
             "${{ steps.package.outputs.archive }}" \
             --title "BreezingForms NG ${GITHUB_REF_NAME}" \
-            --generate-notes
+            --generate-notes \
+            --notes "SHA-256: ${{ steps.checksum.outputs.sha256 }}"

@@ -15,7 +15,7 @@ import os
 import re
 import sys
 
-LANGS = ('en-GB', 'fr-FR', 'de-DE')
+LANGS = ('en-GB', 'fr-FR', 'de-DE', 'it-IT')
 LINE_RE = re.compile(r'^[A-Z0-9_.\-]+\s*=\s*".*"\s*(?:;.*)?$')
 
 

@@ -189,11 +189,6 @@ class OnePageRenderer
     function headers()
     {
 
-        // keep IE8 compatbility
-        if (preg_match('/(?i)msie [1-8]/', $_SERVER['HTTP_USER_AGENT'])) {
-            Factory::getApplication()->getDocument()->addScript('https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js');
-        }
-
         if ($this->hasFlashUpload) {
             Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/plupload/moxie.js');
             Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/plupload/plupload.js');

@@ -70,11 +70,6 @@ class ClassicRenderer {
 	        });
 	    ');
 
-		// keep IE8 compatbility
-		if (preg_match('/(?i)msie [1-8]/', $_SERVER['HTTP_USER_AGENT'])) {
-			Factory::getApplication()->getDocument()->addScript('https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js');
-		}
-
 		if ($this->hasFlashUpload) {
 			Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/plupload/moxie.js');
 			Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/plupload/plupload.js');
@@ -891,31 +886,14 @@ function bfTriggerRules() {
 			});
 		');
 		// loading system css
-		if (method_exists($obj = Factory::getApplication()->getDocument(), 'addCustomTag')) {
+		$document = Factory::getApplication()->getDocument();
+		$stylelink = '<link rel="stylesheet" href="' . Uri::root(true) . '/components/com_breezingformsng/themes/quickmode/system.css" />' . "\n";
+		$document->addCustomTag($stylelink);
 
-			$stylelink = '<link rel="stylesheet" href="' . Uri::root(true) . '/components/com_breezingformsng/themes/quickmode/system.css" />' . "\n";
-			Factory::getApplication()->getDocument()->addCustomTag($stylelink);
-
-			$stylelink = '<!--[if IE 7]>' . "\n";
-			$stylelink .= '<link rel="stylesheet" href="' . Uri::root(true) . '/components/com_breezingformsng/themes/quickmode/system.ie7.css" />' . "\n";
-			$stylelink .= '<![endif]-->' . "\n";
-			Factory::getApplication()->getDocument()->addCustomTag($stylelink);
-
-			$stylelink = '<!--[if IE 6]>' . "\n";
-			$stylelink .= '<link rel="stylesheet" href="' . Uri::root(true) . '/components/com_breezingformsng/themes/quickmode/system.ie6.css" />' . "\n";
-			$stylelink .= '<![endif]-->' . "\n";
-			Factory::getApplication()->getDocument()->addCustomTag($stylelink);
-
-			$stylelink = '<!--[if IE]>' . "\n";
-			$stylelink .= '<link rel="stylesheet" href="' . Uri::root(true) . '/components/com_breezingformsng/themes/quickmode/system.ie.css" />' . "\n";
-			$stylelink .= '<![endif]-->' . "\n";
-			Factory::getApplication()->getDocument()->addCustomTag($stylelink);
-
-			// loading theme
-			if ($this->rootMdata['theme'] != 'none' && @file_exists(JPATH_SITE . '/media/breezingforms/themes/' . $this->rootMdata['theme'] . '/theme.css')) {
-				$stylelink = '<link rel="stylesheet" href="' . Uri::root(true) . '/media/breezingforms/themes/' . $this->rootMdata['theme'] . '/theme.css" />' . "\n";
-				Factory::getApplication()->getDocument()->addCustomTag($stylelink);
-			}
+		// loading theme
+		if ($this->rootMdata['theme'] != 'none' && @file_exists(JPATH_SITE . '/media/breezingforms/themes/' . $this->rootMdata['theme'] . '/theme.css')) {
+			$stylelink = '<link rel="stylesheet" href="' . Uri::root(true) . '/media/breezingforms/themes/' . $this->rootMdata['theme'] . '/theme.css" />' . "\n";
+			$document->addCustomTag($stylelink);
 		}
 	}
 

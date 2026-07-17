@@ -17,14 +17,14 @@ use Joomla\CMS\Language\Text;
         <a href="#"
             id="bfFormPublishedToggle"
             class="js-grid-item-action tbody-icon js-bf-form-state<?php echo $published ? ' active' : ''; ?>"
-            data-item-id="bfformstate0"
+            data-item-id="bfformstate<?php echo (int) $formId; ?>"
             data-item-task="forms.setPublished"
             data-item-form-id="<?php echo (int) $formId; ?>"
             data-state-type="published"
             title="<?php echo $published ? Text::_('JPUBLISHED') : Text::_('JUNPUBLISHED'); ?>">
             <span class="<?php echo $published ? 'icon-publish' : 'icon-unpublish'; ?>" aria-hidden="true"></span>
         </a>
-        <input type="checkbox" name="cid[]" id="bfformstate0" value="<?php echo (int) $formId; ?>" hidden />
+        <input type="checkbox" name="cid[]" id="bfformstate<?php echo (int) $formId; ?>" value="<?php echo (int) $formId; ?>" hidden />
     </div>
     <div class="d-inline-flex align-items-center gap-2">
         <span class="fw-semibold hasTooltip" title="<?php echo Text::_('COM_BREEZINGFORMSNG_DEBUG_MODE_TIP'); ?>">
@@ -33,13 +33,13 @@ use Joomla\CMS\Language\Text;
         <a href="#"
             id="bfFormDebugToggle"
             class="js-grid-item-action tbody-icon js-bf-form-state<?php echo $debugMode ? ' active' : ''; ?>"
-            data-item-id="bfdebugstate0"
+            data-item-id="bfdebugstate<?php echo (int) $formId; ?>"
             data-item-task="forms.setDebug"
             data-item-form-id="<?php echo (int) $formId; ?>"
             data-state-type="debug"
             title="<?php echo $debugMode ? Text::_('COM_BREEZINGFORMSNG_DEBUG_MODE_ENABLED') : Text::_('COM_BREEZINGFORMSNG_DEBUG_MODE_DISABLED'); ?>">
-            <span class="<?php echo $debugMode ? 'fa fa-bug text-success' : 'icon-unpublish'; ?>" aria-hidden="true"></span>
+            <span class="<?php echo $debugMode ? 'fa fa-bug text-success' : 'fa fa-bug text-muted'; ?>" aria-hidden="true"></span>
         </a>
-        <input type="checkbox" name="cid[]" id="bfdebugstate0" value="<?php echo (int) $formId; ?>" hidden />
+        <input type="checkbox" name="cid[]" id="bfdebugstate<?php echo (int) $formId; ?>" value="<?php echo (int) $formId; ?>" hidden />
     </div>
 </div>

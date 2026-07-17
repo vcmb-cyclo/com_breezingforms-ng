@@ -3,8 +3,8 @@ var __bfToggleOpts = Joomla.getOptions('com_breezingformsng.admin-toggle-publish
 function bfSetToggleIcon(link, state, stateType) {
 	var span = link.querySelector('span');
 
-	span.className = stateType === 'debug' && state
-		? 'fa fa-bug text-success'
+	span.className = stateType === 'debug'
+		? (state ? 'fa fa-bug text-success' : 'fa fa-bug text-muted')
 		: (state ? 'icon-publish' : 'icon-unpublish');
 	link.classList.toggle('active', Boolean(state));
 	link.title = stateType === 'debug'

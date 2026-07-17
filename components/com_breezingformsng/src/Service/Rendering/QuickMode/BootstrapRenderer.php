@@ -1554,56 +1554,13 @@ class BootstrapRenderer
 
                         $container = 'JQuery("body").append("<div class=\"bfCalendarResponsiveContainer' . $mdata['dbId'] . '\" style=\"display:block;position:absolute;left:-9999px;\"></div>");';
 
-                        $c = '';
-
                         if (!$this->hasResponsiveDatePicker) {
-                            ob_start();
-                            ?>
-                                    <script type="text/javascript">
-                                                                                                                                                                                                <!--
-                                                                                                                                                                                    function bf_add_yearscroller(fieldname) {
-                                                                                                                                                                                                    if (!JQuery("#bfCalExt" + fieldname).length) {
-                                                                                                                                                                                                        // prev
-                                                                                                                                                                                                        if (JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").get(0).selectedIndex > 0) {
-                                                                                                                                                                                                            JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").before('<img id="bfCalExt' + fieldname + '" onclick="JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').get(0).selectedIndex=JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').get(0).selectedIndex-1;JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').trigger(\'change\')" border="0" src="<?php echo Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/minusyear.png' ?>" style="width: 30px; vertical - align: top; cursor: pointer; " />');
-                                                                                                                                                                                                        }
-                                        // next
-                                        if (JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").get(0).selectedIndex + 1 < JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").get(0).options.length) {
-                                            JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").after('<img id="bfCalExt' + fieldname + '" onclick="JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').get(0).selectedIndex=JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').get(0).selectedIndex+1;JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').trigger(\'change\')" border="0" src="<?php echo Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/plusyear.png' ?>" style="width: 30px; vertical-align: top; cursor:pointer;" />');
-                                        }
-
-                                        JQuery('.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year').on('change', function () {
-                                            bf_add_yearscroller(fieldname);
-                                        });
-                                        JQuery('.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--month').on('change', function () {
-                                            bf_add_yearscroller(fieldname);
-                                        });
-
-                                        var myVal = JQuery('.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year').val();
-                                        var myInterval = setInterval(function () {
-                                            if (myVal != JQuery('.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year').val()) {
-                                                clearInterval(myInterval);
-                                                bf_add_yearscroller(fieldname);
-                                            }
-                                        }, 200);
-
-                                        var myVal = JQuery('.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--month').val();
-                                        var myInterval = setInterval(function () {
-                                            if (myVal != JQuery('.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--month').val()) {
-                                                clearInterval(myInterval);
-                                                bf_add_yearscroller(fieldname);
-                                            }
-                                        }, 200);
-                                                                                                                                                                                                    }
-                                                                                                                                                                                                }
-                                        //-->
-                                    </script>
-                                <?php
-                                $c = ob_get_contents();
-                                ob_end_clean();
+                            Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript(
+                                'var bfPickerMinusYearIcon = ' . json_encode(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/minusyear.png') . ';'
+                                . "\n" . 'var bfPickerPlusYearIcon = ' . json_encode(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/plusyear.png') . ';'
+                            );
+                            Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-legacy-style.js');
                         }
-
-                        echo $c;
 
                         echo '<script type="text/javascript">
                                                 <!--

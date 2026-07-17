@@ -4,19 +4,26 @@
    separate from the classic theme's quickmode-error-alerts.js because the
    Bootstrap variant doesn't have the bfSignature-specific validation
    prompt branch. Depends on two globals declared inline right before this
-   file is loaded: bfShowDefaultErrors and ff_processor.form_id. */
+   file is loaded: bfShowDefaultErrors, bfErrorPageScoped and
+   ff_processor.form_id. */
 				function bfShowErrors(error){
                                         if (bfShowDefaultErrors) {
                                             JQuery(".bfErrorMessage").html("");
                                             JQuery(".bfErrorMessage").css("display","none");
-                                            JQuery(".bfErrorMessage").fadeIn(1500);
+                                            if (bfErrorPageScoped) {
+                                                JQuery("#bfPage" + ff_currentpage + " .bfErrorMessage").fadeIn(1500);
+                                            } else {
+                                                JQuery(".bfErrorMessage").fadeIn(1500);
+                                            }
                                             var allErrors = "";
                                             var errors = error.split("\n");
                                             for(var i = 0; i < errors.length; i++){
                                                 allErrors += "<div class=\"bfError\">" + errors[i] + "</div>";
                                             }
                                             JQuery(".bfErrorMessage").html(allErrors);
-                                            JQuery(".bfErrorMessage").css("display","");
+                                            if (!bfErrorPageScoped) {
+                                                JQuery(".bfErrorMessage").css("display","");
+                                            }
                                         }
 
                                         if(JQuery.bfvalidationEngine)

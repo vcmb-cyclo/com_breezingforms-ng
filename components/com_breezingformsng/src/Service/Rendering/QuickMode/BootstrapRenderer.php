@@ -2088,6 +2088,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                 Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript(
                     'var bfUseErrorAlerts = false;' . "\n"
                     . 'var bfShowDefaultErrors = ' . ($showDefaultErrors ? 'true' : 'false') . ';' . "\n"
+                    . 'var bfErrorPageScoped = false;' . "\n"
                 );
                 Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-error-alerts-bootstrap.js');
             }
@@ -2103,8 +2104,6 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
         }
         Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-post-init.js');
         // loading system css
-        if (method_exists($obj = Factory::getApplication()->getDocument(), 'addCustomTag')) {
-
             // loading theme
             $stylelink = '<link rel="stylesheet" href="' . Uri::root(true) . '/components/com_breezingformsng/themes/quickmode-bootstrap' . $this->bsVersion . '/system.css" />' . "\n";
             Factory::getApplication()->getDocument()->addCustomTag($stylelink);
@@ -2155,7 +2154,6 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                     }
                 }
             }
-        }
     }
 
     private function bfCalendarIsTruthy($mdata, $key)

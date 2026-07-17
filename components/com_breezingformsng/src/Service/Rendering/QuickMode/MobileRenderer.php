@@ -1495,67 +1495,14 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
 					case 'bfSignature':
 
-						$base = 'ba' . 'se' . '64';
-
 						$this->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/js/signature.js');
-						$this->addScriptDeclaration('
-						var bf_signaturePad' . $mdata['dbId'] . ' = null;
-						var bf_canvas' . $mdata['dbId'] . ' = null;
-
-						function bf_resizeCanvas' . $mdata['dbId'] . 'Func() {
-
-							if(arguments[0] !== false){
-
-								var data = bf_signaturePad' . $mdata['dbId'] . '.toDataURL();
-
-							}
-
-						    var ratio =  Math.max(window.devicePixelRatio || 1, 1);
-						    bf_canvas' . $mdata['dbId'] . '.width = bf_canvas' . $mdata['dbId'] . '.offsetWidth * ratio;
-						    bf_canvas' . $mdata['dbId'] . '.height = bf_canvas' . $mdata['dbId'] . '.offsetHeight * ratio;
-						    bf_canvas' . $mdata['dbId'] . '.getContext("2d").scale(ratio, ratio);
-
-						    if(arguments[0] !== false){
-
-						        bf_signaturePad' . $mdata['dbId'] . '.fromDataURL(data);
-						        JQuery("#ff_elem' . $mdata['dbId'] . '").val(data.replace("data:image/png;' . $base . ',",""));
-						    }
-
-						    bf_signaturePad' . $mdata['dbId'] . ' = new SignaturePad(bf_canvas' . $mdata['dbId'] . ', {
-							    backgroundColor: "rgb(255,255,255)",
-							    penColor: "rgb(0,0,0)",
-							    onEnd: function(){
-							        var data = bf_signaturePad' . $mdata['dbId'] . '.toDataURL();
-							        JQuery("#ff_elem' . $mdata['dbId'] . '").val(data.replace("data:image/png;' . $base . ',",""));
-							    }
-							});
-						}
-
-						function bf_Signature' . $mdata['dbId'] . 'Reset(sig) {
-							sig.clear();
-							JQuery("#ff_elem' . $mdata['dbId'] . '").val("");
-						}
-
-						JQuery(document).ready(function(){
-							bf_canvas' . $mdata['dbId'] . ' = document.querySelector("#bfSignature' . $mdata['dbId'] . ' canvas");
-
-							// causes trouble as swipes will falsely triggered as resize events
-							JQuery(window).on("resize", bf_resizeCanvas' . $mdata['dbId'] . 'Func);
-
-							bf_resizeCanvas' . $mdata['dbId'] . 'Func(false);
-
-							// make sure the canvas is resized if dimensions are zero
-							setInterval(function(){
-								if( bf_canvas' . $mdata['dbId'] . '.width == 0 && bf_canvas' . $mdata['dbId'] . '.height == 0 ){
-									bf_resizeCanvas' . $mdata['dbId'] . 'Func(false);
-								}
-							}, 500);
-
-						});
-						');
+						$this->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-signature.js');
+						$this->addScriptDeclaration(
+							'bfSignatureInit(' . json_encode((int) $mdata['dbId']) . ');'
+						);
 
 						echo '<div class="bfSignature" id="bfSignature' . $mdata['dbId'] . '"><div class="bfSignatureCanvasBorder"><canvas></canvas></div>' . "\n";
-						echo '<button onclick="bf_Signature' . $mdata['dbId'] . 'Reset(bf_signaturePad' . $mdata['dbId'] . ');" class="bfSignatureResetButton button btn btn-primary"><span>' . Text::_('COM_BREEZINGFORMSNG_SIGNATURE_RESET_BUTTON') . '</span></button>' . "\n";
+						echo '<button onclick="bfSignatureReset(' . json_encode((int) $mdata['dbId']) . ');" class="bfSignatureResetButton button btn btn-primary"><span>' . Text::_('COM_BREEZINGFORMSNG_SIGNATURE_RESET_BUTTON') . '</span></button>' . "\n";
 						echo '</div>';
 						echo '<input class="ff_elem" type="hidden" name="ff_nm_' . $mdata['bfName'] . '[]" value="" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
 

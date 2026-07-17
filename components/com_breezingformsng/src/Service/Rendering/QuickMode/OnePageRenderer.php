@@ -1803,56 +1803,13 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
                         $container = 'JQuery("body").append("<div class=\"bfCalendarResponsiveContainer' . $mdata['dbId'] . '\" style=\"display:block;position:absolute;left:-9999px;\"></div>");';
 
-                        $c = '';
-
                         if (!$this->hasResponsiveDatePicker) {
-                            ob_start();
-                            ?>
-                                    <script type="text/javascript">
-                                                                                                                        <!--
-                                                                                                            function bf_add_yearscroller(fieldname) {
-                                                                                                                            if (!JQuery("#bfCalExt" + fieldname).length) {
-                                                                                                                                // prev
-                                                                                                                                if (JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").get(0).selectedIndex > 0) {
-                                                                                                                                    JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").before('<img id="bfCalExt' + fieldname + '" onclick="JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').get(0).selectedIndex=JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').get(0).selectedIndex-1;JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').trigger(\'change\')" border="0" src="<?php echo Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/minusyear.png' ?>" style="width: 30px; vertical - align: top; cursor: pointer; " />');
-                                                                                                                                }
-                                        // next
-                                        if (JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").get(0).selectedIndex + 1 < JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").get(0).options.length) {
-                                            JQuery(".bfCalendarResponsiveContainer" + fieldname + " .picker__select--year").after('<img id="bfCalExt' + fieldname + '" onclick="JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').get(0).selectedIndex=JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').get(0).selectedIndex+1;JQuery(\'.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year\').trigger(\'change\')" border="0" src="<?php echo Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/plusyear.png' ?>" style="width: 30px; vertical-align: top; cursor:pointer;" />');
-                                        }
-
-                                        JQuery('.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year').on('change', function () {
-                                            bf_add_yearscroller(fieldname);
-                                        });
-                                        JQuery('.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--month').on('change', function () {
-                                            bf_add_yearscroller(fieldname);
-                                        });
-
-                                        var myVal = JQuery('.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year').val();
-                                        var myInterval = setInterval(function () {
-                                            if (myVal != JQuery('.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--year').val()) {
-                                                clearInterval(myInterval);
-                                                bf_add_yearscroller(fieldname);
-                                            }
-                                        }, 200);
-
-                                        var myVal = JQuery('.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--month').val();
-                                        var myInterval = setInterval(function () {
-                                            if (myVal != JQuery('.bfCalendarResponsiveContainer' + fieldname + ' .picker__select--month').val()) {
-                                                clearInterval(myInterval);
-                                                bf_add_yearscroller(fieldname);
-                                            }
-                                        }, 200);
-                                                                                                                            }
-                                                                                                                        }
-                                        //-->
-                                    </script>
-                                <?php
-                                $c = ob_get_contents();
-                                ob_end_clean();
+                            Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript(
+                                'var bfPickerMinusYearIcon = ' . json_encode(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/minusyear.png') . ';'
+                                . "\n" . 'var bfPickerPlusYearIcon = ' . json_encode(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/plusyear.png') . ';'
+                            );
+                            Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-legacy-style.js');
                         }
-
-                        echo $c;
 
                         echo '<script type="text/javascript">
                                                 <!--
@@ -1890,65 +1847,11 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
                     case 'bfSignature':
 
-                        $base = 'ba' . 'se' . '64';
-
                         Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/js/signature.js');
-                        Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('
-						var bf_signaturePad' . $mdata['dbId'] . ' = null;
-						var bf_canvas' . $mdata['dbId'] . ' = null;
-
-						function bf_resizeCanvas' . $mdata['dbId'] . 'Func() {
-
-							if(arguments[0] !== false){
-
-								var data = bf_signaturePad' . $mdata['dbId'] . '.toDataURL();
-
-							}
-
-						    var ratio =  Math.max(window.devicePixelRatio || 1, 1);
-						    bf_canvas' . $mdata['dbId'] . '.width = bf_canvas' . $mdata['dbId'] . '.offsetWidth * ratio;
-						    bf_canvas' . $mdata['dbId'] . '.height = bf_canvas' . $mdata['dbId'] . '.offsetHeight * ratio;
-						    bf_canvas' . $mdata['dbId'] . '.getContext("2d").scale(ratio, ratio);
-
-						    if(arguments[0] !== false){
-
-						        bf_signaturePad' . $mdata['dbId'] . '.fromDataURL(data);
-						        JQuery("#ff_elem' . $mdata['dbId'] . '").val(data.replace("data:image/png;' . $base . ',",""));
-						    }
-
-						    bf_signaturePad' . $mdata['dbId'] . ' = new SignaturePad(bf_canvas' . $mdata['dbId'] . ', {
-							    backgroundColor: "rgb(255,255,255)",
-							    penColor: "rgb(0,0,0)",
-							    onEnd: function(){
-							        var data = bf_signaturePad' . $mdata['dbId'] . '.toDataURL();
-							        JQuery("#ff_elem' . $mdata['dbId'] . '").val(data.replace("data:image/png;' . $base . ',",""));
-							    }
-							});
-						}
-
-						function bf_Signature' . $mdata['dbId'] . 'Reset(sig) {
-							sig.clear();
-							JQuery("#ff_elem' . $mdata['dbId'] . '").val("");
-						}
-
-						JQuery(document).ready(function(){
-							bf_canvas' . $mdata['dbId'] . ' = document.querySelector("#bfSignature' . $mdata['dbId'] . ' canvas");
-                            if(bf_canvas' . $mdata['dbId'] . ' == null) return;
-                            
-							// trouble on mobile devices, thinks swiping is resize...
-							JQuery(window).on("resize", bf_resizeCanvas' . $mdata['dbId'] . 'Func);
-
-							bf_resizeCanvas' . $mdata['dbId'] . 'Func(false);
-
-							// make sure the canvas is resized if dimensions are zero
-							setInterval(function(){
-								if( bf_canvas' . $mdata['dbId'] . '.width == 0 && bf_canvas' . $mdata['dbId'] . '.height == 0 ){
-									bf_resizeCanvas' . $mdata['dbId'] . 'Func(false);
-								}
-							}, 500);
-
-						});
-						');
+                        Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-signature.js');
+                        Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript(
+                            'bfSignatureInit(' . json_encode((int) $mdata['dbId']) . ');'
+                        );
 
                         echo '<div class="' . $this->bsClass('controls') . ' ' . $this->bsClass('form-inline') . ' bfSignatureWrap">';
                         echo '<div class="' . $this->bsClass('form-group') . ' ' . $this->bsClass('other-form-group') . '">';
@@ -1956,7 +1859,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                         echo '<span class="' . $this->bsClass('nonform-control') . '">';
 
                         echo '<div class="bfSignature" id="bfSignature' . $mdata['dbId'] . '"><div class="bfSignatureCanvasBorder"><canvas></canvas></div>' . "\n";
-                        echo '<button onclick="bf_Signature' . $mdata['dbId'] . 'Reset(bf_signaturePad' . $mdata['dbId'] . ');" class="bfSignatureResetButton button ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . '"><span>' . Text::_('COM_BREEZINGFORMSNG_SIGNATURE_RESET_BUTTON') . '</span></button>' . "\n";
+                        echo '<button onclick="bfSignatureReset(' . json_encode((int) $mdata['dbId']) . ');" class="bfSignatureResetButton button ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . '"><span>' . Text::_('COM_BREEZINGFORMSNG_SIGNATURE_RESET_BUTTON') . '</span></button>' . "\n";
                         echo '</div>';
 
                         echo '</span>';
@@ -2253,91 +2156,12 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 	    Factory::getApplication()->getSession()->set('bfFlashUploadTickets', $tickets);
             echo '<input type="hidden" name="bfFlashUploadTicket" value="' . $this->flashUploadTicket . '"/>' . "\n";
             Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/center.js');
-            Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('
-                        var bfUploaders = [];
-                        var bfUploaderErrorElements = [];
-			var bfFlashUploadInterval = null;
-			var bfFlashUploaders = new Array();
-                        var bfFlashUploadersLength = 0;
-                        function bfRefreshAll(){
-                            for( var i = 0; i < bfUploaders.length; i++ ){
-                                bfUploaders[i].refresh();
-                            }
-                        }
-                        function bfInitAll(){
-                            for( var i = 0; i < bfUploaders.length; i++ ){
-                                bfUploaders[i].init();
-                            }
-                        }
-			function bfDoFlashUpload(){
-                                JQuery("#bfSubmitMessage").css("visibility","hidden");
-                                JQuery("#bfSubmitMessage").css("display","none");
-                                JQuery("#bfSubmitMessage").css("z-index","999999");
-				JQuery(".bfErrorMessage").html("");
-                                JQuery(".bfErrorMessage").css("display","none");
-                                for(var i = 0; i < bfUploaderErrorElements.length; i++){
-                                    JQuery("#"+bfUploaderErrorElements[i]).html("");
-                                }
-                                bfUploaderErrorElements = [];
-                                if(ff_validation(0) == ""){
-					try{
-                                            bfFlashUploadInterval = window.setInterval( bfCheckFlashUploadProgress, 1000 );
-                                            if(bfFlashUploadersLength > 0){
-                                                JQuery("#bfFileQueue").bfcenter(true);
-                                                JQuery("#bfFileQueue").css("visibility","visible");
-                                                for( var i = 0; i < bfUploaders.length; i++ ){
-                                                    bfUploaders[i].start();
-                                                }
-                                            }
-					} catch(e){alert(e)}
-				} else {
-					if(typeof bfUseErrorAlerts == "undefined"){
-                                            alert(error);
-                                        } else {
-                                            alert(error);
-                                        }
-                                        ff_validationFocus("");
-                                        document.getElementById("bfSubmitButton").disabled = false;
-                                        ladda_button.ladda("stop");
-				}
-			}
-			function bfCheckFlashUploadProgress(){
-                                if( JQuery("#bfFileQueue").html() == "" ){ // empty indicates that all queues are uploaded or in any way cancelled
-					JQuery("#bfFileQueue").css("visibility","hidden");
-					window.clearInterval( bfFlashUploadInterval );
-                                        if(typeof bfAjaxObject101 != \'undefined\' || typeof bfReCaptchaLoaded != \'undefined\'){
-                                            ff_submitForm2();
-                                        }else{
-                                            bf_validate_submit(document.getElementById("bfSubmitButton"), "click");
-                                        }
-					JQuery(".bfFlashFileQueueClass").html("");
-                                        if(bfFlashUploadersLength > 0){
-                                            JQuery("#bfSubmitMessage").bfcenter(true);
-                                            JQuery("#bfSubmitMessage").css("visibility","visible");
-                                            JQuery("#bfSubmitMessage").css("display","block");
-                                            JQuery("#bfSubmitMessage").css("z-index","999999");
-                                        }
-
-				}
-			}
-			');
+            Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-flash-upload-onepage.js');
             echo "<div style=\"visibility:hidden;\" id=\"bfFileQueue\"></div>";
             echo "<div style=\"visibility:hidden;display:none;\" id=\"bfSubmitMessage\">" . Text::_('COM_BREEZINGFORMSNG_SUBMIT_MESSAGE') . "</div>";
         }
         echo '<noscript>Please turn on javascript to submit your data. Thank you!</noscript>' . "\n";
-        echo '<script type="text/javascript">
-                <!--
-                function ff_switchpage(page){
-                    for( var i = page; i > 0; i-- ){
-                        JQuery("#bfPage"+i).css("pointer-events","auto");
-                        JQuery("#bfPage"+i).css("opacity","1.0");
-                    }
-                    ff_currentpage = page;
-                    ff_initialize("pageentry");
-                    JQuery("#bfPage"+page).ScrollTo({offsetTop: 50});
-                }
-                //-->
-                </script>';
+        Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-onepage-switchpage.js');
         if ($this->rootMdata['lastPageThankYou']) {
             echo '
                         <div class="remodal" data-remodal-id="modal">

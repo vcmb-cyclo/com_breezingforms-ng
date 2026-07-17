@@ -625,6 +625,16 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > deux chemins vérifiés par relecture de code uniquement (logique inchangée, seules les deux substitutions
 > ci-dessus diffèrent).
 >
+> **Étape 2b, 3e extraction (2026-07-17, `73ace3da`)** : trois blocs conditionnels supplémentaires déplacés,
+> gating PHP conservé à l'identique — `bfFade()` → `quickmode-fade.js` (chargé seulement si `fading` actif) ;
+> `bfSetElemWrapBg`/`bfRollover`/`bfRollover2` → `quickmode-rollover.js` (chargé seulement si `rollover` actif
+> avec une couleur non vide ; les deux interpolations de `$this->rolloverColor` remplacées par une ligne
+> inline `var bfRolloverColor`) ; l'initialiseur `document.ready` inconditionnel → `quickmode-post-init.js`
+> (toujours chargé). Vérifié en navigateur sur le formulaire 2 (rollover actif, couleur `#ffc`) : le survol
+> d'un champ colore bien son conteneur en `rgb(255,255,204)`, la perte de focus restaure le fond — confirme
+> que `bfRolloverColor` est bien lu depuis la nouvelle variable inline. Aucun formulaire publié n'a `fadeIn`
+> actif : `bfFade()` vérifié par relecture de code et syntaxe JS uniquement, pas par un test navigateur réel.
+>
 > **Étape 2b restante** — le gros du travail : `<script>` inline concaténés restants dans les 4 renderers
 > (bien plus volumineux, avec de véritables dépendances aux données du formulaire — extraction plus délicate),
 > `Text::script()` pour les chaînes JS traduisibles, extraction des gabarits HTML echo-és vers des layouts,

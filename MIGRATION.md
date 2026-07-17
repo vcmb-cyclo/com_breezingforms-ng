@@ -664,6 +664,27 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > JS traduisibles restantes, extraction des gabarits HTML echo-és vers des layouts, typage strict. À mener
 > bloc par bloc, en re-vérifiant le rendu ET le comportement (pas seulement le HTML) à chaque lot.
 
+> **Étape 2b, extension Mobile/OnePage (2026-07-17)** : la logique globale des « toggle fields » des deux thèmes
+> était strictement identique à l'asset partagé (même hash SHA-256 après retrait du commentaire d'en-tête) et
+> réutilise désormais `quickmode-toggle-fields.js`. Le bloc `bfFade()` de `OnePageRenderer`, lui aussi identique,
+> réutilise `quickmode-fade.js` lorsque `fadeIn` est actif. Les autres blocs globaux restent à comparer et extraire
+> séparément. `MobileRenderer::bfShowErrors()` réutilise également la variante Bootstrap
+> `quickmode-error-alerts-bootstrap.js` : les deux seules valeurs dynamiques passent par les globals déjà établis
+> `bfShowDefaultErrors` et `ff_processor.form_id`. Le rendu OnePage réel du formulaire temporaire 35 a été exécuté
+> dans Chrome headless sans erreur JavaScript ; l'asset d'erreurs extrait est bien chargé. Le rendu Mobile du même
+> formulaire a ensuite été activé proprement via le décodage/réencodage PHP de `template_code` et un UA iPhone :
+> `MobileRenderer`, jQuery Mobile et l'asset d'erreurs partagé sont chargés, sans erreur JavaScript dans Chrome
+> headless. La valeur originale du formulaire a été restaurée octet pour octet après le test. Ce formulaire n'ayant
+> aucune règle « toggle fields », la parité de cet asset sur Mobile/OnePage reste garantie par l'identité SHA-256
+> du bloc extrait, pas par une interaction navigateur spécifique.
+
+> **Étape 2b, initialiseur Mobile (2026-07-17)** : le bloc statique `pageinit`/`mobileinit` de
+> `MobileRenderer` est déplacé vers `quickmode-post-init-mobile.js`. Il reste volontairement distinct de
+> `quickmode-post-init.js`, car jQuery Mobile utilise `pageinit`, rafraîchit périodiquement ses widgets et configure
+> `mobileinit`, comportements absents des autres thèmes. Vérifié dans Chrome headless avec le formulaire 35 activé
+> temporairement en Mobile et un UA iPhone : le nouvel asset et jQuery Mobile sont chargés, le rendu est présent et
+> aucune erreur JavaScript n'est émise ; la configuration originale a ensuite été restaurée octet pour octet.
+
 ### Vérification (à la complétion de la Phase 9)
 
 - [ ] Chaque service qui remplace un fichier crosstec repasse les scénarios déjà validés dans ce document :

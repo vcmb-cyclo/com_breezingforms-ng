@@ -843,6 +843,14 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
   > → `bf_add_yearscroller` s'exécute via le callback `onOpen`, l'icône `#bfCalExt` est injectée avec la bonne
   > URL `minusyear.png`, zéro erreur console.
   >
+  > **Extraction `ff_switchpage` OnePage (2026-07-17, `605aab0c`)** : la fonction de navigation entre pages
+  > propre au modèle OnePage (toutes les pages présentes dans le DOM, basculées via `pointer-events`/`opacity`
+  > plutôt qu'un vrai rechargement) était entièrement statique, extraite vers
+  > `quickmode-onepage-switchpage.js`. Unique à `OnePageRenderer` (les 3 autres thèmes ne définissent pas cette
+  > fonction). Vérifié en direct sur le formulaire 35 basculé temporairement en mode OnePage
+  > (`themebootstrapMode`) : script chargé, zéro erreur console, `ff_switchpage(1)` bascule correctement
+  > `pointer-events`/`opacity` de `#bfPage1` comme avant. Configuration du formulaire restaurée après le test.
+  >
   > Reste : les scripts inline **par élément** dans la boucle `process()` de chaque renderer (résumeurs,
   > formules `fieldCalc` personnalisées, calendrier/signature/reCAPTCHA) — génuinement dynamiques, dépendent
   > de la configuration de chaque champ, extraction jugée plus délicate/risquée et pas encore entamée. La

@@ -206,7 +206,7 @@
 - [x] `administrator/components/com_breezingformsng/admin/import.class.php` (git mv → ImportModel)
 
 ### Périmètre différé
-- [x] Import de paquets — `ImportModel` réécrit (SimpleXML, requêtes paramétrées, transaction) ; consommé par `script.php::importStandardLibrary()`. Limité aux bibliothèques de scripts/pièces (seul cas réel : `packages/stdlib.english.xml`) ; les paquets avec formulaires/menus sont refusés avec un message clair. Vérifié de bout en bout le 2026-07-10 : installation du paquet 6.1.0-RC3 dans le conteneur `joomla6-joomla-1`, import stdlib OK (71 scripts inchangés ignorés, 3 pièces mises à jour, métadonnées paquet actualisées).
+- [x] Import de paquets — `ImportModel` réécrit (SimpleXML, requêtes paramétrées, transaction) ; consommé par `script.php::importStandardLibrary()`. Limité aux bibliothèques de scripts/pièces (seul cas réel : `packages/stdlib.english.xml`) ; les paquets avec formulaires/menus sont refusés avec un message clair. Vérifié de bout en bout le 2026-07-10 : installation du paquet 6.1.1-alpha.1 dans le conteneur `joomla6-joomla-1`, import stdlib OK (71 scripts inchangés ignorés, 3 pièces mises à jour, métadonnées paquet actualisées).
 
 ### Migré depuis cette phase
 - QuickMode — déplacé en Phase 7 vers `QuickmodeController`, `QuickmodeModel`, `QuickmodeHtml` et routes `task=quickmode.*`
@@ -829,6 +829,19 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
   > régression sur les formulaires 2/7/16/28 (chemin `hasFlashUpload=false`, zéro nouvelle erreur JS). Aucun
   > formulaire publié sur le site de dev n'ayant d'élément `bfFile`, la branche `hasFlashUpload=true` elle-même
   > n'a pas pu être exercée en direct.
+  >
+  > **Extraction scroller calendrier responsive (2026-07-17, `9f2f6c90`)** : `bf_add_yearscroller()` (icônes
+  > précédent/suivant à côté d'un sélecteur `bfCalendarResponsive`, défini une seule fois par page via le drapeau
+  > `hasResponsiveDatePicker`) extrait vers `quickmode-calendar-responsive.js` (Classic) et
+  > `quickmode-calendar-responsive-legacy-style.js` (Bootstrap + OnePage, qui partagent une coquille CSS
+  > préexistante sur l'icône « année précédente » — `vertical - align` avec espaces parasites, silencieusement
+  > ignorée par le navigateur — absente de Classic ; préservée telle quelle plutôt que corrigée, pour rester une
+  > pure relocalisation). `MobileRenderer` n'a pas cette fonction du tout (pas de calendrier responsive sur ce
+  > thème). Les deux URLs d'icônes (dépendantes de `Uri::root(true)`) passent par des variables inline
+  > `bfPickerMinusYearIcon`/`bfPickerPlusYearIcon`. Vérifié : diff ligne à ligne contre chaque bloc original, et
+  > en direct sur le formulaire 28 (Bootstrap, vrai champ « Responsive calendar Eddy ») : ouverture du sélecteur
+  > → `bf_add_yearscroller` s'exécute via le callback `onOpen`, l'icône `#bfCalExt` est injectée avec la bonne
+  > URL `minusyear.png`, zéro erreur console.
   >
   > Reste : les scripts inline **par élément** dans la boucle `process()` de chaque renderer (résumeurs,
   > formules `fieldCalc` personnalisées, calendrier/signature/reCAPTCHA) — génuinement dynamiques, dépendent

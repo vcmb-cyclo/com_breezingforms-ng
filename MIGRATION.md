@@ -635,6 +635,15 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > que `bfRolloverColor` est bien lu depuis la nouvelle variable inline. Aucun formulaire publié n'a `fadeIn`
 > actif : `bfFade()` vérifié par relecture de code et syntaxe JS uniquement, pas par un test navigateur réel.
 >
+> **Étape 2b, 4e extraction (2026-07-17, `30002ae8`)** : `bfShowErrors()` (~90 lignes, seulement émis si
+> `useErrorAlerts` est désactivé) → `quickmode-error-alerts.js`. Deux points dynamiques résolus : le choix
+> entre bloc d'erreurs par défaut ou rien (`useDefaultErrors`/`useBalloonErrors`) → un booléen inline
+> `bfShowDefaultErrors` calculé une fois côté PHP au lieu de dupliquer le code JS ; `$this->p->form_id`
+> interpolé dans un sélecteur jQuery → `"#" + ff_processor.form_id` (même schéma que les extractions
+> précédentes). Vérifié en navigateur sur le formulaire 2 : `bfShowErrors('Ceci est un test')` produit bien
+> `<div class="bfError">Ceci est un test</div>` et rend `.bfErrorMessage` visible, comportement identique à
+> l'original.
+>
 > **Étape 2b restante** — le gros du travail : `<script>` inline concaténés restants dans les 4 renderers
 > (bien plus volumineux, avec de véritables dépendances aux données du formulaire — extraction plus délicate),
 > `Text::script()` pour les chaînes JS traduisibles, extraction des gabarits HTML echo-és vers des layouts,

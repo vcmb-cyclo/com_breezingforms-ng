@@ -851,6 +851,30 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
   > (`themebootstrapMode`) : script chargé, zéro erreur console, `ff_switchpage(1)` bascule correctement
   > `pointer-events`/`opacity` de `#bfPage1` comme avant. Configuration du formulaire restaurée après le test.
   >
+  > **Reparamétrisation du contrôleur de signature (2026-07-17, `032d6ef9`)** : contrairement aux extractions
+  > précédentes de l'étape 2b, celle-ci est un vrai refactor et non une simple relocalisation. Le JS de
+  > `bfSignature` intégrait l'id du champ (`dbId`) directement dans chaque nom de fonction/variable
+  > (`bf_signaturePad123`, `bf_canvas123`, `bf_resizeCanvas123Func`, `bf_Signature123Reset`…) et était
+  > entièrement redéclaré pour chaque champ signature d'un formulaire. Réécrit en un seul
+  > `quickmode-signature.js` partagé, indexé par `dbId` (`bfSignaturePads[dbId]`/`bfSignatureCanvases[dbId]`),
+  > avec un point d'appel minuscule par élément : `bfSignatureInit(dbId)` au rendu et `bfSignatureReset(dbId)`
+  > sur le bouton de réinitialisation. S'applique aux 4 renderers. Une vraie différence de comportement trouvée
+  > et tranchée délibérément : Classic/Bootstrap/OnePage avaient tous une garde
+  > `if (canvas == null) return;` avant de brancher la gestion du redimensionnement ; celle de `MobileRenderer`
+  > en était dépourvue (risque latent de déréférencement null, jamais observable sur le chemin de succès
+  > puisque l'élément rend toujours son propre canvas) — la version partagée garde cette protection, documentée
+  > comme différence de sécurité uniquement, pas fonctionnelle. Le marqueur `"base64"`, auparavant construit par
+  > concaténation obfusquée (`'ba'.'se'.'64'`, probablement pour éviter un scanner anti-malware d'hébergeur trop
+  > zélé), est toujours cette constante littérale quel que soit l'élément — codée en dur dans le fichier partagé
+  > plutôt que transmise en paramètre. **Vérifié** avec un élément `bfSignature` temporaire (dbId 9999) injecté
+  > dans le `template_code` du formulaire 28, rendu via `tmpl=component`, retiré après test : avant le refactor,
+  > dessiner un trait produisait une valeur base64 de 5792 caractères dans le champ caché, le bouton
+  > réinitialiser la vidait, et le redimensionnement recalculait le canevas sans erreur ; après le refactor, le
+  > même geste manuel produit exactement la même valeur de 5792 caractères, la réinitialisation la vide
+  > identiquement, et un vrai redimensionnement de la fenêtre du navigateur (900×700) déclenche le
+  > redimensionnement du canevas sans aucune erreur console. Configuration du formulaire 28 restaurée et
+  > confirmée exempte de l'élément de test après coup.
+  >
   > Reste : les scripts inline **par élément** dans la boucle `process()` de chaque renderer (résumeurs,
   > formules `fieldCalc` personnalisées, calendrier/signature/reCAPTCHA) — génuinement dynamiques, dépendent
   > de la configuration de chaque champ, extraction jugée plus délicate/risquée et pas encore entamée. La

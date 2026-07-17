@@ -604,10 +604,21 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > `method_exists($doc, 'addCustomTag')` toujours vraie simplifiée. Vérifié octet pour octet : seuls ces
 > `<!--[if IE-->` disparaissent du rendu, rien d'autre ne change (formulaires 2/4/16 classique, 7/28 Bootstrap).
 >
-> **Étape 2b restante** — modernisation plus profonde (contenu fonctionnel inchangé pour l'instant, simplement
-> déplacé à l'étape 1) : `WebAssetManager` au lieu des `<script>` inline concaténés, `Text::script()` pour les
-> chaînes JS, extraction des gabarits HTML echo-és vers des layouts, typage strict. À mener renderer par
-> renderer, en re-vérifiant le rendu par comparaison avant/après à chaque lot.
+> **Étape 2b amorcée (2026-07-17, `3368aabe`)** — première extraction JS de `ClassicRenderer` : les ~400 lignes
+> de logique statique jQuery des « toggle fields » (masquage conditionnel de champs — `bfSetFieldValue`,
+> `bfToggleFields`, `bfTriggerRules`…) ne dépendaient d'aucune donnée PHP à part une ligne
+> (`toggleFieldsArray`), mais étaient reconstruites en chaîne PHP à chaque requête et émises en `<script>`
+> inline. Déplacées vers `media/com_breezingformsng/js/site/quickmode-toggle-fields.js`, chargé par
+> `addScript()` (seule la déclaration `toggleFieldsArray` reste inline). Vérifié utile en base avant de s'y
+> attaquer : 15 formulaires publiés en dépendent réellement (paiement Stripe conditionnel, sections VCMB
+> Check) ; comportement fonctionnel revérifié en navigateur sur les formulaires 3 et 16 (le champ « montant
+> personnalisé » apparaît/disparaît toujours correctement selon le radio sélectionné).
+>
+> **Étape 2b restante** — le gros du travail : `<script>` inline concaténés restants dans les 4 renderers
+> (bien plus volumineux que le bloc toggle-fields, avec de véritables dépendances aux données du formulaire —
+> extraction plus délicate), `Text::script()` pour les chaînes JS traduisibles, extraction des gabarits HTML
+> echo-és vers des layouts, typage strict. À mener bloc par bloc et renderer par renderer, en re-vérifiant le
+> rendu ET le comportement (pas seulement le HTML) par comparaison avant/après à chaque lot.
 
 ### Vérification (à la complétion de la Phase 9)
 

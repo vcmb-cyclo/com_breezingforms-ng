@@ -14,11 +14,13 @@ entries="$(unzip -Z1 "${archive}")"
 required=(
     "com_breezingformsng.xml"
     "script.php"
-    "administrator/admin.breezingforms.php"
-    "administrator/sql/create_sql.php"
-    "administrator/plugins/sysbreezingforms/sysbreezingforms.xml"
-    "site/breezingforms.php"
-    "site/facileforms.process.php"
+    "administrator/components/com_breezingformsng/services/provider.php"
+    "administrator/components/com_breezingformsng/src/Extension/BreezingFormsNGComponent.php"
+    "administrator/components/com_breezingformsng/sql/install.mysql.utf8.sql"
+    "administrator/components/com_breezingformsng/plugins/sysbreezingforms/sysbreezingforms.xml"
+    "components/com_breezingformsng/breezingformsng.php"
+    "components/com_breezingformsng/facileforms.process.php"
+    "media/com_breezingformsng/css/custom.css"
 )
 
 for path in "${required[@]}"; do

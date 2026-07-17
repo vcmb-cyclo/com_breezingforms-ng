@@ -1,0 +1,3 @@
+-- Schema versioning baseline for BreezingForms NG 6.1.0.
+-- Structural changes up to this version are handled by script.php::update().
+-- Add future schema changes as new files in this directory (one per version).

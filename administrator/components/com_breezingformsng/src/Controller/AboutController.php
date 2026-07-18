@@ -137,6 +137,58 @@ class AboutController extends BaseController
         $this->setRedirect(Route::_('index.php?option=com_breezingformsng&task=about.display&view=about', false));
     }
 
+    public function deleteDuplicateForm(): void
+    {
+        $this->checkToken();
+
+        $formId = $this->input->getInt('duplicate_form_id', 0);
+
+        try {
+            $application = $this->getAuthorizedApplication();
+
+            // Revalidate against a fresh audit: only a currently detected
+            // "drop" candidate may be deleted, and never one still holding
+            // submission records.
+            $auditService = new DatabaseAuditService($this->getDatabase());
+            $report = $auditService->run();
+            $candidate = null;
+
+            foreach ((array) ($report['duplicate_forms'] ?? []) as $group) {
+                foreach ((array) ($group['drop'] ?? []) as $entry) {
+                    if ((int) ($entry['id'] ?? 0) === $formId) {
+                        $candidate = $entry;
+                        break 2;
+                    }
+                }
+            }
+
+            if ($formId < 1 || $candidate === null) {
+                throw new \RuntimeException(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_FORM_NOT_CANDIDATE', $formId));
+            }
+
+            if ((int) ($candidate['record_count'] ?? 0) > 0) {
+                throw new \RuntimeException(Text::sprintf(
+                    'COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_FORM_RECORDS_BLOCK',
+                    $formId,
+                    (int) $candidate['record_count']
+                ));
+            }
+
+            $application
+                ->bootComponent('com_breezingformsng')
+                ->getMVCFactory()
+                ->createModel('Form', 'Administrator', ['ignore_request' => true])
+                ->deleteItems([$formId]);
+
+            $application->setUserState('com_breezingformsng.about.audit', $auditService->run());
+            $this->setMessage(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_FORM_DELETED', $formId), 'message');
+        } catch (\Throwable $exception) {
+            $this->setMessage(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_FORM_DELETE_FAILED', $exception->getMessage()), 'error');
+        }
+
+        $this->setRedirect(Route::_('index.php?option=com_breezingformsng&task=about.display&view=about', false));
+    }
+
     public function showLog(): void
     {
         $this->checkToken();

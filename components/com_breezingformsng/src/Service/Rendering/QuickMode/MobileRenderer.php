@@ -1188,97 +1188,41 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
 								$http = 'https';
 
-								$lang = Factory::getApplication()->getInput()->getString('lang', '');
-
 								$getLangTag = Factory::getApplication()->getLanguage()->getTag();
 								$getLangSlug = explode('-', $getLangTag);
 								$reCaptchaLang = 'hl=' . $getLangSlug[0];
 
-								if ($lang != '') {
-									$lang = ',lang: ' . json_encode($lang) . '';
-								}
-								$size = '';
-								if ($mdata['size'] != '') {
-									$size = json_encode($mdata['size']);
-								} else {
-									$normal = 'normal';
-									$size = json_encode($normal);
+								$size = (isset($mdata['size']) && $mdata['size'] != '') ? $mdata['size'] : 'normal';
 
-								}
 								$this->addScript($http . '://www.google.com/recaptcha/api.js?' . $reCaptchaLang . '&onload=onloadBFNewRecaptchaCallback&render=explicit', $type = "text/javascript", array('data-usercentrics' => 'reCAPTCHA'));
+								$this->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-visible.js');
 
 								echo '
                                                     <div style="display: inline-block !important; vertical-align: middle;">
                                                         <div id="newrecaptcha"></div>
                                                     </div>
-                                                    <script data-usercentrics="reCAPTCHA" type="text/javascript">
-                                                    <!--
-                                                    var onloadBFNewRecaptchaCallback = function() {
-                                                      grecaptcha.render(document.getElementById("newrecaptcha"), {
-                                                        "sitekey" : "' . $mdata['pubkey'] . '",
-                                                        "theme" : "' . (trim($mdata['theme']) == '' ? 'light' : trim($mdata['theme'])) . '",
-                                                        "size"	: ' . $size . ',
-                                                      });
-                                                    };
-                                                    JQuery(document).ready(function(){
-                                                        var rc_loaded = JQuery("script").filter(function () {
-														    return ((typeof JQuery(this).attr("src") != "undefined" && JQuery(this).attr("src").indexOf("recaptcha\/api.js") > 0) ? true : false);
-														}).length;
-
-														if (rc_loaded === 0) {
-															//JQuery.getScript("' . $http . '://www.google.com/recaptcha/api.js?' . $reCaptchaLang . '&onload=onloadBFNewRecaptchaCallback&render=explicit");
-														}
-                                                    });
-                                                    -->
-                                                  </script>';
+                                                    <script data-usercentrics="reCAPTCHA" type="text/javascript">bfInitVisibleReCaptcha(' . json_encode([
+									'sitekey' => $mdata['pubkey'],
+									'theme' => trim($mdata['theme']) == '' ? 'light' : trim($mdata['theme']),
+									'size' => $size,
+									'resetOnRerender' => false,
+								]) . ');</script>';
 
 							} else
 								if (isset($mdata['invisibleCaptcha']) && $mdata['invisibleCaptcha']) {
 
 									$http = 'https';
 
-									$lang = Factory::getApplication()->getInput()->getString('lang', '');
-									if ($lang != '') {
-										$lang = ',lang: ' . json_encode($lang) . '';
-									}
-
-									$callSubmit = 'ff_validate_submit(this, \'click\')';
-									if ($this->hasFlashUpload) {
-										$callSubmit = 'if(typeof bfAjaxObject101 == \'undefined\' && typeof bfReCaptchaLoaded == \'undefined\'){bfDoFlashUpload()}else{ff_validate_submit(this, \'click\')}';
-									}
-
 									$this->addScript($http . '://www.google.com/recaptcha/api.js?onload=onloadBFNewRecaptchaCallback&render=explicit', $type = "text/javascript", array('data-usercentrics' => 'reCAPTCHA'));
+									$this->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-invisible-mobile.js');
 
-
-									echo '
-                                                    <script data-usercentrics="reCAPTCHA" type="text/javascript">
-                                                    <!--
-                                                    bfInvisibleRecaptcha = true;
-                                                    var onloadBFNewRecaptchaCallback = function() {
-                                                      grecaptcha.render("bfInvisibleReCaptchaContainer", {
-                                                        "sitekey" : "' . $mdata['pubkey'] . '",
-                                                        "size": "invisible",
-                                                        "theme" : "' . (trim($mdata['theme']) == '' ? 'light' : trim($mdata['theme'])) . '",
-                                                        "badge" : "inline",
-                                                        "callback" : function(){if(typeof bf_htmltextareainit != \'undefined\'){ bf_htmltextareainit() }' . $callSubmit . ' }
-                                                      });
-                                                    };
-
-                                                    JQuery(document).ready(function(){
-
-                                                        JQuery("#bfElemWrap' . $mdata['dbId'] . '").css("display","none");
-                                                        JQuery("#' . $this->p->form_id . '").append("<div id=\\"bfInvisibleReCaptchaContainer\\" ></div><div id=\\"bfInvisibleReCaptcha\\" class=\\"g-recaptcha\\" data-callback=\\"onloadBFNewRecaptchaCallback\\" data-size=\\"invisible\\" data-sitekey=\\"' . $mdata['pubkey'] . '\\"></div>");
-
-                                                        var rc_loaded = JQuery("script").filter(function () {
-														    return ((typeof JQuery(this).attr("src") != "undefined" && JQuery(this).attr("src").indexOf("recaptcha\/api.js") > 0) ? true : false);
-														}).length;
-
-														if (rc_loaded === 0) {
-															//JQuery.getScript("' . $http . '://www.google.com/recaptcha/api.js?onload=onloadBFNewRecaptchaCallback&render=explicit");
-														}
-                                                    });
-                                                    -->
-                                                  </script>';
+									echo '<script data-usercentrics="reCAPTCHA" type="text/javascript">bfInitInvisibleReCaptchaMobile(' . json_encode([
+										'sitekey' => $mdata['pubkey'],
+										'theme' => trim($mdata['theme']) == '' ? 'light' : trim($mdata['theme']),
+										'hasFlashUpload' => $this->hasFlashUpload,
+										'dbId' => (int) $mdata['dbId'],
+										'formId' => $this->p->form_id,
+									]) . ');</script>';
 								}
 						} else {
 							echo '<span class="bfCaptcha">' . "\n";
@@ -1414,7 +1358,6 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 							$mdata['format'] = $this->bfCalendarToPickadateFormat($mdata['format']);
 							$pickerFirstDay = $this->bfCalendarToPickadateFirstDay(isset($mdata['firstDay']) ? $mdata['firstDay'] : '');
 							$pickerSelectYears = $this->bfCalendarSelectYears($mdata);
-							$pickerFormat = json_encode($mdata['format']);
 
 							$exploded = explode('::', trim($mdata['value']));
 
@@ -1430,35 +1373,20 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 								$right = '...';
 							}
 
-							$container = 'JQuery("body").append("<div class=\"bfCalendarResponsiveContainer' . $mdata['dbId'] . '\" style=\"display:block;position:absolute;left:-9999px;\"></div>");';
-
 							echo '<input autocomplete="off" class="ff_elem" type="text" name="ff_nm_' . $mdata['bfName'] . '[]"  id="ff_elem' . $mdata['dbId'] . '" value="' . htmlentities($left, ENT_QUOTES, 'UTF-8') . '"/>' . "\n";
 							echo '<label for="ff_elem' . $mdata['dbId'] . '_calendarButton"></label>';
 							echo '<button data-theme="a" id="ff_elem' . $mdata['dbId'] . '_calendarButton" type="button" class="bfCalendar" value="' . htmlentities($right, ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities($right, ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
 
-						echo '<script type="text/javascript">
-                                                <!--
-	                                                JQuery(document).ready(function () {
-	                                                    ' . $container . '
-	                                                    JQuery("#ff_elem' . $mdata['dbId'] . '_calendarButton").on("mousedown",function(event){
-	                                                    event.preventDefault();})
-	                                                    JQuery("#ff_elem' . $mdata['dbId'] . '_calendarButton").pickadate({
-	                                                        format: ' . $pickerFormat . ',
-	                                                        selectYears: ' . $pickerSelectYears . ',
-	                                                        selectMonths: true,
-	                                                        editable: true,
-	                                                        firstDay: ' . $pickerFirstDay . ',
-	                                                        container: ".bfCalendarResponsiveContainer' . $mdata['dbId'] . '",
-	                                                        onClose: function() {
-	                                                            JQuery("#ff_elem' . $mdata['dbId'] . '_calendarButton").blur();
-	                                                        },
-                                                        onSet: function() {
-                                                            JQuery("#ff_elem' . $mdata['dbId'] . '").val(this.get("value"));
-                                                        }
-                                                    });
-                                                });
-                                                //-->
-                                                </script>' . "\n";
+						if (!$this->hasResponsiveDatePicker) {
+							Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js');
+						}
+
+						echo '<script type="text/javascript">bfInitCalendarResponsive(' . json_encode((int) $mdata['dbId']) . ', ' . json_encode([
+							'format' => $mdata['format'],
+							'selectYears' => $pickerSelectYears,
+							'firstDay' => $pickerFirstDay,
+							'hasYearScroller' => false,
+						]) . ');</script>' . "\n";
 
 						$this->hasResponsiveDatePicker = true;
 

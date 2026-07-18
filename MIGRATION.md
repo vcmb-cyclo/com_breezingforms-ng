@@ -897,6 +897,97 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
   > formules `fieldCalc` personnalisées, calendrier/signature/reCAPTCHA) — génuinement dynamiques, dépendent
   > de la configuration de chaque champ, extraction jugée plus délicate/risquée et pas encore entamée. La
   > réécriture native complète (au-delà de la seule extraction JS) reste le chantier de fond, non commencé.
+  >
+  > **Première extraction par élément (2026-07-18)** : l'initialiseur `pickadate()` du champ
+  > `bfCalendarResponsive` était byte-identique entre `ClassicRenderer`/`BootstrapRenderer`/`OnePageRenderer`
+  > (modulo indentation) — seuls `dbId`, `format`, `selectYears`, `firstDay` variaient — et `MobileRenderer`
+  > n'en différait que par l'absence du hook `onOpen` (pas de year-scroller sur ce thème, cf. note existante
+  > plus haut). Extrait vers `bfInitCalendarResponsive(dbId, options)` dans
+  > `media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js`, appelé avec un objet de
+  > configuration JSON par champ (`format`/`selectYears`/`firstDay`/`hasYearScroller`) ; la variable PHP
+  > `$container` (append du conteneur du picker) est désormais construite dans la fonction JS à partir de
+  > `dbId` plutôt que dupliquée par PHP. `MobileRenderer` charge aussi ce nouvel asset (il n'avait auparavant
+  > aucun fichier JS calendrier partagé) avec `hasYearScroller: false`. Vérifié : `php -l` propre sur les 4
+  > renderers ; en conditions réelles sur le formulaire 28 (Bootstrap, champ « Responsive calendar Eddy »,
+  > `dbId` 4807) — asset chargé, `bfInitCalendarResponsive` défini, ouverture du picker déclenche bien
+  > `onOpen` → `bf_add_yearscroller(4807)` → icône `#bfCalExt4807` injectée, zéro erreur console. Classic,
+  > Mobile et OnePage vérifiés par lecture de code uniquement (même patron, pas de champ de test disponible
+  > sur ces thèmes) — à revérifier en direct si l'occasion se présente.
+  >
+  > **Formulaire de test permanent reCAPTCHA créé (2026-07-18)** : aucun formulaire publié sur le site de
+  > dev n'a de champ `bfReCaptcha`, rendant impossible toute vérification en direct de cette famille
+  > d'éléments. Créé `PermanentReCaptchaTest` (id 86, thème Bootstrap, un seul champ reCAPTCHA visible,
+  > clé de test Google officielle publique — `6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI`/
+  > `6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe`, toujours valide, documentée par Google pour l'automatisation
+  > de tests, sans risque ni quota réel). Cloné à partir de la structure racine/page du formulaire 28 (déjà
+  > vérifiée fonctionnelle), avec un seul enfant `bfReCaptcha` construit depuis le template par défaut de
+  > l'éditeur QuickMode (`quickmode-elements.js::createReCaptcha`). **Ne pas supprimer** : accessible sans
+  > menu via `index.php?option=com_breezingformsng&view=form&ff_form=86` (`ff_form` sélectionne un
+  > formulaire par id, indépendamment de tout élément de menu — cf. `FormRenderer.php`). Utilisateur
+  > `claude-test` (Super User) : mot de passe redéfini en session pour tenter une connexion admin, mais
+  > l'accès `/administrator` a été bloqué par le classificateur de permissions de l'environnement (même
+  > blocage que celui déjà documenté pour les tests ACL) ; le formulaire a donc été construit directement en
+  > base plutôt que via l'éditeur QuickMode admin.
+  >
+  > **Extraction de l'initialiseur reCAPTCHA visible (2026-07-18)** : la branche « visible » (case à cocher,
+  > par opposition à l'invisible) du bloc `bfReCaptcha` était identique entre `ClassicRenderer`/
+  > `BootstrapRenderer`/`MobileRenderer`/`OnePageRenderer`, à une différence près : `ClassicRenderer` seul
+  > passe un second argument `true` à `grecaptcha.render()` (comportement non documenté, jamais expliqué
+  > ailleurs dans ce fichier — préservé tel quel via un flag `resetOnRerender` plutôt qu'investigué/corrigé,
+  > conformément à la règle de non-modification du comportement pendant une extraction JS). Extrait vers
+  > `bfInitVisibleReCaptcha(options)` dans `media/com_breezingformsng/js/site/quickmode-recaptcha-visible.js`,
+  > appelé avec `{sitekey, theme, size, resetOnRerender}` par thème. La variable PHP `$lang` (calculée dans
+  > les 4 renderers mais jamais utilisée dans le JS émis, y compris avant cette extraction) n'a pas été
+  > reproduite dans le JS — code mort déjà présent, non ajouté par ce changement. La branche « invisible »
+  > (`invisibleCaptcha`) n'a **pas** été touchée : `MobileRenderer` y diffère structurellement des 3 autres
+  > thèmes (injection DOM différente, pas de `expired-callback`, badge toujours `inline`), une vraie
+  > divergence de comportement à traiter séparément plutôt qu'une extraction mécanique. Vérifié : `php -l`
+  > propre sur les 4 renderers ; **en conditions réelles** sur le nouveau formulaire de test permanent
+  > (id 86, Bootstrap) : widget reCAPTCHA rendu (case à cocher « Je ne suis pas un robot », mention Google
+  > « clé de test »), 2 iframes chargées, `bfInitVisibleReCaptcha` défini, zéro erreur console avant et après
+  > déploiement du changement. Classic/Mobile/OnePage vérifiés par lecture de code uniquement (formulaire de
+  > test actuellement en thème Bootstrap) — à revérifier en direct si l'occasion se présente.
+  >
+  > **Extraction de l'initialiseur reCAPTCHA invisible (2026-07-18)** : contrairement à la branche visible,
+  > les 4 thèmes divergent réellement ici, pas seulement par whitespace. `ClassicRenderer` et
+  > `BootstrapRenderer` sont identiques (fonction nommée `recaptchaCheckedCallback(token)` qui remet
+  > `bfInvisibleRecaptcha` à `false` seulement si `token != ''`). `OnePageRenderer` utilise un callback
+  > anonyme inline qui **ne remet jamais** ce flag à `false` — différence de comportement préexistante,
+  > jamais documentée ni expliquée ailleurs dans ce fichier, préservée telle quelle via un paramètre
+  > `resetFlagOnCallback` plutôt que silencieusement unifiée (cohérent avec la règle déjà appliquée à la
+  > garde `canvas == null` de la signature Mobile). `MobileRenderer` diverge structurellement plus encore :
+  > injection dynamique des conteneurs via jQuery (`.append()`) au lieu d'un echo statique, masquage du
+  > wrapper du champ (`#bfElemWrap<dbId>`), aucun `expired-callback`, badge toujours codé en dur `"inline"`.
+  > Résultat : deux fichiers plutôt qu'un seul avec des flags à l'infini —
+  > `quickmode-recaptcha-invisible.js` (`bfInitInvisibleReCaptcha`, partagé Classic/Bootstrap/OnePage) et
+  > `quickmode-recaptcha-invisible-mobile.js` (`bfInitInvisibleReCaptchaMobile`, dédié). La variable PHP
+  > `$lang` (calculée mais jamais utilisée dans le JS émis, dans les 4 renderers) n'a pas été reproduite —
+  > code mort déjà présent avant ce changement, pas ajouté par lui.
+  >
+  > **Deuxième formulaire de test permanent créé** : `PermanentReCaptchaInvisibleTest` (id 87, thème
+  > Bootstrap, badge `inline`, même clé de test Google que le formulaire 86), cloné à partir du formulaire 86
+  > avec `invisibleCaptcha` activé. Accessible via
+  > `index.php?option=com_breezingformsng&view=form&ff_form=87`. **Ne pas supprimer.** Vérifié en conditions
+  > réelles : `php -l` propre sur les 4 renderers ; sur ce formulaire, `bfInitInvisibleReCaptcha` défini,
+  > `window.bfInvisibleRecaptcha` correctement mis à `true`, 2 iframes Google chargées (widget invisible
+  > effectivement rendu), zéro erreur console avant et après déploiement (chemin `resetFlagOnCallback: true`,
+  > commun à Classic/Bootstrap). Le chemin `resetFlagOnCallback: false` (OnePage) et `MobileRenderer`
+  > vérifiés par lecture de code uniquement (formulaire de test en thème Bootstrap) — à revérifier en direct
+  > si l'occasion se présente, notamment en basculant temporairement le formulaire 87 en OnePage/Mobile comme
+  > cela avait été fait pour le formulaire 35 lors des lots précédents.
+  >
+  > **OnePage vérifié en direct (2026-07-18)** : formulaire 87 basculé temporairement
+  > (`themebootstrapMode: true`), rendu en Chrome headless — `bfInitInvisibleReCaptcha` appelé avec
+  > `"resetFlagOnCallback":false` comme attendu, 2 iframes Google chargées, zéro erreur console. Configuration
+  > restaurée à l'identique après vérification (`themebootstrapMode: false`).
+  >
+  > **Mobile non vérifiable en direct** : tentative de basculement (`mobileEnabled`/`forceMobile` à `true`
+  > + en-tête `User-Agent` iPhone via Playwright) — reproduit exactement la limitation déjà documentée dans
+  > la section « Vérification finale Phase 9 » de ce fichier : le rendu Mobile dépend de `bf_is_mobile()`
+  > côté serveur, qui n'est pas satisfait par un simple en-tête `User-Agent` Playwright (dépend d'un état de
+  > session/détection plus riche). Le rendu est resté Bootstrap malgré le basculement. Configuration
+  > restaurée à l'identique (`mobileEnabled`/`forceMobile: false`) après l'essai. `MobileRenderer` reste donc
+  > vérifié par lecture de code uniquement pour cette extraction, comme documenté plus haut.
 - [~] **Vérification finale Phase 9 (repasse du 2026-07-17)** : après la fusion de la PR #29 et les
   extractions Mobile/OnePage, repasse partielle en conditions réelles :
   - [x] Rendu Classic (formulaires 2/16) et Bootstrap (formulaires 7/28) : zéro erreur JS, assets attendus

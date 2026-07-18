@@ -520,14 +520,24 @@ $aboutDescription = str_replace(
                                     <?php endif; ?>
                                     &mdash;
                                     <?php echo Text::sprintf(
-                                        'COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_FORMS_HINT',
+                                        'COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_FORMS_HINT_KEEP',
                                         (int) ($group['keep']['id'] ?? 0),
-                                        (int) ($group['keep']['record_count'] ?? 0),
-                                        htmlspecialchars(implode(', ', array_map(
-                                            static fn(array $entry): string => '#' . (int) ($entry['id'] ?? 0),
-                                            (array) ($group['drop'] ?? array())
-                                        )), ENT_QUOTES, 'UTF-8')
+                                        (int) ($group['keep']['record_count'] ?? 0)
                                     ); ?>
+                                    <?php foreach ((array) ($group['drop'] ?? array()) as $entry) : ?>
+                                        <?php
+                                        $dropId = (int) ($entry['id'] ?? 0);
+                                        $dropRecordCount = (int) ($entry['record_count'] ?? 0);
+                                        ?>
+                                        <span class="text-nowrap me-1">
+                                            #<?php echo $dropId; ?><?php if ($dropRecordCount > 0) : ?><span class="text-muted"> (<?php echo $dropRecordCount; ?>)</span><?php else : ?><button
+                                                type="button"
+                                                class="btn btn-sm btn-link link-danger p-0 align-baseline"
+                                                title="<?php echo htmlspecialchars(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_FORM_DELETE', $dropId), ENT_QUOTES, 'UTF-8'); ?>"
+                                                onclick="if (window.confirm('<?php echo htmlspecialchars(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_FORM_DELETE_CONFIRM', $dropId), ENT_QUOTES, 'UTF-8'); ?>')) { document.getElementById('bf-duplicate-form-id').value = '<?php echo $dropId; ?>'; Joomla.submitform('about.deleteDuplicateForm'); }"
+                                            ><span class="icon-trash" aria-hidden="true"></span><span class="visually-hidden"><?php echo htmlspecialchars(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_FORM_DELETE', $dropId), ENT_QUOTES, 'UTF-8'); ?></span></button><?php endif; ?>
+                                        </span>
+                                    <?php endforeach; ?>
                                 </li>
                             <?php endforeach; ?>
                         </ul>
@@ -809,5 +819,6 @@ $aboutDescription = str_replace(
     <input type="hidden" name="option" value="com_breezingformsng" />
     <input type="hidden" name="task" value="about.display" />
     <input type="hidden" name="view" value="about" />
+    <input type="hidden" name="duplicate_form_id" id="bf-duplicate-form-id" value="" />
     <?php echo HTMLHelper::_('form.token'); ?>
 </form>

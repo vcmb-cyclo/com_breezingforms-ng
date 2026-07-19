@@ -9,29 +9,35 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Callback;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Database\ParameterType;
+use Joomla\Database\DatabaseInterface;
 use Joomla\Filesystem\File;
 
 /**
  * Double-opt-in / opt-out email confirmation endpoints.
  */
-class OptCallback
+final class OptCallback
 {
+    public function __construct(
+        private readonly CMSApplication $application,
+        private readonly DatabaseInterface $database,
+    ) {
+    }
+
     public function optIn(): void
     {
-        global $database, $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
 
-        $mainframe = Factory::getApplication();
-        $db = $database;
+        $database = $this->database;
+
 
 
     // DOUBLE OPT IN
 
-    $jinput = Factory::getApplication()->getInput();
+    $jinput = $this->application->getInput();
     $ip = $jinput->server->get('REMOTE_ADDR');
 
     $userSubmitedID = $jinput->getString('id', '');
@@ -59,13 +65,12 @@ class OptCallback
 
     public function optOut(): void
     {
-        global $database, $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
 
-        $mainframe = Factory::getApplication();
-        $db = $database;
+        $database = $this->database;
 
 
-    $jinput = Factory::getApplication()->getInput();
+
+    $jinput = $this->application->getInput();
     $ip = $jinput->server->get('REMOTE_ADDR');
 
     $userSubmitedID = $jinput->getString('id', '');

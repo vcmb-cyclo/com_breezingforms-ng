@@ -14,8 +14,6 @@ use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 
-require_once JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFRequest.php';
-
 abstract class BreezingformsNGHelperRoute
 {
     protected static $lookup = array();

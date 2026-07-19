@@ -1,2 +1,1 @@
-ALTER TABLE `#__facileforms_forms`
-  ADD COLUMN `debug_mode` tinyint(1) NOT NULL DEFAULT '0' AFTER `published`;
+-- The debug_mode column is added idempotently by script.php during updates.

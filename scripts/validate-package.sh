@@ -19,7 +19,6 @@ required=(
     "administrator/components/com_breezingformsng/sql/install.mysql.utf8.sql"
     "administrator/components/com_breezingformsng/plugins/sysbreezingforms/sysbreezingforms.xml"
     "components/com_breezingformsng/breezingformsng.php"
-    "components/com_breezingformsng/facileforms.process.php"
     "media/com_breezingformsng/css/custom.css"
 )
 

@@ -12,8 +12,8 @@ namespace Vcmb\Component\BreezingformsNG\Site\View\Form;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 
 /**
- * Renders a form. The default template currently delegates to the legacy
- * engine (breezingformsng.php); rendering moves into a FormRenderer
+ * Renders a form. The default template delegates to the native engine
+ * bootstrap (breezingformsng.php), which dispatches through FormRenderer
  * service as the frontend migration progresses (MIGRATION.md, phase 8).
  */
 class HtmlView extends BaseHtmlView

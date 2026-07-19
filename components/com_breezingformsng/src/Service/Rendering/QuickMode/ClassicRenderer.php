@@ -109,6 +109,7 @@ float:left;
 		}
 
 		Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-core-helpers.js');
+		Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-deactivation.js');
 
 		Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript(
 				$jQuery . '
@@ -271,7 +272,7 @@ float:left;
 			} else if ($mdata['type'] == 'section') {
 
 				if (isset($dataObject['properties']['name']) && isset($mdata['off']) && $mdata['off']) {
-					echo '<script type="text/javascript"><!--' . "\n" . 'bfDeactivateSection.push("' . $dataObject['properties']['name'] . '");' . "\n" . '//--></script>' . "\n";
+					echo '<script type="text/javascript">bfRegisterDeactivatedSection(' . json_encode($dataObject['properties']['name']) . ');</script>' . "\n";
 				}
 
 				/* translatables */
@@ -548,10 +549,11 @@ float:left;
 						// set size of element, number input doesn't allow size attr
 						
 						if ($mdata['size'] != '') {
-							echo '<script type="text/javascript">
-							JQuery(document).ready(
-								JQuery("#ff_elem' . $mdata['dbId'] . '").css("width", "' . $mdata["size"] . '")
-							);</script>';
+							Factory::getApplication()->getDocument()->addScript(
+								Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-number-input.js'
+							);
+							echo '<script type="text/javascript">bfSetNumberInputWidth('
+								. json_encode((int) $mdata['dbId']) . ', ' . json_encode($mdata['size']) . ');</script>';
 						}
 						break;
 
@@ -1048,7 +1050,12 @@ float:left;
 						/* translatables end */
 
 						echo '<span class="ff_elem bfSummarize" id="ff_elem' . $mdata['dbId'] . '"></span>' . "\n";
-						echo '<script type="text/javascript"><!--' . "\n" . 'bfRegisterSummarize("ff_elem' . $mdata['dbId'] . '", "' . $mdata['connectWith'] . '", "' . $mdata['connectType'] . '", "' . addslashes($mdata['emptyMessage']) . '", ' . ($mdata['hideIfEmpty'] ? 'true' : 'false') . ')' . "\n" . '//--></script>';
+						echo '<script type="text/javascript">bfRegisterSummarize('
+							. json_encode('ff_elem' . $mdata['dbId']) . ', '
+							. json_encode($mdata['connectWith']) . ', '
+							. json_encode($mdata['connectType']) . ', '
+							. json_encode($mdata['emptyMessage']) . ', '
+							. json_encode((bool) $mdata['hideIfEmpty']) . ');</script>';
 						if (trim($mdata['fieldCalc']) != '') {
 							echo '<script type="text/javascript">
                                                         <!--
@@ -1341,7 +1348,7 @@ float:left;
 				}
 
 				if (isset($mdata['bfName']) && isset($mdata['off']) && $mdata['off']) {
-					echo '<script type="text/javascript"><!--' . "\n" . 'bfDeactivateField["ff_nm_' . $mdata['bfName'] . '[]"]=true;' . "\n" . '//--></script>' . "\n";
+					echo '<script type="text/javascript">bfRegisterDeactivatedField(' . json_encode($mdata['bfName']) . ');</script>' . "\n";
 				}
 
 				if ($mdata['bfType'] == 'bfFile') {
@@ -1477,21 +1484,15 @@ float:left;
 		// requires a different mandatory validation than ff_valuenotempty
 		if (count($this->htmltextareas)) {
 			$editor = Editor::getInstance(Factory::getApplication()->get('editor'));
-			$htmltextarea_out = '';
+			Factory::getApplication()->getDocument()->addScript(
+				Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-html-textareas.js'
+			);
 			foreach ($this->htmltextareas As $htmltextarea) {
-				$htmltextarea_out .= 'JQuery("[name=\"' . $htmltextarea . '\"]").val(JQuery.trim(JQuery("[name=\"' . $htmltextarea . '\"]").val())+" ");' . "\n";
-				$htmltextarea_out .= 'bf_htmltextareas.push("' . addslashes(rtrim(trim($editor->getContent($htmltextarea)), ';')) . '")' . "\n";
-				$htmltextarea_out .= 'bf_htmltextareanames.push("' . $htmltextarea . '")' . "\n";
+				$editorContent = rtrim(trim($editor->getContent($htmltextarea)), ';');
+				echo '<script type="text/javascript">bfRegisterHtmlTextarea('
+					. json_encode($htmltextarea) . ', function () { return '
+					. json_encode($editorContent) . '; });</script>';
 			}
-			echo '<script type="text/javascript">
-                          <!--
-                          var bf_htmltextareas     = [];
-                          var bf_htmltextareanames = [];
-                          function bf_htmltextareainit(){
-                            ' . $htmltextarea_out . '
-                          }
-                          //-->
-                          </script>';
 		}
 
 		if ($this->hasFlashUpload) {

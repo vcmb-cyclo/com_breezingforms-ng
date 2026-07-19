@@ -340,6 +340,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 		);
 
 		$this->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-core-helpers-mobile.js');
+		$this->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-deactivation.js');
 
 		if (!$this->useErrorAlerts) {
 			$showDefaultErrors = $this->useDefaultErrors || (!$this->useDefaultErrors && !$this->useBalloonErrors);
@@ -487,7 +488,9 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 			} else if ($mdata['type'] == 'section') {
 
 				if (isset($dataObject['properties']['name']) && isset($mdata['off']) && $mdata['off']) {
-					echo '<script type="text/javascript"><!--' . "\n" . 'bfDeactivateSection.push("' . $dataObject['properties']['name'] . '");' . "\n" . '//--></script>' . "\n";
+					$this->addScriptDeclaration(
+						'bfRegisterDeactivatedSection(' . json_encode($dataObject['properties']['name']) . ');'
+					);
 				}
 
 				/* translatables */
@@ -1093,7 +1096,9 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                                                         </script>
 							";
 							// on mobiles, file uploads are forced not to be mandatory, since we cannot determin safely for all handsets if they are even allowed
-							echo '<script type="text/javascript"><!--' . "\n" . 'var bfIsValidMobile = ( navigator.userAgent.match(/(iPad|iPhone|iPod|Android)/i) ? true : false )' . "\n" . 'if(!bfIsValidMobile){bfDeactivateField["ff_nm_' . $mdata['bfName'] . '[]"]=true;}' . "\n" . '//--></script>' . "\n";
+							$this->addScriptDeclaration(
+								'bfRegisterNonMobileFileField(' . json_encode($mdata['bfName']) . ');'
+							);
 
 							echo '<input class="ff_elem" ' . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="hidden" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
 							echo '<div style="clear: both;"></div>';
@@ -1109,7 +1114,9 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 						break;
 
 						// on mobiles, file uploads are forced not to be mandatory, since we cannot determin safely for all handsets if they are even allowed
-						echo '<script type="text/javascript"><!--' . "\n" . 'bfDeactivateField["ff_nm_' . $mdata['bfName'] . '[]"]=true;' . "\n" . '//--></script>' . "\n";
+						$this->addScriptDeclaration(
+							'bfRegisterDeactivatedField(' . json_encode($mdata['bfName']) . ');'
+						);
 
 						break;
 
@@ -1164,7 +1171,12 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                                                             <div class="ui-block-a"><strong>' . $legend . '</strong></div>
                                                             <div class="ui-block-b ff_elem bfSummarize" id="ff_elem' . $mdata['dbId'] . '"></div>
                                                     </div>';
-						echo '<script type="text/javascript"><!--' . "\n" . 'bfRegisterSummarize("ff_elem' . $mdata['dbId'] . '", "' . $mdata['connectWith'] . '", "' . $mdata['connectType'] . '", "' . addslashes($mdata['emptyMessage']) . '", ' . ($mdata['hideIfEmpty'] ? 'true' : 'false') . ')' . "\n" . '//--></script>';
+						echo '<script type="text/javascript">bfRegisterSummarize('
+							. json_encode('ff_elem' . $mdata['dbId']) . ', '
+							. json_encode($mdata['connectWith']) . ', '
+							. json_encode($mdata['connectType']) . ', '
+							. json_encode($mdata['emptyMessage']) . ', '
+							. json_encode((bool) $mdata['hideIfEmpty']) . ');</script>';
 						if (trim($mdata['fieldCalc']) != '') {
 							echo '<script type="text/javascript">
                                                         <!--
@@ -1309,37 +1321,11 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
 							echo $this->calendar($left, "ff_nm_" . $mdata['bfName'] . "[]", "ff_elem" . $mdata['dbId'], $mdata['format'], $calAttr);
 
-							echo '
-	                        <script>
-	                        JQuery(document).ready(function(){
-	                            
-	                            setTimeout(function(){
-	                                
-	                                JQuery(".js-calendar").css("display", "none");
-	                                
-	                                JQuery("#ff_elem' . $mdata['dbId'] . '_btn").on("click", function(){
-	                                    JQuery(this).closest(".input-group").next(".js-calendar").css("display", "block");
-	                                });
-	                                
-	                                JQuery(".js-calendar .btn-exit").on("click", function(){
-	                                   JQuery(this).closest(".js-calendar").css("display", "none");
-	                                });
-	                                
-	                                JQuery(".js-calendar .btn-today").on("click", function(){
-	                                   JQuery(this).closest(".js-calendar").css("display", "none");
-	                                });
-	                                
-	                                JQuery(".js-calendar .day").on("click", function(){
-	                                   JQuery(this).closest(".js-calendar").css("display", "none");
-	                                });
-	                                
-	                                JQuery("#ff_elem' . $mdata['dbId'] . '_btn").html(' . json_encode(Text::_('COM_BREEZINGFORMSNG_CALENDAR_OPEN')) . ');
-	                                
-	                            }, 100);                            
-	                            
-	                        });
-	                        </script>
-	                        ';
+							$this->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-mobile.js');
+							$this->addScriptDeclaration(
+								'bfInitMobileCalendar(' . json_encode((int) $mdata['dbId']) . ', '
+								. json_encode(Text::_('COM_BREEZINGFORMSNG_CALENDAR_OPEN')) . ');'
+							);
 							echo '</span>';
 							echo '</div>';
 							echo '</div>';
@@ -1495,7 +1481,9 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 				}
 
 				if (isset($mdata['bfName']) && isset($mdata['off']) && $mdata['off']) {
-					echo '<script type="text/javascript"><!--' . "\n" . 'bfDeactivateField["ff_nm_' . $mdata['bfName'] . '[]"]=true;' . "\n" . '//--></script>' . "\n";
+					$this->addScriptDeclaration(
+						'bfRegisterDeactivatedField(' . json_encode($mdata['bfName']) . ');'
+					);
 				}
 
 				if ($mdata['bfType'] == 'bfFile') {

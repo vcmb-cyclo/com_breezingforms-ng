@@ -485,6 +485,24 @@
   `addRequestParams()` sont supprimées de `legacy/functions.php`, qui ne résout plus l'application statiquement.
   Le helper de route des intégrations de tags ne charge plus `BFRequest.php`, inutilisé depuis la conversion
   complète des lectures de requête vers Joomla Input.
+  **Tables sorties de `legacy/`** : `legacy/tables.php` devient `Site\Table\RuntimeTables.php`. Les huit classes
+  globales sont renommées `MenuTable`, `FormTable`, `ElementTable`, `ScriptTable`, `PieceTable`, `RecordTable`,
+  `SubrecordTable` et `QueryColumn`, toutes finales et sous le namespace du site. Les consommateurs frontend et
+  administrateur utilisent leurs noms qualifiés ; l'ancien fichier est purgé lors des mises à jour.
+  Le dernier fichier du dossier `legacy/`, désormais limité aux helpers globaux publics requis par les scripts
+  stockés, est déplacé vers `src/Support/runtime_functions.php`. Le dossier `legacy/` disparaît du paquet ; les
+  noms des fonctions restent inchangés afin de préserver le contrat d'exécution des formulaires.
+  L'entrée `<folder>legacy</folder>` est simultanément retirée du manifeste afin que Joomla n'attende pas un
+  dossier désormais absent du paquet.
+  Les six callbacks ne déclarent plus les 72 globals hérités qu'ils n'utilisaient jamais. Le callback captcha
+  perd aussi sa dépendance à la base, et le dernier alias `$mainframe` de l'écran PayPal est remplacé par
+  l'application injectée.
+  Le bootstrap global `facileforms.class.php` est déplacé vers `src/Support/runtime_bootstrap.php`. Les constantes
+  de runmode et symboles publics restent inchangés pour les scripts stockés, mais le fichier historique quitte la
+  racine, disparaît du manifeste et est purgé lors des mises à jour.
+  La façade globale `HTML_facileFormsProcessor` et ses hooks de trace quittent ensuite
+  `facileforms.process.php` pour `src/Support/processor_facade.php`. Le contrat PHP public reste chargé à la
+  demande par `FormRenderer`, tandis que l'ancien fichier racine est retiré du manifeste et du site installé.
   (`BFRequest`, `BFIntegrate` et les quatre rendus `BFQuickMode*`) restent volontairement disponibles comme API externe.
   `BFJoomlaConfig` a été remplacé par `Factory::getConfig()` ; `BFPDF` a été migré vers le service namespacé
   `Administrator\Service\PdfDocument`. Les deux classes globales ont été supprimées. Export administrateur vérifié
@@ -1128,9 +1146,14 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
     `User-Agent` Playwright infructueuse : le rendu Mobile dépend de `mobileEnabled`/`forceMobile` sur le
     formulaire **et** d'un état de session, pas seulement de l'UA de la requête ; à creuser si une
     vérification Mobile est nécessaire dans une session future).
-  - [ ] Upload de fichier : aucun formulaire publié sur la base de dev ne contient actuellement d'élément
-    `bfFile` — non retestable en l'état sans modifier un formulaire réel ; dernière vérification connue
-    antérieure à ce lot de changements.
+  - [x] Upload de fichier *(vérifié le 2026-07-19 : élément `File Upload` temporaire ajouté au formulaire
+    QuickMode `TestEddyElements` (id 28) via un compte `claude-test` réauthentifié, menu temporaire publié,
+    soumission réelle en HTTP via Playwright — extension refusée `.txt` correctement rejetée par la validation
+    serveur avec le message attendu, upload `.pdf` accepté : fichier stocké sur disque
+    (`media/breezingforms/uploads/`) avec le contenu exact, sous-enregistrement `File Upload` créé dans
+    `#__facileforms_subrecords` référençant le chemin physique. Élément, sous-enregistrements de test, fichier
+    uploadé et menu temporaire nettoyés après vérification ; mot de passe `claude-test` repassé à une valeur
+    aléatoire)*.
   - [ ] `commit()` Intégrateur : non rejoué — hors périmètre des changements de ce lot (uniquement le JS des
     renderers QuickMode a été touché), la vérification Phase 9b (insert/update/repli) fait toujours foi.
   - [ ] Callbacks de paiement réels : toujours bloqué, accès sandbox nécessaire (cf. point dédié plus haut).

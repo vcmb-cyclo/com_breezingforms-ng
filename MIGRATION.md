@@ -902,10 +902,12 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
   > redimensionnement du canevas sans aucune erreur console. Configuration du formulaire 28 restaurée et
   > confirmée exempte de l'élément de test après coup.
   >
-  > Reste : les scripts inline **par élément** dans la boucle `process()` de chaque renderer (résumeurs,
-  > formules `fieldCalc` personnalisées, calendrier/signature/reCAPTCHA) — génuinement dynamiques, dépendent
-  > de la configuration de chaque champ, extraction jugée plus délicate/risquée et pas encore entamée. La
-  > réécriture native complète (au-delà de la seule extraction JS) reste le chantier de fond, non commencé.
+  > État initial du lot au 2026-07-17 : les scripts inline **par élément** dans la boucle `process()`
+  > (résumeurs, formules `fieldCalc`, calendrier/signature/reCAPTCHA) restaient à traiter. Les initialiseurs
+  > calendrier, signature et reCAPTCHA ont depuis été extraits ; les résumeurs utilisent désormais leur API
+  > partagée avec des arguments encodés en JSON. Seul le corps de `fieldCalc` reste nécessairement inline :
+  > il s'agit de JavaScript personnalisé stocké avec chaque formulaire. La réécriture native complète
+  > (au-delà de l'extraction JS) reste un chantier de fond.
   >
   > **Première extraction par élément (2026-07-18)** : l'initialiseur `pickadate()` du champ
   > `bfCalendarResponsive` était byte-identique entre `ClassicRenderer`/`BootstrapRenderer`/`OnePageRenderer`
@@ -997,6 +999,36 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
   > session/détection plus riche). Le rendu est resté Bootstrap malgré le basculement. Configuration
   > restaurée à l'identique (`mobileEnabled`/`forceMobile: false`) après l'essai. `MobileRenderer` reste donc
   > vérifié par lecture de code uniquement pour cette extraction, comme documenté plus haut.
+  >
+  > **Extraction du contrôleur de calendrier Joomla Mobile (2026-07-19)** : le bloc statique qui masque le
+  > calendrier Joomla, ouvre le calendrier associé au champ, le referme via les boutons quitter/aujourd'hui ou
+  > un jour, puis remplace le contenu du bouton d'ouverture, est extrait vers
+  > `quickmode-calendar-mobile.js`. Seuls l'id du champ et le libellé traduit restent injectés via
+  > `bfInitMobileCalendar(dbId, openLabel)`. Ce chemin est propre à `MobileRenderer` ; les autres thèmes ne
+  > produisent pas ce contrôleur jQuery Mobile.
+  >
+  > **Extraction de la largeur des champs numériques (2026-07-19)** : le script par champ identique de
+  > Classic/Bootstrap/OnePage est extrait vers `quickmode-number-input.js`, avec un appel paramétré
+  > `bfSetNumberInputWidth(dbId, width)`. L'effet réel du code antérieur est conservé : la largeur est appliquée
+  > immédiatement après le rendu de l'input. Mobile ne contient pas ce bloc.
+  >
+  > **Extraction des marqueurs de désactivation (2026-07-19)** : les écritures inline dans les tableaux de
+  > sections et champs désactivés, communes aux quatre thèmes, sont centralisées dans
+  > `quickmode-deactivation.js`. La garde spécifique aux uploads Mobile fondée sur l'agent utilisateur est
+  > conservée dans `bfRegisterNonMobileFileField()`. Les noms dynamiques sont encodés en JSON au lieu d'être
+  > concaténés directement dans le JavaScript.
+  >
+  > **Initialisation des résumeurs sécurisée (2026-07-19)** : les quatre renderers conservent le point d'appel
+  > public `bfRegisterSummarize()`, mais ses cinq arguments dynamiques sont désormais produits par
+  > `json_encode`. Cela remplace la concaténation et `addslashes()`, notamment incorrects pour certaines
+  > traductions ou valeurs contenant des séquences JavaScript sensibles.
+  >
+  > **Extraction de l'initialisation des éditeurs HTML (2026-07-19)** : la fonction
+  > `bf_htmltextareainit()` et ses tableaux publics quittent Classic/Bootstrap/OnePage pour
+  > `quickmode-html-textareas.js`. Chaque champ enregistre un getter via
+  > `bfRegisterHtmlTextarea(fieldName, valueProvider)` ; la lecture TinyMCE reste différée jusqu'à la
+  > soumission, comme auparavant. La variante Classic conserve sa valeur historique sous forme de chaîne,
+  > tandis que Bootstrap/OnePage interrogent toujours `Joomla.editors.instances[id].getValue()`.
 - [~] **Vérification finale Phase 9 (repasse du 2026-07-17)** : après la fusion de la PR #29 et les
   extractions Mobile/OnePage, repasse partielle en conditions réelles :
   - [x] Rendu Classic (formulaires 2/16) et Bootstrap (formulaires 7/28) : zéro erreur JS, assets attendus

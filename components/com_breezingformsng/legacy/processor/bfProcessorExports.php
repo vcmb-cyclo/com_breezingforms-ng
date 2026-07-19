@@ -282,7 +282,7 @@ trait bfProcessorExports
                     }
                 } else {
 
-                    $cbNonEditableFields = (new ListSupportService())->getListNonEditableElements($cbResult['data']['id']);
+                    $cbNonEditableFields = ListSupportService::createFromRuntimeContext()->getListNonEditableElements($cbResult['data']['id']);
 
                     if (!in_array($data[_FF_DATA_ID], $cbNonEditableFields)) {
 
@@ -519,7 +519,7 @@ trait bfProcessorExports
                         }
                     }
                     $full = false;
-                    $article_id = (new ArticleService())->createArticle(Factory::getApplication()->getInput()->getInt('cb_form_id', 0), $record_return, $cbData->items, $ids, $cbData->title_field, $cbResult['form']->getRecordMetadata($record_return), $config, $full, true, Factory::getApplication()->getInput()->get('cb_category_id', null, 'string'));
+                    $article_id = Factory::getApplication()->bootComponent('com_contentbuilderng')->getContainer()->get(ArticleService::class)->createArticle(Factory::getApplication()->getInput()->getInt('cb_form_id', 0), $record_return, $cbData->items, $ids, $cbData->title_field, $cbResult['form']->getRecordMetadata($record_return), $config, $full, true, Factory::getApplication()->getInput()->get('cb_category_id', null, 'string'));
 
                     $cacheFactory = Factory::getContainer()->get(CacheControllerFactoryInterface::class);
                     $cache = $cacheFactory->createCacheController('callback', ['defaultgroup' => 'com_content']);

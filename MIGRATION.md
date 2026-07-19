@@ -119,7 +119,7 @@
 ### Vérification
 - [x] Composants → BreezingForms NG → Options ouvre l'écran natif Joomla *(vérifié)*
 - [x] Sauvegarde des paramètres → persistance en base (`#__extensions` params) *(vérifié dans Chrome le 2026-07-11 : `disable_ip` modifié, relu après `component.apply`, puis restauré)*
-- [ ] Permissions ACL visibles et fonctionnelles *(interface native et groupes vérifiés ; modification effective d'une règle restant à tester)*
+- [x] Permissions ACL visibles et fonctionnelles *(vérifié le 2026-07-19, avec confirmation explicite de l'utilisateur préalable — cf. note « Reliquat hors Phase 9 » : règle `core.manage` du groupe Public basculée Refusé→Autorisé via `task=component.apply`, persistance confirmée par un rechargement complet de la page, puis restaurée à Refusé et reconfirmée de la même façon. Fait via requêtes HTTP directes — `claude-test` a nécessité une réinitialisation de mot de passe en base pour l'authentification admin faute de `playwright-cli` disponible dans cet environnement — repassé à un mot de passe aléatoire ensuite)*
 
 ---
 
@@ -762,12 +762,21 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 
 ## Reliquat hors Phase 9
 
-- [ ] **Phase 2 — Permissions ACL** : la modification effective d'une règle (Autoriser/Refuser puis Enregistrer)
-  n'a pas pu être testée par un agent — tentative bloquée le 2026-07-12 par le classificateur de permissions de
-  l'environnement (modification de droits ACL jugée sensible, même sur le site de dev). Nécessite soit une
-  confirmation explicite de l'utilisateur avant qu'un agent retente, soit une vérification manuelle directe :
-  Composants → BreezingForms NG → Droits → choisir un groupe → Autoriser/Refuser une action → Enregistrer →
-  rouvrir l'écran et confirmer que la valeur a persisté.
+- [x] **Phase 2 — Permissions ACL** : la modification effective d'une règle (Autoriser/Refuser puis Enregistrer)
+  était bloquée depuis le 2026-07-12 par le classificateur de permissions de l'environnement (modification de
+  droits ACL jugée sensible, même sur le site de dev) — nécessitait soit une confirmation explicite de
+  l'utilisateur, soit une vérification manuelle directe. **Testé le 2026-07-19 avec confirmation explicite de
+  l'utilisateur** : `playwright-cli` indisponible dans cet environnement (non installé, échec d'installation
+  globale par permissions insuffisantes, et Node 18 < 20 requis) — vérification faite par requêtes HTTP directes
+  à la place. Authentification via le compte `claude-test` (Super User, déjà présent en base) après
+  réinitialisation de son mot de passe en base (`UPDATE xda_users SET password=...`, hash bcrypt généré par
+  `password_hash()` dans le conteneur). Règle `jform[rules][core.manage][1]` (groupe Public) basculée de
+  `0` (Refusé) à `1` (Autorisé) via `task=component.apply` sur `index.php?option=com_config` (task correct
+  trouvé dans l'attribut `task="component.apply"` du bouton toolbar — `config.save`/`config.apply` renvoient une
+  404 « Classe du contrôleur invalide : config », le composant utilisant le préfixe `component` pas `config`
+  pour son écran d'options). Persistance confirmée par un rechargement complet indépendant de la page (valeur
+  relue à `1`), puis restaurée à `0` et reconfirmée de la même façon. Mot de passe de `claude-test` repassé à une
+  valeur aléatoire après le test.
 
 - ~~Site de dev (`joomla6-joomla-1`) — panne préexistante et sans rapport, observée le 2026-07-12~~ **Corrigée par
   l'utilisateur le 2026-07-12** : `com_contentbuilderng` (extension distincte installée sur le même site) faisait
@@ -785,7 +794,7 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 - [ ] **Callbacks de paiement en conditions réelles** : `Stripe`/`PayPal`/`Sofort` convertis en QueryBuilder et
   validés par `php -l` + revue, mais jamais confirmés par un vrai paiement de test — accès à un compte sandbox
   nécessaire, non disponible en session agent (cf. notes Phase 9a).
-- [ ] **Phase 2 — Permissions ACL** : test de persistance d'une règle Autoriser/Refuser à faire manuellement
+- [x] **Phase 2 — Permissions ACL** : test de persistance d'une règle Autoriser/Refuser fait le 2026-07-19
   (détail au point « Reliquat hors Phase 9 » ci-dessus).
 
 ### Portages depuis cbng (`~/workspaces/vcmb/com_contentbuilderng`, la copie moderne de référence)

@@ -9,21 +9,23 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Support;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
+use Joomla\CMS\Application\CMSApplication;
 
 /**
  * Enqueues an optional message and redirects the application.
  */
 final class RedirectHelper
 {
-    public static function to(string $link, ?string $msg = null): void
+    public function __construct(private readonly CMSApplication $application)
     {
-        $app = Factory::getApplication();
+    }
 
+    public function to(string $link, ?string $msg = null): void
+    {
         if ($msg !== null) {
-            $app->enqueueMessage($msg);
+            $this->application->enqueueMessage($msg);
         }
 
-        $app->redirect($link);
+        $this->application->redirect($link);
     }
 }

@@ -9,29 +9,34 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Callback;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
+use Joomla\CMS\Application\CMSApplication;
 use Vcmb\Component\BreezingformsNG\Site\Service\Support\RedirectHelper;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Database\ParameterType;
+use Joomla\Database\DatabaseInterface;
 use Joomla\Filesystem\File;
 
 /**
  * Stripe payment callbacks: checkout confirmation and paid-file download.
  */
-class StripeCallback
+final class StripeCallback
 {
+    public function __construct(
+        private readonly CMSApplication $application,
+        private readonly DatabaseInterface $database,
+        private readonly RedirectHelper $redirectHelper,
+    ) {
+    }
+
     public function confirm(): void
     {
-        global $database, $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
-
-        $mainframe = Factory::getApplication();
-        $db = $database;
+        $db = $this->database;
 
 
 
-    $input = Factory::getApplication()->getInput();
+    $input = $this->application->getInput();
     $formId = $input->getInt('form_id', -1);
     $query = $db->getQuery(true)
         ->select('*')
@@ -42,7 +47,7 @@ class StripeCallback
     $list = $db->loadObjectList();
 
     if (count($list) == 0) {
-        RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
+        $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
         exit;
     }
 
@@ -51,7 +56,7 @@ class StripeCallback
     $areas = json_decode($form->template_areas, true);
 
     if (!is_array($areas)) {
-        RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_STRIPE_DATA'));
+        $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_STRIPE_DATA'));
         exit;
     }
 
@@ -89,15 +94,15 @@ class StripeCallback
 
                     if (!$exists) {
 
-                        /* XDA if( Factory::getApplication()->getSession()->get('bf_stripe_last_payment_amount'.$record_id, null) == null ){
+                        /* XDA if( $this->application->getSession()->get('bf_stripe_last_payment_amount'.$record_id, null) == null ){
 
-            RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_STRIPE_AMOUNT'));
+            $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_STRIPE_AMOUNT'));
             exit;
                                 } XDA */
 
                         $stripearray = array();
                         $stripearray = [
-                            "amount" => Factory::getApplication()->getSession()->get('bf_stripe_last_payment_amount' . $record_id, null),
+                            "amount" => $this->application->getSession()->get('bf_stripe_last_payment_amount' . $record_id, null),
                             // amount in cents, again
                             "currency" => strtolower($options['currencyCode']),
                             "source" => $tx_token,
@@ -105,9 +110,9 @@ class StripeCallback
                             "metadata" => array()
                             //,"metadata" => array("Order ID" => $_session_cart['order_id'])
                         ];
-                        if (Factory::getApplication()->getSession()->get('emailfield', '') !== '') {
-                            $stripearray += ['receipt_email' => Factory::getApplication()->getSession()->get('emailfield', '')];
-                            Factory::getApplication()->getSession()->clear('emailfield');
+                        if ($this->application->getSession()->get('emailfield', '') !== '') {
+                            $stripearray += ['receipt_email' => $this->application->getSession()->get('emailfield', '')];
+                            $this->application->getSession()->clear('emailfield');
                         }
                         //$charge = \Stripe\Charge::create( $stripearray );
                         /*
@@ -127,7 +132,7 @@ class StripeCallback
                           ]);*/
 
 
-                        Factory::getApplication()->getSession()->clear('bf_stripe_last_payment_amount' . $record_id);
+                        $this->application->getSession()->clear('bf_stripe_last_payment_amount' . $record_id);
                     } else {
 
                         $exploded = explode(':', $exists);
@@ -198,9 +203,9 @@ class StripeCallback
                         } else {
 
                             if ($options['thankYouPage'] != '') {
-                                RedirectHelper::to($options['thankYouPage']);
+                                $this->redirectHelper->to($options['thankYouPage']);
                             } else {
-                                RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_PAYING_WITH_STRIPE'));
+                                $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_PAYING_WITH_STRIPE'));
                             }
                         }
                     }
@@ -218,14 +223,11 @@ class StripeCallback
 
     public function download(): void
     {
-        global $database, $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
-
-        $mainframe = Factory::getApplication();
-        $db = $database;
+        $db = $this->database;
 
 
 
-    $input = Factory::getApplication()->getInput();
+    $input = $this->application->getInput();
     $formIdForDownload = $input->getInt('form', -1);
     $query = $db->getQuery(true)
         ->select('*')
@@ -235,7 +237,7 @@ class StripeCallback
     $db->setQuery($query);
     $list = $db->loadObjectList();
     if (count($list) == 0) {
-        RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
+        $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
         exit;
     }
 
@@ -243,7 +245,7 @@ class StripeCallback
 
     $areas = json_decode($form->template_areas, true);
     if (!is_array($areas)) {
-        RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYMENT_DATA'));
+        $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYMENT_DATA'));
     }
 
     foreach ($areas as $area) {
@@ -285,21 +287,21 @@ class StripeCallback
                             $db->execute();
 
                             if (!file_exists($file)) {
-                                RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_DOWNLOAD_FILE'));
+                                $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_DOWNLOAD_FILE'));
                             }
 
                             \Vcmb\Component\BreezingformsNG\Site\Service\Support\DownloadHelper::stream($file);
                         } else {
 
-                            RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_MAX_DOWNLOAD_TRIES_REACHED'));
+                            $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_MAX_DOWNLOAD_TRIES_REACHED'));
                         }
                     } else {
 
-                        RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_DOWNLOAD_NOT_POSSIBLE'));
+                        $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_DOWNLOAD_NOT_POSSIBLE'));
                     }
                 } else {
 
-                    RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_NO_DOWNLOADABLE_PRODUCT'));
+                    $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_NO_DOWNLOADABLE_PRODUCT'));
                 }
 
                 break;

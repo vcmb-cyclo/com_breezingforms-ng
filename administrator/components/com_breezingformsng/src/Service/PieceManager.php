@@ -16,7 +16,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Service;
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Exception;
-use facileFormsPieces;
+use Vcmb\Component\BreezingformsNG\Site\Table\PieceTable;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
@@ -146,7 +146,7 @@ class PieceManager
 		$typelist[] = array('After Form', Text::_('COM_BREEZINGFORMSNG_PIECES_AFTERFORM'));
 		$typelist[] = array('Begin Submit', Text::_('COM_BREEZINGFORMSNG_PIECES_BEGINSUBMIT'));
 		$typelist[] = array('End Submit', Text::_('COM_BREEZINGFORMSNG_PIECES_ENDSUBMIT'));
-		$row = new facileFormsPieces($database);
+		$row = new PieceTable($database);
 		if (count($ids)) {
 			$row->load($ids[0]);
 		} else {
@@ -175,7 +175,7 @@ class PieceManager
 		$unitTests = $post['unit_tests'] ?? '';
 
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
-		$row      = new facileFormsPieces($database);
+		$row      = new PieceTable($database);
 
 		try {
 			if (!$row->bind($_POST)) {
@@ -226,7 +226,7 @@ class PieceManager
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
 		ArrayHelper::toInteger($ids);
 		$total = count($ids);
-		$row = new facileFormsPieces($database);
+		$row = new PieceTable($database);
 		if (count($ids))
 			foreach ($ids as $id) {
 				$row->load(intval($id));
@@ -387,7 +387,7 @@ class PieceManager
 			return;
 		}
 
-		$row = new facileFormsPieces($database);
+		$row = new PieceTable($database);
 		$row->load($ids[0]);
 
 		$functionName = '';
@@ -441,7 +441,7 @@ class PieceManager
 			return;
 		}
 
-		$row = new facileFormsPieces($database);
+		$row = new PieceTable($database);
 		$row->load($ids[0]);
 
 		$functionName = $app->getInput()->post->getString('test_function', '');
@@ -519,7 +519,7 @@ class PieceManager
 		parse_str($rawBody, $post);
 
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
-		$row = new facileFormsPieces($database);
+		$row = new PieceTable($database);
 		$row->id = isset($post['id']) ? (int) $post['id'] : 0;
 		$row->code = isset($post['code']) ? (string) $post['code'] : '';
 		$row->unit_tests = isset($post['unit_tests']) ? (string) $post['unit_tests'] : '';

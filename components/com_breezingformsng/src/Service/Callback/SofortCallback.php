@@ -9,12 +9,13 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Callback;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
+use Joomla\CMS\Application\CMSApplication;
 use Vcmb\Component\BreezingformsNG\Site\Service\Support\RedirectHelper;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Database\ParameterType;
+use Joomla\Database\DatabaseInterface;
 use Joomla\Filesystem\File;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 
@@ -22,18 +23,23 @@ use Joomla\CMS\Mail\MailerFactoryInterface;
  * Sofortueberweisung payment callbacks: success page, server-side
  * confirmation and paid-file download.
  */
-class SofortCallback
+final class SofortCallback
 {
+    public function __construct(
+        private readonly CMSApplication $application,
+        private readonly DatabaseInterface $database,
+        private readonly RedirectHelper $redirectHelper,
+        private readonly MailerFactoryInterface $mailerFactory,
+    ) {
+    }
+
     public function success(): void
     {
-        global $database, $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
-
-        $mainframe = Factory::getApplication();
-        $db = $database;
+        $db = $this->database;
 
 
 
-    $input = Factory::getApplication()->getInput();
+    $input = $this->application->getInput();
     $tx_token = $input->getString('tx', '');
     if ($tx_token == '') {
         $msg = Text::_("This transaction id is empty!");
@@ -55,7 +61,7 @@ class SofortCallback
             $db->setQuery($formQuery);
             $list = $db->loadObjectList();
             if (count($list) == 0) {
-                RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
+                $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
                 exit;
             }
 
@@ -63,7 +69,7 @@ class SofortCallback
 
             $areas = json_decode($form->template_areas, true);
             if (!is_array($areas)) {
-                RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_SU_DATA'));
+                $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_SU_DATA'));
             }
 
             foreach ($areas as $area) {
@@ -95,9 +101,9 @@ class SofortCallback
                             require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/sofort_download.php');
                         } else {
                             if ($options['thankYouPage'] != '') {
-                                RedirectHelper::to($options['thankYouPage']);
+                                $this->redirectHelper->to($options['thankYouPage']);
                             } else {
-                                RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_PAYING_WITH_SU'));
+                                $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_PAYING_WITH_SU'));
                             }
                         }
 
@@ -118,14 +124,11 @@ class SofortCallback
 
     public function confirm(): void
     {
-        global $database, $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
-
-        $mainframe = Factory::getApplication();
-        $db = $database;
+        $db = $this->database;
 
 
 
-    $input = Factory::getApplication()->getInput();
+    $input = $this->application->getInput();
     $formId = $input->getInt('user_variable_0', -1);
     $recordId = $input->getInt('user_variable_1', -1);
 
@@ -228,7 +231,7 @@ class SofortCallback
 
                             $recipients = explode('###', $input->getString('user_variable_2', ''));
                             $recipientsSize = count($recipients);
-                            $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
+                            $mailer = $this->mailerFactory->createMailer();
                             $mailer->Subject = Text::_('COM_BREEZINGFORMSNG_YOUR_PAYMENT_AT_SU');
                             $mailer->Body = Text::_('COM_BREEZINGFORMSNG_HALLO') . "\n\n";
                             $mailer->Body .= Text::_('COM_BREEZINGFORMSNG_YOUR_PAYMENT_SUCCEEDED') . "\n\n";
@@ -289,14 +292,11 @@ class SofortCallback
 
     public function download(): void
     {
-        global $database, $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
-
-        $mainframe = Factory::getApplication();
-        $db = $database;
+        $db = $this->database;
 
 
 
-    $input = Factory::getApplication()->getInput();
+    $input = $this->application->getInput();
     $formIdForDownload = $input->getInt('form', -1);
     $formQueryForDownload = $db->getQuery(true)
         ->select('*')
@@ -306,7 +306,7 @@ class SofortCallback
     $db->setQuery($formQueryForDownload);
     $list = $db->loadObjectList();
     if (count($list) == 0) {
-        RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
+        $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
         exit;
     }
 
@@ -314,7 +314,7 @@ class SofortCallback
 
     $areas = json_decode($form->template_areas, true);
     if (!is_array($areas)) {
-        RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYMENT_DATA'));
+        $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYMENT_DATA'));
     }
 
     foreach ($areas as $area) {
@@ -356,21 +356,21 @@ class SofortCallback
                             $db->execute();
 
                             if (!file_exists($file)) {
-                                RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_DOWNLOAD_FILE'));
+                                $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_DOWNLOAD_FILE'));
                             }
 
                             \Vcmb\Component\BreezingformsNG\Site\Service\Support\DownloadHelper::stream($file);
                         } else {
 
-                            RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_MAX_DOWNLOAD_TRIES_REACHED'));
+                            $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_MAX_DOWNLOAD_TRIES_REACHED'));
                         }
                     } else {
 
-                        RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_DOWNLOAD_NOT_POSSIBLE'));
+                        $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_DOWNLOAD_NOT_POSSIBLE'));
                     }
                 } else {
 
-                    RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_NO_DOWNLOADABLE_PRODUCT'));
+                    $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_NO_DOWNLOADABLE_PRODUCT'));
                 }
 
                 break;

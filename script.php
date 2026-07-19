@@ -1965,6 +1965,18 @@ class com_breezingformsngInstallerScript
         $obsolete = [
             JPATH_SITE . '/components/com_breezingformsng/router.php',
             JPATH_SITE . '/components/com_breezingformsng/facileforms.xml.php',
+            JPATH_SITE . '/components/com_breezingformsng/legacy/processor/bfProcessorUploads.php',
+            JPATH_SITE . '/components/com_breezingformsng/legacy/processor/bfProcessorCodeTools.php',
+            JPATH_SITE . '/components/com_breezingformsng/legacy/processor/bfProcessorScripting.php',
+            JPATH_SITE . '/components/com_breezingformsng/legacy/processor/bfProcessorExports.php',
+            JPATH_SITE . '/components/com_breezingformsng/legacy/processor/bfProcessorNotifications.php',
+            JPATH_SITE . '/components/com_breezingformsng/legacy/processor/bfProcessorSubmission.php',
+            JPATH_SITE . '/components/com_breezingformsng/legacy/processor/bfProcessorRendering.php',
+            JPATH_SITE . '/components/com_breezingformsng/legacy/Conf.php',
+            JPATH_SITE . '/components/com_breezingformsng/legacy/tables.php',
+            JPATH_SITE . '/components/com_breezingformsng/legacy/functions.php',
+            JPATH_SITE . '/components/com_breezingformsng/facileforms.class.php',
+            JPATH_SITE . '/components/com_breezingformsng/facileforms.process.php',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/sql/create_sql.php',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/src/Helper/LegacyClassLoader.php',
         ];
@@ -2060,6 +2072,13 @@ class com_breezingformsngInstallerScript
 
         if (isset($tables[$formsTable])) {
             $columns = $tables[$formsTable];
+
+            if (!isset($columns['debug_mode'])) {
+                $db->setQuery(
+                    "ALTER TABLE `{$formsTable}` ADD `debug_mode` TINYINT(1) NOT NULL DEFAULT '0' AFTER `published`"
+                )->execute();
+                $this->log('Added column debug_mode to facileforms_forms.');
+            }
 
             $newFormColumns = [
                 'double_opt' => "TINYINT(1) NOT NULL DEFAULT '0' AFTER `filter_state`",

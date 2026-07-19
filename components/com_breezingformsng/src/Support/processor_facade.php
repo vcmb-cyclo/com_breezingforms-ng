@@ -11,8 +11,11 @@
  * */
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
-use Joomla\CMS\Factory;
+use Joomla\CMS\Application\CMSApplication;
+use Joomla\CMS\Cache\CacheControllerFactoryInterface;
+use Joomla\CMS\Mail\MailerFactoryInterface;
 use Joomla\Database\DatabaseInterface;
+use Joomla\Database\ParameterType;
 use Joomla\Event\Event;
 use Joomla\Event\EventInterface;
 use Joomla\CMS\Uri\Uri;
@@ -28,6 +31,15 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\FormDisplayContextResolv
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\FormPathResolver;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RequestMetadataResolver;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampFactory;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\CodeToolsRuntime;
+use Vcmb\Component\BreezingformsNG\Site\Service\Scripting\ScriptingEngine;
+use Vcmb\Component\BreezingformsNG\Site\Service\Export\ExportEngine;
+use Vcmb\Component\BreezingformsNG\Site\Service\Notification\NotificationEngine;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\RenderingEngine;
+use Vcmb\Component\BreezingformsNG\Site\Service\Submission\SubmissionEngine;
+use Vcmb\Component\BreezingformsNG\Site\Service\Upload\UploadError;
+use Vcmb\Component\BreezingformsNG\Site\Service\Upload\UploadRuntime;
+use Vcmb\Component\BreezingformsNG\Site\Table\FormTable;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Log\Log;
@@ -320,7 +332,7 @@ function _ff_traceExit($line, $retval = null)
 function _ff_errorHandler($errno, $errstr, $errfile, $errline)
 {
     global $ff_processor, $ff_mossite;
-    $database = Factory::getContainer()->get(DatabaseInterface::class);
+    $database = $ff_processor->database;
 
     if (isset($ff_processor->dying) && $ff_processor->dying)
         return;
@@ -414,7 +426,12 @@ function _ff_errorHandler($errno, $errstr, $errfile, $errline)
                     break;
                 case 'p':
                     $package = '';
-                    $database->setQuery("select name, package from #__facileforms_pieces where id=$id");
+                    $piecesQuery = $database->getQuery(true)
+                        ->select(['name', 'package'])
+                        ->from('#__facileforms_pieces')
+                        ->where($database->quoteName('id') . ' = :id')
+                        ->bind(':id', $id, ParameterType::INTEGER);
+                    $database->setQuery($piecesQuery);
                     $rows = $database->loadObjectList();
                     if (count($rows)) {
                         $package = $rows[0]->package;
@@ -429,7 +446,12 @@ function _ff_errorHandler($errno, $errstr, $errfile, $errline)
                     break;
                 case 's':
                     $package = '';
-                    $database->setQuery("select name, package from #__facileforms_scripts where id=$id");
+                    $scriptsQuery = $database->getQuery(true)
+                        ->select(['name', 'package'])
+                        ->from('#__facileforms_scripts')
+                        ->where($database->quoteName('id') . ' = :id')
+                        ->bind(':id', $id, ParameterType::INTEGER);
+                    $database->setQuery($scriptsQuery);
                     $rows = $database->loadObjectList();
                     if (count($rows)) {
                         $package = $rows[0]->package;
@@ -472,87 +494,496 @@ function _ff_errorHandler($errno, $errstr, $errfile, $errline)
 
 // _ff_errorHandler
 
-require_once __DIR__ . '/legacy/processor/bfProcessorCodeTools.php';
-require_once __DIR__ . '/legacy/processor/bfProcessorScripting.php';
-require_once __DIR__ . '/legacy/processor/bfProcessorRendering.php';
-require_once __DIR__ . '/legacy/processor/bfProcessorExports.php';
-require_once __DIR__ . '/legacy/processor/bfProcessorNotifications.php';
-require_once __DIR__ . '/legacy/processor/bfProcessorUploads.php';
-require_once __DIR__ . '/legacy/processor/bfProcessorSubmission.php';
-
 class HTML_facileFormsProcessor
 {
-    use bfProcessorCodeTools;
-    use bfProcessorScripting;
-    use bfProcessorRendering;
-    use bfProcessorExports;
-    use bfProcessorNotifications;
-    use bfProcessorUploads;
-    use bfProcessorSubmission;
-
-
-    var $okrun = null;     // running is allowed
-    var $ip = null;     // visitor ip
-    var $agent = null;     // visitor agent
-    var $browser = null;     // visitors browser
-    var $opsys = null;     // visitors operating system
-    var $provider = null;     // visitors provider
-    var $submitted = null;     // submit date/time
-    var $formrow = null;     // form row
-    var $form = null;     // form #
-    var $form_id = null;     // html form id
-    var $page = null;     // page id
-    var $target = null;     // target form name
-    var $rows = null;     // element rows
-    var $rowcount = null;     // # of element rows
-    var $runmode = null;     // current run mode _FF_RUNMODE_...
-    var $inline = null;     // inline preview
-    var $inframe = null;     // running in a frame
-    var $template = null;     // 0-frontend 1-backend
-    var $homepage = null;     // home page
-    var $mospath = null;     // mos absolute path
-    var $mossite = null;     // mos site
-    var $images = null;     // ff_images path
-    var $uploads = null;     // ff_uploads path
-    var $border = null;     // show border
-    var $align = null;     // form alignment
-    var $top = null;     // top margin
-    var $suffix = null;     // class name suffix
-    var $status = null;     // submit return status
-    var $message = null;     // submit return message
-    var $record_id = null;     // id of saved record
-    var $submitdata = null;     // submitted data
-    var $savedata = null;     // data for db save
-    var $maildata = null;     // data for mail notification
-    var $sfdata = null;
-    var $xmldata = null;     // data for xml attachment
-    var $mb_xmldata = null;     // data for mailback attachments
-    var $queryCols = null;     // query column definitions
-    var $queryRows = null;     // query rows
-    var $showgrid = null;     // show grid in preview
-    var $findtags = null;     // tags to be replaced
-    var $replacetags = null;     // tag replacements
-    var $dying = null;     // form is dying
-    var $errrep = null;     // remember old error reporting
-    var $traceMode = null;     // trace mode
-    var $traceStack = null;     // trace stack
-    var $traceBuffer = null;     // trace buffer
-    var $user_id = null;
-    var $username = null;
-    var $user_full_name = null;
-    var $mailbackRecipients = array();
-    var $editable = null;
-    var $editable_override = null;
-    var $sendNotificationAfterPayment = false;
-    var $opt_token = "9562384751";
+    public $okrun = null;     // running is allowed
+    public $ip = null;     // visitor ip
+    public $agent = null;     // visitor agent
+    public $browser = null;     // visitors browser
+    public $opsys = null;     // visitors operating system
+    public $provider = null;     // visitors provider
+    public $submitted = null;     // submit date/time
+    public $formrow = null;     // form row
+    public $form = null;     // form #
+    public $form_id = null;     // html form id
+    public $page = null;     // page id
+    public $target = null;     // target form name
+    public $rows = null;     // element rows
+    public $rowcount = null;     // # of element rows
+    public $runmode = null;     // current run mode _FF_RUNMODE_...
+    public $inline = null;     // inline preview
+    public $inframe = null;     // running in a frame
+    public $template = null;     // 0-frontend 1-backend
+    public $homepage = null;     // home page
+    public $mospath = null;     // mos absolute path
+    public $mossite = null;     // mos site
+    public $images = null;     // ff_images path
+    public $uploads = null;     // ff_uploads path
+    public $border = null;     // show border
+    public $align = null;     // form alignment
+    public $top = null;     // top margin
+    public $suffix = null;     // class name suffix
+    public $status = null;     // submit return status
+    public $message = null;     // submit return message
+    public $record_id = null;     // id of saved record
+    public $submitdata = null;     // submitted data
+    public $savedata = null;     // data for db save
+    public $maildata = null;     // data for mail notification
+    public $sfdata = null;
+    public $xmldata = null;     // data for xml attachment
+    public $mb_xmldata = null;     // data for mailback attachments
+    public $queryCols = null;     // query column definitions
+    public $queryRows = null;     // query rows
+    public $showgrid = null;     // show grid in preview
+    public $findtags = null;     // tags to be replaced
+    public $replacetags = null;     // tag replacements
+    public $dying = null;     // form is dying
+    public $errrep = null;     // remember old error reporting
+    public $traceMode = null;     // trace mode
+    public $traceStack = null;     // trace stack
+    public $traceBuffer = null;     // trace buffer
+    public $user_id = null;
+    public $username = null;
+    public $user_full_name = null;
+    public $mailbackRecipients = array();
+    public $editable = null;
+    public $editable_override = null;
+    public $sendNotificationAfterPayment = false;
+    public $opt_token = "9562384751";
     public $draggableDivIds = array();
     public $isMobile = false;
     public $quickmode = null;
     public $legacy_wrap = true;
-    var $app;
-    var $database;
+    public $app;
+    public $database;
+    private ?UploadRuntime $uploadRuntimeService = null;
+    private ?CodeToolsRuntime $codeToolsRuntimeService = null;
+    private ?ScriptingEngine $scriptingEngineService = null;
+    private ?ExportEngine $exportEngineService = null;
+    private ?NotificationEngine $notificationEngineService = null;
+    private ?RenderingEngine $renderingEngineService = null;
+    private ?SubmissionEngine $submissionEngineService = null;
+    private MailerFactoryInterface $mailerFactory;
+    private CacheControllerFactoryInterface $cacheControllerFactory;
+
+    public function header()
+    {
+        return $this->renderingEngine()->header();
+    }
+
+    public function cbCreatePathByTokens($path, array $rows, $fieldName)
+    {
+        return $this->renderingEngine()->cbCreatePathByTokens($path, $rows, $fieldName);
+    }
+
+    public function makeSafeFolder($path)
+    {
+        return $this->renderingEngine()->makeSafeFolder($path);
+    }
+
+    public function cbCheckPermissions()
+    {
+        return $this->renderingEngine()->cbCheckPermissions();
+    }
+
+    public function view()
+    {
+        return $this->renderingEngine()->view();
+    }
+
+    private function renderingEngine(): RenderingEngine
+    {
+        return $this->renderingEngineService ??= new RenderingEngine($this);
+    }
+
+    public function collectSubmitdata($cbResult = null)
+    {
+        return $this->submissionEngine()->collectSubmitdata($cbResult);
+    }
+
+    public function submit()
+    {
+        return $this->submissionEngine()->submit();
+    }
+
+    public function removeDangerousHtml($value)
+    {
+        return $this->submissionEngine()->removeDangerousHtml($value);
+    }
+
+    private function submissionEngine(): SubmissionEngine
+    {
+        return $this->submissionEngineService ??= new SubmissionEngine($this, $this->mailerFactory);
+    }
+
+    public function sendEmailNotification()
+    {
+        return $this->notificationEngine()->sendEmailNotification();
+    }
+
+    public function getFormTitleTranslated()
+    {
+        return $this->notificationEngine()->getFormTitleTranslated();
+    }
+
+    public function getFieldTranslated($field, $name, &$res, $dataObject = null, $childrenLength = 0)
+    {
+        return $this->notificationEngine()->getFieldTranslated(
+            $field,
+            $name,
+            $res,
+            $dataObject,
+            $childrenLength
+        );
+    }
+
+    public function sendMailbackNotification()
+    {
+        return $this->notificationEngine()->sendMailbackNotification();
+    }
+
+    public function sendSalesforceNotification()
+    {
+        return $this->notificationEngine()->sendSalesforceNotification();
+    }
+
+    public function sendMailChimpNotification()
+    {
+        return $this->notificationEngine()->sendMailChimpNotification();
+    }
+
+    private function notificationEngine(): NotificationEngine
+    {
+        return $this->notificationEngineService ??= new NotificationEngine($this);
+    }
+
+    public function logToDatabase($cbResult = null)
+    {
+        return $this->exportEngine()->logToDatabase($cbResult);
+    }
+
+    public function random_str($length, $keyspace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+    {
+        return $this->exportEngine()->random_str($length, $keyspace);
+    }
+
+    public function sendMail($from, $fromname, $recipient, $subject, $body, $attachment = null, $html = null, $cc = null, $bcc = null, $alt_sender = '')
+    {
+        return $this->exportEngine()->sendMail(
+            $from,
+            $fromname,
+            $recipient,
+            $subject,
+            $body,
+            $attachment,
+            $html,
+            $cc,
+            $bcc,
+            $alt_sender
+        );
+    }
+
+    public function endsWith($haystack, $needle)
+    {
+        return $this->exportEngine()->endsWith($haystack, $needle);
+    }
+
+    public function exppdf($filter = [], $mailback = false, $translate = true)
+    {
+        return $this->exportEngine()->exppdf($filter, $mailback, $translate);
+    }
+
+    public function expcsv($filter = [], $mailback = false)
+    {
+        return $this->exportEngine()->expcsv($filter, $mailback);
+    }
+
+    public function expxml($filter = [], $mailback = false, $translate = false)
+    {
+        return $this->exportEngine()->expxml($filter, $mailback, $translate);
+    }
+
+    private function exportEngine(): ExportEngine
+    {
+        return $this->exportEngineService ??= new ExportEngine(
+            $this,
+            $this->mailerFactory,
+            $this->cacheControllerFactory
+        );
+    }
+
+    public function getPieceById($id, $name = null)
+    {
+        return $this->scriptingEngine()->getPieceById($id, $name);
+    }
+
+    public function getPieceByName($name, $id = null)
+    {
+        return $this->scriptingEngine()->getPieceByName($name, $id);
+    }
+
+    public function execPiece($code, $name, $type, $id, $pane)
+    {
+        return $this->scriptingEngine()->execPiece($code, $name, $type, $id, $pane);
+    }
+
+    public function execPieceById($id)
+    {
+        return $this->scriptingEngine()->execPieceById($id);
+    }
+
+    public function execPieceByName($name)
+    {
+        return $this->scriptingEngine()->execPieceByName($name);
+    }
+
+    public function replaceCode($code, $name, $type, $id, $pane)
+    {
+        return $this->scriptingEngine()->replaceCode($code, $name, $type, $id, $pane);
+    }
+
+    public function compileQueryCol(&$elem, &$coldef)
+    {
+        return $this->scriptingEngine()->compileQueryCol($elem, $coldef);
+    }
+
+    public function execQueryValue($code, &$elem, &$row, &$coldef, $value)
+    {
+        return $this->scriptingEngine()->execQueryValue($code, $elem, $row, $coldef, $value);
+    }
+
+    public function execQuery(&$elem, &$valrows, &$coldefs)
+    {
+        return $this->scriptingEngine()->execQuery($elem, $valrows, $coldefs);
+    }
+
+    public function script2clause(&$row)
+    {
+        return $this->scriptingEngine()->script2clause($row);
+    }
+
+    public function loadBuiltins(&$library)
+    {
+        return $this->scriptingEngine()->loadBuiltins($library);
+    }
+
+    public function loadScripts(&$library)
+    {
+        return $this->scriptingEngine()->loadScripts($library);
+    }
+
+    public function compressJavascript($str)
+    {
+        return $this->scriptingEngine()->compressJavascript($str);
+    }
+
+    public function linkcode($func, &$library, &$linked, $code, $type = null, $id = null, $pane = null)
+    {
+        return $this->scriptingEngine()->linkcode($func, $library, $linked, $code, $type, $id, $pane);
+    }
+
+    public function addFunction($cond, $id, $name, $code, &$library, &$linked, $type, $rowid, $pane)
+    {
+        return $this->scriptingEngine()->addFunction(
+            $cond,
+            $id,
+            $name,
+            $code,
+            $library,
+            $linked,
+            $type,
+            $rowid,
+            $pane
+        );
+    }
+
+    private function scriptingEngine(): ScriptingEngine
+    {
+        return $this->scriptingEngineService ??= new ScriptingEngine($this);
+    }
+
+    public function dispTraceMode($mode)
+    {
+        return $this->codeToolsRuntime()->dispTraceMode($mode);
+    }
+
+    public function trim(&$code)
+    {
+        return $this->codeToolsRuntime()->trim($code);
+    }
+
+    public function nonblank(&$code)
+    {
+        return $this->codeToolsRuntime()->nonblank($code);
+    }
+
+    public function getClassName($classdef)
+    {
+        return $this->codeToolsRuntime()->getClassName($classdef);
+    }
+
+    public function expJsValue($mixed, $indent = '')
+    {
+        return $this->codeToolsRuntime()->expJsValue($mixed, $indent);
+    }
+
+    public function expJsVar($name, $mixed)
+    {
+        return $this->codeToolsRuntime()->expJsVar($name, $mixed);
+    }
+
+    public function dumpTrace()
+    {
+        $this->codeToolsRuntime()->dumpTrace();
+    }
+
+    public function traceEval($name)
+    {
+        $this->codeToolsRuntime()->traceEval($name);
+    }
+
+    public function suicide()
+    {
+        return $this->codeToolsRuntime()->suicide();
+    }
+
+    public function bury()
+    {
+        return $this->codeToolsRuntime()->bury();
+    }
+
+    public function findToken(&$code, &$spos, &$offs)
+    {
+        return $this->codeToolsRuntime()->findToken($code, $spos, $offs);
+    }
+
+    public function findRealToken(&$code, &$spos, &$offs, &$line)
+    {
+        return $this->codeToolsRuntime()->findRealToken($code, $spos, $offs, $line);
+    }
+
+    public function patchCode($mode, $code, $name, $type, $id, $pane)
+    {
+        return $this->codeToolsRuntime()->patchCode($mode, $code, $name, $type, $id, $pane);
+    }
+
+    public function prepareEvalCode(&$code, $name, $type, $id, $pane)
+    {
+        return $this->codeToolsRuntime()->prepareEvalCode($code, $name, $type, $id, $pane);
+    }
+
+    private function codeToolsRuntime(): CodeToolsRuntime
+    {
+        return $this->codeToolsRuntimeService ??= new CodeToolsRuntime($this);
+    }
+
+    /**
+     * Historical upload facade retained for custom PHP stored with forms.
+     */
+    public function saveUpload($filename, $userfile_name, $destpath, $timestamp, $useUrl = false, $useUrlDownloadDirectory = '', $resize_target_width = 0, $resize_target_height = 0, $resize_type = '', $resize_bgcolor = '#ffffff', $field_name = '')
+    {
+        global $mosConfig_fileperms;
+
+        if ($this->dying) {
+            return '';
+        }
+
+        $identity = $this->app->getIdentity();
+        $filemode = isset($mosConfig_fileperms)
+            ? ($mosConfig_fileperms === '' ? null : octdec($mosConfig_fileperms))
+            : 0644;
+        $result = $this->uploadRuntime()->store(
+            (string) $filename,
+            (string) $userfile_name,
+            (string) $destpath,
+            $this->findtags,
+            $this->replacetags,
+            $this->rows,
+            (string) $this->submitted,
+            (string) $this->app->get('offset'),
+            [
+                'username' => $identity->get('username'),
+                'id' => $identity->get('id'),
+                'name' => $identity->get('name'),
+            ],
+            (bool) $this->app->getSession()->get('bfFileUploadOverride', true),
+            $filemode,
+            (bool) $useUrl,
+            (int) $resize_target_width,
+            (int) $resize_target_height,
+            (string) $resize_type,
+            $resize_bgcolor === null ? null : (string) $resize_bgcolor
+        );
+
+        if (!$result->isSuccessful()) {
+            $this->status = _FF_STATUS_UPLOAD_FAILED;
+            $this->message = Text::_(match ($result->error) {
+                UploadError::DirectoryMissing => 'COM_BREEZINGFORMSNG_PROCESS_DIRNOTEXISTS',
+                UploadError::FileExists => 'COM_BREEZINGFORMSNG_PROCESS_FILEEXISTS',
+                UploadError::MoveFailed => 'COM_BREEZINGFORMSNG_PROCESS_FILEMOVEFAILED',
+                UploadError::ChmodFailed => 'COM_BREEZINGFORMSNG_PROCESS_FILECHMODFAILED',
+            });
+
+            return '';
+        }
+
+        return ['default' => $result->path, 'server' => $result->serverPath];
+    }
+
+    public function exifImageType($filename)
+    {
+        return $this->uploadRuntime()->imageType((string) $filename);
+    }
+
+    public function resizeFile($path, $width, $height, $bgcolor = '#ffffff', $type = '')
+    {
+        $this->uploadRuntime()->resizeFile(
+            (string) $path,
+            (int) $width,
+            (int) $height,
+            $bgcolor === null ? null : (string) $bgcolor,
+            (string) $type
+        );
+    }
+
+    public function resize_image($source_image, $destination_width, $destination_height, $type = 0, $bgcolor = [0, 0, 0])
+    {
+        return $this->uploadRuntime()->resizeImage(
+            $source_image,
+            (int) $destination_width,
+            (int) $destination_height,
+            (int) $type,
+            (array) $bgcolor
+        );
+    }
+
+    public function returnBytes($val)
+    {
+        return $this->uploadRuntime()->parseByteSize((string) $val);
+    }
+
+    public function findQuickModeElement(array $dataObject, $needle)
+    {
+        return $this->uploadRuntime()->findQuickModeElement($dataObject, (string) $needle);
+    }
+
+    public function measureTime()
+    {
+        $time = explode(' ', microtime());
+
+        return ((float) $time[0] + $time[1]) / 1000;
+    }
+
+    private function uploadRuntime(): UploadRuntime
+    {
+        return $this->uploadRuntimeService ??= new UploadRuntime($this->app->getInput());
+    }
 
     function __construct(
+        CMSApplication $application,
+        DatabaseInterface $database,
+        MailerFactoryInterface $mailerFactory,
+        CacheControllerFactoryInterface $cacheControllerFactory,
         $runmode, // _FF_RUNMODE_FRONTEND, ..._BACKEND, ..._PREVIEW
         $inframe, // run in iframe
         $form, // form id
@@ -567,7 +998,9 @@ class HTML_facileFormsProcessor
     ) {
         global $ff_config, $ff_mossite, $ff_mospath, $ff_processor;
         $ff_processor = $this;
-        $this->database = Factory::getContainer()->get(DatabaseInterface::class);
+        $this->database = $database;
+        $this->mailerFactory = $mailerFactory;
+        $this->cacheControllerFactory = $cacheControllerFactory;
         $this->dying = false;
         $this->runmode = $runmode;
         $this->inframe = $inframe;
@@ -580,7 +1013,7 @@ class HTML_facileFormsProcessor
         $this->suffix = trim($suffix);
         $this->editable = $editable;
         $this->editable_override = $editable_override;
-        $this->app = Factory::getApplication();
+        $this->app = $application;
 
         $requestMetadata = (new RequestMetadataResolver(Browser::getInstance()))->resolve(
             $this->app->getInput()->server->getString('REMOTE_ADDR', ''),
@@ -609,15 +1042,22 @@ class HTML_facileFormsProcessor
           $this->submitted = $instance->toFormat($format);
           } */
 
-        $this->formrow = new facileFormsForms($this->database);
+        $this->formrow = new FormTable($this->database);
         $this->formrow->load($form);
 
         if ($this->formrow->published) {
-            $this->database->setQuery(
-                "select * from #__facileforms_elements " .
-                "where form=" . $this->form . " and published=1 " .
-                "order by page, ordering"
-            );
+            $formId = (int) $this->form;
+            $query = $this->database->getQuery(true)
+                ->select('*')
+                ->from($this->database->quoteName('#__facileforms_elements'))
+                ->where($this->database->quoteName('form') . ' = :formId')
+                ->where($this->database->quoteName('published') . ' = 1')
+                ->order([
+                    $this->database->quoteName('page'),
+                    $this->database->quoteName('ordering'),
+                ])
+                ->bind(':formId', $formId, ParameterType::INTEGER);
+            $this->database->setQuery($query);
             $this->rows = $this->database->loadObjectList();
             $this->rowcount = count($this->rows);
         } // if

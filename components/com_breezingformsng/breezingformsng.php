@@ -9,7 +9,7 @@
  * @copyright Copyright (C) 2024-2026 by XDA+GIL
  * @license GNU General Public License version 2 or later; see LICENSE.txt
  *
- * Front controller of the legacy form engine. Boots the legacy runtime,
+ * Front controller of the native form engine. Boots the public stored-script runtime,
  * then dispatches either to the form renderer (view/submit) or to one of
  * the callback services (payments, captcha, uploads, opt-in/out).
  * */
@@ -18,13 +18,10 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 use Joomla\CMS\Factory;
 use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use Joomla\Database\DatabaseInterface;
-use Vcmb\Component\BreezingformsNG\Site\Service\Callback\CaptchaCallback;
-use Vcmb\Component\BreezingformsNG\Site\Service\Callback\FlashUploadCallback;
-use Vcmb\Component\BreezingformsNG\Site\Service\Callback\OptCallback;
-use Vcmb\Component\BreezingformsNG\Site\Service\Callback\PayPalCallback;
-use Vcmb\Component\BreezingformsNG\Site\Service\Callback\SofortCallback;
-use Vcmb\Component\BreezingformsNG\Site\Service\Callback\StripeCallback;
-use Vcmb\Component\BreezingformsNG\Site\Service\FormRenderer;
+use Joomla\CMS\Mail\MailerFactoryInterface;
+use Vcmb\Component\BreezingformsNG\Site\Service\EngineDispatcher;
+use Vcmb\Component\BreezingformsNG\Site\Configuration\FormConfiguration;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RuntimeContextInitializer;
 
 if (!function_exists('bf_b64enc')) {
 
@@ -54,9 +51,10 @@ $mainframe = Factory::getApplication();
 // make sure the component language is available for Text::_()
 $mainframe->getLanguage()->load('com_breezingformsng');
 
-$cache = Factory::getContainer()
-    ->get(CacheControllerFactoryInterface::class)
-    ->createCacheController('callback');
+$container = Factory::getContainer();
+$cacheControllerFactory = $container->get(CacheControllerFactoryInterface::class);
+$mailerFactory = $container->get(MailerFactoryInterface::class);
+$cache = $cacheControllerFactory->createCacheController('callback');
 $cache->setCaching(false);
 
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
@@ -80,11 +78,13 @@ $ff_config, // FacileForms configuration object
 $ff_mospath, // path to root of joomla
 $ff_compath, // path to component frontend root
 $ff_mossite, // url of the site root
+$ff_comsite, // url of the component frontend root
+$ff_otherparams, // request parameters propagated through the form
 $ff_request, // array of request parameters ff_param_*
 $ff_processor, // current form procesor object
 $ff_target;    // index of form on current page
 
-$database = $db = Factory::getContainer()->get(DatabaseInterface::class);
+$database = $db = $container->get(DatabaseInterface::class);
 
 if (!isset($xModuleId)) {
     $xModuleId = 0;
@@ -99,9 +99,16 @@ $ff_mospath = JPATH_SITE;
 $ff_compath = $ff_mospath . '/components/com_breezingformsng';
 
 // load config and initialize globals
-require_once ($ff_compath . '/facileforms.class.php');
-$ff_config = new facileFormsConf();
-initFacileForms();
+require_once $ff_compath . '/src/Support/runtime_bootstrap.php';
+$ff_config = new FormConfiguration();
+$runtimeContext = (new RuntimeContextInitializer($mainframe, $ff_config))->initialize(
+    $ff_mossite ?? null,
+    $ff_comsite ?? null,
+    $ff_otherparams ?? null,
+);
+$ff_mossite = $runtimeContext['siteUrl'];
+$ff_comsite = $runtimeContext['componentUrl'];
+$ff_otherparams = $runtimeContext['otherParameters'];
 
 // context handed over by the including application (module/plugin or MVC template)
 $bfEngineContext = [
@@ -112,52 +119,11 @@ $bfEngineContext = [
     'plg_editable_override' => $plg_editable_override ?? 0,
 ];
 
-if (
-    !Factory::getApplication()->getInput()->getBool('bfCaptcha', false) &&
-    !Factory::getApplication()->getInput()->getBool('checkCaptcha', false) &&
-    !Factory::getApplication()->getInput()->getBool('confirmStripe', false) &&
-    !Factory::getApplication()->getInput()->getBool('confirmPayPal', false) &&
-    !Factory::getApplication()->getInput()->getBool('confirmPayPalIpn', false) &&
-    !Factory::getApplication()->getInput()->getBool('paypalDownload', false) &&
-    !Factory::getApplication()->getInput()->getBool('stripeDownload', false) &&
-    !Factory::getApplication()->getInput()->getBool('showPayPalConnectMsg', false) &&
-    !Factory::getApplication()->getInput()->getBool('successSofortueberweisung', false) &&
-    !Factory::getApplication()->getInput()->getBool('confirmSofortueberweisung', false) &&
-    !Factory::getApplication()->getInput()->getBool('sofortueberweisungDownload', false) &&
-    !Factory::getApplication()->getInput()->getBool('flashUpload', false) &&
-    Factory::getApplication()->getInput()->getString('opt_in', '') != 'true' &&
-    Factory::getApplication()->getInput()->getString('opt_out', '') != 'true'
-) {
-    (new FormRenderer())->render($bfEngineContext);
-} else if (Factory::getApplication()->getInput()->getBool('checkCaptcha', false)) {
-    (new CaptchaCallback())->check();
-} else if (Factory::getApplication()->getInput()->getBool('confirmPayPalIpn', false) && $ff_applic == '') {
-    (new PayPalCallback())->confirmIpn();
-} else if (Factory::getApplication()->getInput()->getBool('confirmStripe', false) && $ff_applic == '') {
-    (new StripeCallback())->confirm();
-} else if (Factory::getApplication()->getInput()->getBool('stripeDownload', false) && $ff_applic == '') {
-    (new StripeCallback())->download();
-} else if (Factory::getApplication()->getInput()->getBool('confirmPayPal', false) && $ff_applic == '') {
-    (new PayPalCallback())->confirm();
-} else if (Factory::getApplication()->getInput()->getBool('paypalDownload', false) && $ff_applic == '') {
-    (new PayPalCallback())->download();
-} else if (Factory::getApplication()->getInput()->getBool('showPayPalConnectMsg', false)) {
-    (new PayPalCallback())->connectMessage();
-} else if (Factory::getApplication()->getInput()->getBool('successSofortueberweisung', false)) {
-    (new SofortCallback())->success();
-} else if (Factory::getApplication()->getInput()->getBool('confirmSofortueberweisung', false)) {
-    (new SofortCallback())->confirm();
-} else if (Factory::getApplication()->getInput()->getBool('sofortueberweisungDownload', false) && $ff_applic == '') {
-    (new SofortCallback())->download();
-} else if (Factory::getApplication()->getInput()->getBool('flashUpload', false)) {
-    (new FlashUploadCallback())->handle();
-} else if (Factory::getApplication()->getInput()->getString('opt_in', '') == 'true') {
-    (new OptCallback())->optIn();
-} else if (Factory::getApplication()->getInput()->getString('opt_out', '') == 'true') {
-    (new OptCallback())->optOut();
-}
+$input = $mainframe->getInput();
+(new EngineDispatcher($input, $mainframe, $database, $mailerFactory, $cacheControllerFactory))
+    ->dispatch($bfEngineContext, (string) $ff_applic);
 
-if (Factory::getApplication()->getInput()->getBool('raw', false)) {
+if ($input->getBool('raw', false)) {
     session_write_close();
     exit;
 }

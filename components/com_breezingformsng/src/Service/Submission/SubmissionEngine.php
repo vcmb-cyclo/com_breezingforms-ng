@@ -10,9 +10,15 @@
  * SPDX-License-Identifier: GPL-2.0-or-later
  **/
 
-defined('_JEXEC') or die('Direct Access to this location is not allowed.');
+declare(strict_types=1);
 
-use Joomla\CMS\Factory;
+namespace Vcmb\Component\BreezingformsNG\Site\Service\Submission;
+
+\defined('_JEXEC') or die;
+
+use Exception;
+use HTML_facileFormsProcessor;
+use Securimage;
 use Joomla\CMS\Filter\InputFilter;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
@@ -44,38 +50,44 @@ use CB\Component\Contentbuilderng\Administrator\Service\PermissionService;
 /**
  * Submit data collection, submission pipeline and HTML sanitizing.
  */
-trait bfProcessorSubmission
+final class SubmissionEngine
 {
     private ?SubmissionTimestampFormatter $uploadTimestampFormatterService = null;
     private ?HtmlSanitizer $htmlSanitizerService = null;
 
+    public function __construct(
+        private readonly HTML_facileFormsProcessor $processor,
+        private readonly MailerFactoryInterface $mailerFactory,
+    ) {
+    }
+
     function collectSubmitdata($cbResult = null)
     {
-        if ($this->dying || $this->submitdata)
+        if ($this->processor->dying || $this->processor->submitdata)
             return;
 
-        $this->submitdata = array();
-        $this->savedata = array();
-        $this->maildata = array();
-        $this->sfdata = array();
-        $this->xmldata = array();
+        $this->processor->submitdata = array();
+        $this->processor->savedata = array();
+        $this->processor->maildata = array();
+        $this->processor->sfdata = array();
+        $this->processor->xmldata = array();
         $names = array();
-        if (count($this->rows)) {
+        if (count($this->processor->rows)) {
             $time_passed = 0;
-            $start_time = $this->measureTime();
+            $start_time = $this->processor->measureTime();
             $max_exec_time = 15;
             if (function_exists('ini_get')) {
                 $max_exec_time = @ini_get('max_execution_time');
             }
             $max_time = !empty($max_exec_time) ? intval($max_exec_time) / 2 : 15;
-            foreach ($this->rows as $row) {
+            foreach ($this->processor->rows as $row) {
                 if (!in_array($row->name, $names)) {
                     switch ($row->type) {
                         case 'File Upload':
 
                             // CONTENTBUILDER
                             if ($cbResult !== null && isset($cbResult['data']) && $cbResult['data'] != null) {
-                                $rowdata1 = Path::clean(str_replace($this->findtags, $this->replacetags, $row->data1));
+                                $rowdata1 = Path::clean(str_replace($this->processor->findtags, $this->processor->replacetags, $row->data1));
                                 if ($cbResult['data']['protect_upload_directory']) {
                                     if (is_dir($rowdata1) && !file_exists($rowdata1 . '/' . '.htaccess'))
                                         File::write($rowdata1 . '/' . '.htaccess', $def = 'deny from all');
@@ -85,14 +97,14 @@ trait bfProcessorSubmission
                                 }
                             }
 
-                            $areas = json_decode($this->formrow->template_areas, true);
+                            $areas = json_decode($this->processor->formrow->template_areas, true);
                             $useUrl = false;
                             $useUrlDownloadDirectory = '';
                             $resize_target_width = 0;
                             $resize_target_height = 0;
                             $resize_type = '';
                             $resize_bgcolor = '#ffffff';
-                            if (trim($this->formrow->template_code_processed) == 'QuickMode' && is_array($areas)) {
+                            if (trim($this->processor->formrow->template_code_processed) == 'QuickMode' && is_array($areas)) {
                                 foreach ($areas as $area) { // don't worry, size is only 1 in QM
                                     if (isset($area['elements'])) {
                                         foreach ($area['elements'] as $element) {
@@ -113,13 +125,13 @@ trait bfProcessorSubmission
 
                             $uploadfiles = isset($_FILES['ff_nm_' . $row->name]) ? $_FILES['ff_nm_' . $row->name] : null;
 
-                            if ($this->formrow->template_code != '' && isset($_FILES['ff_nm_' . $row->name]) && $_FILES['ff_nm_' . $row->name]['tmp_name'][0] != '' && trim($row->data2) != '') {
+                            if ($this->processor->formrow->template_code != '' && isset($_FILES['ff_nm_' . $row->name]) && $_FILES['ff_nm_' . $row->name]['tmp_name'][0] != '' && trim($row->data2) != '') {
                                 $fileName = $_FILES['ff_nm_' . $row->name]['name'][0];
                                 $ext = strtolower(substr($fileName, strrpos($fileName, '.') + 1));
                                 $allowedExtensions = explode(',', strtolower(str_replace(' ', '', trim($row->data2))));
 
                                 if (!in_array($ext, $allowedExtensions)) {
-                                    $this->status = _FF_STATUS_FILE_EXTENSION_NOT_ALLOWED;
+                                    $this->processor->status = _FF_STATUS_FILE_EXTENSION_NOT_ALLOWED;
                                     return;
                                 }
                             }
@@ -138,18 +150,18 @@ trait bfProcessorSubmission
                                     if ($name[$i] != '') {
                                         $rowpath1 = $row->data1;
                                         //if ($cbResult !== null && isset($cbResult['data']) && $cbResult['data'] != null) {
-                                        $rowpath1 = $this->cbCreatePathByTokens($rowpath1, $this->rows, $row->name);
+                                        $rowpath1 = $this->processor->cbCreatePathByTokens($rowpath1, $this->processor->rows, $row->name);
                                         //}
 
-                                        $pathInfo = $this->saveUpload($tmp_name[$i], bf_sanitizeFilename($name[$i]), $rowpath1, $row->flag1, $useUrl, $useUrlDownloadDirectory, $resize_target_width, $resize_target_height, $resize_type, $resize_bgcolor, $row->name);
+                                        $pathInfo = $this->processor->saveUpload($tmp_name[$i], bf_sanitizeFilename($name[$i]), $rowpath1, $row->flag1, $useUrl, $useUrlDownloadDirectory, $resize_target_width, $resize_target_height, $resize_type, $resize_bgcolor, $row->name);
                                         $path = $pathInfo['default'];
                                         $serverPath = $pathInfo['server'];
-                                        if ($this->status != _FF_STATUS_OK)
+                                        if ($this->processor->status != _FF_STATUS_OK)
                                             return;
                                         $paths[] = $path;
 
                                         $serverPaths[] = $serverPath;
-                                        $this->submitdata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $path);
+                                        $this->processor->submitdata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $path);
                                         // CONTENTBUILDER
                                         if (strpos(strtolower($row->data1), '{cbsite}') === 0) {
                                             $is_relative[$serverPath] = true;
@@ -157,21 +169,21 @@ trait bfProcessorSubmission
                                     } // if
                                 } // for
                             } // if
-                            if (Factory::getApplication()->getInput()->getString('bfFlashUploadTicket', '') != '') {
-                                $tickets = $this->app->getSession()->get('bfFlashUploadTickets', array());
+                            if ($this->processor->app->getInput()->getString('bfFlashUploadTicket', '') != '') {
+                                $tickets = $this->processor->app->getSession()->get('bfFlashUploadTickets', array());
                                 mt_srand();
-                                if (isset($tickets[Factory::getApplication()->getInput()->getString('bfFlashUploadTicket', (string) mt_rand(0, mt_getrandmax()))])) {
+                                if (isset($tickets[$this->processor->app->getInput()->getString('bfFlashUploadTicket', (string) mt_rand(0, mt_getrandmax()))])) {
                                     $sourcePath = JPATH_SITE . '/components/com_breezingformsng/uploads/';
                                     if (@file_exists($sourcePath) && @is_readable($sourcePath) && @is_dir($sourcePath)) {
 
-                                        $timezone = (string) $this->app->get('offset');
+                                        $timezone = (string) $this->processor->app->get('offset');
                                         $date_stamp = $this->uploadTimestampFormatter()->formatPattern(
-                                            (string) $this->submitted,
+                                            (string) $this->processor->submitted,
                                             $timezone,
                                             'Y_m_d_H_i_s'
                                         );
                                         $date_stamp2 = $this->uploadTimestampFormatter()->formatPattern(
-                                            (string) $this->submitted,
+                                            (string) $this->processor->submitted,
                                             $timezone,
                                             'Y_m_d'
                                         );
@@ -187,7 +199,7 @@ trait bfProcessorSubmission
                                                 if (count($parts) >= 5) {
                                                     if ($parts[count($parts) - 1] == 'flashtmp') {
 
-                                                        if ($parts[count($parts) - 3] == Factory::getApplication()->getInput()->getString('bfFlashUploadTicket', '')) {
+                                                        if ($parts[count($parts) - 3] == $this->processor->app->getInput()->getString('bfFlashUploadTicket', '')) {
 
 
                                                             if ($parts[count($parts) - 4] == $row->name) {
@@ -199,9 +211,9 @@ trait bfProcessorSubmission
                                                                 $userfile_name = implode('_', $parts);
                                                                 $rowpath1 = $row->data1;
                                                                 //if ($cbResult !== null && isset($cbResult['data']) && $cbResult['data'] != null) {
-                                                                $rowpath1 = $this->cbCreatePathByTokens($rowpath1, $this->rows, $row->name);
+                                                                $rowpath1 = $this->processor->cbCreatePathByTokens($rowpath1, $this->processor->rows, $row->name);
                                                                 //}
-                                                                $baseDir = Path::clean(str_replace($this->findtags, $this->replacetags, $rowpath1));
+                                                                $baseDir = Path::clean(str_replace($this->processor->findtags, $this->processor->replacetags, $rowpath1));
 
                                                                 // test if there is a filemask and remove it from the basepath
                                                                 $_baseDir = $baseDir;
@@ -214,9 +226,9 @@ trait bfProcessorSubmission
                                                                 if ($fmtest != basename($_baseDir)) {
                                                                     $fm = basename($_baseDir);
 
-                                                                    foreach ($this->rows as $row2) {
+                                                                    foreach ($this->processor->rows as $row2) {
 
-                                                                        $rawFname = Factory::getApplication()->getInput()->post->get('ff_nm_' . $row2->name, [], 'raw');
+                                                                        $rawFname = $this->processor->app->getInput()->post->get('ff_nm_' . $row2->name, [], 'raw');
                                                         $permissiveFilter = InputFilter::getInstance([], [], 1, 1);
                                                         $fname = \is_array($rawFname)
                                                             ? array_map(static fn ($value) => $permissiveFilter->clean((string) $value, 'html'), $rawFname)
@@ -230,9 +242,9 @@ trait bfProcessorSubmission
                                                                     }
 
                                                                     $fm = str_replace('{filemask:_separator}', '_', $fm);
-                                                                    $fm = str_replace('{filemask:_username}', trim(Factory::getApplication()->getIdentity()->get('username')), $fm);
-                                                                    $fm = str_replace('{filemask:_userid}', trim(Factory::getApplication()->getIdentity()->get('id')), $fm);
-                                                                    $fm = str_replace('{filemask:_name}', trim(Factory::getApplication()->getIdentity()->get('name')), $fm);
+                                                                    $fm = str_replace('{filemask:_username}', trim($this->processor->app->getIdentity()->get('username')), $fm);
+                                                                    $fm = str_replace('{filemask:_userid}', trim($this->processor->app->getIdentity()->get('id')), $fm);
+                                                                    $fm = str_replace('{filemask:_name}', trim($this->processor->app->getIdentity()->get('name')), $fm);
                                                                     $fm = str_replace('{filemask:_datetime}', trim($date_stamp), $fm);
                                                                     $fm = str_replace('{filemask:_date}', trim($date_stamp2), $fm);
                                                                     $fm = str_replace('{filemask:_timestamp}', trim(time()), $fm);
@@ -248,16 +260,16 @@ trait bfProcessorSubmission
                                                                 //	$userfile_name = $date_stamp . '_' . $userfile_name;
                                                                 $path = $baseDir . '/' . $userfile_name;
                                                                 //if ($row->flag1) $path .= '.'.date('YmdHis');
-                                                                if (file_exists($path) && $this->app->getSession()->get('bfFileUploadOverride', true)) {
+                                                                if (file_exists($path) && $this->processor->app->getSession()->get('bfFileUploadOverride', true)) {
                                                                     $rnd = md5(mt_rand(0, mt_getrandmax()));
                                                                     $path = $baseDir . '/' . $rnd . '_' . $userfile_name;
                                                                     //if ($row->flag1) $path .= '.'.date('YmdHis');
                                                                     if (file_exists($path)) {
-                                                                        $this->status = _FF_STATUS_UPLOAD_FAILED;
-                                                                        $this->message = Text::_('COM_BREEZINGFORMSNG_PROCESS_FILEEXISTS');
+                                                                        $this->processor->status = _FF_STATUS_UPLOAD_FAILED;
+                                                                        $this->processor->message = Text::_('COM_BREEZINGFORMSNG_PROCESS_FILEEXISTS');
                                                                         return '';
                                                                     }
-                                                                } else if (file_exists($path) && !$this->app->getSession()->get('bfFileUploadOverride', true)) {
+                                                                } else if (file_exists($path) && !$this->processor->app->getSession()->get('bfFileUploadOverride', true)) {
                                                                     unlink($path);
                                                                 }
 
@@ -265,17 +277,17 @@ trait bfProcessorSubmission
                                                                 $allowedExtensions = explode(',', strtolower(str_replace(' ', '', trim($row->data2))));
 
                                                                 if (!in_array($ext, $allowedExtensions)) {
-                                                                    $this->status = _FF_STATUS_FILE_EXTENSION_NOT_ALLOWED;
+                                                                    $this->processor->status = _FF_STATUS_FILE_EXTENSION_NOT_ALLOWED;
                                                                 }
 
-                                                                if ($this->status != _FF_STATUS_OK)
+                                                                if ($this->processor->status != _FF_STATUS_OK)
                                                                     return;
 
                                                                 if (@is_readable($sourcePath . $file) && @file_exists($baseDir) && @is_dir($baseDir)) {
                                                                     @File::copy($sourcePath . $file, $path);
                                                                 } else {
-                                                                    $this->status = _FF_STATUS_UPLOAD_FAILED;
-                                                                    $this->message = Text::_('COM_BREEZINGFORMSNG_PROCESS_FILEMOVEFAILED');
+                                                                    $this->processor->status = _FF_STATUS_UPLOAD_FAILED;
+                                                                    $this->processor->message = Text::_('COM_BREEZINGFORMSNG_PROCESS_FILEMOVEFAILED');
                                                                     return;
                                                                 }
                                                                 @File::delete($sourcePath . $file);
@@ -291,12 +303,12 @@ trait bfProcessorSubmission
 
                                                                 $paths[] = $path;
                                                                 $serverPaths[] = $serverPath;
-                                                                $this->submitdata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $path);
+                                                                $this->processor->submitdata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $path);
 
                                                                 // resize if image
                                                                 // last param = crop or simple. Nothing for exact.
                                                                 if (intval($resize_target_height) > 0 && intval($resize_target_width) > 0) {
-                                                                    $this->resizeFile($serverPath, intval($resize_target_width), intval($resize_target_height), $resize_bgcolor, $resize_type);
+                                                                    $this->processor->resizeFile($serverPath, intval($resize_target_width), intval($resize_target_height), $resize_bgcolor, $resize_type);
                                                                 }
 
                                                                 // CONTENTBUILDER
@@ -321,70 +333,70 @@ trait bfProcessorSubmission
                                 foreach ($serverPaths as $serverPath) {
 
                                     // DROPBOX File Upload
-                                    if ($this->formrow->dropbox_email) {
+                                    if ($this->processor->formrow->dropbox_email) {
                                         $this->uploadFileToDropbox($serverPath);
                                     }
 
                                     // CONTENTBUILDER: to keep the relative path with prefix
                                     $savedata_path = $serverPath;
-                                    foreach ($this->findtags as $tag) {
+                                    foreach ($this->processor->findtags as $tag) {
                                         if (strtolower($tag) == '{cbsite}' && isset($is_relative[$serverPath]) && $is_relative[$serverPath]) {
                                             $savedata_path = Path::clean(str_replace(array(JPATH_SITE, JPATH_SITE), array('{cbsite}', '{CBSite}'), $savedata_path));
                                         }
                                     }
 
                                     if (
-                                        ($this->formrow->dblog == 1 && $savedata_path != '') ||
-                                        $this->formrow->dblog == 2 || ($cbResult != null && $cbResult['record'] != null)
+                                        ($this->processor->formrow->dblog == 1 && $savedata_path != '') ||
+                                        $this->processor->formrow->dblog == 2 || ($cbResult != null && $cbResult['record'] != null)
                                     )
-                                        $this->savedata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $savedata_path);
+                                        $this->processor->savedata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $savedata_path);
                                 }
 
                                 foreach ($paths as $path) {
                                     if (
-                                        (($this->formrow->emaillog == 1 && $this->trim($path)) ||
-                                            $this->formrow->emaillog == 2) && ($this->formrow->emailxml == 1 ||
-                                            $this->formrow->emailxml == 2 || $this->formrow->emailxml == 3 || $this->formrow->emailxml == 4)
+                                        (($this->processor->formrow->emaillog == 1 && $this->processor->trim($path)) ||
+                                            $this->processor->formrow->emaillog == 2) && ($this->processor->formrow->emailxml == 1 ||
+                                            $this->processor->formrow->emailxml == 2 || $this->processor->formrow->emailxml == 3 || $this->processor->formrow->emailxml == 4)
                                     )
-                                        $this->xmldata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $path);
+                                        $this->processor->xmldata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $path);
                                     if (
-                                        (($this->formrow->emaillog == 1 && $this->trim($path)) ||
-                                            $this->formrow->mb_emaillog == 2) && ($this->formrow->mb_emailxml == 1 ||
-                                            $this->formrow->mb_emailxml == 2 || $this->formrow->mb_emailxml == 3 || $this->formrow->mb_emailxml == 4)
+                                        (($this->processor->formrow->emaillog == 1 && $this->processor->trim($path)) ||
+                                            $this->processor->formrow->mb_emaillog == 2) && ($this->processor->formrow->mb_emailxml == 1 ||
+                                            $this->processor->formrow->mb_emailxml == 2 || $this->processor->formrow->mb_emailxml == 3 || $this->processor->formrow->mb_emailxml == 4)
                                     )
-                                        $this->mb_xmldata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $path);
+                                        $this->processor->mb_xmldata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $path);
                                 } // foreach
 
                                 if (!count($paths)) {
                                     if (
-                                        ($this->formrow->dblog == 1) ||
-                                        $this->formrow->dblog == 2
+                                        ($this->processor->formrow->dblog == 1) ||
+                                        $this->processor->formrow->dblog == 2
                                     )
-                                        $this->savedata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, '');
+                                        $this->processor->savedata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, '');
                                     if (
-                                        $this->formrow->emaillog == 2 && ($this->formrow->emailxml == 1 ||
-                                            $this->formrow->emailxml == 2 || $this->formrow->emailxml == 3 || $this->formrow->emailxml == 4)
+                                        $this->processor->formrow->emaillog == 2 && ($this->processor->formrow->emailxml == 1 ||
+                                            $this->processor->formrow->emailxml == 2 || $this->processor->formrow->emailxml == 3 || $this->processor->formrow->emailxml == 4)
                                     )
-                                        $this->xmldata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, '');
+                                        $this->processor->xmldata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, '');
                                     if (
-                                        $this->formrow->mb_emaillog == 2 && ($this->formrow->mb_emailxml == 1 ||
-                                            $this->formrow->mb_emailxml == 2 || $this->formrow->mb_emailxml == 3 || $this->formrow->mb_emailxml == 4)
+                                        $this->processor->formrow->mb_emaillog == 2 && ($this->processor->formrow->mb_emailxml == 1 ||
+                                            $this->processor->formrow->mb_emailxml == 2 || $this->processor->formrow->mb_emailxml == 3 || $this->processor->formrow->mb_emailxml == 4)
                                     )
-                                        $this->mb_xmldata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, '');
+                                        $this->processor->mb_xmldata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, '');
                                 }
                                 // mail
                                 $paths = implode(nl(), $paths);
                                 $serverPaths = implode(nl(), $serverPaths);
 
-                                if ($this->trim($paths)) {
-                                    $this->sfadata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $paths, $serverPaths);
+                                if ($this->processor->trim($paths)) {
+                                    $this->processor->sfadata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $paths, $serverPaths);
                                 }
 
                                 if (
-                                    ($this->formrow->emaillog == 1 && $this->trim($paths)) ||
-                                    $this->formrow->emaillog == 2
+                                    ($this->processor->formrow->emaillog == 1 && $this->processor->trim($paths)) ||
+                                    $this->processor->formrow->emaillog == 2
                                 ) {
-                                    $this->maildata[] = array(
+                                    $this->processor->maildata[] = array(
                                         $row->id,
                                         $row->name,
                                         strip_tags($row->title),
@@ -409,7 +421,7 @@ trait bfProcessorSubmission
                         case 'Signature':
                             if ($row->logging == 1) {
 
-                                $rawValues = Factory::getApplication()->getInput()->post->get("ff_nm_" . $row->name, [''], 'raw');
+                                $rawValues = $this->processor->app->getInput()->post->get("ff_nm_" . $row->name, [''], 'raw');
                                 $permissiveFilter = InputFilter::getInstance([], [], 1, 1);
                                 $values = \is_array($rawValues)
                                     ? array_map(static fn ($value) => $permissiveFilter->clean((string) $value, 'html'), $rawValues)
@@ -418,12 +430,12 @@ trait bfProcessorSubmission
                                 if ($row->type == 'Textarea') {
                                     require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
 
-                                    if (trim($this->formrow->template_code_processed) == 'QuickMode') {
-                                        $dataObject = json_decode(bf_b64dec($this->formrow->template_code), true);
-                                        $qmelement = $this->findQuickModeElement($dataObject, $row->name);
+                                    if (trim($this->processor->formrow->template_code_processed) == 'QuickMode') {
+                                        $dataObject = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
+                                        $qmelement = $this->processor->findQuickModeElement($dataObject, $row->name);
 
                                         if ($qmelement !== null && isset($qmelement['properties']['is_html']) && $qmelement['properties']['is_html']) {
-                                            $rawValues = Factory::getApplication()->getInput()->post->get("ff_nm_" . $row->name, [''], 'raw');
+                                            $rawValues = $this->processor->app->getInput()->post->get("ff_nm_" . $row->name, [''], 'raw');
                                             $permissiveFilter = InputFilter::getInstance([], [], 1, 1);
                                             $values = \is_array($rawValues)
                                                 ? array_map(static fn ($value) => $permissiveFilter->clean((string) $value, 'html'), $rawValues)
@@ -433,10 +445,10 @@ trait bfProcessorSubmission
 
                                             for ($html_i = 0; $html_i < $html_value_cnt; $html_i++) {
 
-                                                //$values[$html_i] = $this->removeDangerousHtml($values[$html_i]);
+                                                //$values[$html_i] = $this->processor->removeDangerousHtml($values[$html_i]);
 
                                                 /*
-                                                  $input = $this->app->getInput();
+                                                  $input = $this->processor->app->getInput();
                                                   $input->set('cbCleanVar', $values[$html_i]);
                                                   $values[$html_i] = $input->getHtml('cbCleanVar'); */
 
@@ -465,17 +477,17 @@ trait bfProcessorSubmission
 
                                         // DROPBOX SUPPORT request v2 API
                                         // DROPBOX Signature upload
-                                        if ($this->formrow->dropbox_email) {
+                                        if ($this->processor->formrow->dropbox_email) {
                                             $this->uploadFileToDropbox($sig_file);
                                         }
                                     }
 
                                     // for db
                                     if (
-                                        ($this->formrow->dblog == 1 && $value != '') ||
-                                        $this->formrow->dblog == 2 || ($cbResult != null && $cbResult['record'] != null)
+                                        ($this->processor->formrow->dblog == 1 && $value != '') ||
+                                        $this->processor->formrow->dblog == 2 || ($cbResult != null && $cbResult['record'] != null)
                                     )
-                                        $this->savedata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $value);
+                                        $this->processor->savedata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $value);
 
                                     // CONTENTBUILDER
                                     $loadData = true;
@@ -493,21 +505,21 @@ trait bfProcessorSubmission
 
                                     if ($loadData) {
                                         // submitdata
-                                        if ($this->trim($value) != '')
-                                            $this->submitdata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $value);
+                                        if ($this->processor->trim($value) != '')
+                                            $this->processor->submitdata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $value);
 
                                         if (
-                                            ($this->formrow->emaillog == 1 && $this->trim($value) != '') ||
-                                            $this->formrow->emaillog == 2 && (($this->formrow->emailxml == 1 ||
-                                                $this->formrow->emailxml == 2 || $this->formrow->emailxml == 3 || $this->formrow->emailxml == 4))
+                                            ($this->processor->formrow->emaillog == 1 && $this->processor->trim($value) != '') ||
+                                            $this->processor->formrow->emaillog == 2 && (($this->processor->formrow->emailxml == 1 ||
+                                                $this->processor->formrow->emailxml == 2 || $this->processor->formrow->emailxml == 3 || $this->processor->formrow->emailxml == 4))
                                         )
-                                            $this->xmldata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $value);
+                                            $this->processor->xmldata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $value);
                                         if (
-                                            ($this->formrow->mb_emaillog == 1 && $this->trim($value) != '') ||
-                                            $this->formrow->mb_emaillog == 2 && (($this->formrow->mb_emailxml == 1 ||
-                                                $this->formrow->mb_emailxml == 2 || $this->formrow->mb_emailxml == 3 || $this->formrow->mb_emailxml == 4))
+                                            ($this->processor->formrow->mb_emaillog == 1 && $this->processor->trim($value) != '') ||
+                                            $this->processor->formrow->mb_emaillog == 2 && (($this->processor->formrow->mb_emailxml == 1 ||
+                                                $this->processor->formrow->mb_emailxml == 2 || $this->processor->formrow->mb_emailxml == 3 || $this->processor->formrow->mb_emailxml == 4))
                                         )
-                                            $this->mb_xmldata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $value);
+                                            $this->processor->mb_xmldata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $value);
                                     }
                                 } // foreach
                                 // for mail
@@ -555,15 +567,15 @@ trait bfProcessorSubmission
                                     }
                                 }
 
-                                if ($this->trim($sfvalues)) {
-                                    $this->sfdata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $sfvalues);
+                                if ($this->processor->trim($sfvalues)) {
+                                    $this->processor->sfdata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $sfvalues);
                                 }
 
                                 if (
-                                    ($this->formrow->emaillog == 1 && $this->trim($values)) ||
-                                    $this->formrow->emaillog == 2
+                                    ($this->processor->formrow->emaillog == 1 && $this->processor->trim($values)) ||
+                                    $this->processor->formrow->emaillog == 2
                                 ) {
-                                    $this->maildata[] = array(
+                                    $this->processor->maildata[] = array(
                                         $row->id,
                                         $row->name,
                                         strip_tags($row->title),
@@ -578,7 +590,7 @@ trait bfProcessorSubmission
                     } // switch
                     $names[] = $row->name;
                 } // if
-                $time_passed = $this->measureTime();
+                $time_passed = $this->processor->measureTime();
                 if (($time_passed - $start_time) > $max_time) {
                     //break;
                 }
@@ -592,7 +604,7 @@ trait bfProcessorSubmission
     {
         global $ff_config, $ff_comsite, $ff_mossite, $ff_otherparams;
 
-        if (trim((string) $this->formrow->template_code_processed) !== 'QuickMode') {
+        if (trim((string) $this->processor->formrow->template_code_processed) !== 'QuickMode') {
             echo '<div class="alert alert-warning">' . Text::_('COM_BREEZINGFORMSNG_QUICKMODE_ONLY') . '</div>';
             return;
         }
@@ -601,16 +613,16 @@ trait bfProcessorSubmission
         $cbRecordId = 0;
         $cbEmailNotifications = false;
         $cbEmailUpdateNotifications = false;
-        $cbResult = $this->cbCheckPermissions();
+        $cbResult = $this->processor->cbCheckPermissions();
         if ($cbResult['data'] !== null && $cbResult['data']['email_notifications']) {
-            if (!Factory::getApplication()->getInput()->getInt('cb_record_id', 0)) {
+            if (!$this->processor->app->getInput()->getInt('cb_record_id', 0)) {
                 $cbEmailNotifications = true;
             } else {
                 $cbEmailNotifications = false;
             }
         }
         if ($cbResult['data'] !== null && $cbResult['data']['email_update_notifications']) {
-            if (Factory::getApplication()->getInput()->getInt('cb_record_id', 0)) {
+            if ($this->processor->app->getInput()->getInt('cb_record_id', 0)) {
                 $cbEmailUpdateNotifications = true;
             } else {
                 $cbEmailUpdateNotifications = false;
@@ -621,42 +633,42 @@ trait bfProcessorSubmission
             $cbEmailUpdateNotifications = true;
         }
         // CONTENTBUILDER END
-        if (!$this->okrun)
+        if (!$this->processor->okrun)
             return;
 
         ob_start();
-        $this->record_id = '';
-        $this->status = _FF_STATUS_OK;
-        $this->message = '';
-        $this->sendNotificationAfterPayment = false;
+        $this->processor->record_id = '';
+        $this->processor->status = _FF_STATUS_OK;
+        $this->processor->message = '';
+        $this->processor->sendNotificationAfterPayment = false;
 
         // handle Begin Submit piece
         $halt = false;
-        $this->collectSubmitdata($cbResult);
+        $this->processor->collectSubmitdata($cbResult);
 
         if (!$halt) {
 
             require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
 
-            $dataObject = json_decode(bf_b64dec($this->formrow->template_code), true);
+            $dataObject = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
             $rootMdata = $dataObject['properties'];
 
-            if (Factory::getApplication()->getInput()->getString('ff_applic', '') != 'mod_facileforms' && Factory::getApplication()->getInput()->getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
+            if ($this->processor->app->getInput()->getString('ff_applic', '') != 'mod_facileforms' && $this->processor->app->getInput()->getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
                 $is_device = true;
-                $this->isMobile = isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile'] ? true : (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $this->app->getSession()->get('com_breezingformsng.mobile', false) ? true : false);
+                $this->processor->isMobile = isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile'] ? true : (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $this->processor->app->getSession()->get('com_breezingformsng.mobile', false) ? true : false);
             } else
-                $this->isMobile = false;
+                $this->processor->isMobile = false;
 
 
 
-            for ($i = 0; $i < $this->rowcount; $i++) {
-                $row = $this->rows[$i];
+            for ($i = 0; $i < $this->processor->rowcount; $i++) {
+                $row = $this->processor->rows[$i];
                 if ($row->type == "Captcha") {
                     require_once(JPATH_SITE . '/media/com_breezingformsng/images/site/captcha/securimage.php');
                     $securimage = new Securimage();
-                    if (!$securimage->check(Factory::getApplication()->getInput()->getString('bfCaptchaEntry', ''))) {
+                    if (!$securimage->check($this->processor->app->getInput()->getString('bfCaptchaEntry', ''))) {
                         $halt = true;
-                        $this->status = _FF_STATUS_CAPTCHA_FAILED;
+                        $this->processor->status = _FF_STATUS_CAPTCHA_FAILED;
                         exit;
                     }
                     break;
@@ -664,7 +676,7 @@ trait bfProcessorSubmission
                     if ($row->type == "ReCaptcha") {
 
 
-                        $areas = json_decode($this->formrow->template_areas, true);
+                        $areas = json_decode($this->processor->formrow->template_areas, true);
 
                         foreach ($areas as $area) {
                             foreach ($area['elements'] as $element) {
@@ -673,8 +685,8 @@ trait bfProcessorSubmission
                                     try {
                                         $verified = (new RecaptchaVerifier())->verify(
                                             (string) $element['privkey'],
-                                            Factory::getApplication()->getInput()->getString('g-recaptcha-response', ''),
-                                            Factory::getApplication()->getInput()->server->getString('REMOTE_ADDR', '')
+                                            $this->processor->app->getInput()->getString('g-recaptcha-response', ''),
+                                            $this->processor->app->getInput()->server->getString('REMOTE_ADDR', '')
                                         );
                                     } catch (\Throwable) {
                                         $verified = false;
@@ -686,7 +698,7 @@ trait bfProcessorSubmission
                                     } else {
 
                                         $halt = true;
-                                        $this->status = _FF_STATUS_CAPTCHA_FAILED;
+                                        $this->processor->status = _FF_STATUS_CAPTCHA_FAILED;
                                         exit;
                                     }
 
@@ -700,10 +712,10 @@ trait bfProcessorSubmission
             }
 
 
-            $areas = json_decode($this->formrow->template_areas, true);
+            $areas = json_decode($this->processor->formrow->template_areas, true);
 
             if (is_array($areas)) {
-                switch (Factory::getApplication()->getInput()->getString('ff_payment_method', '')) {
+                switch ($this->processor->app->getInput()->getString('ff_payment_method', '')) {
                     case 'Stripe':
                     case 'PayPal':
                     case 'Sofortueberweisung':
@@ -712,7 +724,7 @@ trait bfProcessorSubmission
                                 if ($element['internalType'] == 'bfStripe' || $element['internalType'] == 'bfPayPal' || $element['internalType'] == 'bfSofortueberweisung') {
                                     $options = $element['options'];
                                     if (isset($options['sendNotificationAfterPayment']) && $options['sendNotificationAfterPayment']) {
-                                        $this->sendNotificationAfterPayment = true;
+                                        $this->processor->sendNotificationAfterPayment = true;
                                     }
                                 }
                             }
@@ -725,73 +737,73 @@ trait bfProcessorSubmission
 
             $code = '';
 
-            switch ($this->formrow->piece3cond) {
+            switch ($this->processor->formrow->piece3cond) {
                 case 1: // library
-                    $piece3id = (int) $this->formrow->piece3id;
-                    $query = $this->database->getQuery(true)
+                    $piece3id = (int) $this->processor->formrow->piece3id;
+                    $query = $this->processor->database->getQuery(true)
                         ->select(['name', 'code'])
-                        ->from($this->database->quoteName('#__facileforms_pieces'))
-                        ->where($this->database->quoteName('id') . ' = :piece3id')
-                        ->where($this->database->quoteName('published') . ' = 1')
+                        ->from($this->processor->database->quoteName('#__facileforms_pieces'))
+                        ->where($this->processor->database->quoteName('id') . ' = :piece3id')
+                        ->where($this->processor->database->quoteName('published') . ' = 1')
                         ->bind(':piece3id', $piece3id, ParameterType::INTEGER);
-                    $this->database->setQuery($query);
-                    $rows = $this->database->loadObjectList();
+                    $this->processor->database->setQuery($query);
+                    $rows = $this->processor->database->loadObjectList();
                     if (count($rows))
-                        echo $this->execPiece(
+                        echo $this->processor->execPiece(
                             $rows[0]->code,
                             Text::_('COM_BREEZINGFORMSNG_PROCESS_BSPIECE') . " " . $rows[0]->name,
                             'p',
-                            $this->formrow->piece3id,
+                            $this->processor->formrow->piece3id,
                             null
                         );
                     break;
                 case 2: // custom code
-                    echo $this->execPiece(
-                        $this->formrow->piece3code,
+                    echo $this->processor->execPiece(
+                        $this->processor->formrow->piece3code,
                         Text::_('COM_BREEZINGFORMSNG_PROCESS_BSPIECEC'),
                         'f',
-                        $this->form,
+                        $this->processor->form,
                         3
                     );
                     break;
                 default:
                     break;
             } // switch
-            if ($this->bury())
+            if ($this->processor->bury())
                 return;
 
-            if ($this->status == _FF_STATUS_OK) {
-                if (!$this->formrow->published) {
-                    $this->status = _FF_STATUS_UNPUBLISHED;
+            if ($this->processor->status == _FF_STATUS_OK) {
+                if (!$this->processor->formrow->published) {
+                    $this->processor->status = _FF_STATUS_UNPUBLISHED;
                 } else {
-                    if ($this->status == _FF_STATUS_OK) {
-                        if ($this->formrow->dblog > 0)
-                            $cbRecordId = $this->logToDatabase($cbResult);
+                    if ($this->processor->status == _FF_STATUS_OK) {
+                        if ($this->processor->formrow->dblog > 0)
+                            $cbRecordId = $this->processor->logToDatabase($cbResult);
 
-                        if ($this->status == _FF_STATUS_OK) {
-                            if ($this->formrow->emailntf > 0 && ($cbEmailNotifications || $cbEmailUpdateNotifications)) { // CONTENTBUILDER
-                                $this->sendEmailNotification();
+                        if ($this->processor->status == _FF_STATUS_OK) {
+                            if ($this->processor->formrow->emailntf > 0 && ($cbEmailNotifications || $cbEmailUpdateNotifications)) { // CONTENTBUILDER
+                                $this->processor->sendEmailNotification();
                             }
-                            if ($this->formrow->mb_emailntf > 0 && ($cbEmailNotifications || $cbEmailUpdateNotifications)) { // CONTENTBUILDER
-                                $this->sendMailbackNotification();
+                            if ($this->processor->formrow->mb_emailntf > 0 && ($cbEmailNotifications || $cbEmailUpdateNotifications)) { // CONTENTBUILDER
+                                $this->processor->sendMailbackNotification();
                             }
 
                             // DROPBOX request v2 API and PDF,CSV, XML upload
-                            if ($this->formrow->dropbox_submission_enabled) {
-                                if ($this->formrow->dropbox_email) {
+                            if ($this->processor->formrow->dropbox_submission_enabled) {
+                                if ($this->processor->formrow->dropbox_email) {
                                     try {
-                                        $dropbox_types = explode(',', $this->formrow->dropbox_submission_types);
+                                        $dropbox_types = explode(',', $this->processor->formrow->dropbox_submission_types);
                                         foreach ($dropbox_types as $dropbox_type) {
                                             $dropbox_file = '';
                                             switch ($dropbox_type) {
                                                 case 'pdf':
-                                                    $dropbox_file = $this->exppdf();
+                                                    $dropbox_file = $this->processor->exppdf();
                                                     break;
                                                 case 'csv':
-                                                    $dropbox_file = $this->expcsv();
+                                                    $dropbox_file = $this->processor->expcsv();
                                                     break;
                                                 case 'xml':
-                                                    $dropbox_file = $this->expxml();
+                                                    $dropbox_file = $this->processor->expxml();
                                                     break;
                                             }
                                             if ($dropbox_file != '') {
@@ -805,22 +817,22 @@ trait bfProcessorSubmission
                             }
 
 
-                            $this->sendMailChimpNotification();
-                            $this->sendSalesforceNotification();
+                            $this->processor->sendMailChimpNotification();
+                            $this->processor->sendSalesforceNotification();
 
                             PluginHelper::importPlugin('breezingforms_addons');
-                            $dispatcher = $this->app->getDispatcher();
-                            $dispatcher->dispatch('onPropertiesExecute', new Joomla\Event\Event('onPropertiesExecute',
+                            $dispatcher = $this->processor->app->getDispatcher();
+                            $dispatcher->dispatch('onPropertiesExecute', new Event('onPropertiesExecute',
                                 array(
                                     $this
                                 )
                             ));
 
-                            $tickets = $this->app->getSession()->get('bfFlashUploadTickets', array());
+                            $tickets = $this->processor->app->getSession()->get('bfFlashUploadTickets', array());
                             mt_srand();
-                            if (isset($tickets[Factory::getApplication()->getInput()->getString('bfFlashUploadTicket', (string) mt_rand(0, mt_getrandmax()))])) {
-                                unset($tickets[Factory::getApplication()->getInput()->getString('bfFlashUploadTicket', '')]);
-                                $this->app->getSession()->set('bfFlashUploadTickets', $tickets);
+                            if (isset($tickets[$this->processor->app->getInput()->getString('bfFlashUploadTicket', (string) mt_rand(0, mt_getrandmax()))])) {
+                                unset($tickets[$this->processor->app->getInput()->getString('bfFlashUploadTicket', '')]);
+                                $this->processor->app->getSession()->set('bfFlashUploadTickets', $tickets);
                             }
                         }
                     } // if
@@ -829,18 +841,18 @@ trait bfProcessorSubmission
             // handle End Submit piece
             // DOUBLE OPT-IN
 
-            if ($this->formrow->double_opt) {
+            if ($this->processor->formrow->double_opt) {
                 $uri = Uri::getInstance();
                 $domainAddress = $uri->toString(array('scheme', 'host', 'port', 'path'));
 
-                $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
-                $config = Factory::getApplication()->getConfig();
+                $mailer = $this->mailerFactory->createMailer();
+                $config = $this->processor->app->getConfig();
 
                 $recipient = '';
-                $email_field_name = $this->formrow->opt_mail;
+                $email_field_name = $this->processor->formrow->opt_mail;
 
                 // getting the email address from the form based on the setting in admin
-                foreach ($this->submitdata as $data) {
+                foreach ($this->processor->submitdata as $data) {
 
                     if ($data[_FF_DATA_NAME] == $email_field_name) {
                         $recipient = $data[_FF_DATA_VALUE];
@@ -850,21 +862,21 @@ trait bfProcessorSubmission
 
                 if (bf_is_email($recipient)) {
 
-                    $formValue = $this->form;
-                    $existsQuery = $this->database->getQuery(true)
+                    $formValue = $this->processor->form;
+                    $existsQuery = $this->processor->database->getQuery(true)
                         ->select('s.record')
-                        ->from($this->database->quoteName('#__facileforms_subrecords', 's'))
-                        ->from($this->database->quoteName('#__facileforms_records', 'r'))
+                        ->from($this->processor->database->quoteName('#__facileforms_subrecords', 's'))
+                        ->from($this->processor->database->quoteName('#__facileforms_records', 'r'))
                         ->where('r.form = :formValue')
                         ->where('r.id = s.record')
-                        ->where($this->database->quoteName('s.name') . ' = :emailFieldName')
-                        ->where($this->database->quoteName('s.value') . ' = :recipient')
-                        ->where($this->database->quoteName('r.opted') . ' = 1')
+                        ->where($this->processor->database->quoteName('s.name') . ' = :emailFieldName')
+                        ->where($this->processor->database->quoteName('s.value') . ' = :recipient')
+                        ->where($this->processor->database->quoteName('r.opted') . ' = 1')
                         ->bind(':formValue', $formValue, ParameterType::STRING)
                         ->bind(':emailFieldName', $email_field_name, ParameterType::STRING)
                         ->bind(':recipient', $recipient, ParameterType::STRING);
-                    $this->database->setQuery($existsQuery);
-                    $exists = $this->database->loadResult();
+                    $this->processor->database->setQuery($existsQuery);
+                    $exists = $this->processor->database->loadResult();
 
                     if (!$exists) {
 
@@ -874,17 +886,17 @@ trait bfProcessorSubmission
                             $config->get('fromname')
                         );
 
-                        $lastID = $this->record_id;
-                        $token = $this->random_str(20);
+                        $lastID = $this->processor->record_id;
+                        $token = $this->processor->random_str(20);
                         $optToken = bf_b64enc($token);
-                        $updateQuery = $this->database->getQuery(true)
-                            ->update($this->database->quoteName('#__facileforms_records'))
-                            ->set($this->database->quoteName('opt_token') . ' = :optToken')
-                            ->where($this->database->quoteName('id') . ' = :lastID')
+                        $updateQuery = $this->processor->database->getQuery(true)
+                            ->update($this->processor->database->quoteName('#__facileforms_records'))
+                            ->set($this->processor->database->quoteName('opt_token') . ' = :optToken')
+                            ->where($this->processor->database->quoteName('id') . ' = :lastID')
                             ->bind(':optToken', $optToken, ParameterType::STRING)
                             ->bind(':lastID', $lastID, ParameterType::STRING);
-                        $this->database->setQuery($updateQuery);
-                        $this->database->execute();
+                        $this->processor->database->setQuery($updateQuery);
+                        $this->processor->database->execute();
 
                         $opt_in_link = $domainAddress . '?option=com_breezingformsng&opt_in=true&id=' . $lastID . '&' . 'token=' . bf_b64enc($token);
                         $opt_out_link = $domainAddress . '?option=com_breezingformsng&opt_out=true&id=' . $lastID . '&' . 'token=' . bf_b64enc($token);
@@ -907,42 +919,42 @@ trait bfProcessorSubmission
 
             // DOUBLE OPT-INT END
 
-            $maxIdQuery = $this->database->getQuery(true)
+            $maxIdQuery = $this->processor->database->getQuery(true)
                 ->select('MAX(id)')
-                ->from($this->database->quoteName('#__facileforms_records'));
-            $this->database->setQuery($maxIdQuery);
-            $lastid = $this->database->loadResult();
+                ->from($this->processor->database->quoteName('#__facileforms_records'));
+            $this->processor->database->setQuery($maxIdQuery);
+            $lastid = $this->processor->database->loadResult();
             $_SESSION['virtuemart_bf_id'] = $lastid;
-            $session = $this->app->getSession();
+            $session = $this->processor->app->getSession();
             $session->set('virtuemart_bf_id', $lastid);
 
             $code = '';
-            switch ($this->formrow->piece4cond) {
+            switch ($this->processor->formrow->piece4cond) {
                 case 1: // library
-                    $piece4id = (int) $this->formrow->piece4id;
-                    $query = $this->database->getQuery(true)
+                    $piece4id = (int) $this->processor->formrow->piece4id;
+                    $query = $this->processor->database->getQuery(true)
                         ->select(['name', 'code'])
-                        ->from($this->database->quoteName('#__facileforms_pieces'))
-                        ->where($this->database->quoteName('id') . ' = :piece4id')
-                        ->where($this->database->quoteName('published') . ' = 1')
+                        ->from($this->processor->database->quoteName('#__facileforms_pieces'))
+                        ->where($this->processor->database->quoteName('id') . ' = :piece4id')
+                        ->where($this->processor->database->quoteName('published') . ' = 1')
                         ->bind(':piece4id', $piece4id, ParameterType::INTEGER);
-                    $this->database->setQuery($query);
-                    $rows = $this->database->loadObjectList();
+                    $this->processor->database->setQuery($query);
+                    $rows = $this->processor->database->loadObjectList();
                     if (count($rows))
-                        echo $this->execPiece(
+                        echo $this->processor->execPiece(
                             $rows[0]->code,
                             Text::_('COM_BREEZINGFORMSNG_PROCESS_ESPIECE') . " " . $rows[0]->name,
                             'p',
-                            $this->formrow->piece4id,
+                            $this->processor->formrow->piece4id,
                             null
                         );
                     break;
                 case 2: // custom code
-                    echo $this->execPiece(
-                        $this->formrow->piece4code,
+                    echo $this->processor->execPiece(
+                        $this->processor->formrow->piece4code,
                         Text::_('COM_BREEZINGFORMSNG_PROCESS_ESPIECEC'),
                         'f',
-                        $this->form,
+                        $this->processor->form,
                         3
                     );
                     break;
@@ -950,11 +962,11 @@ trait bfProcessorSubmission
                     break;
             } // switch
 
-            if ($this->bury())
+            if ($this->processor->bury())
                 return;
         }
 
-        switch ($this->status) {
+        switch ($this->processor->status) {
             case _FF_STATUS_OK:
                 $message = Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITSUCCESS');
                 break;
@@ -990,11 +1002,11 @@ trait bfProcessorSubmission
         // built in PayPal action
         $paymentAction = false;
 
-        if ($this->formrow->template_code != '') {
+        if ($this->processor->formrow->template_code != '') {
 
 
-            $areas = json_decode($this->formrow->template_areas, true);
-            $head = json_decode(bf_b64dec($this->formrow->template_code), true);
+            $areas = json_decode($this->processor->formrow->template_areas, true);
+            $head = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
 
             if (is_array($areas)) {
                 $j15 = false;
@@ -1002,7 +1014,7 @@ trait bfProcessorSubmission
 
                 $paymentAction = true;
 
-                switch (Factory::getApplication()->getInput()->getString('ff_payment_method', '')) {
+                switch ($this->processor->app->getInput()->getString('ff_payment_method', '')) {
 
 
                     case 'Stripe':
@@ -1013,7 +1025,7 @@ trait bfProcessorSubmission
 
                                 $options = $element['options'];
 
-                                $ppselect = Factory::getApplication()->getInput()->get('ff_nm_bfPaymentSelect', [], 'string');
+                                $ppselect = $this->processor->app->getInput()->get('ff_nm_bfPaymentSelect', [], 'string');
                                 if (count($ppselect) != 0) {
                                     $ppselected = explode('|', $ppselect[0]);
                                     if (count($ppselected) == 4) {
@@ -1026,11 +1038,11 @@ trait bfProcessorSubmission
 
                                 $options['amount'] = round(floatval($options['amount']), 2) * 100;
 
-                                $this->app->getSession()->set('bf_stripe_last_payment_amount' . $this->record_id, $options['amount']);
+                                $this->processor->app->getSession()->set('bf_stripe_last_payment_amount' . $this->processor->record_id, $options['amount']);
 
                                 $html = '';
 
-                                if (!$this->inline)
+                                if (!$this->processor->inline)
                                     /*$html .= '<html><head><style> .stripe_checkout_app { height: 580px !important; } </style>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1090,12 +1102,12 @@ transition: box-shadow .15s linear;
 </style></head><body>';*/
                                     \Vcmb\Component\BreezingformsNG\Administrator\Helper\VendorHelper::load();
                                 \Stripe\Stripe::setApiKey($options['secretKey']);
-                                $stripeemail = strtolower((Factory::getApplication()->getInput()->get('ff_nm_' . $options['emailfield'], '', 'string')[0] ?? ''));
+                                $stripeemail = strtolower(($this->processor->app->getInput()->get('ff_nm_' . $options['emailfield'], '', 'string')[0] ?? ''));
                                 //header('Content-Type: application/json');
-                                $returnurl = Uri::root() . "index.php?option=com_breezingformsng&confirmStripe=true&form_id=" . $this->form . "&record_id=" . $this->record_id;
+                                $returnurl = Uri::root() . "index.php?option=com_breezingformsng&confirmStripe=true&form_id=" . $this->processor->form . "&record_id=" . $this->processor->record_id;
                                 if (isset($options['emailfield']) && $options['emailfield'] !== '') {
-                                    $stripeemail = strtolower((Factory::getApplication()->getInput()->get('ff_nm_' . $options['emailfield'], '', 'string')[0] ?? ''));
-                                    $this->app->getSession()->set('emailfield', $stripeemail);
+                                    $stripeemail = strtolower(($this->processor->app->getInput()->get('ff_nm_' . $options['emailfield'], '', 'string')[0] ?? ''));
+                                    $this->processor->app->getSession()->set('emailfield', $stripeemail);
                                 }
 
                                 // XDA BEGIN
@@ -1149,7 +1161,7 @@ transition: box-shadow .15s linear;
                                 $html .= header("HTTP/1.1 303 See Other");
                                 $html .= header("Location: " . $checkout_session->url);
 
-                                $current_tag = $this->app->getLanguage()->getTag();
+                                $current_tag = $this->processor->app->getLanguage()->getTag();
                                 $exploded = explode('-', $current_tag);
 
                                 $locale = 'auto';
@@ -1159,10 +1171,10 @@ transition: box-shadow .15s linear;
                                     $locale = strtolower($exploded[0]);
                                 }
 
-                                $returnurl = Uri::root() . "index.php?option=com_breezingformsng&confirmStripe=true&form_id=" . $this->form . "&record_id=" . $this->record_id;
+                                $returnurl = Uri::root() . "index.php?option=com_breezingformsng&confirmStripe=true&form_id=" . $this->processor->form . "&record_id=" . $this->processor->record_id;
                                 if (isset($options['emailfield']) && $options['emailfield'] !== '') {
-                                    $stripeemail = strtolower((Factory::getApplication()->getInput()->get('ff_nm_' . $options['emailfield'], '', 'string')[0] ?? ''));
-                                    $this->app->getSession()->set('emailfield', $stripeemail);
+                                    $stripeemail = strtolower(($this->processor->app->getInput()->get('ff_nm_' . $options['emailfield'], '', 'string')[0] ?? ''));
+                                    $this->processor->app->getSession()->set('emailfield', $stripeemail);
                                 }
 
                                 $html .= '
@@ -1183,7 +1195,7 @@ transition: box-shadow .15s linear;
                                                                 });
                             
                             var options = {
-                                        name: ' . json_encode(isset($head['properties']['title_translation' . $this->app->getLanguage()->getTag()]) ? $head['properties']['title_translation' . $this->app->getLanguage()->getTag()] : $this->formrow->title) . ',
+                                        name: ' . json_encode(isset($head['properties']['title_translation' . $this->processor->app->getLanguage()->getTag()]) ? $head['properties']['title_translation' . $this->processor->app->getLanguage()->getTag()] : $this->processor->formrow->title) . ',
                                         description: ' . json_encode($options['itemname']) . ',
                                         currency: ' . json_encode(strtolower($options['currencyCode'])) . ',
                                         amount: ' . json_encode($options['amount']) . ',
@@ -1213,7 +1225,7 @@ transition: box-shadow .15s linear;
 			                	
 			                	';
 
-                                if (!$this->inline)
+                                if (!$this->processor->inline)
                                     $html .= "</form><div style='margin-top: 25%; text-align: center; width: 100%;'><button class='thebutton' onclick='handler.open(options);'>Click To Pay</button></body></div></html>";
 
                                 echo $html;
@@ -1240,17 +1252,17 @@ transition: box-shadow .15s linear;
                                         $business = $options['testBusiness'];
                                     }
 
-                                    $returnurl = htmlentities(Uri::root() . "index.php?option=com_breezingformsng&confirmPayPal=true&form_id=" . $this->form . "&record_id=" . $this->record_id);
+                                    $returnurl = htmlentities(Uri::root() . "index.php?option=com_breezingformsng&confirmPayPal=true&form_id=" . $this->processor->form . "&record_id=" . $this->processor->record_id);
                                     // $cancelurl = htmlentities(Uri::root() . "index.php?msg=" . Text::_('Transaction Cancelled'));
                                     $cancelurl = $options['cancelURL'];
 
                                     $html = '';
-                                    if (!$this->inline)
+                                    if (!$this->processor->inline)
                                         $html .= '<html><head><meta charset="UTF-8"></head><body>';
 
                                     HTMLHelper::_('bootstrap.modal');
 
-                                    $ppselect = Factory::getApplication()->getInput()->get('ff_nm_bfPaymentSelect', [], 'string');
+                                    $ppselect = $this->processor->app->getInput()->get('ff_nm_bfPaymentSelect', [], 'string');
                                     if (count($ppselect) != 0) {
                                         $ppselected = explode('|', $ppselect[0]);
                                         if (count($ppselected) == 4) {
@@ -1275,7 +1287,7 @@ transition: box-shadow .15s linear;
                                     }
 
                                     // keeping this for compat reasons
-                                    $ppselect = Factory::getApplication()->getInput()->get('ff_nm_PayPalSelect', [], 'string');
+                                    $ppselect = $this->processor->app->getInput()->get('ff_nm_PayPalSelect', [], 'string');
                                     if (count($ppselect) != 0) {
                                         $ppselected = explode('|', $ppselect[0]);
                                         if (count($ppselected) == 4) {
@@ -1310,7 +1322,7 @@ transition: box-shadow .15s linear;
                                     $html .= "<input type=\"hidden\" name=\"no_shipping\" value=\"" . ($options['shipping'] == 1 ? 0 : 1) . "\"/>";
                                     $html .= "<input type=\"hidden\" name=\"no_note\" value=\"1\"/>";
                                     if ($options['useIpn']) {
-                                        $html .= "<input type=\"hidden\" name=\"notify_url\" value=\"" . htmlentities(Uri::root() . "index.php?option=com_breezingformsng&confirmPayPalIpn=true&raw=true&form_id=" . $this->form . "&record_id=" . $this->record_id) . "\"/>";
+                                        $html .= "<input type=\"hidden\" name=\"notify_url\" value=\"" . htmlentities(Uri::root() . "index.php?option=com_breezingformsng&confirmPayPalIpn=true&raw=true&form_id=" . $this->processor->form . "&record_id=" . $this->processor->record_id) . "\"/>";
                                         if ($options['testaccount']) {
                                             $html .= "<input type=\"hidden\" name=\"test_ipn\" value=\"1\"/>";
                                         }
@@ -1327,7 +1339,7 @@ transition: box-shadow .15s linear;
                                     $html .= "<input type=\"hidden\" name=\"lc\" value=\"" . $options['locale'] . "\"/>";
                                     $html .= "<input type=\"hidden\" name=\"currency_code\" value=\"" . strtoupper($options['currencyCode']) . "\"/>";
 
-                                    if (!$this->inline)
+                                    if (!$this->processor->inline)
                                         $html .= "</form></body></html>";
 
                                     // TODO: let the user decide to use modal or simple alert
@@ -1371,14 +1383,14 @@ transition: box-shadow .15s linear;
                                 if ($element['internalType'] == 'bfSofortueberweisung') {
 
                                     $html = '';
-                                    if (!$this->inline)
+                                    if (!$this->processor->inline)
                                         $html .= '<html><head></head><body>';
 
                                     HTMLHelper::_('bootstrap.modal');
 
                                     $options = $element['options'];
 
-                                    $ppselect = Factory::getApplication()->getInput()->get('ff_nm_bfPaymentSelect', [], 'string');
+                                    $ppselect = $this->processor->app->getInput()->get('ff_nm_bfPaymentSelect', [], 'string');
                                     if (count($ppselect) != 0) {
                                         $ppselected = explode('|', $ppselect[0]);
                                         if (count($ppselected) == 4) {
@@ -1408,9 +1420,9 @@ transition: box-shadow .15s linear;
                                             $options['currency_id'],
                                             $options['reason_1'], // reason_1
                                             $options['reason_2'], // reason_2
-                                            $this->form, // user_variable_0
-                                            $this->record_id, // user_variable_1
-                                            (isset($options['mailback']) && $options['mailback'] ? implode('###', $this->mailbackRecipients) : ''), // user_variable_2
+                                            $this->processor->form, // user_variable_0
+                                            $this->processor->record_id, // user_variable_1
+                                            (isset($options['mailback']) && $options['mailback'] ? implode('###', $this->processor->mailbackRecipients) : ''), // user_variable_2
                                             '', // user_variable_3
                                             '', // user_variable_4
                                             '', // user_variable_5
@@ -1425,7 +1437,7 @@ transition: box-shadow .15s linear;
 
                                     $mailback = '';
                                     if (isset($options['mailback']) && $options['mailback']) {
-                                        $mailback = '<input type="hidden" name="user_variable_2" value="' . implode('###', $this->mailbackRecipients) . '" />';
+                                        $mailback = '<input type="hidden" name="user_variable_2" value="' . implode('###', $this->processor->mailbackRecipients) . '" />';
                                     }
 
                                     $html .= '
@@ -1438,8 +1450,8 @@ transition: box-shadow .15s linear;
 									<input type="hidden" name="amount" value="' . $options['amount'] . '" />
 									<input type="hidden" name="currency_id" value="' . $options['currency_id'] . '" />
 									<input type="hidden" name="language_id" value="' . $options['language_id'] . '" />
-									<input type="hidden" name="user_variable_0" value="' . $this->form . '" />
-									<input type="hidden" name="user_variable_1" value="' . $this->record_id . '" />
+									<input type="hidden" name="user_variable_0" value="' . $this->processor->form . '" />
+									<input type="hidden" name="user_variable_1" value="' . $this->processor->record_id . '" />
 									' . $mailback . '
 									' . $hash . '
 									</form>
@@ -1470,7 +1482,7 @@ transition: box-shadow .15s linear;
                                     }
                                     $html .= '<script type="text/javascript"><!--' . nl() . 'document.ff_submitform.submit();' . nl() . '//--></script>';
 
-                                    if (!$this->inline)
+                                    if (!$this->processor->inline)
                                         $html .= "</form></body></html>";
 
                                     echo $html;
@@ -1489,13 +1501,13 @@ transition: box-shadow .15s linear;
         }
 
         // CONTENTBUILDER
-        if (Factory::getApplication()->getInput()->get('cb_controller', null, 'string') != 'edit' && $cbRecordId && is_array($cbResult) && isset($cbResult['data']) && isset($cbResult['data']['id']) && $cbResult['data']['id']) {
+        if ($this->processor->app->getInput()->get('cb_controller', null, 'string') != 'edit' && $cbRecordId && is_array($cbResult) && isset($cbResult['data']) && isset($cbResult['data']['id']) && $cbResult['data']['id']) {
             if ($cbRecordId) {
-                $return = Factory::getApplication()->getInput()->getString('return', '');
+                $return = $this->processor->app->getInput()->getString('return', '');
                 if ($return) {
                     $return = bf_b64dec($return);
                     if (Uri::isInternal($return)) {
-                        $this->app->redirect($return);
+                        $this->processor->app->redirect($return);
                     }
                 }
             }
@@ -1503,18 +1515,18 @@ transition: box-shadow .15s linear;
             if ($cbResult['data']['force_login']) {
                 $is15 = false;
 
-                if (!Factory::getApplication()->getIdentity()->get('id', 0)) {
-                    $this->app->redirect(Route::_('index.php?option=com_users&view=login&Itemid=' . Factory::getApplication()->getInput()->getInt('Itemid', 0), false));
+                if (!$this->processor->app->getIdentity()->get('id', 0)) {
+                    $this->processor->app->redirect(Route::_('index.php?option=com_users&view=login&Itemid=' . $this->processor->app->getInput()->getInt('Itemid', 0), false));
                 } else {
 
-                    $this->app->redirect(Route::_('index.php?option=com_users&view=profile&Itemid=' . Factory::getApplication()->getInput()->getInt('Itemid', 0), false));
+                    $this->processor->app->redirect(Route::_('index.php?option=com_users&view=profile&Itemid=' . $this->processor->app->getInput()->getInt('Itemid', 0), false));
                 }
             } else if (trim($cbResult['data']['force_url'])) {
-                $this->app->redirect(trim($cbResult['data']['force_url']));
+                $this->processor->app->redirect(trim($cbResult['data']['force_url']));
             }
 
-            $this->app->enqueueMessage(Text::_('COM_CONTENTBUILDERNG_SAVED'), 'success');
-            $this->app->redirect(Route::_('index.php?option=com_contentbuilderng&task=details.display&Itemid=' . Factory::getApplication()->getInput()->getInt('Itemid', 0) . '&backtolist=' . Factory::getApplication()->getInput()->getInt('backtolist', 0) . '&id=' . $cbResult['data']['id'] . '&record_id=' . $cbRecordId . '&limitstart=' . Factory::getApplication()->getInput()->getInt('limitstart', 0) . '&filter_order=' . Factory::getApplication()->getInput()->getCmd('filter_order', ''), false));
+            $this->processor->app->enqueueMessage(Text::_('COM_CONTENTBUILDERNG_SAVED'), 'success');
+            $this->processor->app->redirect(Route::_('index.php?option=com_contentbuilderng&task=details.display&Itemid=' . $this->processor->app->getInput()->getInt('Itemid', 0) . '&backtolist=' . $this->processor->app->getInput()->getInt('backtolist', 0) . '&id=' . $cbResult['data']['id'] . '&record_id=' . $cbRecordId . '&limitstart=' . $this->processor->app->getInput()->getInt('limitstart', 0) . '&filter_order=' . $this->processor->app->getInput()->getCmd('filter_order', ''), false));
         }
 
         if (!$paymentAction) {
@@ -1538,103 +1550,103 @@ transition: box-shadow .15s linear;
             }
 
             if ($message == '')
-                $message = $this->message;
+                $message = $this->processor->message;
             else {
-                if ($this->message != '')
-                    $message .= ":" . nl() . $this->message;
+                if ($this->processor->message != '')
+                    $message .= ":" . nl() . $this->processor->message;
             } // if
 
-            if (!$this->inline) {
-                $url = ($this->inframe) ? $ff_mossite . '/index.php?format=html&tmpl=component' : (($this->runmode == _FF_RUNMODE_FRONTEND) ? '' : 'index.php?format=html' . (Factory::getApplication()->getInput()->getCmd('tmpl', '') ? '&tmpl=' . Factory::getApplication()->getInput()->getCmd('tmpl', '') : ''));
+            if (!$this->processor->inline) {
+                $url = ($this->processor->inframe) ? $ff_mossite . '/index.php?format=html&tmpl=component' : (($this->processor->runmode == _FF_RUNMODE_FRONTEND) ? '' : 'index.php?format=html' . ($this->processor->app->getInput()->getCmd('tmpl', '') ? '&tmpl=' . $this->processor->app->getInput()->getCmd('tmpl', '') : ''));
                 echo '<form name="ff_submitform" action="' . $url . '" method="post">' . nl();
             } // if
 
-            switch ($this->runmode) {
+            switch ($this->processor->runmode) {
                 case _FF_RUNMODE_FRONTEND:
-                    echo indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities($this->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                    if ($this->target > 1)
-                        echo indentc(1) . '<input type="hidden" name="ff_target" value="' . htmlentities($this->target, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                    if ($this->inframe)
+                    echo indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities((string) $this->processor->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                    if ($this->processor->target > 1)
+                        echo indentc(1) . '<input type="hidden" name="ff_target" value="' . htmlentities((string) $this->processor->target, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                    if ($this->processor->inframe)
                         echo indentc(1) . '<input type="hidden" name="ff_frame" value="1"/>' . nl();
-                    if ($this->border)
+                    if ($this->processor->border)
                         echo indentc(1) . '<input type="hidden" name="ff_border" value="1"/>' . nl();
-                    if ($this->page != 1)
-                        indentc(1) . '<input type="hidden" name="ff_page" value="' . htmlentities($this->page, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                    if ($this->align != 1)
-                        echo indentc(1) . '<input type="hidden" name="ff_align" value="' . htmlentities($this->align, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                    if ($this->top != 0)
-                        echo indentc(1) . '<input type="hidden" name="ff_top" value="' . htmlentities($this->top, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                    if ($this->processor->page != 1)
+                        indentc(1) . '<input type="hidden" name="ff_page" value="' . htmlentities((string) $this->processor->page, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                    if ($this->processor->align != 1)
+                        echo indentc(1) . '<input type="hidden" name="ff_align" value="' . htmlentities((string) $this->processor->align, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                    if ($this->processor->top != 0)
+                        echo indentc(1) . '<input type="hidden" name="ff_top" value="' . htmlentities((string) $this->processor->top, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                     reset($ff_otherparams);
                     foreach ($ff_otherparams as $prop => $val)
-                        echo indentc(1) . '<input type="hidden" name="' . htmlentities($prop, ENT_QUOTES, 'UTF-8') . '" value="' . htmlentities($val, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                        echo indentc(1) . '<input type="hidden" name="' . htmlentities((string) $prop, ENT_QUOTES, 'UTF-8') . '" value="' . htmlentities((string) $val, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                     break;
 
                 case _FF_RUNMODE_BACKEND:
                     echo indentc(1) . '<input type="hidden" name="option" value="com_breezingformsng"/>' . nl() .
                         indentc(1) . '<input type="hidden" name="act" value="run"/>' . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities($this->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_runmode" value="' . htmlentities($this->runmode, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                    if ($this->target > 1)
-                        echo indentc(1) . '<input type="hidden" name="ff_target" value="' . htmlentities($this->target, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                    if ($this->inframe)
+                        indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities((string) $this->processor->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
+                        indentc(1) . '<input type="hidden" name="ff_runmode" value="' . htmlentities((string) $this->processor->runmode, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                    if ($this->processor->target > 1)
+                        echo indentc(1) . '<input type="hidden" name="ff_target" value="' . htmlentities((string) $this->processor->target, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                    if ($this->processor->inframe)
                         echo indentc(1) . '<input type="hidden" name="ff_frame" value="1"/>' . nl();
-                    if ($this->border)
+                    if ($this->processor->border)
                         echo indentc(1) . '<input type="hidden" name="ff_border" value="1"/>' . nl();
-                    if ($this->page != 1)
-                        indentc(1) . '<input type="hidden" name="ff_page" value="' . htmlentities($this->page, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                    if ($this->align != 1)
-                        echo indentc(1) . '<input type="hidden" name="ff_align" value="' . htmlentities($this->align, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                    if ($this->top != 0)
-                        echo indentc(1) . '<input type="hidden" name="ff_top" value="' . htmlentities($this->top, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                    if ($this->processor->page != 1)
+                        indentc(1) . '<input type="hidden" name="ff_page" value="' . htmlentities((string) $this->processor->page, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                    if ($this->processor->align != 1)
+                        echo indentc(1) . '<input type="hidden" name="ff_align" value="' . htmlentities((string) $this->processor->align, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                    if ($this->processor->top != 0)
+                        echo indentc(1) . '<input type="hidden" name="ff_top" value="' . htmlentities((string) $this->processor->top, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                     break;
 
                 default: // _FF_RUNMODE_PREVIEW:
-                    if ($this->inframe) {
+                    if ($this->processor->inframe) {
                         echo indentc(1) . '<input type="hidden" name="option" value="com_breezingformsng"/>' . nl() .
                             indentc(1) . '<input type="hidden" name="ff_frame" value="1"/>' . nl() .
-                            indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities($this->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
-                            indentc(1) . '<input type="hidden" name="ff_runmode" value="' . htmlentities($this->runmode, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                        if ($this->page != 1)
-                            indentc(1) . '<input type="hidden" name="ff_page" value="' . htmlentities($this->page, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                            indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities((string) $this->processor->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
+                            indentc(1) . '<input type="hidden" name="ff_runmode" value="' . htmlentities((string) $this->processor->runmode, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                        if ($this->processor->page != 1)
+                            indentc(1) . '<input type="hidden" name="ff_page" value="' . htmlentities((string) $this->processor->page, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                     } // if
             } // if
 
-            echo indentc(1) . '<input type="hidden" name="ff_contentid" value="' . Factory::getApplication()->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
-                indentc(1) . '<input type="hidden" name="ff_applic" value="' . Factory::getApplication()->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
-                indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->record_id . '"/>' . nl() .
-                indentc(1) . '<input type="hidden" name="ff_module_id" value="' . Factory::getApplication()->getInput()->getInt('ff_module_id', 0) . '"/>' . nl() .
-                indentc(1) . '<input type="hidden" name="ff_status" value="' . htmlentities($this->status, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
-                indentc(1) . '<input type="hidden" name="ff_message" value="' . htmlentities($message, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
+            echo indentc(1) . '<input type="hidden" name="ff_contentid" value="' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
+                indentc(1) . '<input type="hidden" name="ff_applic" value="' . $this->processor->app->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
+                indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->processor->record_id . '"/>' . nl() .
+                indentc(1) . '<input type="hidden" name="ff_module_id" value="' . $this->processor->app->getInput()->getInt('ff_module_id', 0) . '"/>' . nl() .
+                indentc(1) . '<input type="hidden" name="ff_status" value="' . htmlentities((string) $this->processor->status, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
+                indentc(1) . '<input type="hidden" name="ff_message" value="' . htmlentities((string) $message, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
                 indentc(1) . '<input type="hidden" name="ff_form_submitted" value="1"/>' . nl();
 
-            if (Factory::getApplication()->getInput()->getString('tmpl', '') == 'component') {
+            if ($this->processor->app->getInput()->getString('tmpl', '') == 'component') {
                 echo indentc(1) . '<input type="hidden" name="tmpl" value="component"/>' . nl();
             }
-            if (Factory::getApplication()->getInput()->getInt('cb_form_id', 0)) {
-                echo indentc(1) . '<input type="hidden" name="cb_form_id" value="' . Factory::getApplication()->getInput()->getInt('cb_form_id', 0) . '"/>' . nl();
-                if (Factory::getApplication()->getInput()->getInt('cb_record_id', 0)) {
-                    echo indentc(1) . '<input type="hidden" name="cb_record_id" value="' . Factory::getApplication()->getInput()->getInt('cb_record_id', 0) . '"/>' . nl();
+            if ($this->processor->app->getInput()->getInt('cb_form_id', 0)) {
+                echo indentc(1) . '<input type="hidden" name="cb_form_id" value="' . $this->processor->app->getInput()->getInt('cb_form_id', 0) . '"/>' . nl();
+                if ($this->processor->app->getInput()->getInt('cb_record_id', 0)) {
+                    echo indentc(1) . '<input type="hidden" name="cb_record_id" value="' . $this->processor->app->getInput()->getInt('cb_record_id', 0) . '"/>' . nl();
                 }
-                if (Factory::getApplication()->getInput()->getBool('cbIsNew', false)) {
+                if ($this->processor->app->getInput()->getBool('cbIsNew', false)) {
                     echo indentc(1) . '<input type="hidden" name="cbIsNew" value="1"/>' . nl();
                 }
             }
-            if (Factory::getApplication()->getInput()->getString('return', '') !== '') {
-                echo indentc(1) . '<input type="hidden" name="return" value="' . htmlentities(Factory::getApplication()->getInput()->getString('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+            if ($this->processor->app->getInput()->getString('return', '') !== '') {
+                echo indentc(1) . '<input type="hidden" name="return" value="' . htmlentities($this->processor->app->getInput()->getString('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
             }
             // TODO: turn off tracing in the options
-            if ($this->traceMode & _FF_TRACEMODE_DIRECT) {
-                $this->dumpTrace();
+            if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT) {
+                $this->processor->dumpTrace();
                 ob_end_flush();
                 echo '</pre>';
             } else {
 
                 ob_end_flush();
-                $this->dumpTrace();
+                $this->processor->dumpTrace();
             } // if
             restore_error_handler();
 
-            if (!$this->inline) {
+            if (!$this->processor->inline) {
                 echo '</form>' . nl() .
                     '<script type="text/javascript">' . nl() .
                     indentc(1) . '<!--' . nl() .
@@ -1653,10 +1665,10 @@ transition: box-shadow .15s linear;
             }
         }
 
-        unset($_SESSION['ff_editable_overridePlg' . Factory::getApplication()->getInput()->getInt('ff_contentid', 0) . $this->form_id]);
-        unset($_SESSION['ff_editablePlg' . Factory::getApplication()->getInput()->getInt('ff_contentid', 0) . $this->form_id]);
-        $this->app->getSession()->set('ff_editableMod' . Factory::getApplication()->getInput()->getInt('ff_module_id', 0) . $this->form_id, 0);
-        $this->app->getSession()->set('ff_editable_overrideMod' . Factory::getApplication()->getInput()->getInt('ff_module_id', 0) . $this->form_id, 0);
+        unset($_SESSION['ff_editable_overridePlg' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . $this->processor->form_id]);
+        unset($_SESSION['ff_editablePlg' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . $this->processor->form_id]);
+        $this->processor->app->getSession()->set('ff_editableMod' . $this->processor->app->getInput()->getInt('ff_module_id', 0) . $this->processor->form_id, 0);
+        $this->processor->app->getSession()->set('ff_editable_overrideMod' . $this->processor->app->getInput()->getInt('ff_module_id', 0) . $this->processor->form_id, 0);
 
         if (!defined('VMBFCF_RUNNING')) {
             exit;
@@ -1665,11 +1677,11 @@ transition: box-shadow .15s linear;
 
     private function uploadFileToDropbox(string $localFile): void
     {
-        $folder = trim((string) ($this->formrow->dropbox_folder ?: $this->formrow->name), '/');
+        $folder = trim((string) ($this->processor->formrow->dropbox_folder ?: $this->processor->formrow->name), '/');
         $remotePath = '/' . ($folder !== '' ? $folder . '/' : '') . basename($localFile);
 
         (new DropboxUploader())->upload(
-            trim((string) $this->formrow->dropbox_email),
+            trim((string) $this->processor->formrow->dropbox_email),
             $remotePath,
             $localFile
         );

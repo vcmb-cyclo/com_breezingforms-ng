@@ -1,4 +1,8 @@
 <?php
+
+declare(strict_types=1);
+
+namespace Vcmb\Component\BreezingformsNG\Site\Table;
 /**
  * BreezingForms NG - A Joomla Forms Application
  *
@@ -13,12 +17,10 @@
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\Table\Table;
-use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
-use Joomla\Database\ParameterType;
 
-// Legacy table classes of the form engine (global names, used across the processor).
-class facileFormsMenus extends Table
+// Runtime table records retained in one bootstrap file while the engine facade remains global.
+final class MenuTable extends Table
 {
 	public $id = null;     // identifier
 	public $package = null;     // package name
@@ -33,37 +35,19 @@ class facileFormsMenus extends Table
 	public $border = 0;        // show a border
 	public $params = null;     // additional parameters
 
-	function __construct(&$db)
+	public function __construct(DatabaseInterface $db)
 	{
-		parent::__construct('#__facileforms_compmenus', 'id', Factory::getContainer()->get(DatabaseInterface::class));
+		parent::__construct('#__facileforms_compmenus', 'id', $db);
 	} // constructor
 
 	public function load($id = null, $reset = true)
 	{
-		global $database;
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
-		$idInt = (int) $id;
-		$query = $database->getQuery(true)
-			->select('*')
-			->from($database->quoteName('#__facileforms_compmenus'))
-			->where($database->quoteName('id') . ' = :idInt')
-			->bind(':idInt', $idInt, ParameterType::INTEGER);
-		$database->setQuery($query);
-		$rows = $database->loadObjectList();
-		if ($rows) {
-			$row = $rows[0];
-			$arr = get_object_vars($this);
-			foreach ($arr as $prop => $val)
-				if ($prop[0] != '_')
-					$this->$prop = $row->$prop;
-			return true;
-		} // if
-		return false;
-	} // load
+		return parent::load($id, $reset ?? true);
+	}
 
-} // class facileFormsMenus
+} // class MenuTable
 
-class facileFormsForms extends Table
+final class FormTable extends Table
 {
 	public $id = null;     // identifier
 	public $package = null;     // package name
@@ -157,46 +141,19 @@ class facileFormsForms extends Table
 	public $modified = null;
 	public $modified_by = null;
 
-	function __construct(&$db)
+	public function __construct(DatabaseInterface $db)
 	{
-		parent::__construct('#__facileforms_forms', 'id', Factory::getContainer()->get(DatabaseInterface::class));
+		parent::__construct('#__facileforms_forms', 'id', $db);
 	} // constructor
 
 	public function load($id = null, $reset = true)
 	{
-		global $database;
+		return parent::load($id, $reset ?? true);
+	}
 
-		$idInt = (int) $id;
-		$query = $database->getQuery(true)
-			->select('*')
-			->from($database->quoteName('#__facileforms_forms'))
-			->where($database->quoteName('id') . ' = :idInt')
-			->bind(':idInt', $idInt, ParameterType::INTEGER);
-		$database->setQuery($query);
-		$rows = $database->loadObjectList();
+} // class FormTable
 
-		if ($rows) {
-			$row = $rows[0];
-			$arr = get_object_vars($this);
-			foreach ($arr as $prop => $val) {
-				if ($prop[0] != '_') {
-					@$this->$prop = $row->$prop;
-				}
-			}
-			// Deprecated in PHP 7.2 version so code above is used
-
-			// while (list($prop, $val) = each($arr))
-			// 	if ($prop[0] != '_'){
-			// 		@$this->$prop = $row->$prop;
-			// 	}
-			return true;
-		} // if
-		return false;
-	} // load
-
-} // class facileFormsForms
-
-class facileFormsElements extends Table
+final class ElementTable extends Table
 {
 	public $id = null;     // general parameters
 	public $form = null;     // form id
@@ -272,37 +229,19 @@ Query List Settings: border / cellspacing / cellpadding / <tr(h)>class / <tr(1)>
 	public $mailback = null;
 	public $mailbackfile = null;
 
-	function __construct(&$db)
+	public function __construct(DatabaseInterface $db)
 	{
-		parent::__construct('#__facileforms_elements', 'id', Factory::getContainer()->get(DatabaseInterface::class));
+		parent::__construct('#__facileforms_elements', 'id', $db);
 	} // constructor
 
 	public function load($id = null, $reset = null)
 	{
-		global $database;
+		return parent::load($id, $reset ?? true);
+	}
 
-		$idInt = (int) $id;
-		$query = $database->getQuery(true)
-			->select('*')
-			->from($database->quoteName('#__facileforms_elements'))
-			->where($database->quoteName('id') . ' = :idInt')
-			->bind(':idInt', $idInt, ParameterType::INTEGER);
-		$database->setQuery($query);
-		$rows = $database->loadObjectList();
-		if ($rows) {
-			$row = $rows[0];
-			$arr = get_object_vars($this);
-			foreach ($arr as $prop => $val)
-				if ($prop[0] != '_')
-					@$this->$prop = $row->$prop;
-			return true;
-		} // if
-		return false;
-	} // load
+} // class ElementTable
 
-} // class facileFormsElements
-
-class facileFormsScripts extends Table
+final class ScriptTable extends Table
 {
 	public $id = null;     		// identifier
 	public $published = null;   // is published
@@ -318,44 +257,19 @@ class facileFormsScripts extends Table
 	public $modified = null;
 	public $modified_by = null;
 
-	function __construct(&$db)
+	public function __construct(DatabaseInterface $db)
 	{
-		parent::__construct('#__facileforms_scripts', 'id', Factory::getContainer()->get(DatabaseInterface::class));
+		parent::__construct('#__facileforms_scripts', 'id', $db);
 	} // constructor
 
 	public function load($id = null, $reset = true)
 	{
-		global $database;
+		return parent::load($id, $reset ?? true);
+	}
 
-		$idInt = (int) $id;
-		$query = $database->getQuery(true)
-			->select('*')
-			->from($database->quoteName('#__facileforms_scripts'))
-			->where($database->quoteName('id') . ' = :idInt')
-			->bind(':idInt', $idInt, ParameterType::INTEGER);
-		$database->setQuery($query);
-		$rows = $database->loadObjectList();
-		if ($rows) {
-			$row = $rows[0];
-			$arr = get_object_vars($this);
-			foreach ($arr as $prop => $val) {
-				if ($prop[0] != '_') {
-					@$this->$prop = $row->$prop;
-				}
-			}
-			// Deprecated in PHP 7.2 version so code above is used
+} // class ScriptTable
 
-			// while (list($prop, $val) = each($arr))
-			// 	if ($prop[0] != '_')
-			// 		$this->$prop = $row->$prop;
-			return true;
-		} // if
-		return false;
-	} // load
-
-} // class facileFormsScripts
-
-class facileFormsPieces extends Table
+final class PieceTable extends Table
 {
 	public $id = null;     			// identifier
 	public $published = null;   	// is published
@@ -371,44 +285,19 @@ class facileFormsPieces extends Table
 	public $modified = null;
 	public $modified_by = null;
 
-	function __construct(&$db)
+	public function __construct(DatabaseInterface $db)
 	{
-		parent::__construct('#__facileforms_pieces', 'id', Factory::getContainer()->get(DatabaseInterface::class));
+		parent::__construct('#__facileforms_pieces', 'id', $db);
 	} // constructor
 
 	public function load($id = null, $reset = true)
 	{
-		global $database;
+		return parent::load($id, $reset ?? true);
+	}
 
-		$idInt = (int) $id;
-		$query = $database->getQuery(true)
-			->select('*')
-			->from($database->quoteName('#__facileforms_pieces'))
-			->where($database->quoteName('id') . ' = :idInt')
-			->bind(':idInt', $idInt, ParameterType::INTEGER);
-		$database->setQuery($query);
-		$rows = $database->loadObjectList();
-		if ($rows) {
-			$row = $rows[0];
-			$arr = get_object_vars($this);
-			foreach ($arr as $prop => $val) {
-				if ($prop[0] != '_') {
-					@$this->$prop = $row->$prop;
-				}
-			}
-			// Deprecated in PHP 7.2 version so code above is used
+} // class PieceTable
 
-			// while (list($prop, $val) = each($arr))
-			// 	if ($prop[0] != '_')
-			// 		$this->$prop = $row->$prop;
-			return true;
-		} // if
-		return false;
-	} // load
-
-} // class facileFormsPieces
-
-class facileFormsRecords extends Table
+final class RecordTable extends Table
 {
 	public $id = null;     		// identifier
 	public $submitted = null;   // date and time
@@ -427,37 +316,19 @@ class facileFormsRecords extends Table
 	public $paypal_testaccount = null;
 	public $paypal_download_tries = null;
 
-	function __construct(&$db)
+	public function __construct(DatabaseInterface $db)
 	{
-		parent::__construct('#__facileforms_records', 'id', Factory::getContainer()->get(DatabaseInterface::class));
+		parent::__construct('#__facileforms_records', 'id', $db);
 	} // constructor
 
 	public function load($id = null, $reset = true)
 	{
-		global $database;
+		return parent::load($id, $reset ?? true);
+	}
 
-		$idInt = (int) $id;
-		$query = $database->getQuery(true)
-			->select('*')
-			->from($database->quoteName('#__facileforms_records'))
-			->where($database->quoteName('id') . ' = :idInt')
-			->bind(':idInt', $idInt, ParameterType::INTEGER);
-		$database->setQuery($query);
-		$rows = $database->loadObjectList();
-		if ($rows) {
-			$row = $rows[0];
-			$arr = get_object_vars($this);
-			foreach ($arr as $prop => $val)
-				if ($prop[0] != '_')
-					$this->$prop = $row->$prop;
-			return true;
-		} // if
-		return false;
-	} // load
+} // class RecordTable
 
-} // class facileFormsRecords
-
-class facileFormsSubrecords extends Table
+final class SubrecordTable extends Table
 {
 	public $id = null;     	// identifier
 	public $record = null;  // record id
@@ -466,37 +337,19 @@ class facileFormsSubrecords extends Table
 	public $type = null;    // data type
 	public $value = null;   // data value
 
-	function __construct(&$db)
+	public function __construct(DatabaseInterface $db)
 	{
-		parent::__construct('#__facileforms_subrecords', 'id', Factory::getContainer()->get(DatabaseInterface::class));
+		parent::__construct('#__facileforms_subrecords', 'id', $db);
 	} // constructor
 
 	public function load($id = null, $reset = true)
 	{
-		global $database;
+		return parent::load($id, $reset ?? true);
+	}
 
-		$idInt = (int) $id;
-		$query = $database->getQuery(true)
-			->select('*')
-			->from($database->quoteName('#__facileforms_subrecords'))
-			->where($database->quoteName('id') . ' = :idInt')
-			->bind(':idInt', $idInt, ParameterType::INTEGER);
-		$database->setQuery($query);
-		$rows = $database->loadObjectList();
-		if ($rows) {
-			$row = $rows[0];
-			$arr = get_object_vars($this);
-			foreach ($arr as $prop => $val)
-				if ($prop[0] != '_')
-					$this->$prop = $row->$prop;
-			return true;
-		} // if
-		return false;
-	} // load
+} // class SubrecordTable
 
-} // class facileFormsSubrecords
-
-class facileFormsQuerycols
+final class QueryColumn
 {
 	public $title = null;    // column title
 	public $name = null;     // column name
@@ -591,6 +444,6 @@ class facileFormsQuerycols
 			expstring($this->value);
 	} // pack
 
-} // class facileFormsQuerycols
+} // class QueryColumn
 
 ?>

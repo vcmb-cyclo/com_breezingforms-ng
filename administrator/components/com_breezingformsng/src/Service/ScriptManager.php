@@ -16,7 +16,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Service;
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
-use facileFormsScripts;
+use Vcmb\Component\BreezingformsNG\Site\Table\ScriptTable;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
@@ -39,7 +39,7 @@ class ScriptManager
 		$typelist[] = array('Element Validation', Text::_('COM_BREEZINGFORMSNG_SCRIPTS_ELEMENTVALID'));
 		$typelist[] = array('Form Init', Text::_('COM_BREEZINGFORMSNG_SCRIPTS_FORMINIT'));
 		$typelist[] = array('Form Submitted', Text::_('COM_BREEZINGFORMSNG_SCRIPTS_FORMSUBMIT'));
-		$row = new facileFormsScripts($database);
+		$row = new ScriptTable($database);
 		if (count($ids)) {
 			$row->load($ids[0]);
 		} else {
@@ -68,7 +68,7 @@ class ScriptManager
 		$unitTests = $post['unit_tests'] ?? '';
 
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
-		$row      = new facileFormsScripts($database);
+		$row      = new ScriptTable($database);
 
 		try {
 			if (!$row->bind($_POST)) {
@@ -117,7 +117,7 @@ class ScriptManager
 	{
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
 		$total = count($ids);
-		$row = new facileFormsScripts($database);
+		$row = new ScriptTable($database);
 		if (count($ids)) foreach ($ids as $id) {
 			$row->load(intval($id));
 			$row->id       = NULL;
@@ -269,7 +269,7 @@ class ScriptManager
 			return;
 		}
 
-		$row = new facileFormsScripts($database);
+		$row = new ScriptTable($database);
 		$row->load($ids[0]);
 		if (!(int) $row->id) {
 			$app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");

@@ -18,13 +18,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 use Joomla\CMS\Factory;
 use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use Joomla\Database\DatabaseInterface;
-use Vcmb\Component\BreezingformsNG\Site\Service\Callback\CaptchaCallback;
-use Vcmb\Component\BreezingformsNG\Site\Service\Callback\FlashUploadCallback;
-use Vcmb\Component\BreezingformsNG\Site\Service\Callback\OptCallback;
-use Vcmb\Component\BreezingformsNG\Site\Service\Callback\PayPalCallback;
-use Vcmb\Component\BreezingformsNG\Site\Service\Callback\SofortCallback;
-use Vcmb\Component\BreezingformsNG\Site\Service\Callback\StripeCallback;
-use Vcmb\Component\BreezingformsNG\Site\Service\FormRenderer;
+use Vcmb\Component\BreezingformsNG\Site\Service\EngineDispatcher;
 
 if (!function_exists('bf_b64enc')) {
 
@@ -112,52 +106,10 @@ $bfEngineContext = [
     'plg_editable_override' => $plg_editable_override ?? 0,
 ];
 
-if (
-    !Factory::getApplication()->getInput()->getBool('bfCaptcha', false) &&
-    !Factory::getApplication()->getInput()->getBool('checkCaptcha', false) &&
-    !Factory::getApplication()->getInput()->getBool('confirmStripe', false) &&
-    !Factory::getApplication()->getInput()->getBool('confirmPayPal', false) &&
-    !Factory::getApplication()->getInput()->getBool('confirmPayPalIpn', false) &&
-    !Factory::getApplication()->getInput()->getBool('paypalDownload', false) &&
-    !Factory::getApplication()->getInput()->getBool('stripeDownload', false) &&
-    !Factory::getApplication()->getInput()->getBool('showPayPalConnectMsg', false) &&
-    !Factory::getApplication()->getInput()->getBool('successSofortueberweisung', false) &&
-    !Factory::getApplication()->getInput()->getBool('confirmSofortueberweisung', false) &&
-    !Factory::getApplication()->getInput()->getBool('sofortueberweisungDownload', false) &&
-    !Factory::getApplication()->getInput()->getBool('flashUpload', false) &&
-    Factory::getApplication()->getInput()->getString('opt_in', '') != 'true' &&
-    Factory::getApplication()->getInput()->getString('opt_out', '') != 'true'
-) {
-    (new FormRenderer())->render($bfEngineContext);
-} else if (Factory::getApplication()->getInput()->getBool('checkCaptcha', false)) {
-    (new CaptchaCallback())->check();
-} else if (Factory::getApplication()->getInput()->getBool('confirmPayPalIpn', false) && $ff_applic == '') {
-    (new PayPalCallback())->confirmIpn();
-} else if (Factory::getApplication()->getInput()->getBool('confirmStripe', false) && $ff_applic == '') {
-    (new StripeCallback())->confirm();
-} else if (Factory::getApplication()->getInput()->getBool('stripeDownload', false) && $ff_applic == '') {
-    (new StripeCallback())->download();
-} else if (Factory::getApplication()->getInput()->getBool('confirmPayPal', false) && $ff_applic == '') {
-    (new PayPalCallback())->confirm();
-} else if (Factory::getApplication()->getInput()->getBool('paypalDownload', false) && $ff_applic == '') {
-    (new PayPalCallback())->download();
-} else if (Factory::getApplication()->getInput()->getBool('showPayPalConnectMsg', false)) {
-    (new PayPalCallback())->connectMessage();
-} else if (Factory::getApplication()->getInput()->getBool('successSofortueberweisung', false)) {
-    (new SofortCallback())->success();
-} else if (Factory::getApplication()->getInput()->getBool('confirmSofortueberweisung', false)) {
-    (new SofortCallback())->confirm();
-} else if (Factory::getApplication()->getInput()->getBool('sofortueberweisungDownload', false) && $ff_applic == '') {
-    (new SofortCallback())->download();
-} else if (Factory::getApplication()->getInput()->getBool('flashUpload', false)) {
-    (new FlashUploadCallback())->handle();
-} else if (Factory::getApplication()->getInput()->getString('opt_in', '') == 'true') {
-    (new OptCallback())->optIn();
-} else if (Factory::getApplication()->getInput()->getString('opt_out', '') == 'true') {
-    (new OptCallback())->optOut();
-}
+$input = $mainframe->getInput();
+(new EngineDispatcher($input, $mainframe, $database))->dispatch($bfEngineContext, (string) $ff_applic);
 
-if (Factory::getApplication()->getInput()->getBool('raw', false)) {
+if ($input->getBool('raw', false)) {
     session_write_close();
     exit;
 }

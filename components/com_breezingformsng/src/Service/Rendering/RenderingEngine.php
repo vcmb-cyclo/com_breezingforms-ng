@@ -1,4 +1,8 @@
 <?php
+
+declare(strict_types=1);
+
+namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering;
 /**
  * BreezingForms NG - A Joomla Forms Application
  *
@@ -30,23 +34,32 @@ use Joomla\CMS\Environment\Browser;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Log\Log;
+use BFQuickMode;
+use BFQuickModeBootstrap;
+use BFQuickModeMobile;
+use BFQuickModeOnePage;
+use Exception;
+use facileFormsQuerycols;
+use HTML_facileFormsProcessor;
 use CB\Component\Contentbuilderng\Administrator\Helper\ContentbuilderngHelper;
 use CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory;
 use CB\Component\Contentbuilderng\Administrator\Service\ArticleService;
 use CB\Component\Contentbuilderng\Administrator\Service\ListSupportService;
 use CB\Component\Contentbuilderng\Administrator\Service\PermissionService;
 use CB\Component\Contentbuilderng\Administrator\Helper\RuntimeContextHelper;
-use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\JavascriptValueExporter;
-use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ProcessorHeaderRenderer;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\TokenizedDirectoryResolver;
 
 /**
  * Page header, ContentBuilder path handling and form view rendering.
  */
-trait bfProcessorRendering
+final class RenderingEngine
 {
     private ?TokenizedDirectoryResolver $tokenizedDirectoryResolverService = null;
     private ?ProcessorHeaderRenderer $processorHeaderRendererService = null;
+
+    public function __construct(private readonly HTML_facileFormsProcessor $processor)
+    {
+    }
 
     function header()
     {
@@ -54,36 +67,36 @@ trait bfProcessorRendering
 
         return $this->processorHeaderRenderer()->render(
             [
-                'ff_processor.okrun      ' => $this->okrun,
-                'ff_processor.ip         ' => $this->ip,
-                'ff_processor.agent      ' => $this->agent,
-                'ff_processor.browser    ' => $this->browser,
-                'ff_processor.opsys      ' => $this->opsys,
-                'ff_processor.provider   ' => $this->provider,
-                'ff_processor.submitted  ' => $this->submitted,
-                'ff_processor.form       ' => $this->form,
-                'ff_processor.form_id    ' => $this->form_id,
-                'ff_processor.page       ' => $this->page,
-                'ff_processor.target     ' => $this->target,
-                'ff_processor.runmode    ' => $this->runmode,
-                'ff_processor.inframe    ' => $this->inframe,
-                'ff_processor.inline     ' => $this->inline,
-                'ff_processor.template   ' => $this->template,
-                'ff_processor.homepage   ' => $this->homepage,
-                'ff_processor.mossite    ' => $this->mossite,
-                'ff_processor.images     ' => $this->images,
-                'ff_processor.border     ' => $this->border,
-                'ff_processor.align      ' => $this->align,
-                'ff_processor.top        ' => $this->top,
-                'ff_processor.suffix     ' => $this->suffix,
-                'ff_processor.status     ' => $this->status,
-                'ff_processor.message    ' => $this->message,
-                'ff_processor.record_id  ' => $this->record_id,
-                'ff_processor.showgrid   ' => $this->showgrid,
-                'ff_processor.traceBuffer' => $this->traceBuffer,
+                'ff_processor.okrun      ' => $this->processor->okrun,
+                'ff_processor.ip         ' => $this->processor->ip,
+                'ff_processor.agent      ' => $this->processor->agent,
+                'ff_processor.browser    ' => $this->processor->browser,
+                'ff_processor.opsys      ' => $this->processor->opsys,
+                'ff_processor.provider   ' => $this->processor->provider,
+                'ff_processor.submitted  ' => $this->processor->submitted,
+                'ff_processor.form       ' => $this->processor->form,
+                'ff_processor.form_id    ' => $this->processor->form_id,
+                'ff_processor.page       ' => $this->processor->page,
+                'ff_processor.target     ' => $this->processor->target,
+                'ff_processor.runmode    ' => $this->processor->runmode,
+                'ff_processor.inframe    ' => $this->processor->inframe,
+                'ff_processor.inline     ' => $this->processor->inline,
+                'ff_processor.template   ' => $this->processor->template,
+                'ff_processor.homepage   ' => $this->processor->homepage,
+                'ff_processor.mossite    ' => $this->processor->mossite,
+                'ff_processor.images     ' => $this->processor->images,
+                'ff_processor.border     ' => $this->processor->border,
+                'ff_processor.align      ' => $this->processor->align,
+                'ff_processor.top        ' => $this->processor->top,
+                'ff_processor.suffix     ' => $this->processor->suffix,
+                'ff_processor.status     ' => $this->processor->status,
+                'ff_processor.message    ' => $this->processor->message,
+                'ff_processor.record_id  ' => $this->processor->record_id,
+                'ff_processor.showgrid   ' => $this->processor->showgrid,
+                'ff_processor.traceBuffer' => $this->processor->traceBuffer,
             ],
             (bool) $ff_config->compress,
-            fn (string $code): string => $this->compressJavascript($code)
+            fn (string $code): string => $this->processor->compressJavascript($code)
         );
     }
 
@@ -91,21 +104,21 @@ trait bfProcessorRendering
 
     function cbCreatePathByTokens($path, array $rows, $field_name)
     {
-        $identity = $this->app->getIdentity();
+        $identity = $this->processor->app->getIdentity();
 
         return $this->tokenizedDirectoryResolver()->resolve(
             (string) $path,
             $rows,
             (string) $field_name,
-            $this->findtags,
-            $this->replacetags,
+            $this->processor->findtags,
+            $this->processor->replacetags,
             [
                 'username' => $identity->get('username', 'anonymous'),
                 'id' => $identity->get('id', 0),
                 'name' => $identity->get('name', 'Anonymous'),
             ],
-            (string) $this->submitted,
-            (string) $this->app->get('offset')
+            (string) $this->processor->submitted,
+            (string) $this->processor->app->get('offset')
         );
     }
 
@@ -117,7 +130,7 @@ trait bfProcessorRendering
     private function tokenizedDirectoryResolver(): TokenizedDirectoryResolver
     {
         return $this->tokenizedDirectoryResolverService ??=
-            new TokenizedDirectoryResolver($this->app->getInput());
+            new TokenizedDirectoryResolver($this->processor->app->getInput());
     }
 
     private function processorHeaderRenderer(): ProcessorHeaderRenderer
@@ -138,19 +151,19 @@ trait bfProcessorRendering
 
         if (file_exists(JPATH_ADMINISTRATOR . '/components/com_contentbuilderng/com_contentbuilderng.xml')) {
 
-            if ($this->app->isClient('administrator')) {
+            if ($this->processor->app->isClient('administrator')) {
                 $cbFrontend = false;
             }
 
             if ($cbFrontend) {
-                $this->app->getLanguage()->load('com_contentbuilderng');
+                $this->processor->app->getLanguage()->load('com_contentbuilderng');
             } else {
-                $this->app->getLanguage()->load('com_contentbuilderng', JPATH_SITE . '/administrator');
+                $this->processor->app->getLanguage()->load('com_contentbuilderng', JPATH_SITE . '/administrator');
             }
 
             $db = Factory::getContainer()->get(DatabaseInterface::class);
 
-            $referenceId = (int) $this->form;
+            $referenceId = (int) $this->processor->form;
             $query = $db->getQuery(true)
                 ->select($db->quoteName('id'))
                 ->from($db->quoteName('#__contentbuilderng_forms'))
@@ -228,24 +241,24 @@ trait bfProcessorRendering
         global $ff_mospath, $ff_mossite, $my;
         global $ff_config, $ff_version, $ff_comsite, $ff_otherparams;
 
-        if (trim((string) $this->formrow->template_code_processed) !== 'QuickMode') {
+        if (trim((string) $this->processor->formrow->template_code_processed) !== 'QuickMode') {
             echo '<div class="alert alert-warning">' . Text::_('COM_BREEZINGFORMSNG_QUICKMODE_ONLY') . '</div>';
             return;
         }
 
         $is_mobile_type = '';
 
-        if (trim($this->formrow->template_code_processed) == 'QuickMode') {
+        if (trim($this->processor->formrow->template_code_processed) == 'QuickMode') {
 
             if (isset($_GET['non_mobile']) && Factory::getApplication()->getInput()->getBool('non_mobile', false)) {
-                $this->app->getSession()->clear('com_breezingformsng.mobile');
+                $this->processor->app->getSession()->clear('com_breezingformsng.mobile');
             } else if (isset($_GET['mobile']) && Factory::getApplication()->getInput()->getBool('mobile', false)) {
-                $this->app->getSession()->set('com_breezingformsng.mobile', true);
+                $this->processor->app->getSession()->set('com_breezingformsng.mobile', true);
             }
 
             require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
 
-            $dataObject = json_decode(bf_b64dec($this->formrow->template_code), true);
+            $dataObject = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
             $rootMdata = $dataObject['properties'];
             $is_device = false;
 
@@ -257,12 +270,12 @@ trait bfProcessorRendering
 
             if (Factory::getApplication()->getInput()->getString('ff_applic', '') != 'mod_facileforms' && Factory::getApplication()->getInput()->getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
                 $is_device = true;
-                $this->isMobile = isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile'] ? true : (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $this->app->getSession()->get('com_breezingformsng.mobile', false) ? true : false);
+                $this->processor->isMobile = isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile'] ? true : (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $this->processor->app->getSession()->get('com_breezingformsng.mobile', false) ? true : false);
             } else {
-                $this->isMobile = false;
+                $this->processor->isMobile = false;
 
                 if (isset($rootMdata['themebootstrapThemeEngine']) && $rootMdata['themebootstrapThemeEngine'] == 'bootstrap') {
-                    $this->legacy_wrap = false;
+                    $this->processor->legacy_wrap = false;
                 }
             }
 
@@ -270,17 +283,17 @@ trait bfProcessorRendering
                 $is_mobile_type = 'choose';
             }
 
-            if (!$this->isMobile || ($this->isMobile && Factory::getApplication()->getInput()->getString('ff_task', '') == 'submit')) {
+            if (!$this->processor->isMobile || ($this->processor->isMobile && Factory::getApplication()->getInput()->getString('ff_task', '') == 'submit')) {
 
                 // nothing
             } else {
 
-                if ($this->isMobile) {
+                if ($this->processor->isMobile) {
 
                     ob_end_clean();
                     ob_start();
                     require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickModeMobile.php');
-                    $quickMode = new BFQuickModeMobile($this);
+                    $quickMode = new BFQuickModeMobile($this->processor);
                     if (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile']) {
                         $quickMode->forceMobileUrl = isset($rootMdata['forceMobileUrl']) ? $rootMdata['forceMobileUrl'] : 'index.php';
                     }
@@ -289,7 +302,7 @@ trait bfProcessorRendering
         }
 
         // CONTENTBUILDER BEGIN
-        $cbResult = $this->cbCheckPermissions();
+        $cbResult = $this->processor->cbCheckPermissions();
 
         $cbForm = $cbResult['form'];
         $cbRecord = $cbResult['record'];
@@ -297,58 +310,58 @@ trait bfProcessorRendering
         $cbFull = $cbResult['full'];
         // CONTENTBUILDER END
 
-        if (!$this->okrun)
+        if (!$this->processor->okrun)
             return;
         set_error_handler('_ff_errorHandler');
         ob_start();
-        echo $this->header();
-        $this->queryCols = array();
-        $this->queryRows = array();
-        if ($this->runmode == _FF_RUNMODE_PREVIEW) {
+        echo $this->processor->header();
+        $this->processor->queryCols = array();
+        $this->processor->queryRows = array();
+        if ($this->processor->runmode == _FF_RUNMODE_PREVIEW) {
             echo '<script type="text/javascript" src="' . Uri::root() . 'administrator/components/com_breezingformsng/libraries/wz_dragdrop/wz_dragdrop.js"></script>';
         }
-        if (trim($this->formrow->template_code_processed) == 'QuickMode' && $this->legacy_wrap)
+        if (trim($this->processor->formrow->template_code_processed) == 'QuickMode' && $this->processor->legacy_wrap)
             echo '<table style="display:none;width:100%;" id="bfReCaptchaWrap"><tr><td><div id="bfReCaptchaDiv"></div></td></tr></table>';
-        echo '<div id="ff_formdiv' . $this->form . '"';
-        echo ' class="bfFormDiv' . ($this->formrow->class1 != '' ? ' ' . $this->getClassName($this->formrow->class1) : '') . '"';
-        if ($this->legacy_wrap) {
+        echo '<div id="ff_formdiv' . $this->processor->form . '"';
+        echo ' class="bfFormDiv' . ($this->processor->formrow->class1 != '' ? ' ' . $this->processor->getClassName($this->processor->formrow->class1) : '') . '"';
+        if ($this->processor->legacy_wrap) {
             echo '><div class="bfPage-tl"><div class="bfPage-tr"><div class="bfPage-t"></div></div></div><div class="bfPage-l"><div class="bfPage-r"><div class="bfPage-m bfClearfix">' . nl();
         } else {
             echo '>';
         }
-        $this->status = Factory::getApplication()->getInput()->getCmd('ff_status', '');
-        $this->message = Factory::getApplication()->getInput()->getString('ff_message', '');
+        $this->processor->status = Factory::getApplication()->getInput()->getCmd('ff_status', '');
+        $this->processor->message = Factory::getApplication()->getInput()->getString('ff_message', '');
 
         // handle Before Form piece
         $code = '';
-        switch ($this->formrow->piece1cond) {
+        switch ($this->processor->formrow->piece1cond) {
             case 1: // library
-                $piece1id = (int) $this->formrow->piece1id;
-                $query = $this->database->getQuery(true)
+                $piece1id = (int) $this->processor->formrow->piece1id;
+                $query = $this->processor->database->getQuery(true)
                     ->select(['name', 'code'])
-                    ->from($this->database->quoteName('#__facileforms_pieces'))
-                    ->where($this->database->quoteName('id') . ' = :piece1id')
-                    ->where($this->database->quoteName('published') . ' = 1')
+                    ->from($this->processor->database->quoteName('#__facileforms_pieces'))
+                    ->where($this->processor->database->quoteName('id') . ' = :piece1id')
+                    ->where($this->processor->database->quoteName('published') . ' = 1')
                     ->bind(':piece1id', $piece1id, ParameterType::INTEGER);
-                $this->database->setQuery($query);
-                $rows = $this->database->loadObjectList();
+                $this->processor->database->setQuery($query);
+                $rows = $this->processor->database->loadObjectList();
                 if (count($rows))
-                    echo $this->execPiece($rows[0]->code, Text::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECE') . " " . $rows[0]->name, 'p', $this->formrow->piece1id, null);
+                    echo $this->processor->execPiece($rows[0]->code, Text::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECE') . " " . $rows[0]->name, 'p', $this->processor->formrow->piece1id, null);
                 break;
             case 2: // custom code
-                echo $this->execPiece($this->formrow->piece1code, Text::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECEC'), 'f', $this->form, 2);
+                echo $this->processor->execPiece($this->processor->formrow->piece1code, Text::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECEC'), 'f', $this->processor->form, 2);
                 break;
             default:
                 break;
         } // switch
-        if ($this->bury())
+        if ($this->processor->bury())
             return;
 
         $cntFiles = 0;
         $fileExtensionsCheck = 'function checkFileExtensions(){';
-        for ($i = 0; $i < $this->rowcount; $i++) {
-            $row = $this->rows[$i];
-            if ($row->type == 'File Upload' && trim($this->formrow->template_code) != '') {
+        for ($i = 0; $i < $this->processor->rowcount; $i++) {
+            $row = $this->processor->rows[$i];
+            if ($row->type == 'File Upload' && trim($this->processor->formrow->template_code) != '') {
                 if (trim($row->data2) != '') {
                     $exts = explode(',', $row->data2);
                     $extsCount = count($exts);
@@ -387,8 +400,8 @@ trait bfProcessorRendering
 
         $capFunc = 'function bfCheckCaptcha(){if(checkFileExtensions())ff_submitForm2();}';
 
-        for ($i = 0; $i < $this->rowcount; $i++) {
-            $row = $this->rows[$i];
+        for ($i = 0; $i < $this->processor->rowcount; $i++) {
+            $row = $this->processor->rows[$i];
             if ($row->type == "Captcha") {
                 $capFunc = '
 
@@ -452,7 +465,7 @@ trait bfProcessorRendering
                                                                                     bf_restore_submitbutton();
                                                                                 }
                                                                                 
-                                                                                        document.getElementById(\'ff_capimgValue\').src = \'' . Uri::root(true) . ($this->app->isClient('administrator') ? '/administrator' : '') . '/media/com_breezingformsng/images/site/captcha/securimage_show.php?bfMathRandom=\' + Math.random();
+                                                                                        document.getElementById(\'ff_capimgValue\').src = \'' . Uri::root(true) . ($this->processor->app->isClient('administrator') ? '/administrator' : '') . '/media/com_breezingformsng/images/site/captcha/securimage_show.php?bfMathRandom=\' + Math.random();
                                                                                         document.getElementById(\'bfCaptchaEntry\').value = "";
                                                                                         if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
                                                                                         document.getElementById(\'bfCaptchaEntry\').focus();
@@ -478,7 +491,7 @@ trait bfProcessorRendering
                                 function bfCheckCaptcha(){
                                         if(checkFileExtensions()){
                                                var ao = new bfAjaxObject101();
-                                               ao.sndReq("get","' . Uri::root(true) . ($this->app->isClient('administrator') ? '/administrator' : '') . '/index.php?raw=true&option=com_breezingformsng&checkCaptcha=true&Itemid=0&tmpl=component&value="+document.getElementById("bfCaptchaEntry").value,"");
+                                               ao.sndReq("get","' . Uri::root(true) . ($this->processor->app->isClient('administrator') ? '/administrator' : '') . '/index.php?raw=true&option=com_breezingformsng&checkCaptcha=true&Itemid=0&tmpl=component&value="+document.getElementById("bfCaptchaEntry").value,"");
                                         }
                                 }';
                 break;
@@ -503,7 +516,7 @@ trait bfProcessorRendering
                                                         responseField = JQuery("input#recaptcha_response_field").val();
                                                         var html = JQuery.ajax({
                                                         type: "POST",
-                                                        url: "' . Route::_("index.php?raw=true&option=com_breezingformsng&bfReCaptcha=true&form=" . $this->form . "&Itemid=0&tmpl=component") . '",
+                                                        url: "' . Route::_("index.php?raw=true&option=com_breezingformsng&bfReCaptcha=true&form=" . $this->processor->form . "&Itemid=0&tmpl=component") . '",
                                                         data: "recaptcha_challenge_field=" + challengeField + "&recaptcha_response_field=" + responseField,
                                                         async: false
                                                         }).responseText;
@@ -603,91 +616,91 @@ trait bfProcessorRendering
 
         // create library list
         $library = array();
-        $this->loadBuiltins($library);
-        $this->loadScripts($library);
+        $this->processor->loadBuiltins($library);
+        $this->processor->loadScripts($library);
 
         // start linking
         $linked = array();
 
-        if ($this->status == '') {
+        if ($this->processor->status == '') {
             $code = "onload = function()" . nl() .
                 "{" . nl() .
                 "    ff_initialize('formentry');" . nl() .
                 "    ff_initialize('pageentry');" . nl();
-            if ($this->formrow->heightmode)
-                $code .= "    ff_resizepage(" . $this->formrow->heightmode . ", " . $this->formrow->height . ");" . nl();
-            if ($this->showgrid)
+            if ($this->processor->formrow->heightmode)
+                $code .= "    ff_resizepage(" . $this->processor->formrow->heightmode . ", " . $this->processor->formrow->height . ");" . nl();
+            if ($this->processor->showgrid)
                 $code .= "    ff_showgrid();" . nl();
             $code .= "    if (ff_processor && ff_processor.traceBuffer) ff_traceWindow();" . nl() .
                 "} // onload";
-            $this->linkcode('onload', $library, $linked, $code);
+            $this->processor->linkcode('onload', $library, $linked, $code);
         } else {
             $funcname = "";
-            switch ($this->formrow->script2cond) {
+            switch ($this->processor->formrow->script2cond) {
                 case 1:
-                    $script2id = (int) $this->formrow->script2id;
-                    $query = $this->database->getQuery(true)
+                    $script2id = (int) $this->processor->formrow->script2id;
+                    $query = $this->processor->database->getQuery(true)
                         ->select('name')
-                        ->from($this->database->quoteName('#__facileforms_scripts'))
-                        ->where($this->database->quoteName('id') . ' = :script2id')
-                        ->where($this->database->quoteName('published') . ' = 1')
+                        ->from($this->processor->database->quoteName('#__facileforms_scripts'))
+                        ->where($this->processor->database->quoteName('id') . ' = :script2id')
+                        ->where($this->processor->database->quoteName('published') . ' = 1')
                         ->bind(':script2id', $script2id, ParameterType::INTEGER);
-                    $this->database->setQuery($query);
-                    $funcname = $this->database->loadResult();
+                    $this->processor->database->setQuery($query);
+                    $funcname = $this->processor->database->loadResult();
                     break;
                 case 2:
-                    $funcname = "ff_" . $this->formrow->name . "_submitted";
+                    $funcname = "ff_" . $this->processor->formrow->name . "_submitted";
                     break;
                 default:
                     break;
             } // switch
-            if ($funcname != '' || $this->formrow->heightmode || $this->showgrid) {
+            if ($funcname != '' || $this->processor->formrow->heightmode || $this->processor->showgrid) {
                 $code = "onload = function()" . nl() .
                     "{" . nl();
-                if ($this->formrow->heightmode)
-                    $code .= "    ff_resizepage(" . $this->formrow->heightmode . ", " . $this->formrow->height . ");" . nl();
-                if ($this->showgrid)
+                if ($this->processor->formrow->heightmode)
+                    $code .= "    ff_resizepage(" . $this->processor->formrow->heightmode . ", " . $this->processor->formrow->height . ");" . nl();
+                if ($this->processor->showgrid)
                     $code .= "    ff_showgrid();" . nl();
                 if ($funcname != '') {
-                    $json_return = json_encode($this->message, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS);
+                    $json_return = json_encode($this->processor->message, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS);
                     if (trim($json_return) == '') {
                         $json_return = '""';
                     }
-                    $code .= "    " . $funcname . "(" . $this->status . "," . $json_return . ");" . nl();
+                    $code .= "    " . $funcname . "(" . $this->processor->status . "," . $json_return . ");" . nl();
                 }
                 $code .= "} // onload";
-                $this->linkcode('onload', $library, $linked, $code);
+                $this->processor->linkcode('onload', $library, $linked, $code);
             } // if
         } // if
-        if ($this->bury())
+        if ($this->processor->bury())
             return;
 
         // add form scripts
-        $this->addFunction(
-            $this->formrow->script1cond,
-            $this->formrow->script1id,
-            'ff_' . $this->formrow->name . '_init',
-            $this->formrow->script1code,
+        $this->processor->addFunction(
+            $this->processor->formrow->script1cond,
+            $this->processor->formrow->script1id,
+            'ff_' . $this->processor->formrow->name . '_init',
+            $this->processor->formrow->script1code,
             $library,
             $linked,
             'f',
-            $this->form,
+            $this->processor->form,
             1
         );
-        if ($this->bury())
+        if ($this->processor->bury())
             return;
-        $this->addFunction(
-            $this->formrow->script2cond,
-            $this->formrow->script2id,
-            'ff_' . $this->formrow->name . '_submitted',
-            $this->formrow->script2code,
+        $this->processor->addFunction(
+            $this->processor->formrow->script2cond,
+            $this->processor->formrow->script2id,
+            'ff_' . $this->processor->formrow->name . '_submitted',
+            $this->processor->formrow->script2code,
             $library,
             $linked,
             'f',
-            $this->form,
+            $this->processor->form,
             1
         );
-        if ($this->bury())
+        if ($this->processor->bury())
             return;
 
         // all element scripts & static text/HTML
@@ -696,10 +709,10 @@ trait bfProcessorRendering
         $qcheckboxes = 0;
         $qcode = '';
 
-        for ($i = 0; $i < $this->rowcount; $i++) {
-            $row = &$this->rows[$i];
+        for ($i = 0; $i < $this->processor->rowcount; $i++) {
+            $row = &$this->processor->rows[$i];
 
-            $this->draggableDivIds[] = 'ff_div' . $row->id;
+            $this->processor->draggableDivIds[] = 'ff_div' . $row->id;
 
             if ($row->type == "Icon")
                 $icons++;
@@ -710,16 +723,16 @@ trait bfProcessorRendering
                     $qcheckboxes++;
 
                 // load column definitions
-                $this->queryCols['ff_' . $row->id] = array();
-                $cols = &$this->queryCols['ff_' . $row->id];
-                if ($this->trim($row->data3)) {
+                $this->processor->queryCols['ff_' . $row->id] = array();
+                $cols = &$this->processor->queryCols['ff_' . $row->id];
+                if ($this->processor->trim($row->data3)) {
                     $cls = explode("\n", $row->data3);
                     for ($c = 0; $c < count($cls); $c++) {
                         if ($cls[$c] != '') {
                             $col = ''; // instead of unset
                             $col = new facileFormsQuerycols;
                             $col->unpack($cls[$c]);
-                            $this->compileQueryCol($row, $col);
+                            $this->processor->compileQueryCol($row, $col);
                             $cols[] = $col;
                         } // if
                     } // for
@@ -735,7 +748,7 @@ trait bfProcessorRendering
                 // get pagenav
                 $pagenav = 1;
                 $settings = explode("\n", $row->data1);
-                if (count($settings) > 8 && $this->trim($settings[8]))
+                if (count($settings) > 8 && $this->processor->trim($settings[8]))
                     $pagenav = $settings[8];
 
                 // export the javascript parameters
@@ -757,15 +770,15 @@ trait bfProcessorRendering
                 $qcode .= '];' . nl();
 
                 // execute the query and export it to javascript
-                $this->queryRows['ff_' . $row->id] = array();
-                $this->execQuery($row, $this->queryRows['ff_' . $row->id], $cols);
-                $qcode .= 'ff_queryRows[' . $row->id . '] = ' . $this->expJsValue($this->queryRows['ff_' . $row->id]) . ';' . nl();
+                $this->processor->queryRows['ff_' . $row->id] = array();
+                $this->processor->execQuery($row, $this->processor->queryRows['ff_' . $row->id], $cols);
+                $qcode .= 'ff_queryRows[' . $row->id . '] = ' . $this->processor->expJsValue($this->processor->queryRows['ff_' . $row->id]) . ';' . nl();
 
                 unset($cols);
-                if ($this->bury())
+                if ($this->processor->bury())
                     return;
             } // if
-            $this->addFunction(
+            $this->processor->addFunction(
                 $row->script1cond,
                 $row->script1id,
                 'ff_' . $row->name . '_init',
@@ -776,11 +789,11 @@ trait bfProcessorRendering
                 $row->id,
                 1
             );
-            if ($this->bury()) {
+            if ($this->processor->bury()) {
                 unset($row);
                 return;
             }
-            $this->addFunction(
+            $this->processor->addFunction(
                 $row->script2cond,
                 $row->script2id,
                 'ff_' . $row->name . '_action',
@@ -791,11 +804,11 @@ trait bfProcessorRendering
                 $row->id,
                 1
             );
-            if ($this->bury()) {
+            if ($this->processor->bury()) {
                 unset($row);
                 return;
             }
-            $this->addFunction(
+            $this->processor->addFunction(
                 $row->script3cond,
                 $row->script3id,
                 'ff_' . $row->name . '_validate',
@@ -806,19 +819,19 @@ trait bfProcessorRendering
                 $row->id,
                 1
             );
-            if ($this->bury()) {
+            if ($this->processor->bury()) {
                 ob_end_clean();
                 return;
             }
             if ($row->type == 'Static Text/HTML')
-                $this->linkcode('#scanonly', $library, $linked, $row->data1);
+                $this->processor->linkcode('#scanonly', $library, $linked, $row->data1);
             unset($row);
-            if ($this->bury())
+            if ($this->processor->bury())
                 return;
         } // for
 
         if ($icons > 0) {
-            $this->linkcode(
+            $this->processor->linkcode(
                 'ff_hideIconBorder',
                 $library,
                 $linked,
@@ -827,9 +840,9 @@ trait bfProcessorRendering
                 '    element.style.border = "none";' . nl() .
                 '} // ff_hideIconBorder'
             );
-            if ($this->bury())
+            if ($this->processor->bury())
                 return;
-            $this->linkcode(
+            $this->processor->linkcode(
                 'ff_dispIconBorder',
                 $library,
                 $linked,
@@ -838,7 +851,7 @@ trait bfProcessorRendering
                 '    element.style.border = "1px outset";' . nl() .
                 '} // ff_dispIconBorder'
             );
-            if ($this->bury())
+            if ($this->processor->bury())
                 return;
         } // if
 
@@ -959,14 +972,14 @@ trait bfProcessorRendering
                 '    ff_queryCurrPage[id] = page;' . nl();
             if ($qcheckboxes)
                 $code .= '    if (checkbox) ff_selectAllQueryRows(id, false);' . nl();
-            if ($this->formrow->heightmode > 0)
-                $code .= '    ff_resizepage(' . $this->formrow->heightmode . ', ' . $this->formrow->height . ');' . nl();
-            if ($this->inframe)
+            if ($this->processor->formrow->heightmode > 0)
+                $code .= '    ff_resizepage(' . $this->processor->formrow->heightmode . ', ' . $this->processor->formrow->height . ');' . nl();
+            if ($this->processor->inframe)
                 $code .= '    parent.window.scrollTo(0,0);' . nl();
             $code .= '    window.scrollTo(0,0);' . nl() .
                 '} // ff_dispQueryPage';
-            $this->linkcode('ff_dispQueryPage', $library, $linked, $code);
-            if ($this->bury())
+            $this->processor->linkcode('ff_dispQueryPage', $library, $linked, $code);
+            if ($this->processor->bury())
                 return;
         } // if
 
@@ -977,30 +990,30 @@ trait bfProcessorRendering
             echo '<script language="JavaScript" src="' . $ff_mossite . '/components/com_breezingformsng/libraries/js/joomla.javascript.js" type="text/javascript"></script>' . nl();
         if ($tooltips > 0) {
             echo '<script language="Javascript" src="' . $ff_mossite . '/components/com_breezingformsng/libraries/js/overlib_mini.js" type="text/javascript"></script>' . nl();
-            if ($this->inframe)
+            if ($this->processor->inframe)
                 echo '<div id="overDiv" style="position:absolute;visibility:hidden;z-index:1000;"></div>' . nl();
         } // if
 
-        if (!$this->inline) {
+        if (!$this->processor->inline) {
             $current_url = Uri::getInstance()->toString();
 
-            $url = ($this->inframe) ? $ff_mossite . '/index.php?format=html&tmpl=component' : (($this->runmode == _FF_RUNMODE_FRONTEND) ? $current_url : 'index.php?format=html' . (Factory::getApplication()->getInput()->getCmd('tmpl', '') ? '&tmpl=' . Factory::getApplication()->getInput()->getCmd('tmpl', '') : $current_url));
+            $url = ($this->processor->inframe) ? $ff_mossite . '/index.php?format=html&tmpl=component' : (($this->processor->runmode == _FF_RUNMODE_FRONTEND) ? $current_url : 'index.php?format=html' . (Factory::getApplication()->getInput()->getCmd('tmpl', '') ? '&tmpl=' . Factory::getApplication()->getInput()->getCmd('tmpl', '') : $current_url));
             $params = ' action="' . $url . '"' .
                 ' method="post"' .
-                ' name="' . $this->form_id . '"' .
-                ' id="' . $this->form_id . '"' .
+                ' name="' . $this->processor->form_id . '"' .
+                ' id="' . $this->processor->form_id . '"' .
                 ' enctype="multipart/form-data"';
-            if ($this->formrow->class2 != '')
-                $params .= ' class="' . $this->getClassName($this->formrow->class2) . '"';
+            if ($this->processor->formrow->class2 != '')
+                $params .= ' class="' . $this->processor->getClassName($this->processor->formrow->class2) . '"';
             echo '<form data-ajax="false" ' . $params . ' accept-charset="utf-8" onsubmit="return false;" class="bfQuickMode">' . nl();
         } // if
 
         $js = '';
         $cbJs = '';
 
-        if ($this->editable && $cbRecord === null) {
+        if ($this->processor->editable && $cbRecord === null) {
             $db = Factory::getContainer()->get(DatabaseInterface::class);
-            $formValue = $this->form;
+            $formValue = $this->processor->form;
             $userId = Factory::getApplication()->getIdentity()->get('id', -1);
             $query = $db->getQuery(true)
                 ->select(['id', 'form'])
@@ -1015,7 +1028,7 @@ trait bfProcessorRendering
             $db->setQuery($query, 0, 1);
             $recordsResult = $db->loadObjectList();
             if (count($recordsResult) != 0) {
-                $this->record_id = $recordsResult[0]->id;
+                $this->processor->record_id = $recordsResult[0]->id;
                 $recordId = (int) $recordsResult[0]->id;
                 $subrecordsQuery = $db->getQuery(true)
                     ->select('*')
@@ -1027,10 +1040,10 @@ trait bfProcessorRendering
                 $js = '';
                 foreach ($recordEntries as $recordEntry) {
 
-                    //$recordEntry->value = $this->removeDangerousHtml($recordEntry->value);
+                    //$recordEntry->value = $this->processor->removeDangerousHtml($recordEntry->value);
 
                     /*
-                      $input = $this->app->getInput();
+                      $input = $this->processor->app->getInput();
                       $input->set('cbCleanVar', $recordEntry->value);
                       $recordEntry->value = $input->getHtml('cbCleanVar'); */
 
@@ -1046,12 +1059,12 @@ trait bfProcessorRendering
                             /*
                               if($recordEntry->type == 'Textarea'){
 
-                              $dataObject = json_decode(bf_b64dec($this->formrow->template_code), true);
-                              $qmelement = $this->findQuickModeElement($dataObject, $recordEntry->name);
+                              $dataObject = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
+                              $qmelement = $this->processor->findQuickModeElement($dataObject, $recordEntry->name);
 
                               if(isset($recordEntry->value) && $qmelement !== null && isset($qmelement['properties']['is_html']) && $qmelement['properties']['is_html']) {
 
-                              $recordEntry->value = $this->removeDangerousHtml($recordEntry->value);
+                              $recordEntry->value = $this->processor->removeDangerousHtml($recordEntry->value);
                               }
                               } */
 
@@ -1066,10 +1079,10 @@ trait bfProcessorRendering
                             break;
                         case 'Checkbox Group':
                             $js .= '
-							for(var i = 0;i < document.ff_form' . $this->form . '.elements.length;i++){
-								if(document.ff_form' . $this->form . '.elements[i].type == "checkbox" && document.ff_form' . $this->form . '.elements[i].name == "ff_nm_' . $recordEntry->name . '[]" && document.ff_form' . $this->form . '.elements[i].value == ' . json_encode($recordEntry->value) . '){
-									if(typeof JQuery != "undefined" && !JQuery(document.ff_form' . $this->form . '.elements[i]).attr("checked")){
-									    JQuery(document.ff_form' . $this->form . '.elements[i]).click();
+							for(var i = 0;i < document.ff_form' . $this->processor->form . '.elements.length;i++){
+								if(document.ff_form' . $this->processor->form . '.elements[i].type == "checkbox" && document.ff_form' . $this->processor->form . '.elements[i].name == "ff_nm_' . $recordEntry->name . '[]" && document.ff_form' . $this->processor->form . '.elements[i].value == ' . json_encode($recordEntry->value) . '){
+									if(typeof JQuery != "undefined" && !JQuery(document.ff_form' . $this->processor->form . '.elements[i]).attr("checked")){
+									    JQuery(document.ff_form' . $this->processor->form . '.elements[i]).click();
 									}
 								}
 							}' . "\n";
@@ -1077,10 +1090,10 @@ trait bfProcessorRendering
                         case 'Radio Button':
                         case 'Radio Group':
                             $js .= '
-							for(var i = 0;i < document.ff_form' . $this->form . '.elements.length;i++){
-								if(document.ff_form' . $this->form . '.elements[i].type == "radio" && document.ff_form' . $this->form . '.elements[i].name == "ff_nm_' . $recordEntry->name . '[]" && document.ff_form' . $this->form . '.elements[i].value == ' . json_encode($recordEntry->value) . '){
-									if(typeof JQuery != "undefined" && !JQuery(document.ff_form' . $this->form . '.elements[i]).attr("checked")){
-									    JQuery(document.ff_form' . $this->form . '.elements[i]).click();
+							for(var i = 0;i < document.ff_form' . $this->processor->form . '.elements.length;i++){
+								if(document.ff_form' . $this->processor->form . '.elements[i].type == "radio" && document.ff_form' . $this->processor->form . '.elements[i].name == "ff_nm_' . $recordEntry->name . '[]" && document.ff_form' . $this->processor->form . '.elements[i].value == ' . json_encode($recordEntry->value) . '){
+									if(typeof JQuery != "undefined" && !JQuery(document.ff_form' . $this->processor->form . '.elements[i]).attr("checked")){
+									    JQuery(document.ff_form' . $this->processor->form . '.elements[i]).click();
 									}
 								}
 							}' . "\n";
@@ -1103,9 +1116,9 @@ trait bfProcessorRendering
                                 function bfLoadEditable(){
                                     ' . $js . '
                                     // legacy seccode removal
-                                    for(var i = 0;i < document.ff_form' . $this->form . '.elements.length;i++){
-                                            if(document.ff_form' . $this->form . '.elements[i].name == "ff_nm_seccode[]"){
-                                                    document.ff_form' . $this->form . '.elements[i].value = "";
+                                    for(var i = 0;i < document.ff_form' . $this->processor->form . '.elements.length;i++){
+                                            if(document.ff_form' . $this->processor->form . '.elements[i].name == "ff_nm_seccode[]"){
+                                                    document.ff_form' . $this->processor->form . '.elements[i].value = "";
                                             }
                                     }
                                 }
@@ -1124,10 +1137,10 @@ trait bfProcessorRendering
             foreach ($cbRecord as $cbEntry) {
                 if (!in_array($cbEntry->recElementId, $cbNonEditableFields)) {
 
-                    //$cbEntry->recValue = $this->removeDangerousHtml($cbEntry->recValue);
+                    //$cbEntry->recValue = $this->processor->removeDangerousHtml($cbEntry->recValue);
 
                     /*
-                      $input = $this->app->getInput();
+                      $input = $this->processor->app->getInput();
                       $input->set('cbCleanVar', $cbEntry->recValue);
                       $cbEntry->recValue = $input->getHtml('cbCleanVar'); */
 
@@ -1135,7 +1148,7 @@ trait bfProcessorRendering
 
                     switch ($cbEntry->recType) {
                         case 'File Upload':
-                            if (trim($this->formrow->template_code_processed) == 'QuickMode') {
+                            if (trim($this->processor->formrow->template_code_processed) == 'QuickMode') {
 
                                 if ($cbFlashUploadValidationOverride == '') {
                                     $cbJs .= '
@@ -1213,12 +1226,12 @@ trait bfProcessorRendering
                             /*
                               if($cbEntry->recType == 'Textarea'){
 
-                              $dataObject = json_decode(bf_b64dec($this->formrow->template_code), true);
-                              $qmelement = $this->findQuickModeElement($dataObject, $cbEntry->recName);
+                              $dataObject = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
+                              $qmelement = $this->processor->findQuickModeElement($dataObject, $cbEntry->recName);
 
                               if(isset($cbEntry->recValue) && $qmelement !== null && isset($qmelement['properties']['is_html']) && $qmelement['properties']['is_html']) {
 
-                              $cbEntry->recValue = $this->removeDangerousHtml($cbEntry->recValue);
+                              $cbEntry->recValue = $this->processor->removeDangerousHtml($cbEntry->recValue);
                               }
                               } */
 
@@ -1238,10 +1251,10 @@ trait bfProcessorRendering
                             foreach ($cbValues as $cbValue) {
                                 $cbValue = trim($cbValue);
                                 $js .= '
-                                                for(var i = 0;i < document.ff_form' . $this->form . '.elements.length;i++){
-                                                        if(document.ff_form' . $this->form . '.elements[i].type == "checkbox" && document.ff_form' . $this->form . '.elements[i].name == "ff_nm_' . $cbEntry->recName . '[]" && document.ff_form' . $this->form . '.elements[i].value == ' . json_encode($cbValue) . '){
-                                                                if(typeof JQuery != "undefined" && !JQuery(document.ff_form' . $this->form . '.elements[i]).attr("checked")){
-                                                                    JQuery(document.ff_form' . $this->form . '.elements[i]).click();
+                                                for(var i = 0;i < document.ff_form' . $this->processor->form . '.elements.length;i++){
+                                                        if(document.ff_form' . $this->processor->form . '.elements[i].type == "checkbox" && document.ff_form' . $this->processor->form . '.elements[i].name == "ff_nm_' . $cbEntry->recName . '[]" && document.ff_form' . $this->processor->form . '.elements[i].value == ' . json_encode($cbValue) . '){
+                                                                if(typeof JQuery != "undefined" && !JQuery(document.ff_form' . $this->processor->form . '.elements[i]).attr("checked")){
+                                                                    JQuery(document.ff_form' . $this->processor->form . '.elements[i]).click();
                                                                 }
                                                         }
                                                 }' . nl();
@@ -1253,10 +1266,10 @@ trait bfProcessorRendering
                             foreach ($cbValues as $cbValue) {
                                 $cbValue = trim($cbValue);
                                 $js .= '
-                                                for(var i = 0;i < document.ff_form' . $this->form . '.elements.length;i++){
-                                                        if(document.ff_form' . $this->form . '.elements[i].type == "radio" && document.ff_form' . $this->form . '.elements[i].name == "ff_nm_' . $cbEntry->recName . '[]" && document.ff_form' . $this->form . '.elements[i].value == ' . json_encode($cbValue) . '){
-                                                                if(typeof JQuery != "undefined" && !JQuery(document.ff_form' . $this->form . '.elements[i]).attr("checked")){
-                                                                    JQuery(document.ff_form' . $this->form . '.elements[i]).click();
+                                                for(var i = 0;i < document.ff_form' . $this->processor->form . '.elements.length;i++){
+                                                        if(document.ff_form' . $this->processor->form . '.elements[i].type == "radio" && document.ff_form' . $this->processor->form . '.elements[i].name == "ff_nm_' . $cbEntry->recName . '[]" && document.ff_form' . $this->processor->form . '.elements[i].value == ' . json_encode($cbValue) . '){
+                                                                if(typeof JQuery != "undefined" && !JQuery(document.ff_form' . $this->processor->form . '.elements[i]).attr("checked")){
+                                                                    JQuery(document.ff_form' . $this->processor->form . '.elements[i]).click();
                                                                 }
                                                         }
                                                 }' . nl();
@@ -1299,9 +1312,9 @@ trait bfProcessorRendering
                     function bfLoadContentBuilderEditable(){
                         ' . $js . '
                         // legacy seccode removal
-                        for(var i = 0;i < document.ff_form' . $this->form . '.elements.length;i++){
-                                if(document.ff_form' . $this->form . '.elements[i].name == "ff_nm_seccode[]"){
-                                        document.ff_form' . $this->form . '.elements[i].value = "";
+                        for(var i = 0;i < document.ff_form' . $this->processor->form . '.elements.length;i++){
+                                if(document.ff_form' . $this->processor->form . '.elements[i].name == "ff_nm_seccode[]"){
+                                        document.ff_form' . $this->processor->form . '.elements[i].value = "";
                                 }
                         }
                     }
@@ -1358,7 +1371,7 @@ trait bfProcessorRendering
 
         // CONTENTBUILDER END
 
-        if (trim($this->formrow->template_code_processed) == '') {
+        if (trim($this->processor->formrow->template_code_processed) == '') {
 
             // fixing J3 css
             Factory::getApplication()->getDocument()->addStyleDeclaration(
@@ -1373,21 +1386,21 @@ trait bfProcessorRendering
              '
             );
 
-            for ($i = 0; $i < $this->rowcount; $i++) {
-                $row = &$this->rows[$i];
+            for ($i = 0; $i < $this->processor->rowcount; $i++) {
+                $row = &$this->processor->rows[$i];
                 if (!is_numeric($row->width))
                     $row->width = 0;
                 if (!is_numeric($row->height))
                     $row->height = 0;
                 if ($row->type != 'Query List') {
-                    $data1 = $this->replaceCode($row->data1, "data1 of $row->name", 'e', $row->id, 0);
-                    if ($this->bury())
+                    $data1 = $this->processor->replaceCode($row->data1, "data1 of $row->name", 'e', $row->id, 0);
+                    if ($this->processor->bury())
                         return;
-                    $data2 = $this->replaceCode($row->data2, "data2 of $row->name", 'e', $row->id, 0);
-                    if ($this->bury())
+                    $data2 = $this->processor->replaceCode($row->data2, "data2 of $row->name", 'e', $row->id, 0);
+                    if ($this->processor->bury())
                         return;
-                    $data3 = $this->replaceCode($row->data3, "data3 of $row->name", 'e', $row->id, 0);
-                    if ($this->bury())
+                    $data3 = $this->processor->replaceCode($row->data3, "data3 of $row->name", 'e', $row->id, 0);
+                    if ($this->processor->bury())
                         return;
                 } // if
                 $attribs = 'position:absolute;z-index:' . $i . ';';
@@ -1411,16 +1424,16 @@ trait bfProcessorRendering
                 $class2 = '';
                 if ($row->type == 'Select List') {
                     if ($row->class1 != '')
-                        $class1 = ' class="' . $this->getClassName($row->class1) . '"';
+                        $class1 = ' class="' . $this->processor->getClassName($row->class1) . '"';
                     if ($row->class2 != '')
-                        $class2 = ' class="' . $this->getClassName($row->class2) . ' chzn-done"';
+                        $class2 = ' class="' . $this->processor->getClassName($row->class2) . ' chzn-done"';
                     else
                         $class2 = ' class="chzn-done"';
                 } else {
                     if ($row->class1 != '')
-                        $class1 = ' class="' . $this->getClassName($row->class1) . '"';
+                        $class1 = ' class="' . $this->processor->getClassName($row->class1) . '"';
                     if ($row->class2 != '')
-                        $class2 = ' class="' . $this->getClassName($row->class2) . '"';
+                        $class2 = ' class="' . $this->processor->getClassName($row->class2) . '"';
                 }
                 switch ($row->type) {
                     case 'Static Text/HTML':
@@ -1444,7 +1457,7 @@ trait bfProcessorRendering
                     default:
                         break;
                 } // switch
-                if ($row->page != $this->page)
+                if ($row->page != $this->processor->page)
                     $attribs .= 'visibility:hidden;';
                 switch ($row->type) {
                     case 'Static Text/HTML':
@@ -1492,7 +1505,7 @@ trait bfProcessorRendering
                             $attribs .= ' checked="checked"';
                         if ($row->flag2)
                             $attribs .= ' disabled="disabled"';
-                        $attribs .= $this->script2clause($row);
+                        $attribs .= $this->processor->script2clause($row);
                         echo indentc(2) . '<input id="ff_elem' . $row->id . '" type="checkbox" name="ff_nm_' . $row->name . '[]" value="' . $data1 . '"' . $attribs . $class2 . '/><label id="ff_lbl' . $row->id . '" for="ff_elem' . $row->id . '"> ' . $data2 . '</label>' . nlc();
                         echo indentc(1) . '</div>' . nl();
                         break;
@@ -1503,7 +1516,7 @@ trait bfProcessorRendering
                             $attribs .= ' checked="checked"';
                         if ($row->flag2)
                             $attribs .= ' disabled="disabled"';
-                        $attribs .= $this->script2clause($row);
+                        $attribs .= $this->processor->script2clause($row);
                         echo indentc(2) . '<input id="ff_elem' . $row->id . '" type="radio" name="ff_nm_' . $row->name . '[]" value="' . $data1 . '"' . $attribs . $class2 . '/><label id="ff_lbl' . $row->id . '" for="ff_elem' . $row->id . '"> ' . $data2 . '</label>' . nlc();
                         echo indentc(1) . '</div>' . nl();
                         break;
@@ -1512,7 +1525,7 @@ trait bfProcessorRendering
                         $attribs = '';
                         if ($row->flag2)
                             $attribs .= ' disabled="disabled"';
-                        $attribs .= $this->script2clause($row);
+                        $attribs .= $this->processor->script2clause($row);
                         echo indentc(2) . '<input id="ff_elem' . $row->id . '" type="button" name="ff_nm_' . $row->name . '" value="' . $data2 . '"' . $attribs . $class2 . '/>' . nlc();
                         echo indentc(1) . '</div>' . nl();
                         break;
@@ -1521,7 +1534,7 @@ trait bfProcessorRendering
                         $attribs = '';
                         if ($row->flag2)
                             $attribs .= ' disabled="disabled"';
-                        $attribs .= $this->script2clause($row);
+                        $attribs .= $this->processor->script2clause($row);
                         echo indentc(2) . '<button id="ff_elem' . $row->id . '" type="button" name="ff_nm_' . $row->name . '" value="' . $data2 . '"' . $attribs . $class2 . '>' . nlc();
                         $attribs = '';
                         if ($row->width > 0)
@@ -1581,7 +1594,7 @@ trait bfProcessorRendering
                         if ($data3 != '')
                             $swap = 'onmouseout="MM_swapImgRestore();" onmouseover="MM_swapImage(\'ff_img' . $row->id . '\',\'\',\'' . $data3 . '\',1);" ';
 
-                        $swap .= $this->script2clause($row);
+                        $swap .= $this->processor->script2clause($row);
                         $attribs = '';
                         if ($row->width > 0)
                             $attribs .= 'width="' . $row->width . '" ';
@@ -1630,7 +1643,7 @@ trait bfProcessorRendering
                             $attribs .= ' multiple="multiple"';
                         if ($row->flag2)
                             $attribs .= ' disabled="disabled"';
-                        $attribs .= $this->script2clause($row);
+                        $attribs .= $this->processor->script2clause($row);
                         if ($data1 != '')
                             $attribs .= ' size="' . $data1 . '"';
                         if ($styles != '')
@@ -1645,7 +1658,7 @@ trait bfProcessorRendering
                                 case 0:
                                     break;
                                 case 1:
-                                    if ($this->trim($opt[0])) {
+                                    if ($this->processor->trim($opt[0])) {
                                         $selected = '0';
                                         $value = $text = $opt[0];
                                     } // if
@@ -1659,9 +1672,9 @@ trait bfProcessorRendering
                                     $text = $opt[1];
                                     $value = $opt[2];
                             } // switch
-                            if ($this->trim($selected)) {
+                            if ($this->processor->trim($selected)) {
                                 $attribs = '';
-                                if ($this->trim($value) != '') {
+                                if ($this->processor->trim($value) != '') {
                                     if ($value == '""' || $value == "''")
                                         $value = '';
                                     $attribs .= ' value="' . htmlspecialchars($value, ENT_QUOTES) . '"';
@@ -1699,7 +1712,7 @@ trait bfProcessorRendering
                             default:
                                 break;
                         } // switch
-                        $attribs .= $this->script2clause($row);
+                        $attribs .= $this->processor->script2clause($row);
                         echo indentc(2) . '<input id="ff_elem' . $row->id . '"' . $attribs . ' name="ff_nm_' . $row->name . '[]" value="' . $data1 . '"' . $class2 . '/>' . nlc();
                         echo indentc(1) . '</div>' . nl();
                         break;
@@ -1728,14 +1741,14 @@ trait bfProcessorRendering
                                 $styles .= 'height:' . $row->height . 'px;';
                             else {
                                 $height = $row->height;
-                                if ($height > 1 && stristr($this->browser, 'mozilla'))
+                                if ($height > 1 && stristr($this->processor->browser, 'mozilla'))
                                     $height--;
                                 $attribs .= ' rows="' . $height . '"';
                             } // if
                         } // if
                         if ($styles != '')
                             $attribs .= ' style="' . $styles . '"';
-                        $attribs .= $this->script2clause($row);
+                        $attribs .= $this->processor->script2clause($row);
                         echo indentc(2) . '<textarea id="ff_elem' . $row->id . '" name="ff_nm_' . $row->name . '[]"' . $attribs . $class2 . '>' . $data1 . '</textarea>' . nlc();
                         echo indentc(1) . '</div>' . nl();
                         break;
@@ -1750,12 +1763,12 @@ trait bfProcessorRendering
                             $attribs .= ' disabled="disabled"';
                         if ($row->data2 != '')
                             $attribs .= ' accept="' . $data2 . '"';
-                        $attribs .= $this->script2clause($row);
+                        $attribs .= $this->processor->script2clause($row);
                         echo indentc(2) . '<input id="ff_elem' . $row->id . '"' . $attribs . ' type="file" name="ff_nm_' . $row->name . '[]"' . $class2 . '/>' . nlc();
                         echo indentc(1) . '</div>' . nl();
                         break;
                     case 'Captcha':
-                        if ($this->app->isClient('site')) {
+                        if ($this->processor->app->isClient('site')) {
                             $captcha_url = Uri::root(true) . '/media/com_breezingformsng/images/site/captcha/securimage_show.php';
                         } else {
                             $captcha_url = Uri::root(true) . '/media/com_breezingformsng/images/site/captcha/securimage_show.php';
@@ -1780,7 +1793,7 @@ trait bfProcessorRendering
                         $settings = explode("\n", $row->data1);
                         $scnt = count($settings);
                         for ($s = 0; $s < $scnt; $s++)
-                            $this->trim($settings[$s]);
+                            $this->processor->trim($settings[$s]);
                         $trhclass = '';
                         $tr1class = '';
                         $tr2class = '';
@@ -1795,15 +1808,15 @@ trait bfProcessorRendering
                         if ($scnt > 2 && $settings[2] != '')
                             $attribs .= ' cellpadding="' . $settings[2] . '"';
                         if ($scnt > 3 && $settings[3] != '')
-                            $trhclass = ' class="' . $this->getClassName($settings[3]) . '"';
+                            $trhclass = ' class="' . $this->processor->getClassName($settings[3]) . '"';
                         if ($scnt > 4 && $settings[4] != '')
-                            $tr1class = ' class="' . $this->getClassName($settings[4]) . '"';
+                            $tr1class = ' class="' . $this->processor->getClassName($settings[4]) . '"';
                         if ($scnt > 5 && $settings[5] != '')
-                            $tr2class = ' class="' . $this->getClassName($settings[5]) . '"';
+                            $tr2class = ' class="' . $this->processor->getClassName($settings[5]) . '"';
                         if ($scnt > 6 && $settings[6] != '')
-                            $trfclass = ' class="' . $this->getClassName($settings[6]) . '"';
+                            $trfclass = ' class="' . $this->processor->getClassName($settings[6]) . '"';
                         if ($scnt > 7 && $settings[7] != '')
-                            $tdfclass = ' class="' . $this->getClassName($settings[7]) . '"';
+                            $tdfclass = ' class="' . $this->processor->getClassName($settings[7]) . '"';
                         if ($scnt > 8 && $settings[8] != '')
                             $pagenav = $settings[8];
 
@@ -1813,7 +1826,7 @@ trait bfProcessorRendering
                         // display 1st page of table
                         echo indentc(2) . '<table id="ff_elem' . $row->id . '"' . $attribs . $class2 . '>' . nl();
 
-                        $cols = &$this->queryCols['ff_' . $row->id];
+                        $cols = &$this->processor->queryCols['ff_' . $row->id];
                         $colcnt = count($cols);
 
                         // display header
@@ -1867,7 +1880,7 @@ trait bfProcessorRendering
                                             $skip = $col->thspan - 1;
                                         } // if
                                         if ($col->class1 != '')
-                                            $attribs .= ' class="' . $this->getClassName($col->class1) . '"';
+                                            $attribs .= ' class="' . $this->processor->getClassName($col->class1) . '"';
                                         if (intval($col->width) > 0 && !$skip) {
                                             $style .= 'width:' . $col->width;
                                             if ($col->widthmd)
@@ -1883,14 +1896,14 @@ trait bfProcessorRendering
                                             else
                                                 echo indentc(4) . '<th' . $attribs . '></th>' . nlc();
                                         } else
-                                            echo indentc(4) . '<th' . $attribs . '>' . $this->replaceCode($col->title, Text::_('COM_BREEZINGFORMSNG_PROCESS_QTITLEOF') . " $row->name::$col->name", 'e', $row->id, 2) . '</th>' . nlc();
+                                            echo indentc(4) . '<th' . $attribs . '>' . $this->processor->replaceCode($col->title, Text::_('COM_BREEZINGFORMSNG_PROCESS_QTITLEOF') . " $row->name::$col->name", 'e', $row->id, 2) . '</th>' . nlc();
                                     } // if
                                     unset($col);
                                 } // if
                             echo indentc(3) . '</tr>' . nl();
                         } // if
                         // display data rows
-                        $qrows = &$this->queryRows['ff_' . $row->id];
+                        $qrows = &$this->processor->queryRows['ff_' . $row->id];
                         $qcnt = count($qrows);
                         $k = 1;
                         if ($row->height > 0 && $qcnt > $row->height)
@@ -1947,7 +1960,7 @@ trait bfProcessorRendering
                                     else
                                         $cl = $col->class3;
                                     if ($cl != '')
-                                        $attribs .= ' class="' . $this->getClassName($cl) . '"';
+                                        $attribs .= ' class="' . $this->processor->getClassName($cl) . '"';
                                     if (!$skip && $col->thspan > 1)
                                         $skip = $col->thspan;
                                     if ($skip && $q == 0)
@@ -1971,16 +1984,16 @@ trait bfProcessorRendering
                                         echo indentc(4) . '<td' . $attribs . '>' . $qrow[$c] . '</td>' . nlc();
                                 } // if
                                 unset($col);
-                                if ($this->dying)
+                                if ($this->processor->dying)
                                     break;
                             } // for
                             echo indentc(3) . '</tr>' . nl();
                             $k = 3 - $k;
                             unset($qrow);
-                            if ($this->dying)
+                            if ($this->processor->dying)
                                 break;
                         } // for
-                        if ($this->bury())
+                        if ($this->processor->bury())
                             return;
 
                         // display footer
@@ -2035,9 +2048,9 @@ trait bfProcessorRendering
                 } // switch
                 unset($row);
             } // for
-        } else if (trim($this->formrow->template_code_processed) == 'QuickMode') {
+        } else if (trim($this->processor->formrow->template_code_processed) == 'QuickMode') {
 
-            if ($this->isMobile) {
+            if ($this->processor->isMobile) {
 
                 // nothing
             } else {
@@ -2048,18 +2061,18 @@ trait bfProcessorRendering
                     if (isset($rootMdata['themebootstrapMode']) && $rootMdata['themebootstrapMode']) {
 
                         require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickModeOnePage.php');
-                        $quickMode = new BFQuickModeOnePage($this);
+                        $quickMode = new BFQuickModeOnePage($this->processor);
                     } else {
 
                         require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickModeBootstrap.php');
-                        $quickMode = new BFQuickModeBootstrap($this);
+                        $quickMode = new BFQuickModeBootstrap($this->processor);
                     }
 
-                    $this->quickmode = $quickMode;
+                    $this->processor->quickmode = $quickMode;
                 } else {
                     require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickMode.php');
-                    $quickMode = new BFQuickMode($this);
-                    $this->quickmode = $quickMode;
+                    $quickMode = new BFQuickMode($this->processor);
+                    $this->processor->quickmode = $quickMode;
                 }
             }
 
@@ -2079,7 +2092,7 @@ trait bfProcessorRendering
             $quickMode->render();
         }
 
-        if ($this->editable) {
+        if ($this->processor->editable) {
             echo '<script type="text/javascript"><!--' . nl() . 'if(typeof bfLoadEditable != "undefined") { 
 			    if(typeof JQuery != "undefined" && typeof bfToggleFieldsLoaded != "undefined" && typeof bfToggleFieldsLoaded != "undefined"){
 			        JQuery(document).ready(function(){
@@ -2134,8 +2147,8 @@ trait bfProcessorRendering
         // writing hidden input for groups. helps on recording updates, otherwise no value would be transferred.
         // the "cbGroupMark" won't be stored.
         if ($cbForm !== null) {
-            for ($i = 0; $i < $this->rowcount; $i++) {
-                $row = $this->rows[$i];
+            for ($i = 0; $i < $this->processor->rowcount; $i++) {
+                $row = $this->processor->rows[$i];
                 switch ($row->type) {
                     case 'Checkbox':
                     case 'Checkbox Group':
@@ -2150,39 +2163,39 @@ trait bfProcessorRendering
         }
 
         $paymentMethod = '';
-        for ($i = 0; $i < $this->rowcount; $i++) {
-            $row = $this->rows[$i];
+        for ($i = 0; $i < $this->processor->rowcount; $i++) {
+            $row = $this->processor->rows[$i];
             if ($row->type == "PayPal" || $row->type == "Sofortueberweisung" || $row->type == "Stripe") {
                 echo indentc(1) . '<input type="hidden" name="ff_payment_method" id="bfPaymentMethod" value=""/>' . nl();
                 break;
             }
         }
 
-        switch ($this->runmode) {
+        switch ($this->processor->runmode) {
             case _FF_RUNMODE_FRONTEND:
                 echo indentc(1) . '<input type="hidden" name="ff_contentid" value="' . Factory::getApplication()->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_applic" value="' . Factory::getApplication()->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->record_id . '"/>' . nl() .
+                    indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->processor->record_id . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_module_id" value="' . Factory::getApplication()->getInput()->getInt('ff_module_id', 0) . '"/>' . nl();
-                echo indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities($this->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
+                echo indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities((string) $this->processor->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
                     indentc(1) . \Joomla\CMS\HTML\HTMLHelper::_('form.token') . nl();
-                if ($this->target > 1)
-                    echo indentc(1) . '<input type="hidden" name="ff_target" value="' . htmlentities($this->target, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if ($this->inframe)
+                if ($this->processor->target > 1)
+                    echo indentc(1) . '<input type="hidden" name="ff_target" value="' . htmlentities((string) $this->processor->target, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                if ($this->processor->inframe)
                     echo indentc(1) . '<input type="hidden" name="ff_frame" value="1"/>' . nl();
-                if ($this->border)
+                if ($this->processor->border)
                     echo indentc(1) . '<input type="hidden" name="ff_border" value="1"/>' . nl();
-                if ($this->page != 1)
-                    echo indentc(1) . '<input type="hidden" name="ff_page" value="' . htmlentities($this->page, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if ($this->align != 1)
-                    echo indentc(1) . '<input type="hidden" name="ff_align" value="' . htmlentities($this->align, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if ($this->top != 0)
-                    echo indentc(1) . '<input type="hidden" name="ff_top" value="' . htmlentities($this->top, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                if ($this->processor->page != 1)
+                    echo indentc(1) . '<input type="hidden" name="ff_page" value="' . htmlentities((string) $this->processor->page, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                if ($this->processor->align != 1)
+                    echo indentc(1) . '<input type="hidden" name="ff_align" value="' . htmlentities((string) $this->processor->align, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                if ($this->processor->top != 0)
+                    echo indentc(1) . '<input type="hidden" name="ff_top" value="' . htmlentities((string) $this->processor->top, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                 reset($ff_otherparams);
                 // while (list($prop, $val) = each($ff_otherparams))
                 foreach ($ff_otherparams as $prop => $val) {
-                    echo indentc(1) . '<input type="hidden" name="' . htmlentities($prop, ENT_QUOTES, 'UTF-8') . '" value="' . htmlentities(urlencode($val), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                    echo indentc(1) . '<input type="hidden" name="' . htmlentities((string) $prop, ENT_QUOTES, 'UTF-8') . '" value="' . htmlentities(urlencode((string) $val), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                 }
                 if (Factory::getApplication()->getInput()->getInt('cb_form_id', 0)) {
                     echo '<input type="hidden" name="cb_form_id" value="' . Factory::getApplication()->getInput()->getInt('cb_form_id', 0) . '"/>' . nl();
@@ -2205,26 +2218,26 @@ trait bfProcessorRendering
             case _FF_RUNMODE_BACKEND:
                 echo indentc(1) . '<input type="hidden" name="option" value="com_breezingformsng"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="act" value="run"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities($this->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
+                    indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities((string) $this->processor->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
                     indentc(1) . \Joomla\CMS\HTML\HTMLHelper::_('form.token') . nl() .
                     indentc(1) . '<input type="hidden" name="ff_contentid" value="' . Factory::getApplication()->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_applic" value="' . Factory::getApplication()->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->record_id . '"/>' . nl() .
+                    indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->processor->record_id . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_module_id" value="' . Factory::getApplication()->getInput()->getInt('ff_module_id', 0) . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_runmode" value="' . htmlentities($this->runmode, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if ($this->target > 1)
-                    echo indentc(1) . '<input type="hidden" name="ff_target" value="' . htmlentities($this->target, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if ($this->inframe)
+                    indentc(1) . '<input type="hidden" name="ff_runmode" value="' . htmlentities((string) $this->processor->runmode, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                if ($this->processor->target > 1)
+                    echo indentc(1) . '<input type="hidden" name="ff_target" value="' . htmlentities((string) $this->processor->target, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                if ($this->processor->inframe)
                     echo indentc(1) . '<input type="hidden" name="ff_frame" value="1"/>' . nl();
-                if ($this->border)
+                if ($this->processor->border)
                     echo indentc(1) . '<input type="hidden" name="ff_border" value="1"/>' . nl();
-                if ($this->page != 1)
-                    echo indentc(1) . '<input type="hidden" name="ff_page" value="' . htmlentities($this->page, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if ($this->align != 1)
-                    echo indentc(1) . '<input type="hidden" name="ff_align" value="' . htmlentities($this->align, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if ($this->top != 0)
-                    echo indentc(1) . '<input type="hidden" name="ff_top" value="' . htmlentities($this->top, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                if ($this->processor->page != 1)
+                    echo indentc(1) . '<input type="hidden" name="ff_page" value="' . htmlentities((string) $this->processor->page, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                if ($this->processor->align != 1)
+                    echo indentc(1) . '<input type="hidden" name="ff_align" value="' . htmlentities((string) $this->processor->align, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                if ($this->processor->top != 0)
+                    echo indentc(1) . '<input type="hidden" name="ff_top" value="' . htmlentities((string) $this->processor->top, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                 if (Factory::getApplication()->getInput()->getInt('cb_form_id', 0)) {
                     echo '<input type="hidden" name="cb_form_id" value="' . Factory::getApplication()->getInput()->getInt('cb_form_id', 0) . '"/>' . nl();
                     if (Factory::getApplication()->getInput()->getInt('cb_record_id', 0)) {
@@ -2245,19 +2258,19 @@ trait bfProcessorRendering
                 break;
 
             default: // _FF_RUNMODE_PREVIEW:
-                if ($this->inframe) {
+                if ($this->processor->inframe) {
                     echo indentc(1) . '<input type="hidden" name="option" value="com_breezingformsng"/>' . nl() .
                         indentc(1) . '<input type="hidden" name="ff_frame" value="1"/>' . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities($this->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
+                        indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities((string) $this->processor->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
                         indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
                     indentc(1) . \Joomla\CMS\HTML\HTMLHelper::_('form.token') . nl() .
                         indentc(1) . '<input type="hidden" name="ff_contentid" value="' . Factory::getApplication()->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
                         indentc(1) . '<input type="hidden" name="ff_applic" value="' . Factory::getApplication()->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->record_id . '"/>' . nl() .
+                        indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->processor->record_id . '"/>' . nl() .
                         indentc(1) . '<input type="hidden" name="ff_module_id" value="' . Factory::getApplication()->getInput()->getInt('ff_module_id', 0) . '"/>' . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_runmode" value="' . htmlentities($this->runmode, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                    if ($this->page != 1)
-                        echo indentc(1) . '<input type="hidden" name="ff_page" value="' . htmlentities($this->page, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                        indentc(1) . '<input type="hidden" name="ff_runmode" value="' . htmlentities((string) $this->processor->runmode, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                    if ($this->processor->page != 1)
+                        echo indentc(1) . '<input type="hidden" name="ff_page" value="' . htmlentities((string) $this->processor->page, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                     if (Factory::getApplication()->getInput()->getInt('cb_form_id', 0)) {
                         echo '<input type="hidden" name="cb_form_id" value="' . Factory::getApplication()->getInput()->getInt('cb_form_id', 0) . '"/>' . nl();
                         if (Factory::getApplication()->getInput()->getInt('cb_record_id', 0)) {
@@ -2279,57 +2292,57 @@ trait bfProcessorRendering
         // handle After Form piece
         $code = '';
 
-        switch ($this->formrow->piece2cond) {
+        switch ($this->processor->formrow->piece2cond) {
             case 1: // library
-                $piece2id = (int) $this->formrow->piece2id;
-                $query = $this->database->getQuery(true)
+                $piece2id = (int) $this->processor->formrow->piece2id;
+                $query = $this->processor->database->getQuery(true)
                     ->select(['name', 'code'])
-                    ->from($this->database->quoteName('#__facileforms_pieces'))
-                    ->where($this->database->quoteName('id') . ' = :piece2id')
-                    ->where($this->database->quoteName('published') . ' = 1')
+                    ->from($this->processor->database->quoteName('#__facileforms_pieces'))
+                    ->where($this->processor->database->quoteName('id') . ' = :piece2id')
+                    ->where($this->processor->database->quoteName('published') . ' = 1')
                     ->bind(':piece2id', $piece2id, ParameterType::INTEGER);
-                $this->database->setQuery($query);
-                $rows = $this->database->loadObjectList();
+                $this->processor->database->setQuery($query);
+                $rows = $this->processor->database->loadObjectList();
                 if (count($rows))
-                    echo $this->execPiece(
+                    echo $this->processor->execPiece(
                         $rows[0]->code,
                         Text::_('COM_BREEZINGFORMSNG_PROCESS_AFPIECE') . " " . $rows[0]->name,
                         'p',
-                        $this->formrow->piece2id,
+                        $this->processor->formrow->piece2id,
                         null
                     );
                 break;
             case 2: // custom code
-                echo $this->execPiece(
-                    $this->formrow->piece2code,
+                echo $this->processor->execPiece(
+                    $this->processor->formrow->piece2code,
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_AFPIECEC'),
                     'f',
-                    $this->form,
+                    $this->processor->form,
                     2
                 );
                 break;
             default:
                 break;
         } // switch
-        if ($this->bury())
+        if ($this->processor->bury())
             return;
 
-        if ($this->legacy_wrap) {
+        if ($this->processor->legacy_wrap) {
             echo '</div></div></div><div class="bfPage-bl"><div class="bfPage-br"><div class="bfPage-b"></div></div></div></div><!-- form end -->' . nl();
         } else {
             echo '</div><!-- form end -->' . nl();
         }
-        if ($this->traceMode & _FF_TRACEMODE_DIRECT) {
-            $this->dumpTrace();
+        if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT) {
+            $this->processor->dumpTrace();
             ob_end_flush();
             echo '</pre>';
         } else {
             ob_end_flush();
-            $this->dumpTrace();
+            $this->processor->dumpTrace();
         } // if
         restore_error_handler();
 
-        if (trim($this->formrow->template_code_processed) == 'QuickMode' && $this->isMobile) {
+        if (trim($this->processor->formrow->template_code_processed) == 'QuickMode' && $this->processor->isMobile) {
             $contents = ob_get_contents();
             $ob = 0;
             while (ob_get_level() > 0 && $ob <= 32) {

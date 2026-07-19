@@ -1,4 +1,8 @@
 <?php
+
+declare(strict_types=1);
+
+namespace Vcmb\Component\BreezingformsNG\Site\Configuration;
 /**
  * BreezingForms NG - A Joomla Forms Application
  *
@@ -12,12 +16,12 @@
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
-use Joomla\CMS\Factory;
 use Joomla\CMS\Component\ComponentHelper;
-use Joomla\Database\DatabaseInterface;
 
-// Legacy configuration object, backed by the component parameters.
-class facileFormsConf
+/**
+ * Runtime form-engine configuration backed by the component parameters.
+ */
+final class FormConfiguration
 {
 	public $stylesheet = 1;        	// backend frame preview no/yes
 	public $wysiwyg = 0;        	// use wysiwyg editor for static text
@@ -54,17 +58,13 @@ class facileFormsConf
 
 		public $disable_ip = 0;
 
-	function __construct()
+	public function __construct()
 	{
 		$this->load();
 	} // constructor
 
-	function load()
+	public function load(): void
 	{
-		global $database;
-
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
-
 		$params = ComponentHelper::getParams('com_breezingformsng');
 
 		foreach (['disable_ip', 'emailadr', 'uploads', 'csvdelimiter', 'csvquote', 'cellnewline'] as $key) {
@@ -74,5 +74,4 @@ class facileFormsConf
 			}
 		}
 	} // load
-} // class facileFormsConf
-
+}

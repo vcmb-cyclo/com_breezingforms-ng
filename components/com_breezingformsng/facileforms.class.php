@@ -39,5 +39,4 @@ DEFINE('_FF_RUNMODE_BACKEND', 1);
 DEFINE('_FF_RUNMODE_PREVIEW', 2);
 
 require_once __DIR__ . '/legacy/functions.php';
-require_once __DIR__ . '/legacy/Conf.php';
 require_once __DIR__ . '/legacy/tables.php';

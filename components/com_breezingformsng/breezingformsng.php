@@ -20,6 +20,8 @@ use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use Joomla\Database\DatabaseInterface;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 use Vcmb\Component\BreezingformsNG\Site\Service\EngineDispatcher;
+use Vcmb\Component\BreezingformsNG\Site\Configuration\FormConfiguration;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RuntimeContextInitializer;
 
 if (!function_exists('bf_b64enc')) {
 
@@ -76,6 +78,8 @@ $ff_config, // FacileForms configuration object
 $ff_mospath, // path to root of joomla
 $ff_compath, // path to component frontend root
 $ff_mossite, // url of the site root
+$ff_comsite, // url of the component frontend root
+$ff_otherparams, // request parameters propagated through the form
 $ff_request, // array of request parameters ff_param_*
 $ff_processor, // current form procesor object
 $ff_target;    // index of form on current page
@@ -96,8 +100,15 @@ $ff_compath = $ff_mospath . '/components/com_breezingformsng';
 
 // load config and initialize globals
 require_once ($ff_compath . '/facileforms.class.php');
-$ff_config = new facileFormsConf();
-initFacileForms();
+$ff_config = new FormConfiguration();
+$runtimeContext = (new RuntimeContextInitializer($mainframe, $ff_config))->initialize(
+    $ff_mossite ?? null,
+    $ff_comsite ?? null,
+    $ff_otherparams ?? null,
+);
+$ff_mossite = $runtimeContext['siteUrl'];
+$ff_comsite = $runtimeContext['componentUrl'];
+$ff_otherparams = $runtimeContext['otherParameters'];
 
 // context handed over by the including application (module/plugin or MVC template)
 $bfEngineContext = [

@@ -185,7 +185,7 @@ class PiecesController extends BaseController
         $ff_admsite = $ff_mospath . '/administrator' . $comppath;
         $ff_admicon = $ff_admsite . '/images/icons';
 
-        require_once JPATH_SITE . '/components/com_breezingformsng/facileforms.class.php';
+        require_once JPATH_SITE . '/components/com_breezingformsng/src/Support/runtime_bootstrap.php';
 
         $ff_config = (object) [
             'areasmall'  => 4,

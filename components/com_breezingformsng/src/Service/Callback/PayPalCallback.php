@@ -33,12 +33,7 @@ final class PayPalCallback
 
     public function confirmIpn(): void
     {
-        global $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
-
-        $database = $this->database;
-
-        $mainframe = $this->application;
-        $db = $database;
+        $db = $this->database;
 
 
 
@@ -227,12 +222,7 @@ final class PayPalCallback
 
     public function confirm(): void
     {
-        global $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
-
-        $database = $this->database;
-
-        $mainframe = $this->application;
-        $db = $database;
+        $db = $this->database;
 
 
 
@@ -440,12 +430,7 @@ final class PayPalCallback
 
     public function download(): void
     {
-        global $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
-
-        $database = $this->database;
-
-        $mainframe = $this->application;
-        $db = $database;
+        $db = $this->database;
 
 
 
@@ -544,16 +529,11 @@ final class PayPalCallback
 
     public function connectMessage(): void
     {
-        global $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
-
-        $database = $this->database;
-
-        $mainframe = $this->application;
-        $db = $database;
+        $db = $this->database;
 
 
 
-    $style = '<link rel="stylesheet" href="' . Uri::root() . 'templates/' . $mainframe->getTemplate() . '/css/template.css" type="text/css" />';
+    $style = '<link rel="stylesheet" href="' . Uri::root() . 'templates/' . $this->application->getTemplate() . '/css/template.css" type="text/css" />';
 
     echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="' . strtolower($this->application->getLanguage()->getTag()) . '" lang="' . strtolower($this->application->getLanguage()->getTag()) . '" >

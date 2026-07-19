@@ -398,7 +398,7 @@ $ff_request = array();
             $id = $this->database->loadResult();
             if ($id)
                 $myUser->get('id', -1);
-            require_once JPATH_SITE . '/components/com_breezingformsng/facileforms.process.php';
+            require_once JPATH_SITE . '/components/com_breezingformsng/src/Support/processor_facade.php';
             if ($task == 'view') {
                 $div1style = '';
                 $div2style = '';

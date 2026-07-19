@@ -12,7 +12,7 @@
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
-// Legacy runtime helpers of the form engine.
+// Public runtime helpers used by stored form scripts and the processor facade.
 
 function nl()
 {
@@ -117,4 +117,3 @@ function ff_reserved($p, $ff_param = true)
 				return true;
 	return false;
 } // ff_reserved
-

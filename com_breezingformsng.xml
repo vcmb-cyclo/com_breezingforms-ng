@@ -42,12 +42,9 @@
 	<files folder="components/com_breezingformsng">
 		<filename>index.html</filename>
 		<filename>breezingformsng.php</filename>
-		<filename>facileforms.class.php</filename>
-		<filename>facileforms.process.php</filename>
 		<folder>downloadtpl</folder>
 		<folder>exports</folder>
 		<folder>language</folder>
-		<folder>legacy</folder>
 		<folder>libraries</folder>
 		<folder>src</folder>
 		<folder>themes</folder>

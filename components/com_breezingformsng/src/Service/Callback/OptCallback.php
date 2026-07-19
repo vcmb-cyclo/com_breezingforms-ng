@@ -30,12 +30,9 @@ final class OptCallback
 
     public function optIn(): void
     {
-        global $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
 
         $database = $this->database;
 
-        $mainframe = $this->application;
-        $db = $database;
 
 
     // DOUBLE OPT IN
@@ -68,12 +65,9 @@ final class OptCallback
 
     public function optOut(): void
     {
-        global $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
 
         $database = $this->database;
 
-        $mainframe = $this->application;
-        $db = $database;
 
 
     $jinput = $this->application->getInput();

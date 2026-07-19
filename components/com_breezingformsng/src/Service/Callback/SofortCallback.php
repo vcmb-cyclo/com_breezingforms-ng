@@ -35,12 +35,7 @@ final class SofortCallback
 
     public function success(): void
     {
-        global $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
-
-        $database = $this->database;
-
-        $mainframe = $this->application;
-        $db = $database;
+        $db = $this->database;
 
 
 
@@ -129,12 +124,7 @@ final class SofortCallback
 
     public function confirm(): void
     {
-        global $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
-
-        $database = $this->database;
-
-        $mainframe = $this->application;
-        $db = $database;
+        $db = $this->database;
 
 
 
@@ -302,12 +292,7 @@ final class SofortCallback
 
     public function download(): void
     {
-        global $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
-
-        $database = $this->database;
-
-        $mainframe = $this->application;
-        $db = $database;
+        $db = $this->database;
 
 
 

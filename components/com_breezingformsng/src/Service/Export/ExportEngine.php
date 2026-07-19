@@ -19,8 +19,8 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Export;
 use BFIntegrate;
 use DateTimeZone;
 use Exception;
-use facileFormsRecords;
-use facileFormsSubrecords;
+use Vcmb\Component\BreezingformsNG\Site\Table\RecordTable;
+use Vcmb\Component\BreezingformsNG\Site\Table\SubrecordTable;
 use HTML_facileFormsProcessor;
 use Throwable;
 use Joomla\Database\DatabaseInterface;
@@ -101,7 +101,7 @@ final class ExportEngine
             }
         }
 
-        $record = new facileFormsRecords($this->processor->database);
+        $record = new RecordTable($this->processor->database);
         $record->submitted = $this->processor->submitted;
         $record->form = $this->processor->form;
         $record->title = $this->processor->formrow->title;
@@ -183,7 +183,7 @@ final class ExportEngine
         $this->processor->record_id = $record->id;
 
         $names = array();
-        $subrecord = new facileFormsSubrecords($this->processor->database);
+        $subrecord = new SubrecordTable($this->processor->database);
         $subrecord->record = $record->id;
         if (count($this->processor->savedata)) {
 

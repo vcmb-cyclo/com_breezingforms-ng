@@ -1,4 +1,8 @@
 <?php
+
+declare(strict_types=1);
+
+namespace Vcmb\Component\BreezingformsNG\Site\Table;
 /**
  * BreezingForms NG - A Joomla Forms Application
  *
@@ -15,8 +19,8 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 use Joomla\CMS\Table\Table;
 use Joomla\Database\DatabaseInterface;
 
-// Legacy table classes of the form engine (global names, used across the processor).
-class facileFormsMenus extends Table
+// Runtime table records retained in one bootstrap file while the engine facade remains global.
+final class MenuTable extends Table
 {
 	public $id = null;     // identifier
 	public $package = null;     // package name
@@ -41,9 +45,9 @@ class facileFormsMenus extends Table
 		return parent::load($id, $reset ?? true);
 	}
 
-} // class facileFormsMenus
+} // class MenuTable
 
-class facileFormsForms extends Table
+final class FormTable extends Table
 {
 	public $id = null;     // identifier
 	public $package = null;     // package name
@@ -147,9 +151,9 @@ class facileFormsForms extends Table
 		return parent::load($id, $reset ?? true);
 	}
 
-} // class facileFormsForms
+} // class FormTable
 
-class facileFormsElements extends Table
+final class ElementTable extends Table
 {
 	public $id = null;     // general parameters
 	public $form = null;     // form id
@@ -235,9 +239,9 @@ Query List Settings: border / cellspacing / cellpadding / <tr(h)>class / <tr(1)>
 		return parent::load($id, $reset ?? true);
 	}
 
-} // class facileFormsElements
+} // class ElementTable
 
-class facileFormsScripts extends Table
+final class ScriptTable extends Table
 {
 	public $id = null;     		// identifier
 	public $published = null;   // is published
@@ -263,9 +267,9 @@ class facileFormsScripts extends Table
 		return parent::load($id, $reset ?? true);
 	}
 
-} // class facileFormsScripts
+} // class ScriptTable
 
-class facileFormsPieces extends Table
+final class PieceTable extends Table
 {
 	public $id = null;     			// identifier
 	public $published = null;   	// is published
@@ -291,9 +295,9 @@ class facileFormsPieces extends Table
 		return parent::load($id, $reset ?? true);
 	}
 
-} // class facileFormsPieces
+} // class PieceTable
 
-class facileFormsRecords extends Table
+final class RecordTable extends Table
 {
 	public $id = null;     		// identifier
 	public $submitted = null;   // date and time
@@ -322,9 +326,9 @@ class facileFormsRecords extends Table
 		return parent::load($id, $reset ?? true);
 	}
 
-} // class facileFormsRecords
+} // class RecordTable
 
-class facileFormsSubrecords extends Table
+final class SubrecordTable extends Table
 {
 	public $id = null;     	// identifier
 	public $record = null;  // record id
@@ -343,9 +347,9 @@ class facileFormsSubrecords extends Table
 		return parent::load($id, $reset ?? true);
 	}
 
-} // class facileFormsSubrecords
+} // class SubrecordTable
 
-class facileFormsQuerycols
+final class QueryColumn
 {
 	public $title = null;    // column title
 	public $name = null;     // column name
@@ -440,6 +444,6 @@ class facileFormsQuerycols
 			expstring($this->value);
 	} // pack
 
-} // class facileFormsQuerycols
+} // class QueryColumn
 
 ?>

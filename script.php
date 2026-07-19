@@ -1969,6 +1969,9 @@ class com_breezingformsngInstallerScript
             JPATH_SITE . '/components/com_breezingformsng/legacy/processor/bfProcessorCodeTools.php',
             JPATH_SITE . '/components/com_breezingformsng/legacy/processor/bfProcessorScripting.php',
             JPATH_SITE . '/components/com_breezingformsng/legacy/processor/bfProcessorExports.php',
+            JPATH_SITE . '/components/com_breezingformsng/legacy/processor/bfProcessorNotifications.php',
+            JPATH_SITE . '/components/com_breezingformsng/legacy/processor/bfProcessorSubmission.php',
+            JPATH_SITE . '/components/com_breezingformsng/legacy/processor/bfProcessorRendering.php',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/sql/create_sql.php',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/src/Helper/LegacyClassLoader.php',
         ];

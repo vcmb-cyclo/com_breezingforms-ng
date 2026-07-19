@@ -423,6 +423,39 @@
   `SubmissionTimestampFormatter` restent des dépendances internes typées. Les sept méthodes publiques
   historiques sont conservées comme façades. L'ancien fichier est retiré du bootstrap et ajouté au nettoyage
   de mise à jour. Restent trois traits : `Rendering`, `Notifications` et `Submission`.
+  **Cinquième trait supprimé le 2026-07-19** : `bfProcessorNotifications` devient
+  `Site\Service\Notification\NotificationEngine`. Les notifications administrateur/mailback,
+  Salesforce et Mailchimp ainsi que la résolution des traductions reçoivent explicitement le processeur comme
+  contexte. `TranslationResolver` et `SubmissionTimestampFormatter` restent des dépendances privées typées ;
+  les six méthodes historiques restent des façades publiques. L'ancien fichier est retiré du bootstrap et
+  purgé lors des mises à jour. Restent deux traits : `Rendering` et `Submission`.
+  **Sixième trait supprimé le 2026-07-19** : `bfProcessorSubmission` devient
+  `Site\Service\Submission\SubmissionEngine`. Le pipeline de collecte,
+  validation, stockage, notifications, paiements, Dropbox et nettoyage HTML reçoit explicitement le processeur
+  comme contexte ; `HtmlSanitizer` et `SubmissionTimestampFormatter` restent des dépendances privées typées.
+  Les façades `collectSubmitdata()`, `submit()` et `removeDangerousHtml()` préservent l'API publique.
+  Les deux anciens fichiers sont retirés du bootstrap et purgés lors des mises à jour. Reste un seul trait :
+  `Rendering`.
+  **Septième et dernier trait supprimé le 2026-07-19** : `bfProcessorRendering` devient
+  `Site\Service\Rendering\RenderingEngine`. Le rendu de l'en-tête, les chemins ContentBuilder, les contrôles
+  d'autorisation et la vue QuickMode reçoivent explicitement le processeur comme contexte. Les services
+  `TokenizedDirectoryResolver` et `ProcessorHeaderRenderer` restent des dépendances privées typées ; les cinq
+  méthodes historiques restent des façades publiques. Les instances `BFQuickMode*` reçoivent toujours le
+  processeur public afin de préserver leur contrat. L'ancien fichier est retiré du bootstrap et purgé lors des
+  mises à jour. Aucun trait `legacy/processor/bfProcessor*` ne reste désormais chargé par le moteur.
+  **Dispatcher natif extrait le 2026-07-19** : la sélection procédurale entre rendu, soumission et callbacks
+  quitte `breezingformsng.php` pour `Site\Service\EngineDispatcher`. Le service reçoit explicitement l'objet
+  `Joomla\Input\Input`, centralise la détection des callbacks et conserve exactement leurs gardes historiques.
+  Le contrôleur frontal ne garde plus que l'initialisation du contexte d'exécution, nécessaire aux formulaires
+  et scripts stockés, puis délègue le traitement au service.
+  `FormRenderer` reçoit maintenant explicitement `CMSApplication` et `DatabaseInterface` depuis ce dispatcher :
+  ses 60 résolutions statiques de l'application et son accès à la base globale sont supprimés. La classe est
+  finale, en typage strict, et ne conserve en globals que l'état d'exécution public partagé avec les scripts de
+  formulaires stockés.
+  La façade `HTML_facileFormsProcessor` reçoit à son tour ces deux dépendances dans son constructeur au lieu de
+  les retrouver via `Factory`/le conteneur. Le chargement initial des éléments utilise désormais le query builder
+  Joomla avec paramètre entier lié, sans concaténation SQL. Ses 56 propriétés déclarées avec le mot-clé PHP 4
+  `var` sont converties en propriétés `public` explicites, sans changer le contrat exposé aux scripts stockés.
   (`BFRequest`, `BFIntegrate` et les quatre rendus `BFQuickMode*`) restent volontairement disponibles comme API externe.
   `BFJoomlaConfig` a été remplacé par `Factory::getConfig()` ; `BFPDF` a été migré vers le service namespacé
   `Administrator\Service\PdfDocument`. Les deux classes globales ont été supprimées. Export administrateur vérifié

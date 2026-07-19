@@ -395,9 +395,34 @@
   `Site\Service\Rendering\JavascriptCompressor` ; la longueur de coupure et la fin de ligne sont désormais des
   dépendances explicites, tandis que `compressJavascript()` reste la façade publique. Les lectures des pièces et
   scripts publiés passent par `Site\Service\Scripting\Repository`, avec Query Builder Joomla, paramètres liés et
-  résultats `StoredCode` typés ; les méthodes historiques restent des façades. Restent les
-  responsabilités encore portées par les sept traits
-  `legacy/processor`. Les six classes Crosstec protégées
+  résultats `StoredCode` typés ; les méthodes historiques restent des façades. **Premier trait supprimé le
+  2026-07-19** : `bfProcessorUploads` est remplacé par
+  `Site\Service\Upload\UploadRuntime`, qui compose `UploadPathResolver`, `UploadStorage`,
+  `ImageResizer` et `QuickMode\ElementFinder`. Les méthodes publiques historiques restent sur
+  `HTML_facileFormsProcessor` comme façades pour le PHP personnalisé stocké en base. Son `require_once` et
+  son `use` sont retirés, le fichier supprimé du paquet et ajouté au nettoyage des mises à jour.
+  **Deuxième trait supprimé le 2026-07-19** : `bfProcessorCodeTools` devient
+  `Site\Service\Runtime\CodeToolsRuntime`. Le service compose les quatre helpers typés déjà extraits
+  (`ClassNameResolver`, `JavascriptValueExporter`, `CodeStringTools`, `TraceModeFormatter`) et reçoit
+  explicitement le processeur dont il fait évoluer l'état de trace. Toutes les signatures historiques, y
+  compris les paramètres passés par référence, restent des façades publiques sur
+  `HTML_facileFormsProcessor`. L'évaluation demeure dans le trait Scripting : le `$this` visible par le PHP
+  personnalisé reste donc le processeur, jamais le nouveau runtime. Restent cinq traits `legacy/processor` :
+  `Scripting`, `Rendering`, `Exports`, `Notifications` et `Submission`. Les six classes Crosstec protégées
+  **Troisième trait supprimé le 2026-07-19** : `bfProcessorScripting` devient
+  `Site\Service\Scripting\ScriptingEngine`, appuyé sur `ScriptingRuntime` pour le dépôt et la compression.
+  Les trois chemins d'évaluation PHP sont centralisés dans `StoredPhpExecutor` ; chaque closure est liée
+  explicitement à `HTML_facileFormsProcessor` avec `Closure::call()`, de sorte que le `$this` et les
+  variables locales historiques restent disponibles au code Super User stocké en base. Toutes les méthodes
+  historiques restent des façades publiques sur le processeur, y compris leurs paramètres par référence.
+  L'ancien trait est retiré du bootstrap, supprimé du paquet et purgé lors des mises à jour. Restent quatre
+  traits : `Rendering`, `Exports`, `Notifications` et `Submission`.
+  **Quatrième trait supprimé le 2026-07-19** : `bfProcessorExports` devient
+  `Site\Service\Export\ExportEngine`. La journalisation des enregistrements, les primitives de mail et les
+  exports PDF/CSV/XML reçoivent explicitement `HTML_facileFormsProcessor` comme contexte ; `MailSender` et
+  `SubmissionTimestampFormatter` restent des dépendances internes typées. Les sept méthodes publiques
+  historiques sont conservées comme façades. L'ancien fichier est retiré du bootstrap et ajouté au nettoyage
+  de mise à jour. Restent trois traits : `Rendering`, `Notifications` et `Submission`.
   (`BFRequest`, `BFIntegrate` et les quatre rendus `BFQuickMode*`) restent volontairement disponibles comme API externe.
   `BFJoomlaConfig` a été remplacé par `Factory::getConfig()` ; `BFPDF` a été migré vers le service namespacé
   `Administrator\Service\PdfDocument`. Les deux classes globales ont été supprimées. Export administrateur vérifié

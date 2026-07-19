@@ -10,8 +10,14 @@
  * SPDX-License-Identifier: GPL-2.0-or-later
  **/
 
-defined('_JEXEC') or die('Direct Access to this location is not allowed.');
+declare(strict_types=1);
 
+namespace Vcmb\Component\BreezingformsNG\Site\Service\Scripting;
+
+\defined('_JEXEC') or die;
+
+use Error;
+use HTML_facileFormsProcessor;
 use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Event\Event;
@@ -33,23 +39,24 @@ use CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory;
 use CB\Component\Contentbuilderng\Administrator\Service\ArticleService;
 use CB\Component\Contentbuilderng\Administrator\Service\ListSupportService;
 use CB\Component\Contentbuilderng\Administrator\Service\PermissionService;
-use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\JavascriptCompressor;
-use Vcmb\Component\BreezingformsNG\Site\Service\Scripting\Repository as ScriptingRepository;
 
 /**
  * Pieces, scripts, query columns, builtin JS library and code linking.
  */
-trait bfProcessorScripting
+final class ScriptingEngine
 {
-    private ?JavascriptCompressor $javascriptCompressorService = null;
-    private ?ScriptingRepository $scriptingRepositoryService = null;
+    private ?ScriptingRuntime $scriptingRuntimeService = null;
+
+    public function __construct(private readonly HTML_facileFormsProcessor $processor)
+    {
+    }
 
     function getPieceById($id, $name = null)
     {
-        if ($this->dying)
+        if ($this->processor->dying)
             return '';
 
-        $piece = $this->scriptingRepository()->findPublishedPieceById((int) $id);
+        $piece = $this->scriptingRuntime()->findPieceById((int) $id);
 
         if ($piece === null) {
             return '';
@@ -64,9 +71,9 @@ trait bfProcessorScripting
 
     function getPieceByName($name, $id = null)
     {
-        if ($this->dying)
+        if ($this->processor->dying)
             return '';
-        $piece = $this->scriptingRepository()->findPublishedPieceByName((string) $name);
+        $piece = $this->scriptingRuntime()->findPieceByName((string) $name);
 
         if ($piece === null) {
             return '';
@@ -82,12 +89,12 @@ trait bfProcessorScripting
     function execPiece($code, $name, $type, $id, $pane)
     {
         $ret = '';
-        if ($this->prepareEvalCode($code, $name, $type, $id, $pane)) {
-            $this->traceEval($name);
+        if ($this->processor->prepareEvalCode($code, $name, $type, $id, $pane)) {
+            $this->processor->traceEval($name);
             try {
-                $ret = eval($code);
+                $ret = $this->scriptingRuntime()->executePiece($this->processor, $code, $name, $type, $id, $pane);
             } catch (Error $e) {
-                $this->app->enqueueMessage($e->getMessage() . " in $name.", 'error');
+                $this->processor->app->enqueueMessage($e->getMessage() . " in $name.", 'error');
                 if (\defined('JDEBUG') && JDEBUG) {
                     Log::add( "PHP piece '$name' : " .$e->getMessage(), Log::DEBUG, 'BF Piece');
                 }
@@ -101,8 +108,8 @@ trait bfProcessorScripting
     function execPieceById($id)
     {
         $name = null;
-        $code = $this->getPieceById($id, $name);
-        return $this->execPiece($code, Text::_('COM_BREEZINGFORMSNG_PROCESS_PIECE') . " $name", 'p', $id, null);
+        $code = $this->processor->getPieceById($id, $name);
+        return $this->processor->execPiece($code, Text::_('COM_BREEZINGFORMSNG_PROCESS_PIECE') . " $name", 'p', $id, null);
     }
 
     // execPieceById
@@ -110,8 +117,8 @@ trait bfProcessorScripting
     function execPieceByName($name)
     {
         $id = null;
-        $code = $this->getPieceByName($name, $id);
-        return $this->execPiece($code, Text::_('COM_BREEZINGFORMSNG_PROCESS_PIECE') . " $name", 'p', $id, null);
+        $code = $this->processor->getPieceByName($name, $id);
+        return $this->processor->execPiece($code, Text::_('COM_BREEZINGFORMSNG_PROCESS_PIECE') . " $name", 'p', $id, null);
     }
 
     // execPieceByName
@@ -119,7 +126,7 @@ trait bfProcessorScripting
     function replaceCode($code, $name, $type, $id, $pane)
     {
 
-        if ($this->dying)
+        if ($this->processor->dying)
             return '';
         $p1 = 0;
         $l = strlen($code);
@@ -137,13 +144,13 @@ trait bfProcessorScripting
                 if ($p2 === false)
                     $p2 = $l;
                 $n++;
-                $c .= $this->execPiece(substr($code, $p1, $p2 - $p1), $name . "[$n]", $type, $id, $pane);
-                if ($this->dying)
+                $c .= $this->processor->execPiece(substr($code, $p1, $p2 - $p1), $name . "[$n]", $type, $id, $pane);
+                if ($this->processor->dying)
                     return '';
                 $p1 = $p2 + 2;
             } // if
         } // while
-        return str_replace($this->findtags, $this->replacetags, $c);
+        return str_replace($this->processor->findtags, $this->processor->replacetags, $c);
     }
 
     // replaceCode
@@ -151,7 +158,7 @@ trait bfProcessorScripting
     function compileQueryCol(&$elem, &$coldef)
     {
         $coldef->comp = array();
-        if ($this->trim(str_replace($this->findtags, $this->replacetags, $coldef->value))) {
+        if ($this->processor->trim(str_replace($this->processor->findtags, $this->processor->replacetags, $coldef->value))) {
             $c = $p1 = 0;
             $l = strlen($coldef->value);
             while ($p1 < $l) {
@@ -161,12 +168,12 @@ trait bfProcessorScripting
                 $coldef->comp[$c] = array(
                     false,
                     str_replace(
-                        $this->findtags,
-                        $this->replacetags,
+                        $this->processor->findtags,
+                        $this->processor->replacetags,
                         trim(substr($coldef->value, $p1, $p2 - $p1))
                     )
                 );
-                if ($this->trim($coldef->comp[$c][1]))
+                if ($this->processor->trim($coldef->comp[$c][1]))
                     $c++;
                 $p1 = $p2;
                 if ($p1 < $l) {
@@ -176,7 +183,7 @@ trait bfProcessorScripting
                         $p2 = $l;
                     $coldef->comp[$c] = array(true, substr($coldef->value, $p1, $p2 - $p1));
                     if (
-                        $this->prepareEvalCode(
+                        $this->processor->prepareEvalCode(
                             $coldef->comp[$c][1],
                             Text::_('COM_BREEZINGFORMSNG_PROCESS_QVALUEOF') . " " . $elem->name . "::" . $coldef->name,
                             'e',
@@ -197,12 +204,19 @@ trait bfProcessorScripting
 
     function execQueryValue($code, &$elem, &$row, &$coldef, $value)
     {
-        $this->traceEval(Text::_('COM_BREEZINGFORMSNG_PROCESS_QVALUEOF') . " " . $elem->name . "::" . $coldef->name);
+        $this->processor->traceEval(Text::_('COM_BREEZINGFORMSNG_PROCESS_QVALUEOF') . " " . $elem->name . "::" . $coldef->name);
         try {
-            return eval($code);
+            return $this->scriptingRuntime()->executeQueryValue(
+                $this->processor,
+                $code,
+                $elem,
+                $row,
+                $coldef,
+                $value
+            );
         } catch (Error $e) {
             if (\defined('JDEBUG') && JDEBUG) {
-                $this->app->enqueueMessage($e->getMessage() . " in $name.", 'error');
+                $this->processor->app->enqueueMessage($e->getMessage() . " in $name.", 'error');
                 Log::add( "Piece PHP '$name' invalid :"  . $e->getMessage(), Log::DEBUG, 'BF Piece');
             }
         }
@@ -214,15 +228,21 @@ trait bfProcessorScripting
     {
         $ret = null;
         $code = $elem->data2;
-        if ($this->prepareEvalCode($code, Text::_('COM_BREEZINGFORMSNG_PROCESS_QPIECEOF') . " " . $elem->name, 'e', $elem->id, 1)) {
-            $rows = array();
-            $this->traceEval(Text::_('COM_BREEZINGFORMSNG_PROCESS_QPIECEOF') . " " . $elem->name);
+        if ($this->processor->prepareEvalCode($code, Text::_('COM_BREEZINGFORMSNG_PROCESS_QPIECEOF') . " " . $elem->name, 'e', $elem->id, 1)) {
+            $rows = [];
+            $this->processor->traceEval(Text::_('COM_BREEZINGFORMSNG_PROCESS_QPIECEOF') . " " . $elem->name);
 
             try {
-                eval($code);
+                $rows = $this->scriptingRuntime()->executeQuery(
+                    $this->processor,
+                    $code,
+                    $elem,
+                    $valrows,
+                    $coldefs
+                );
             } catch (Error $e) {
                 if (\defined('JDEBUG') && JDEBUG) {
-                    $this->app->enqueueMessage($e->getMessage() . " in $name.", 'error');
+                    $this->processor->app->enqueueMessage($e->getMessage() . " in $name.", 'error');
                     Log::add( "PHP piece '$name' : " .$e->getMessage(), Log::DEBUG, 'BF Piece');
                 }
             }
@@ -236,26 +256,26 @@ trait bfProcessorScripting
                 for ($c = 0; $c < $ccnt; $c++) {
                     $coldef = &$coldefs[$c];
                     $cname = $coldef->name;
-                    $value = isset($row->$cname) ? str_replace($this->findtags, $this->replacetags, $row->$cname) : '';
+                    $value = isset($row->$cname) ? str_replace($this->processor->findtags, $this->processor->replacetags, $row->$cname) : '';
                     $xcnt = count($coldef->comp);
                     if (!$xcnt)
                         $valrow[] = $value;
                     else {
                         $val = '';
                         for ($x = 0; $x < $xcnt; $x++) {
-                            $val .= $coldef->comp[$x][0] ? $this->execQueryValue($coldef->comp[$x][1], $elem, $row, $coldef, $value) : $coldef->comp[$x][1];
-                            if ($this->dying)
+                            $val .= $coldef->comp[$x][0] ? $this->processor->execQueryValue($coldef->comp[$x][1], $elem, $row, $coldef, $value) : $coldef->comp[$x][1];
+                            if ($this->processor->dying)
                                 break;
                         } // for
-                        $valrow[] = str_replace($this->findtags, $this->replacetags, $val);
+                        $valrow[] = str_replace($this->processor->findtags, $this->processor->replacetags, $val);
                     } // if
                     unset($coldef);
-                    if ($this->dying)
+                    if ($this->processor->dying)
                         break;
                 } // for
                 $valrows[] = $valrow;
                 unset($row);
-                if ($this->dying)
+                if ($this->processor->dying)
                     break;
             } // for
             $rows = null;
@@ -266,14 +286,14 @@ trait bfProcessorScripting
 
     function script2clause(&$row)
     {
-        if ($this->dying)
+        if ($this->processor->dying)
             return '';
         
         $funcname = '';
         switch ($row->script2cond) {
             case 1:
-                $funcname = $this->scriptingRepository()
-                    ->findPublishedScriptById((int) $row->script2id)?->name ?? '';
+                $funcname = $this->scriptingRuntime()
+                    ->findScriptById((int) $row->script2id)?->name ?? '';
                 break;
             case 2:
                 $funcname = 'ff_' . $row->name . '_action';
@@ -302,7 +322,7 @@ trait bfProcessorScripting
     function loadBuiltins(&$library)
     {
         global $ff_config, $ff_request;
-        if ($this->dying)
+        if ($this->processor->dying)
             return;
         $library[] = array('FF_STATUS_OK', 'var FF_STATUS_OK = ' . _FF_STATUS_OK . ';');
         $library[] = array('FF_STATUS_UNPUBLISHED', 'var FF_STATUS_UNPUBLISHED = ' . _FF_STATUS_UNPUBLISHED . ';');
@@ -312,18 +332,18 @@ trait bfProcessorScripting
         $library[] = array('FF_STATUS_SENDMAIL_FAILED', 'var FF_STATUS_SENDMAIL_FAILED = ' . _FF_STATUS_SENDMAIL_FAILED . ';');
         $library[] = array('FF_STATUS_ATTACHMENT_FAILED', 'var FF_STATUS_ATTACHMENT_FAILED = ' . _FF_STATUS_ATTACHMENT_FAILED . ';');
 
-        $library[] = array('ff_homepage', "var ff_homepage = '" . $this->homepage . "';");
-        $library[] = array('ff_currentpage', "var ff_currentpage = " . $this->page . ";");
-        $library[] = array('ff_lastpage', "var ff_lastpage = " . $this->formrow->pages . ";");
-        $library[] = array('ff_images', "var ff_images = '" . $this->images . "';");
+        $library[] = array('ff_homepage', "var ff_homepage = '" . $this->processor->homepage . "';");
+        $library[] = array('ff_currentpage', "var ff_currentpage = " . $this->processor->page . ";");
+        $library[] = array('ff_lastpage', "var ff_lastpage = " . $this->processor->formrow->pages . ";");
+        $library[] = array('ff_images', "var ff_images = '" . $this->processor->images . "';");
         $library[] = array('ff_validationFocusName', "var ff_validationFocusName = '';");
         $library[] = array('ff_currentheight', "var ff_currentheight = 0;");
 
         $code = "var ff_elements = [" . nl();
-        for ($i = 0; $i < $this->rowcount; $i++) {
-            $row = $this->rows[$i];
+        for ($i = 0; $i < $this->processor->rowcount; $i++) {
+            $row = $this->processor->rows[$i];
             $endline = "," . nl();
-            if ($i == $this->rowcount - 1)
+            if ($i == $this->processor->rowcount - 1)
                 $endline = nl();
             switch ($row->type) {
                 case "Hidden Input":
@@ -357,7 +377,7 @@ trait bfProcessorScripting
             "function ff_getElementByIndex(index)" . nl() .
             "{" . nl() .
             "    if (index >= 0 && index < ff_elements.length)" . nl() .
-            "        return eval('document." . $this->form_id . ".'+ff_elements[index][0]);" . nl() .
+            "        return eval('document." . $this->processor->form_id . ".'+ff_elements[index][0]);" . nl() .
             "    return null;" . nl() .
             "} // ff_getElementByIndex"
         );
@@ -369,7 +389,7 @@ trait bfProcessorScripting
             "    if (name.substr(0,6) == 'ff_nm_') name = name.substring(6,name.length-2);" . nl() .
             "    for (var i = 0; i < ff_elements.length; i++)" . nl() .
             "        if (ff_elements[i][2]==name)" . nl() .
-            "            return eval('document." . $this->form_id . ".'+ff_elements[i][0]);" . nl() .
+            "            return eval('document." . $this->processor->form_id . ".'+ff_elements[i][0]);" . nl() .
             "    return null;" . nl() .
             "} // ff_getElementByName"
         );
@@ -414,7 +434,7 @@ trait bfProcessorScripting
             'ff_getForm',
             "function ff_getForm()" . nl() .
             "{" . nl() .
-            "    return document." . $this->form_id . ";" . nl() .
+            "    return document." . $this->processor->form_id . ";" . nl() .
             "} // ff_getForm"
         );
 
@@ -422,10 +442,10 @@ trait bfProcessorScripting
             "{if(document.getElementById('bfSubmitButton')){document.getElementById('bfSubmitButton').disabled = true;} if(typeof JQuery != 'undefined'){JQuery('.bfCustomSubmitButton').prop('disabled', true);} bfCheckCaptcha();}" . nl();
         $code .= "function ff_submitForm2()" . nl() .
             "{if(document.getElementById('bfSubmitButton')){document.getElementById('bfSubmitButton').disabled = true;} if(typeof JQuery != 'undefined'){JQuery('.bfCustomSubmitButton').prop('disabled', true);} " . nl();
-        if ($this->inline)
+        if ($this->processor->inline)
             $code .= " if(typeof bf_ajax_submit != 'undefined') { bf_ajax_submit() } else { submitform('submit'); }" . nl();
         else
-            $code .= " if(typeof bf_ajax_submit != 'undefined') { bf_ajax_submit() } else { document." . $this->form_id . ".submit(); }" . nl();
+            $code .= " if(typeof bf_ajax_submit != 'undefined') { bf_ajax_submit() } else { document." . $this->processor->form_id . ".submit(); }" . nl();
         $code .= "} // ff_submitForm";
         $library[] = array('ff_submitForm', $code);
 
@@ -455,13 +475,13 @@ trait bfProcessorScripting
             "    error = '';" . nl() .
             "    ff_validationFocusName = '';" . nl();
         $curr = -1;
-        for ($i = 0; $i < $this->rowcount; $i++) {
-            $row = $this->rows[$i];
+        for ($i = 0; $i < $this->processor->rowcount; $i++) {
+            $row = $this->processor->rows[$i];
             $funcname = '';
             switch ($row->script3cond) {
                 case 1:
-                    $funcname = $this->scriptingRepository()
-                        ->findPublishedScriptById((int) $row->script3id)?->name ?? '';
+                    $funcname = $this->scriptingRuntime()
+                        ->findScriptById((int) $row->script3id)?->name ?? '';
                     break;
                 case 2:
                     $funcname = 'ff_' . $row->name . '_validation';
@@ -476,10 +496,10 @@ trait bfProcessorScripting
                     $code .= "    if (page==" . $row->page . " || page==0) {" . nl();
                     $curr = $row->page;
                 } // if
-                if ($this->trim($row->script3msg)) {
+                if ($this->processor->trim($row->script3msg)) {
                     $msg = addslashes($row->script3msg) . "\\n";
                     $res_msg = '';
-                    $this->getFieldTranslated('validationMessage', $row->name, $res_msg);
+                    $this->processor->getFieldTranslated('validationMessage', $row->name, $res_msg);
                     if ($res_msg != '') {
                         $msg = $res_msg . "\\n";
                     }
@@ -487,7 +507,7 @@ trait bfProcessorScripting
                     $msg = "";
                 }
                 $code .= " if( typeof bfDeactivateField == 'undefined' || !bfDeactivateField['ff_nm_" . $row->name . "[]'] ){ " . nl();
-                $code .= "        errorout = " . $funcname . "(document." . $this->form_id . "['ff_nm_" . $row->name . "[]'],\"" . $msg . "\");" . nl();
+                $code .= "        errorout = " . $funcname . "(document." . $this->processor->form_id . "['ff_nm_" . $row->name . "[]'],\"" . $msg . "\");" . nl();
                 $code .= "        error += errorout" . nl();
                 $code .= "        if(typeof inlineErrorElements != 'undefined'){" . nl();
                 $code .= "             inlineErrorElements.push([\"" . $row->name . "\",errorout]);" . nl();
@@ -498,7 +518,7 @@ trait bfProcessorScripting
         if ($curr > 0)
             $code .= "    } // if" . nl();
         $code .= 'if(error != "" && document.getElementById(\'ff_capimgValue\')){
-                 document.getElementById(\'ff_capimgValue\').src = \'' . Uri::root(true) . ($this->app->isClient('administrator') ? '/administrator' : '') . '/media/com_breezingformsng/images/site/captcha/securimage_show.php?bfMathRandom=\' + Math.random();
+                 document.getElementById(\'ff_capimgValue\').src = \'' . Uri::root(true) . ($this->processor->app->isClient('administrator') ? '/administrator' : '') . '/media/com_breezingformsng/images/site/captcha/securimage_show.php?bfMathRandom=\' + Math.random();
                  document.getElementById(\'bfCaptchaEntry\').value = "";
             }';
         $code .= 'if(error!="" && document.getElementById("bfSubmitButton")){document.getElementById("bfSubmitButton").disabled = false;}' . nl();
@@ -512,13 +532,13 @@ trait bfProcessorScripting
             "{" . nl();
         $formentry = false;
         $funcname = '';
-        switch ($this->formrow->script1cond) {
+        switch ($this->processor->formrow->script1cond) {
             case 1:
-                $funcname = $this->scriptingRepository()
-                    ->findPublishedScriptById((int) $this->formrow->script1id)?->name ?? '';
+                $funcname = $this->scriptingRuntime()
+                    ->findScriptById((int) $this->processor->formrow->script1id)?->name ?? '';
                 break;
             case 2:
-                $funcname = 'ff_' . $this->formrow->name . '_init';
+                $funcname = 'ff_' . $this->processor->formrow->name . '_init';
                 break;
             default:
                 break;
@@ -528,13 +548,13 @@ trait bfProcessorScripting
                 "        " . $funcname . "();" . nl();
             $formentry = true;
         } // if
-        for ($i = 0; $i < $this->rowcount; $i++) {
-            $row = $this->rows[$i];
+        for ($i = 0; $i < $this->processor->rowcount; $i++) {
+            $row = $this->processor->rows[$i];
             $funcname = '';
             switch ($row->script1cond) {
                 case 1:
-                    $funcname = $this->scriptingRepository()
-                        ->findPublishedScriptById((int) $row->script1id)?->name ?? '';
+                    $funcname = $this->scriptingRuntime()
+                        ->findScriptById((int) $row->script1id)?->name ?? '';
                     break;
                 case 2:
                     $funcname = 'ff_' . $row->name . '_init';
@@ -548,19 +568,19 @@ trait bfProcessorScripting
                         $code .= "    if (condition=='formentry') {" . nl();
                         $formentry = true;
                     } // if
-                    $code .= "        " . $funcname . "(document." . $this->form_id . "['ff_nm_" . $row->name . "[]'], condition);" . nl();
+                    $code .= "        " . $funcname . "(document." . $this->processor->form_id . "['ff_nm_" . $row->name . "[]'], condition);" . nl();
                 } // if
             } // if
         } // for
         $pageentry = false;
         $curr = -1;
-        for ($i = 0; $i < $this->rowcount; $i++) {
-            $row = $this->rows[$i];
+        for ($i = 0; $i < $this->processor->rowcount; $i++) {
+            $row = $this->processor->rows[$i];
             $funcname = '';
             switch ($row->script1cond) {
                 case 1:
-                    $funcname = $this->scriptingRepository()
-                        ->findPublishedScriptById((int) $row->script1id)?->name ?? '';
+                    $funcname = $this->scriptingRuntime()
+                        ->findScriptById((int) $row->script1id)?->name ?? '';
                     break;
                 case 2:
                     $funcname = 'ff_' . $row->name . '_init';
@@ -584,7 +604,7 @@ trait bfProcessorScripting
                         $code .= "        if (ff_currentpage==" . $row->page . ") {" . nl();
                         $curr = $row->page;
                     } // if
-                    $code .= "            " . $funcname . "(document." . $this->form_id . ".ff_elem" . $row->id . ", condition);" . nl();
+                    $code .= "            " . $funcname . "(document." . $this->processor->form_id . ".ff_elem" . $row->id . ", condition);" . nl();
                 } // if
             } // if
         } // for
@@ -595,23 +615,23 @@ trait bfProcessorScripting
         $code .= "} // ff_initialize";
         $library[] = array('ff_initialize', $code);
 
-        if ($this->showgrid) {
-            if ($this->formrow->widthmode)
-                $width = $this->formrow->prevwidth;
+        if ($this->processor->showgrid) {
+            if ($this->processor->formrow->widthmode)
+                $width = $this->processor->formrow->prevwidth;
             else
-                $width = $this->formrow->width;
+                $width = $this->processor->formrow->width;
             $library[] = array(
                 'ff_showgrid',
                 "var ff_gridvcnt = 0;" . nl() .
                 "var ff_gridhcnt = 0;" . nl() .
-                "var ff_gridheight = " . $this->formrow->height . ";" . nl() .
+                "var ff_gridheight = " . $this->processor->formrow->height . ";" . nl() .
                 nl() .
                 "function ff_showgrid()" . nl() .
                 "{" . nl() .
                 "   var i, e, s;" . nl() .
                 "   var hcnt = parseInt(ff_gridheight / " . $ff_config->gridsize . ")+1;" . nl() .
                 "   var vcnt = parseInt(" . $width . " / " . $ff_config->gridsize . ")+1;" . nl() .
-                "   var formdiv = document.getElementById('ff_formdiv" . $this->form . "');" . nl() .
+                "   var formdiv = document.getElementById('ff_formdiv" . $this->processor->form . "');" . nl() .
                 "   var firstelem = formdiv.firstChild;" . nl() .
                 "   for (i = ff_gridhcnt; i < hcnt; i++) {" . nl() .
                 "       e = document.createElement('div');" . nl() .
@@ -669,18 +689,18 @@ trait bfProcessorScripting
             "    } // if" . nl() .
             "    var totheight = height+value;" . nl() .
             "    if ((mode==2 && totheight>ff_currentheight) || (mode!=2 && totheight!=ff_currentheight)) {" . nl();
-        if ($this->inframe) {
-            $fn = ($this->runmode == _FF_RUNMODE_PREVIEW) ? 'ff_prevframe' : ('ff_frame' . $this->form);
+        if ($this->processor->inframe) {
+            $fn = ($this->processor->runmode == _FF_RUNMODE_PREVIEW) ? 'ff_prevframe' : ('ff_frame' . $this->processor->form);
             $code .= "        parent.document.getElementById('" . $fn . "').style.height = totheight+'px';" . nl() .
                 "        parent.window.scrollTo(0,0);" . nl() .
-                "        document.getElementById('ff_formdiv" . $this->form . "').style.height = height+'px';" . nl() .
+                "        document.getElementById('ff_formdiv" . $this->processor->form . "').style.height = height+'px';" . nl() .
                 "        window.scrollTo(0,0);" . nl();
         } // if
         else
-            $code .= "        document.getElementById('ff_formdiv" . $this->form . "').style.height = totheight+'px';" . nl() .
+            $code .= "        document.getElementById('ff_formdiv" . $this->processor->form . "').style.height = totheight+'px';" . nl() .
                 "        window.scrollTo(0,0);" . nl();
         $code .= "        ff_currentheight = totheight;" . nl();
-        if ($this->showgrid) {
+        if ($this->processor->showgrid) {
             $code .= "        ff_gridheight = totheight;" . nl() .
                 "        ff_showgrid();" . nl();
         } // if
@@ -688,7 +708,7 @@ trait bfProcessorScripting
             "} // ff_resizepage";
         $library[] = array('ff_resizepage', $code);
 
-        if ($this->formrow->template_code_processed == '') {
+        if ($this->processor->formrow->template_code_processed == '') {
 
             // ff_switchpage
             $code = "function ff_switchpage(page)" . nl() .
@@ -696,8 +716,8 @@ trait bfProcessorScripting
                 "    if (page>=1 && page<=ff_lastpage && page!=ff_currentpage) {" . nl() .
                 "        vis = 'visible';" . nl();
             $curr = -1;
-            for ($i = 0; $i < $this->rowcount; $i++) {
-                $row = $this->rows[$i];
+            for ($i = 0; $i < $this->processor->rowcount; $i++) {
+                $row = $this->processor->rows[$i];
                 if ($row->type != "Hidden Input") {
                     if ($row->page != $curr) {
                         if ($curr >= 1)
@@ -712,14 +732,14 @@ trait bfProcessorScripting
             if ($curr >= 1)
                 $code .= "        } // if" . nl();
             $code .= "        ff_currentpage = page;" . nl();
-            if ($this->formrow->heightmode == 1)
-                $code .= "        ff_resizepage(" . $this->formrow->heightmode . ", " . $this->formrow->height . ");" . nl();
+            if ($this->processor->formrow->heightmode == 1)
+                $code .= "        ff_resizepage(" . $this->processor->formrow->heightmode . ", " . $this->processor->formrow->height . ");" . nl();
             $code .= "        ff_initialize('pageentry');" . nl() .
                 "    } // if" . nl() .
                 "} // ff_switchpage";
         } else {
             $visPages = '';
-            $pagesSize = isset($this->formrow->pages) ? intval($this->formrow->pages) : 1;
+            $pagesSize = isset($this->processor->formrow->pages) ? intval($this->processor->formrow->pages) : 1;
             for ($pageCnt = 1; $pageCnt <= $pagesSize; $pageCnt++) {
                 $visPages .= 'if(document.getElementById("bfPage' . $pageCnt . '"))document.getElementById("bfPage' . $pageCnt . '").style.display = "none";';
             }
@@ -728,7 +748,7 @@ trait bfProcessorScripting
 				' . $visPages . '
 				if(document.getElementById("bfPage"+page))document.getElementById("bfPage"+page).style.display = "";
 				ff_currentpage = page;
-				' . ($this->formrow->heightmode == 1 ? "ff_resizepage(" . $this->formrow->heightmode . ", " . $this->formrow->height . ");" : "") . '
+				' . ($this->processor->formrow->heightmode == 1 ? "ff_resizepage(" . $this->processor->formrow->heightmode . ", " . $this->processor->formrow->height . ");" : "") . '
 				ff_initialize("pageentry");
 			}';
         }
@@ -740,9 +760,9 @@ trait bfProcessorScripting
 
     function loadScripts(&$library)
     {
-        if ($this->dying)
+        if ($this->processor->dying)
             return;
-        foreach ($this->scriptingRepository()->getPublishedScripts() as $script) {
+        foreach ($this->scriptingRuntime()->publishedScripts() as $script) {
             $library[] = [trim($script->name), $script->code, 's', $script->id, null];
         }
     }
@@ -751,19 +771,14 @@ trait bfProcessorScripting
 
     function compressJavascript($str)
     {
-        if ($this->dying)
+        if ($this->processor->dying)
             return '';
-        return $this->javascriptCompressor()->compress((string) $str, _FF_PACKBREAKAFTER, nl());
+        return $this->scriptingRuntime()->compress((string) $str, _FF_PACKBREAKAFTER, nl());
     }
 
-    private function javascriptCompressor(): JavascriptCompressor
+    private function scriptingRuntime(): ScriptingRuntime
     {
-        return $this->javascriptCompressorService ??= new JavascriptCompressor();
-    }
-
-    private function scriptingRepository(): ScriptingRepository
-    {
-        return $this->scriptingRepositoryService ??= new ScriptingRepository($this->database);
+        return $this->scriptingRuntimeService ??= new ScriptingRuntime($this->processor->database);
     }
 
     // compressJavascript
@@ -772,7 +787,7 @@ trait bfProcessorScripting
     {
         global $ff_config;
 
-        if ($this->dying)
+        if ($this->processor->dying)
             return;
         if ($func != '#scanonly') {
             // check if function allready linked
@@ -795,8 +810,8 @@ trait bfProcessorScripting
                     $lid = $library[$i][3];
                     $lpane = $library[$i][4];
                 } // if
-                $this->linkcode($libname, $library, $linked, $library[$i][1], $ltype, $lid, $lpane);
-                if ($this->dying)
+                $this->processor->linkcode($libname, $library, $linked, $library[$i][1], $ltype, $lid, $lpane);
+                if ($this->processor->dying)
                     return '';
             } // if
         } // for
@@ -804,11 +819,11 @@ trait bfProcessorScripting
         if ($func != '#scanonly') {
             // emit the code
             if ($ff_config->compress)
-                echo $this->compressJavascript(
-                    $this->replaceCode($code, Text::_('COM_BREEZINGFORMSNG_PROCESS_SCRIPT') . " $func", $type, $id, $pane)
+                echo $this->processor->compressJavascript(
+                    $this->processor->replaceCode($code, Text::_('COM_BREEZINGFORMSNG_PROCESS_SCRIPT') . " $func", $type, $id, $pane)
                 );
             else
-                echo $this->replaceCode($code, Text::_('COM_BREEZINGFORMSNG_PROCESS_SCRIPT') . " $func", $type, $id, $pane) . nl() . nl();
+                echo $this->processor->replaceCode($code, Text::_('COM_BREEZINGFORMSNG_PROCESS_SCRIPT') . " $func", $type, $id, $pane) . nl() . nl();
         } // if
     }
 
@@ -816,26 +831,26 @@ trait bfProcessorScripting
 
     function addFunction($cond, $id, $name, $code, &$library, &$linked, $type, $rowid, $pane)
     {
-        if ($this->dying)
+        if ($this->processor->dying)
             return;
         switch ($cond) {
             case 1:
-                $script = $this->scriptingRepository()->findPublishedScriptById((int) $id);
+                $script = $this->scriptingRuntime()->findScriptById((int) $id);
                 if ($script !== null) {
                     $scriptName = $script->name;
                     $scriptCode = $script->code;
 
-                    if ($this->trim($scriptName) && $this->nonblank($scriptCode)) {
-                        $this->linkcode($scriptName, $library, $linked, $scriptCode, 's', $id, null);
-                        if ($this->dying)
+                    if ($this->processor->trim($scriptName) && $this->processor->nonblank($scriptCode)) {
+                        $this->processor->linkcode($scriptName, $library, $linked, $scriptCode, 's', $id, null);
+                        if ($this->processor->dying)
                             return;
                     } // if
                 } // if
                 break;
             case 2:
-                if ($this->trim($name) && $this->nonblank($code)) {
-                    $this->linkcode($name, $library, $linked, $code, $type, $rowid, $pane);
-                    if ($this->dying)
+                if ($this->processor->trim($name) && $this->processor->nonblank($code)) {
+                    $this->processor->linkcode($name, $library, $linked, $code, $type, $rowid, $pane);
+                    if ($this->processor->dying)
                         return;
                 } // if
                 break;

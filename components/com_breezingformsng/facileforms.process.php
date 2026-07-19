@@ -28,6 +28,11 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\FormDisplayContextResolv
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\FormPathResolver;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RequestMetadataResolver;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampFactory;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\CodeToolsRuntime;
+use Vcmb\Component\BreezingformsNG\Site\Service\Scripting\ScriptingEngine;
+use Vcmb\Component\BreezingformsNG\Site\Service\Export\ExportEngine;
+use Vcmb\Component\BreezingformsNG\Site\Service\Upload\UploadError;
+use Vcmb\Component\BreezingformsNG\Site\Service\Upload\UploadRuntime;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Log\Log;
@@ -472,22 +477,14 @@ function _ff_errorHandler($errno, $errstr, $errfile, $errline)
 
 // _ff_errorHandler
 
-require_once __DIR__ . '/legacy/processor/bfProcessorCodeTools.php';
-require_once __DIR__ . '/legacy/processor/bfProcessorScripting.php';
 require_once __DIR__ . '/legacy/processor/bfProcessorRendering.php';
-require_once __DIR__ . '/legacy/processor/bfProcessorExports.php';
 require_once __DIR__ . '/legacy/processor/bfProcessorNotifications.php';
-require_once __DIR__ . '/legacy/processor/bfProcessorUploads.php';
 require_once __DIR__ . '/legacy/processor/bfProcessorSubmission.php';
 
 class HTML_facileFormsProcessor
 {
-    use bfProcessorCodeTools;
-    use bfProcessorScripting;
     use bfProcessorRendering;
-    use bfProcessorExports;
     use bfProcessorNotifications;
-    use bfProcessorUploads;
     use bfProcessorSubmission;
 
 
@@ -551,6 +548,328 @@ class HTML_facileFormsProcessor
     public $legacy_wrap = true;
     var $app;
     var $database;
+    private ?UploadRuntime $uploadRuntimeService = null;
+    private ?CodeToolsRuntime $codeToolsRuntimeService = null;
+    private ?ScriptingEngine $scriptingEngineService = null;
+    private ?ExportEngine $exportEngineService = null;
+
+    public function logToDatabase($cbResult = null)
+    {
+        return $this->exportEngine()->logToDatabase($cbResult);
+    }
+
+    public function random_str($length, $keyspace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+    {
+        return $this->exportEngine()->random_str($length, $keyspace);
+    }
+
+    public function sendMail($from, $fromname, $recipient, $subject, $body, $attachment = null, $html = null, $cc = null, $bcc = null, $alt_sender = '')
+    {
+        return $this->exportEngine()->sendMail(
+            $from,
+            $fromname,
+            $recipient,
+            $subject,
+            $body,
+            $attachment,
+            $html,
+            $cc,
+            $bcc,
+            $alt_sender
+        );
+    }
+
+    public function endsWith($haystack, $needle)
+    {
+        return $this->exportEngine()->endsWith($haystack, $needle);
+    }
+
+    public function exppdf($filter = [], $mailback = false, $translate = true)
+    {
+        return $this->exportEngine()->exppdf($filter, $mailback, $translate);
+    }
+
+    public function expcsv($filter = [], $mailback = false)
+    {
+        return $this->exportEngine()->expcsv($filter, $mailback);
+    }
+
+    public function expxml($filter = [], $mailback = false, $translate = false)
+    {
+        return $this->exportEngine()->expxml($filter, $mailback, $translate);
+    }
+
+    private function exportEngine(): ExportEngine
+    {
+        return $this->exportEngineService ??= new ExportEngine($this);
+    }
+
+    public function getPieceById($id, $name = null)
+    {
+        return $this->scriptingEngine()->getPieceById($id, $name);
+    }
+
+    public function getPieceByName($name, $id = null)
+    {
+        return $this->scriptingEngine()->getPieceByName($name, $id);
+    }
+
+    public function execPiece($code, $name, $type, $id, $pane)
+    {
+        return $this->scriptingEngine()->execPiece($code, $name, $type, $id, $pane);
+    }
+
+    public function execPieceById($id)
+    {
+        return $this->scriptingEngine()->execPieceById($id);
+    }
+
+    public function execPieceByName($name)
+    {
+        return $this->scriptingEngine()->execPieceByName($name);
+    }
+
+    public function replaceCode($code, $name, $type, $id, $pane)
+    {
+        return $this->scriptingEngine()->replaceCode($code, $name, $type, $id, $pane);
+    }
+
+    public function compileQueryCol(&$elem, &$coldef)
+    {
+        return $this->scriptingEngine()->compileQueryCol($elem, $coldef);
+    }
+
+    public function execQueryValue($code, &$elem, &$row, &$coldef, $value)
+    {
+        return $this->scriptingEngine()->execQueryValue($code, $elem, $row, $coldef, $value);
+    }
+
+    public function execQuery(&$elem, &$valrows, &$coldefs)
+    {
+        return $this->scriptingEngine()->execQuery($elem, $valrows, $coldefs);
+    }
+
+    public function script2clause(&$row)
+    {
+        return $this->scriptingEngine()->script2clause($row);
+    }
+
+    public function loadBuiltins(&$library)
+    {
+        return $this->scriptingEngine()->loadBuiltins($library);
+    }
+
+    public function loadScripts(&$library)
+    {
+        return $this->scriptingEngine()->loadScripts($library);
+    }
+
+    public function compressJavascript($str)
+    {
+        return $this->scriptingEngine()->compressJavascript($str);
+    }
+
+    public function linkcode($func, &$library, &$linked, $code, $type = null, $id = null, $pane = null)
+    {
+        return $this->scriptingEngine()->linkcode($func, $library, $linked, $code, $type, $id, $pane);
+    }
+
+    public function addFunction($cond, $id, $name, $code, &$library, &$linked, $type, $rowid, $pane)
+    {
+        return $this->scriptingEngine()->addFunction(
+            $cond,
+            $id,
+            $name,
+            $code,
+            $library,
+            $linked,
+            $type,
+            $rowid,
+            $pane
+        );
+    }
+
+    private function scriptingEngine(): ScriptingEngine
+    {
+        return $this->scriptingEngineService ??= new ScriptingEngine($this);
+    }
+
+    public function dispTraceMode($mode)
+    {
+        return $this->codeToolsRuntime()->dispTraceMode($mode);
+    }
+
+    public function trim(&$code)
+    {
+        return $this->codeToolsRuntime()->trim($code);
+    }
+
+    public function nonblank(&$code)
+    {
+        return $this->codeToolsRuntime()->nonblank($code);
+    }
+
+    public function getClassName($classdef)
+    {
+        return $this->codeToolsRuntime()->getClassName($classdef);
+    }
+
+    public function expJsValue($mixed, $indent = '')
+    {
+        return $this->codeToolsRuntime()->expJsValue($mixed, $indent);
+    }
+
+    public function expJsVar($name, $mixed)
+    {
+        return $this->codeToolsRuntime()->expJsVar($name, $mixed);
+    }
+
+    public function dumpTrace()
+    {
+        $this->codeToolsRuntime()->dumpTrace();
+    }
+
+    public function traceEval($name)
+    {
+        $this->codeToolsRuntime()->traceEval($name);
+    }
+
+    public function suicide()
+    {
+        return $this->codeToolsRuntime()->suicide();
+    }
+
+    public function bury()
+    {
+        return $this->codeToolsRuntime()->bury();
+    }
+
+    public function findToken(&$code, &$spos, &$offs)
+    {
+        return $this->codeToolsRuntime()->findToken($code, $spos, $offs);
+    }
+
+    public function findRealToken(&$code, &$spos, &$offs, &$line)
+    {
+        return $this->codeToolsRuntime()->findRealToken($code, $spos, $offs, $line);
+    }
+
+    public function patchCode($mode, $code, $name, $type, $id, $pane)
+    {
+        return $this->codeToolsRuntime()->patchCode($mode, $code, $name, $type, $id, $pane);
+    }
+
+    public function prepareEvalCode(&$code, $name, $type, $id, $pane)
+    {
+        return $this->codeToolsRuntime()->prepareEvalCode($code, $name, $type, $id, $pane);
+    }
+
+    private function codeToolsRuntime(): CodeToolsRuntime
+    {
+        return $this->codeToolsRuntimeService ??= new CodeToolsRuntime($this);
+    }
+
+    /**
+     * Historical upload facade retained for custom PHP stored with forms.
+     */
+    public function saveUpload($filename, $userfile_name, $destpath, $timestamp, $useUrl = false, $useUrlDownloadDirectory = '', $resize_target_width = 0, $resize_target_height = 0, $resize_type = '', $resize_bgcolor = '#ffffff', $field_name = '')
+    {
+        global $mosConfig_fileperms;
+
+        if ($this->dying) {
+            return '';
+        }
+
+        $identity = $this->app->getIdentity();
+        $filemode = isset($mosConfig_fileperms)
+            ? ($mosConfig_fileperms === '' ? null : octdec($mosConfig_fileperms))
+            : 0644;
+        $result = $this->uploadRuntime()->store(
+            (string) $filename,
+            (string) $userfile_name,
+            (string) $destpath,
+            $this->findtags,
+            $this->replacetags,
+            $this->rows,
+            (string) $this->submitted,
+            (string) $this->app->get('offset'),
+            [
+                'username' => $identity->get('username'),
+                'id' => $identity->get('id'),
+                'name' => $identity->get('name'),
+            ],
+            (bool) $this->app->getSession()->get('bfFileUploadOverride', true),
+            $filemode,
+            (bool) $useUrl,
+            (int) $resize_target_width,
+            (int) $resize_target_height,
+            (string) $resize_type,
+            $resize_bgcolor === null ? null : (string) $resize_bgcolor
+        );
+
+        if (!$result->isSuccessful()) {
+            $this->status = _FF_STATUS_UPLOAD_FAILED;
+            $this->message = Text::_(match ($result->error) {
+                UploadError::DirectoryMissing => 'COM_BREEZINGFORMSNG_PROCESS_DIRNOTEXISTS',
+                UploadError::FileExists => 'COM_BREEZINGFORMSNG_PROCESS_FILEEXISTS',
+                UploadError::MoveFailed => 'COM_BREEZINGFORMSNG_PROCESS_FILEMOVEFAILED',
+                UploadError::ChmodFailed => 'COM_BREEZINGFORMSNG_PROCESS_FILECHMODFAILED',
+            });
+
+            return '';
+        }
+
+        return ['default' => $result->path, 'server' => $result->serverPath];
+    }
+
+    public function exifImageType($filename)
+    {
+        return $this->uploadRuntime()->imageType((string) $filename);
+    }
+
+    public function resizeFile($path, $width, $height, $bgcolor = '#ffffff', $type = '')
+    {
+        $this->uploadRuntime()->resizeFile(
+            (string) $path,
+            (int) $width,
+            (int) $height,
+            $bgcolor === null ? null : (string) $bgcolor,
+            (string) $type
+        );
+    }
+
+    public function resize_image($source_image, $destination_width, $destination_height, $type = 0, $bgcolor = [0, 0, 0])
+    {
+        return $this->uploadRuntime()->resizeImage(
+            $source_image,
+            (int) $destination_width,
+            (int) $destination_height,
+            (int) $type,
+            (array) $bgcolor
+        );
+    }
+
+    public function returnBytes($val)
+    {
+        return $this->uploadRuntime()->parseByteSize((string) $val);
+    }
+
+    public function findQuickModeElement(array $dataObject, $needle)
+    {
+        return $this->uploadRuntime()->findQuickModeElement($dataObject, (string) $needle);
+    }
+
+    public function measureTime()
+    {
+        $time = explode(' ', microtime());
+
+        return ((float) $time[0] + $time[1]) / 1000;
+    }
+
+    private function uploadRuntime(): UploadRuntime
+    {
+        return $this->uploadRuntimeService ??= new UploadRuntime($this->app->getInput());
+    }
 
     function __construct(
         $runmode, // _FF_RUNMODE_FRONTEND, ..._BACKEND, ..._PREVIEW

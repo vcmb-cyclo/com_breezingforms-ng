@@ -10,8 +10,19 @@
  * SPDX-License-Identifier: GPL-2.0-or-later
  **/
 
-defined('_JEXEC') or die('Direct Access to this location is not allowed.');
+declare(strict_types=1);
 
+namespace Vcmb\Component\BreezingformsNG\Site\Service\Export;
+
+\defined('_JEXEC') or die;
+
+use BFIntegrate;
+use DateTimeZone;
+use Exception;
+use facileFormsRecords;
+use facileFormsSubrecords;
+use HTML_facileFormsProcessor;
+use Throwable;
 use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
@@ -43,56 +54,60 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampForma
 /**
  * Database logging, mailing primitives and PDF/CSV/XML exports.
  */
-trait bfProcessorExports
+final class ExportEngine
 {
     private ?MailSender $mailSenderService = null;
     private ?SubmissionTimestampFormatter $submissionTimestampFormatterService = null;
 
+    public function __construct(private readonly HTML_facileFormsProcessor $processor)
+    {
+    }
+
     function logToDatabase($cbResult = null)
     { // CONTENTBUILDER
         global $ff_config;
-        if ($this->dying)
+        if ($this->processor->dying)
             return;
 
-        if (!is_object($cbResult['form']) && $this->editable && $this->editable_override) {
-            $editableFormValue = $this->form;
+        if (!is_object($cbResult['form']) && $this->processor->editable && $this->processor->editable_override) {
+            $editableFormValue = $this->processor->form;
             $editableUserId = Factory::getApplication()->getIdentity()->get('id', 0);
-            $recordsQuery = $this->database->getQuery(true)
+            $recordsQuery = $this->processor->database->getQuery(true)
                 ->select('id')
-                ->from($this->database->quoteName('#__facileforms_records'))
-                ->where($this->database->quoteName('form') . ' = :editableFormValue')
-                ->where($this->database->quoteName('user_id') . ' = :editableUserId')
-                ->where($this->database->quoteName('user_id') . ' <> 0')
+                ->from($this->processor->database->quoteName('#__facileforms_records'))
+                ->where($this->processor->database->quoteName('form') . ' = :editableFormValue')
+                ->where($this->processor->database->quoteName('user_id') . ' = :editableUserId')
+                ->where($this->processor->database->quoteName('user_id') . ' <> 0')
                 ->bind(':editableFormValue', $editableFormValue, ParameterType::STRING)
                 ->bind(':editableUserId', $editableUserId, ParameterType::INTEGER);
-            $this->database->setQuery($recordsQuery);
-            $records = $this->database->loadObjectList();
+            $this->processor->database->setQuery($recordsQuery);
+            $records = $this->processor->database->loadObjectList();
             foreach ($records as $record) {
                 $recordIdToDelete = (int) $record->id;
-                $delSubrecordsQuery = $this->database->getQuery(true)
-                    ->delete($this->database->quoteName('#__facileforms_subrecords'))
-                    ->where($this->database->quoteName('record') . ' = :recordIdToDelete')
+                $delSubrecordsQuery = $this->processor->database->getQuery(true)
+                    ->delete($this->processor->database->quoteName('#__facileforms_subrecords'))
+                    ->where($this->processor->database->quoteName('record') . ' = :recordIdToDelete')
                     ->bind(':recordIdToDelete', $recordIdToDelete, ParameterType::INTEGER);
-                $this->database->setQuery($delSubrecordsQuery);
-                $this->database->execute();
-                $delRecordQuery = $this->database->getQuery(true)
-                    ->delete($this->database->quoteName('#__facileforms_records'))
-                    ->where($this->database->quoteName('id') . ' = :recordIdToDelete')
+                $this->processor->database->setQuery($delSubrecordsQuery);
+                $this->processor->database->execute();
+                $delRecordQuery = $this->processor->database->getQuery(true)
+                    ->delete($this->processor->database->quoteName('#__facileforms_records'))
+                    ->where($this->processor->database->quoteName('id') . ' = :recordIdToDelete')
                     ->bind(':recordIdToDelete', $recordIdToDelete, ParameterType::INTEGER);
-                $this->database->setQuery($delRecordQuery);
-                $this->database->execute();
+                $this->processor->database->setQuery($delRecordQuery);
+                $this->processor->database->execute();
             }
         }
 
-        $record = new facileFormsRecords($this->database);
-        $record->submitted = $this->submitted;
-        $record->form = $this->form;
-        $record->title = $this->formrow->title;
-        $record->name = $this->formrow->name;
-        $record->ip = $this->ip;
-        $record->browser = $this->browser;
-        $record->opsys = $this->opsys;
-        $record->provider = $this->provider;
+        $record = new facileFormsRecords($this->processor->database);
+        $record->submitted = $this->processor->submitted;
+        $record->form = $this->processor->form;
+        $record->title = $this->processor->formrow->title;
+        $record->name = $this->processor->formrow->name;
+        $record->ip = $this->processor->ip;
+        $record->browser = $this->processor->browser;
+        $record->opsys = $this->processor->opsys;
+        $record->provider = $this->processor->provider;
         $record->viewed = 0;
         $record->exported = 0;
         $record->archived = 0;
@@ -109,8 +124,8 @@ trait bfProcessorExports
         $cbFileFields = array();
         if (!is_object($cbResult['form'])) {
             if (!$record->store()) {
-                $this->status = _FF_STATUS_SAVERECORD_FAILED;
-                $this->message = Text::_('COM_BREEZINGFORMSNG_PROCESS_SAVERECFAILED');
+                $this->processor->status = _FF_STATUS_SAVERECORD_FAILED;
+                $this->processor->message = Text::_('COM_BREEZINGFORMSNG_PROCESS_SAVERECFAILED');
                 return;
             } // if
 
@@ -120,7 +135,7 @@ trait bfProcessorExports
                 $last_update = new \Joomla\CMS\Date\Date();
                 $last_update = $last_update->toSql();
                 $db = Factory::getContainer()->get(DatabaseInterface::class);
-                $cbFormValue = $this->form;
+                $cbFormValue = $this->processor->form;
                 $cbRecordReturn = $record_return;
                 $existsQuery = $db->getQuery(true)
                     ->select('id')
@@ -133,7 +148,7 @@ trait bfProcessorExports
                 $db->setQuery($existsQuery);
                 $res = $db->loadResult();
                 if (!$res) {
-                    $sessionId = $this->app->getSession()->getId();
+                    $sessionId = $this->processor->app->getSession()->getId();
                     $cbType = 'com_breezingformsng';
                     $insertQuery = $db->getQuery(true)
                         ->insert($db->quoteName('#__contentbuilderng_records'))
@@ -163,12 +178,12 @@ trait bfProcessorExports
             }
         }
 
-        $this->record_id = $record->id;
+        $this->processor->record_id = $record->id;
 
         $names = array();
-        $subrecord = new facileFormsSubrecords($this->database);
+        $subrecord = new facileFormsSubrecords($this->processor->database);
         $subrecord->record = $record->id;
-        if (count($this->savedata)) {
+        if (count($this->processor->savedata)) {
 
             $cbData = array();
 
@@ -211,35 +226,35 @@ trait bfProcessorExports
 
                         if (isset($_files_deleted[$_rec->recElementId]) && is_array($_files_deleted[$_rec->recElementId]) && count($_files_deleted[$_rec->recElementId])) {
                             $_i = 0;
-                            foreach ($this->savedata as $data) {
+                            foreach ($this->processor->savedata as $data) {
                                 if ($data[_FF_DATA_ID] == $_rec->recElementId) {
                                     $_is_values = explode("\n", $_rec->recValue);
                                     $_j = 0;
                                     foreach ($_is_values as $_is_value) {
                                         if (!in_array($_j, $_files_deleted[$_rec->recElementId])) {
-                                            $this->savedata[$_i][_FF_DATA_VALUE] .= $_is_value . "\n";
+                                            $this->processor->savedata[$_i][_FF_DATA_VALUE] .= $_is_value . "\n";
                                         }
                                         $_j++;
                                     }
-                                    $this->savedata[$_i][_FF_DATA_VALUE] = rtrim($this->savedata[$_i][_FF_DATA_VALUE]);
+                                    $this->processor->savedata[$_i][_FF_DATA_VALUE] = rtrim($this->processor->savedata[$_i][_FF_DATA_VALUE]);
                                     break;
                                 }
                                 $_i++;
                             }
                         } else {
                             if (true) {
-                                $next = count($this->savedata);
-                                $this->savedata[$next] = array();
-                                $this->savedata[$next][_FF_DATA_ID] = $_rec->recElementId;
-                                $this->savedata[$next][_FF_DATA_NAME] = $_rec->recName;
-                                $this->savedata[$next][_FF_DATA_TITLE] = strip_tags($_rec->recTitle);
-                                $this->savedata[$next][_FF_DATA_TYPE] = $_rec->recType;
-                                $this->savedata[$next][_FF_DATA_VALUE] = '';
+                                $next = count($this->processor->savedata);
+                                $this->processor->savedata[$next] = array();
+                                $this->processor->savedata[$next][_FF_DATA_ID] = $_rec->recElementId;
+                                $this->processor->savedata[$next][_FF_DATA_NAME] = $_rec->recName;
+                                $this->processor->savedata[$next][_FF_DATA_TITLE] = strip_tags($_rec->recTitle);
+                                $this->processor->savedata[$next][_FF_DATA_TYPE] = $_rec->recType;
+                                $this->processor->savedata[$next][_FF_DATA_VALUE] = '';
                                 $_is_values = explode("\n", $_rec->recValue);
                                 foreach ($_is_values as $_is_value) {
-                                    $this->savedata[$next][_FF_DATA_VALUE] .= $_is_value . "\n";
+                                    $this->processor->savedata[$next][_FF_DATA_VALUE] .= $_is_value . "\n";
                                 }
-                                $this->savedata[$next][_FF_DATA_VALUE] = rtrim($this->savedata[$next][_FF_DATA_VALUE]);
+                                $this->processor->savedata[$next][_FF_DATA_VALUE] = rtrim($this->processor->savedata[$next][_FF_DATA_VALUE]);
                             }
                         }
                     }
@@ -247,7 +262,7 @@ trait bfProcessorExports
             }
             $_savedata = array();
             if (!is_object($cbResult['form'])) {
-                foreach ($this->savedata as $data) {
+                foreach ($this->processor->savedata as $data) {
                     if ($data[_FF_DATA_TYPE] == 'File Upload') {
                         if (!isset($_savedata[$data[_FF_DATA_ID]])) {
                             $_savedata[$data[_FF_DATA_ID]] = '';
@@ -257,7 +272,7 @@ trait bfProcessorExports
                 }
             }
             $isset = array();
-            foreach ($this->savedata as $data) {
+            foreach ($this->processor->savedata as $data) {
                 // CONTENTBUILDER WILL TAKE OVER SAVING/UPDATE IF EXISTS
                 if (!is_object($cbResult['form'])) {
                     $subrecord->id = NULL;
@@ -272,8 +287,8 @@ trait bfProcessorExports
                     }
                     if (!isset($isset[$data[_FF_DATA_ID]])) {
                         if (!$subrecord->store()) {
-                            $this->status = _FF_STATUS_SAVESUBRECORD_FAILED;
-                            $this->message = Text::_('COM_BREEZINGFORMSNG_PROCESS_SAVESUBFAILED');
+                            $this->processor->status = _FF_STATUS_SAVESUBRECORD_FAILED;
+                            $this->processor->message = Text::_('COM_BREEZINGFORMSNG_PROCESS_SAVESUBFAILED');
                             return;
                         }
                     }
@@ -332,8 +347,8 @@ trait bfProcessorExports
                     }
                 }
 
-                $dispatcher = $this->app->getDispatcher();
-                $dispatcher->dispatch('onBeforeSubmit', new Joomla\Event\Event('onBeforeSubmit', array(
+                $dispatcher = $this->processor->app->getDispatcher();
+                $dispatcher->dispatch('onBeforeSubmit', new Event('onBeforeSubmit', array(
                     Factory::getApplication()->getInput()->getInt('cb_record_id', 0),
                     $cbResult['form'],
                     $values
@@ -355,7 +370,7 @@ trait bfProcessorExports
 
                 if ($record_return) {
 
-                    $this->record_id = $record_return;
+                    $this->processor->record_id = $record_return;
 
                     $sef = '';
                     $ignore_lang_code = '*';
@@ -412,7 +427,7 @@ trait bfProcessorExports
                             $created_down = $date->toSql();
                         }
 
-                        $langSessionId = $this->app->getSession()->getId();
+                        $langSessionId = $this->processor->app->getSession()->getId();
                         $langType = 'com_breezingformsng';
                         $langPublished = $cbData->auto_publish && !$is_future ? 1 : 0;
                         $langReferenceId = $cbResult['form']->getReferenceId();
@@ -474,8 +489,8 @@ trait bfProcessorExports
                     Factory::getApplication()->getInput()->set('cb_category_id', null);
                     Factory::getApplication()->getInput()->set('cb_controller', null);
 
-                    if ($this->app->isClient('site') && Factory::getApplication()->getInput()->getInt('Itemid', 0)) {
-                        $menu = $this->app->getMenu();
+                    if ($this->processor->app->isClient('site') && Factory::getApplication()->getInput()->getInt('Itemid', 0)) {
+                        $menu = $this->processor->app->getMenu();
                         $item = $menu->getActive();
                         if (is_object($item)) {
                             Factory::getApplication()->getInput()->set('cb_category_id', $item->getParams()->get('cb_category_id', null));
@@ -512,7 +527,7 @@ trait bfProcessorExports
                         throw new Exception(Text::_('COM_CONTENTBUILDERNG_RECORD_NOT_FOUND'), 404);
                     }
                     $config = array();
-                    foreach ($this->savedata as $data) {
+                    foreach ($this->processor->savedata as $data) {
                         if ($data[_FF_DATA_NAME] == 'cb_article_category_id') {
                             $config['bf_catid'] = intval($data[_FF_DATA_VALUE]);
                             break;
@@ -528,8 +543,8 @@ trait bfProcessorExports
                     $cache->clean();
                 }
 
-                $dispatcher = $this->app->getDispatcher();
-                $dispatcher->dispatch('onAfterSubmit', new Joomla\Event\Event('onAfterSubmit', 
+                $dispatcher = $this->processor->app->getDispatcher();
+                $dispatcher->dispatch('onAfterSubmit', new Event('onAfterSubmit',
                     array(
                         $record_return,
                         $article_id,
@@ -542,9 +557,9 @@ trait bfProcessorExports
         }
 
         require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFIntegrate.php');
-        $integrate = new BFIntegrate($this->form);
-        if (count($this->savedata))
-            foreach ($this->savedata as $data) {
+        $integrate = new BFIntegrate($this->processor->form);
+        if (count($this->processor->savedata))
+            foreach ($this->processor->savedata as $data) {
                 $integrate->field($data);
             }
         $integrate->commit();
@@ -572,7 +587,7 @@ trait bfProcessorExports
 
     function sendMail($from, $fromname, $recipient, $subject, $body, $attachment = NULL, $html = NULL, $cc = NULL, $bcc = NULL, $alt_sender = '')
     {
-        if ($this->dying)
+        if ($this->processor->dying)
             return;
 
         try {
@@ -589,9 +604,9 @@ trait bfProcessorExports
                 (string) $alt_sender
             );
         } catch (Throwable $e) {
-            $this->status = _FF_STATUS_SENDMAIL_FAILED;
-            $this->message = $e->getMessage();
-            $this->app->enqueueMessage($this->message, 'error');
+            $this->processor->status = _FF_STATUS_SENDMAIL_FAILED;
+            $this->processor->message = $e->getMessage();
+            $this->processor->app->enqueueMessage($this->processor->message, 'error');
         }
     }
 
@@ -601,7 +616,7 @@ trait bfProcessorExports
     {
         return $this->mailSenderService ??= new MailSender(
             Factory::getContainer()->get(MailerFactoryInterface::class),
-            $this->app->getConfig()
+            $this->processor->app->getConfig()
         );
     }
 
@@ -627,15 +642,15 @@ trait bfProcessorExports
         global $ff_compath;
 
         $tz = 'UTC';
-        $tz = new DateTimeZone($this->app->get('offset'));
+        $tz = new DateTimeZone($this->processor->app->get('offset'));
 
-        $file = JPATH_SITE . '/media/breezingforms/pdftpl/' . $this->formrow->name . '_pdf_attachment.php';
+        $file = JPATH_SITE . '/media/breezingforms/pdftpl/' . $this->processor->formrow->name . '_pdf_attachment.php';
         if (!file_exists($file)) {
             $file = JPATH_SITE . '/media/breezingforms/pdftpl/pdf_attachment.php';
         }
 
         if ($mailback) {
-            $mb_file = JPATH_SITE . '/media/breezingforms/pdftpl/' . $this->formrow->name . '_pdf_mailback_attachment.php';
+            $mb_file = JPATH_SITE . '/media/breezingforms/pdftpl/' . $this->processor->formrow->name . '_pdf_mailback_attachment.php';
             if (file_exists($mb_file)) {
                 $file = $mb_file;
             } else {
@@ -649,16 +664,16 @@ trait bfProcessorExports
         $processed = array();
         $xmldata = array();
 
-        $_xmldata = $this->xmldata;
+        $_xmldata = $this->processor->xmldata;
         if ($mailback) {
-            $_xmldata = $this->mb_xmldata;
+            $_xmldata = $this->processor->mb_xmldata;
         }
 
         foreach ($_xmldata as $data) {
             if (!in_array($data[_FF_DATA_NAME], $filter) && !in_array($data[_FF_DATA_NAME], $processed)) {
                 if ($translate) {
                     $title_translated = '';
-                    $this->getFieldTranslated('label', $data[_FF_DATA_NAME], $title_translated);
+                    $this->processor->getFieldTranslated('label', $data[_FF_DATA_NAME], $title_translated);
                     $data[_FF_DATA_TITLE] = $title_translated != '' ? $title_translated : strip_tags($data[_FF_DATA_TITLE]);
                 }
                 $xmldata[] = $data;
@@ -666,23 +681,23 @@ trait bfProcessorExports
             }
         }
 
-        $submitted = $this->submitted;
+        $submitted = $this->processor->submitted;
         $timestamp = $this->submissionTimestampFormatter()->format(
-            (string) $this->submitted,
-            (string) $this->app->get('offset')
+            (string) $this->processor->submitted,
+            (string) $this->processor->app->get('offset')
         );
-        $this->submitted = $timestamp->submittedAt;
+        $this->processor->submitted = $timestamp->submittedAt;
         $date_stamp = $timestamp->fileStamp;
         $date_stamp2 = $this->submissionTimestampFormatter()->format(
-            (string) $this->submitted,
-            (string) $this->app->get('offset')
+            (string) $this->processor->submitted,
+            (string) $this->processor->app->get('offset')
         )->fileStamp;
 
-        $this->submitted = $submitted;
+        $this->processor->submitted = $submitted;
 
         $pdf = new PdfDocument();
         $pdf->setMailback($mailback);
-        $pdf->setFormName($this->formrow->name);
+        $pdf->setFormName($this->processor->formrow->name);
 
         ob_start();
         require($file);
@@ -698,7 +713,7 @@ trait bfProcessorExports
             $sourcePath = JPATH_SITE . '/media/breezingforms/pdftpl/fonts/';
             if (@file_exists($sourcePath) && @is_readable($sourcePath) && @is_dir($sourcePath) && $handle = @opendir($sourcePath)) {
                 while (false !== ($file = @readdir($handle))) {
-                    if ($file != "." && $file != ".." && $this->endsWith(strtolower($file), '.php')) {
+                    if ($file != "." && $file != ".." && $this->processor->endsWith(strtolower($file), '.php')) {
                         $file_sep = explode('.', $file);
                         if (count($file_sep) > 1) {
                             unset($file_sep[count($file_sep) - 1]);
@@ -706,7 +721,7 @@ trait bfProcessorExports
                             $font_loaded = true;
                         }
                     }
-                    if ($file != "." && $file != ".." && $this->endsWith(strtolower($file), '.ttf')) {
+                    if ($file != "." && $file != ".." && $this->processor->endsWith(strtolower($file), '.ttf')) {
                         $file_sep = explode('.', $file);
                         if (count($file_sep) > 1) {
                             unset($file_sep[count($file_sep) - 1]);
@@ -714,7 +729,7 @@ trait bfProcessorExports
                             $font_loaded = true;
                         }
                     }
-                    if ($this->endsWith(strtolower($file), '_active')) {
+                    if ($this->processor->endsWith(strtolower($file), '_active')) {
                         $active = explode('_', $file);
                         if (count($active) > 1) {
                             unset($active[count($active) - 1]);
@@ -769,7 +784,7 @@ trait bfProcessorExports
             $fm = $matches_array[2][0];
 
             if (substr(trim($fm), 0, strlen('{mospath}')) === '{mospath}') {
-                $fm = str_replace('{mospath}', $this->mospath, $fm);
+                $fm = str_replace('{mospath}', $this->processor->mospath, $fm);
             }
 
             foreach ($_xmldata as $data) {
@@ -791,7 +806,7 @@ trait bfProcessorExports
                 $fm = '__empty__';
             }
 
-            $uploads = $this->uploads . '/';
+            $uploads = $this->processor->uploads . '/';
 
             if (substr(trim($fm), 0, 1) === '/' || substr(trim($fm), 1, 1) === ':') {
                 $uploads = '';
@@ -805,7 +820,7 @@ trait bfProcessorExports
             }
         } else {
 
-            $pdfname = $this->uploads . '/ffexport-pdf-' . $date_stamp . '-' . mt_rand(0, mt_getrandmax()) . '.pdf';
+            $pdfname = $this->processor->uploads . '/ffexport-pdf-' . $date_stamp . '-' . mt_rand(0, mt_getrandmax()) . '.pdf';
         }
 
         $pdf->lastPage();
@@ -834,23 +849,23 @@ trait bfProcessorExports
         $fields['ZZZ_D_BROWSER'] = true;
         $fields['ZZZ_E_OPSYS'] = true;
 
-        $lines[$lineNum]['ZZZ_A_FORM'][] = $this->form;
+        $lines[$lineNum]['ZZZ_A_FORM'][] = $this->processor->form;
 
         $timestamp = $this->submissionTimestampFormatter()->format(
-            (string) $this->submitted,
-            (string) $this->app->get('offset')
+            (string) $this->processor->submitted,
+            (string) $this->processor->app->get('offset')
         );
         $submitted = $timestamp->submittedAt;
         $date_stamp = $timestamp->fileStamp;
 
         $lines[$lineNum]['ZZZ_B_SUBMITTED'][] = $submitted;
-        $lines[$lineNum]['ZZZ_C_IP'][] = $this->ip;
-        $lines[$lineNum]['ZZZ_D_BROWSER'][] = $this->browser;
-        $lines[$lineNum]['ZZZ_E_OPSYS'][] = $this->opsys;
+        $lines[$lineNum]['ZZZ_C_IP'][] = $this->processor->ip;
+        $lines[$lineNum]['ZZZ_D_BROWSER'][] = $this->processor->browser;
+        $lines[$lineNum]['ZZZ_E_OPSYS'][] = $this->processor->opsys;
 
-        $xmldata = $this->xmldata;
+        $xmldata = $this->processor->xmldata;
         if ($mailback) {
-            $xmldata = $this->mb_xmldata;
+            $xmldata = $this->processor->mb_xmldata;
         }
 
         $processed = array();
@@ -897,19 +912,19 @@ trait bfProcessorExports
             }
         }
         mt_srand();
-        $csvname = $this->uploads . '/ffexport-' . $date_stamp . '-' . mt_rand(0, mt_getrandmax()) . '.csv';
+        $csvname = $this->processor->uploads . '/ffexport-' . $date_stamp . '-' . mt_rand(0, mt_getrandmax()) . '.csv';
         File::makeSafe($csvname);
         if (function_exists('mb_convert_encoding')) {
             $to_encoding = 'UTF-16LE';
             $from_encoding = 'UTF-8';
             $chrchr = chr(255) . chr(254) . mb_convert_encoding($head . $out, $to_encoding, $from_encoding);
             if (!File::write($csvname, $chrchr)) {
-                $this->status = _FF_STATUS_ATTACHMENT_FAILED;
+                $this->processor->status = _FF_STATUS_ATTACHMENT_FAILED;
             } // if
         } else {
             $head_out = $head . $out;
             if (!File::write($csvname, $head_out)) {
-                $this->status = _FF_STATUS_ATTACHMENT_FAILED;
+                $this->processor->status = _FF_STATUS_ATTACHMENT_FAILED;
             } // if
         }
         return $csvname;
@@ -920,44 +935,44 @@ trait bfProcessorExports
         global $ff_compath, $ff_version, $mosConfig_fileperms;
 
         $timestamp = $this->submissionTimestampFormatter()->format(
-            (string) $this->submitted,
-            (string) $this->app->get('offset')
+            (string) $this->processor->submitted,
+            (string) $this->processor->app->get('offset')
         );
         $submitted = $timestamp->submittedAt;
         $date_stamp = $timestamp->fileStamp;
         $date_file = $submitted;
 
-        if ($this->dying)
+        if ($this->processor->dying)
             return '';
         mt_srand();
-        $xmlname = $this->uploads . '/ffexport-' . $date_stamp . '-' . mt_rand(0, mt_getrandmax()) . '.xml';
+        $xmlname = $this->processor->uploads . '/ffexport-' . $date_stamp . '-' . mt_rand(0, mt_getrandmax()) . '.xml';
 
         $xml = '<?xml version="1.0" encoding="utf-8" ?>' . nl() .
             '<FacileFormsExport type="records" version="' . $ff_version . '">' . nl() .
             indent(1) . '<exportdate>' . $date_file . '</exportdate>' . nl();
-        if ($this->record_id != '')
-            $xml .= indent(1) . '<record id="' . $this->record_id . '">' . nl();
+        if ($this->processor->record_id != '')
+            $xml .= indent(1) . '<record id="' . $this->processor->record_id . '">' . nl();
         else
             $xml .= indent(1) . '<record>' . nl();
 
-        $title_translated = $this->getFormTitleTranslated();
+        $title_translated = $this->processor->getFormTitleTranslated();
 
         $xml .= indent(2) . '<submitted>' . $submitted . '</submitted>' . nl() .
-            indent(2) . '<form>' . $this->form . '</form>' . nl() .
-            indent(2) . '<title>' . htmlspecialchars($title_translated != '' ? $title_translated : $this->formrow->title, ENT_QUOTES, 'UTF-8') . '</title>' . nl() .
-            indent(2) . '<name>' . $this->formrow->name . '</name>' . nl() .
-            indent(2) . '<ip>' . $this->ip . '</ip>' . nl() .
-            indent(2) . '<browser>' . htmlspecialchars($this->browser, ENT_QUOTES, 'UTF-8') . '</browser>' . nl() .
-            indent(2) . '<opsys>' . htmlspecialchars($this->opsys, ENT_QUOTES, 'UTF-8') . '</opsys>' . nl() .
-            indent(2) . '<provider>' . $this->provider . '</provider>' . nl() .
+            indent(2) . '<form>' . $this->processor->form . '</form>' . nl() .
+            indent(2) . '<title>' . htmlspecialchars($title_translated != '' ? $title_translated : $this->processor->formrow->title, ENT_QUOTES, 'UTF-8') . '</title>' . nl() .
+            indent(2) . '<name>' . $this->processor->formrow->name . '</name>' . nl() .
+            indent(2) . '<ip>' . $this->processor->ip . '</ip>' . nl() .
+            indent(2) . '<browser>' . htmlspecialchars($this->processor->browser, ENT_QUOTES, 'UTF-8') . '</browser>' . nl() .
+            indent(2) . '<opsys>' . htmlspecialchars($this->processor->opsys, ENT_QUOTES, 'UTF-8') . '</opsys>' . nl() .
+            indent(2) . '<provider>' . $this->processor->provider . '</provider>' . nl() .
             indent(2) . '<viewed>0</viewed>' . nl() .
             indent(2) . '<exported>0</exported>' . nl() .
             indent(2) . '<archived>0</archived>' . nl();
         $processed = array();
 
-        $xmldata = $this->xmldata;
+        $xmldata = $this->processor->xmldata;
         if ($mailback) {
-            $xmldata = $this->mb_xmldata;
+            $xmldata = $this->processor->mb_xmldata;
         }
 
         if (count($xmldata))
@@ -965,7 +980,7 @@ trait bfProcessorExports
 
                 if ($translate) {
                     $title_translated = '';
-                    $this->getFieldTranslated('label', $data[_FF_DATA_NAME], $title_translated);
+                    $this->processor->getFieldTranslated('label', $data[_FF_DATA_NAME], $title_translated);
                 }
 
                 if (!in_array($data[_FF_DATA_NAME], $filter) && !in_array($data[_FF_DATA_NAME], $processed)) {
@@ -984,7 +999,7 @@ trait bfProcessorExports
 
         File::makeSafe($xmlname);
         if (!File::write($xmlname, $xml)) {
-            $this->status = _FF_STATUS_ATTACHMENT_FAILED;
+            $this->processor->status = _FF_STATUS_ATTACHMENT_FAILED;
         } // if
 
         return $xmlname;

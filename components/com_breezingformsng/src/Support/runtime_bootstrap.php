@@ -13,7 +13,7 @@
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 // Version constants, reserved names and runmodes stay here; the engine
-// implementation is split by concern under legacy/.
+// implementation is split into native services while public runtime helpers remain available.
 
 global $ff_version, $ff_resnames, $ff_request, $ff_target;
 
@@ -38,5 +38,5 @@ DEFINE('_FF_RUNMODE_FRONTEND', 0);
 DEFINE('_FF_RUNMODE_BACKEND', 1);
 DEFINE('_FF_RUNMODE_PREVIEW', 2);
 
-require_once __DIR__ . '/legacy/functions.php';
-require_once __DIR__ . '/legacy/tables.php';
+require_once __DIR__ . '/runtime_functions.php';
+require_once dirname(__DIR__) . '/Table/RuntimeTables.php';

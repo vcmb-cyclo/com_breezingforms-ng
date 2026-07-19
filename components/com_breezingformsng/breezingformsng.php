@@ -9,7 +9,7 @@
  * @copyright Copyright (C) 2024-2026 by XDA+GIL
  * @license GNU General Public License version 2 or later; see LICENSE.txt
  *
- * Front controller of the legacy form engine. Boots the legacy runtime,
+ * Front controller of the native form engine. Boots the public stored-script runtime,
  * then dispatches either to the form renderer (view/submit) or to one of
  * the callback services (payments, captcha, uploads, opt-in/out).
  * */
@@ -99,7 +99,7 @@ $ff_mospath = JPATH_SITE;
 $ff_compath = $ff_mospath . '/components/com_breezingformsng';
 
 // load config and initialize globals
-require_once ($ff_compath . '/facileforms.class.php');
+require_once $ff_compath . '/src/Support/runtime_bootstrap.php';
 $ff_config = new FormConfiguration();
 $runtimeContext = (new RuntimeContextInitializer($mainframe, $ff_config))->initialize(
     $ff_mossite ?? null,

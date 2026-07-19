@@ -38,7 +38,7 @@ use BFQuickModeBootstrap;
 use BFQuickModeMobile;
 use BFQuickModeOnePage;
 use Exception;
-use facileFormsQuerycols;
+use Vcmb\Component\BreezingformsNG\Site\Table\QueryColumn;
 use HTML_facileFormsProcessor;
 use CB\Component\Contentbuilderng\Administrator\Helper\ContentbuilderngHelper;
 use CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory;
@@ -729,7 +729,7 @@ final class RenderingEngine
                     for ($c = 0; $c < count($cls); $c++) {
                         if ($cls[$c] != '') {
                             $col = ''; // instead of unset
-                            $col = new facileFormsQuerycols;
+                            $col = new QueryColumn;
                             $col->unpack($cls[$c]);
                             $this->processor->compileQueryCol($row, $col);
                             $cols[] = $col;

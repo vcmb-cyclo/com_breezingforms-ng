@@ -11,7 +11,6 @@
  * */
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
-use Joomla\CMS\Factory;
 use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use Joomla\CMS\Mail\MailerFactoryInterface;
@@ -40,6 +39,7 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\RenderingEngine;
 use Vcmb\Component\BreezingformsNG\Site\Service\Submission\SubmissionEngine;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\UploadError;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\UploadRuntime;
+use Vcmb\Component\BreezingformsNG\Site\Table\FormTable;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Log\Log;
@@ -332,7 +332,7 @@ function _ff_traceExit($line, $retval = null)
 function _ff_errorHandler($errno, $errstr, $errfile, $errline)
 {
     global $ff_processor, $ff_mossite;
-    $database = Factory::getContainer()->get(DatabaseInterface::class);
+    $database = $ff_processor->database;
 
     if (isset($ff_processor->dying) && $ff_processor->dying)
         return;
@@ -1042,7 +1042,7 @@ class HTML_facileFormsProcessor
           $this->submitted = $instance->toFormat($format);
           } */
 
-        $this->formrow = new facileFormsForms($this->database);
+        $this->formrow = new FormTable($this->database);
         $this->formrow->load($form);
 
         if ($this->formrow->published) {

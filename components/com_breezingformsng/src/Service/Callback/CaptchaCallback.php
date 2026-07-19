@@ -14,7 +14,6 @@ use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
-use Joomla\Database\DatabaseInterface;
 use Joomla\Filesystem\File;
 
 /**
@@ -22,21 +21,12 @@ use Joomla\Filesystem\File;
  */
 final class CaptchaCallback
 {
-    public function __construct(
-        private readonly CMSApplication $application,
-        private readonly DatabaseInterface $database,
-    ) {
+    public function __construct(private readonly CMSApplication $application)
+    {
     }
 
     public function check(): void
     {
-        global $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
-
-        $database = $this->database;
-
-        $mainframe = $this->application;
-        $db = $database;
-
 
     @ob_end_clean();
 

@@ -49,7 +49,7 @@ final class EngineDispatcher
         }
 
         if ($this->input->getBool('checkCaptcha', false)) {
-            (new CaptchaCallback($this->application, $this->database))->check();
+            (new CaptchaCallback($this->application))->check();
         } elseif ($this->input->getBool('confirmPayPalIpn', false) && $application === '') {
             (new PayPalCallback($this->application, $this->database, $this->redirectHelper()))->confirmIpn();
         } elseif ($this->input->getBool('confirmStripe', false) && $application === '') {

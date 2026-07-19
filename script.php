@@ -1965,6 +1965,10 @@ class com_breezingformsngInstallerScript
         $obsolete = [
             JPATH_SITE . '/components/com_breezingformsng/router.php',
             JPATH_SITE . '/components/com_breezingformsng/facileforms.xml.php',
+            JPATH_SITE . '/components/com_breezingformsng/legacy/processor/bfProcessorUploads.php',
+            JPATH_SITE . '/components/com_breezingformsng/legacy/processor/bfProcessorCodeTools.php',
+            JPATH_SITE . '/components/com_breezingformsng/legacy/processor/bfProcessorScripting.php',
+            JPATH_SITE . '/components/com_breezingformsng/legacy/processor/bfProcessorExports.php',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/sql/create_sql.php',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/src/Helper/LegacyClassLoader.php',
         ];

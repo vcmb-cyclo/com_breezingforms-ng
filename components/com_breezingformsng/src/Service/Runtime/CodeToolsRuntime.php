@@ -10,150 +10,157 @@
  * SPDX-License-Identifier: GPL-2.0-or-later
  **/
 
-defined('_JEXEC') or die('Direct Access to this location is not allowed.');
+declare(strict_types=1);
 
+namespace Vcmb\Component\BreezingformsNG\Site\Service\Runtime;
+
+\defined('_JEXEC') or die;
+
+use HTML_facileFormsProcessor;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ClassNameResolver;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\JavascriptValueExporter;
-use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\CodeStringTools;
-use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\TraceModeFormatter;
 
 /**
  * Tracing display and legacy code patching/eval preparation.
  */
-trait bfProcessorCodeTools
+final class CodeToolsRuntime
 {
     private ?ClassNameResolver $classNameResolverService = null;
     private ?JavascriptValueExporter $javascriptValueExporterService = null;
     private ?CodeStringTools $codeStringToolsService = null;
     private ?TraceModeFormatter $traceModeFormatterService = null;
 
-    function dispTraceMode($mode)
+    public function __construct(private readonly HTML_facileFormsProcessor $processor)
+    {
+    }
+
+    public function dispTraceMode(mixed $mode): string
     {
         return $this->traceModeFormatter()->format($mode);
     }
 
     // dispTraceMode
 
-    function trim(&$code)
+    public function trim(mixed &$code): mixed
     {
         return $this->codeStringTools()->trimInPlace($code);
     }
 
     // trim
 
-    function nonblank(&$code)
+    public function nonblank(mixed &$code): int
     {
         return $this->codeStringTools()->containsNonWhitespace((string) $code) ? 1 : 0;
     }
 
     // nonblank
 
-    function getClassName($classdef)
+    public function getClassName(mixed $classdef): string
     {
         return $this->classNameResolver()->resolve(
             (string) $classdef,
-            (int) $this->template,
-            (string) $this->suffix
+            (int) $this->processor->template,
+            (string) $this->processor->suffix
         );
     }
 
     // getClassName
 
-    function expJsValue($mixed, $indent = '')
+    public function expJsValue(mixed $mixed, string $indent = ''): string
     {
         return $this->javascriptValueExporter()->exportValue($mixed, (string) $indent);
     }
 
     // expJsValue
 
-    function expJsVar($name, $mixed)
+    public function expJsVar(mixed $name, mixed $mixed): string
     {
         return $this->javascriptValueExporter()->exportVariable((string) $name, $mixed);
     }
 
     // expJsVar
 
-    function dumpTrace()
+    public function dumpTrace(): void
     {
-        if ($this->traceMode & _FF_TRACEMODE_DIRECT) {
+        if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT) {
             $html = ob_get_contents();
             ob_end_clean();
-            echo htmlspecialchars($html, ENT_QUOTES) . $this->traceBuffer;
+            echo htmlspecialchars($html, ENT_QUOTES) . $this->processor->traceBuffer;
             ob_start();
-            $this->traceBuffer = null;
+            $this->processor->traceBuffer = null;
             return;
         } // if
-        if (!$this->traceBuffer)
+        if (!$this->processor->traceBuffer)
             return;
-        if ($this->traceMode & _FF_TRACEMODE_APPEND) {
-            echo '<pre>' . $this->traceBuffer . '</pre>';
-            $this->traceBuffer = null;
+        if ($this->processor->traceMode & _FF_TRACEMODE_APPEND) {
+            echo '<pre>' . $this->processor->traceBuffer . '</pre>';
+            $this->processor->traceBuffer = null;
             return;
         } // if
         echo
             '<script type="text/javascript">' . nl() .
             '<!--' . nl();
-        if ($this->dying)
-            echo 'console.log(' . json_encode($this->traceBuffer) . ')' . nl();
+        if ($this->processor->dying)
+            echo 'console.log(' . json_encode($this->processor->traceBuffer) . ')' . nl();
         echo
             '-->' . nl() .
             '</script>' . nl();
-        $this->traceBuffer = null;
+        $this->processor->traceBuffer = null;
     }
 
     // dumpTrace
 
-    function traceEval($name)
+    public function traceEval(mixed $name): void
     {
         if (
-            ($this->traceMode & _FF_TRACEMODE_DISABLE) ||
-            !($this->traceMode & _FF_TRACEMODE_EVAL) ||
-            $this->dying
+            ($this->processor->traceMode & _FF_TRACEMODE_DISABLE) ||
+            !($this->processor->traceMode & _FF_TRACEMODE_EVAL) ||
+            $this->processor->dying
         )
             return;
         
-        $level = count($this->traceStack);
+        $level = count($this->processor->traceStack);
         for ($l = 0; $l < $level; $l++)
-            $this->traceBuffer .= '  ';
+            $this->processor->traceBuffer .= '  ';
         
-            $this->traceBuffer .= htmlspecialchars("eval($name)\n", ENT_QUOTES);
-        if ($this->traceMode & _FF_TRACEMODE_DIRECT)
+            $this->processor->traceBuffer .= htmlspecialchars("eval($name)\n", ENT_QUOTES);
+        if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT)
             $this->dumpTrace();
     }
 
     // traceEval
 
-    function suicide()
+    public function suicide(): bool
     {
-        if ($this->dying)
+        if ($this->processor->dying)
             return false;
-        $this->dying = true;
+        $this->processor->dying = true;
         $rep = 0;
-        $this->errrep = error_reporting($rep);
+        $this->processor->errrep = error_reporting($rep);
         return true;
     }
 
     // suicide
 
-    function bury()
+    public function bury(): bool
     {
-        if (!$this->dying)
+        if (!$this->processor->dying)
             return false;
-        if ($this->traceMode & _FF_TRACEMODE_DIRECT)
+        if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT)
             $this->dumpTrace();
         ob_end_clean();
-        if ($this->traceMode & _FF_TRACEMODE_DIRECT)
+        if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT)
             echo '</pre>';
         else
             $this->dumpTrace();
-        error_reporting($this->errrep);
+        error_reporting($this->processor->errrep);
         restore_error_handler();
         return true;
     }
 
     // bury
 
-    function findToken(&$code, &$spos, &$offs)
+    public function findToken(mixed &$code, mixed &$spos, mixed &$offs): string
     {
         $srch = '#(\bfunction\b|return[^a-zA-Z_-]|_ff_trace|ff_trace[ \\t]*\\(|//|/\*|\*/|\\\\"|\\\\\'|{|}|\(|\)|;|"|\'|\n)#si';
         $match = array();
@@ -167,7 +174,7 @@ trait bfProcessorCodeTools
 
     // findToken
 
-    function findRealToken(&$code, &$spos, &$offs, &$line)
+    public function findRealToken(mixed &$code, mixed &$spos, mixed &$offs, mixed &$line): string
     {
         $linecmt = $blockcmt = false;
         $quote = null;
@@ -215,7 +222,7 @@ trait bfProcessorCodeTools
 
     // findRealToken
 
-    function patchCode($mode, $code, $name, $type, $id, $pane)
+    public function patchCode(mixed $mode, mixed $code, mixed $name, mixed $type, mixed $id, mixed $pane): string
     {
         $flevel = $cpos = $spos = $offs = 0;
         $bye = false;
@@ -335,7 +342,7 @@ trait bfProcessorCodeTools
         $line--;
         $dst .= "_ff_traceExit($line);";
         if (_FF_DEBUG & _FF_DEBUG_PATCHEDCODE) {
-            $this->traceBuffer .= htmlspecialchars(
+            $this->processor->traceBuffer .= htmlspecialchars(
                 "\n_FF_DEBUG_PATCHEDCODE:" .
                 "\n  Mode = " . $this->dispTraceMode($mode) .
                 "\n  Name = $name" .
@@ -346,7 +353,7 @@ trait bfProcessorCodeTools
                 "\n",
                 ENT_QUOTES
             );
-            if ($this->traceMode & _FF_TRACEMODE_DIRECT)
+            if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT)
                 $this->dumpTrace();
         } // if
         return $dst;
@@ -354,14 +361,14 @@ trait bfProcessorCodeTools
 
     // patchCode
 
-    function prepareEvalCode(&$code, $name, $type, $id, $pane)
+    public function prepareEvalCode(mixed &$code, mixed $name, mixed $type, mixed $id, mixed $pane): bool
     {
-        if ($this->dying)
+        if ($this->processor->dying)
             return false;
         if (!$this->nonblank($code))
             return false;
         $code .= "\n/*'/*\"/**/;"; // closes all comments and strings that my be open
-        $disable = ($this->traceMode & _FF_TRACEMODE_DISABLE) ? true : false;
+        $disable = ($this->processor->traceMode & _FF_TRACEMODE_DISABLE) ? true : false;
         if (!$disable) {
             $mode = 'null';
             $srch = '#' .
@@ -478,16 +485,16 @@ trait bfProcessorCodeTools
                 if ($local)
                     $mode |= _FF_TRACEMODE_LOCAL;
 
-                $first = ($this->traceMode & _FF_TRACEMODE_FIRST) ? true : false;
+                $first = ($this->processor->traceMode & _FF_TRACEMODE_FIRST) ? true : false;
                 if ($first) {
-                    $oldMode = $this->traceMode;
-                    $this->traceMode = 0;
+                    $oldMode = $this->processor->traceMode;
+                    $this->processor->traceMode = 0;
                     if ($disable)
-                        $this->traceMode |= _FF_TRACEMODE_DISABLE;
+                        $this->processor->traceMode |= _FF_TRACEMODE_DISABLE;
                     if ($append)
-                        $this->traceMode |= _FF_TRACEMODE_APPEND;
+                        $this->processor->traceMode |= _FF_TRACEMODE_APPEND;
                     if ($direct) {
-                        $this->traceMode |= _FF_TRACEMODE_DIRECT;
+                        $this->processor->traceMode |= _FF_TRACEMODE_DIRECT;
                         $html = ob_get_contents();
                         ob_end_clean();
                         echo '<pre>' . htmlspecialchars($html, ENT_QUOTES);
@@ -499,11 +506,11 @@ trait bfProcessorCodeTools
                     $_deb = "\n_FF_DEBUG_DIRECTIVE:";
                     if ($first)
                         $_deb .= "\n  Previous mode=" . $this->dispTraceMode($oldMode);
-                    $_deb .= "\n  Trace mode   =" . $this->dispTraceMode($this->traceMode) .
+                    $_deb .= "\n  Trace mode   =" . $this->dispTraceMode($this->processor->traceMode) .
                         "\n  New mode     =" . $this->dispTraceMode($mode) .
                         "\n";
-                    $this->traceBuffer .= htmlspecialchars($_deb, ENT_QUOTES);
-                    if ($this->traceMode & _FF_TRACEMODE_DIRECT)
+                    $this->processor->traceBuffer .= htmlspecialchars($_deb, ENT_QUOTES);
+                    if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT)
                         $this->dumpTrace();
                 } // if
             } // if trace directive
@@ -516,7 +523,7 @@ trait bfProcessorCodeTools
                 $code = $this->patchCode($mode, $code, $name, $type, $id, $pane);
             } // if
         } // if trace not disabled
-        $code = str_replace($this->findtags, $this->replacetags, $code);
+        $code = str_replace($this->processor->findtags, $this->processor->replacetags, $code);
         return true;
     }
 

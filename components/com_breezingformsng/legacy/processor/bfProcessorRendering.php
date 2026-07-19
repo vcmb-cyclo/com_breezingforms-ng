@@ -35,6 +35,7 @@ use CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory;
 use CB\Component\Contentbuilderng\Administrator\Service\ArticleService;
 use CB\Component\Contentbuilderng\Administrator\Service\ListSupportService;
 use CB\Component\Contentbuilderng\Administrator\Service\PermissionService;
+use CB\Component\Contentbuilderng\Administrator\Helper\RuntimeContextHelper;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\JavascriptValueExporter;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ProcessorHeaderRenderer;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\TokenizedDirectoryResolver;
@@ -169,7 +170,7 @@ trait bfProcessorRendering
             // test if all published contentbuilder views allow creating new submissions
             if (!Factory::getApplication()->getInput()->getInt('cb_record_id', 0) || !Factory::getApplication()->getInput()->getInt('cb_form_id', 0)) {
 
-                $permissionService = new PermissionService();
+                $permissionService = PermissionService::createFromRuntimeContext();
                 $cbAuth = true;
                 foreach ($cbForms as $cbFormId) {
                     $permissionService->setPermissions($cbFormId, 0, $cbFrontend ? '_fe' : '');
@@ -190,11 +191,11 @@ trait bfProcessorRendering
 
                 // test the permissions of given record
                 if (Factory::getApplication()->getInput()->getInt('cb_record_id', 0)) {
-                    (new PermissionService())->setPermissions(Factory::getApplication()->getInput()->getInt('cb_form_id', 0), Factory::getApplication()->getInput()->getInt('cb_record_id', 0), $cbFrontend ? '_fe' : '');
-                    (new PermissionService())->checkPermissions('edit', Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_EDIT_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
+                    (PermissionService::createFromRuntimeContext())->setPermissions(Factory::getApplication()->getInput()->getInt('cb_form_id', 0), Factory::getApplication()->getInput()->getInt('cb_record_id', 0), $cbFrontend ? '_fe' : '');
+                    (PermissionService::createFromRuntimeContext())->checkPermissions('edit', Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_EDIT_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
                 } else {
-                    (new PermissionService())->setPermissions(Factory::getApplication()->getInput()->getInt('cb_form_id', 0), 0, $cbFrontend ? '_fe' : '');
-                    (new PermissionService())->checkPermissions('new', Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_NEW_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
+                    (PermissionService::createFromRuntimeContext())->setPermissions(Factory::getApplication()->getInput()->getInt('cb_form_id', 0), 0, $cbFrontend ? '_fe' : '');
+                    (PermissionService::createFromRuntimeContext())->checkPermissions('new', Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_NEW_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
                 }
 
                 $cbFormId = Factory::getApplication()->getInput()->getInt('cb_form_id', 0);
@@ -207,7 +208,7 @@ trait bfProcessorRendering
                 $db->setQuery($query);
                 $cbData = $db->loadAssoc();
                 if (is_array($cbData)) {
-                    $permissionService = new PermissionService();
+                    $permissionService = PermissionService::createFromRuntimeContext();
                     $cbFull = $cbFrontend ? $permissionService->authorizeFe('fullarticle') : $permissionService->authorize('fullarticle');
                     $cbForm = FormSourceFactory::getForm('com_breezingformsng', $cbData['reference_id']);
                     $cbRecord = $cbForm->getRecord(Factory::getApplication()->getInput()->getInt('cb_record_id', 0), $cbData['published_only'], $cbFrontend ? ($cbData['own_only_fe'] ? Factory::getApplication()->getIdentity()->get('id', 0) : -1) : ($cbData['own_only'] ? Factory::getApplication()->getIdentity()->get('id', 0) : -1), $cbFrontend ? $cbData['show_all_languages_fe'] : true);
@@ -1118,7 +1119,7 @@ trait bfProcessorRendering
 
         if ($cbRecord !== null) {
 
-            $cbNonEditableFields = (new ListSupportService())->getListNonEditableElements($cbResult['data']['id']);
+            $cbNonEditableFields = ListSupportService::createFromRuntimeContext()->getListNonEditableElements($cbResult['data']['id']);
             $cbFlashUploadValidationOverride = '';
             foreach ($cbRecord as $cbEntry) {
                 if (!in_array($cbEntry->recElementId, $cbNonEditableFields)) {
@@ -1311,7 +1312,7 @@ trait bfProcessorRendering
 
         $cbNonEditableFields = array();
         if ($cbForm !== null) {
-            $cbNonEditableFields = (new ListSupportService())->getListNonEditableElements($cbResult['data']['id']);
+            $cbNonEditableFields = ListSupportService::createFromRuntimeContext()->getListNonEditableElements($cbResult['data']['id']);
             if (count($cbNonEditableFields)) {
                 Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('<!--' . nl() . 'var bfDeactivateField = new Array();' . nl() . '//-->');
                 echo '<script type="text/javascript">' . nl();

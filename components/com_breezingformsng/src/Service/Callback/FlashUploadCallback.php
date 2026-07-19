@@ -9,23 +9,32 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Callback;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Database\ParameterType;
+use Joomla\Database\DatabaseInterface;
 use Joomla\Filesystem\File;
 
 /**
  * Chunked (legacy flash) upload endpoint (flashUpload=1).
  */
-class FlashUploadCallback
+final class FlashUploadCallback
 {
+    public function __construct(
+        private readonly CMSApplication $application,
+        private readonly DatabaseInterface $database,
+    ) {
+    }
+
     public function handle(): void
     {
-        global $database, $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
+        global $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
 
-        $mainframe = Factory::getApplication();
+        $database = $this->database;
+
+        $mainframe = $this->application;
         $db = $database;
 
 
@@ -36,7 +45,7 @@ class FlashUploadCallback
         if ($mdata['type'] == 'element') {
             switch ($mdata['bfType']) {
                 case 'bfFile':
-                    if (isset($mdata['flashUploaderBytes']) && intval($mdata['flashUploaderBytes']) > 0 && isset($mdata['bfName']) && trim($mdata['bfName']) == trim(Factory::getApplication()->getInput()->getString('itemName', ''))) {
+                    if (isset($mdata['flashUploaderBytes']) && intval($mdata['flashUploaderBytes']) > 0 && isset($mdata['bfName']) && trim($mdata['bfName']) == trim($this->application->getInput()->getString('itemName', ''))) {
                         if (file_exists($finaltargetFile) && @filesize($finaltargetFile) > intval($mdata['flashUploaderBytes'])) {
                             @File::delete($finaltargetFile);
                             echo trim($mdata['label']) . ': ' . Text::_('COM_BREEZINGFORMSNG_FLASH_UPLOADER_TOO_LARGE');
@@ -57,7 +66,7 @@ class FlashUploadCallback
     }
 
     @ob_end_clean();
-    $input = Factory::getApplication()->getInput();
+    $input = $this->application->getInput();
     if (is_numeric($input->getString('form', '')) && !empty($_FILES) && $input->getString('bfFlashUploadTicket', '') != '') {
 
         $formId = $input->getInt('form', -1);
@@ -79,11 +88,11 @@ class FlashUploadCallback
             $tempFile = $_FILES['Filedata']['tmp_name'];
             $targetPath = JPATH_SITE . '/components/com_breezingformsng/uploads/';
             if (@file_exists($targetPath) && @is_dir($targetPath)) {
-                $secureTicket = Factory::getApplication()->getSession()->get('secure_ticket', '', 'com_breezingformsng');
+                $secureTicket = $this->application->getSession()->get('secure_ticket', '', 'com_breezingformsng');
                 if ($secureTicket == '') {
                     mt_srand();
                     $secureTicket = md5(strtotime('now') . mt_rand(0, mt_getrandmax()));
-                    Factory::getApplication()->getSession()->set('secure_ticket', $secureTicket, 'com_breezingformsng');
+                    $this->application->getSession()->set('secure_ticket', $secureTicket, 'com_breezingformsng');
                 }
 
                 $targetFile = str_replace('//', '/', $targetPath) . 'chunks/' . $input->getInt('offset', 0) . '_' . bf_sanitizeFilename($input->getString('name', 'unknown')) . '_' . $input->getString('itemName', '') . '_' . $input->getString('bfFlashUploadTicket', '') . '_' . $secureTicket . '_chunktmp';

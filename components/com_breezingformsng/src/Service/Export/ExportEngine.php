@@ -23,7 +23,6 @@ use facileFormsRecords;
 use facileFormsSubrecords;
 use HTML_facileFormsProcessor;
 use Throwable;
-use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 use Joomla\Event\Event;
@@ -59,8 +58,11 @@ final class ExportEngine
     private ?MailSender $mailSenderService = null;
     private ?SubmissionTimestampFormatter $submissionTimestampFormatterService = null;
 
-    public function __construct(private readonly HTML_facileFormsProcessor $processor)
-    {
+    public function __construct(
+        private readonly HTML_facileFormsProcessor $processor,
+        private readonly MailerFactoryInterface $mailerFactory,
+        private readonly CacheControllerFactoryInterface $cacheControllerFactory,
+    ) {
     }
 
     function logToDatabase($cbResult = null)
@@ -71,7 +73,7 @@ final class ExportEngine
 
         if (!is_object($cbResult['form']) && $this->processor->editable && $this->processor->editable_override) {
             $editableFormValue = $this->processor->form;
-            $editableUserId = Factory::getApplication()->getIdentity()->get('id', 0);
+            $editableUserId = $this->processor->app->getIdentity()->get('id', 0);
             $recordsQuery = $this->processor->database->getQuery(true)
                 ->select('id')
                 ->from($this->processor->database->quoteName('#__facileforms_records'))
@@ -111,12 +113,12 @@ final class ExportEngine
         $record->viewed = 0;
         $record->exported = 0;
         $record->archived = 0;
-        if (Factory::getApplication()->getIdentity()->get('id', 0) > 0) {
-            $record->user_id = Factory::getApplication()->getIdentity()->get('id', 0);
-            $record->username = Factory::getApplication()->getIdentity()->get('username', '');
-            $record->user_full_name = Factory::getApplication()->getIdentity()->get('name', '');
+        if ($this->processor->app->getIdentity()->get('id', 0) > 0) {
+            $record->user_id = $this->processor->app->getIdentity()->get('id', 0);
+            $record->username = $this->processor->app->getIdentity()->get('username', '');
+            $record->user_full_name = $this->processor->app->getIdentity()->get('name', '');
         } else {
-            $record->user_id = Factory::getApplication()->getIdentity()->get('id', 0);
+            $record->user_id = $this->processor->app->getIdentity()->get('id', 0);
             $record->username = '-';
             $record->user_full_name = '-';
         }
@@ -134,7 +136,7 @@ final class ExportEngine
             if ($record_return && file_exists(JPATH_ADMINISTRATOR . '/components/com_contentbuilderng/com_contentbuilderng.xml')) {
                 $last_update = new \Joomla\CMS\Date\Date();
                 $last_update = $last_update->toSql();
-                $db = Factory::getContainer()->get(DatabaseInterface::class);
+                $db = $this->processor->database;
                 $cbFormValue = $this->processor->form;
                 $cbRecordReturn = $record_return;
                 $existsQuery = $db->getQuery(true)
@@ -190,8 +192,8 @@ final class ExportEngine
             // CONTENTBUILDER file deletion/upgrade
             if (is_object($cbResult['form'])) {
 
-                $db = Factory::getContainer()->get(DatabaseInterface::class);
-                $cbFormIdInput = Factory::getApplication()->getInput()->getInt('cb_form_id', 0);
+                $db = $this->processor->database;
+                $cbFormIdInput = $this->processor->app->getInput()->getInt('cb_form_id', 0);
                 $cbFormQuery = $db->getQuery(true)
                     ->select('SQL_CALC_FOUND_ROWS *')
                     ->from($db->quoteName('#__contentbuilderng_forms'))
@@ -201,11 +203,11 @@ final class ExportEngine
                 $db->setQuery($cbFormQuery);
                 $_settings = $db->loadObject();
 
-                $_record = $cbResult['form']->getRecord(Factory::getApplication()->getInput()->getInt('record_id', 0), $_settings->published_only, $cbResult['frontend'] ? ($_settings->own_only_fe ? Factory::getApplication()->getIdentity()->get('id', 0) : -1) : ($_settings->own_only ? Factory::getApplication()->getIdentity()->get('id', 0) : -1), true);
+                $_record = $cbResult['form']->getRecord($this->processor->app->getInput()->getInt('record_id', 0), $_settings->published_only, $cbResult['frontend'] ? ($_settings->own_only_fe ? $this->processor->app->getIdentity()->get('id', 0) : -1) : ($_settings->own_only ? $this->processor->app->getIdentity()->get('id', 0) : -1), true);
                 foreach ($_record as $_rec) {
                     $_files_deleted = array();
                     if ($_rec->recType == 'File Upload') {
-                        $_array = Factory::getApplication()->getInput()->get('cb_delete_' . $_rec->recElementId, [], 'array');
+                        $_array = $this->processor->app->getInput()->get('cb_delete_' . $_rec->recElementId, [], 'array');
                         foreach ($_array as $_key => $_arr) {
                             if ($_arr == 1) {
                                 $_values = explode("\n", $_rec->recValue);
@@ -349,16 +351,16 @@ final class ExportEngine
 
                 $dispatcher = $this->processor->app->getDispatcher();
                 $dispatcher->dispatch('onBeforeSubmit', new Event('onBeforeSubmit', array(
-                    Factory::getApplication()->getInput()->getInt('cb_record_id', 0),
+                    $this->processor->app->getInput()->getInt('cb_record_id', 0),
                     $cbResult['form'],
                     $values
                 )
             ));
 
-                $record_return = $cbResult['form']->saveRecord(Factory::getApplication()->getInput()->getInt('cb_record_id', 0), $values);
+                $record_return = $cbResult['form']->saveRecord($this->processor->app->getInput()->getInt('cb_record_id', 0), $values);
 
-                $db = Factory::getContainer()->get(DatabaseInterface::class);
-                $cbFormIdInput = Factory::getApplication()->getInput()->getInt('cb_form_id', 0);
+                $db = $this->processor->database;
+                $cbFormIdInput = $this->processor->app->getInput()->getInt('cb_form_id', 0);
                 $cbFormQuery = $db->getQuery(true)
                     ->select('SQL_CALC_FOUND_ROWS *')
                     ->from($db->quoteName('#__contentbuilderng_forms'))
@@ -376,7 +378,7 @@ final class ExportEngine
                     $ignore_lang_code = '*';
                     if ($cbResult['data']['default_lang_code_ignore']) {
 
-                        $langSef = trim(Factory::getApplication()->getInput()->getCmd('lang', ''));
+                        $langSef = trim($this->processor->app->getInput()->getCmd('lang', ''));
                         $langQuery = $db->getQuery(true)
                             ->select($db->quoteName('lang_code'))
                             ->from($db->quoteName('#__languages'))
@@ -389,7 +391,7 @@ final class ExportEngine
                             $ignore_lang_code = '*';
                         }
 
-                        $sef = trim(Factory::getApplication()->getInput()->getCmd('lang', ''));
+                        $sef = trim($this->processor->app->getInput()->getCmd('lang', ''));
                         if ($ignore_lang_code == '*') {
                             $sef = '';
                         }
@@ -486,15 +488,15 @@ final class ExportEngine
                 // creating the article
                 if (is_object($cbData) && $cbData->create_articles) {
 
-                    Factory::getApplication()->getInput()->set('cb_category_id', null);
-                    Factory::getApplication()->getInput()->set('cb_controller', null);
+                    $this->processor->app->getInput()->set('cb_category_id', null);
+                    $this->processor->app->getInput()->set('cb_controller', null);
 
-                    if ($this->processor->app->isClient('site') && Factory::getApplication()->getInput()->getInt('Itemid', 0)) {
+                    if ($this->processor->app->isClient('site') && $this->processor->app->getInput()->getInt('Itemid', 0)) {
                         $menu = $this->processor->app->getMenu();
                         $item = $menu->getActive();
                         if (is_object($item)) {
-                            Factory::getApplication()->getInput()->set('cb_category_id', $item->getParams()->get('cb_category_id', null));
-                            Factory::getApplication()->getInput()->set('cb_controller', $item->getParams()->get('cb_controller', null));
+                            $this->processor->app->getInput()->set('cb_category_id', $item->getParams()->get('cb_category_id', null));
+                            $this->processor->app->getInput()->set('cb_controller', $item->getParams()->get('cb_controller', null));
                         }
                     }
 
@@ -506,7 +508,7 @@ final class ExportEngine
                     }
                     $cbData->labels = array();
                     if (count($ids)) {
-                        $cbFormIdForLabels = Factory::getApplication()->getInput()->getInt('cb_form_id', 0);
+                        $cbFormIdForLabels = $this->processor->app->getInput()->getInt('cb_form_id', 0);
                         $labelsQuery = $db->getQuery(true)
                             ->select('DISTINCT ' . $db->quoteName('label') . ', ' . $db->quoteName('reference_id'))
                             ->from($db->quoteName('#__contentbuilderng_elements'))
@@ -522,7 +524,7 @@ final class ExportEngine
                             $ids[] = $row['reference_id'];
                         }
                     }
-                    $cbData->items = $cbResult['form']->getRecord($record_return, $cbData->published_only, $cbResult['frontend'] ? ($cbData->own_only_fe ? Factory::getApplication()->getIdentity()->get('id', 0) : -1) : ($cbData->own_only ? Factory::getApplication()->getIdentity()->get('id', 0) : -1), true);
+                    $cbData->items = $cbResult['form']->getRecord($record_return, $cbData->published_only, $cbResult['frontend'] ? ($cbData->own_only_fe ? $this->processor->app->getIdentity()->get('id', 0) : -1) : ($cbData->own_only ? $this->processor->app->getIdentity()->get('id', 0) : -1), true);
                     if (!count($cbData->items)) {
                         throw new Exception(Text::_('COM_CONTENTBUILDERNG_RECORD_NOT_FOUND'), 404);
                     }
@@ -534,9 +536,9 @@ final class ExportEngine
                         }
                     }
                     $full = false;
-                    $article_id = Factory::getApplication()->bootComponent('com_contentbuilderng')->getContainer()->get(ArticleService::class)->createArticle(Factory::getApplication()->getInput()->getInt('cb_form_id', 0), $record_return, $cbData->items, $ids, $cbData->title_field, $cbResult['form']->getRecordMetadata($record_return), $config, $full, true, Factory::getApplication()->getInput()->get('cb_category_id', null, 'string'));
+                    $article_id = $this->processor->app->bootComponent('com_contentbuilderng')->getContainer()->get(ArticleService::class)->createArticle($this->processor->app->getInput()->getInt('cb_form_id', 0), $record_return, $cbData->items, $ids, $cbData->title_field, $cbResult['form']->getRecordMetadata($record_return), $config, $full, true, $this->processor->app->getInput()->get('cb_category_id', null, 'string'));
 
-                    $cacheFactory = Factory::getContainer()->get(CacheControllerFactoryInterface::class);
+                    $cacheFactory = $this->cacheControllerFactory;
                     $cache = $cacheFactory->createCacheController('callback', ['defaultgroup' => 'com_content']);
                     $cache->clean();
                     $cache = $cacheFactory->createCacheController('callback', ['defaultgroup' => 'com_contentbuilderng']);
@@ -615,7 +617,7 @@ final class ExportEngine
     private function mailSender(): MailSender
     {
         return $this->mailSenderService ??= new MailSender(
-            Factory::getContainer()->get(MailerFactoryInterface::class),
+            $this->mailerFactory,
             $this->processor->app->getConfig()
         );
     }
@@ -795,9 +797,9 @@ final class ExportEngine
             }
 
             $fm = str_replace('{filemask:_separator}', '_', $fm);
-            $fm = str_replace('{filemask:_username}', trim(Factory::getApplication()->getIdentity()->get('username')), $fm);
-            $fm = str_replace('{filemask:_userid}', trim(Factory::getApplication()->getIdentity()->get('id')), $fm);
-            $fm = str_replace('{filemask:_name}', trim(Factory::getApplication()->getIdentity()->get('name')), $fm);
+            $fm = str_replace('{filemask:_username}', trim($this->processor->app->getIdentity()->get('username')), $fm);
+            $fm = str_replace('{filemask:_userid}', trim($this->processor->app->getIdentity()->get('id')), $fm);
+            $fm = str_replace('{filemask:_name}', trim($this->processor->app->getIdentity()->get('name')), $fm);
             $fm = str_replace('{filemask:_datetime}', trim($date_stamp), $fm);
             $fm = str_replace('{filemask:_date}', trim($date_stamp2), $fm);
             $fm = str_replace('{filemask:_timestamp}', trim(time()), $fm);

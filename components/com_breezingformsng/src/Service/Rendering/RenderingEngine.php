@@ -16,7 +16,6 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering;
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
-use Joomla\CMS\Factory;
 use Joomla\CMS\Filter\InputFilter;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
@@ -161,7 +160,7 @@ final class RenderingEngine
                 $this->processor->app->getLanguage()->load('com_contentbuilderng', JPATH_SITE . '/administrator');
             }
 
-            $db = Factory::getContainer()->get(DatabaseInterface::class);
+            $db = $this->processor->database;
 
             $referenceId = (int) $this->processor->form;
             $query = $db->getQuery(true)
@@ -181,7 +180,7 @@ final class RenderingEngine
             }
 
             // test if all published contentbuilder views allow creating new submissions
-            if (!Factory::getApplication()->getInput()->getInt('cb_record_id', 0) || !Factory::getApplication()->getInput()->getInt('cb_form_id', 0)) {
+            if (!$this->processor->app->getInput()->getInt('cb_record_id', 0) || !$this->processor->app->getInput()->getInt('cb_form_id', 0)) {
 
                 $permissionService = PermissionService::createFromRuntimeContext();
                 $cbAuth = true;
@@ -200,18 +199,18 @@ final class RenderingEngine
                 }
             }
 
-            if (Factory::getApplication()->getInput()->getInt('cb_form_id', 0)) {
+            if ($this->processor->app->getInput()->getInt('cb_form_id', 0)) {
 
                 // test the permissions of given record
-                if (Factory::getApplication()->getInput()->getInt('cb_record_id', 0)) {
-                    (PermissionService::createFromRuntimeContext())->setPermissions(Factory::getApplication()->getInput()->getInt('cb_form_id', 0), Factory::getApplication()->getInput()->getInt('cb_record_id', 0), $cbFrontend ? '_fe' : '');
+                if ($this->processor->app->getInput()->getInt('cb_record_id', 0)) {
+                    (PermissionService::createFromRuntimeContext())->setPermissions($this->processor->app->getInput()->getInt('cb_form_id', 0), $this->processor->app->getInput()->getInt('cb_record_id', 0), $cbFrontend ? '_fe' : '');
                     (PermissionService::createFromRuntimeContext())->checkPermissions('edit', Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_EDIT_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
                 } else {
-                    (PermissionService::createFromRuntimeContext())->setPermissions(Factory::getApplication()->getInput()->getInt('cb_form_id', 0), 0, $cbFrontend ? '_fe' : '');
+                    (PermissionService::createFromRuntimeContext())->setPermissions($this->processor->app->getInput()->getInt('cb_form_id', 0), 0, $cbFrontend ? '_fe' : '');
                     (PermissionService::createFromRuntimeContext())->checkPermissions('new', Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_NEW_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
                 }
 
-                $cbFormId = Factory::getApplication()->getInput()->getInt('cb_form_id', 0);
+                $cbFormId = $this->processor->app->getInput()->getInt('cb_form_id', 0);
                 $query = $db->getQuery(true)
                     ->select('*')
                     ->from($db->quoteName('#__contentbuilderng_forms'))
@@ -224,9 +223,9 @@ final class RenderingEngine
                     $permissionService = PermissionService::createFromRuntimeContext();
                     $cbFull = $cbFrontend ? $permissionService->authorizeFe('fullarticle') : $permissionService->authorize('fullarticle');
                     $cbForm = FormSourceFactory::getForm('com_breezingformsng', $cbData['reference_id']);
-                    $cbRecord = $cbForm->getRecord(Factory::getApplication()->getInput()->getInt('cb_record_id', 0), $cbData['published_only'], $cbFrontend ? ($cbData['own_only_fe'] ? Factory::getApplication()->getIdentity()->get('id', 0) : -1) : ($cbData['own_only'] ? Factory::getApplication()->getIdentity()->get('id', 0) : -1), $cbFrontend ? $cbData['show_all_languages_fe'] : true);
+                    $cbRecord = $cbForm->getRecord($this->processor->app->getInput()->getInt('cb_record_id', 0), $cbData['published_only'], $cbFrontend ? ($cbData['own_only_fe'] ? $this->processor->app->getIdentity()->get('id', 0) : -1) : ($cbData['own_only'] ? $this->processor->app->getIdentity()->get('id', 0) : -1), $cbFrontend ? $cbData['show_all_languages_fe'] : true);
 
-                    if (!count($cbRecord) && !Factory::getApplication()->getInput()->getBool('cbIsNew', false)) {
+                    if (!count($cbRecord) && !$this->processor->app->getInput()->getBool('cbIsNew', false)) {
                         throw new Exception(Text::_('COM_CONTENTBUILDERNG_RECORD_NOT_FOUND'), 404);
                     }
                 }
@@ -250,9 +249,9 @@ final class RenderingEngine
 
         if (trim($this->processor->formrow->template_code_processed) == 'QuickMode') {
 
-            if (isset($_GET['non_mobile']) && Factory::getApplication()->getInput()->getBool('non_mobile', false)) {
+            if (isset($_GET['non_mobile']) && $this->processor->app->getInput()->getBool('non_mobile', false)) {
                 $this->processor->app->getSession()->clear('com_breezingformsng.mobile');
-            } else if (isset($_GET['mobile']) && Factory::getApplication()->getInput()->getBool('mobile', false)) {
+            } else if (isset($_GET['mobile']) && $this->processor->app->getInput()->getBool('mobile', false)) {
                 $this->processor->app->getSession()->set('com_breezingformsng.mobile', true);
             }
 
@@ -268,7 +267,7 @@ final class RenderingEngine
                 $useragent = $_SERVER['HTTP_USER_AGENT'];
             }
 
-            if (Factory::getApplication()->getInput()->getString('ff_applic', '') != 'mod_facileforms' && Factory::getApplication()->getInput()->getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
+            if ($this->processor->app->getInput()->getString('ff_applic', '') != 'mod_facileforms' && $this->processor->app->getInput()->getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
                 $is_device = true;
                 $this->processor->isMobile = isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile'] ? true : (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $this->processor->app->getSession()->get('com_breezingformsng.mobile', false) ? true : false);
             } else {
@@ -283,7 +282,7 @@ final class RenderingEngine
                 $is_mobile_type = 'choose';
             }
 
-            if (!$this->processor->isMobile || ($this->processor->isMobile && Factory::getApplication()->getInput()->getString('ff_task', '') == 'submit')) {
+            if (!$this->processor->isMobile || ($this->processor->isMobile && $this->processor->app->getInput()->getString('ff_task', '') == 'submit')) {
 
                 // nothing
             } else {
@@ -329,8 +328,8 @@ final class RenderingEngine
         } else {
             echo '>';
         }
-        $this->processor->status = Factory::getApplication()->getInput()->getCmd('ff_status', '');
-        $this->processor->message = Factory::getApplication()->getInput()->getString('ff_message', '');
+        $this->processor->status = $this->processor->app->getInput()->getCmd('ff_status', '');
+        $this->processor->message = $this->processor->app->getInput()->getString('ff_message', '');
 
         // handle Before Form piece
         $code = '';
@@ -997,7 +996,7 @@ final class RenderingEngine
         if (!$this->processor->inline) {
             $current_url = Uri::getInstance()->toString();
 
-            $url = ($this->processor->inframe) ? $ff_mossite . '/index.php?format=html&tmpl=component' : (($this->processor->runmode == _FF_RUNMODE_FRONTEND) ? $current_url : 'index.php?format=html' . (Factory::getApplication()->getInput()->getCmd('tmpl', '') ? '&tmpl=' . Factory::getApplication()->getInput()->getCmd('tmpl', '') : $current_url));
+            $url = ($this->processor->inframe) ? $ff_mossite . '/index.php?format=html&tmpl=component' : (($this->processor->runmode == _FF_RUNMODE_FRONTEND) ? $current_url : 'index.php?format=html' . ($this->processor->app->getInput()->getCmd('tmpl', '') ? '&tmpl=' . $this->processor->app->getInput()->getCmd('tmpl', '') : $current_url));
             $params = ' action="' . $url . '"' .
                 ' method="post"' .
                 ' name="' . $this->processor->form_id . '"' .
@@ -1012,9 +1011,9 @@ final class RenderingEngine
         $cbJs = '';
 
         if ($this->processor->editable && $cbRecord === null) {
-            $db = Factory::getContainer()->get(DatabaseInterface::class);
+            $db = $this->processor->database;
             $formValue = $this->processor->form;
-            $userId = Factory::getApplication()->getIdentity()->get('id', -1);
+            $userId = $this->processor->app->getIdentity()->get('id', -1);
             $query = $db->getQuery(true)
                 ->select(['id', 'form'])
                 ->from($db->quoteName('#__facileforms_records'))
@@ -1327,7 +1326,7 @@ final class RenderingEngine
         if ($cbForm !== null) {
             $cbNonEditableFields = ListSupportService::createFromRuntimeContext()->getListNonEditableElements($cbResult['data']['id']);
             if (count($cbNonEditableFields)) {
-                Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('<!--' . nl() . 'var bfDeactivateField = new Array();' . nl() . '//-->');
+                $this->processor->app->getDocument()->getWebAssetManager()->addInlineScript('<!--' . nl() . 'var bfDeactivateField = new Array();' . nl() . '//-->');
                 echo '<script type="text/javascript">' . nl();
                 echo '<!--' . nl();
                 echo 'function bfContentBuilderFieldHasVisibleControl(fieldId){' . nl();
@@ -1374,7 +1373,7 @@ final class RenderingEngine
         if (trim($this->processor->formrow->template_code_processed) == '') {
 
             // fixing J3 css
-            Factory::getApplication()->getDocument()->addStyleDeclaration(
+            $this->processor->app->getDocument()->addStyleDeclaration(
                 '
              .bfFormDiv input[type=checkbox][id^="ff_elem"], input[type=radio][id^="ff_elem"]{
                 vertical-align: text-bottom;
@@ -2173,10 +2172,10 @@ final class RenderingEngine
 
         switch ($this->processor->runmode) {
             case _FF_RUNMODE_FRONTEND:
-                echo indentc(1) . '<input type="hidden" name="ff_contentid" value="' . Factory::getApplication()->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_applic" value="' . Factory::getApplication()->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
+                echo indentc(1) . '<input type="hidden" name="ff_contentid" value="' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
+                    indentc(1) . '<input type="hidden" name="ff_applic" value="' . $this->processor->app->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->processor->record_id . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_module_id" value="' . Factory::getApplication()->getInput()->getInt('ff_module_id', 0) . '"/>' . nl();
+                    indentc(1) . '<input type="hidden" name="ff_module_id" value="' . $this->processor->app->getInput()->getInt('ff_module_id', 0) . '"/>' . nl();
                 echo indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities((string) $this->processor->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
                     indentc(1) . \Joomla\CMS\HTML\HTMLHelper::_('form.token') . nl();
@@ -2197,19 +2196,19 @@ final class RenderingEngine
                 foreach ($ff_otherparams as $prop => $val) {
                     echo indentc(1) . '<input type="hidden" name="' . htmlentities((string) $prop, ENT_QUOTES, 'UTF-8') . '" value="' . htmlentities(urlencode((string) $val), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                 }
-                if (Factory::getApplication()->getInput()->getInt('cb_form_id', 0)) {
-                    echo '<input type="hidden" name="cb_form_id" value="' . Factory::getApplication()->getInput()->getInt('cb_form_id', 0) . '"/>' . nl();
-                    if (Factory::getApplication()->getInput()->getInt('cb_record_id', 0)) {
-                        echo '<input type="hidden" name="cb_record_id" value="' . Factory::getApplication()->getInput()->getInt('cb_record_id', 0) . '"/>' . nl();
+                if ($this->processor->app->getInput()->getInt('cb_form_id', 0)) {
+                    echo '<input type="hidden" name="cb_form_id" value="' . $this->processor->app->getInput()->getInt('cb_form_id', 0) . '"/>' . nl();
+                    if ($this->processor->app->getInput()->getInt('cb_record_id', 0)) {
+                        echo '<input type="hidden" name="cb_record_id" value="' . $this->processor->app->getInput()->getInt('cb_record_id', 0) . '"/>' . nl();
                     }
-                    if (Factory::getApplication()->getInput()->getBool('cbIsNew', false)) {
+                    if ($this->processor->app->getInput()->getBool('cbIsNew', false)) {
                         echo '<input type="hidden" name="cbIsNew" value="1"/>' . nl();
                     }
                 }
-                if (Factory::getApplication()->getInput()->getString('return', '') !== '') {
-                    echo '<input type="hidden" name="return" value="' . htmlentities(Factory::getApplication()->getInput()->getString('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                if ($this->processor->app->getInput()->getString('return', '') !== '') {
+                    echo '<input type="hidden" name="return" value="' . htmlentities($this->processor->app->getInput()->getString('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                 }
-                if (Factory::getApplication()->getInput()->getString('tmpl', '') == 'component') {
+                if ($this->processor->app->getInput()->getString('tmpl', '') == 'component') {
                     echo '<input type="hidden" name="tmpl" value="component"/>' . nl();
                 }
                 echo '</form>' . nl();
@@ -2221,10 +2220,10 @@ final class RenderingEngine
                     indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities((string) $this->processor->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
                     indentc(1) . \Joomla\CMS\HTML\HTMLHelper::_('form.token') . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_contentid" value="' . Factory::getApplication()->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_applic" value="' . Factory::getApplication()->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
+                    indentc(1) . '<input type="hidden" name="ff_contentid" value="' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
+                    indentc(1) . '<input type="hidden" name="ff_applic" value="' . $this->processor->app->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->processor->record_id . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_module_id" value="' . Factory::getApplication()->getInput()->getInt('ff_module_id', 0) . '"/>' . nl() .
+                    indentc(1) . '<input type="hidden" name="ff_module_id" value="' . $this->processor->app->getInput()->getInt('ff_module_id', 0) . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_runmode" value="' . htmlentities((string) $this->processor->runmode, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                 if ($this->processor->target > 1)
                     echo indentc(1) . '<input type="hidden" name="ff_target" value="' . htmlentities((string) $this->processor->target, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
@@ -2238,20 +2237,20 @@ final class RenderingEngine
                     echo indentc(1) . '<input type="hidden" name="ff_align" value="' . htmlentities((string) $this->processor->align, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                 if ($this->processor->top != 0)
                     echo indentc(1) . '<input type="hidden" name="ff_top" value="' . htmlentities((string) $this->processor->top, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if (Factory::getApplication()->getInput()->getInt('cb_form_id', 0)) {
-                    echo '<input type="hidden" name="cb_form_id" value="' . Factory::getApplication()->getInput()->getInt('cb_form_id', 0) . '"/>' . nl();
-                    if (Factory::getApplication()->getInput()->getInt('cb_record_id', 0)) {
-                        echo '<input type="hidden" name="cb_record_id" value="' . Factory::getApplication()->getInput()->getInt('cb_record_id', 0) . '"/>' . nl();
+                if ($this->processor->app->getInput()->getInt('cb_form_id', 0)) {
+                    echo '<input type="hidden" name="cb_form_id" value="' . $this->processor->app->getInput()->getInt('cb_form_id', 0) . '"/>' . nl();
+                    if ($this->processor->app->getInput()->getInt('cb_record_id', 0)) {
+                        echo '<input type="hidden" name="cb_record_id" value="' . $this->processor->app->getInput()->getInt('cb_record_id', 0) . '"/>' . nl();
                     }
-                    if (Factory::getApplication()->getInput()->getBool('cbIsNew', false)) {
+                    if ($this->processor->app->getInput()->getBool('cbIsNew', false)) {
                         echo '<input type="hidden" name="cbIsNew" value="1"/>' . nl();
                     }
                 }
-                if (Factory::getApplication()->getInput()->getString('return', '') !== '') {
-                    echo '<input type="hidden" name="return" value="' . htmlentities(Factory::getApplication()->getInput()->getString('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                if ($this->processor->app->getInput()->getString('return', '') !== '') {
+                    echo '<input type="hidden" name="return" value="' . htmlentities($this->processor->app->getInput()->getString('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                 }
-                //echo '<input type="hidden" name="tmpl" value="' . Factory::getApplication()->getInput()->getCmd('tmpl', '') . '"/>' . nl();
-                if (Factory::getApplication()->getInput()->getString('tmpl', '') == 'component') {
+                //echo '<input type="hidden" name="tmpl" value="' . $this->processor->app->getInput()->getCmd('tmpl', '') . '"/>' . nl();
+                if ($this->processor->app->getInput()->getString('tmpl', '') == 'component') {
                     echo '<input type="hidden" name="tmpl" value="component"/>' . nl();
                 }
                 echo '</form>' . nl();
@@ -2264,26 +2263,26 @@ final class RenderingEngine
                         indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities((string) $this->processor->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
                         indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
                     indentc(1) . \Joomla\CMS\HTML\HTMLHelper::_('form.token') . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_contentid" value="' . Factory::getApplication()->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_applic" value="' . Factory::getApplication()->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
+                        indentc(1) . '<input type="hidden" name="ff_contentid" value="' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
+                        indentc(1) . '<input type="hidden" name="ff_applic" value="' . $this->processor->app->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
                         indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->processor->record_id . '"/>' . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_module_id" value="' . Factory::getApplication()->getInput()->getInt('ff_module_id', 0) . '"/>' . nl() .
+                        indentc(1) . '<input type="hidden" name="ff_module_id" value="' . $this->processor->app->getInput()->getInt('ff_module_id', 0) . '"/>' . nl() .
                         indentc(1) . '<input type="hidden" name="ff_runmode" value="' . htmlentities((string) $this->processor->runmode, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                     if ($this->processor->page != 1)
                         echo indentc(1) . '<input type="hidden" name="ff_page" value="' . htmlentities((string) $this->processor->page, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                    if (Factory::getApplication()->getInput()->getInt('cb_form_id', 0)) {
-                        echo '<input type="hidden" name="cb_form_id" value="' . Factory::getApplication()->getInput()->getInt('cb_form_id', 0) . '"/>' . nl();
-                        if (Factory::getApplication()->getInput()->getInt('cb_record_id', 0)) {
-                            echo '<input type="hidden" name="cb_record_id" value="' . Factory::getApplication()->getInput()->getInt('cb_record_id', 0) . '"/>' . nl();
+                    if ($this->processor->app->getInput()->getInt('cb_form_id', 0)) {
+                        echo '<input type="hidden" name="cb_form_id" value="' . $this->processor->app->getInput()->getInt('cb_form_id', 0) . '"/>' . nl();
+                        if ($this->processor->app->getInput()->getInt('cb_record_id', 0)) {
+                            echo '<input type="hidden" name="cb_record_id" value="' . $this->processor->app->getInput()->getInt('cb_record_id', 0) . '"/>' . nl();
                         }
-                        if (Factory::getApplication()->getInput()->getBool('cbIsNew', false)) {
+                        if ($this->processor->app->getInput()->getBool('cbIsNew', false)) {
                             echo '<input type="hidden" name="cbIsNew" value="1"/>' . nl();
                         }
                     }
-                    if (Factory::getApplication()->getInput()->getString('return', '') !== '') {
-                        echo '<input type="hidden" name="return" value="' . htmlentities(Factory::getApplication()->getInput()->getString('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                    if ($this->processor->app->getInput()->getString('return', '') !== '') {
+                        echo '<input type="hidden" name="return" value="' . htmlentities($this->processor->app->getInput()->getString('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                     }
-                    if (Factory::getApplication()->getInput()->getString('tmpl', '') == 'component') {
+                    if ($this->processor->app->getInput()->getString('tmpl', '') == 'component') {
                         echo '<input type="hidden" name="tmpl" value="component"/>' . nl();
                     }
                     echo '</form>' . nl();
@@ -2353,11 +2352,11 @@ final class RenderingEngine
             echo '<!DOCTYPE html> 
 <html> 
 <head> 
-<title>' . Factory::getApplication()->getDocument()->getTitle() . '</title>
+<title>' . $this->processor->app->getDocument()->getTitle() . '</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1">';
             echo $quickMode->headers();
-            echo $quickMode->fetchHead(Factory::getApplication()->getDocument()->getHeadData());
+            echo $quickMode->fetchHead($this->processor->app->getDocument()->getHeadData());
             echo '</head>' . "\n";
             echo '<body>' . "\n";
             echo $contents;

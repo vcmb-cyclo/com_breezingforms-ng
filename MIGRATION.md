@@ -456,6 +456,22 @@
   les retrouver via `Factory`/le conteneur. Le chargement initial des éléments utilise désormais le query builder
   Joomla avec paramètre entier lié, sans concaténation SQL. Ses 56 propriétés déclarées avec le mot-clé PHP 4
   `var` sont converties en propriétés `public` explicites, sans changer le contrat exposé aux scripts stockés.
+  Les six services de callback (`Captcha`, `FlashUpload`, `Opt`, `PayPal`, `Sofort`, `Stripe`) reçoivent ensuite
+  `CMSApplication` et `DatabaseInterface` depuis `EngineDispatcher`. Leurs 36 appels statiques à
+  `Factory::getApplication()` et leurs 13 lectures du global `$database` sont supprimés ; les garde-fous et
+  protocoles externes restent inchangés. `RedirectHelper` devient lui aussi un service injecté sans appel
+  statique à `Factory`, et la fabrique de mail Joomla utilisée par Sofort est fournie par le dispatcher.
+  Les moteurs `Export`, `Notification`, `Rendering` et `Submission` cessent ensuite de résoudre l'application
+  179 fois via `Factory` : ils utilisent l'application déjà portée par le processeur. Leurs cinq résolutions de
+  la base passent également par `DatabaseInterface` injecté. Les fabriques Joomla de cache et de mail sont
+  propagées explicitement du bootstrap jusqu'aux moteurs qui les consomment ; ces quatre moteurs n'appellent
+  plus ni `Factory::getApplication()` ni `Factory::getContainer()`.
+  Les quatre renderers QuickMode suivent enfin la même règle : leurs 215 résolutions statiques de l'application
+  sont remplacées par l'application du processeur déjà injecté, et Mobile utilise son `DatabaseInterface` pour
+  la date nulle. `ClassicRenderer`, `BootstrapRenderer`, `MobileRenderer` et `OnePageRenderer` ne dépendent plus
+  du tout de `Factory`, tandis que les façades globales `BFQuickMode*` restent intactes pour les scripts stockés.
+  Les deux dernières requêtes SQL concaténées du gestionnaire de traces (`pieces` et `scripts`) utilisent aussi
+  le query builder Joomla et un identifiant entier lié.
   (`BFRequest`, `BFIntegrate` et les quatre rendus `BFQuickMode*`) restent volontairement disponibles comme API externe.
   `BFJoomlaConfig` a été remplacé par `Factory::getConfig()` ; `BFPDF` a été migré vers le service namespacé
   `Administrator\Service\PdfDocument`. Les deux classes globales ont été supprimées. Export administrateur vérifié

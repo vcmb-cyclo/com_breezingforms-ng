@@ -7,14 +7,17 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service;
 defined('_JEXEC') or die;
 
 use Joomla\CMS\Application\CMSApplication;
+use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Input\Input;
+use Joomla\CMS\Mail\MailerFactoryInterface;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\CaptchaCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\FlashUploadCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\OptCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\PayPalCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\SofortCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\StripeCallback;
+use Vcmb\Component\BreezingformsNG\Site\Service\Support\RedirectHelper;
 
 /**
  * Dispatches form rendering and the dedicated frontend callbacks.
@@ -25,43 +28,50 @@ final class EngineDispatcher
         private readonly Input $input,
         private readonly CMSApplication $application,
         private readonly DatabaseInterface $database,
+        private readonly MailerFactoryInterface $mailerFactory,
+        private readonly CacheControllerFactoryInterface $cacheControllerFactory,
     ) {
     }
 
     public function dispatch(array $engineContext, string $application): void
     {
         if (!$this->isCallbackRequest()) {
-            (new FormRenderer($this->application, $this->database))->render($engineContext);
+            (new FormRenderer(
+                $this->application,
+                $this->database,
+                $this->mailerFactory,
+                $this->cacheControllerFactory,
+            ))->render($engineContext);
 
             return;
         }
 
         if ($this->input->getBool('checkCaptcha', false)) {
-            (new CaptchaCallback())->check();
+            (new CaptchaCallback($this->application, $this->database))->check();
         } elseif ($this->input->getBool('confirmPayPalIpn', false) && $application === '') {
-            (new PayPalCallback())->confirmIpn();
+            (new PayPalCallback($this->application, $this->database, $this->redirectHelper()))->confirmIpn();
         } elseif ($this->input->getBool('confirmStripe', false) && $application === '') {
-            (new StripeCallback())->confirm();
+            (new StripeCallback($this->application, $this->database, $this->redirectHelper()))->confirm();
         } elseif ($this->input->getBool('stripeDownload', false) && $application === '') {
-            (new StripeCallback())->download();
+            (new StripeCallback($this->application, $this->database, $this->redirectHelper()))->download();
         } elseif ($this->input->getBool('confirmPayPal', false) && $application === '') {
-            (new PayPalCallback())->confirm();
+            (new PayPalCallback($this->application, $this->database, $this->redirectHelper()))->confirm();
         } elseif ($this->input->getBool('paypalDownload', false) && $application === '') {
-            (new PayPalCallback())->download();
+            (new PayPalCallback($this->application, $this->database, $this->redirectHelper()))->download();
         } elseif ($this->input->getBool('showPayPalConnectMsg', false)) {
-            (new PayPalCallback())->connectMessage();
+            (new PayPalCallback($this->application, $this->database, $this->redirectHelper()))->connectMessage();
         } elseif ($this->input->getBool('successSofortueberweisung', false)) {
-            (new SofortCallback())->success();
+            (new SofortCallback($this->application, $this->database, $this->redirectHelper(), $this->mailerFactory))->success();
         } elseif ($this->input->getBool('confirmSofortueberweisung', false)) {
-            (new SofortCallback())->confirm();
+            (new SofortCallback($this->application, $this->database, $this->redirectHelper(), $this->mailerFactory))->confirm();
         } elseif ($this->input->getBool('sofortueberweisungDownload', false) && $application === '') {
-            (new SofortCallback())->download();
+            (new SofortCallback($this->application, $this->database, $this->redirectHelper(), $this->mailerFactory))->download();
         } elseif ($this->input->getBool('flashUpload', false)) {
-            (new FlashUploadCallback())->handle();
+            (new FlashUploadCallback($this->application, $this->database))->handle();
         } elseif ($this->input->getString('opt_in', '') === 'true') {
-            (new OptCallback())->optIn();
+            (new OptCallback($this->application, $this->database))->optIn();
         } elseif ($this->input->getString('opt_out', '') === 'true') {
-            (new OptCallback())->optOut();
+            (new OptCallback($this->application, $this->database))->optOut();
         }
     }
 
@@ -81,5 +91,10 @@ final class EngineDispatcher
             || $this->input->getBool('flashUpload', false)
             || $this->input->getString('opt_in', '') === 'true'
             || $this->input->getString('opt_out', '') === 'true';
+    }
+
+    private function redirectHelper(): RedirectHelper
+    {
+        return new RedirectHelper($this->application);
     }
 }

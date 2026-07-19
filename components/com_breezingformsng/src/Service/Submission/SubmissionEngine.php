@@ -19,7 +19,6 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Submission;
 use Exception;
 use HTML_facileFormsProcessor;
 use Securimage;
-use Joomla\CMS\Factory;
 use Joomla\CMS\Filter\InputFilter;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
@@ -56,8 +55,10 @@ final class SubmissionEngine
     private ?SubmissionTimestampFormatter $uploadTimestampFormatterService = null;
     private ?HtmlSanitizer $htmlSanitizerService = null;
 
-    public function __construct(private readonly HTML_facileFormsProcessor $processor)
-    {
+    public function __construct(
+        private readonly HTML_facileFormsProcessor $processor,
+        private readonly MailerFactoryInterface $mailerFactory,
+    ) {
     }
 
     function collectSubmitdata($cbResult = null)
@@ -168,10 +169,10 @@ final class SubmissionEngine
                                     } // if
                                 } // for
                             } // if
-                            if (Factory::getApplication()->getInput()->getString('bfFlashUploadTicket', '') != '') {
+                            if ($this->processor->app->getInput()->getString('bfFlashUploadTicket', '') != '') {
                                 $tickets = $this->processor->app->getSession()->get('bfFlashUploadTickets', array());
                                 mt_srand();
-                                if (isset($tickets[Factory::getApplication()->getInput()->getString('bfFlashUploadTicket', (string) mt_rand(0, mt_getrandmax()))])) {
+                                if (isset($tickets[$this->processor->app->getInput()->getString('bfFlashUploadTicket', (string) mt_rand(0, mt_getrandmax()))])) {
                                     $sourcePath = JPATH_SITE . '/components/com_breezingformsng/uploads/';
                                     if (@file_exists($sourcePath) && @is_readable($sourcePath) && @is_dir($sourcePath)) {
 
@@ -198,7 +199,7 @@ final class SubmissionEngine
                                                 if (count($parts) >= 5) {
                                                     if ($parts[count($parts) - 1] == 'flashtmp') {
 
-                                                        if ($parts[count($parts) - 3] == Factory::getApplication()->getInput()->getString('bfFlashUploadTicket', '')) {
+                                                        if ($parts[count($parts) - 3] == $this->processor->app->getInput()->getString('bfFlashUploadTicket', '')) {
 
 
                                                             if ($parts[count($parts) - 4] == $row->name) {
@@ -227,7 +228,7 @@ final class SubmissionEngine
 
                                                                     foreach ($this->processor->rows as $row2) {
 
-                                                                        $rawFname = Factory::getApplication()->getInput()->post->get('ff_nm_' . $row2->name, [], 'raw');
+                                                                        $rawFname = $this->processor->app->getInput()->post->get('ff_nm_' . $row2->name, [], 'raw');
                                                         $permissiveFilter = InputFilter::getInstance([], [], 1, 1);
                                                         $fname = \is_array($rawFname)
                                                             ? array_map(static fn ($value) => $permissiveFilter->clean((string) $value, 'html'), $rawFname)
@@ -241,9 +242,9 @@ final class SubmissionEngine
                                                                     }
 
                                                                     $fm = str_replace('{filemask:_separator}', '_', $fm);
-                                                                    $fm = str_replace('{filemask:_username}', trim(Factory::getApplication()->getIdentity()->get('username')), $fm);
-                                                                    $fm = str_replace('{filemask:_userid}', trim(Factory::getApplication()->getIdentity()->get('id')), $fm);
-                                                                    $fm = str_replace('{filemask:_name}', trim(Factory::getApplication()->getIdentity()->get('name')), $fm);
+                                                                    $fm = str_replace('{filemask:_username}', trim($this->processor->app->getIdentity()->get('username')), $fm);
+                                                                    $fm = str_replace('{filemask:_userid}', trim($this->processor->app->getIdentity()->get('id')), $fm);
+                                                                    $fm = str_replace('{filemask:_name}', trim($this->processor->app->getIdentity()->get('name')), $fm);
                                                                     $fm = str_replace('{filemask:_datetime}', trim($date_stamp), $fm);
                                                                     $fm = str_replace('{filemask:_date}', trim($date_stamp2), $fm);
                                                                     $fm = str_replace('{filemask:_timestamp}', trim(time()), $fm);
@@ -420,7 +421,7 @@ final class SubmissionEngine
                         case 'Signature':
                             if ($row->logging == 1) {
 
-                                $rawValues = Factory::getApplication()->getInput()->post->get("ff_nm_" . $row->name, [''], 'raw');
+                                $rawValues = $this->processor->app->getInput()->post->get("ff_nm_" . $row->name, [''], 'raw');
                                 $permissiveFilter = InputFilter::getInstance([], [], 1, 1);
                                 $values = \is_array($rawValues)
                                     ? array_map(static fn ($value) => $permissiveFilter->clean((string) $value, 'html'), $rawValues)
@@ -434,7 +435,7 @@ final class SubmissionEngine
                                         $qmelement = $this->processor->findQuickModeElement($dataObject, $row->name);
 
                                         if ($qmelement !== null && isset($qmelement['properties']['is_html']) && $qmelement['properties']['is_html']) {
-                                            $rawValues = Factory::getApplication()->getInput()->post->get("ff_nm_" . $row->name, [''], 'raw');
+                                            $rawValues = $this->processor->app->getInput()->post->get("ff_nm_" . $row->name, [''], 'raw');
                                             $permissiveFilter = InputFilter::getInstance([], [], 1, 1);
                                             $values = \is_array($rawValues)
                                                 ? array_map(static fn ($value) => $permissiveFilter->clean((string) $value, 'html'), $rawValues)
@@ -614,14 +615,14 @@ final class SubmissionEngine
         $cbEmailUpdateNotifications = false;
         $cbResult = $this->processor->cbCheckPermissions();
         if ($cbResult['data'] !== null && $cbResult['data']['email_notifications']) {
-            if (!Factory::getApplication()->getInput()->getInt('cb_record_id', 0)) {
+            if (!$this->processor->app->getInput()->getInt('cb_record_id', 0)) {
                 $cbEmailNotifications = true;
             } else {
                 $cbEmailNotifications = false;
             }
         }
         if ($cbResult['data'] !== null && $cbResult['data']['email_update_notifications']) {
-            if (Factory::getApplication()->getInput()->getInt('cb_record_id', 0)) {
+            if ($this->processor->app->getInput()->getInt('cb_record_id', 0)) {
                 $cbEmailUpdateNotifications = true;
             } else {
                 $cbEmailUpdateNotifications = false;
@@ -652,7 +653,7 @@ final class SubmissionEngine
             $dataObject = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
             $rootMdata = $dataObject['properties'];
 
-            if (Factory::getApplication()->getInput()->getString('ff_applic', '') != 'mod_facileforms' && Factory::getApplication()->getInput()->getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
+            if ($this->processor->app->getInput()->getString('ff_applic', '') != 'mod_facileforms' && $this->processor->app->getInput()->getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
                 $is_device = true;
                 $this->processor->isMobile = isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile'] ? true : (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $this->processor->app->getSession()->get('com_breezingformsng.mobile', false) ? true : false);
             } else
@@ -665,7 +666,7 @@ final class SubmissionEngine
                 if ($row->type == "Captcha") {
                     require_once(JPATH_SITE . '/media/com_breezingformsng/images/site/captcha/securimage.php');
                     $securimage = new Securimage();
-                    if (!$securimage->check(Factory::getApplication()->getInput()->getString('bfCaptchaEntry', ''))) {
+                    if (!$securimage->check($this->processor->app->getInput()->getString('bfCaptchaEntry', ''))) {
                         $halt = true;
                         $this->processor->status = _FF_STATUS_CAPTCHA_FAILED;
                         exit;
@@ -684,8 +685,8 @@ final class SubmissionEngine
                                     try {
                                         $verified = (new RecaptchaVerifier())->verify(
                                             (string) $element['privkey'],
-                                            Factory::getApplication()->getInput()->getString('g-recaptcha-response', ''),
-                                            Factory::getApplication()->getInput()->server->getString('REMOTE_ADDR', '')
+                                            $this->processor->app->getInput()->getString('g-recaptcha-response', ''),
+                                            $this->processor->app->getInput()->server->getString('REMOTE_ADDR', '')
                                         );
                                     } catch (\Throwable) {
                                         $verified = false;
@@ -714,7 +715,7 @@ final class SubmissionEngine
             $areas = json_decode($this->processor->formrow->template_areas, true);
 
             if (is_array($areas)) {
-                switch (Factory::getApplication()->getInput()->getString('ff_payment_method', '')) {
+                switch ($this->processor->app->getInput()->getString('ff_payment_method', '')) {
                     case 'Stripe':
                     case 'PayPal':
                     case 'Sofortueberweisung':
@@ -829,8 +830,8 @@ final class SubmissionEngine
 
                             $tickets = $this->processor->app->getSession()->get('bfFlashUploadTickets', array());
                             mt_srand();
-                            if (isset($tickets[Factory::getApplication()->getInput()->getString('bfFlashUploadTicket', (string) mt_rand(0, mt_getrandmax()))])) {
-                                unset($tickets[Factory::getApplication()->getInput()->getString('bfFlashUploadTicket', '')]);
+                            if (isset($tickets[$this->processor->app->getInput()->getString('bfFlashUploadTicket', (string) mt_rand(0, mt_getrandmax()))])) {
+                                unset($tickets[$this->processor->app->getInput()->getString('bfFlashUploadTicket', '')]);
                                 $this->processor->app->getSession()->set('bfFlashUploadTickets', $tickets);
                             }
                         }
@@ -844,8 +845,8 @@ final class SubmissionEngine
                 $uri = Uri::getInstance();
                 $domainAddress = $uri->toString(array('scheme', 'host', 'port', 'path'));
 
-                $mailer = Factory::getContainer()->get(MailerFactoryInterface::class)->createMailer();
-                $config = Factory::getApplication()->getConfig();
+                $mailer = $this->mailerFactory->createMailer();
+                $config = $this->processor->app->getConfig();
 
                 $recipient = '';
                 $email_field_name = $this->processor->formrow->opt_mail;
@@ -1013,7 +1014,7 @@ final class SubmissionEngine
 
                 $paymentAction = true;
 
-                switch (Factory::getApplication()->getInput()->getString('ff_payment_method', '')) {
+                switch ($this->processor->app->getInput()->getString('ff_payment_method', '')) {
 
 
                     case 'Stripe':
@@ -1024,7 +1025,7 @@ final class SubmissionEngine
 
                                 $options = $element['options'];
 
-                                $ppselect = Factory::getApplication()->getInput()->get('ff_nm_bfPaymentSelect', [], 'string');
+                                $ppselect = $this->processor->app->getInput()->get('ff_nm_bfPaymentSelect', [], 'string');
                                 if (count($ppselect) != 0) {
                                     $ppselected = explode('|', $ppselect[0]);
                                     if (count($ppselected) == 4) {
@@ -1101,11 +1102,11 @@ transition: box-shadow .15s linear;
 </style></head><body>';*/
                                     \Vcmb\Component\BreezingformsNG\Administrator\Helper\VendorHelper::load();
                                 \Stripe\Stripe::setApiKey($options['secretKey']);
-                                $stripeemail = strtolower((Factory::getApplication()->getInput()->get('ff_nm_' . $options['emailfield'], '', 'string')[0] ?? ''));
+                                $stripeemail = strtolower(($this->processor->app->getInput()->get('ff_nm_' . $options['emailfield'], '', 'string')[0] ?? ''));
                                 //header('Content-Type: application/json');
                                 $returnurl = Uri::root() . "index.php?option=com_breezingformsng&confirmStripe=true&form_id=" . $this->processor->form . "&record_id=" . $this->processor->record_id;
                                 if (isset($options['emailfield']) && $options['emailfield'] !== '') {
-                                    $stripeemail = strtolower((Factory::getApplication()->getInput()->get('ff_nm_' . $options['emailfield'], '', 'string')[0] ?? ''));
+                                    $stripeemail = strtolower(($this->processor->app->getInput()->get('ff_nm_' . $options['emailfield'], '', 'string')[0] ?? ''));
                                     $this->processor->app->getSession()->set('emailfield', $stripeemail);
                                 }
 
@@ -1172,7 +1173,7 @@ transition: box-shadow .15s linear;
 
                                 $returnurl = Uri::root() . "index.php?option=com_breezingformsng&confirmStripe=true&form_id=" . $this->processor->form . "&record_id=" . $this->processor->record_id;
                                 if (isset($options['emailfield']) && $options['emailfield'] !== '') {
-                                    $stripeemail = strtolower((Factory::getApplication()->getInput()->get('ff_nm_' . $options['emailfield'], '', 'string')[0] ?? ''));
+                                    $stripeemail = strtolower(($this->processor->app->getInput()->get('ff_nm_' . $options['emailfield'], '', 'string')[0] ?? ''));
                                     $this->processor->app->getSession()->set('emailfield', $stripeemail);
                                 }
 
@@ -1261,7 +1262,7 @@ transition: box-shadow .15s linear;
 
                                     HTMLHelper::_('bootstrap.modal');
 
-                                    $ppselect = Factory::getApplication()->getInput()->get('ff_nm_bfPaymentSelect', [], 'string');
+                                    $ppselect = $this->processor->app->getInput()->get('ff_nm_bfPaymentSelect', [], 'string');
                                     if (count($ppselect) != 0) {
                                         $ppselected = explode('|', $ppselect[0]);
                                         if (count($ppselected) == 4) {
@@ -1286,7 +1287,7 @@ transition: box-shadow .15s linear;
                                     }
 
                                     // keeping this for compat reasons
-                                    $ppselect = Factory::getApplication()->getInput()->get('ff_nm_PayPalSelect', [], 'string');
+                                    $ppselect = $this->processor->app->getInput()->get('ff_nm_PayPalSelect', [], 'string');
                                     if (count($ppselect) != 0) {
                                         $ppselected = explode('|', $ppselect[0]);
                                         if (count($ppselected) == 4) {
@@ -1389,7 +1390,7 @@ transition: box-shadow .15s linear;
 
                                     $options = $element['options'];
 
-                                    $ppselect = Factory::getApplication()->getInput()->get('ff_nm_bfPaymentSelect', [], 'string');
+                                    $ppselect = $this->processor->app->getInput()->get('ff_nm_bfPaymentSelect', [], 'string');
                                     if (count($ppselect) != 0) {
                                         $ppselected = explode('|', $ppselect[0]);
                                         if (count($ppselected) == 4) {
@@ -1500,9 +1501,9 @@ transition: box-shadow .15s linear;
         }
 
         // CONTENTBUILDER
-        if (Factory::getApplication()->getInput()->get('cb_controller', null, 'string') != 'edit' && $cbRecordId && is_array($cbResult) && isset($cbResult['data']) && isset($cbResult['data']['id']) && $cbResult['data']['id']) {
+        if ($this->processor->app->getInput()->get('cb_controller', null, 'string') != 'edit' && $cbRecordId && is_array($cbResult) && isset($cbResult['data']) && isset($cbResult['data']['id']) && $cbResult['data']['id']) {
             if ($cbRecordId) {
-                $return = Factory::getApplication()->getInput()->getString('return', '');
+                $return = $this->processor->app->getInput()->getString('return', '');
                 if ($return) {
                     $return = bf_b64dec($return);
                     if (Uri::isInternal($return)) {
@@ -1514,18 +1515,18 @@ transition: box-shadow .15s linear;
             if ($cbResult['data']['force_login']) {
                 $is15 = false;
 
-                if (!Factory::getApplication()->getIdentity()->get('id', 0)) {
-                    $this->processor->app->redirect(Route::_('index.php?option=com_users&view=login&Itemid=' . Factory::getApplication()->getInput()->getInt('Itemid', 0), false));
+                if (!$this->processor->app->getIdentity()->get('id', 0)) {
+                    $this->processor->app->redirect(Route::_('index.php?option=com_users&view=login&Itemid=' . $this->processor->app->getInput()->getInt('Itemid', 0), false));
                 } else {
 
-                    $this->processor->app->redirect(Route::_('index.php?option=com_users&view=profile&Itemid=' . Factory::getApplication()->getInput()->getInt('Itemid', 0), false));
+                    $this->processor->app->redirect(Route::_('index.php?option=com_users&view=profile&Itemid=' . $this->processor->app->getInput()->getInt('Itemid', 0), false));
                 }
             } else if (trim($cbResult['data']['force_url'])) {
                 $this->processor->app->redirect(trim($cbResult['data']['force_url']));
             }
 
             $this->processor->app->enqueueMessage(Text::_('COM_CONTENTBUILDERNG_SAVED'), 'success');
-            $this->processor->app->redirect(Route::_('index.php?option=com_contentbuilderng&task=details.display&Itemid=' . Factory::getApplication()->getInput()->getInt('Itemid', 0) . '&backtolist=' . Factory::getApplication()->getInput()->getInt('backtolist', 0) . '&id=' . $cbResult['data']['id'] . '&record_id=' . $cbRecordId . '&limitstart=' . Factory::getApplication()->getInput()->getInt('limitstart', 0) . '&filter_order=' . Factory::getApplication()->getInput()->getCmd('filter_order', ''), false));
+            $this->processor->app->redirect(Route::_('index.php?option=com_contentbuilderng&task=details.display&Itemid=' . $this->processor->app->getInput()->getInt('Itemid', 0) . '&backtolist=' . $this->processor->app->getInput()->getInt('backtolist', 0) . '&id=' . $cbResult['data']['id'] . '&record_id=' . $cbRecordId . '&limitstart=' . $this->processor->app->getInput()->getInt('limitstart', 0) . '&filter_order=' . $this->processor->app->getInput()->getCmd('filter_order', ''), false));
         }
 
         if (!$paymentAction) {
@@ -1556,7 +1557,7 @@ transition: box-shadow .15s linear;
             } // if
 
             if (!$this->processor->inline) {
-                $url = ($this->processor->inframe) ? $ff_mossite . '/index.php?format=html&tmpl=component' : (($this->processor->runmode == _FF_RUNMODE_FRONTEND) ? '' : 'index.php?format=html' . (Factory::getApplication()->getInput()->getCmd('tmpl', '') ? '&tmpl=' . Factory::getApplication()->getInput()->getCmd('tmpl', '') : ''));
+                $url = ($this->processor->inframe) ? $ff_mossite . '/index.php?format=html&tmpl=component' : (($this->processor->runmode == _FF_RUNMODE_FRONTEND) ? '' : 'index.php?format=html' . ($this->processor->app->getInput()->getCmd('tmpl', '') ? '&tmpl=' . $this->processor->app->getInput()->getCmd('tmpl', '') : ''));
                 echo '<form name="ff_submitform" action="' . $url . '" method="post">' . nl();
             } // if
 
@@ -1610,28 +1611,28 @@ transition: box-shadow .15s linear;
                     } // if
             } // if
 
-            echo indentc(1) . '<input type="hidden" name="ff_contentid" value="' . Factory::getApplication()->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
-                indentc(1) . '<input type="hidden" name="ff_applic" value="' . Factory::getApplication()->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
+            echo indentc(1) . '<input type="hidden" name="ff_contentid" value="' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
+                indentc(1) . '<input type="hidden" name="ff_applic" value="' . $this->processor->app->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
                 indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->processor->record_id . '"/>' . nl() .
-                indentc(1) . '<input type="hidden" name="ff_module_id" value="' . Factory::getApplication()->getInput()->getInt('ff_module_id', 0) . '"/>' . nl() .
+                indentc(1) . '<input type="hidden" name="ff_module_id" value="' . $this->processor->app->getInput()->getInt('ff_module_id', 0) . '"/>' . nl() .
                 indentc(1) . '<input type="hidden" name="ff_status" value="' . htmlentities((string) $this->processor->status, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
                 indentc(1) . '<input type="hidden" name="ff_message" value="' . htmlentities((string) $message, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
                 indentc(1) . '<input type="hidden" name="ff_form_submitted" value="1"/>' . nl();
 
-            if (Factory::getApplication()->getInput()->getString('tmpl', '') == 'component') {
+            if ($this->processor->app->getInput()->getString('tmpl', '') == 'component') {
                 echo indentc(1) . '<input type="hidden" name="tmpl" value="component"/>' . nl();
             }
-            if (Factory::getApplication()->getInput()->getInt('cb_form_id', 0)) {
-                echo indentc(1) . '<input type="hidden" name="cb_form_id" value="' . Factory::getApplication()->getInput()->getInt('cb_form_id', 0) . '"/>' . nl();
-                if (Factory::getApplication()->getInput()->getInt('cb_record_id', 0)) {
-                    echo indentc(1) . '<input type="hidden" name="cb_record_id" value="' . Factory::getApplication()->getInput()->getInt('cb_record_id', 0) . '"/>' . nl();
+            if ($this->processor->app->getInput()->getInt('cb_form_id', 0)) {
+                echo indentc(1) . '<input type="hidden" name="cb_form_id" value="' . $this->processor->app->getInput()->getInt('cb_form_id', 0) . '"/>' . nl();
+                if ($this->processor->app->getInput()->getInt('cb_record_id', 0)) {
+                    echo indentc(1) . '<input type="hidden" name="cb_record_id" value="' . $this->processor->app->getInput()->getInt('cb_record_id', 0) . '"/>' . nl();
                 }
-                if (Factory::getApplication()->getInput()->getBool('cbIsNew', false)) {
+                if ($this->processor->app->getInput()->getBool('cbIsNew', false)) {
                     echo indentc(1) . '<input type="hidden" name="cbIsNew" value="1"/>' . nl();
                 }
             }
-            if (Factory::getApplication()->getInput()->getString('return', '') !== '') {
-                echo indentc(1) . '<input type="hidden" name="return" value="' . htmlentities(Factory::getApplication()->getInput()->getString('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+            if ($this->processor->app->getInput()->getString('return', '') !== '') {
+                echo indentc(1) . '<input type="hidden" name="return" value="' . htmlentities($this->processor->app->getInput()->getString('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
             }
             // TODO: turn off tracing in the options
             if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT) {
@@ -1664,10 +1665,10 @@ transition: box-shadow .15s linear;
             }
         }
 
-        unset($_SESSION['ff_editable_overridePlg' . Factory::getApplication()->getInput()->getInt('ff_contentid', 0) . $this->processor->form_id]);
-        unset($_SESSION['ff_editablePlg' . Factory::getApplication()->getInput()->getInt('ff_contentid', 0) . $this->processor->form_id]);
-        $this->processor->app->getSession()->set('ff_editableMod' . Factory::getApplication()->getInput()->getInt('ff_module_id', 0) . $this->processor->form_id, 0);
-        $this->processor->app->getSession()->set('ff_editable_overrideMod' . Factory::getApplication()->getInput()->getInt('ff_module_id', 0) . $this->processor->form_id, 0);
+        unset($_SESSION['ff_editable_overridePlg' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . $this->processor->form_id]);
+        unset($_SESSION['ff_editablePlg' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . $this->processor->form_id]);
+        $this->processor->app->getSession()->set('ff_editableMod' . $this->processor->app->getInput()->getInt('ff_module_id', 0) . $this->processor->form_id, 0);
+        $this->processor->app->getSession()->set('ff_editable_overrideMod' . $this->processor->app->getInput()->getInt('ff_module_id', 0) . $this->processor->form_id, 0);
 
         if (!defined('VMBFCF_RUNNING')) {
             exit;

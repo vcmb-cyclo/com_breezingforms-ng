@@ -13,6 +13,8 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Application\CMSApplication;
+use Joomla\CMS\Cache\CacheControllerFactoryInterface;
+use Joomla\CMS\Mail\MailerFactoryInterface;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 use Joomla\Event\Event;
@@ -424,7 +426,12 @@ function _ff_errorHandler($errno, $errstr, $errfile, $errline)
                     break;
                 case 'p':
                     $package = '';
-                    $database->setQuery("select name, package from #__facileforms_pieces where id=$id");
+                    $piecesQuery = $database->getQuery(true)
+                        ->select(['name', 'package'])
+                        ->from('#__facileforms_pieces')
+                        ->where($database->quoteName('id') . ' = :id')
+                        ->bind(':id', $id, ParameterType::INTEGER);
+                    $database->setQuery($piecesQuery);
                     $rows = $database->loadObjectList();
                     if (count($rows)) {
                         $package = $rows[0]->package;
@@ -439,7 +446,12 @@ function _ff_errorHandler($errno, $errstr, $errfile, $errline)
                     break;
                 case 's':
                     $package = '';
-                    $database->setQuery("select name, package from #__facileforms_scripts where id=$id");
+                    $scriptsQuery = $database->getQuery(true)
+                        ->select(['name', 'package'])
+                        ->from('#__facileforms_scripts')
+                        ->where($database->quoteName('id') . ' = :id')
+                        ->bind(':id', $id, ParameterType::INTEGER);
+                    $database->setQuery($scriptsQuery);
                     $rows = $database->loadObjectList();
                     if (count($rows)) {
                         $package = $rows[0]->package;
@@ -551,6 +563,8 @@ class HTML_facileFormsProcessor
     private ?NotificationEngine $notificationEngineService = null;
     private ?RenderingEngine $renderingEngineService = null;
     private ?SubmissionEngine $submissionEngineService = null;
+    private MailerFactoryInterface $mailerFactory;
+    private CacheControllerFactoryInterface $cacheControllerFactory;
 
     public function header()
     {
@@ -599,7 +613,7 @@ class HTML_facileFormsProcessor
 
     private function submissionEngine(): SubmissionEngine
     {
-        return $this->submissionEngineService ??= new SubmissionEngine($this);
+        return $this->submissionEngineService ??= new SubmissionEngine($this, $this->mailerFactory);
     }
 
     public function sendEmailNotification()
@@ -691,7 +705,11 @@ class HTML_facileFormsProcessor
 
     private function exportEngine(): ExportEngine
     {
-        return $this->exportEngineService ??= new ExportEngine($this);
+        return $this->exportEngineService ??= new ExportEngine(
+            $this,
+            $this->mailerFactory,
+            $this->cacheControllerFactory
+        );
     }
 
     public function getPieceById($id, $name = null)
@@ -964,6 +982,8 @@ class HTML_facileFormsProcessor
     function __construct(
         CMSApplication $application,
         DatabaseInterface $database,
+        MailerFactoryInterface $mailerFactory,
+        CacheControllerFactoryInterface $cacheControllerFactory,
         $runmode, // _FF_RUNMODE_FRONTEND, ..._BACKEND, ..._PREVIEW
         $inframe, // run in iframe
         $form, // form id
@@ -979,6 +999,8 @@ class HTML_facileFormsProcessor
         global $ff_config, $ff_mossite, $ff_mospath, $ff_processor;
         $ff_processor = $this;
         $this->database = $database;
+        $this->mailerFactory = $mailerFactory;
+        $this->cacheControllerFactory = $cacheControllerFactory;
         $this->dying = false;
         $this->runmode = $runmode;
         $this->inframe = $inframe;

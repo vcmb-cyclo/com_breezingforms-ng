@@ -361,7 +361,7 @@
   construction conservée, fallback `Factory::getDbo()` neutralisé avec `dbo => null` ; listes Scripts et Pièces en HTTP 200)*
 - [x] Retirer le helper mort `bf_ToolTip()` fondé sur l'ancien service `HTMLHelper::_('tooltip')` et supprimer
   l'initialisation Bootstrap répétée dans les 293 appels à `bf_tooltipText()` *(tooltip initialisé une fois par QuickMode)*
-- [ ] Réécriture native du moteur (remplacer les traits legacy par de vrais services typés) — chantier de fond restant.
+- [x] Réécriture native du moteur (remplacer les traits legacy par de vrais services typés) — terminée le 2026-07-19.
   Le stockage physique, le traitement d'images, la résolution des chemins/masques et la recherche d'éléments QuickMode du trait
   `bfProcessorUploads` sont extraits dans les services typés `Site\Service\Upload\ImageResizer`,
   `UploadPathResolver`, `UploadStorage` (résultat et erreurs typés) et `Site\Service\QuickMode\ElementFinder`

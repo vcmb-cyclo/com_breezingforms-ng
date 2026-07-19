@@ -14,7 +14,9 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service;
 use Exception;
 use HTML_facileFormsProcessor;
 use Joomla\CMS\Application\CMSApplication;
+use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use Joomla\CMS\HTML\HTMLHelper;
+use Joomla\CMS\Mail\MailerFactoryInterface;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Database\ParameterType;
@@ -30,6 +32,8 @@ final class FormRenderer
     public function __construct(
         private readonly CMSApplication $application,
         private readonly DatabaseInterface $database,
+        private readonly MailerFactoryInterface $mailerFactory,
+        private readonly CacheControllerFactoryInterface $cacheControllerFactory,
     ) {
     }
 
@@ -512,6 +516,8 @@ $ff_request = array();
             $ff_processor = new HTML_facileFormsProcessor(
                 $this->application,
                 $this->database,
+                $this->mailerFactory,
+                $this->cacheControllerFactory,
                 $runmode,
                 $inframe,
                 $form->id,

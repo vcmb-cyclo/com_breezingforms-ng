@@ -9,30 +9,40 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Callback;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
+use Joomla\CMS\Application\CMSApplication;
 use Vcmb\Component\BreezingformsNG\Site\Service\Support\RedirectHelper;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Database\ParameterType;
+use Joomla\Database\DatabaseInterface;
 use Joomla\Filesystem\File;
 
 /**
  * PayPal payment callbacks: IPN notification, return-URL confirmation,
  * paid-file download and the connect interstitial message.
  */
-class PayPalCallback
+final class PayPalCallback
 {
+    public function __construct(
+        private readonly CMSApplication $application,
+        private readonly DatabaseInterface $database,
+        private readonly RedirectHelper $redirectHelper,
+    ) {
+    }
+
     public function confirmIpn(): void
     {
-        global $database, $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
+        global $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
 
-        $mainframe = Factory::getApplication();
+        $database = $this->database;
+
+        $mainframe = $this->application;
         $db = $database;
 
 
 
-    $input = Factory::getApplication()->getInput();
+    $input = $this->application->getInput();
     $formId = $input->getInt('form_id', -1);
     $query = $db->getQuery(true)
         ->select('*')
@@ -217,14 +227,16 @@ class PayPalCallback
 
     public function confirm(): void
     {
-        global $database, $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
+        global $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
 
-        $mainframe = Factory::getApplication();
+        $database = $this->database;
+
+        $mainframe = $this->application;
         $db = $database;
 
 
 
-    $input = Factory::getApplication()->getInput();
+    $input = $this->application->getInput();
     $formId = $input->getInt('form_id', -1);
     $query = $db->getQuery(true)
         ->select('*')
@@ -234,7 +246,7 @@ class PayPalCallback
     $db->setQuery($query);
     $list = $db->loadObjectList();
     if (count($list) == 0) {
-        RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
+        $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
         exit;
     }
 
@@ -242,7 +254,7 @@ class PayPalCallback
 
     $areas = json_decode($form->template_areas, true);
     if (!is_array($areas)) {
-        RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYPAL_DATA'));
+        $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYPAL_DATA'));
         exit;
     }
 
@@ -376,9 +388,9 @@ class PayPalCallback
                                 } else {
 
                                     if ($options['thankYouPage'] != '') {
-                                        RedirectHelper::to($options['thankYouPage']);
+                                        $this->redirectHelper->to($options['thankYouPage']);
                                     } else {
-                                        RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_PAYING_WITH_PAYPAL'));
+                                        $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_PAYING_WITH_PAYPAL'));
                                     }
                                 }
 
@@ -393,9 +405,9 @@ class PayPalCallback
                                 } else {
                                     if ($options['useIpn']) {
                                         if ($options['thankYouPage'] != '') {
-                                            RedirectHelper::to($options['thankYouPage']);
+                                            $this->redirectHelper->to($options['thankYouPage']);
                                         } else {
-                                            RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_PAYING_WITH_PAYPAL'));
+                                            $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_THANK_YOU_FOR_PAYING_WITH_PAYPAL'));
                                         }
                                     } else {
                                         $success = false;
@@ -428,14 +440,16 @@ class PayPalCallback
 
     public function download(): void
     {
-        global $database, $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
+        global $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
 
-        $mainframe = Factory::getApplication();
+        $database = $this->database;
+
+        $mainframe = $this->application;
         $db = $database;
 
 
 
-    $input = Factory::getApplication()->getInput();
+    $input = $this->application->getInput();
     $formIdForDownload = $input->getInt('form', -1);
     $query = $db->getQuery(true)
         ->select('*')
@@ -445,7 +459,7 @@ class PayPalCallback
     $db->setQuery($query);
     $list = $db->loadObjectList();
     if (count($list) == 0) {
-        RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
+        $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
         exit;
     }
 
@@ -453,7 +467,7 @@ class PayPalCallback
 
     $areas = json_decode($form->template_areas, true);
     if (!is_array($areas)) {
-        RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYPAL_DATA'));
+        $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYPAL_DATA'));
     }
 
     foreach ($areas as $area) {
@@ -505,21 +519,21 @@ class PayPalCallback
                             $db->execute();
 
                             if (!file_exists($file)) {
-                                RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_DOWNLOAD_FILE'));
+                                $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_DOWNLOAD_FILE'));
                             }
 
                             \Vcmb\Component\BreezingformsNG\Site\Service\Support\DownloadHelper::stream($file);
                         } else {
 
-                            RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_MAX_DOWNLOAD_TRIES_REACHED'));
+                            $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_MAX_DOWNLOAD_TRIES_REACHED'));
                         }
                     } else {
 
-                        RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_DOWNLOAD_NOT_POSSIBLE'));
+                        $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_DOWNLOAD_NOT_POSSIBLE'));
                     }
                 } else {
 
-                    RedirectHelper::to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_NO_DOWNLOADABLE_PRODUCT'));
+                    $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_NO_DOWNLOADABLE_PRODUCT'));
                 }
 
                 break;
@@ -530,9 +544,11 @@ class PayPalCallback
 
     public function connectMessage(): void
     {
-        global $database, $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
+        global $ff_version, $ff_config, $ff_mospath, $ff_compath, $ff_mossite, $ff_request, $ff_processor, $ff_target;
 
-        $mainframe = Factory::getApplication();
+        $database = $this->database;
+
+        $mainframe = $this->application;
         $db = $database;
 
 
@@ -540,7 +556,7 @@ class PayPalCallback
     $style = '<link rel="stylesheet" href="' . Uri::root() . 'templates/' . $mainframe->getTemplate() . '/css/template.css" type="text/css" />';
 
     echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="' . strtolower(Factory::getApplication()->getLanguage()->getTag()) . '" lang="' . strtolower(Factory::getApplication()->getLanguage()->getTag()) . '" >
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="' . strtolower($this->application->getLanguage()->getTag()) . '" lang="' . strtolower($this->application->getLanguage()->getTag()) . '" >
 <head>' . $style . '</head>
 <div class="payPalConnectMsg">
 <div class="paymentConnectMsg">

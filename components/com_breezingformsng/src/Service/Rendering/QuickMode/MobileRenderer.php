@@ -14,12 +14,10 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode;
 
 use HTML_facileFormsProcessor;
 
-use Joomla\CMS\Factory;
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Language\Text;
-use Joomla\Database\DatabaseInterface;
 // use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Component\ComponentHelper;
 
@@ -50,28 +48,28 @@ class MobileRenderer
 
 	function __construct(HTML_facileFormsProcessor $p)
 	{
+		$this->p = $p;
 
 		$default = ComponentHelper::getParams('com_languages')->get('site');
-		$this->language_tag = Factory::getApplication()->getLanguage()->getTag() != $default ? Factory::getApplication()->getLanguage()->getTag() : 'zz-ZZ';
+		$this->language_tag = $this->p->app->getLanguage()->getTag() != $default ? $this->p->app->getLanguage()->getTag() : 'zz-ZZ';
 
-		$head = Factory::getApplication()->getDocument()->getHeadData();
+		$head = $this->p->app->getDocument()->getHeadData();
 		$head['styleSheets'] = array();
 		$head['style'] = array();
 		$head['scripts'] = array();
 		$head['script'] = array();
 		$head['custom'] = array();
-		Factory::getApplication()->getDocument()->setHeadData($head);
+		$this->p->app->getDocument()->setHeadData($head);
 
-		$this->p = $p;
 		$this->dataObject = json_decode(bf_b64dec($this->p->formrow->template_code), true);
 
 		$this->rootMdata = $this->dataObject['properties'];
 
-		if (Factory::getApplication()->getInput()->getString('ff_applic', '') != 'mod_facileforms' && Factory::getApplication()->getInput()->getString('ff_applic', '') != 'plg_facileforms') {
+		if ($this->p->app->getInput()->getString('ff_applic', '') != 'mod_facileforms' && $this->p->app->getInput()->getString('ff_applic', '') != 'plg_facileforms') {
 			/* translatables */
 			if (isset($this->rootMdata['title_translation' . $this->language_tag]) && $this->rootMdata['title_translation' . $this->language_tag] != '') {
 				$this->rootMdata['title'] = $this->rootMdata['title_translation' . $this->language_tag];
-				Factory::getApplication()->getDocument()->setTitle($this->rootMdata['title']);
+				$this->p->app->getDocument()->setTitle($this->rootMdata['title']);
 			}
 			/* translatables end */
 		}
@@ -182,11 +180,11 @@ class MobileRenderer
 
 	public function fetchHead($head)
 	{
-		$app = Factory::getApplication();
+		$app = $this->p->app;
 
 		// Get line endings
-		$lnEnd = Factory::getApplication()->getDocument()->_getLineEnd();
-		$tab = Factory::getApplication()->getDocument()->_getTab();
+		$lnEnd = $this->p->app->getDocument()->_getLineEnd();
+		$tab = $this->p->app->getDocument()->_getTab();
 		$tagEnd = ' />';
 		$buffer = '';
 
@@ -275,7 +273,7 @@ class MobileRenderer
 			$this->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/picker.js');
 			$this->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/picker.date.js');
 
-			$lang = Factory::getApplication()->getLanguage()->getTag();
+			$lang = $this->p->app->getLanguage()->getTag();
 			$lang = explode('-', $lang);
 			$lang = strtolower($lang[0]);
 			if (file_exists(JPATH_SITE . '/components/com_breezingformsng/libraries/jquery/pickadate/translations/' . $lang . '.js')) {
@@ -304,9 +302,9 @@ class MobileRenderer
 		$this->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/tooltip.js');
 
 		if ($this->hasFlashUpload) {
-			$tickets = Factory::getApplication()->getSession()->get('bfFlashUploadTickets', array());
+			$tickets = $this->p->app->getSession()->get('bfFlashUploadTickets', array());
 			$tickets[$this->flashUploadTicket] = array(); // stores file info for later processing
-			Factory::getApplication()->getSession()->set('bfFlashUploadTickets', $tickets);
+			$this->p->app->getSession()->set('bfFlashUploadTickets', $tickets);
 			$this->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/center.js');
 			$this->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-flash-upload-mobile.js');
 		}
@@ -382,7 +380,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
 		//  data-position="fixed"
 		echo '<div data-role="header" class="ui-header ui-bar-inherit">';
-		echo '<h1>' . Factory::getApplication()->getDocument()->getTitle() . '</h1>';
+		echo '<h1>' . $this->p->app->getDocument()->getTitle() . '</h1>';
 		$current_url = Uri::getInstance()->toString();
 
 		$return_url = $current_url;
@@ -439,11 +437,11 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 				}
 
 				$display = ' style="display:none;"';
-				if (Factory::getApplication()->getInput()->getInt('ff_form_submitted', 0) == 0 && Factory::getApplication()->getInput()->getInt('ff_page', 1) == $parentPage['pageNumber']) {
+				if ($this->p->app->getInput()->getInt('ff_form_submitted', 0) == 0 && $this->p->app->getInput()->getInt('ff_page', 1) == $parentPage['pageNumber']) {
 					$display = '';
-				} else if (Factory::getApplication()->getInput()->getInt('ff_form_submitted', 0) == 1 && $this->rootMdata['lastPageThankYou'] && $parentPage['pageNumber'] == count($this->dataObject['children'])) {
+				} else if ($this->p->app->getInput()->getInt('ff_form_submitted', 0) == 1 && $this->rootMdata['lastPageThankYou'] && $parentPage['pageNumber'] == count($this->dataObject['children'])) {
 					$display = '';
-				} else if (Factory::getApplication()->getInput()->getInt('ff_form_submitted', 0) == 1 && false == $this->rootMdata['lastPageThankYou'] && $parentPage['pageNumber'] == 1) {
+				} else if ($this->p->app->getInput()->getInt('ff_form_submitted', 0) == 1 && false == $this->rootMdata['lastPageThankYou'] && $parentPage['pageNumber'] == 1) {
 					$display = '';
 				}
 
@@ -464,7 +462,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
 					preg_match_all($regex, $introtext, $matches, PREG_SET_ORDER);
 
-					$document = Factory::getApplication()->getDocument();
+					$document = $this->p->app->getDocument();
 					$renderer = $document->loadRenderer('modules');
 					$options = array('style' => 'xhtml');
 
@@ -526,7 +524,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
 					if ($matches) {
 
-						$document = Factory::getApplication()->getDocument();
+						$document = $this->p->app->getDocument();
 						$renderer = $document->loadRenderer('modules');
 						$options = array('style' => 'xhtml');
 
@@ -987,7 +985,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                                                                         container: 'bfUploadContainer" . $mdata['dbId'] . "',
                                                                         file_data_name: 'Filedata',
                                                                         multipart_params: { form: " . $this->p->form . ", itemName : '" . $mdata['bfName'] . "', bfFlashUploadTicket: '" . $this->flashUploadTicket . "', option: 'com_breezingformsng', format: 'html', flashUpload: 'true', Itemid: 0 },
-                                                                        url : '" . $base . (Factory::getApplication()->getConfig()->get('sef') && !Factory::getApplication()->getConfig()->get('sef_rewrite') ? 'index.php/' : '') . (Factory::getApplication()->getInput()->getCmd('lang', '') && Factory::getApplication()->getConfig()->get('sef') ? (Factory::getApplication()->getConfig()->get('sef_rewrite') ? 'index.php' : '') : 'index.php') . "',
+                                                                        url : '" . $base . ($this->p->app->getConfig()->get('sef') && !$this->p->app->getConfig()->get('sef_rewrite') ? 'index.php/' : '') . ($this->p->app->getInput()->getCmd('lang', '') && $this->p->app->getConfig()->get('sef') ? ($this->p->app->getConfig()->get('sef_rewrite') ? 'index.php' : '') : 'index.php') . "',
                                                                         flash_swf_url : '" . $base . "components/com_breezingformsng/libraries/jquery/plupload/Moxie.swf',
                                                                         filters : [
                                                                                 {title : '" . addslashes(Text::_('COM_BREEZINGFORMSNG_CHOOSE_FILE')) . "', extensions : '" . $exts . "'}
@@ -1200,7 +1198,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
 								$http = 'https';
 
-								$getLangTag = Factory::getApplication()->getLanguage()->getTag();
+								$getLangTag = $this->p->app->getLanguage()->getTag();
 								$getLangSlug = explode('-', $getLangTag);
 								$reCaptchaLang = 'hl=' . $getLangSlug[0];
 
@@ -1244,7 +1242,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 						break;
 					case 'bfCaptcha':
 
-						if (Factory::getApplication()->isClient('site')) {
+						if ($this->p->app->isClient('site')) {
 							$captcha_url = Uri::root(true) . '/media/com_breezingformsng/images/site/captcha/securimage_show.php';
 						} else {
 							$captcha_url = Uri::root(true) . '/media/com_breezingformsng/images/site/captcha/securimage_show.php';
@@ -1364,7 +1362,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 							echo '<button data-theme="a" id="ff_elem' . $mdata['dbId'] . '_calendarButton" type="button" class="bfCalendar" value="' . htmlentities($right, ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities($right, ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
 
 						if (!$this->hasResponsiveDatePicker) {
-							Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js');
+							$this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js');
 						}
 
 						echo '<script type="text/javascript">bfInitCalendarResponsive(' . json_encode((int) $mdata['dbId']) . ', ' . json_encode([
@@ -1579,9 +1577,9 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
 	public function calendar($value, $name, $id, $format = '%Y-%m-%d', $attribs = array())
 	{
-		$tag = Factory::getApplication()->getLanguage()->getTag();
-		$calendar = Factory::getApplication()->getLanguage()->getCalendar();
-		$direction = strtolower(Factory::getApplication()->getDocument()->getDirection());
+		$tag = $this->p->app->getLanguage()->getTag();
+		$calendar = $this->p->app->getLanguage()->getCalendar();
+		$direction = strtolower($this->p->app->getDocument()->getDirection());
 
 		// Get the appropriate file for the current language date helper
 		$helperPath = Uri::root(true) . '/media/system/js/fields/calendar-locales/date/gregorian/date-helper.min.js';
@@ -1628,7 +1626,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 		$singleHeader = ($singleHeader) ? "1" : "0";
 
 		// Format value when not nulldate ('0000-00-00 00:00:00'), otherwise blank it as it would result in 1970-01-01.
-		if ($value && $value !== Factory::getContainer()->get(DatabaseInterface::class)->getNullDate() && strtotime($value) !== false) {
+		if ($value && $value !== $this->p->database->getNullDate() && strtotime($value) !== false) {
 			$tz = date_default_timezone_get();
 			date_default_timezone_set('UTC');
 			$inputvalue = strftime($format, strtotime($value));

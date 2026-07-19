@@ -17,7 +17,6 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Notification;
 \defined('_JEXEC') or die;
 
 use HTML_facileFormsProcessor;
-use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Event\Event;
 use Joomla\Event\EventInterface;
@@ -87,11 +86,11 @@ final class NotificationEngine
 
         /*
           $customSender = false;
-          $sender = Factory::getApplication()->getInput()->get('mailbackSender', array(), 'string');
+          $sender = $this->processor->app->getInput()->get('mailbackSender', array(), 'string');
 
           for ($i = 0; $i < $this->processor->rowcount; $i++) {
           $row = $this->processor->rows[$i];
-          $mb = Factory::getApplication()->getInput()->get('ff_nm_' . $row->name, '', 'string');
+          $mb = $this->processor->app->getInput()->get('ff_nm_' . $row->name, '', 'string');
           if ($row->mailback == 1) {
           $mbCnt = count($mb);
           for ($x = 0; $x < $mbCnt; $x++) {
@@ -246,10 +245,10 @@ final class NotificationEngine
                 $PROCESS_SUBMITTERFULLNAME = Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME');
                 $SUBMITTERFULLNAME = '-';
 
-                if (Factory::getApplication()->getIdentity()->get('id', 0) > 0) {
-                    $SUBMITTERID = Factory::getApplication()->getIdentity()->get('id', 0);
-                    $SUBMITTERUSERNAME = Factory::getApplication()->getIdentity()->get('username', '');
-                    $SUBMITTERFULLNAME = Factory::getApplication()->getIdentity()->get('name', '');
+                if ($this->processor->app->getIdentity()->get('id', 0) > 0) {
+                    $SUBMITTERID = $this->processor->app->getIdentity()->get('id', 0);
+                    $SUBMITTERUSERNAME = $this->processor->app->getIdentity()->get('username', '');
+                    $SUBMITTERFULLNAME = $this->processor->app->getIdentity()->get('name', '');
                 }
 
                 $MAILDATA = array();
@@ -279,9 +278,9 @@ final class NotificationEngine
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMNAME') . ": " . $this->processor->formrow->name . nl() . nl() .
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT') . ": " . $submitted . nl() .
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP') . ": " . $this->processor->ip . nl() .
-                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID') . ": " . Factory::getApplication()->getIdentity()->get('id', 0) . nl() .
-                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME') . ": " . Factory::getApplication()->getIdentity()->get('username', '') . nl() .
-                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME') . ": " . Factory::getApplication()->getIdentity()->get('name', '') . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID') . ": " . $this->processor->app->getIdentity()->get('id', 0) . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME') . ": " . $this->processor->app->getIdentity()->get('username', '') . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME') . ": " . $this->processor->app->getIdentity()->get('name', '') . nl() .
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_PROVIDER') . ": " . $this->processor->provider . nl() .
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_BROWSER') . ": " . $this->processor->browser . nl() .
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS') . ": " . $this->processor->opsys . nl() . nl();
@@ -316,10 +315,10 @@ final class NotificationEngine
             $SUBMITTERID = 0;
             $SUBMITTERUSERNAME = '-';
             $SUBMITTERFULLNAME = '-';
-            if (Factory::getApplication()->getIdentity()->get('id', 0) > 0) {
-                $SUBMITTERID = Factory::getApplication()->getIdentity()->get('id', 0);
-                $SUBMITTERUSERNAME = Factory::getApplication()->getIdentity()->get('username', '');
-                $SUBMITTERFULLNAME = Factory::getApplication()->getIdentity()->get('name', '');
+            if ($this->processor->app->getIdentity()->get('id', 0) > 0) {
+                $SUBMITTERID = $this->processor->app->getIdentity()->get('id', 0);
+                $SUBMITTERUSERNAME = $this->processor->app->getIdentity()->get('username', '');
+                $SUBMITTERFULLNAME = $this->processor->app->getIdentity()->get('name', '');
             }
 
             $body = str_replace('{BF_RECORD_ID:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID'), $body);
@@ -418,10 +417,10 @@ final class NotificationEngine
                 return;
         }
 
-        $sender = Factory::getApplication()->getInput()->get('mailbackSender', array(), 'string');
+        $sender = $this->processor->app->getInput()->get('mailbackSender', array(), 'string');
         for ($i = 0; $i < $this->processor->rowcount; $i++) {
             $row = $this->processor->rows[$i];
-            $mb = Factory::getApplication()->getInput()->get('ff_nm_' . $row->name, '', 'string');
+            $mb = $this->processor->app->getInput()->get('ff_nm_' . $row->name, '', 'string');
             if ($row->mailback == 1 && is_array($mb)) {
                 $mbCnt = count($mb);
                 for ($x = 0; $x < $mbCnt; $x++) {
@@ -522,7 +521,7 @@ final class NotificationEngine
 
         $signatures = array();
 
-        $attachToAdminMail = Factory::getApplication()->getInput()->get('attachToAdminMail', array(), 'string');
+        $attachToAdminMail = $this->processor->app->getInput()->get('attachToAdminMail', array(), 'string');
         if (count($this->processor->maildata)) {
             foreach ($this->processor->maildata as $data) {
                 if (isset($attachToAdminMail[$data[_FF_DATA_NAME]])) {
@@ -719,15 +718,15 @@ final class NotificationEngine
             }
         }
 
-        $accept = Factory::getApplication()->getInput()->get('mailbackConnectWith', array(), 'string');
-        $sender = Factory::getApplication()->getInput()->get('mailbackSender', array(), 'string');
-        $attachToUserMail = Factory::getApplication()->getInput()->get('attachToUserMail', array(), 'string');
+        $accept = $this->processor->app->getInput()->get('mailbackConnectWith', array(), 'string');
+        $sender = $this->processor->app->getInput()->get('mailbackSender', array(), 'string');
+        $attachToUserMail = $this->processor->app->getInput()->get('attachToUserMail', array(), 'string');
 
         $mailbackfiles = array();
         $recipients = array();
         for ($i = 0; $i < $this->processor->rowcount; $i++) {
             $row = $this->processor->rows[$i];
-            $mb = Factory::getApplication()->getInput()->get('ff_nm_' . $row->name, '', 'string');
+            $mb = $this->processor->app->getInput()->get('ff_nm_' . $row->name, '', 'string');
             if ($row->mailback == 1) {
                 $mbCnt = count($mb);
                 for ($x = 0; $x < $mbCnt; $x++) {
@@ -736,7 +735,7 @@ final class NotificationEngine
                         $checked = array('');
                         if (isset($accept[$row->name])) {
                             $yesno = explode('_', $accept[$row->name]);
-                            $checked = Factory::getApplication()->getInput()->get('ff_nm_' . $yesno[1], '', 'string');
+                            $checked = $this->processor->app->getInput()->get('ff_nm_' . $yesno[1], '', 'string');
                         }
 
                         //if (isset($sender[$row->name]) && !$customSender) {
@@ -975,10 +974,10 @@ final class NotificationEngine
                 $PROCESS_SUBMITTERFULLNAME = Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME');
                 $SUBMITTERFULLNAME = '-';
 
-                if (Factory::getApplication()->getIdentity()->get('id', 0) > 0) {
-                    $SUBMITTERID = Factory::getApplication()->getIdentity()->get('id', 0);
-                    $SUBMITTERUSERNAME = Factory::getApplication()->getIdentity()->get('username', '');
-                    $SUBMITTERFULLNAME = Factory::getApplication()->getIdentity()->get('name', '');
+                if ($this->processor->app->getIdentity()->get('id', 0) > 0) {
+                    $SUBMITTERID = $this->processor->app->getIdentity()->get('id', 0);
+                    $SUBMITTERUSERNAME = $this->processor->app->getIdentity()->get('username', '');
+                    $SUBMITTERFULLNAME = $this->processor->app->getIdentity()->get('name', '');
                 }
 
                 $MAILDATA = array();
@@ -1021,9 +1020,9 @@ final class NotificationEngine
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMNAME') . ": " . $this->processor->formrow->name . nl() . nl() .
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTEDAT') . ": " . $submitted . nl() .
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERIP') . ": " . $this->processor->ip . nl() .
-                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID') . ": " . Factory::getApplication()->getIdentity()->get('id', 0) . nl() .
-                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME') . ": " . Factory::getApplication()->getIdentity()->get('username', '') . nl() .
-                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME') . ": " . Factory::getApplication()->getIdentity()->get('name', '') . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERID') . ": " . $this->processor->app->getIdentity()->get('id', 0) . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERUSERNAME') . ": " . $this->processor->app->getIdentity()->get('username', '') . nl() .
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITTERFULLNAME') . ": " . $this->processor->app->getIdentity()->get('name', '') . nl() .
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_PROVIDER') . ": " . $this->processor->provider . nl() .
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_BROWSER') . ": " . $this->processor->browser . nl() .
                     Text::_('COM_BREEZINGFORMSNG_PROCESS_OPSYS') . ": " . $this->processor->opsys . nl() . nl();
@@ -1070,10 +1069,10 @@ final class NotificationEngine
             $SUBMITTERID = 0;
             $SUBMITTERUSERNAME = '-';
             $SUBMITTERFULLNAME = '-';
-            if (Factory::getApplication()->getIdentity()->get('id', 0) > 0) {
-                $SUBMITTERID = Factory::getApplication()->getIdentity()->get('id', 0);
-                $SUBMITTERUSERNAME = Factory::getApplication()->getIdentity()->get('username', '');
-                $SUBMITTERFULLNAME = Factory::getApplication()->getIdentity()->get('name', '');
+            if ($this->processor->app->getIdentity()->get('id', 0) > 0) {
+                $SUBMITTERID = $this->processor->app->getIdentity()->get('id', 0);
+                $SUBMITTERUSERNAME = $this->processor->app->getIdentity()->get('username', '');
+                $SUBMITTERFULLNAME = $this->processor->app->getIdentity()->get('name', '');
             }
 
             $body = str_replace('{BF_RECORD_ID:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID'), $body);
@@ -1325,7 +1324,7 @@ final class NotificationEngine
             $list_ids = explode(',', trim($this->processor->formrow->mailchimp_list_id));
 
             if ($checkboxField != '') {
-                $box = Factory::getApplication()->getInput()->get('ff_nm_' . $checkboxField, array(''), 'string');
+                $box = $this->processor->app->getInput()->get('ff_nm_' . $checkboxField, array(''), 'string');
                 if (isset($box[0]) && $box[0] != '') {
                     $checked = true;
                 } else {
@@ -1334,14 +1333,14 @@ final class NotificationEngine
             }
 
             if ($unsubscribeField != '') {
-                $box = Factory::getApplication()->getInput()->get('ff_nm_' . $unsubscribeField, array(''), 'string');
+                $box = $this->processor->app->getInput()->get('ff_nm_' . $unsubscribeField, array(''), 'string');
                 if (isset($box[0]) && $box[0] != '') {
                     $unsubscribe = true;
                 }
             }
 
             if ($htmlTextMobileField != '') {
-                $selection = Factory::getApplication()->getInput()->get('ff_nm_' . $htmlTextMobileField, array(''), 'string');
+                $selection = $this->processor->app->getInput()->get('ff_nm_' . $htmlTextMobileField, array(''), 'string');
                 if (isset($selection[0]) && $selection[0] != '') {
                     $htmlTextMobile = $selection[0];
                 }

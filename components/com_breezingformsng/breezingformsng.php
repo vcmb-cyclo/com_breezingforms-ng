@@ -18,6 +18,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 use Joomla\CMS\Factory;
 use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use Joomla\Database\DatabaseInterface;
+use Joomla\CMS\Mail\MailerFactoryInterface;
 use Vcmb\Component\BreezingformsNG\Site\Service\EngineDispatcher;
 
 if (!function_exists('bf_b64enc')) {
@@ -48,9 +49,10 @@ $mainframe = Factory::getApplication();
 // make sure the component language is available for Text::_()
 $mainframe->getLanguage()->load('com_breezingformsng');
 
-$cache = Factory::getContainer()
-    ->get(CacheControllerFactoryInterface::class)
-    ->createCacheController('callback');
+$container = Factory::getContainer();
+$cacheControllerFactory = $container->get(CacheControllerFactoryInterface::class);
+$mailerFactory = $container->get(MailerFactoryInterface::class);
+$cache = $cacheControllerFactory->createCacheController('callback');
 $cache->setCaching(false);
 
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
@@ -78,7 +80,7 @@ $ff_request, // array of request parameters ff_param_*
 $ff_processor, // current form procesor object
 $ff_target;    // index of form on current page
 
-$database = $db = Factory::getContainer()->get(DatabaseInterface::class);
+$database = $db = $container->get(DatabaseInterface::class);
 
 if (!isset($xModuleId)) {
     $xModuleId = 0;
@@ -107,7 +109,8 @@ $bfEngineContext = [
 ];
 
 $input = $mainframe->getInput();
-(new EngineDispatcher($input, $mainframe, $database))->dispatch($bfEngineContext, (string) $ff_applic);
+(new EngineDispatcher($input, $mainframe, $database, $mailerFactory, $cacheControllerFactory))
+    ->dispatch($bfEngineContext, (string) $ff_applic);
 
 if ($input->getBool('raw', false)) {
     session_write_close();

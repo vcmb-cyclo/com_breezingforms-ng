@@ -13,7 +13,6 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode;
 
 use HTML_facileFormsProcessor;
 
-use Joomla\CMS\Factory;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\HTML\HTMLHelper;
@@ -73,12 +72,12 @@ class BootstrapRenderer
 
     function __construct(HTML_facileFormsProcessor $p)
     {
-        $default = ComponentHelper::getParams('com_languages')->get('site');
-        $this->language_tag = Factory::getApplication()->getLanguage()->getTag() != $default ? Factory::getApplication()->getLanguage()->getTag() : 'zz-ZZ';
-
-        Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('<!--');
-
         $this->p = $p;
+        $default = ComponentHelper::getParams('com_languages')->get('site');
+        $this->language_tag = $this->p->app->getLanguage()->getTag() != $default ? $this->p->app->getLanguage()->getTag() : 'zz-ZZ';
+
+        $this->p->app->getDocument()->getWebAssetManager()->addInlineScript('<!--');
+
         $this->dataObject = json_decode(bf_b64dec($this->p->formrow->template_code), true);
 
         $this->rootMdata = $this->dataObject['properties'];
@@ -153,11 +152,11 @@ class BootstrapRenderer
             'form-select' => 'form-select'
         );
 
-        if (Factory::getApplication()->getInput()->getString('ff_applic', '') != 'mod_facileforms' && Factory::getApplication()->getInput()->getString('ff_applic', '') != 'plg_facileforms') {
+        if ($this->p->app->getInput()->getString('ff_applic', '') != 'mod_facileforms' && $this->p->app->getInput()->getString('ff_applic', '') != 'plg_facileforms') {
             /* translatables */
             if (isset($this->rootMdata['title_translation' . $this->language_tag]) && $this->rootMdata['title_translation' . $this->language_tag] != '') {
                 $this->rootMdata['title'] = $this->rootMdata['title_translation' . $this->language_tag];
-                Factory::getApplication()->getDocument()->setTitle($this->rootMdata['title']);
+                $this->p->app->getDocument()->setTitle($this->rootMdata['title']);
             }
             /* translatables end */
         }
@@ -257,26 +256,26 @@ class BootstrapRenderer
         $this->headers();
 
         if ($this->hasResponsiveDatePicker) {
-            Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/picker.js');
-            Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/picker.date.js');
+            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/picker.js');
+            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/picker.date.js');
 
-            $lang = Factory::getApplication()->getLanguage()->getTag();
+            $lang = $this->p->app->getLanguage()->getTag();
             $lang = explode('-', $lang);
             $lang = strtolower($lang[0]);
             if (file_exists(JPATH_SITE . '/components/com_breezingformsng/libraries/jquery/pickadate/translations/' . $lang . '.js')) {
-                Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/translations/' . $lang . '.js');
+                $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/translations/' . $lang . '.js');
             }
 
-            Factory::getApplication()->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/themes/default.css');
-            Factory::getApplication()->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/themes/default.date.css');
+            $this->p->app->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/themes/default.css');
+            $this->p->app->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/themes/default.date.css');
         }
 
         // we must make sure that everything mootools related is included after moxie and plupload
-        if (isset(Factory::getApplication()->getDocument()->_scripts)) {
-            foreach (Factory::getApplication()->getDocument()->_scripts as $script_name => $script_value) {
+        if (isset($this->p->app->getDocument()->_scripts)) {
+            foreach ($this->p->app->getDocument()->_scripts as $script_name => $script_value) {
                 if (basename($script_name) != 'moxie.js' && basename($script_name) != 'plupload.js' && basename($script_name) != 'calendar.js' && basename($script_name) != 'calendar-setup.js') {
-                    unset(Factory::getApplication()->getDocument()->_scripts[$script_name]);
-                    Factory::getApplication()->getDocument()->_scripts[$script_name] = $script_value;
+                    unset($this->p->app->getDocument()->_scripts[$script_name]);
+                    $this->p->app->getDocument()->_scripts[$script_name] = $script_value;
                 }
             }
         }
@@ -285,7 +284,7 @@ class BootstrapRenderer
         $area_count = count($this->htmltextareas);
         if ($area_count) {
             $editor = Editor::getInstance('tinymce');
-            Factory::getApplication()->getDocument()->addScript(
+            $this->p->app->getDocument()->addScript(
                 Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-html-textareas.js'
             );
             for ($i = 0; $i < $area_count; $i++) {
@@ -298,17 +297,17 @@ class BootstrapRenderer
         }
 
         if ($this->hasFlashUpload) {
-            $tickets = Factory::getApplication()->getSession()->get('bfFlashUploadTickets', array());
+            $tickets = $this->p->app->getSession()->get('bfFlashUploadTickets', array());
             $tickets[$this->flashUploadTicket] = array(); // stores file info for later processing
-            Factory::getApplication()->getSession()->set('bfFlashUploadTickets', $tickets);
+            $this->p->app->getSession()->set('bfFlashUploadTickets', $tickets);
             echo '<input type="hidden" name="bfFlashUploadTicket" value="' . $this->flashUploadTicket . '"/>' . "\n";
-            Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/center.js');
-            Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-flash-upload.js');
+            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/center.js');
+            $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-flash-upload.js');
             echo "<div style=\"visibility:hidden;\" id=\"bfFileQueue\"></div>";
             echo "<div style=\"visibility:hidden;display:none;\" id=\"bfSubmitMessage\">" . Text::_('COM_BREEZINGFORMSNG_SUBMIT_MESSAGE') . "</div>";
         }
         echo '<noscript>Please turn on javascript to submit your data. Thank you!</noscript>' . "\n";
-        Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript('//-->');
+        $this->p->app->getDocument()->getWebAssetManager()->addInlineScript('//-->');
     }
 
     public function process(&$dataObject, $parent = null, $parentPage = null, $index = 0, $childrenLength = 0, $parentFull = null)
@@ -376,11 +375,11 @@ class BootstrapRenderer
                 }
 
                 $display = ' style="display:none;"';
-                if (Factory::getApplication()->getInput()->getInt('ff_form_submitted', 0) == 0 && Factory::getApplication()->getInput()->getInt('ff_page', 1) == $parentPage['pageNumber']) {
+                if ($this->p->app->getInput()->getInt('ff_form_submitted', 0) == 0 && $this->p->app->getInput()->getInt('ff_page', 1) == $parentPage['pageNumber']) {
                     $display = '';
-                } else if (Factory::getApplication()->getInput()->getInt('ff_form_submitted', 0) == 1 && $this->rootMdata['lastPageThankYou'] && $parentPage['pageNumber'] == count($this->dataObject['children'])) {
+                } else if ($this->p->app->getInput()->getInt('ff_form_submitted', 0) == 1 && $this->rootMdata['lastPageThankYou'] && $parentPage['pageNumber'] == count($this->dataObject['children'])) {
                     $display = '';
-                } else if (Factory::getApplication()->getInput()->getInt('ff_form_submitted', 0) == 1 && false == $this->rootMdata['lastPageThankYou'] && $parentPage['pageNumber'] == 1) {
+                } else if ($this->p->app->getInput()->getInt('ff_form_submitted', 0) == 1 && false == $this->rootMdata['lastPageThankYou'] && $parentPage['pageNumber'] == 1) {
                     $display = '';
                 }
 
@@ -401,7 +400,7 @@ class BootstrapRenderer
 
                     preg_match_all($regex, $introtext, $matches, PREG_SET_ORDER);
 
-                    $document = Factory::getApplication()->getDocument();
+                    $document = $this->p->app->getDocument();
                     $renderer = $document->loadRenderer('modules');
                     $options = array('style' => 'xhtml');
 
@@ -468,7 +467,7 @@ class BootstrapRenderer
 
                     if ($matches) {
 
-                        $document = Factory::getApplication()->getDocument();
+                        $document = $this->p->app->getDocument();
                         $renderer = $document->loadRenderer('modules');
                         $options = array('style' => 'xhtml');
 
@@ -700,7 +699,7 @@ class BootstrapRenderer
 
                         // set size of element, number input doesn't allow size attr
                         if ($mdata['size'] != '') {
-                            Factory::getApplication()->getDocument()->addScript(
+                            $this->p->app->getDocument()->addScript(
                                 Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-number-input.js'
                             );
                             echo '<script type="text/javascript">bfSetNumberInputWidth('
@@ -1073,7 +1072,7 @@ class BootstrapRenderer
                                                                         container: 'bfUploadContainer" . $mdata['dbId'] . "',
                                                                         file_data_name: 'Filedata',
                                                                         multipart_params: { form: " . $this->p->form . ", itemName : '" . $mdata['bfName'] . "', bfFlashUploadTicket: '" . $this->flashUploadTicket . "', option: 'com_breezingformsng', format: 'html', flashUpload: 'true', Itemid: 0 },
-                                                                        url : '" . $base . (Factory::getApplication()->getConfig()->get('sef') && !Factory::getApplication()->getConfig()->get('sef_rewrite') ? 'index.php/' : '') . (Factory::getApplication()->getInput()->getCmd('lang', '') && Factory::getApplication()->getConfig()->get('sef') ? (Factory::getApplication()->getConfig()->get('sef_rewrite') ? 'index.php' : '') : 'index.php') . "',
+                                                                        url : '" . $base . ($this->p->app->getConfig()->get('sef') && !$this->p->app->getConfig()->get('sef_rewrite') ? 'index.php/' : '') . ($this->p->app->getInput()->getCmd('lang', '') && $this->p->app->getConfig()->get('sef') ? ($this->p->app->getConfig()->get('sef_rewrite') ? 'index.php' : '') : 'index.php') . "',
                                                                         flash_swf_url : '" . $base . "components/com_breezingformsng/libraries/jquery/plupload/Moxie.swf',
                                                                         filters : [
                                                                                 {title : '" . addslashes(Text::_('COM_BREEZINGFORMSNG_CHOOSE_FILE')) . "', extensions : '" . $exts . "'}
@@ -1287,14 +1286,14 @@ class BootstrapRenderer
 
                                 $http = 'https';
 
-                                $getLangTag = Factory::getApplication()->getLanguage()->getTag();
+                                $getLangTag = $this->p->app->getLanguage()->getTag();
                                 $getLangSlug = explode('-', $getLangTag);
                                 $reCaptchaLang = 'hl=' . $getLangSlug[0];
 
                                 $size = (isset($mdata['size']) && $mdata['size'] != '') ? $mdata['size'] : 'normal';
 
-                                Factory::getApplication()->getDocument()->addScript($http . '://www.google.com/recaptcha/api.js?' . $reCaptchaLang . '&onload=onloadBFNewRecaptchaCallback&render=explicit', $type = "text/javascript", array('data-usercentrics' => 'reCAPTCHA'));
-                                Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-visible.js');
+                                $this->p->app->getDocument()->addScript($http . '://www.google.com/recaptcha/api.js?' . $reCaptchaLang . '&onload=onloadBFNewRecaptchaCallback&render=explicit', $type = "text/javascript", array('data-usercentrics' => 'reCAPTCHA'));
+                                $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-visible.js');
 
                                 echo '
                                                     <div style="display: inline-block !important; vertical-align: middle;">
@@ -1335,7 +1334,7 @@ class BootstrapRenderer
                                         <?php
                                     }
 
-                                    Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-invisible.js');
+                                    $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-invisible.js');
                                     ?>
 
                                             <script data-usercentrics="reCAPTCHA" type="text/javascript">bfInitInvisibleReCaptcha(<?php echo json_encode([
@@ -1368,7 +1367,7 @@ class BootstrapRenderer
                         echo $label;
                         echo '<span class="' . $this->bsClass('nonform-control') . '">';
 
-                        if (Factory::getApplication()->isClient('site')) {
+                        if ($this->p->app->isClient('site')) {
                             $captcha_url = Uri::root(true) . '/media/com_breezingformsng/images/site/captcha/securimage_show.php';
                         } else {
                             $captcha_url = Uri::root(true) . '/media/com_breezingformsng/images/site/captcha/securimage_show.php';
@@ -1497,12 +1496,12 @@ class BootstrapRenderer
                         echo '</div>' . "\n";
 
                         if (!$this->hasResponsiveDatePicker) {
-                            Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript(
+                            $this->p->app->getDocument()->getWebAssetManager()->addInlineScript(
                                 'var bfPickerMinusYearIcon = ' . json_encode(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/minusyear.png') . ';'
                                 . "\n" . 'var bfPickerPlusYearIcon = ' . json_encode(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/plusyear.png') . ';'
                             );
-                            Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-legacy-style.js');
-                            Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js');
+                            $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-legacy-style.js');
+                            $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js');
                         }
 
                         echo '<script type="text/javascript">bfInitCalendarResponsive(' . json_encode((int) $mdata['dbId']) . ', ' . json_encode([
@@ -1521,9 +1520,9 @@ class BootstrapRenderer
 
                     case 'bfSignature':
 
-                        Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/js/signature.js');
-                        Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-signature.js');
-                        Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript(
+                        $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/js/signature.js');
+                        $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-signature.js');
+                        $this->p->app->getDocument()->getWebAssetManager()->addInlineScript(
                             'bfSignatureInit(' . json_encode((int) $mdata['dbId']) . ');'
                         );
 
@@ -1744,48 +1743,48 @@ class BootstrapRenderer
     {
 
         if ($this->hasFlashUpload) {
-            Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/plupload/moxie.js');
-            Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/plupload/plupload.js');
-            Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-plupload-compat.js');
+            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/plupload/moxie.js');
+            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/plupload/plupload.js');
+            $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-plupload-compat.js');
         }
 
-        Factory::getApplication()->getDocument()->addStyleSheet(Uri::root(true) . '/media/com_breezingformsng/css/site/quickmode-runtime.css');
+        $this->p->app->getDocument()->addStyleSheet(Uri::root(true) . '/media/com_breezingformsng/css/site/quickmode-runtime.css');
 
         // force jquery to be loaded after mootools but before any other js (since J! 3.4)
         HTMLHelper::_('bootstrap.framework');
         HTMLHelper::_('jquery.framework');
         HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
-        Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-tooltip-init.js');
+        $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-tooltip-init.js');
 
         $jQuery = '';
         if (isset($this->rootMdata['disableJQuery']) && $this->rootMdata['disableJQuery']) {
             $jQuery = 'var JQuery = jQuery;' . "\n";
         } else {
-            Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jq.min.js');
+            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jq.min.js');
         }
 
         if ($this->useErrorAlerts) {
-            Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/js/sweetalert.min.js');
+            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/js/sweetalert.min.js');
         }
 
         if ($this->useBalloonErrors) {
-            Factory::getApplication()->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/validationEngine.jquery.css');
-            Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jquery.validationEngine-en.js');
-            Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jquery.validationEngine.js');
+            $this->p->app->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/validationEngine.jquery.css');
+            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jquery.validationEngine-en.js');
+            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jquery.validationEngine.js');
         }
 
         $toggleCode = '';
         if ($this->toggleFields != '[]') {
-            Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-toggle-fields.js');
+            $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-toggle-fields.js');
             $toggleCode = '
 var toggleFieldsArray = ' . $this->toggleFields . ';
 ';
         }
 
-        Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-core-helpers-bootstrap.js');
-        Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-deactivation.js');
+        $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-core-helpers-bootstrap.js');
+        $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-deactivation.js');
 
-        Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript(
+        $this->p->app->getDocument()->getWebAssetManager()->addInlineScript(
             $jQuery . '
 			var inlineErrorElements = new Array();
 			var bfSummarizers = new Array();
@@ -1800,28 +1799,28 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
         if ($this->fading || !$this->useErrorAlerts || $this->rollover) {
             if (!$this->useErrorAlerts) {
                 $showDefaultErrors = $this->useDefaultErrors || (!$this->useDefaultErrors && !$this->useBalloonErrors);
-                Factory::getApplication()->getDocument()->getWebAssetManager()->addInlineScript(
+                $this->p->app->getDocument()->getWebAssetManager()->addInlineScript(
                     'var bfUseErrorAlerts = false;' . "\n"
                     . 'var bfShowDefaultErrors = ' . ($showDefaultErrors ? 'true' : 'false') . ';' . "\n"
                     . 'var bfErrorPageScoped = false;' . "\n"
                 );
-                Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-error-alerts-bootstrap.js');
+                $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-error-alerts-bootstrap.js');
             }
             if ($this->fading) {
                 $this->fadingClass = ' bfFadingClass';
                 $this->fadingCall = 'bfFade();';
-                Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-fade.js');
+                $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-fade.js');
             }
 
             if ($this->rollover && trim($this->rolloverColor) != '') {
                 // removed in bootstrap
             }
         }
-        Factory::getApplication()->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-post-init.js');
+        $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-post-init.js');
         // loading system css
             // loading theme
             $stylelink = '<link rel="stylesheet" href="' . Uri::root(true) . '/components/com_breezingformsng/themes/quickmode-bootstrap' . $this->bsVersion . '/system.css" />' . "\n";
-            Factory::getApplication()->getDocument()->addCustomTag($stylelink);
+            $this->p->app->getDocument()->addCustomTag($stylelink);
 
             if (isset($this->rootMdata['themebootstrap'])) {
 
@@ -1863,9 +1862,9 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                     }
 
                     $style = '<style type="text/css">/** BreezingForms Bootstap Theme ' . strip_tags($this->rootMdata['themebootstrap']) . ' **/' . "\n" . $themecss . "\n" . '</style>' . "\n";
-                    Factory::getApplication()->getDocument()->addCustomTag($style);
+                    $this->p->app->getDocument()->addCustomTag($style);
                     if ($scriptjs) {
-                        Factory::getApplication()->getDocument()->addCustomTag('<script type="text/javascript">' . "\n" . $scriptjs . "\n" . '</script>');
+                        $this->p->app->getDocument()->addCustomTag('<script type="text/javascript">' . "\n" . $scriptjs . "\n" . '</script>');
                     }
                 }
             }

@@ -2061,6 +2061,13 @@ class com_breezingformsngInstallerScript
         if (isset($tables[$formsTable])) {
             $columns = $tables[$formsTable];
 
+            if (!isset($columns['debug_mode'])) {
+                $db->setQuery(
+                    "ALTER TABLE `{$formsTable}` ADD `debug_mode` TINYINT(1) NOT NULL DEFAULT '0' AFTER `published`"
+                )->execute();
+                $this->log('Added column debug_mode to facileforms_forms.');
+            }
+
             $newFormColumns = [
                 'double_opt' => "TINYINT(1) NOT NULL DEFAULT '0' AFTER `filter_state`",
                 'opt_mail'   => "VARCHAR(128) NOT NULL DEFAULT '' AFTER `double_opt`",

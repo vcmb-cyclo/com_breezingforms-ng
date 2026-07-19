@@ -22,6 +22,7 @@ use Joomla\CMS\Uri\Uri;
 use Joomla\Database\ParameterType;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Filesystem\File;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RequestParameterParser;
 
 /**
  * Renders a form (ff_task=view) or processes a submission (ff_task=submit)
@@ -34,6 +35,7 @@ final class FormRenderer
         private readonly DatabaseInterface $database,
         private readonly MailerFactoryInterface $mailerFactory,
         private readonly CacheControllerFactoryInterface $cacheControllerFactory,
+        private readonly RequestParameterParser $requestParameterParser,
     ) {
     }
 
@@ -104,7 +106,10 @@ $ff_request = array();
             $top = intval($params->get('ff_mod_top', $top));
             $suffix = $params->get('ff_mod_suffix', '');
             $parprv = $params->get('ff_mod_parprv', '');
-            addRequestParams($params->get('ff_mod_parpub', ''));
+            $ff_request = array_replace(
+                $ff_request,
+                $this->requestParameterParser->parse((string) $params->get('ff_mod_parpub', ''))
+            );
             $pagetitle = false;
 
             $this->application->getSession()->set('ff_editableMod' . $xModuleId . $formname, intval($params->get('ff_mod_editable', $editable)));
@@ -122,7 +127,7 @@ $ff_request = array();
             $top = '';
             $suffix = htmlentities($this->application->getInput()->getString('ff_suffix', ''), ENT_QUOTES, 'UTF-8');
             $parprv = '';
-            addRequestParams('');
+            $ff_request = array_replace($ff_request, $this->requestParameterParser->parse(''));
         } else {
 
             // is this called with an Itemid?
@@ -164,7 +169,10 @@ $ff_request = array();
                     $editable_override = intval($params->get('ff_com_editable_override', $editable_override));
                     $suffix = $params->get('ff_com_suffix', '');
                     $parprv = $params->get('ff_com_parprv', '');
-                    addRequestParams($params->get('ff_com_parpub', ''));
+                    $ff_request = array_replace(
+                        $ff_request,
+                        $this->requestParameterParser->parse((string) $params->get('ff_com_parpub', ''))
+                    );
                 }
             } // if
         }
@@ -279,7 +287,10 @@ $ff_request = array();
         }
 
         if ($form->name == $formname)
-            addRequestParams($parprv);
+            $ff_request = array_replace(
+                $ff_request,
+                $this->requestParameterParser->parse((string) $parprv)
+            );
         if ($my_ff_params) {
             // reset($_REQUEST);
             foreach ($_REQUEST as $prop => $val) {

@@ -18,6 +18,7 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Callback\PayPalCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\SofortCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\StripeCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Support\RedirectHelper;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RequestParameterParser;
 
 /**
  * Dispatches form rendering and the dedicated frontend callbacks.
@@ -41,6 +42,7 @@ final class EngineDispatcher
                 $this->database,
                 $this->mailerFactory,
                 $this->cacheControllerFactory,
+                new RequestParameterParser(),
             ))->render($engineContext);
 
             return;

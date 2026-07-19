@@ -472,6 +472,19 @@
   du tout de `Factory`, tandis que les façades globales `BFQuickMode*` restent intactes pour les scripts stockés.
   Les deux dernières requêtes SQL concaténées du gestionnaire de traces (`pieces` et `scripts`) utilisent aussi
   le query builder Joomla et un identifiant entier lié.
+  **Tables du moteur modernisées** : les sept classes de `legacy/tables.php` utilisent désormais exclusivement
+  le `DatabaseInterface` reçu par leur constructeur. Leurs résolutions du conteneur, écritures dans le global
+  `$database` et sept implémentations manuelles de `load()` sont supprimées au profit de
+  `Joomla\CMS\Table\Table::load()`.
+  **Configuration native** : `legacy/Conf.php` devient la classe finale et stricte
+  `Site\Configuration\FormConfiguration`, autoloadée par Joomla. Son faux accès à la base et son chargement
+  manuel disparaissent ; l'ancien fichier est purgé lors des mises à jour.
+  **Initialisation runtime extraite** : `RuntimeContextInitializer` construit les URL du moteur et collecte les
+  paramètres Joomla à préserver à partir de `CMSApplication`; `RequestParameterParser` alimente explicitement
+  le tableau de requête du `FormRenderer`. Les fonctions globales `initFacileForms()`, `saveOtherParam()` et
+  `addRequestParams()` sont supprimées de `legacy/functions.php`, qui ne résout plus l'application statiquement.
+  Le helper de route des intégrations de tags ne charge plus `BFRequest.php`, inutilisé depuis la conversion
+  complète des lectures de requête vers Joomla Input.
   (`BFRequest`, `BFIntegrate` et les quatre rendus `BFQuickMode*`) restent volontairement disponibles comme API externe.
   `BFJoomlaConfig` a été remplacé par `Factory::getConfig()` ; `BFPDF` a été migré vers le service namespacé
   `Administrator\Service\PdfDocument`. Les deux classes globales ont été supprimées. Export administrateur vérifié

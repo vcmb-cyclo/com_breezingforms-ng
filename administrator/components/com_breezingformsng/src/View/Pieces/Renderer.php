@@ -337,30 +337,30 @@ class Renderer
 				<thead>
 				<tr>
 					<th class="w-1 text-nowrap">
-						<?php echo HTMLHelper::_('grid.sort', 'JGRID_HEADING_ID', 'a.id', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ID', 'a.id', $listDirn, $listOrder); ?>
 					</th>
 					<th class="w-1 text-center"><input class="form-check-input" type="checkbox" name="toggle" value=""
 							onclick="Joomla.checkAll(this);" /></th>
 					<th>
-						<?php echo HTMLHelper::_('grid.sort', 'COM_BREEZINGFORMSNG_PIECES_PACKAGE', 'a.package', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_PIECES_PACKAGE', 'a.package', $listDirn, $listOrder); ?>
 					</th>
 					<th>
-						<?php echo HTMLHelper::_('grid.sort', 'COM_BREEZINGFORMSNG_PIECES_TITLE', 'a.title', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_PIECES_TITLE', 'a.title', $listDirn, $listOrder); ?>
 					</th>
 					<th>
-						<?php echo HTMLHelper::_('grid.sort', 'COM_BREEZINGFORMSNG_PIECES_NAME', 'a.name', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_PIECES_NAME', 'a.name', $listDirn, $listOrder); ?>
 					</th>
 					<th>
-						<?php echo HTMLHelper::_('grid.sort', 'COM_BREEZINGFORMSNG_PIECES_TYPE', 'a.type', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_PIECES_TYPE', 'a.type', $listDirn, $listOrder); ?>
 					</th>
 					<th>
-						<?php echo HTMLHelper::_('grid.sort', 'COM_BREEZINGFORMSNG_PIECES_DESCRIPTION', 'a.description', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_PIECES_DESCRIPTION', 'a.description', $listDirn, $listOrder); ?>
 					</th>
 					<th class="text-nowrap">
-						<?php echo HTMLHelper::_('grid.sort', 'JGLOBAL_MODIFIED', 'a.modified', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_MODIFIED', 'a.modified', $listDirn, $listOrder); ?>
 					</th>
 					<th class="w-1 text-center">
-						<?php echo HTMLHelper::_('grid.sort', 'COM_BREEZINGFORMSNG_PIECES_PUBLISHED', 'a.published', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_PIECES_PUBLISHED', 'a.published', $listDirn, $listOrder); ?>
 					</th>
 				</tr>
 				</thead>

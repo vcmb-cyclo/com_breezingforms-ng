@@ -94,6 +94,7 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
         } else {
             $document = Factory::getApplication()->getDocument();
             $wa       = $document->getWebAssetManager();
+            $wa->useScript('com_breezingformsng.admin-sort');
             $wa->registerAndUseScript(
                 'com_breezingformsng.admin-form',
                 'media/com_breezingformsng/js/admin/admin-form.js',

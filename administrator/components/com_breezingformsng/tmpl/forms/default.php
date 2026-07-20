@@ -58,14 +58,14 @@ $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
         <th class="w-1 text-center">
           <input type="checkbox" class="form-check-input" onclick="Joomla.checkAll(this)" title="<?= Text::_('JGLOBAL_CHECK_ALL'); ?>">
         </th>
-        <th class="text-center"><?= HTMLHelper::_('grid.sort', 'JGRID_HEADING_ID', 'id', $this->listDirn, $this->listOrder); ?></th>
-        <th><?= HTMLHelper::_('grid.sort', Text::_('COM_BREEZINGFORMSNG_FORMS_TITLE'), 'title', $this->listDirn, $this->listOrder); ?></th>
-        <th><?= HTMLHelper::_('grid.sort', Text::_('COM_BREEZINGFORMSNG_FORMS_NAME'), 'name', $this->listDirn, $this->listOrder); ?></th>
-        <th class="text-center"><?= HTMLHelper::_('grid.sort', Text::_('COM_BREEZINGFORMSNG_FORMS_PAGES'), 'pages', $this->listDirn, $this->listOrder); ?></th>
-        <th class="text-center w-10"><?= HTMLHelper::_('grid.sort', Text::_('JPUBLISHED'), 'published', $this->listDirn, $this->listOrder); ?></th>
-        <th class="text-center w-10"><?= HTMLHelper::_('grid.sort', Text::_('JGRID_HEADING_ORDERING'), 'ordering', $this->listDirn, $this->listOrder); ?></th>
+        <th class="text-center"><?= HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ID', 'id', $this->listDirn, $this->listOrder); ?></th>
+        <th><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_FORMS_TITLE', 'title', $this->listDirn, $this->listOrder); ?></th>
+        <th><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_FORMS_NAME', 'name', $this->listDirn, $this->listOrder); ?></th>
+        <th class="text-center"><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_FORMS_PAGES', 'pages', $this->listDirn, $this->listOrder); ?></th>
+        <th class="text-center w-10"><?= HTMLHelper::_('searchtools.sort', 'JPUBLISHED', 'published', $this->listDirn, $this->listOrder); ?></th>
+        <th class="text-center w-10"><?= HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ORDERING', 'ordering', $this->listDirn, $this->listOrder); ?></th>
         <th class="text-center"><?= Text::_('COM_BREEZINGFORMSNG_FORMS_ACTIONS'); ?></th>
-        <th class="text-nowrap"><?= HTMLHelper::_('grid.sort', Text::_('COM_BREEZINGFORMSNG_FORMS_MODIFIED'), 'modified', $this->listDirn, $this->listOrder); ?></th>
+        <th class="text-nowrap"><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_FORMS_MODIFIED', 'modified', $this->listDirn, $this->listOrder); ?></th>
       </tr>
     </thead>
     <tbody>

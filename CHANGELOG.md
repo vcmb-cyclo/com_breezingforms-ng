@@ -35,5 +35,7 @@
   response API while retaining streamed file delivery.
 - Normalized integer and nullable relation fields when copying forms so strict Joomla 6 database configurations
   no longer receive empty strings for integer columns.
+- Aligned every sortable Forms, Records, Scripts, and Pieces heading with ContentBuilder NG by using Joomla 6
+  SearchTools icons and accessible list-view sorting behavior; non-sortable columns remain icon-free.
 - Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
   moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

@@ -41,6 +41,7 @@ class HtmlView extends BaseHtmlView
         'records.id', 'records.submitted', 'forms.title',
         'records.ip', 'records.username',
         'records.viewed', 'records.exported', 'records.archived',
+        'records.modified',
     ];
 
     public function display($tpl = null)
@@ -63,6 +64,7 @@ class HtmlView extends BaseHtmlView
             $this->prepareListToolbar();
 
             $document = $app->getDocument();
+            $document->getWebAssetManager()->useScript('com_breezingformsng.admin-sort');
             $document->getWebAssetManager()->registerAndUseScript(
                 'com_breezingformsng.records-list',
                 'media/com_breezingformsng/js/admin/records-list.js',

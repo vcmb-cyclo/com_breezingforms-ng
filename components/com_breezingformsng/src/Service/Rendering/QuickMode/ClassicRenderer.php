@@ -157,7 +157,6 @@ float:left;
 	function __construct(HTML_facileFormsProcessor $p) {
 		$this->p = $p;
 
-		// will make sure mootools loads first, important 4 jquery
         $default = ComponentHelper::getParams( 'com_languages' )->get( 'site' );
         $this->language_tag = $this->p->app->getLanguage()->getTag() != $default ? $this->p->app->getLanguage()->getTag() : 'zz-ZZ';
 
@@ -1470,15 +1469,6 @@ float:left;
 			RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/themes/default.date.css');
 		}
 
-		// we must make sure that everything mootools related is included after moxie and plupload
-		if (isset($this->p->app->getDocument()->_scripts)) {
-			foreach ($this->p->app->getDocument()->_scripts As $script_name => $script_value) {
-				if (basename($script_name) != 'moxie.js' && basename($script_name) != 'plupload.js' && basename($script_name) != 'calendar.js' && basename($script_name) != 'calendar-setup.js') {
-					unset($this->p->app->getDocument()->_scripts[$script_name]);
-					$this->p->app->getDocument()->_scripts[$script_name] = $script_value;
-				}
-			}
-		}
 		// we gonna add a blank to each textarea, since the value is transferred upon submit
 		// requires a different mandatory validation than ff_valuenotempty
 		if (count($this->htmltextareas)) {

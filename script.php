@@ -2009,6 +2009,8 @@ class com_breezingformsngInstallerScript
             JPATH_SITE . '/components/com_breezingformsng/facileforms.process.php',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/sql/create_sql.php',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/src/Helper/LegacyClassLoader.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/jquery/jq.js',
+            JPATH_SITE . '/components/com_breezingformsng/libraries/jquery/jq.min.legacy.js',
         ];
 
         foreach ($obsolete as $file) {

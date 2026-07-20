@@ -185,7 +185,6 @@ class com_breezingformsngInstallerScript
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng',
             JPATH_ROOT . '/components/com_breezingformsng',
             JPATH_ROOT . '/media/com_breezingformsng',
-            JPATH_ROOT . '/plugins/system/sysbreezingforms',
         ];
     }
 
@@ -1954,8 +1953,28 @@ class com_breezingformsngInstallerScript
         $this->deduplicateBreezingFormsComponentRows();
         $this->removeLegacyBreezingFormsComponentRows();
         $this->removeLegacyBreezingFormsComponentDirectories();
+        $this->removeObsoleteSystemPlugin();
         $this->removeObsoleteComponentFiles();
         $this->log('Legacy BreezingForms component cleanup completed in safe mode; uninstall hooks intentionally skipped.');
+    }
+
+    private function removeObsoleteSystemPlugin(): void
+    {
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $query = $db->getQuery(true)
+            ->select($db->quoteName('extension_id'))
+            ->from($db->quoteName('#__extensions'))
+            ->where($db->quoteName('type') . ' = ' . $db->quote('plugin'))
+            ->where($db->quoteName('folder') . ' = ' . $db->quote('system'))
+            ->where($db->quoteName('element') . ' = ' . $db->quote('sysbreezingforms'));
+        $extensionId = (int) $db->setQuery($query)->loadResult();
+
+        if ($extensionId > 0) {
+            $installer = new Installer();
+            $installer->setDatabase($db);
+            $installer->uninstall('plugin', $extensionId, 1);
+            $this->log('Obsolete sysbreezingforms plugin removed.');
+        }
     }
 
     /**
@@ -2442,7 +2461,6 @@ class com_breezingformsngInstallerScript
         $plugins = array();
         $plugins['system'] = array();
         $plugins['system'][] = 'bfcompat';
-        $plugins['system'][] = 'sysbreezingforms';
         return $plugins;
     }
 

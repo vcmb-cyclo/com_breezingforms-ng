@@ -1976,6 +1976,12 @@ class com_breezingformsngInstallerScript
             JPATH_SITE . '/components/com_breezingformsng/legacy/tables.php',
             JPATH_SITE . '/components/com_breezingformsng/legacy/functions.php',
             JPATH_SITE . '/components/com_breezingformsng/src/Table/RuntimeTables.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFFactory.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFIntegrate.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFJoomlaConfig.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFPDF.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFRequest.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFText.php',
             JPATH_SITE . '/media/com_breezingformsng/images/site/captcha/securimage_show.php',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/images/captcha/securimage_show.php',
             JPATH_SITE . '/components/com_breezingformsng/facileforms.class.php',
@@ -2433,6 +2439,7 @@ class com_breezingformsngInstallerScript
     {
         $plugins = array();
         $plugins['system'] = array();
+        $plugins['system'][] = 'bfcompat';
         $plugins['system'][] = 'sysbreezingforms';
         return $plugins;
     }

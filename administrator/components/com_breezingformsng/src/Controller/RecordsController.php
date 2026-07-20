@@ -189,13 +189,6 @@ class RecordsController extends BaseController
         $pdf->setFormName($formName);
         $pdf->setWhich('export');
 
-        // Site-customised PDF templates under media/breezingforms/pdftpl/ can
-        // predate the BFText -> Text migration and still call BFText::_(),
-        // BFJoomlaConfig::get() or reference BFPDF by name.
-        require_once JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFText.php';
-        require_once JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFJoomlaConfig.php';
-        require_once JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFPDF.php';
-
         @ob_end_clean();
         ob_start();
         require_once $file;

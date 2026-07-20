@@ -1,4 +1,9 @@
 <?php
+
+declare(strict_types=1);
+
+namespace Vcmb\Component\BreezingformsNG\Site\Service\Integration;
+
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Joomla\CMS\Factory;
@@ -21,7 +26,7 @@ use Joomla\Database\ParameterType;
  * is now quoted via quoteName() and every value is bound as a query
  * parameter instead of being concatenated into the SQL string.
  **/
-class BFIntegrate
+class IntegratorRuntime
 {
     /**
      * JDatabase

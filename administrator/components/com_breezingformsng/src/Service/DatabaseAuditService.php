@@ -540,7 +540,7 @@ final class DatabaseAuditService
 
             // The NG component and its system plugin are the only expected rows.
             $isExpected = ($entry['type'] === 'component' && $element === 'com_breezingformsng')
-                || ($entry['type'] === 'plugin' && $element === 'sysbreezingforms' && $entry['folder'] === 'system');
+                || ($entry['type'] === 'plugin' && in_array($element, ['bfcompat', 'sysbreezingforms'], true) && $entry['folder'] === 'system');
 
             if (!$isExpected && !str_contains($element, 'breezingformsng')) {
                 $legacy[] = $entry;

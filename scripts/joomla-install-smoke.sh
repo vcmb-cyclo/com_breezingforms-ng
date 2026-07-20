@@ -108,11 +108,11 @@ fi
 
 plugin_count="$(
     docker exec -e MYSQL_PWD=joomla "${db_container}" mysql -N -ujoomla joomla \
-        -e "SELECT COUNT(*) FROM \`${table_prefix}extensions\` WHERE type = 'plugin' AND element = 'sysbreezingforms' AND folder = 'system';"
+        -e "SELECT COUNT(*) FROM \`${table_prefix}extensions\` WHERE type = 'plugin' AND element IN ('bfcompat', 'sysbreezingforms') AND folder = 'system';"
 )"
 
-if [[ "${plugin_count}" -ne 1 ]]; then
-    echo "BreezingForms NG system plugin was not installed correctly." >&2
+if [[ "${plugin_count}" -ne 2 ]]; then
+    echo "BreezingForms NG system plugins were not installed correctly." >&2
     exit 1
 fi
 

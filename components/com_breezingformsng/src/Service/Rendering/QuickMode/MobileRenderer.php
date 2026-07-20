@@ -190,7 +190,7 @@ class MobileRenderer
 		// loading system css
 		$this->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/themes/quickmode/mobile-system.css');
 
-		$this->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jq.min.js');
+		$this->p->app->getDocument()->getWebAssetManager()->useScript('jquery');
 
 		if ($this->hasResponsiveDatePicker) {
 			$this->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/picker.js');

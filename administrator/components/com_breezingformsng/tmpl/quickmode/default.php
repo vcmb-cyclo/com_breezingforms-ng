@@ -56,7 +56,6 @@ if ($this->formId === 0 || $this->templateCode === '') {
             useErrorAlerts: false,
             useDefaultErrors: true,
             useBalloonErrors: false,
-            disableJQuery: false,
             joomlaHint: false,
             mobileEnabled: false,
             forceMobile: false,

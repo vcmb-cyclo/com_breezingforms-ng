@@ -1748,12 +1748,7 @@ class BootstrapRenderer
         HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
         RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-tooltip-init.js');
 
-        $jQuery = '';
-        if (isset($this->rootMdata['disableJQuery']) && $this->rootMdata['disableJQuery']) {
-            $jQuery = 'var JQuery = jQuery;' . "\n";
-        } else {
-            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jq.min.js');
-        }
+        $jQuery = 'var JQuery = jQuery;' . "\n";
 
         if ($this->useErrorAlerts) {
             RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/js/sweetalert.min.js');

@@ -59,7 +59,7 @@ class ScriptsController extends BaseController
 
     public function unpublish(): void
     {
-        $this->checkToken();
+        $this->assertPostToken();
         $this->runLegacyTask('publish', null, 0);
     }
 

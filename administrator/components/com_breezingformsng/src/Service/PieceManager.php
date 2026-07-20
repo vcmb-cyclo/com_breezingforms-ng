@@ -162,23 +162,16 @@ class PieceManager
 	static function save($option, $pkg)
 	{
 		$app = Factory::getApplication();
-
-		// Lire le body brut
-		$rawBody = file_get_contents('php://input');
-
-		// Parser comme application/x-www-form-urlencoded
-		$post = [];
-		parse_str($rawBody, $post);
-
-		// Récupérer code tel qu'envoyé
-		$code = $post['code'] ?? '';
-		$unitTests = $post['unit_tests'] ?? '';
+		$post = $app->getInput()->post;
+		$data = $post->getArray();
+		$code = $post->get('code', '', 'raw');
+		$unitTests = $post->get('unit_tests', '', 'raw');
 
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
 		$row      = new PieceTable($database);
 
 		try {
-			if (!$row->bind($_POST)) {
+			if (!$row->bind($data)) {
 				throw new RuntimeException(Text::_('COM_BREEZINGFORMSNG_PIECES_SAVE_FAILED'));
 			}
 
@@ -188,7 +181,7 @@ class PieceManager
 			$row->description = $app->getInput()->post->get('description', '', 'raw');
 
 			$now = (new \Joomla\CMS\Date\Date())->toSql();
-			$userId = (string) Factory::getApplication()->getIdentity()->username;
+			$userId = (string) $app->getIdentity()->username;
 
 			if (empty($row->id)) {
 				if (empty($row->created)) {
@@ -513,17 +506,14 @@ class PieceManager
 	{
 		$app = Factory::getApplication();
 		$app->setHeader('Content-Type', 'application/json', true);
-
-		$rawBody = file_get_contents('php://input');
-		$post = [];
-		parse_str($rawBody, $post);
+		$post = $app->getInput()->post;
 
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
 		$row = new PieceTable($database);
-		$row->id = isset($post['id']) ? (int) $post['id'] : 0;
-		$row->code = isset($post['code']) ? (string) $post['code'] : '';
-		$row->unit_tests = isset($post['unit_tests']) ? (string) $post['unit_tests'] : '';
-		$functionName = isset($post['test_function']) ? (string) $post['test_function'] : '';
+		$row->id = $post->getInt('id', 0);
+		$row->code = $post->get('code', '', 'raw');
+		$row->unit_tests = $post->get('unit_tests', '', 'raw');
+		$functionName = $post->getString('test_function', '');
 
 		$result = self::runUnitTests($row, $functionName, $database);
 		echo json_encode($result);

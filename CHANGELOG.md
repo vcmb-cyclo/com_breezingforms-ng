@@ -21,5 +21,7 @@
   Joomla 6 web assets, and migrated remaining local runtime script tags to WebAssetManager.
 - Removed all embedded jQuery copies and migrated frontend and administrator rendering to Joomla 6's native
   jQuery web asset.
+- Migrated script and piece source submissions from direct request-body and superglobal access to Joomla 6
+  Input with explicit raw filtering, and standardized their state-changing actions on POST CSRF validation.
 - Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
   moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

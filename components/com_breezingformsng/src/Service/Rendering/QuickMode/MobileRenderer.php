@@ -190,10 +190,7 @@ class MobileRenderer
 		// loading system css
 		$this->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/themes/quickmode/mobile-system.css');
 
-		//$this->addScript(Uri::root(true) . '/media/vendor/jquery/js/jquery.min.js');
-		//$this->addScript(Uri::root(true) . '/media/legacy/js/jquery-noconflict.min.js');
-
-		$this->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jq.min.legacy.js');
+		$this->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jq.min.js');
 
 		if ($this->hasResponsiveDatePicker) {
 			$this->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/picker.js');
@@ -1199,12 +1196,8 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 								}
 							}
 							/* translatables end */
-							$this->addStyleSheet(Uri::root(true) . '/media/system/css/fields/calendar.min.css');
-							$this->addScript(Uri::root(true) . '/media/system/js/fields/calendar-locales/date/gregorian/date-helper.min.js');
-							$this->addScript(Uri::root(true) . '/media/system/js/fields/calendar.min.js');
-							$this->addScript(Uri::root(true) . '/media/vendor/bootstrap/js/bootstrap.bundle.min.js');
-							$this->addScript(Uri::root(true) . '/media/system/js/core.min.js');
-							$this->addScript(Uri::root(true) . '/media/legacy/js/bootstrap-init.min.js');
+							$assets = $this->p->app->getDocument()->getWebAssetManager();
+							$assets->useStyle('field.calendar')->useScript('field.calendar');
 
 							echo '<div class="d-flex flex-wrap align-items-center gap-2">';
 							echo '<div class="mb-0 other-form-group">';

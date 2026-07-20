@@ -22,6 +22,7 @@ required=(
     "administrator/components/com_breezingformsng/libraries/securimage/CaptchaObject.php"
     "administrator/components/com_breezingformsng/libraries/securimage/StorageAdapter/Session.php"
     "components/com_breezingformsng/breezingformsng.php"
+    "components/com_breezingformsng/libraries/jquery/jq.min.js"
     "media/com_breezingformsng/css/custom.css"
 )
 
@@ -45,6 +46,24 @@ forbidden_patterns=(
 for pattern in "${forbidden_patterns[@]}"; do
     if grep -Eq "${pattern}" <<<"${entries}"; then
         echo "Forbidden development artifact found in package: ${pattern}" >&2
+        exit 1
+    fi
+done
+
+if ! unzip -p "${archive}" components/com_breezingformsng/libraries/jquery/jq.min.js \
+    | grep -F 'jQuery v2.2.4' >/dev/null; then
+    echo "The embedded jQuery library is not version 2.2.4." >&2
+    exit 1
+fi
+
+obsolete_entries=(
+    "administrator/components/com_breezingformsng/libraries/jquery/jq.js"
+    "components/com_breezingformsng/libraries/jquery/jq.min.legacy.js"
+)
+
+for path in "${obsolete_entries[@]}"; do
+    if grep -Fxq "${path}" <<<"${entries}"; then
+        echo "Obsolete package entry is still present: ${path}" >&2
         exit 1
     fi
 done

@@ -50,7 +50,7 @@ class HtmlView extends BaseHtmlView
         $layout = $input->getCmd('layout', 'default');
         $this->layout = $layout;
 
-        HTMLHelper::_('behavior.keepalive');
+        $app->getDocument()->getWebAssetManager()->useScript('keepalive');
 
         if ($layout === 'edit') {
             $this->prepareEditData($input);

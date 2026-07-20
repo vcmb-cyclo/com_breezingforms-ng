@@ -47,6 +47,7 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\BootstrapRen
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\ClassicRenderer;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\MobileRenderer;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\OnePageRenderer;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RuntimeAssetLoader;
 
 /**
  * Page header, ContentBuilder path handling and form view rendering.
@@ -63,6 +64,11 @@ final class RenderingEngine
     function header()
     {
         global $ff_config;
+
+        RuntimeAssetLoader::script(
+            $this->processor->app,
+            Uri::root(true) . '/media/com_breezingformsng/js/facileforms.js'
+        );
 
         return $this->processorHeaderRenderer()->render(
             [
@@ -316,7 +322,10 @@ final class RenderingEngine
         $this->processor->queryCols = array();
         $this->processor->queryRows = array();
         if ($this->processor->runmode == _FF_RUNMODE_PREVIEW) {
-            echo '<script type="text/javascript" src="' . Uri::root() . 'administrator/components/com_breezingformsng/libraries/wz_dragdrop/wz_dragdrop.js"></script>';
+            RuntimeAssetLoader::script(
+                $this->processor->app,
+                Uri::root(true) . '/administrator/components/com_breezingformsng/libraries/wz_dragdrop/wz_dragdrop.js'
+            );
         }
         if (trim($this->processor->formrow->template_code_processed) == 'QuickMode' && $this->processor->legacy_wrap)
             echo '<table style="display:none;width:100%;" id="bfReCaptchaWrap"><tr><td><div id="bfReCaptchaDiv"></div></td></tr></table>';
@@ -984,10 +993,17 @@ final class RenderingEngine
         echo '//-->' . nl() .
             '</script>' . nl();
 
-        if ($icons > 0)
-            echo '<script language="JavaScript" src="' . $ff_mossite . '/components/com_breezingformsng/libraries/js/joomla.javascript.js" type="text/javascript"></script>' . nl();
+        if ($icons > 0) {
+            RuntimeAssetLoader::script(
+                $this->processor->app,
+                Uri::root(true) . '/components/com_breezingformsng/libraries/js/joomla.javascript.js'
+            );
+        }
         if ($tooltips > 0) {
-            echo '<script language="Javascript" src="' . $ff_mossite . '/components/com_breezingformsng/libraries/js/overlib_mini.js" type="text/javascript"></script>' . nl();
+            RuntimeAssetLoader::script(
+                $this->processor->app,
+                Uri::root(true) . '/components/com_breezingformsng/libraries/js/overlib_mini.js'
+            );
             if ($this->processor->inframe)
                 echo '<div id="overDiv" style="position:absolute;visibility:hidden;z-index:1000;"></div>' . nl();
         } // if

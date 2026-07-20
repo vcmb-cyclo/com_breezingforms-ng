@@ -197,7 +197,6 @@ class OnePageRenderer
 
         RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/media/com_breezingformsng/css/site/quickmode-runtime.css');
 
-        HTMLHelper::_('bootstrap.framework');
         $this->p->app->getDocument()->getWebAssetManager()->useScript('jquery');
         HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
         RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-tooltip-init.js');
@@ -1996,17 +1995,6 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
             RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/themes/default.date.css');
         }
 
-        // we must make sure that everything mootools related is included after moxie and plupload
-        if (isset($this->p->app->getDocument()->_scripts)) {
-            foreach ($this->p->app->getDocument()->_scripts as $script_name => $script_value) {
-                if (
-                    basename($script_name) != 'moxie.js' && basename($script_name) != 'plupload.js' && basename($script_name) != 'calendar.js' && basename($script_name) != 'calendar-setup.js'
-                ) {
-                    unset($this->p->app->getDocument()->_scripts[$script_name]);
-                    $this->p->app->getDocument()->_scripts[$script_name] = $script_value;
-                }
-            }
-        }
         // we gonna add a blank to each textarea, since the value is transferred upon submit
         // requires a different mandatory validation than ff_valuenotempty
         $area_count = count($this->htmltextareas);

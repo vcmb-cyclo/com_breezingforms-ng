@@ -17,5 +17,9 @@
 - Removed the unused legacy Dropbox configuration containing obsolete embedded application credentials.
 - Migrated reCAPTCHA, Dropbox, Mailchimp, and Salesforce HTTP clients from the Joomla CMS compatibility
   wrapper to the native `Joomla\\Http` package required by Joomla 6.
+- Removed direct mutation of Joomla document internals, replaced legacy Bootstrap/calendar file loading with
+  Joomla 6 web assets, and migrated remaining local runtime script tags to WebAssetManager.
+- Standardized the optional embedded frontend jQuery fallback on 2.2.4 and removed the obsolete jQuery 1.2.6
+  and duplicate mobile copies; Joomla administration continues to use Joomla 6's native jQuery asset.
 - Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
   moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

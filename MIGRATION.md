@@ -358,7 +358,7 @@
 - [x] Remplacer les 41 `Factory::getDate()` par `Joomla\CMS\Date\Date` *(l'implémentation Joomla 6.0.4 de l'ancien
   accesseur appelle encore `Factory::getLanguage()` déprécié ; 15 fichiers lintés, puis About, Records, QuickMode et
   formulaire frontend vérifiés en HTTP 200)*
-- [x] Empêcher l'accès déprécié à la base pendant la construction de `LegacyPackageModel` *(injection explicite après
+- [x] Empêcher l'accès déprécié à la base pendant la construction de `PackageModel` *(injection explicite après
   construction conservée, fallback `Factory::getDbo()` neutralisé avec `dbo => null` ; listes Scripts et Pièces en HTTP 200)*
 - [x] Retirer le helper mort `bf_ToolTip()` fondé sur l'ancien service `HTMLHelper::_('tooltip')` et supprimer
   l'initialisation Bootstrap répétée dans les 293 appels à `bf_tooltipText()` *(tooltip initialisé une fois par QuickMode)*
@@ -618,8 +618,8 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > que ce document décrivait depuis le début de la Phase 9 s'est donc résolu de la façon la plus simple : il n'y avait
 > pas de vrai couplage à préserver, seulement de la logique héritée jamais nettoyée. Les 10 appels ont été supprimés
 > (pas convertis) ; les imports `use BFRequest;` devenus inutiles retirés des 3 fichiers Callback concernés.
-> `legacy/functions.php::saveOtherParam()` (2 appels) et `src/Helper/legacy/route.php::getFormRoute()` (1 appel)
-> convertis aussi au passage (aucun `setVar()` pour leurs clés). **Total Phase 9a : 326 appels convertis, zéro
+> `legacy/functions.php::saveOtherParam()` (2 appels) et l'ancien helper de route (1 appel, supprimé depuis car
+> orphelin) ont aussi été convertis au passage. **Total Phase 9a : 326 appels convertis, zéro
 > appel `BFRequest::` fonctionnel restant hors des 4 rendus `BFQuickMode*`** (`grep -rl BFRequest` ne retourne plus
 > que ces 4 fichiers plus 3 `require_once` inertes vers la définition de la classe, conservés car ces 4 rendus en
 > dépendent encore). Vérifié : `php -l` propre sur tous les fichiers touchés ; trois formulaires réels différents

@@ -2012,6 +2012,8 @@ class com_breezingformsngInstallerScript
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/jquery/jq.js',
             JPATH_SITE . '/components/com_breezingformsng/libraries/jquery/jq.min.legacy.js',
             JPATH_SITE . '/components/com_breezingformsng/libraries/jquery/jq.min.js',
+            JPATH_SITE . '/components/com_breezingformsng/src/Helper/legacy/route.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/src/Model/LegacyPackageModel.php',
         ];
 
         foreach ($obsolete as $file) {

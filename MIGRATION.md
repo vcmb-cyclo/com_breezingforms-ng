@@ -574,6 +574,9 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > Les dernières balises injectées avec `addCustomTag()` (CSS système, CSS et JavaScript des thèmes dynamiques)
 > passent également par `WebAssetManager`; le calendrier responsive Mobile utilise le même chargeur. Une seconde
 > vérification Playwright confirme les CSS système Classic et Bootstrap, le rendu des formulaires et `JQuery`.
+> Les quatre helpers publics Mobile `addScript()`, `addStyleSheet()`, `addScriptDeclaration()` et
+> `addStyleDeclaration()` conservent leurs points d'appel mais délèguent désormais au même gestionnaire natif.
+> `fetchHead()`, méthode morte qui reconstruisait le head avec les internes protégés de Document, est supprimée.
 >
 > **Suite (2026-07-12)** : `bfProcessorUploads.php` (1 appel), `bfProcessorNotifications.php` (13),
 > `bfProcessorExports.php` (16) et `bfProcessorSubmission.php` (45) sont également convertis — **235 appels au

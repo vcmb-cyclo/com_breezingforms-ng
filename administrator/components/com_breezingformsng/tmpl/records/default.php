@@ -93,7 +93,7 @@ $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key)
         <th class="text-center" title="<?= $headerTitle('COM_BREEZINGFORMSNG_ARCHIVED_DESC'); ?>"><a href="<?= $sortUrl('records.archived'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_ARCHIVED_DESC'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_ARCHIVED'); ?><?= $sortIcon('records.archived'); ?></a></th>
         <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_ACTIONS_DESC'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_ACTIONS'); ?></th>
         <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_SUBMITTED_DESC'); ?>"><a href="<?= $sortUrl('records.submitted'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_SUBMITTED_DESC'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_SUBMITTED'); ?><?= $sortIcon('records.submitted'); ?></a></th>
-        <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_MODIFIED_DESC'); ?>"><a href="<?= $sortUrl('records.modified'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_MODIFIED_DESC'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_MODIFIED'); ?><?= $sortIcon('records.modified'); ?></a></th>
+        <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_MODIFIED_DESC'); ?>"><a href="<?= $sortUrl('records.modified'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_MODIFIED_DESC'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_FORMS_MODIFIED'); ?><?= $sortIcon('records.modified'); ?></a></th>
       </tr>
     </thead>
     <tbody>

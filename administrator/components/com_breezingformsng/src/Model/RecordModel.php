@@ -31,6 +31,11 @@ class RecordModel extends BaseDatabaseModel
         return $this->tz;
     }
 
+    public function getDatabaseConnection(): DatabaseInterface
+    {
+        return $this->getDatabase();
+    }
+
     public function getRecord(int $id): ?\stdClass
     {
         $db = $this->getDatabase();

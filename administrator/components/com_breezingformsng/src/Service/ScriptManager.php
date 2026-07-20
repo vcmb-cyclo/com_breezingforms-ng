@@ -18,8 +18,9 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Vcmb\Component\BreezingformsNG\Site\Table\ScriptTable;
 use Joomla\Utilities\ArrayHelper;
-use Joomla\CMS\Factory;
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\Database\DatabaseInterface;
+use Joomla\Database\ParameterType;
 use RuntimeException;
 use Throwable;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\ScriptModel;
@@ -28,9 +29,15 @@ use Joomla\CMS\Language\Text;
 
 class ScriptManager
 {
-	static function edit($option, $pkg, $ids)
+	public function __construct(
+		private readonly CMSApplication $app,
+		private readonly DatabaseInterface $database,
+	) {
+	}
+
+	function edit($option, $pkg, $ids)
 	{
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
+		$database = $this->database;
 		ArrayHelper::toInteger($ids);
 		$typelist = array();
 		$typelist[] = array('Untyped', Text::_('COM_BREEZINGFORMSNG_SCRIPTS_UNTYPED'));
@@ -52,15 +59,15 @@ class ScriptManager
 
 
 	// ✅ FORCER le champ code en RAW (conserve < et >)
-	static function save($option, $pkg)
+	function save($option, $pkg)
 	{
-		$app = Factory::getApplication();
+		$app = $this->app;
 		$post = $app->getInput()->post;
 		$data = $post->getArray();
 		$code = $post->get('code', '', 'raw');
 		$unitTests = $post->get('unit_tests', '', 'raw');
 
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
+		$database = $this->database;
 		$row      = new ScriptTable($database);
 
 		try {
@@ -101,65 +108,65 @@ class ScriptManager
 	}
 
 
-	static function cancel($option, $pkg)
+	function cancel($option, $pkg)
 	{
-		Factory::getApplication()->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
+		$this->app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 	} // cancel
 
-	static function copy($option, $pkg, $ids)
+	function copy($option, $pkg, $ids)
 	{
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
+		$database = $this->database;
 		$total = count($ids);
 		$row = new ScriptTable($database);
 		if (count($ids)) foreach ($ids as $id) {
 			$row->load(intval($id));
 			$row->id       = NULL;
 			$row->created = (new \Joomla\CMS\Date\Date())->toSql();
-			$row->created_by = (string) Factory::getApplication()->getIdentity()->username;
+			$row->created_by = (string) $this->app->getIdentity()->username;
 			$row->modified = $row->created;
 			$row->modified_by = $row->created_by;
 			$row->store();
 		} // foreach
 		$msg = $total . ' ' . Text::_('COM_BREEZINGFORMSNG_SCRIPTS_SUCCOPIED');
-		Factory::getApplication()->enqueueMessage($msg);
-		Factory::getApplication()->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
+		$this->app->enqueueMessage($msg);
+		$this->app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 	} // copy
 
-	static function del($option, $pkg, $ids)
+	function del($option, $pkg, $ids)
 	{
 		$model = ScriptModel::create();
 
 		try {
 			$total = $model->deleteByIds($ids);
 		} catch (RuntimeException $e) {
-			Factory::getApplication()->enqueueMessage($e->getMessage(), 'error');
-			Factory::getApplication()->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
+			$this->app->enqueueMessage($e->getMessage(), 'error');
+			$this->app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 		}
 
 		if ($total) {
-			Factory::getApplication()->enqueueMessage(
+			$this->app->enqueueMessage(
 				$total . ' ' . Text::_('COM_BREEZINGFORMSNG_SCRIPTS_SUCCDELETED'),
 				'message'
 			);
 		}
-		Factory::getApplication()->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
+		$this->app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 	} // del
 
-	static function publish($option, $pkg, $ids, $publish)
+	function publish($option, $pkg, $ids, $publish)
 	{
 		try {
 			ScriptModel::create()->publishByIds($ids, (bool) $publish);
 		} catch (RuntimeException $e) {
-			Factory::getApplication()->enqueueMessage($e->getMessage(), 'error');
-			Factory::getApplication()->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
+			$this->app->enqueueMessage($e->getMessage(), 'error');
+			$this->app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 		}
 
-		Factory::getApplication()->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
+		$this->app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 	} // publish
 
-	static function listitems($option, $pkg)
+	function listitems($option, $pkg)
 	{
-		$app = Factory::getApplication();
+		$app = $this->app;
 		$input = $app->getInput();
 		$session = $app->getSession();
 
@@ -246,10 +253,10 @@ class ScriptManager
 		Renderer::listitems($option, $rows, $pkglist, $pkg, $search, $total, $limit, $limitstart, $pageSizes);
 	} // listitems
 
-	static function test($option, $pkg, $ids)
+	function test($option, $pkg, $ids)
 	{
-		$app = Factory::getApplication();
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
+		$app = $this->app;
+		$database = $this->database;
 		ArrayHelper::toInteger($ids);
 		if (!count($ids)) {
 			$id = $app->getInput()->getInt('id', 0);
@@ -288,20 +295,20 @@ class ScriptManager
 		Renderer::test($option, $pkg, $row, $functionName, $params, $paramDefaults, $autoRun, $testMode);
 	}
 
-	static function prev($option, $pkg, $ids)
+	function prev($option, $pkg, $ids)
 	{
-		self::navigate($option, $pkg, $ids, 'prev');
+		$this->navigate($option, $pkg, $ids, 'prev');
 	}
 
-	static function next($option, $pkg, $ids)
+	function next($option, $pkg, $ids)
 	{
-		self::navigate($option, $pkg, $ids, 'next');
+		$this->navigate($option, $pkg, $ids, 'next');
 	}
 
-	private static function navigate($option, $pkg, $ids, $direction)
+	private function navigate($option, $pkg, $ids, $direction)
 	{
-		$app = Factory::getApplication();
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
+		$app = $this->app;
+		$database = $this->database;
 		ArrayHelper::toInteger($ids);
 		if (!count($ids)) {
 			$id = $app->getInput()->getInt('id', 0);
@@ -315,31 +322,30 @@ class ScriptManager
 		}
 
 		$currentId = (int) $ids[0];
-		$pkgCondition = $pkg !== '' ? "package = " . $database->Quote($pkg) : "1=1";
-		if ($direction === 'prev') {
-			$database->setQuery(
-				"SELECT id FROM #__facileforms_scripts WHERE " . $pkgCondition .
-				" AND id < " . $currentId . " ORDER BY id DESC LIMIT 1"
-			);
-		} else {
-			$database->setQuery(
-				"SELECT id FROM #__facileforms_scripts WHERE " . $pkgCondition .
-				" AND id > " . $currentId . " ORDER BY id ASC LIMIT 1"
-			);
+		$query = $database->getQuery(true)
+			->select($database->quoteName('id'))
+			->from($database->quoteName('#__facileforms_scripts'))
+			->where($database->quoteName('id') . ($direction === 'prev' ? ' < :currentId' : ' > :currentId'))
+			->order($database->quoteName('id') . ($direction === 'prev' ? ' DESC' : ' ASC'))
+			->bind(':currentId', $currentId, ParameterType::INTEGER)
+			->setLimit(1);
+		if ($pkg !== '') {
+			$query->where($database->quoteName('package') . ' = :package')
+				->bind(':package', $pkg);
 		}
+		$database->setQuery($query);
 		$targetId = (int) $database->loadResult();
 		if (!$targetId) {
-			if ($direction === 'prev') {
-				$database->setQuery(
-					"SELECT id FROM #__facileforms_scripts WHERE " . $pkgCondition .
-					" ORDER BY id DESC LIMIT 1"
-				);
-			} else {
-				$database->setQuery(
-					"SELECT id FROM #__facileforms_scripts WHERE " . $pkgCondition .
-					" ORDER BY id ASC LIMIT 1"
-				);
+			$query = $database->getQuery(true)
+				->select($database->quoteName('id'))
+				->from($database->quoteName('#__facileforms_scripts'))
+				->order($database->quoteName('id') . ($direction === 'prev' ? ' DESC' : ' ASC'))
+				->setLimit(1);
+			if ($pkg !== '') {
+				$query->where($database->quoteName('package') . ' = :package')
+					->bind(':package', $pkg);
 			}
+			$database->setQuery($query);
 			$targetId = (int) $database->loadResult();
 			if (!$targetId) {
 				$targetId = $currentId;

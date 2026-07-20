@@ -14,6 +14,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
+use Joomla\Database\DatabaseInterface;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\ScriptManager;
 
 class ScriptsController extends BaseController
@@ -94,7 +95,11 @@ class ScriptsController extends BaseController
             $arguments[] = $state;
         }
 
-        ScriptManager::$method(...$arguments);
+        $manager = new ScriptManager(
+            $this->app,
+            Factory::getContainer()->get(DatabaseInterface::class),
+        );
+        $manager->$method(...$arguments);
     }
 
     private function assertAuthorised(): void

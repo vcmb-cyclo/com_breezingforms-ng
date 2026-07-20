@@ -46,7 +46,11 @@ class RecordsController extends BaseController
 
         if ($recordId > 0) {
             $values = $input->get('element', [], 'post', 'array');
-            $this->getRecordModel()->saveRecord($recordId, is_array($values) ? $values : []);
+            $this->getRecordModel()->saveRecord(
+                $recordId,
+                is_array($values) ? $values : [],
+                $this->getTimezone()
+            );
         }
 
         $app->redirect(
@@ -64,7 +68,8 @@ class RecordsController extends BaseController
         $input = $app->getInput();
         $ids = $input->get('cid', [], 'post', 'array');
         ArrayHelper::toInteger($ids);
-        $this->getRecordModel()->deleteRecords($ids);
+        $contentFactory = $app->bootComponent('com_content')->getMVCFactory();
+        $this->getRecordModel()->deleteRecords($ids, $contentFactory);
         $app->redirect($this->listUrl($input));
     }
 
@@ -141,7 +146,7 @@ class RecordsController extends BaseController
         $formSelection = $input->getInt('form_selection', 0);
 
         $model = $this->getRecordModel();
-        $tz = $model->getTimezone();
+        $tz = $this->getTimezone();
         $db = $model->getDatabaseConnection();
 
         $recs = $this->fetchRecords($db, $ids, $formSelection);
@@ -263,7 +268,7 @@ class RecordsController extends BaseController
 
         $model = $this->getRecordModel();
         $config = $model->getExportConfig();
-        $tz = $model->getTimezone();
+        $tz = $this->getTimezone();
         $db = $model->getDatabaseConnection();
 
         $delimiter = stripslashes((string) $config->csvdelimiter);
@@ -378,7 +383,7 @@ class RecordsController extends BaseController
         $formSelection = $input->getInt('form_selection', 0);
 
         $model = $this->getRecordModel();
-        $tz = $model->getTimezone();
+        $tz = $this->getTimezone();
         $db = $model->getDatabaseConnection();
 
         $recs = $this->fetchRecords($db, $ids, $formSelection);
@@ -494,6 +499,11 @@ class RecordsController extends BaseController
             ->bootComponent('com_breezingformsng')
             ->getMVCFactory()
             ->createModel('Record', 'Administrator');
+    }
+
+    private function getTimezone(): \DateTimeZone
+    {
+        return new \DateTimeZone((string) $this->app->get('offset', 'UTC'));
     }
 
     /**

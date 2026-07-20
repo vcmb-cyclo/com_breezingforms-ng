@@ -562,6 +562,12 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > `addStyleDeclaration()` sont remplacés par `WebAssetManager::addInlineStyle()` dans le renderer Classic et le
 > moteur de rendu.
 >
+> **Assets Classic natifs (2026-07-20)** : `FormRenderer` et `ClassicRenderer` n'appellent plus les méthodes
+> Document dépréciées `addScript()`/`addStyleSheet()`. Le service `RuntimeAssetLoader` enregistre les assets
+> dynamiques sous des identifiants stables dans `WebAssetManager`, conserve leurs attributs et normalise les
+> chemins locaux par rapport à la racine Joomla. Vérifié avec Playwright sur le formulaire Classic 2 : formulaire,
+> CSS runtime, helpers et initialiseur final chargés, `JQuery` disponible, aucune erreur liée au composant.
+>
 > **Suite (2026-07-12)** : `bfProcessorUploads.php` (1 appel), `bfProcessorNotifications.php` (13),
 > `bfProcessorExports.php` (16) et `bfProcessorSubmission.php` (45) sont également convertis — **235 appels au
 > total sur 393**. Le couplage `cb_category_id`/`cb_controller` entre Exports (écrivain) et Submission (lecteur)

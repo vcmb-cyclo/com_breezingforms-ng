@@ -19,6 +19,7 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RuntimeAssetLoader;
 use Joomla\Database\ParameterType;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Filesystem\File;
@@ -358,8 +359,8 @@ $ff_request = array();
                 'allowtransparency="true" ' .
                 'scrolling="no" ';
             if ($form->autoheight == 1) {
-                $this->application->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jq.min.js');
-                $this->application->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jq.iframeautoheight.js');
+                RuntimeAssetLoader::script($this->application, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jq.min.js');
+                RuntimeAssetLoader::script($this->application, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jq.iframeautoheight.js');
                 $this->application->getDocument()->getWebAssetManager()->addInlineScript("<!--
                             JQuery(document).ready(function() {
                                 //JQuery(\".breezingforms_iframe\").css(\"width\",\"100%\");

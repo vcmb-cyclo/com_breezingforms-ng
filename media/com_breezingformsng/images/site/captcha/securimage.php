@@ -582,6 +582,7 @@ class Securimage
     protected $gdbgcolor;
     protected $gdtextcolor;
     protected $gdlinecolor;
+    protected $gdnoisecolor;
     protected $gdsignaturecolor;
 
     /**

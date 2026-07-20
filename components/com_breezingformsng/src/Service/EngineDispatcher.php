@@ -48,7 +48,9 @@ final class EngineDispatcher
             return;
         }
 
-        if ($this->input->getBool('checkCaptcha', false)) {
+        if ($this->input->getBool('bfCaptcha', false)) {
+            (new CaptchaCallback($this->application))->image();
+        } elseif ($this->input->getBool('checkCaptcha', false)) {
             (new CaptchaCallback($this->application))->check();
         } elseif ($this->input->getBool('confirmPayPalIpn', false) && $application === '') {
             (new PayPalCallback($this->application, $this->database, $this->redirectHelper()))->confirmIpn();

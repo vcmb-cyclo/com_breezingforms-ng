@@ -22,14 +22,14 @@ class RecordsController extends BaseController
 {
     public function display($cachable = false, $urlparams = [])
     {
-        Factory::getApplication()->getInput()->set('view', 'records');
+        $this->app->getInput()->set('view', 'records');
         return parent::display($cachable, $urlparams);
     }
 
     public function edit(): void
     {
-        $input = Factory::getApplication()->getInput();
-        Factory::getApplication()->redirect(
+        $input = $this->app->getInput();
+        $this->app->redirect(
             'index.php?option=com_breezingformsng&act=managerecs&view=records&layout=edit'
             . '&record_id=' . $input->getInt('record_id', 0)
             . '&form_selection=' . $input->getInt('form_selection', 0)
@@ -40,7 +40,7 @@ class RecordsController extends BaseController
     {
         $this->checkToken();
 
-        $app = Factory::getApplication();
+        $app = $this->app;
         $input = $app->getInput();
         $recordId = $input->getInt('record_id', 0);
         $formSelection = $input->getInt('form_selection', 0);
@@ -61,7 +61,7 @@ class RecordsController extends BaseController
     {
         $this->checkToken();
 
-        $app = Factory::getApplication();
+        $app = $this->app;
         $input = $app->getInput();
         $ids = $input->get('cid', [], 'post', 'array');
         ArrayHelper::toInteger($ids);
@@ -81,7 +81,7 @@ class RecordsController extends BaseController
         $this->checkToken();
 
         @ob_end_clean();
-        $input = Factory::getApplication()->getInput();
+        $input = $this->app->getInput();
         $recordId = $input->getInt('record_id', 0);
         $column = $input->getString('column', '');
         $flag = $input->getInt('flag', 0);
@@ -89,12 +89,12 @@ class RecordsController extends BaseController
             $this->getRecordModel()->setFlagSingle($recordId, $column, $flag);
         }
         echo json_encode(['Result' => 'OK']);
-        Factory::getApplication()->close();
+        $this->app->close();
     }
 
     public function csvImport(): void
     {
-        $input = Factory::getApplication()->getInput();
+        $input = $this->app->getInput();
         $input->set('view', 'records');
         $input->set('layout', 'csvimport');
         parent::display();
@@ -104,7 +104,7 @@ class RecordsController extends BaseController
     {
         $this->checkToken();
 
-        $app = Factory::getApplication();
+        $app = $this->app;
         $input = $app->getInput();
         $formId = $input->getInt('form_id', 0);
         $formSelection = $input->getInt('form_selection', $formId);
@@ -132,7 +132,7 @@ class RecordsController extends BaseController
     {
         $this->checkToken();
 
-        $app = Factory::getApplication();
+        $app = $this->app;
         $input = $app->getInput();
         $ids = $input->get('cid', [], 'post', 'array');
         ArrayHelper::toInteger($ids);
@@ -251,7 +251,7 @@ class RecordsController extends BaseController
     {
         $this->checkToken();
 
-        $app = Factory::getApplication();
+        $app = $this->app;
         $input = $app->getInput();
         $ids = $input->get('cid', [], 'post', 'array');
         ArrayHelper::toInteger($ids);
@@ -364,7 +364,7 @@ class RecordsController extends BaseController
     {
         $this->checkToken();
 
-        $app = Factory::getApplication();
+        $app = $this->app;
         $input = $app->getInput();
         $ids = $input->get('cid', [], 'post', 'array');
         ArrayHelper::toInteger($ids);
@@ -460,7 +460,7 @@ class RecordsController extends BaseController
     {
         $this->checkToken();
 
-        $app = Factory::getApplication();
+        $app = $this->app;
         $input = $app->getInput();
         $ids = $input->get('cid', [], 'post', 'array');
         ArrayHelper::toInteger($ids);
@@ -480,7 +480,7 @@ class RecordsController extends BaseController
 
     private function getRecordModel(): RecordModel
     {
-        return Factory::getApplication()
+        return $this->app
             ->bootComponent('com_breezingformsng')
             ->getMVCFactory()
             ->createModel('Record', 'Administrator');

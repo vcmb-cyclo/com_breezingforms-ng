@@ -11,16 +11,16 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\MVC\Model\BaseModel;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Event\Event;
 
-class FormModel extends BaseModel
+class FormModel extends BaseDatabaseModel
 {
     private function db(): DatabaseInterface
     {
-        return Factory::getContainer()->get(DatabaseInterface::class);
+        return $this->getDatabase();
     }
 
     public function getForm(int $id): ?\stdClass

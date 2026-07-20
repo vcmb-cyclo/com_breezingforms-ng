@@ -9,7 +9,6 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\CMS\Router\Route;
@@ -19,26 +18,26 @@ class FormsController extends BaseController
 {
     public function display($cachable = false, $urlparams = []): static
     {
-        Factory::getApplication()->getInput()->set('view', 'forms');
+        $this->app->getInput()->set('view', 'forms');
         return parent::display($cachable, $urlparams);
     }
 
     public function edit(): void
     {
-        $input    = Factory::getApplication()->getInput();
+        $input    = $this->app->getInput();
         $id       = $input->getInt('id', 0);
         $pkg      = $input->getString('pkg', '');
         $advanced = $input->getBool('advanced', false);
 
         if ($id > 0 && !$advanced) {
-            Factory::getApplication()->redirect(Route::_(
+            $this->app->redirect(Route::_(
                 'index.php?option=com_breezingformsng&task=quickmode.display&form=' . $id . '&pkg=' . rawurlencode($pkg),
                 false
             ));
             return;
         }
 
-        Factory::getApplication()->redirect(Route::_(
+        $this->app->redirect(Route::_(
             'index.php?option=com_breezingformsng&act=manageforms&view=forms&layout=edit&id=' . $id . '&pkg=' . rawurlencode($pkg)
                 . ($advanced ? '&advanced=1' : ''),
             false
@@ -47,7 +46,7 @@ class FormsController extends BaseController
 
     public function save(): void
     {
-        $app   = Factory::getApplication();
+        $app   = $this->app;
         $input = $app->getInput();
 
         if (!$this->checkToken()) {
@@ -140,13 +139,13 @@ class FormsController extends BaseController
 
     public function cancel(): void
     {
-        $pkg = Factory::getApplication()->getInput()->getString('pkg', '');
-        Factory::getApplication()->redirect(Route::_($this->listUrl($pkg), false));
+        $pkg = $this->app->getInput()->getString('pkg', '');
+        $this->app->redirect(Route::_($this->listUrl($pkg), false));
     }
 
     public function remove(): void
     {
-        $app   = Factory::getApplication();
+        $app   = $this->app;
         $input = $app->getInput();
 
         if (!$this->checkToken()) {
@@ -164,7 +163,7 @@ class FormsController extends BaseController
 
     public function copy(): void
     {
-        $app   = Factory::getApplication();
+        $app   = $this->app;
         $input = $app->getInput();
 
         if (!$this->checkToken()) {
@@ -205,15 +204,15 @@ class FormsController extends BaseController
 
     public function run(): void
     {
-        $input  = Factory::getApplication()->getInput();
+        $input  = $this->app->getInput();
         $formId = $input->getInt('id', 0);
 
         if ($formId <= 0) {
-            Factory::getApplication()->redirect(Route::_($this->listUrl($input->getString('pkg', '')), false));
+            $this->app->redirect(Route::_($this->listUrl($input->getString('pkg', '')), false));
             return;
         }
 
-        Factory::getApplication()->redirect(Route::_(
+        $this->app->redirect(Route::_(
             'index.php?option=com_breezingformsng&ff_form=' . $formId,
             false
         ));
@@ -231,7 +230,7 @@ class FormsController extends BaseController
 
     private function togglePublish(int $state): void
     {
-        $app   = Factory::getApplication();
+        $app   = $this->app;
         $input = $app->getInput();
 
         if (!$this->checkToken()) {
@@ -248,7 +247,7 @@ class FormsController extends BaseController
 
     private function setAjaxState(string $property): void
     {
-        $app = Factory::getApplication();
+        $app = $this->app;
 
         @ob_end_clean();
 
@@ -278,7 +277,7 @@ class FormsController extends BaseController
 
     private function moveOrder(int $inc): void
     {
-        $app   = Factory::getApplication();
+        $app   = $this->app;
         $input = $app->getInput();
 
         if (!$this->checkToken()) {
@@ -316,7 +315,7 @@ class FormsController extends BaseController
 
     private function getFormModel(): FormModel
     {
-        $model = Factory::getApplication()
+        $model = $this->app
             ->bootComponent('com_breezingformsng')
             ->getMVCFactory()
             ->createModel('Form', 'Administrator', ['ignore_request' => true]);

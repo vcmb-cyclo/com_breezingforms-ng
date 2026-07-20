@@ -19,11 +19,11 @@ class DisplayController extends BaseController
 {
     public function display($cachable = false, $urlparams = [])
     {
-        if (!Factory::getApplication()->getIdentity()->authorise('core.manage', 'com_breezingformsng')) {
+        if (!$this->app->getIdentity()->authorise('core.manage', 'com_breezingformsng')) {
             throw new \Exception(Text::_('JERROR_ALERTNOAUTHOR'), 403);
         }
 
-        $input = Factory::getApplication()->getInput();
+        $input = $this->app->getInput();
         $act = $input->getCmd('act', '');
         $task = $input->getCmd('task', '');
         $view = $input->getCmd('view', '');
@@ -67,7 +67,7 @@ class DisplayController extends BaseController
             $input->set('view', 'forms');
             $input->set('act', '');
             if ($task === '' && $input->getCmd('layout', '') === 'edit' && $input->getInt('id', 0) > 0 && !$input->getBool('advanced', false)) {
-                Factory::getApplication()->redirect(
+                $this->app->redirect(
                     'index.php?option=com_breezingformsng&task=quickmode.display'
                     . '&form=' . $input->getInt('id', 0)
                     . '&pkg=' . rawurlencode($input->getString('pkg', ''))
@@ -150,8 +150,8 @@ class DisplayController extends BaseController
 
     private function prepareListPackage(string $view): void
     {
-        $input      = Factory::getApplication()->getInput();
-        $session    = Factory::getApplication()->getSession();
+        $input      = $this->app->getInput();
+        $session    = $this->app->getSession();
         $sessionKey = $view === 'pieces' ? 'bf.piecepkg' : 'bf.scriptpkg';
 
         $package = $input->get('pkg', null, 'STRING');
@@ -163,7 +163,7 @@ class DisplayController extends BaseController
         }
 
         if ($package !== '') {
-            $model = Factory::getApplication()
+            $model = $this->app
                 ->bootComponent('com_breezingformsng')
                 ->getMVCFactory()
                 ->createModel($view === 'pieces' ? 'Piece' : 'Script', 'Administrator', ['ignore_request' => true]);

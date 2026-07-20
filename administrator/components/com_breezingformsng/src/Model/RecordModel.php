@@ -11,12 +11,12 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Factory;
-use Joomla\CMS\MVC\Model\BaseModel;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 use Joomla\Event\Event;
 
-class RecordModel extends BaseModel
+class RecordModel extends BaseDatabaseModel
 {
     private \DateTimeZone $tz;
 
@@ -33,7 +33,7 @@ class RecordModel extends BaseModel
 
     public function getRecord(int $id): ?\stdClass
     {
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $query = $db->getQuery(true)
             ->select(['records.*', 'forms.title AS form_title', 'forms.name AS form_name'])
             ->from($db->quoteName('#__facileforms_records', 'records'))
@@ -46,7 +46,7 @@ class RecordModel extends BaseModel
 
     public function getEditableElements(int $formId): array
     {
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $query = $db->getQuery(true)
             ->select(['id', 'title', 'name', 'type'])
             ->from($db->quoteName('#__facileforms_elements'))
@@ -62,7 +62,7 @@ class RecordModel extends BaseModel
     public function getEditableRows(int $recordId, int $formId, string $recordName): array
     {
         $elements = $this->getEditableElements($formId);
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $query = $db->getQuery(true)
             ->select(['id', 'record', 'element', 'title', 'name', 'type', 'value'])
             ->from($db->quoteName('#__facileforms_subrecords'))
@@ -104,7 +104,7 @@ class RecordModel extends BaseModel
 
     public function saveRecord(int $recordId, array $values): void
     {
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $query = $db->getQuery(true)
             ->select($db->quoteName('form'))
             ->from($db->quoteName('#__facileforms_records'))
@@ -144,7 +144,7 @@ class RecordModel extends BaseModel
 
     private function saveElementValue(int $recordId, array $element, string $value): void
     {
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $elementId = (int) $element['id'];
         $name = (string) $element['name'];
         $title = (string) $element['title'];
@@ -228,7 +228,7 @@ class RecordModel extends BaseModel
             return;
         }
 
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
 
         if (file_exists(JPATH_SITE . '/administrator/components/com_contentbuilderng/com_contentbuilderng.xml')) {
             $query = $db->getQuery(true)
@@ -328,7 +328,7 @@ class RecordModel extends BaseModel
         if (!$ids) {
             return;
         }
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $flag = $value ? 1 : 0;
         $query = $db->getQuery(true)
             ->update($db->quoteName('#__facileforms_records'))
@@ -344,7 +344,7 @@ class RecordModel extends BaseModel
         if (!in_array($col, ['viewed', 'exported', 'archived'], true)) {
             return;
         }
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $query = $db->getQuery(true)
             ->update($db->quoteName('#__facileforms_records'))
             ->set($db->quoteName($col) . ' = :value')
@@ -360,7 +360,7 @@ class RecordModel extends BaseModel
             return 0;
         }
 
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $db->setQuery(
             $db->getQuery(true)
                 ->select($db->quoteName(['title', 'name']))
@@ -521,7 +521,7 @@ class RecordModel extends BaseModel
 
     public function getSubrecords(int $recordId): array
     {
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $query = $db->getQuery(true)
             ->select('DISTINCT ' . $db->quoteName('subs') . '.*')
             ->from($db->quoteName('#__facileforms_subrecords', 'subs'))
@@ -540,7 +540,7 @@ class RecordModel extends BaseModel
         if (!$ids) {
             return;
         }
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $query = $db->getQuery(true)
             ->update($db->quoteName('#__facileforms_records'))
             ->set($db->quoteName('exported') . ' = 1')

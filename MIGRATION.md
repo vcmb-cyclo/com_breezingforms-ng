@@ -567,6 +567,10 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > dynamiques sous des identifiants stables dans `WebAssetManager`, conserve leurs attributs et normalise les
 > chemins locaux par rapport à la racine Joomla. Vérifié avec Playwright sur le formulaire Classic 2 : formulaire,
 > CSS runtime, helpers et initialiseur final chargés, `JQuery` disponible, aucune erreur liée au composant.
+> Bootstrap et OnePage utilisent ensuite le même chargeur pour tous leurs scripts et feuilles de style. Vérifié
+> avec Playwright sur le formulaire Bootstrap 35 : formulaire et assets attendus chargés, `JQuery` disponible,
+> zéro erreur console. Aucun formulaire OnePage n'est actuellement publié dans la base de développement ; ce
+> chemin est couvert par la conversion structurellement identique et les contrôles syntaxiques.
 >
 > **Suite (2026-07-12)** : `bfProcessorUploads.php` (1 appel), `bfProcessorNotifications.php` (13),
 > `bfProcessorExports.php` (16) et `bfProcessorSubmission.php` (45) sont également convertis — **235 appels au

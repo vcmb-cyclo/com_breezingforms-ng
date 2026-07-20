@@ -17,6 +17,7 @@ use HTML_facileFormsProcessor;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\Uri\Uri;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RuntimeAssetLoader;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Component\ComponentHelper;
 
@@ -189,41 +190,41 @@ class OnePageRenderer
     {
 
         if ($this->hasFlashUpload) {
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/plupload/moxie.js');
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/plupload/plupload.js');
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-plupload-compat.js');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/plupload/moxie.js');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/plupload/plupload.js');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-plupload-compat.js');
         }
 
-        $this->p->app->getDocument()->addStyleSheet(Uri::root(true) . '/media/com_breezingformsng/css/site/quickmode-runtime.css');
+        RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/media/com_breezingformsng/css/site/quickmode-runtime.css');
 
         // force jquery to be loaded after mootools but before any other js (since J! 3.4)
         HTMLHelper::_('bootstrap.framework');
         HTMLHelper::_('jquery.framework');
         HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
-        $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-tooltip-init.js');
+        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-tooltip-init.js');
 
         $jQuery = '';
         if (isset($this->rootMdata['disableJQuery']) && $this->rootMdata['disableJQuery']) {
             $jQuery = 'var JQuery = jQuery;' . "\n";
         } else {
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jq.min.js');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jq.min.js');
         }
 
-        $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/scrollto.js');
+        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/scrollto.js');
 
         if ($this->useErrorAlerts) {
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/js/sweetalert.min.js');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/js/sweetalert.min.js');
         }
 
         if ($this->useBalloonErrors) {
-            $this->p->app->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/validationEngine.jquery.css');
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jquery.validationEngine-en.js');
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jquery.validationEngine.js');
+            RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/validationEngine.jquery.css');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jquery.validationEngine-en.js');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jquery.validationEngine.js');
         }
 
         $toggleCode = '';
         if ($this->toggleFields != '[]') {
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-toggle-fields.js');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-toggle-fields.js');
             $toggleCode = '
 var toggleFieldsArray = ' . $this->toggleFields . ';
 			';
@@ -234,9 +235,9 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
             $has_last_page = 'true';
 
             // loading remodal
-            $this->p->app->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/remodal/remodal.css');
-            $this->p->app->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/remodal/remodal-default-theme.css');
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/remodal/remodal.min.js');
+            RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/remodal/remodal.css');
+            RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/remodal/remodal-default-theme.css');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/remodal/remodal.min.js');
             $this->p->app->getDocument()->getWebAssetManager()->addInlineScript("\n" . '
                    function bf_remodal_close(){
                         if(typeof crbc_cart_url != "undefined"){
@@ -248,10 +249,10 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                    ' . "\n");
         }
 
-        $this->p->app->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/ladda/ladda-themeless.min.css');
-        $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/ladda/spin.min.js');
-        $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/ladda/ladda.min.js');
-        $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/ladda/ladda.jq.min.js');
+        RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/ladda/ladda-themeless.min.css');
+        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/ladda/spin.min.js');
+        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/ladda/ladda.min.js');
+        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/ladda/ladda.jq.min.js');
 
         $this->p->app->getDocument()->getWebAssetManager()->addInlineScript(
             $jQuery . '
@@ -434,8 +435,8 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 '
         );
 
-        $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-field-helpers-bootstrap.js');
-        $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-deactivation.js');
+        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-field-helpers-bootstrap.js');
+        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-deactivation.js');
 
         if ($this->fading || !$this->useErrorAlerts || $this->rollover) {
             if (!$this->useErrorAlerts) {
@@ -445,19 +446,19 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                     . 'var bfShowDefaultErrors = ' . ($showDefaultErrors ? 'true' : 'false') . ';' . "\n"
                     . 'var bfErrorPageScoped = true;' . "\n"
                 );
-                $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-error-alerts-bootstrap.js');
+                RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-error-alerts-bootstrap.js');
             }
             if ($this->fading) {
                 $this->fadingClass = ' bfFadingClass';
                 $this->fadingCall = 'bfFade();';
-                $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-fade.js');
+                RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-fade.js');
             }
 
             if ($this->rollover && trim($this->rolloverColor) != '') {
                 // removed in bootstrap
             }
         }
-        $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-post-init-onepage.js');
+        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-post-init-onepage.js');
         // loading system css
 
             $stylelink = '<link rel="stylesheet" href="' . Uri::root(true) . '/components/com_breezingformsng/themes/quickmode-bootstrap' . $this->bsVersion . '/system.css" />' . "\n";
@@ -1458,8 +1459,12 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
                                 $size = (isset($mdata['size']) && $mdata['size'] != '') ? $mdata['size'] : 'normal';
 
-                                $this->p->app->getDocument()->addScript($http . '://www.google.com/recaptcha/api.js?' . $reCaptchaLang . '&onload=onloadBFNewRecaptchaCallback&render=explicit', $type = "text/javascript", array('data-usercentrics' => 'reCAPTCHA'));
-                                $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-visible.js');
+                                RuntimeAssetLoader::script(
+                                    $this->p->app,
+                                    $http . '://www.google.com/recaptcha/api.js?' . $reCaptchaLang . '&onload=onloadBFNewRecaptchaCallback&render=explicit',
+                                    ['data-usercentrics' => 'reCAPTCHA']
+                                );
+                                RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-visible.js');
 
                                 echo '
                                                     <div style="display: inline-block !important; vertical-align: middle;">
@@ -1499,7 +1504,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                                         ';
                                     }
 
-                                    $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-invisible.js');
+                                    RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-invisible.js');
 
                                     echo '<script data-usercentrics="reCAPTCHA" type="text/javascript">bfInitInvisibleReCaptcha(' . json_encode([
                                         'sitekey' => $mdata['pubkey'],
@@ -1558,7 +1563,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
                         // set size of element, number input doesn't allow size attr
                         if ($mdata['size'] != '') {
-                            $this->p->app->getDocument()->addScript(
+                            RuntimeAssetLoader::script($this->p->app,
                                 Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-number-input.js'
                             );
                             echo '<script type="text/javascript">bfSetNumberInputWidth('
@@ -1706,8 +1711,8 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                                 'var bfPickerMinusYearIcon = ' . json_encode(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/minusyear.png') . ';'
                                 . "\n" . 'var bfPickerPlusYearIcon = ' . json_encode(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/plusyear.png') . ';'
                             );
-                            $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-legacy-style.js');
-                            $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js');
+                            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-legacy-style.js');
+                            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js');
                         }
 
                         echo '<script type="text/javascript">bfInitCalendarResponsive(' . json_encode((int) $mdata['dbId']) . ', ' . json_encode([
@@ -1726,8 +1731,8 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
                     case 'bfSignature':
 
-                        $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/js/signature.js');
-                        $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-signature.js');
+                        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/js/signature.js');
+                        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-signature.js');
                         $this->p->app->getDocument()->getWebAssetManager()->addInlineScript(
                             'bfSignatureInit(' . json_encode((int) $mdata['dbId']) . ');'
                         );
@@ -1979,18 +1984,18 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
         $this->headers();
 
         if ($this->hasResponsiveDatePicker) {
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/picker.js');
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/picker.date.js');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/picker.js');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/picker.date.js');
 
             $lang = $this->p->app->getLanguage()->getTag();
             $lang = explode('-', $lang);
             $lang = strtolower($lang[0]);
             if (file_exists(JPATH_SITE . '/components/com_breezingformsng/libraries/jquery/pickadate/translations/' . $lang . '.js')) {
-                $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/translations/' . $lang . '.js');
+                RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/translations/' . $lang . '.js');
             }
 
-            $this->p->app->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/themes/default.css');
-            $this->p->app->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/themes/default.date.css');
+            RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/themes/default.css');
+            RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/themes/default.date.css');
         }
 
         // we must make sure that everything mootools related is included after moxie and plupload
@@ -2009,7 +2014,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
         $area_count = count($this->htmltextareas);
         if ($area_count) {
             $editor = Editor::getInstance('tinymce');
-            $this->p->app->getDocument()->addScript(
+            RuntimeAssetLoader::script($this->p->app,
                 Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-html-textareas.js'
             );
             for ($i = 0; $i < $area_count; $i++) {
@@ -2026,13 +2031,13 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
             $tickets[$this->flashUploadTicket] = array(); // stores file info for later processing
 	    $this->p->app->getSession()->set('bfFlashUploadTickets', $tickets);
             echo '<input type="hidden" name="bfFlashUploadTicket" value="' . $this->flashUploadTicket . '"/>' . "\n";
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/center.js');
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-flash-upload-onepage.js');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/center.js');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-flash-upload-onepage.js');
             echo "<div style=\"visibility:hidden;\" id=\"bfFileQueue\"></div>";
             echo "<div style=\"visibility:hidden;display:none;\" id=\"bfSubmitMessage\">" . Text::_('COM_BREEZINGFORMSNG_SUBMIT_MESSAGE') . "</div>";
         }
         echo '<noscript>Please turn on javascript to submit your data. Thank you!</noscript>' . "\n";
-        $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-onepage-switchpage.js');
+        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-onepage-switchpage.js');
         if ($this->rootMdata['lastPageThankYou']) {
             echo '
                         <div class="remodal" data-remodal-id="modal">

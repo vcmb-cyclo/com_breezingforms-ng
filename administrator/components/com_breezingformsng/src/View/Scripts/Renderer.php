@@ -24,6 +24,10 @@ use Vcmb\Component\BreezingformsNG\Administrator\Helper\BreadcrumbHelper;
 
 class Renderer
 {
+	private const AREA_SMALL = 4;
+	private const AREA_MEDIUM = 12;
+	private const AREA_LARGE = 20;
+	private const DESCRIPTION_LIMIT = 100;
 	private static function registerEditLabels(): void
 	{
 		$keys = [
@@ -80,7 +84,6 @@ class Renderer
 	static function edit($option, $pkg, &$row, &$typelist)
 	{
 		Factory::getApplication()->getInput()->set('hidemainmenu', 1);
-		global $ff_mossite, $ff_admsite, $ff_config;
 		$action = $row->id ? Text::_('COM_BREEZINGFORMSNG_SCRIPTS_EDITSCRIPT') : Text::_('COM_BREEZINGFORMSNG_SCRIPTS_ADDSCRIPT');
 
 		$pageTitle = BreadcrumbHelper::render([
@@ -199,16 +202,16 @@ class Renderer
 						echo '<span><span title="' . HTMLHelper::tooltipText(Text::_('COM_BREEZINGFORMSNG_SCRIPTS_TIPDESCRIPTION')) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
 						?>
 						<a href="javascript:void(0);"
-							onClick="textAreaResize('description',<?php echo $ff_config->areasmall; ?>);">[
-							<?php echo $ff_config->areasmall; ?>]
+							onClick="textAreaResize('description',<?php echo self::AREA_SMALL; ?>);">[
+							<?php echo self::AREA_SMALL; ?>]
 						</a>
 						<a href="javascript:void(0);"
-							onClick="textAreaResize('description',<?php echo $ff_config->areamedium; ?>);">[
-							<?php echo $ff_config->areamedium; ?>]
+							onClick="textAreaResize('description',<?php echo self::AREA_MEDIUM; ?>);">[
+							<?php echo self::AREA_MEDIUM; ?>]
 						</a>
 						<a href="javascript:void(0);"
-							onClick="textAreaResize('description',<?php echo $ff_config->arealarge; ?>);">[
-							<?php echo $ff_config->arealarge; ?>]
+							onClick="textAreaResize('description',<?php echo self::AREA_LARGE; ?>);">[
+							<?php echo self::AREA_LARGE; ?>]
 						</a>
 						<br />
 						<textarea wrap="off" name="description" id="description" style="width:100%;" rows="12"
@@ -241,16 +244,16 @@ class Renderer
 						echo '<span><span title="' . htmlspecialchars($unitTestsHelp, ENT_QUOTES) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
 						?>
 						<a href="javascript:void(0);"
-							onClick="textAreaResize('unit_tests',<?php echo $ff_config->areasmall; ?>);">[
-							<?php echo $ff_config->areasmall; ?>]
+							onClick="textAreaResize('unit_tests',<?php echo self::AREA_SMALL; ?>);">[
+							<?php echo self::AREA_SMALL; ?>]
 						</a>
 						<a href="javascript:void(0);"
-							onClick="textAreaResize('unit_tests',<?php echo $ff_config->areamedium; ?>);">[
-							<?php echo $ff_config->areamedium; ?>]
+							onClick="textAreaResize('unit_tests',<?php echo self::AREA_MEDIUM; ?>);">[
+							<?php echo self::AREA_MEDIUM; ?>]
 						</a>
 						<a href="javascript:void(0);"
-							onClick="textAreaResize('unit_tests',<?php echo $ff_config->arealarge; ?>);">[
-							<?php echo $ff_config->arealarge; ?>]
+							onClick="textAreaResize('unit_tests',<?php echo self::AREA_LARGE; ?>);">[
+							<?php echo self::AREA_LARGE; ?>]
 						</a>
 						<br />
 						<textarea wrap="off" name="unit_tests" id="unit_tests" style="width:100%;" rows="8"
@@ -319,7 +322,6 @@ class Renderer
 	static function listitems($option, &$rows, &$pkglist, $pkg, $search, $total, $limit, $limitstart, $pagination = null, $listOrder = 'a.name', $listDirn = 'asc', $filterState = '')
 	{
 		Factory::getApplication()->getInput()->set('hidemainmenu', 0);
-		global $ff_config, $ff_version;
 		$listOrder = (string) $listOrder;
 		$listDirn = strtolower((string) $listDirn);
 		$listDirn = $listDirn === 'desc' ? 'desc' : 'asc';
@@ -374,30 +376,30 @@ class Renderer
 				<thead>
 				<tr>
 					<th class="w-1 text-nowrap">
-						<?php echo HTMLHelper::_('grid.sort', 'JGRID_HEADING_ID', 'a.id', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ID', 'a.id', $listDirn, $listOrder); ?>
 					</th>
 					<th class="w-1 text-center"><input class="form-check-input" type="checkbox" name="toggle" value=""
 							onclick="Joomla.checkAll(this);" /></th>
 					<th>
-						<?php echo HTMLHelper::_('grid.sort', 'COM_BREEZINGFORMSNG_SCRIPTS_PACKAGE', 'a.package', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_SCRIPTS_PACKAGE', 'a.package', $listDirn, $listOrder); ?>
 					</th>
 					<th>
-						<?php echo HTMLHelper::_('grid.sort', 'COM_BREEZINGFORMSNG_SCRIPTS_TITLE', 'a.title', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_SCRIPTS_TITLE', 'a.title', $listDirn, $listOrder); ?>
 					</th>
 					<th>
-						<?php echo HTMLHelper::_('grid.sort', 'COM_BREEZINGFORMSNG_SCRIPTS_NAME', 'a.name', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_SCRIPTS_NAME', 'a.name', $listDirn, $listOrder); ?>
 					</th>
 					<th>
-						<?php echo HTMLHelper::_('grid.sort', 'COM_BREEZINGFORMSNG_SCRIPTS_TYPE', 'a.type', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_SCRIPTS_TYPE', 'a.type', $listDirn, $listOrder); ?>
 					</th>
 					<th>
-						<?php echo HTMLHelper::_('grid.sort', 'COM_BREEZINGFORMSNG_SCRIPTS_DESCRIPTION', 'a.description', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_SCRIPTS_DESCRIPTION', 'a.description', $listDirn, $listOrder); ?>
 					</th>
 					<th class="text-nowrap">
-						<?php echo HTMLHelper::_('grid.sort', 'JGLOBAL_MODIFIED', 'a.modified', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('searchtools.sort', 'JGLOBAL_MODIFIED', 'a.modified', $listDirn, $listOrder); ?>
 					</th>
 					<th class="w-1 text-center">
-						<?php echo HTMLHelper::_('grid.sort', 'COM_BREEZINGFORMSNG_SCRIPTS_PUBLISHED', 'a.published', $listDirn, $listOrder); ?>
+						<?php echo HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_SCRIPTS_PUBLISHED', 'a.published', $listDirn, $listOrder); ?>
 					</th>
 				</tr>
 				</thead>
@@ -408,8 +410,8 @@ class Renderer
 				for ($i = 0; $i < count($rows); $i++) {
 					$row = $rows[$i];
 					$desc = $row->description;
-					if (strlen($desc) > $ff_config->limitdesc)
-						$desc = substr($desc, 0, $ff_config->limitdesc) . '...';
+					if (strlen($desc) > self::DESCRIPTION_LIMIT)
+						$desc = substr($desc, 0, self::DESCRIPTION_LIMIT) . '...';
 					$editLink = 'index.php?option=' . htmlspecialchars($option, ENT_QUOTES) . '&amp;view=scripts&amp;task=scripts.edit&amp;pkg=' . urlencode($pkg) . '&amp;ids[]=' . (int) $row->id;
 					?>
 					<tr>

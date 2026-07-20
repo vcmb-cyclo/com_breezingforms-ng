@@ -11,6 +11,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Pieces;
 
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Factory;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\PiecesModel;
 use Vcmb\Component\BreezingformsNG\Administrator\View\BreezingformsNG\HtmlView as BaseHtmlView;
 
@@ -19,8 +20,6 @@ class HtmlView extends BaseHtmlView
     public $option = 'com_breezingformsng';
 
     public string $package = '';
-
-    public int $showInternal = 0;
 
     public string $search = '';
 
@@ -44,26 +43,23 @@ class HtmlView extends BaseHtmlView
 
     public function display($tpl = null)
     {
-        $model = \Joomla\CMS\Factory::getApplication()
-            ->bootComponent('com_breezingformsng')
-            ->getMVCFactory()
-            ->createModel('Pieces', 'Administrator', ['ignore_request' => true]);
+        $model = $this->getModel();
 
         if (!$model instanceof PiecesModel) {
             throw new \RuntimeException('Unable to create BreezingForms NG pieces model.');
         }
 
-        $this->setModel($model, true);
+        $app = Factory::getApplication();
+        $input = $app->getInput();
 
         if ($this->package === '') {
-            $this->package = \Joomla\CMS\Factory::getApplication()->getInput()->getString('pkg', '');
+            $this->package = $input->getString('pkg', '');
         }
 
-        $list = $model->prepareList($this->package);
+        $list = $model->prepareList($this->package, $input, $app->getSession());
 
         $this->package = $list['package'];
         $this->packageList = $list['packageList'];
-        $this->showInternal = $list['showInternal'];
         $this->search = $list['search'];
         $this->total = $list['total'];
         $this->limit = $list['limit'];
@@ -73,8 +69,6 @@ class HtmlView extends BaseHtmlView
         $this->listOrder = $list['listOrder'];
         $this->listDirn = $list['listDirn'];
         $this->filterState = $list['filterState'];
-
-        \Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager()->useScript('table.columns');
 
         ToolbarHelper::help(
             'COM_BREEZINGFORMSNG_HELP_PIECES_TITLE',

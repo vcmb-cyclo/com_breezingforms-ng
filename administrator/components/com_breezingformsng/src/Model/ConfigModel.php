@@ -13,9 +13,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
-use Joomla\CMS\MVC\Model\BaseModel;
-use Joomla\Database\DatabaseInterface;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\Database\ParameterType;
 use Joomla\Registry\Registry;
 
@@ -23,7 +21,7 @@ use Joomla\Registry\Registry;
  * Migrates the legacy #__facileforms_config key/value store into the
  * component params (#__extensions.params), which com_config manages.
  */
-class ConfigModel extends BaseModel
+class ConfigModel extends BaseDatabaseModel
 {
     /**
      * Keys managed by config.xml; everything else in the legacy table is
@@ -47,7 +45,7 @@ class ConfigModel extends BaseModel
      */
     public function migrateFromLegacy(): array
     {
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
 
         try {
             $query = $db->createQuery()

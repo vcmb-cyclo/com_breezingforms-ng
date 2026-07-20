@@ -10,30 +10,22 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Component\ComponentHelper;
-use Joomla\CMS\Factory;
-use Joomla\CMS\MVC\Model\BaseModel;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
-use Joomla\Event\Event;
 
-class RecordModel extends BaseModel
+class RecordModel extends BaseDatabaseModel
 {
-    private \DateTimeZone $tz;
-
-    public function __construct($config = [])
+    public function getDatabaseConnection(): DatabaseInterface
     {
-        parent::__construct($config);
-        $this->tz = new \DateTimeZone(Factory::getApplication()->get('offset'));
-    }
-
-    public function getTimezone(): \DateTimeZone
-    {
-        return $this->tz;
+        return $this->getDatabase();
     }
 
     public function getRecord(int $id): ?\stdClass
     {
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $query = $db->getQuery(true)
             ->select(['records.*', 'forms.title AS form_title', 'forms.name AS form_name'])
             ->from($db->quoteName('#__facileforms_records', 'records'))
@@ -46,7 +38,7 @@ class RecordModel extends BaseModel
 
     public function getEditableElements(int $formId): array
     {
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $query = $db->getQuery(true)
             ->select(['id', 'title', 'name', 'type'])
             ->from($db->quoteName('#__facileforms_elements'))
@@ -62,7 +54,7 @@ class RecordModel extends BaseModel
     public function getEditableRows(int $recordId, int $formId, string $recordName): array
     {
         $elements = $this->getEditableElements($formId);
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $query = $db->getQuery(true)
             ->select(['id', 'record', 'element', 'title', 'name', 'type', 'value'])
             ->from($db->quoteName('#__facileforms_subrecords'))
@@ -102,9 +94,9 @@ class RecordModel extends BaseModel
         return $rows;
     }
 
-    public function saveRecord(int $recordId, array $values): void
+    public function saveRecord(int $recordId, array $values, \DateTimeZone $timezone): void
     {
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $query = $db->getQuery(true)
             ->select($db->quoteName('form'))
             ->from($db->quoteName('#__facileforms_records'))
@@ -125,8 +117,8 @@ class RecordModel extends BaseModel
             $this->saveElementValue($recordId, $element, (string) $values[$elementId]);
         }
 
-        $user = Factory::getApplication()->getIdentity();
-        $now  = (new \Joomla\CMS\Date\Date('now', $this->tz))->format('Y-m-d H:i:s', true);
+        $user = $this->getCurrentUser();
+        $now  = (new \Joomla\CMS\Date\Date('now', $timezone))->format('Y-m-d H:i:s', true);
         $username = (string) $user->username;
         $userId = (int) $user->id;
         $query = $db->getQuery(true)
@@ -144,7 +136,7 @@ class RecordModel extends BaseModel
 
     private function saveElementValue(int $recordId, array $element, string $value): void
     {
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $elementId = (int) $element['id'];
         $name = (string) $element['name'];
         $title = (string) $element['title'];
@@ -221,14 +213,14 @@ class RecordModel extends BaseModel
         ));
     }
 
-    public function deleteRecords(array $ids): void
+    public function deleteRecords(array $ids, MVCFactoryInterface $contentFactory): void
     {
         $ids = array_values(array_filter(array_map('intval', $ids)));
         if (!$ids) {
             return;
         }
 
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
 
         if (file_exists(JPATH_SITE . '/administrator/components/com_contentbuilderng/com_contentbuilderng.xml')) {
             $query = $db->getQuery(true)
@@ -261,9 +253,6 @@ class RecordModel extends BaseModel
                 $db->setQuery($delCbRecords)->execute();
 
                 if ((int) $cbRecord['delete_articles'] === 1) {
-                    $contentFactory = Factory::getApplication()
-                        ->bootComponent('com_content')
-                        ->getMVCFactory();
                     $articleQuery = $db->getQuery(true)
                         ->select($db->quoteName('article_id'))
                         ->from($db->quoteName('#__contentbuilderng_articles'))
@@ -273,28 +262,14 @@ class RecordModel extends BaseModel
                         ->bind(':recordId', $recordId, ParameterType::INTEGER);
                     $db->setQuery($articleQuery);
 
-                    foreach ($db->loadColumn() as $article) {
-                        $articleId = (int) $article;
-                        $table = $contentFactory->createTable('Article', 'Administrator');
-                        if ($table->load($articleId)) {
-                            Factory::getApplication()->getDispatcher()->dispatch('onContentBeforeDelete', new Event('onContentBeforeDelete', ['com_content.article', $table]));
+                    $articleIds = array_map('intval', $db->loadColumn() ?: []);
+
+                    if ($articleIds) {
+                        $articleModel = $contentFactory->createModel('Article', 'Administrator');
+
+                        if (!$articleModel || !$articleModel->delete($articleIds)) {
+                            throw new \RuntimeException((string) ($articleModel?->getError() ?: Text::_('JERROR_AN_ERROR_HAS_OCCURRED')));
                         }
-
-                        $delArticle = $db->getQuery(true)
-                            ->delete($db->quoteName('#__content'))
-                            ->where($db->quoteName('id') . ' = :articleId')
-                            ->bind(':articleId', $articleId, ParameterType::INTEGER);
-                        $db->setQuery($delArticle)->execute();
-
-                        $table->reset();
-                        Factory::getApplication()->getDispatcher()->dispatch('onContentAfterDelete', new Event('onContentAfterDelete', ['com_content.article', $table]));
-
-                        $assetName = 'com_content.article.' . $articleId;
-                        $delAsset = $db->getQuery(true)
-                            ->delete($db->quoteName('#__assets'))
-                            ->where($db->quoteName('name') . ' = :assetName')
-                            ->bind(':assetName', $assetName, ParameterType::STRING);
-                        $db->setQuery($delAsset)->execute();
                     }
                 }
 
@@ -328,7 +303,7 @@ class RecordModel extends BaseModel
         if (!$ids) {
             return;
         }
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $flag = $value ? 1 : 0;
         $query = $db->getQuery(true)
             ->update($db->quoteName('#__facileforms_records'))
@@ -344,7 +319,7 @@ class RecordModel extends BaseModel
         if (!in_array($col, ['viewed', 'exported', 'archived'], true)) {
             return;
         }
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $query = $db->getQuery(true)
             ->update($db->quoteName('#__facileforms_records'))
             ->set($db->quoteName($col) . ' = :value')
@@ -360,7 +335,7 @@ class RecordModel extends BaseModel
             return 0;
         }
 
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $db->setQuery(
             $db->getQuery(true)
                 ->select($db->quoteName(['title', 'name']))
@@ -422,7 +397,7 @@ class RecordModel extends BaseModel
             'user_id', 'username', 'user_full_name', 'paypal_tx_id', 'paypal_payment_date',
             'paypal_testaccount', 'paypal_download_tries', 'double_opt_in', 'opted',
         ];
-        $identity = Factory::getApplication()->getIdentity();
+        $identity = $this->getCurrentUser();
         $valueAt = static function (array $row, array $keys, string $key, mixed $default = ''): mixed {
             $index = array_search($key, $keys, true);
             return $index === false ? $default : ($row[$index] ?? $default);
@@ -521,7 +496,7 @@ class RecordModel extends BaseModel
 
     public function getSubrecords(int $recordId): array
     {
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $query = $db->getQuery(true)
             ->select('DISTINCT ' . $db->quoteName('subs') . '.*')
             ->from($db->quoteName('#__facileforms_subrecords', 'subs'))
@@ -540,7 +515,7 @@ class RecordModel extends BaseModel
         if (!$ids) {
             return;
         }
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $query = $db->getQuery(true)
             ->update($db->quoteName('#__facileforms_records'))
             ->set($db->quoteName('exported') . ' = 1')

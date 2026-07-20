@@ -123,15 +123,17 @@ final class QuickmodeHtml
             . '; window.BFQMConfig.dataObject = ' . $dataObjectJson . ';';
     }
 
-    public static function showApplication($formId, $formName, $formTitle, $formDesc, $formEmailntf, $formEmailadr, $published, $debugMode, $dataObjectString, $elementScripts, $themes, $themesbootstrap, $themesbootstrap3)
+    public static function showApplication($formId, $formName, $formTitle, $formDesc, $formEmailntf, $formEmailadr, $published, $debugMode, $dataObjectString, $elementScripts, $themes, $themesbootstrap)
     {
         $active_language_code = htmlentities(
             Factory::getApplication()->getInput()->getString('active_language_code', ''),
             ENT_QUOTES,
             'UTF-8'
         );
+        $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+        HTMLHelper::_('bootstrap.modal');
         HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
-        HTMLHelper::_('behavior.keepalive');
+        $wa->useScript('keepalive');
         $iconBase = Uri::root() . 'media/com_breezingformsng/images/quickmode/';
         $decodedThemeObject = null;
         $decodedThemeObject = self::decodeJsonArray((string) $dataObjectString);
@@ -140,7 +142,6 @@ final class QuickmodeHtml
             && is_array($decodedThemeObject['properties'])
             && (($decodedThemeObject['properties']['themebootstrapThemeEngine'] ?? '') === 'bootstrap')
             && (($decodedThemeObject['properties']['themebootstrap'] ?? '') === 'Azure');
-        $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
         $wa->useStyle('com_breezingformsng.quickmode-style');
         $wa->useStyle('com_breezingformsng.jtree-style');
         $wa->useStyle('com_breezingformsng.admin-style');

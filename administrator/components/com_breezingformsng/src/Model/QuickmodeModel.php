@@ -12,23 +12,32 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\MVC\Model\BaseModel;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 use Joomla\Filesystem\File;
 
-class QuickmodeModel extends BaseModel
+class QuickmodeModel extends BaseDatabaseModel
 {
     private DatabaseInterface $db;
 
     public function __construct(array $config = [])
     {
         parent::__construct($config);
-        $this->db = Factory::getContainer()->get(DatabaseInterface::class);
+        $this->db = $this->getDatabase();
     }
 
     public function save(int $form, array $dataObject): int
     {
+        if (isset($dataObject['properties']) && is_array($dataObject['properties'])) {
+            unset(
+                $dataObject['properties']['themebootstrapUse3'],
+                $dataObject['properties']['themebootstrap3builtin'],
+                $dataObject['properties']['themebootstrap3classpfx'],
+                $dataObject['properties']['themeusebootstraplegacy']
+            );
+        }
+
         $areas = new \stdClass();
         $areas->container    = [];
         $areas->container[0] = ['elements' => [], 'elementCount' => 0];
@@ -123,12 +132,7 @@ class QuickmodeModel extends BaseModel
 
     public function getThemesBootstrap(): array
     {
-        return $this->scanThemeDir(JPATH_SITE . '/media/breezingforms/themes-bootstrap4/');
-    }
-
-    public function getThemesBootstrap4(): array
-    {
-        return $this->scanThemeDir(JPATH_SITE . '/media/breezingforms/themes-bootstrap4/');
+        return $this->scanThemeDir(JPATH_SITE . '/media/breezingforms/themes-bootstrap5/');
     }
 
     // ── Private helpers ───────────────────────────────────────────────────────
@@ -208,7 +212,7 @@ class QuickmodeModel extends BaseModel
                     && isset($mdata['themebootstrapbefore'])
                     && $mdata['themebootstrapbefore'] === $mdata['themebootstrap']
                 ) {
-                    $folder   = (!empty($mdata['themebootstrapUse3'])) ? 'themes-bootstrap3' : 'themes-bootstrap';
+                    $folder   = 'themes-bootstrap5';
                     $varspath = JPATH_SITE . '/media/breezingforms/' . $folder . '/' . $mdata['themebootstrap'] . '/vars.txt';
                     if (file_exists($varspath)) {
                         File::write($varspath, $mdata['themebootstrapvars']);
@@ -450,7 +454,7 @@ class QuickmodeModel extends BaseModel
         $dataObject = json_decode(base64_decode($templateCode), true);
         $mdata      = $dataObject['properties'];
         $now        = (new \Joomla\CMS\Date\Date())->toSql();
-        $userId     = (string) Factory::getApplication()->getIdentity()->username;
+        $userId     = (string) $this->getCurrentUser()->username;
 
         $existsQuery = $this->db->getQuery(true)
             ->select('id')

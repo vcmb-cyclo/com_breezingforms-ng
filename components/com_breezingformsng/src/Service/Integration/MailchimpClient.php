@@ -9,8 +9,8 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Integration;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Http\Http;
-use Joomla\CMS\Http\HttpFactory;
+use Joomla\Http\Http;
+use Joomla\Http\HttpFactory;
 use RuntimeException;
 
 final class MailchimpClient

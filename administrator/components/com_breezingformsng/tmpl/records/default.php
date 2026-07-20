@@ -23,27 +23,8 @@ $searchTerm = $this->searchTerm;
 $totalPages  = ($limit > 0) ? (int) ceil($total / $limit) : 1;
 $currentPage = ($limit > 0) ? (int) floor($limitStart / $limit) : 0;
 
-$sortIcon = function (string $col) use ($listOrder, $listDirn): string {
-    if ($listOrder !== $col) {
-        return '';
-    }
-    return $listDirn === 'asc'
-        ? ' <span class="icon-arrow-up" aria-hidden="true"></span>'
-        : ' <span class="icon-arrow-down" aria-hidden="true"></span>';
-};
-
-$sortUrl = function (string $col) use ($listOrder, $listDirn, $formSelection, $searchTerm): string {
-    $dir = ($listOrder === $col && $listDirn === 'asc') ? 'desc' : 'asc';
-    return 'index.php?option=com_breezingformsng&act=managerecs&view=records'
-        . '&filter_order=' . rawurlencode($col)
-        . '&filter_order_Dir=' . $dir
-        . '&form_selection=' . $formSelection
-        . ($searchTerm !== '' ? '&searchterm=' . rawurlencode($searchTerm) : '')
-        . '&limitstart=0';
-};
-
 $pageUrl = function (int $start) use ($listOrder, $listDirn, $formSelection, $searchTerm): string {
-    return 'index.php?option=com_breezingformsng&act=managerecs&view=records'
+    return 'index.php?option=com_breezingformsng&view=records'
         . '&filter_order=' . rawurlencode($listOrder)
         . '&filter_order_Dir=' . $listDirn
         . '&form_selection=' . $formSelection
@@ -53,7 +34,7 @@ $pageUrl = function (int $start) use ($listOrder, $listDirn, $formSelection, $se
 
 $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key), ENT_QUOTES, 'UTF-8');
 ?>
-<form action="index.php?option=com_breezingformsng&amp;act=managerecs&amp;view=records" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_breezingformsng&amp;view=records" method="post" name="adminForm" id="adminForm">
 
   <div class="row mb-3">
     <div class="col-md-4">
@@ -71,7 +52,7 @@ $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key)
         <input type="text" name="searchterm" class="form-control" placeholder="<?= Text::_('JSEARCH_FILTER'); ?>" value="<?= htmlspecialchars($this->searchTerm); ?>">
         <button type="submit" class="btn btn-primary" onclick="this.form.limitstart.value=0;" title="<?= $headerTitle('JSEARCH_FILTER_SUBMIT'); ?>"><?= Text::_('JSEARCH_FILTER_SUBMIT'); ?></button>
         <?php if ($this->searchTerm !== ''): ?>
-          <a href="index.php?option=com_breezingformsng&act=managerecs&view=records&form_selection=<?= $this->formSelection; ?>" class="btn btn-secondary" title="<?= $headerTitle('JSEARCH_FILTER_CLEAR'); ?>"><?= Text::_('JSEARCH_FILTER_CLEAR'); ?></a>
+          <a href="index.php?option=com_breezingformsng&view=records&form_selection=<?= $this->formSelection; ?>" class="btn btn-secondary" title="<?= $headerTitle('JSEARCH_FILTER_CLEAR'); ?>"><?= Text::_('JSEARCH_FILTER_CLEAR'); ?></a>
         <?php endif; ?>
       </div>
     </div>
@@ -84,21 +65,20 @@ $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key)
     <thead>
       <tr>
         <th class="w-1 text-center"><input type="checkbox" class="form-check-input" onclick="Joomla.checkAll(this)" title="<?= Text::_('JGLOBAL_CHECK_ALL'); ?>"></th>
-        <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_ID_DESC'); ?>"><a href="<?= $sortUrl('records.id'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_ID_DESC'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_ID'); ?><?= $sortIcon('records.id'); ?></a></th>
-        <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_RECORD_FORM_DESC'); ?>"><a href="<?= $sortUrl('forms.title'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_RECORD_FORM_DESC'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_FORM'); ?><?= $sortIcon('forms.title'); ?></a></th>
-        <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_IP_DESC'); ?>"><a href="<?= $sortUrl('records.ip'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_IP_DESC'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_IP'); ?><?= $sortIcon('records.ip'); ?></a></th>
-        <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_USER_DESC'); ?>"><a href="<?= $sortUrl('records.username'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_USER_DESC'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_USER'); ?><?= $sortIcon('records.username'); ?></a></th>
-        <th class="text-center" title="<?= $headerTitle('COM_BREEZINGFORMSNG_VIEWED_DESC'); ?>"><a href="<?= $sortUrl('records.viewed'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_VIEWED_DESC'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_VIEWED'); ?><?= $sortIcon('records.viewed'); ?></a></th>
-        <th class="text-center" title="<?= $headerTitle('COM_BREEZINGFORMSNG_EXPORTED_DESC'); ?>"><a href="<?= $sortUrl('records.exported'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_EXPORTED_DESC'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_EXPORTED'); ?><?= $sortIcon('records.exported'); ?></a></th>
-        <th class="text-center" title="<?= $headerTitle('COM_BREEZINGFORMSNG_ARCHIVED_DESC'); ?>"><a href="<?= $sortUrl('records.archived'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_ARCHIVED_DESC'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_ARCHIVED'); ?><?= $sortIcon('records.archived'); ?></a></th>
-        <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_ACTIONS_DESC'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_ACTIONS'); ?></th>
-        <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_SUBMITTED_DESC'); ?>"><a href="<?= $sortUrl('records.submitted'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_SUBMITTED_DESC'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_SUBMITTED'); ?><?= $sortIcon('records.submitted'); ?></a></th>
-        <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_MODIFIED_DESC'); ?>"><a href="<?= $sortUrl('records.modified'); ?>" title="<?= $headerTitle('COM_BREEZINGFORMSNG_MODIFIED_DESC'); ?>"><?= Text::_('COM_BREEZINGFORMSNG_MODIFIED'); ?><?= $sortIcon('records.modified'); ?></a></th>
+        <th><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_ID', 'records.id', $listDirn, $listOrder); ?></th>
+        <th><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_FORM', 'forms.title', $listDirn, $listOrder); ?></th>
+        <th><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_IP', 'records.ip', $listDirn, $listOrder); ?></th>
+        <th><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_USER', 'records.username', $listDirn, $listOrder); ?></th>
+        <th class="text-center"><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_VIEWED', 'records.viewed', $listDirn, $listOrder); ?></th>
+        <th class="text-center"><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_EXPORTED', 'records.exported', $listDirn, $listOrder); ?></th>
+        <th class="text-center"><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_ARCHIVED', 'records.archived', $listDirn, $listOrder); ?></th>
+        <th><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_SUBMITTED', 'records.submitted', $listDirn, $listOrder); ?></th>
+        <th><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_FORMS_MODIFIED', 'records.modified', $listDirn, $listOrder); ?></th>
       </tr>
     </thead>
     <tbody>
       <?php if (empty($this->records)): ?>
-        <tr><td colspan="11" class="text-center"><?= Text::_('COM_BREEZINGFORMSNG_NO_RECORDS_FOUND'); ?></td></tr>
+        <tr><td colspan="10" class="text-center"><?= Text::_('COM_BREEZINGFORMSNG_NO_RECORDS_FOUND'); ?></td></tr>
       <?php else: ?>
         <?php foreach ($this->records as $i => $rec): ?>
           <?php $recId = (int) $rec['id']; ?>
@@ -106,7 +86,7 @@ $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key)
             <td class="text-center"><?= HTMLHelper::_('grid.id', $i, $recId); ?></td>
             <td><?= $recId; ?></td>
             <td>
-              <a href="index.php?option=com_breezingformsng&act=managerecs&view=records&layout=edit&record_id=<?= $recId; ?>&form_selection=<?= $this->formSelection; ?>" title="<?= $headerTitle('JACTION_EDIT'); ?>">
+              <a href="index.php?option=com_breezingformsng&view=records&layout=edit&record_id=<?= $recId; ?>&form_selection=<?= $this->formSelection; ?>" title="<?= $headerTitle('JACTION_EDIT'); ?>">
                 <?= htmlspecialchars((string) $rec['form_title']); ?>
               </a>
             </td>
@@ -125,11 +105,6 @@ $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key)
             <td class="text-center">
               <a href="#" onclick="bfToggleFlag(<?= $recId; ?>, 'bfrecord_archived', this); return false;" title="<?= Text::_('COM_BREEZINGFORMSNG_TOGGLE_ARCHIVED'); ?>">
                 <span class="<?= $rec['archived'] ? 'icon-check text-success' : 'icon-times text-danger'; ?>"></span>
-              </a>
-            </td>
-            <td>
-              <a href="index.php?option=com_breezingformsng&act=managerecs&view=records&layout=edit&record_id=<?= $recId; ?>&form_selection=<?= $this->formSelection; ?>" title="<?= $headerTitle('JACTION_EDIT'); ?>" aria-label="<?= $headerTitle('JACTION_EDIT'); ?>">
-                <span class="icon-edit" aria-hidden="true"></span>
               </a>
             </td>
             <td><?= htmlspecialchars((string) $rec['submitted']); ?></td>

@@ -9,7 +9,6 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\IntegratorModel;
 
@@ -17,7 +16,7 @@ class IntegratorController extends BaseController
 {
     public function display($cachable = false, $urlparams = [])
     {
-        $input = Factory::getApplication()->getInput();
+        $input = $this->app->getInput();
         $input->set('view', 'integrator');
         $input->set('layout', 'default');
         return parent::display($cachable, $urlparams);
@@ -25,7 +24,7 @@ class IntegratorController extends BaseController
 
     public function edit(): void
     {
-        $input = Factory::getApplication()->getInput();
+        $input = $this->app->getInput();
         $input->set('view', 'integrator');
         $input->set('layout', 'edit');
         parent::display();
@@ -34,7 +33,7 @@ class IntegratorController extends BaseController
     public function save(): void
     {
         $this->checkToken();
-        $input  = Factory::getApplication()->getInput();
+        $input  = $this->app->getInput();
         $model  = $this->getIntegratorModel();
         $name   = $input->getString('rule_name', '');
         $formId = $input->getInt('form_id', 0);
@@ -48,7 +47,7 @@ class IntegratorController extends BaseController
     public function remove(): void
     {
         $this->checkToken();
-        $ids = (array) Factory::getApplication()->getInput()->get('cid', [], 'ARRAY');
+        $ids = (array) $this->app->getInput()->get('cid', [], 'ARRAY');
         $this->getIntegratorModel()->deleteRules($ids);
         $this->setRedirect($this->listUrl());
     }
@@ -57,21 +56,24 @@ class IntegratorController extends BaseController
     {
         $this->checkToken();
 
-        @ob_end_clean();
-        $input = Factory::getApplication()->getInput();
+        if (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        $input = $this->app->getInput();
         $id    = $input->getInt('id', 0);
         $state = $input->getInt('state', 0);
         if ($id > 0) {
             $this->getIntegratorModel()->publishRule($id, $state);
         }
-        echo json_encode(['Result' => 'OK']);
-        Factory::getApplication()->close();
+        $this->app->setHeader('Content-Type', 'application/json; charset=utf-8', true);
+        $this->app->setBody(json_encode(['Result' => 'OK'], JSON_THROW_ON_ERROR));
+        $this->app->close();
     }
 
     public function publish(): void
     {
         $this->checkToken();
-        $id = Factory::getApplication()->getInput()->getInt('publish_id', 0);
+        $id = $this->app->getInput()->getInt('publish_id', 0);
         $this->getIntegratorModel()->publishRule($id, 1);
         $this->setRedirect($this->listUrl());
     }
@@ -79,7 +81,7 @@ class IntegratorController extends BaseController
     public function unpublish(): void
     {
         $this->checkToken();
-        $id = Factory::getApplication()->getInput()->getInt('publish_id', 0);
+        $id = $this->app->getInput()->getInt('publish_id', 0);
         $this->getIntegratorModel()->publishRule($id, 0);
         $this->setRedirect($this->listUrl());
     }
@@ -87,7 +89,7 @@ class IntegratorController extends BaseController
     public function addItem(): void
     {
         $this->checkToken();
-        $input  = Factory::getApplication()->getInput();
+        $input  = $this->app->getInput();
         $ruleId = $input->getInt('id', 0);
         $model  = $this->getIntegratorModel();
         $model->addItem(
@@ -102,7 +104,7 @@ class IntegratorController extends BaseController
     {
         $this->checkToken();
 
-        $input  = Factory::getApplication()->getInput();
+        $input  = $this->app->getInput();
         $ruleId = $input->getInt('id', 0);
         $this->getIntegratorModel()->removeItem($input->getInt('itemId', 0));
         $this->setRedirect($this->editUrl($ruleId));
@@ -111,7 +113,7 @@ class IntegratorController extends BaseController
     public function saveCode(): void
     {
         $this->checkToken();
-        $input  = Factory::getApplication()->getInput();
+        $input  = $this->app->getInput();
         $ruleId = $input->getInt('id', 0);
         $this->getIntegratorModel()->saveCode(
             $input->getInt('itemId', 0),
@@ -124,7 +126,7 @@ class IntegratorController extends BaseController
     public function saveFinalizeCode(): void
     {
         $this->checkToken();
-        $input  = Factory::getApplication()->getInput();
+        $input  = $this->app->getInput();
         $ruleId = $input->getInt('id', 0);
         $this->getIntegratorModel()->saveFinalizeCode(
             $ruleId,
@@ -136,7 +138,7 @@ class IntegratorController extends BaseController
     public function addCriteria(): void
     {
         $this->checkToken();
-        $input  = Factory::getApplication()->getInput();
+        $input  = $this->app->getInput();
         $ruleId = $input->getInt('id', 0);
         $this->getIntegratorModel()->addCriteria(
             $ruleId,
@@ -152,7 +154,7 @@ class IntegratorController extends BaseController
     {
         $this->checkToken();
 
-        $input  = Factory::getApplication()->getInput();
+        $input  = $this->app->getInput();
         $ruleId = $input->getInt('id', 0);
         $this->getIntegratorModel()->removeCriteria($input->getInt('criteriaId', 0));
         $this->setRedirect($this->editUrl($ruleId));
@@ -161,7 +163,7 @@ class IntegratorController extends BaseController
     public function addCriteriaJoomla(): void
     {
         $this->checkToken();
-        $input  = Factory::getApplication()->getInput();
+        $input  = $this->app->getInput();
         $ruleId = $input->getInt('id', 0);
         $this->getIntegratorModel()->addCriteriaJoomla(
             $ruleId,
@@ -177,7 +179,7 @@ class IntegratorController extends BaseController
     {
         $this->checkToken();
 
-        $input  = Factory::getApplication()->getInput();
+        $input  = $this->app->getInput();
         $ruleId = $input->getInt('id', 0);
         $this->getIntegratorModel()->removeCriteriaJoomla($input->getInt('criteriaId', 0));
         $this->setRedirect($this->editUrl($ruleId));
@@ -186,7 +188,7 @@ class IntegratorController extends BaseController
     public function addCriteriaFixed(): void
     {
         $this->checkToken();
-        $input  = Factory::getApplication()->getInput();
+        $input  = $this->app->getInput();
         $ruleId = $input->getInt('id', 0);
         $this->getIntegratorModel()->addCriteriaFixed(
             $ruleId,
@@ -202,7 +204,7 @@ class IntegratorController extends BaseController
     {
         $this->checkToken();
 
-        $input  = Factory::getApplication()->getInput();
+        $input  = $this->app->getInput();
         $ruleId = $input->getInt('id', 0);
         $this->getIntegratorModel()->removeCriteriaFixed($input->getInt('criteriaId', 0));
         $this->setRedirect($this->editUrl($ruleId));
@@ -211,7 +213,7 @@ class IntegratorController extends BaseController
     public function publishItem(): void
     {
         $this->checkToken();
-        $input  = Factory::getApplication()->getInput();
+        $input  = $this->app->getInput();
         $ruleId = $input->getInt('id', 0);
         $this->getIntegratorModel()->publishItem($input->getInt('publish_id', 0), 1);
         $this->setRedirect($this->editUrl($ruleId));
@@ -220,7 +222,7 @@ class IntegratorController extends BaseController
     public function unpublishItem(): void
     {
         $this->checkToken();
-        $input  = Factory::getApplication()->getInput();
+        $input  = $this->app->getInput();
         $ruleId = $input->getInt('id', 0);
         $this->getIntegratorModel()->publishItem($input->getInt('publish_id', 0), 0);
         $this->setRedirect($this->editUrl($ruleId));
@@ -228,17 +230,17 @@ class IntegratorController extends BaseController
 
     private function editUrl(int $id): string
     {
-        return 'index.php?option=com_breezingformsng&act=integrate&view=integrator&layout=edit&id=' . $id;
+        return 'index.php?option=com_breezingformsng&view=integrator&layout=edit&id=' . $id;
     }
 
     private function listUrl(): string
     {
-        return 'index.php?option=com_breezingformsng&act=integrate&view=integrator';
+        return 'index.php?option=com_breezingformsng&view=integrator';
     }
 
     private function getIntegratorModel(): IntegratorModel
     {
-        $model = Factory::getApplication()
+        $model = $this->app
             ->bootComponent('com_breezingformsng')
             ->getMVCFactory()
             ->createModel('Integrator', 'Administrator');

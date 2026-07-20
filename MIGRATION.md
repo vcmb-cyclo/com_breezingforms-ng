@@ -87,6 +87,7 @@
 - [x] Édition et sauvegarde d'un enregistrement *(vérifié HTTP et en base le 2026-07-11 : valeur modifiée puis restaurée ; requête sans jeton rejetée sans mutation)*
 - [x] Flags (viewed / exported / archived) fonctionnels en unitaire *(setFlag vérifié ; bascule en masse à confirmer à la main)*
 - [x] Bouton Help ouvre la modale *(vérifié dans Chrome le 2026-07-11 : popup Joomla iframe, URL d'aide Records correcte, aucune nouvelle fenêtre)*
+- [x] Toolbar obtenue depuis le document Joomla 6 ; suppression du singleton déprécié `Toolbar::getInstance()` *(2026-07-20)*
 
 > **Durcissement (2026-07-11)** : contrôle CSRF ajouté aux sauvegardes, suppressions, flags unitaires/en masse,
 > imports CSV et exports (ces derniers marquent les enregistrements comme exportés). `RecordModel::saveRecord()` ne dépend
@@ -357,7 +358,7 @@
 - [x] Remplacer les 41 `Factory::getDate()` par `Joomla\CMS\Date\Date` *(l'implémentation Joomla 6.0.4 de l'ancien
   accesseur appelle encore `Factory::getLanguage()` déprécié ; 15 fichiers lintés, puis About, Records, QuickMode et
   formulaire frontend vérifiés en HTTP 200)*
-- [x] Empêcher l'accès déprécié à la base pendant la construction de `LegacyPackageModel` *(injection explicite après
+- [x] Empêcher l'accès déprécié à la base pendant la construction de `PackageModel` *(injection explicite après
   construction conservée, fallback `Factory::getDbo()` neutralisé avec `dbo => null` ; listes Scripts et Pièces en HTTP 200)*
 - [x] Retirer le helper mort `bf_ToolTip()` fondé sur l'ancien service `HTMLHelper::_('tooltip')` et supprimer
   l'initialisation Bootstrap répétée dans les 293 appels à `bf_tooltipText()` *(tooltip initialisé une fois par QuickMode)*
@@ -485,10 +486,11 @@
   `addRequestParams()` sont supprimées de `legacy/functions.php`, qui ne résout plus l'application statiquement.
   Le helper de route des intégrations de tags ne charge plus `BFRequest.php`, inutilisé depuis la conversion
   complète des lectures de requête vers Joomla Input.
-  **Tables sorties de `legacy/`** : `legacy/tables.php` devient `Site\Table\RuntimeTables.php`. Les huit classes
-  globales sont renommées `MenuTable`, `FormTable`, `ElementTable`, `ScriptTable`, `PieceTable`, `RecordTable`,
-  `SubrecordTable` et `QueryColumn`, toutes finales et sous le namespace du site. Les consommateurs frontend et
-  administrateur utilisent leurs noms qualifiés ; l'ancien fichier est purgé lors des mises à jour.
+  **Tables sorties de `legacy/`** : les huit classes globales sont renommées `MenuTable`, `FormTable`,
+  `ElementTable`, `ScriptTable`, `PieceTable`, `RecordTable`, `SubrecordTable` et `QueryColumn`, toutes finales
+  et sous le namespace du site. Chaque classe possède désormais son propre fichier PSR-4 ; le bootstrap manuel
+  de `RuntimeTables.php` a disparu. Les consommateurs frontend et administrateur utilisent leurs noms qualifiés ;
+  l'ancien fichier est purgé lors des mises à jour.
   Le dernier fichier du dossier `legacy/`, désormais limité aux helpers globaux publics requis par les scripts
   stockés, est déplacé vers `src/Support/runtime_functions.php`. Le dossier `legacy/` disparaît du paquet ; les
   noms des fonctions restent inchangés afin de préserver le contrat d'exécution des formulaires.
@@ -543,6 +545,39 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > liée à `BFRequest`/`Callback`. `Stripe`/`PayPal`/`Sofort` restent à confirmer avec un vrai paiement de test (accès
 > à un compte sandbox nécessaire, non disponible dans cette session).
 >
+> **Image CAPTCHA routée par Joomla (2026-07-20)** : les deux scripts web autonomes
+> `securimage_show.php`, qui amorçaient Joomla manuellement et appelaient encore
+> `Factory::getApplication('site'|'administrator')`, sont supprimés. `CaptchaCallback` sert désormais le PNG
+> via `index.php?option=com_breezingformsng&bfCaptcha=1` pour le site comme pour l'administration ; tous les
+> renderers et scripts de rechargement utilisent cette route. La propriété interne `gdnoisecolor` est déclarée
+> dans Securimage afin d'éviter la création de propriété dynamique qui corrompait la réponse sous PHP 8.3 ; la
+> bibliothèque ne définit plus elle-même `_JEXEC` et exige désormais un contexte Joomla déjà amorcé.
+> Vérifié sur le conteneur Joomla 6 avec Playwright : réponse `image/png`, dimensions 230 × 80.
+>
+> **Calendrier Mobile PHP 8.1+ (2026-07-20)** : le dernier appel PHP à `strftime()`, déprécié, est supprimé.
+> Le renderer utilise le convertisseur de format natif `HTMLHelper::strftimeFormatToDateFormat()` de Joomla 6
+> puis `DateTimeImmutable` en UTC. Un format non pris en charge est désormais refusé explicitement.
+>
+> **Styles inline natifs (2026-07-20)** : les deux derniers appels directs à la méthode Document dépréciée
+> `addStyleDeclaration()` sont remplacés par `WebAssetManager::addInlineStyle()` dans le renderer Classic et le
+> moteur de rendu.
+>
+> **Assets Classic natifs (2026-07-20)** : `FormRenderer` et `ClassicRenderer` n'appellent plus les méthodes
+> Document dépréciées `addScript()`/`addStyleSheet()`. Le service `RuntimeAssetLoader` enregistre les assets
+> dynamiques sous des identifiants stables dans `WebAssetManager`, conserve leurs attributs et normalise les
+> chemins locaux par rapport à la racine Joomla. Vérifié avec Playwright sur le formulaire Classic 2 : formulaire,
+> CSS runtime, helpers et initialiseur final chargés, `JQuery` disponible, aucune erreur liée au composant.
+> Bootstrap et OnePage utilisent ensuite le même chargeur pour tous leurs scripts et feuilles de style. Vérifié
+> avec Playwright sur le formulaire Bootstrap 35 : formulaire et assets attendus chargés, `JQuery` disponible,
+> zéro erreur console. Aucun formulaire OnePage n'est actuellement publié dans la base de développement ; ce
+> chemin est couvert par la conversion structurellement identique et les contrôles syntaxiques.
+> Les dernières balises injectées avec `addCustomTag()` (CSS système, CSS et JavaScript des thèmes dynamiques)
+> passent également par `WebAssetManager`; le calendrier responsive Mobile utilise le même chargeur. Une seconde
+> vérification Playwright confirme les CSS système Classic et Bootstrap, le rendu des formulaires et `JQuery`.
+> Les quatre helpers publics Mobile `addScript()`, `addStyleSheet()`, `addScriptDeclaration()` et
+> `addStyleDeclaration()` conservent leurs points d'appel mais délèguent désormais au même gestionnaire natif.
+> `fetchHead()`, méthode morte qui reconstruisait le head avec les internes protégés de Document, est supprimée.
+>
 > **Suite (2026-07-12)** : `bfProcessorUploads.php` (1 appel), `bfProcessorNotifications.php` (13),
 > `bfProcessorExports.php` (16) et `bfProcessorSubmission.php` (45) sont également convertis — **235 appels au
 > total sur 393**. Le couplage `cb_category_id`/`cb_controller` entre Exports (écrivain) et Submission (lecteur)
@@ -583,8 +618,8 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > que ce document décrivait depuis le début de la Phase 9 s'est donc résolu de la façon la plus simple : il n'y avait
 > pas de vrai couplage à préserver, seulement de la logique héritée jamais nettoyée. Les 10 appels ont été supprimés
 > (pas convertis) ; les imports `use BFRequest;` devenus inutiles retirés des 3 fichiers Callback concernés.
-> `legacy/functions.php::saveOtherParam()` (2 appels) et `src/Helper/legacy/route.php::getFormRoute()` (1 appel)
-> convertis aussi au passage (aucun `setVar()` pour leurs clés). **Total Phase 9a : 326 appels convertis, zéro
+> `legacy/functions.php::saveOtherParam()` (2 appels) et l'ancien helper de route (1 appel, supprimé depuis car
+> orphelin) ont aussi été convertis au passage. **Total Phase 9a : 326 appels convertis, zéro
 > appel `BFRequest::` fonctionnel restant hors des 4 rendus `BFQuickMode*`** (`grep -rl BFRequest` ne retourne plus
 > que ces 4 fichiers plus 3 `require_once` inertes vers la définition de la classe, conservés car ces 4 rendus en
 > dépendent encore). Vérifié : `php -l` propre sur tous les fichiers touchés ; trois formulaires réels différents

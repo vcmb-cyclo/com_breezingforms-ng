@@ -43,11 +43,6 @@ class HtmlView extends BaseHtmlView
 
         ToolbarHelper::title($this->getToolbarTitle(), 'logo_left');
 
-        // $doc->addScript( URI::root().'media/system/js/core.js' )
-        // Add Joomla core JavaScript framework
- //       HTMLHelper::_('bootstrap.framework');
- //       $doc->addScript('media/system/js/core.js');
-
         parent::display($tpl);
     }
 

@@ -48,7 +48,7 @@ final class StripeCallback
 
     if (count($list) == 0) {
         $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
-        exit;
+        $this->application->close();
     }
 
     $form = $list[0];
@@ -57,7 +57,7 @@ final class StripeCallback
 
     if (!is_array($areas)) {
         $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_STRIPE_DATA'));
-        exit;
+        $this->application->close();
     }
 
     $tx_token = $input->getString('token', '');
@@ -97,7 +97,7 @@ final class StripeCallback
                         /* XDA if( $this->application->getSession()->get('bf_stripe_last_payment_amount'.$record_id, null) == null ){
 
             $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_STRIPE_AMOUNT'));
-            exit;
+            $this->application->close();
                                 } XDA */
 
                         $stripearray = array();
@@ -140,7 +140,7 @@ final class StripeCallback
                     }
 
                     //                                      $tx_token = $charge->id;
-                    $session_id = $_GET['session_id'];
+                    $session_id = $input->getString('session_id');
                     $session = $stripe->checkout->sessions->retrieve(
                         "$session_id",
                         []
@@ -148,7 +148,6 @@ final class StripeCallback
 
                     if ($session->payment_status != 'paid') {
 
-                        //echo $_GET['session_id'].'<br>bf dont understand new stripe and says it was diclined lol: <br>'.var_dump($session);
                         $msg = Text::_("COM_BREEZINGFORMSNG_STRIPE_DECLINED");
 
                         require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
@@ -238,7 +237,7 @@ final class StripeCallback
     $list = $db->loadObjectList();
     if (count($list) == 0) {
         $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
-        exit;
+        $this->application->close();
     }
 
     $form = $list[0];
@@ -290,7 +289,7 @@ final class StripeCallback
                                 $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_DOWNLOAD_FILE'));
                             }
 
-                            \Vcmb\Component\BreezingformsNG\Site\Service\Support\DownloadHelper::stream($file);
+                            \Vcmb\Component\BreezingformsNG\Site\Service\Support\DownloadHelper::stream($this->application, $file);
                         } else {
 
                             $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_MAX_DOWNLOAD_TRIES_REACHED'));

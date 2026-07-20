@@ -33,10 +33,6 @@ use Joomla\CMS\Environment\Browser;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Log\Log;
-use BFQuickMode;
-use BFQuickModeBootstrap;
-use BFQuickModeMobile;
-use BFQuickModeOnePage;
 use Exception;
 use Vcmb\Component\BreezingformsNG\Site\Table\QueryColumn;
 use HTML_facileFormsProcessor;
@@ -47,6 +43,11 @@ use CB\Component\Contentbuilderng\Administrator\Service\ListSupportService;
 use CB\Component\Contentbuilderng\Administrator\Service\PermissionService;
 use CB\Component\Contentbuilderng\Administrator\Helper\RuntimeContextHelper;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\TokenizedDirectoryResolver;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\BootstrapRenderer;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\ClassicRenderer;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\MobileRenderer;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\OnePageRenderer;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RuntimeAssetLoader;
 
 /**
  * Page header, ContentBuilder path handling and form view rendering.
@@ -63,6 +64,11 @@ final class RenderingEngine
     function header()
     {
         global $ff_config;
+
+        RuntimeAssetLoader::script(
+            $this->processor->app,
+            Uri::root(true) . '/media/com_breezingformsng/js/facileforms.js'
+        );
 
         return $this->processorHeaderRenderer()->render(
             [
@@ -249,9 +255,9 @@ final class RenderingEngine
 
         if (trim($this->processor->formrow->template_code_processed) == 'QuickMode') {
 
-            if (isset($_GET['non_mobile']) && $this->processor->app->getInput()->getBool('non_mobile', false)) {
+            if ($this->processor->app->getInput()->getBool('non_mobile', false)) {
                 $this->processor->app->getSession()->clear('com_breezingformsng.mobile');
-            } else if (isset($_GET['mobile']) && $this->processor->app->getInput()->getBool('mobile', false)) {
+            } else if ($this->processor->app->getInput()->getBool('mobile', false)) {
                 $this->processor->app->getSession()->set('com_breezingformsng.mobile', true);
             }
 
@@ -260,12 +266,6 @@ final class RenderingEngine
             $dataObject = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
             $rootMdata = $dataObject['properties'];
             $is_device = false;
-
-            $useragent = 'Unknown';
-
-            if (isset($_SERVER['HTTP_USER_AGENT'])) {
-                $useragent = $_SERVER['HTTP_USER_AGENT'];
-            }
 
             if ($this->processor->app->getInput()->getString('ff_applic', '') != 'mod_facileforms' && $this->processor->app->getInput()->getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
                 $is_device = true;
@@ -289,10 +289,7 @@ final class RenderingEngine
 
                 if ($this->processor->isMobile) {
 
-                    ob_end_clean();
-                    ob_start();
-                    require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickModeMobile.php');
-                    $quickMode = new BFQuickModeMobile($this->processor);
+                    $quickMode = new MobileRenderer($this->processor);
                     if (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile']) {
                         $quickMode->forceMobileUrl = isset($rootMdata['forceMobileUrl']) ? $rootMdata['forceMobileUrl'] : 'index.php';
                     }
@@ -317,7 +314,10 @@ final class RenderingEngine
         $this->processor->queryCols = array();
         $this->processor->queryRows = array();
         if ($this->processor->runmode == _FF_RUNMODE_PREVIEW) {
-            echo '<script type="text/javascript" src="' . Uri::root() . 'administrator/components/com_breezingformsng/libraries/wz_dragdrop/wz_dragdrop.js"></script>';
+            RuntimeAssetLoader::script(
+                $this->processor->app,
+                Uri::root(true) . '/administrator/components/com_breezingformsng/libraries/wz_dragdrop/wz_dragdrop.js'
+            );
         }
         if (trim($this->processor->formrow->template_code_processed) == 'QuickMode' && $this->processor->legacy_wrap)
             echo '<table style="display:none;width:100%;" id="bfReCaptchaWrap"><tr><td><div id="bfReCaptchaDiv"></div></td></tr></table>';
@@ -464,7 +464,7 @@ final class RenderingEngine
                                                                                     bf_restore_submitbutton();
                                                                                 }
                                                                                 
-                                                                                        document.getElementById(\'ff_capimgValue\').src = \'' . Uri::root(true) . ($this->processor->app->isClient('administrator') ? '/administrator' : '') . '/media/com_breezingformsng/images/site/captcha/securimage_show.php?bfMathRandom=\' + Math.random();
+                                                                                        document.getElementById(\'ff_capimgValue\').src = \'' . Uri::root(true) . ($this->processor->app->isClient('administrator') ? '/administrator' : '') . '/index.php?option=com_breezingformsng&bfCaptcha=1&bfMathRandom=\' + Math.random();
                                                                                         document.getElementById(\'bfCaptchaEntry\').value = "";
                                                                                         if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
                                                                                         document.getElementById(\'bfCaptchaEntry\').focus();
@@ -985,10 +985,17 @@ final class RenderingEngine
         echo '//-->' . nl() .
             '</script>' . nl();
 
-        if ($icons > 0)
-            echo '<script language="JavaScript" src="' . $ff_mossite . '/components/com_breezingformsng/libraries/js/joomla.javascript.js" type="text/javascript"></script>' . nl();
+        if ($icons > 0) {
+            RuntimeAssetLoader::script(
+                $this->processor->app,
+                Uri::root(true) . '/components/com_breezingformsng/libraries/js/joomla.javascript.js'
+            );
+        }
         if ($tooltips > 0) {
-            echo '<script language="Javascript" src="' . $ff_mossite . '/components/com_breezingformsng/libraries/js/overlib_mini.js" type="text/javascript"></script>' . nl();
+            RuntimeAssetLoader::script(
+                $this->processor->app,
+                Uri::root(true) . '/components/com_breezingformsng/libraries/js/overlib_mini.js'
+            );
             if ($this->processor->inframe)
                 echo '<div id="overDiv" style="position:absolute;visibility:hidden;z-index:1000;"></div>' . nl();
         } // if
@@ -1373,7 +1380,7 @@ final class RenderingEngine
         if (trim($this->processor->formrow->template_code_processed) == '') {
 
             // fixing J3 css
-            $this->processor->app->getDocument()->addStyleDeclaration(
+            $this->processor->app->getDocument()->getWebAssetManager()->addInlineStyle(
                 '
              .bfFormDiv input[type=checkbox][id^="ff_elem"], input[type=radio][id^="ff_elem"]{
                 vertical-align: text-bottom;
@@ -1767,11 +1774,9 @@ final class RenderingEngine
                         echo indentc(1) . '</div>' . nl();
                         break;
                     case 'Captcha':
-                        if ($this->processor->app->isClient('site')) {
-                            $captcha_url = Uri::root(true) . '/media/com_breezingformsng/images/site/captcha/securimage_show.php';
-                        } else {
-                            $captcha_url = Uri::root(true) . '/media/com_breezingformsng/images/site/captcha/securimage_show.php';
-                        }
+                        $captcha_url = Uri::root(true)
+                            . ($this->processor->app->isClient('administrator') ? '/administrator' : '')
+                            . '/index.php?option=com_breezingformsng&bfCaptcha=1';
                         echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
                         $attribs = '';
                         if ($row->width > 0)
@@ -1782,7 +1787,7 @@ final class RenderingEngine
                         echo '<br/>';
                         echo '<input type="text" style="' . $attribs . '" name="bfCaptchaEntry" id="bfCaptchaEntry" />';
                         //echo '<br/>';
-                        echo '<a href="#" onclick="document.getElementById(\'bfCaptchaEntry\').value=\'\';document.getElementById(\'bfCaptchaEntry\').focus();document.getElementById(\'ff_capimgValue\').src = \'' . $captcha_url . '?bfCaptcha=true&bfMathRandom=\' + Math.random(); return false"><img src="' . Uri::root() . 'media/com_breezingformsng/images/site/captcha/refresh-captcha.png" border="0" /></a>';
+                        echo '<a href="#" onclick="document.getElementById(\'bfCaptchaEntry\').value=\'\';document.getElementById(\'bfCaptchaEntry\').focus();document.getElementById(\'ff_capimgValue\').src = \'' . $captcha_url . '&bfMathRandom=\' + Math.random(); return false"><img src="' . Uri::root() . 'media/com_breezingformsng/images/site/captcha/refresh-captcha.png" border="0" /></a>';
                         echo indentc(1) . '</div>' . nl();
                         break;
                     case 'Query List':
@@ -2059,18 +2064,15 @@ final class RenderingEngine
 
                     if (isset($rootMdata['themebootstrapMode']) && $rootMdata['themebootstrapMode']) {
 
-                        require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickModeOnePage.php');
-                        $quickMode = new BFQuickModeOnePage($this->processor);
+                        $quickMode = new OnePageRenderer($this->processor);
                     } else {
 
-                        require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickModeBootstrap.php');
-                        $quickMode = new BFQuickModeBootstrap($this->processor);
+                        $quickMode = new BootstrapRenderer($this->processor);
                     }
 
                     $this->processor->quickmode = $quickMode;
                 } else {
-                    require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickMode.php');
-                    $quickMode = new BFQuickMode($this->processor);
+                    $quickMode = new ClassicRenderer($this->processor);
                     $this->processor->quickmode = $quickMode;
                 }
             }
@@ -2341,29 +2343,6 @@ final class RenderingEngine
         } // if
         restore_error_handler();
 
-        if (trim($this->processor->formrow->template_code_processed) == 'QuickMode' && $this->processor->isMobile) {
-            $contents = ob_get_contents();
-            $ob = 0;
-            while (ob_get_level() > 0 && $ob <= 32) {
-                ob_end_clean();
-                $ob++;
-            }
-
-            echo '<!DOCTYPE html> 
-<html> 
-<head> 
-<title>' . $this->processor->app->getDocument()->getTitle() . '</title>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1">';
-            echo $quickMode->headers();
-            echo $quickMode->fetchHead($this->processor->app->getDocument()->getHeadData());
-            echo '</head>' . "\n";
-            echo '<body>' . "\n";
-            echo $contents;
-            echo '
-</body>' . "\n" . '</html>';
-            exit;
-        }
     }
 
     // view

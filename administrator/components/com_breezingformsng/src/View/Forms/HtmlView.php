@@ -14,6 +14,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Pagination\Pagination;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\Session\SessionInterface;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\FormModel;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\FormsModel;
 
@@ -62,7 +63,13 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
             // swap which code editor is visible - defined here, not in the
             // list-only branch below.
             $document = Factory::getApplication()->getDocument();
-            $document->getWebAssetManager()->registerAndUseScript(
+            $wa = $document->getWebAssetManager();
+            $wa->registerAndUseStyle(
+                'com_breezingformsng.forms-edit',
+                'media/com_breezingformsng/css/admin/forms-edit.css',
+                ['version' => 'auto']
+            );
+            $wa->registerAndUseScript(
                 'com_breezingformsng.admin-form',
                 'media/com_breezingformsng/js/admin/admin-form.js',
                 ['version' => 'auto'],
@@ -78,7 +85,7 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
 
             if ($this->form === null) {
                 Factory::getApplication()->enqueueMessage(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'), 'error');
-                Factory::getApplication()->redirect('index.php?option=com_breezingformsng&act=manageforms&view=forms');
+                Factory::getApplication()->redirect('index.php?option=com_breezingformsng&view=forms');
                 return;
             }
 
@@ -94,6 +101,7 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
         } else {
             $document = Factory::getApplication()->getDocument();
             $wa       = $document->getWebAssetManager();
+            $wa->useScript('com_breezingformsng.admin-sort');
             $wa->registerAndUseScript(
                 'com_breezingformsng.admin-form',
                 'media/com_breezingformsng/js/admin/admin-form.js',
@@ -121,7 +129,7 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
 
             $session = Factory::getApplication()->getSession();
             $pkgIn   = $input->getString('pkg', '__unset__');
-            $this->pkg   = $listModel->resolvedPkg($pkgIn);
+            $this->pkg   = $this->resolvePackage($pkgIn, $listModel, $session);
 
             $searchReq = $input->getString('search', '__unset__');
             if ($searchReq === '__unset__') {
@@ -172,6 +180,25 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
         }
 
         parent::display($tpl);
+    }
+
+    private function resolvePackage(string $package, FormsModel $model, SessionInterface $session): string
+    {
+        $packages = $model->getPackages();
+
+        if ($package === '__unset__') {
+            $package = (string) $session->get('bf.forms_pkg', '');
+        } elseif ($package === '- blank -') {
+            $package = '';
+        }
+
+        if ($package !== '' && !in_array($package, $packages, true)) {
+            $package = $packages[0] ?? '';
+        }
+
+        $session->set('bf.forms_pkg', $package);
+
+        return $package;
     }
 
     protected function getDetailLabel(): ?string

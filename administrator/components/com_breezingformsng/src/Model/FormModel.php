@@ -11,16 +11,34 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\MVC\Model\BaseModel;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Event\Event;
 
-class FormModel extends BaseModel
+class FormModel extends BaseDatabaseModel
 {
+    private const INTEGER_COLUMNS = [
+        'autoheight', 'ordering', 'published', 'debug_mode', 'runmode',
+        'width', 'widthmode', 'height', 'heightmode', 'pages',
+        'emailntf', 'mb_emailntf', 'emaillog', 'mb_emaillog',
+        'emailxml', 'mb_emailxml', 'email_type', 'mb_email_type',
+        'email_custom_html', 'mb_email_custom_html', 'dblog',
+        'script1cond', 'script2cond', 'piece1cond', 'piece2cond',
+        'piece3cond', 'piece4cond', 'prevmode', 'double_opt',
+        'mailchimp_double_optin', 'mailchimp_send_errors',
+        'mailchimp_delete_member', 'salesforce_enabled',
+        'dropbox_submission_enabled',
+    ];
+
+    private const NULLABLE_INTEGER_COLUMNS = [
+        'script1id', 'script2id', 'piece1id', 'piece2id', 'piece3id', 'piece4id',
+        'prevwidth',
+    ];
+
     private function db(): DatabaseInterface
     {
-        return Factory::getContainer()->get(DatabaseInterface::class);
+        return $this->getDatabase();
     }
 
     public function getForm(int $id): ?\stdClass
@@ -96,6 +114,19 @@ class FormModel extends BaseModel
         $obj->piece4cond             = 0;
         $obj->piece4id               = 0;
         $obj->piece4code             = '';
+        foreach (['mailchimp_email_field', 'mailchimp_checkbox_field', 'mailchimp_api_key', 'mailchimp_list_id',
+            'mailchimp_mergevars', 'mailchimp_text_html_mobile_field', 'mailchimp_unsubscribe_field',
+            'salesforce_token', 'salesforce_username', 'salesforce_password', 'salesforce_type', 'salesforce_fields',
+            'dropbox_email', 'dropbox_password', 'dropbox_folder'] as $column) {
+            $obj->$column = '';
+        }
+        $obj->mailchimp_double_optin = 1;
+        $obj->mailchimp_send_errors = 0;
+        $obj->mailchimp_default_type = 'text';
+        $obj->mailchimp_delete_member = 0;
+        $obj->salesforce_enabled = 0;
+        $obj->dropbox_submission_enabled = 0;
+        $obj->dropbox_submission_types = 'pdf';
         $obj->created                = null;
         $obj->created_by             = '';
         $obj->modified               = null;
@@ -108,7 +139,7 @@ class FormModel extends BaseModel
     {
         $db  = $this->db();
         $now = (new \Joomla\CMS\Date\Date())->toSql();
-        $uid = (string) Factory::getApplication()->getIdentity()->username;
+        $uid = (string) $this->getCurrentUser()->username;
         $id  = (int) ($data['id'] ?? 0);
 
         $title = trim((string) ($data['title'] ?? ''));
@@ -132,6 +163,12 @@ class FormModel extends BaseModel
             'piece2cond', 'piece2id', 'piece2code',
             'piece3cond', 'piece3id', 'piece3code',
             'piece4cond', 'piece4id', 'piece4code',
+            'mailchimp_email_field', 'mailchimp_checkbox_field', 'mailchimp_api_key', 'mailchimp_list_id',
+            'mailchimp_double_optin', 'mailchimp_mergevars', 'mailchimp_text_html_mobile_field',
+            'mailchimp_send_errors', 'mailchimp_default_type', 'mailchimp_delete_member',
+            'mailchimp_unsubscribe_field', 'salesforce_token', 'salesforce_username', 'salesforce_password',
+            'salesforce_type', 'salesforce_fields', 'salesforce_enabled', 'dropbox_email', 'dropbox_password',
+            'dropbox_folder', 'dropbox_submission_enabled', 'dropbox_submission_types',
         ];
 
         $sets = [];
@@ -144,6 +181,8 @@ class FormModel extends BaseModel
                 'script1cond', 'script1id', 'script2cond', 'script2id',
                 'piece1cond', 'piece1id', 'piece2cond', 'piece2id',
                 'piece3cond', 'piece3id', 'piece4cond', 'piece4id',
+                'mailchimp_double_optin', 'mailchimp_send_errors', 'mailchimp_delete_member',
+                'salesforce_enabled', 'dropbox_submission_enabled',
             ], true) ? (int) $val : (string) $val;
         }
 
@@ -176,7 +215,7 @@ class FormModel extends BaseModel
         $this->reorder($sets['package'] ?? '');
 
         PluginHelper::importPlugin('breezingforms_addons');
-        Factory::getApplication()->getDispatcher()
+        $this->getDispatcher()
             ->dispatch('onPropertiesSave', new Event('onPropertiesSave', [$id]));
 
         return $id;
@@ -210,7 +249,7 @@ class FormModel extends BaseModel
 
         $db  = $this->db();
         $now = (new \Joomla\CMS\Date\Date())->toSql();
-        $uid = (string) Factory::getApplication()->getIdentity()->username;
+        $uid = (string) $this->getCurrentUser()->username;
 
         foreach (array_map('intval', $ids) as $id) {
             $src = $this->getForm($id);
@@ -229,11 +268,15 @@ class FormModel extends BaseModel
             $data['modified_by']= $uid;
 
             unset($data['id']);
+            $data = $this->normaliseCloneData($data);
 
             $q = $db->getQuery(true)
                 ->insert($db->quoteName('#__facileforms_forms'))
                 ->columns(array_map(fn($c) => $db->quoteName($c), array_keys($data)))
-                ->values(implode(',', array_map(fn($v) => $db->quote($v), array_values($data))));
+                ->values(implode(',', array_map(
+                    fn($value) => $value === null ? 'NULL' : $db->quote($value),
+                    array_values($data)
+                )));
             $db->setQuery($q)->execute();
             $newId = (int) $db->insertid();
 
@@ -256,6 +299,25 @@ class FormModel extends BaseModel
 
             $this->reorder((string) ($src->package ?? ''));
         }
+    }
+
+    private function normaliseCloneData(array $data): array
+    {
+        foreach (self::INTEGER_COLUMNS as $column) {
+            if (array_key_exists($column, $data)) {
+                $data[$column] = (int) $data[$column];
+            }
+        }
+
+        foreach (self::NULLABLE_INTEGER_COLUMNS as $column) {
+            if (array_key_exists($column, $data)) {
+                $data[$column] = $data[$column] === '' || $data[$column] === null
+                    ? null
+                    : (int) $data[$column];
+            }
+        }
+
+        return $data;
     }
 
     public function publish(array $ids, int $state): void

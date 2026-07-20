@@ -15,6 +15,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\CMS\Uri\Uri;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\IntegratorModel;
 
 class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\BreezingformsNG\HtmlView
@@ -30,6 +31,8 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
     public array $criteriaJoomla   = [];
     public array $criteriaFixed    = [];
     public string $formFilter  = 'all';
+    public string $listOrder = 'rules.name';
+    public string $listDirn = 'asc';
 
     public function display($tpl = null): void
     {
@@ -46,21 +49,36 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
 
         if ($layout === 'edit') {
             $this->prepareEdit($model, $input);
+        } elseif ($layout === 'help') {
+            // The help layout is self-contained.
         } else {
-            $this->prepareList($model);
+            $this->prepareList($model, $input);
         }
 
         parent::display($tpl);
     }
 
-    private function prepareList(IntegratorModel $model): void
+    private function prepareList(IntegratorModel $model, \Joomla\Input\Input $input): void
     {
-        $this->rules = $model->getRules();
+        $allowedSorts = [
+            'rules.name', 'rules.type', 'forms.name',
+            'rules.reference_table', 'rules.published',
+        ];
+        $requestedOrder = $input->getCmd('filter_order', 'rules.name');
+        $this->listOrder = in_array($requestedOrder, $allowedSorts, true) ? $requestedOrder : 'rules.name';
+        $this->listDirn = strtolower($input->getCmd('filter_order_Dir', 'asc')) === 'desc' ? 'desc' : 'asc';
+        $this->rules = $model->getRules($this->listOrder, $this->listDirn);
         ToolbarHelper::addNew('integrator.edit');
         ToolbarHelper::deleteList('', 'integrator.remove');
+        ToolbarHelper::help(
+            'COM_BREEZINGFORMSNG_HELP_INTEGRATOR_TITLE',
+            false,
+            Uri::base() . 'index.php?option=com_breezingformsng&view=integrator&layout=help&tmpl=component'
+        );
 
         $document = Factory::getApplication()->getDocument();
         $wa       = $document->getWebAssetManager();
+        $wa->useScript('com_breezingformsng.admin-sort');
         $wa->registerAndUseScript(
             'com_breezingformsng.admin-form',
             'media/com_breezingformsng/js/admin/admin-form.js',

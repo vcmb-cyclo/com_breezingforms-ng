@@ -32,22 +32,62 @@ function bfSel(array $list, string $name, int $current, string $extra = ''): str
 }
 
 $editor = Editor::getInstance('codemirror');
+$countConfigured = static function (array $values): int {
+    return count(array_filter($values, static fn($value): bool => $value !== null && $value !== '' && $value !== 0 && $value !== '0'));
+};
+$tabEntryCounts = [
+    'general' => $countConfigured([$f->title ?? '', $f->name ?? '', $f->package ?? '', $f->description ?? '', $f->class1 ?? '']),
+    'email' => $countConfigured([
+        $f->emailntf ?? 0, $f->emailadr ?? '', $f->custom_mail_subject ?? '', $f->alt_mailfrom ?? '',
+        $f->alt_fromname ?? '', $f->mb_emailntf ?? 0, $f->mb_custom_mail_subject ?? '',
+        $f->mb_alt_mailfrom ?? '', $f->mb_alt_fromname ?? '',
+    ]),
+    'scripts' => (int) ((int) ($f->script1cond ?? 0) > 0) + (int) ((int) ($f->script2cond ?? 0) > 0),
+    'form-pieces' => (int) ((int) ($f->piece1cond ?? 0) > 0) + (int) ((int) ($f->piece2cond ?? 0) > 0),
+    'submit-pieces' => (int) ((int) ($f->piece3cond ?? 0) > 0) + (int) ((int) ($f->piece4cond ?? 0) > 0),
+    'mailchimp' => $countConfigured([
+        $f->mailchimp_api_key ?? '', $f->mailchimp_list_id ?? '', $f->mailchimp_email_field ?? '',
+        $f->mailchimp_checkbox_field ?? '', $f->mailchimp_unsubscribe_field ?? '',
+        $f->mailchimp_text_html_mobile_field ?? '', $f->mailchimp_mergevars ?? '',
+    ]),
+    'salesforce' => $countConfigured([
+        $f->salesforce_enabled ?? 0, $f->salesforce_token ?? '', $f->salesforce_username ?? '',
+        $f->salesforce_type ?? '', $f->salesforce_fields ?? '',
+    ]),
+    'dropbox' => $countConfigured([
+        $f->dropbox_email ?? '', $f->dropbox_password ?? '', $f->dropbox_folder ?? '',
+        $f->dropbox_submission_enabled ?? 0,
+    ]),
+];
 ?>
-<form action="index.php?option=com_breezingformsng" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_breezingformsng" method="post" name="adminForm" id="adminForm"
+      class="bf-forms-edit">
 
   <ul class="nav nav-tabs" id="<?= $tabId; ?>" role="tablist">
     <li class="nav-item" role="presentation">
       <button class="nav-link active" id="tab-general" data-bs-toggle="tab" data-bs-target="#pane-general"
-              type="button" role="tab"><?= Text::_('COM_BREEZINGFORMSNG_FORMS_TAB_GENERAL'); ?></button>
+              type="button" role="tab"><?= Text::_('COM_BREEZINGFORMSNG_FORMS_TAB_GENERAL'); ?><?php if ($tabEntryCounts['general'] > 0): ?> <span class="badge bg-primary text-white"><?= $tabEntryCounts['general']; ?></span><?php endif; ?></button>
     </li>
     <li class="nav-item" role="presentation">
       <button class="nav-link" id="tab-email" data-bs-toggle="tab" data-bs-target="#pane-email"
-              type="button" role="tab"><?= Text::_('COM_BREEZINGFORMSNG_FORMS_TAB_EMAIL'); ?></button>
+              type="button" role="tab"><?= Text::_('COM_BREEZINGFORMSNG_FORMS_TAB_EMAIL'); ?><?php if ($tabEntryCounts['email'] > 0): ?> <span class="badge bg-primary text-white"><?= $tabEntryCounts['email']; ?></span><?php endif; ?></button>
     </li>
     <li class="nav-item" role="presentation">
       <button class="nav-link" id="tab-scripts" data-bs-toggle="tab" data-bs-target="#pane-scripts"
-              type="button" role="tab"><?= Text::_('COM_BREEZINGFORMSNG_FORMS_TAB_SCRIPTS'); ?></button>
+              type="button" role="tab"><?= Text::_('COM_BREEZINGFORMSNG_FORMS_TAB_SCRIPTS'); ?><?php if ($tabEntryCounts['scripts'] > 0): ?> <span class="badge bg-primary text-white"><?= $tabEntryCounts['scripts']; ?></span><?php endif; ?></button>
     </li>
+    <?php foreach ([
+        'form-pieces' => Text::_('COM_BREEZINGFORMSNG_FORMS_FORMPIECES'),
+        'submit-pieces' => Text::_('COM_BREEZINGFORMSNG_FORMS_SUBMPIECES'),
+        'mailchimp' => 'MailChimp®',
+        'salesforce' => 'Salesforce®',
+        'dropbox' => 'Dropbox®',
+    ] as $pane => $label): ?>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="tab-<?= $pane; ?>" data-bs-toggle="tab" data-bs-target="#pane-<?= $pane; ?>"
+              type="button" role="tab"><?= $label; ?><?php if (($tabEntryCounts[$pane] ?? 0) > 0): ?> <span class="badge bg-primary text-white"><?= $tabEntryCounts[$pane]; ?></span><?php endif; ?></button>
+    </li>
+    <?php endforeach; ?>
   </ul>
 
   <div class="tab-content border border-top-0 p-3 mb-3">
@@ -325,15 +365,20 @@ $editor = Editor::getInstance('codemirror');
         </div>
       </div>
 
-      <!-- Additional script code -->
+    </div><!-- /tab scripts -->
+
+    <?php
+    $pieceLabels = [
+        1 => ['COM_BREEZINGFORMSNG_FORMS_PIECE_BEFORE', $this->pieceBefore, 'piece1cond', 'piece1id', 'piece1code', 'p1'],
+        2 => ['COM_BREEZINGFORMSNG_FORMS_PIECE_AFTER', $this->pieceAfter, 'piece2cond', 'piece2id', 'piece2code', 'p2'],
+        3 => ['COM_BREEZINGFORMSNG_FORMS_PIECE_BEGIN_SUBMIT', $this->pieceBeginSubmit, 'piece3cond', 'piece3id', 'piece3code', 'p3'],
+        4 => ['COM_BREEZINGFORMSNG_FORMS_PIECE_END_SUBMIT', $this->pieceEndSubmit, 'piece4cond', 'piece4id', 'piece4code', 'p4'],
+    ];
+    foreach (['form-pieces' => [1, 2], 'submit-pieces' => [3, 4]] as $piecePane => $pieceIndexes): ?>
+    <div class="tab-pane fade" id="pane-<?= $piecePane; ?>" role="tabpanel">
       <?php
-      $pieceLabels = [
-          1 => ['COM_BREEZINGFORMSNG_FORMS_PIECE_BEFORE',       $this->pieceBefore,      'piece1cond', 'piece1id', 'piece1code', 'p1'],
-          2 => ['COM_BREEZINGFORMSNG_FORMS_PIECE_AFTER',        $this->pieceAfter,       'piece2cond', 'piece2id', 'piece2code', 'p2'],
-          3 => ['COM_BREEZINGFORMSNG_FORMS_PIECE_BEGIN_SUBMIT', $this->pieceBeginSubmit, 'piece3cond', 'piece3id', 'piece3code', 'p3'],
-          4 => ['COM_BREEZINGFORMSNG_FORMS_PIECE_END_SUBMIT',   $this->pieceEndSubmit,   'piece4cond', 'piece4id', 'piece4code', 'p4'],
-      ];
-      foreach ($pieceLabels as [$label, $pieces, $condName, $idName, $codeName, $pfx]): ?>
+      foreach ($pieceIndexes as $pieceIndex):
+      [$label, $pieces, $condName, $idName, $codeName, $pfx] = $pieceLabels[$pieceIndex]; ?>
       <div class="card mb-3">
         <div class="card-header"><?= Text::_($label); ?></div>
         <div class="card-body">
@@ -359,8 +404,76 @@ $editor = Editor::getInstance('codemirror');
         </div>
       </div>
       <?php endforeach; ?>
+    </div>
+    <?php endforeach; ?>
 
-    </div><!-- /tab scripts -->
+    <div class="tab-pane fade" id="pane-mailchimp" role="tabpanel">
+      <?php foreach ([
+          'mailchimp_api_key' => 'COM_BREEZINGFORMSNG_API_KEY',
+          'mailchimp_list_id' => 'COM_BREEZINGFORMSNG_LIST_ID',
+          'mailchimp_email_field' => 'COM_BREEZINGFORMSNG_EMAIL_FIELD',
+          'mailchimp_checkbox_field' => 'COM_BREEZINGFORMSNG_CHECKBOX_FIELD',
+          'mailchimp_unsubscribe_field' => 'COM_BREEZINGFORMSNG_UNSUBSCRIBE_FIELD',
+          'mailchimp_text_html_mobile_field' => 'COM_BREEZINGFORMSNG_TEXT_HTML_MOBILE_FIELD',
+          'mailchimp_mergevars' => 'COM_BREEZINGFORMSNG_MERGE_VARS',
+      ] as $name => $label): ?>
+      <div class="row mb-3">
+        <label class="col-sm-3 col-form-label" for="jf_<?= $name; ?>"><?= Text::_($label); ?></label>
+        <div class="col-sm-9"><input class="form-control" id="jf_<?= $name; ?>" name="<?= $name; ?>" value="<?= htmlspecialchars($f->$name ?? ''); ?>"></div>
+      </div>
+      <?php endforeach; ?>
+      <div class="row mb-3">
+        <label class="col-sm-3 col-form-label" for="jf_mailchimp_default_type"><?= Text::_('COM_BREEZINGFORMSNG_DEFAULT_TYPE'); ?></label>
+        <div class="col-sm-9"><select class="form-select" id="jf_mailchimp_default_type" name="mailchimp_default_type">
+          <?php foreach (['text' => 'Text', 'html' => 'HTML', 'mobile' => 'Mobile'] as $value => $label): ?>
+          <option value="<?= $value; ?>"<?= ($f->mailchimp_default_type ?? 'text') === $value ? ' selected' : ''; ?>><?= $label; ?></option>
+          <?php endforeach; ?>
+        </select></div>
+      </div>
+      <?php foreach ([
+          'mailchimp_double_optin' => 'COM_BREEZINGFORMSNG_DOUBLE_OPTIN',
+          'mailchimp_delete_member' => 'COM_BREEZINGFORMSNG_UNSUBSCRIBE_DELETE_MEMBER',
+          'mailchimp_send_errors' => 'COM_BREEZINGFORMSNG_SEND_ERRORS',
+      ] as $name => $label): ?>
+      <div class="row mb-3">
+        <label class="col-sm-3 col-form-label" for="jf_<?= $name; ?>"><?= Text::_($label); ?></label>
+        <div class="col-sm-9 form-check form-switch"><input type="hidden" name="<?= $name; ?>" value="0"><input class="form-check-input" id="jf_<?= $name; ?>" type="checkbox" name="<?= $name; ?>" value="1"<?= !empty($f->$name) ? ' checked' : ''; ?>></div>
+      </div>
+      <?php endforeach; ?>
+    </div>
+
+    <div class="tab-pane fade" id="pane-salesforce" role="tabpanel">
+      <div class="row mb-3">
+        <label class="col-sm-3 col-form-label" for="jf_salesforce_enabled"><?= Text::_('COM_BREEZINGFORMSNG_SF_ENABLED'); ?></label>
+        <div class="col-sm-9 form-check form-switch"><input type="hidden" name="salesforce_enabled" value="0"><input class="form-check-input" id="jf_salesforce_enabled" type="checkbox" name="salesforce_enabled" value="1"<?= !empty($f->salesforce_enabled) ? ' checked' : ''; ?>></div>
+      </div>
+      <?php foreach ([
+          'salesforce_token' => 'COM_BREEZINGFORMSNG_SF_TOKEN',
+          'salesforce_username' => 'COM_BREEZINGFORMSNG_SF_USERNAME',
+          'salesforce_type' => 'COM_BREEZINGFORMSNG_SF_TYPE',
+      ] as $name => $label): ?>
+      <div class="row mb-3"><label class="col-sm-3 col-form-label" for="jf_<?= $name; ?>"><?= Text::_($label); ?></label><div class="col-sm-9"><input class="form-control" id="jf_<?= $name; ?>" name="<?= $name; ?>" value="<?= htmlspecialchars($f->$name ?? ''); ?>"></div></div>
+      <?php endforeach; ?>
+      <div class="row mb-3"><label class="col-sm-3 col-form-label" for="jf_salesforce_password"><?= Text::_('COM_BREEZINGFORMSNG_SF_PASSWORD'); ?></label><div class="col-sm-9"><input type="password" class="form-control" id="jf_salesforce_password" name="salesforce_password" autocomplete="new-password"></div></div>
+      <div class="row mb-3"><label class="col-sm-3 col-form-label" for="jf_salesforce_fields"><?= Text::_('COM_BREEZINGFORMSNG_SF_FIELDS'); ?></label><div class="col-sm-9"><input class="form-control" id="jf_salesforce_fields" name="salesforce_fields[]" value="<?= htmlspecialchars($f->salesforce_fields ?? ''); ?>"></div></div>
+    </div>
+
+    <div class="tab-pane fade" id="pane-dropbox" role="tabpanel">
+      <?php foreach ([
+          'dropbox_email' => 'COM_BREEZINGFORMSNG_DROPBOX_ACCESS_TOKEN',
+          'dropbox_password' => 'COM_BREEZINGFORMSNG_DROPBOX_AUTH_CODE',
+          'dropbox_folder' => 'COM_BREEZINGFORMSNG_DROPBOX_FOLDER',
+      ] as $name => $label): ?>
+      <div class="row mb-3"><label class="col-sm-3 col-form-label" for="jf_<?= $name; ?>"><?= Text::_($label); ?></label><div class="col-sm-9"><input class="form-control" id="jf_<?= $name; ?>" name="<?= $name; ?>" value="<?= htmlspecialchars($f->$name ?? ''); ?>"></div></div>
+      <?php endforeach; ?>
+      <div class="row mb-3"><label class="col-sm-3 col-form-label" for="jf_dropbox_submission_enabled"><?= Text::_('COM_BREEZINGFORMSNG_DROPBOX_UPLOAD_SUBMISSION'); ?></label><div class="col-sm-9 form-check form-switch"><input type="hidden" name="dropbox_submission_enabled" value="0"><input class="form-check-input" id="jf_dropbox_submission_enabled" type="checkbox" name="dropbox_submission_enabled" value="1"<?= !empty($f->dropbox_submission_enabled) ? ' checked' : ''; ?>></div></div>
+      <div class="row mb-3"><span class="col-sm-3 col-form-label"><?= Text::_('COM_BREEZINGFORMSNG_DROPBOX_SUBMISSION_TYPES'); ?></span><div class="col-sm-9 d-flex gap-3">
+        <?php $dropboxTypes = explode(',', (string) ($f->dropbox_submission_types ?? 'pdf')); foreach (['pdf', 'csv', 'xml'] as $type): ?>
+        <label class="form-check"><input class="form-check-input" type="checkbox" name="dropbox_submission_types[]" value="<?= $type; ?>"<?= in_array($type, $dropboxTypes, true) ? ' checked' : ''; ?>> <?= strtoupper($type); ?></label>
+        <?php endforeach; ?>
+      </div></div>
+      <div class="row mb-3"><label class="col-sm-3 col-form-label" for="jf_dropbox_reset_auth"><?= Text::_('COM_BREEZINGFORMSNG_DROPBOX_RESET_AUTH'); ?></label><div class="col-sm-9 form-check"><input class="form-check-input" id="jf_dropbox_reset_auth" type="checkbox" name="dropbox_reset_auth" value="1"></div></div>
+    </div>
 
   </div><!-- /.tab-content -->
 

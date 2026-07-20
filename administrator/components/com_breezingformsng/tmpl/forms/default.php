@@ -15,8 +15,10 @@ use Joomla\CMS\Pagination\Pagination;
 $pkg = $this->pkg;
 
 $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
+$itemCount  = count($this->items);
+$saveOrder  = $this->listOrder === 'ordering' && strtolower($this->listDirn) === 'asc';
 ?>
-<form action="index.php?option=com_breezingformsng&amp;act=manageforms&amp;view=forms" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_breezingformsng&amp;view=forms" method="post" name="adminForm" id="adminForm">
   <input type="hidden" name="view" value="forms">
 
   <div class="d-flex flex-wrap gap-2 mb-3 align-items-center">
@@ -45,7 +47,7 @@ $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
              placeholder="<?= Text::_('JSEARCH_FILTER'); ?>">
       <button type="submit" class="btn btn-primary" id="filter_search_submit"><?= Text::_('JSEARCH_FILTER_SUBMIT'); ?></button>
       <?php if ($this->search !== ''): ?>
-        <a href="index.php?option=com_breezingformsng&act=manageforms&view=forms&search=&pkg=<?= rawurlencode($pkg); ?>"
+        <a href="index.php?option=com_breezingformsng&view=forms&search=&pkg=<?= rawurlencode($pkg); ?>"
            class="btn btn-secondary" id="filter_search_clear"><?= Text::_('JSEARCH_FILTER_CLEAR'); ?></a>
       <?php endif; ?>
     </div>
@@ -58,13 +60,13 @@ $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
         <th class="w-1 text-center">
           <input type="checkbox" class="form-check-input" onclick="Joomla.checkAll(this)" title="<?= Text::_('JGLOBAL_CHECK_ALL'); ?>">
         </th>
-        <th><?= HTMLHelper::_('grid.sort', Text::_('COM_BREEZINGFORMSNG_FORMS_TITLE'), 'title', $this->listDirn, $this->listOrder); ?></th>
-        <th><?= HTMLHelper::_('grid.sort', Text::_('COM_BREEZINGFORMSNG_FORMS_NAME'), 'name', $this->listDirn, $this->listOrder); ?></th>
-        <th class="text-center"><?= HTMLHelper::_('grid.sort', Text::_('COM_BREEZINGFORMSNG_FORMS_PAGES'), 'pages', $this->listDirn, $this->listOrder); ?></th>
-        <th class="text-center w-10"><?= HTMLHelper::_('grid.sort', Text::_('JPUBLISHED'), 'published', $this->listDirn, $this->listOrder); ?></th>
-        <th class="text-center w-10"><?= HTMLHelper::_('grid.sort', Text::_('JGRID_HEADING_ORDERING'), 'ordering', $this->listDirn, $this->listOrder); ?></th>
-        <th class="text-center"><?= Text::_('COM_BREEZINGFORMSNG_FORMS_ACTIONS'); ?></th>
-        <th class="text-nowrap"><?= HTMLHelper::_('grid.sort', Text::_('COM_BREEZINGFORMSNG_FORMS_MODIFIED'), 'modified', $this->listDirn, $this->listOrder); ?></th>
+        <th class="text-center"><?= HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ID', 'id', $this->listDirn, $this->listOrder); ?></th>
+        <th><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_FORMS_TITLE', 'title', $this->listDirn, $this->listOrder); ?></th>
+        <th><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_FORMS_NAME', 'name', $this->listDirn, $this->listOrder); ?></th>
+        <th class="text-center"><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_FORMS_PAGES', 'pages', $this->listDirn, $this->listOrder); ?></th>
+        <th class="text-center w-10"><?= HTMLHelper::_('searchtools.sort', 'JPUBLISHED', 'published', $this->listDirn, $this->listOrder); ?></th>
+        <th class="text-center w-10"><?= HTMLHelper::_('searchtools.sort', 'JGRID_HEADING_ORDERING', 'ordering', $this->listDirn, $this->listOrder); ?></th>
+        <th class="text-nowrap"><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_FORMS_MODIFIED', 'modified', $this->listDirn, $this->listOrder); ?></th>
       </tr>
     </thead>
     <tbody>
@@ -74,8 +76,10 @@ $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
         <?php foreach ($this->items as $i => $form): ?>
           <tr>
             <td class="text-center"><?= HTMLHelper::_('grid.id', $i, $form->id); ?></td>
+            <td class="text-center"><?= (int) $form->id; ?></td>
             <td>
-              <a href="index.php?option=com_breezingformsng&task=quickmode.display&form=<?= (int) $form->id; ?>&pkg=<?= rawurlencode($pkg); ?>">
+              <a href="index.php?option=com_breezingformsng&task=quickmode.display&form=<?= (int) $form->id; ?>&pkg=<?= rawurlencode($pkg); ?>"
+                 title="<?= Text::_('COM_BREEZINGFORMSNG_FORMS_OPEN_EDITOR'); ?>">
                 <?= htmlspecialchars($form->title); ?>
               </a>
             </td>
@@ -83,7 +87,7 @@ $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
             <td class="text-center"><?= (int) $form->pages; ?></td>
             <td class="text-center">
               <a href="#"
-                 class="js-grid-item-action tbody-icon<?= $form->published ? ' active' : ''; ?>"
+                 class="tbody-icon<?= $form->published ? ' active' : ''; ?>"
                  data-item-id="cb<?= (int) $i; ?>"
                  data-item-task="forms.setPublished"
                  data-item-form-id="<?= (int) $form->id; ?>"
@@ -92,21 +96,22 @@ $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
                 <span class="<?= $form->published ? 'icon-publish' : 'icon-unpublish'; ?>" aria-hidden="true"></span>
               </a>
             </td>
-            <td class="text-center">
-              <button type="button" class="btn btn-link p-0 border-0" title="<?= Text::_('JLIB_HTML_MOVE_UP'); ?>"
-                      onclick="this.form.action_id.value='<?= (int) $form->id; ?>';Joomla.submitbutton('forms.orderup');">
-                <span class="icon-arrow-up-2" aria-hidden="true"></span>
-              </button>
-              <button type="button" class="btn btn-link p-0 border-0" title="<?= Text::_('JLIB_HTML_MOVE_DOWN'); ?>"
-                      onclick="this.form.action_id.value='<?= (int) $form->id; ?>';Joomla.submitbutton('forms.orderdown');">
-                <span class="icon-arrow-down-2" aria-hidden="true"></span>
-              </button>
-            </td>
-            <td class="text-center">
-              <a href="index.php?option=com_breezingformsng&task=quickmode.display&form=<?= (int) $form->id; ?>&pkg=<?= rawurlencode($pkg); ?>"
-                 class="btn btn-sm btn-outline-secondary" title="<?= Text::_('COM_BREEZINGFORMSNG_FORMS_OPEN_EDITOR'); ?>">
-                <span class="icon-edit" aria-hidden="true"></span>
-              </a>
+            <td class="order text-center text-nowrap">
+              <?= $pagination->orderUpIcon(
+                  $i,
+                  $saveOrder,
+                  'forms.orderup',
+                  Text::_('JLIB_HTML_MOVE_UP'),
+                  $saveOrder
+              ); ?>
+              <?= $pagination->orderDownIcon(
+                  $i,
+                  $itemCount,
+                  $saveOrder,
+                  'forms.orderdown',
+                  Text::_('JLIB_HTML_MOVE_DOWN'),
+                  $saveOrder
+              ); ?>
             </td>
             <td class="text-nowrap">
               <?php
@@ -128,7 +133,6 @@ $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
   <input type="hidden" name="filter_order" value="<?= htmlspecialchars($this->listOrder); ?>">
   <input type="hidden" name="filter_order_Dir" value="<?= htmlspecialchars($this->listDirn); ?>">
   <input type="hidden" name="boxchecked" value="0">
-  <input type="hidden" name="action_id" value="0">
   <?= HTMLHelper::_('form.token'); ?>
 </form>
 

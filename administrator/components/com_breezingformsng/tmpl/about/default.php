@@ -195,6 +195,7 @@ if (!function_exists('bf_about_get_php_libraries')) {
         $vendorInstalled = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/vendor/composer/installed.json';
 
         bf_about_collect_php_libraries_from_installed_json($indexedLibraries, $vendorInstalled);
+        bf_about_add_php_library($indexedLibraries, 'Securimage CAPTCHA', '4.0.4', false);
 
         $libraries = array_values($indexedLibraries);
 
@@ -241,13 +242,14 @@ if (!function_exists('bf_about_get_javascript_libraries')) {
     {
         $notAvailable = Text::_('COM_BREEZINGFORMSNG_NOT_AVAILABLE');
         $bundledSource = Text::_('COM_BREEZINGFORMSNG_JS_LIBRARY_SOURCE_BUNDLED');
+        $externalSource = Text::_('COM_BREEZINGFORMSNG_JS_LIBRARY_SOURCE_EXTERNAL');
         $basePath = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/jquery/';
         $libraries = array();
 
         $candidates = array(
             array(
                 'name' => 'jQuery',
-                'script_path' => $basePath . 'jq.js',
+                'script_path' => JPATH_ROOT . '/media/vendor/jquery/js/jquery.min.js',
                 'css_path' => '',
             ),
             array(
@@ -289,6 +291,13 @@ if (!function_exists('bf_about_get_javascript_libraries')) {
                 'source' => $bundledSource,
             );
         }
+
+        $libraries[] = array(
+            'name' => 'Google reCAPTCHA',
+            'version' => 'v2',
+            'assets' => 'JS',
+            'source' => $externalSource,
+        );
 
         usort($libraries, function ($a, $b) {
             return strcasecmp((string) $a['name'], (string) $b['name']);

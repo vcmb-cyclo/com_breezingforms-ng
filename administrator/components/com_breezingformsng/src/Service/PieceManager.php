@@ -18,8 +18,9 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 use Exception;
 use Vcmb\Component\BreezingformsNG\Site\Table\PieceTable;
 use Joomla\Utilities\ArrayHelper;
-use Joomla\CMS\Factory;
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\Database\DatabaseInterface;
+use Joomla\Database\ParameterType;
 use RuntimeException;
 use Throwable;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\PieceModel;
@@ -28,11 +29,11 @@ use Joomla\CMS\Language\Text;
 
 class BFAdminPieceTestContext
 {
-	private $db;
+	private DatabaseInterface $db;
 	public $formrow;
 	public $form_id;
 
-	public function __construct($db)
+	public function __construct(DatabaseInterface $db)
 	{
 		$this->db = $db;
 		$this->formrow = (object) array('id' => 0, 'name' => '');
@@ -45,9 +46,13 @@ class BFAdminPieceTestContext
 			return null;
 		}
 
-		$this->db->setQuery(
-			"SELECT code FROM #__facileforms_pieces WHERE name = " . $this->db->Quote($name) . " LIMIT 1"
-		);
+		$query = $this->db->getQuery(true)
+			->select($this->db->quoteName('code'))
+			->from($this->db->quoteName('#__facileforms_pieces'))
+			->where($this->db->quoteName('name') . ' = :name')
+			->bind(':name', $name)
+			->setLimit(1);
+		$this->db->setQuery($query);
 		$code = (string) $this->db->loadResult();
 		if ($code === '') {
 			return null;
@@ -71,6 +76,13 @@ class BFAdminPieceTestContext
 
 class PieceManager
 {
+	public function __construct(
+		private readonly CMSApplication $app,
+		private readonly DatabaseInterface $database,
+		private readonly PieceModel $model,
+	) {
+	}
+
 	private static function buildIsolatedNamespace()
 	{
 		try {
@@ -112,7 +124,7 @@ class PieceManager
 				if (is_callable($callable)) {
 					$result = call_user_func_array($callable, $args);
 				} else {
-					$error = 'Function not found in piece code.';
+					$error = Text::_('COM_BREEZINGFORMSNG_TEST_INVALID_FUNCTION_NAME');
 				}
 			} else {
 				$result = $evalResult;
@@ -136,9 +148,9 @@ class PieceManager
 		);
 	}
 
-	static function edit($option, $pkg, $ids)
+	function edit($option, $pkg, $ids)
 	{
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
+		$database = $this->database;
 		ArrayHelper::toInteger($ids);
 		$typelist = array();
 		$typelist[] = array('Untyped', Text::_('COM_BREEZINGFORMSNG_PIECES_UNTYPED'));
@@ -159,26 +171,19 @@ class PieceManager
 
 
 	// ✅ FORCER le champ code en RAW (conserve < et >)
-	static function save($option, $pkg)
+	function save($option, $pkg)
 	{
-		$app = Factory::getApplication();
+		$app = $this->app;
+		$post = $app->getInput()->post;
+		$data = $post->getArray();
+		$code = $post->get('code', '', 'raw');
+		$unitTests = $post->get('unit_tests', '', 'raw');
 
-		// Lire le body brut
-		$rawBody = file_get_contents('php://input');
-
-		// Parser comme application/x-www-form-urlencoded
-		$post = [];
-		parse_str($rawBody, $post);
-
-		// Récupérer code tel qu'envoyé
-		$code = $post['code'] ?? '';
-		$unitTests = $post['unit_tests'] ?? '';
-
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
+		$database = $this->database;
 		$row      = new PieceTable($database);
 
 		try {
-			if (!$row->bind($_POST)) {
+			if (!$row->bind($data)) {
 				throw new RuntimeException(Text::_('COM_BREEZINGFORMSNG_PIECES_SAVE_FAILED'));
 			}
 
@@ -188,7 +193,7 @@ class PieceManager
 			$row->description = $app->getInput()->post->get('description', '', 'raw');
 
 			$now = (new \Joomla\CMS\Date\Date())->toSql();
-			$userId = (string) Factory::getApplication()->getIdentity()->username;
+			$userId = (string) $app->getIdentity()->username;
 
 			if (empty($row->id)) {
 				if (empty($row->created)) {
@@ -215,15 +220,15 @@ class PieceManager
 		$app->redirect("index.php?option=$option&task=pieces.edit&pkg=$pkg&ids[]=" . (int) $row->id);
 	}
 
-	static function cancel($option, $pkg)
+	function cancel($option, $pkg)
 	{
-		Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
+		$this->app->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 	} // cancel
 
 
-	static function copy($option, $pkg, $ids)
+	function copy($option, $pkg, $ids)
 	{
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
+		$database = $this->database;
 		ArrayHelper::toInteger($ids);
 		$total = count($ids);
 		$row = new PieceTable($database);
@@ -232,55 +237,53 @@ class PieceManager
 				$row->load(intval($id));
 				$row->id = NULL;
 				$row->created = (new \Joomla\CMS\Date\Date())->toSql();
-				$row->created_by = (string) Factory::getApplication()->getIdentity()->username;
+				$row->created_by = (string) $this->app->getIdentity()->username;
 				$row->modified = $row->created;
 				$row->modified_by = $row->created_by;
 				$row->store();
 			} // foreach
 		$msg = $total . ' ' . Text::_('COM_BREEZINGFORMSNG_PIECES_SUCCOPIED');
-		Factory::getApplication()->enqueueMessage($msg);
-		Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
+		$this->app->enqueueMessage($msg);
+		$this->app->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 	} // copy
 
 
-	static function del($option, $pkg, $ids)
+	function del($option, $pkg, $ids)
 	{
-		$model = PieceModel::create();
-
 		try {
-			$total = $model->deleteByIds($ids);
+			$total = $this->model->deleteByIds($ids);
 		} catch (RuntimeException $e) {
-			Factory::getApplication()->enqueueMessage($e->getMessage(), 'error');
-			Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
+			$this->app->enqueueMessage($e->getMessage(), 'error');
+			$this->app->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 		}
 
 		if ($total) {
 			$msg = $total . ' ' . Text::_('COM_BREEZINGFORMSNG_PIECES_SUCCDELETED');
-			Factory::getApplication()->enqueueMessage($msg);
-			Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
+			$this->app->enqueueMessage($msg);
+			$this->app->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 			return;
 		}
-		Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
+		$this->app->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 	} // del
 
 
-	static function publish($option, $pkg, $ids, $publish)
+	function publish($option, $pkg, $ids, $publish)
 	{
 		try {
-			PieceModel::create()->publishByIds($ids, (bool) $publish);
+			$this->model->publishByIds($ids, (bool) $publish);
 		} catch (RuntimeException $e) {
-			Factory::getApplication()->enqueueMessage($e->getMessage(), 'error');
-			Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
+			$this->app->enqueueMessage($e->getMessage(), 'error');
+			$this->app->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 		}
 
-		Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
+		$this->app->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 	} // publish
 
 
-	static function listitems($option, $pkg)
+	function listitems($option, $pkg)
 	{
 		try {
-			$pkgs = PieceModel::create()->getPackages();
+			$pkgs = $this->model->getPackages();
 		} catch (Exception $e) {
 			echo $e->getCode() . ' : ' . $e->getMessage();
 			return false;
@@ -303,16 +306,9 @@ class PieceManager
 			foreach ($pkgs as $p)
 				$pkglist[] = array($p->name == $pkg, $p->name);
 
-		$app = Factory::getApplication();
+		$app = $this->app;
 		$input = $app->getInput();
 		$session = $app->getSession();
-		$showInternalReq = $input->get('show_internal', null, 'int');
-		if ($showInternalReq === null) {
-			$showInternal = (int) $session->get('bf.show_internal_pieces', 0);
-		} else {
-			$showInternal = (int) $showInternalReq;
-			$session->set('bf.show_internal_pieces', $showInternal);
-		}
 		$searchReq = $input->get('search', null, 'string');
 		if ($searchReq === null) {
 			$search = (string) $session->get('bf.pieces_search', '');
@@ -359,7 +355,7 @@ class PieceManager
 		}
 
 		try {
-			$listData = PieceModel::create()->getListData($pkg, $search, $sort, $dir, $limit, $limitstart, $showInternal);
+			$listData = $this->model->getListData($pkg, $search, $sort, $dir, $limit, $limitstart);
 		} catch (Exception $e) {
 			echo $e->getCode() . ' : ' . $e->getMessage();
 			return false;
@@ -369,21 +365,21 @@ class PieceManager
 		$session->set('bf.pieces_limitstart', $limitstart);
 		$rows = $listData['rows'];
 
-		Renderer::listitems($option, $rows, $pkglist, $pkg, $showInternal, $search, $total, $limit, $limitstart, $pageSizes);
+		Renderer::listitems($option, $rows, $pkglist, $pkg, $search, $total, $limit, $limitstart, $pageSizes);
 	} // listitems
 
-	static function test($option, $pkg, $ids)
+	function test($option, $pkg, $ids)
 	{
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
+		$database = $this->database;
 		ArrayHelper::toInteger($ids);
 		if (!count($ids)) {
-			$id = Factory::getApplication()->getInput()->getInt('id', 0);
+			$id = $this->app->getInput()->getInt('id', 0);
 			if ($id) {
 				$ids = array($id);
 			}
 		}
 		if (!count($ids)) {
-			Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
+			$this->app->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 			return;
 		}
 
@@ -421,14 +417,14 @@ class PieceManager
 			}
 			$autoRun = $allDefaults;
 		}
-		$testMode = Factory::getApplication()->getInput()->getCmd('test_mode', '');
+		$testMode = $this->app->getInput()->getCmd('test_mode', '');
 		Renderer::test($option, $pkg, $row, $functionName, $params, $paramDefaults, array(), null, '', '', 0, $autoRun, array(), $testMode, array());
 	}
 
-	static function testrun($option, $pkg, $ids)
+	function testrun($option, $pkg, $ids)
 	{
-		$app = Factory::getApplication();
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
+		$app = $this->app;
+		$database = $this->database;
 		ArrayHelper::toInteger($ids);
 		if (!count($ids)) {
 			$id = $app->getInput()->getInt('id', 0);
@@ -509,41 +505,38 @@ class PieceManager
 		Renderer::test($option, $pkg, $row, $functionName, $paramNames, $paramDefaults, $paramValues, $result, $output, $error, $safeMode, false, $errorDetails, $testMode, $unitTestResult, $autoOpened);
 	}
 
-	static function testrunajax($option, $pkg, $ids)
+	function testrunajax($option, $pkg, $ids)
 	{
-		$app = Factory::getApplication();
-		$app->setHeader('Content-Type', 'application/json', true);
+		$app = $this->app;
+		$app->setHeader('Content-Type', 'application/json; charset=utf-8', true);
+		$post = $app->getInput()->post;
 
-		$rawBody = file_get_contents('php://input');
-		$post = [];
-		parse_str($rawBody, $post);
-
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
+		$database = $this->database;
 		$row = new PieceTable($database);
-		$row->id = isset($post['id']) ? (int) $post['id'] : 0;
-		$row->code = isset($post['code']) ? (string) $post['code'] : '';
-		$row->unit_tests = isset($post['unit_tests']) ? (string) $post['unit_tests'] : '';
-		$functionName = isset($post['test_function']) ? (string) $post['test_function'] : '';
+		$row->id = $post->getInt('id', 0);
+		$row->code = $post->get('code', '', 'raw');
+		$row->unit_tests = $post->get('unit_tests', '', 'raw');
+		$functionName = $post->getString('test_function', '');
 
 		$result = self::runUnitTests($row, $functionName, $database);
-		echo json_encode($result);
+		$app->setBody(json_encode($result, JSON_THROW_ON_ERROR));
 		$app->close();
 	}
 
-	static function prev($option, $pkg, $ids)
+	function prev($option, $pkg, $ids)
 	{
-		self::navigate($option, $pkg, $ids, 'prev');
+		$this->navigate($option, $pkg, $ids, 'prev');
 	}
 
-	static function next($option, $pkg, $ids)
+	function next($option, $pkg, $ids)
 	{
-		self::navigate($option, $pkg, $ids, 'next');
+		$this->navigate($option, $pkg, $ids, 'next');
 	}
 
-	private static function navigate($option, $pkg, $ids, $direction)
+	private function navigate($option, $pkg, $ids, $direction)
 	{
-		$app = Factory::getApplication();
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
+		$app = $this->app;
+		$database = $this->database;
 		ArrayHelper::toInteger($ids);
 		if (!count($ids)) {
 			$id = $app->getInput()->getInt('id', 0);
@@ -557,31 +550,30 @@ class PieceManager
 		}
 
 		$currentId = (int) $ids[0];
-		$pkgCondition = $pkg !== '' ? "package = " . $database->Quote($pkg) : "1=1";
-		if ($direction === 'prev') {
-			$database->setQuery(
-				"SELECT id FROM #__facileforms_pieces WHERE " . $pkgCondition .
-				" AND id < " . $currentId . " ORDER BY id DESC LIMIT 1"
-			);
-		} else {
-			$database->setQuery(
-				"SELECT id FROM #__facileforms_pieces WHERE " . $pkgCondition .
-				" AND id > " . $currentId . " ORDER BY id ASC LIMIT 1"
-			);
+		$query = $database->getQuery(true)
+			->select($database->quoteName('id'))
+			->from($database->quoteName('#__facileforms_pieces'))
+			->where($database->quoteName('id') . ($direction === 'prev' ? ' < :currentId' : ' > :currentId'))
+			->order($database->quoteName('id') . ($direction === 'prev' ? ' DESC' : ' ASC'))
+			->bind(':currentId', $currentId, ParameterType::INTEGER)
+			->setLimit(1);
+		if ($pkg !== '') {
+			$query->where($database->quoteName('package') . ' = :package')
+				->bind(':package', $pkg);
 		}
+		$database->setQuery($query);
 		$targetId = (int) $database->loadResult();
 		if (!$targetId) {
-			if ($direction === 'prev') {
-				$database->setQuery(
-					"SELECT id FROM #__facileforms_pieces WHERE " . $pkgCondition .
-					" ORDER BY id DESC LIMIT 1"
-				);
-			} else {
-				$database->setQuery(
-					"SELECT id FROM #__facileforms_pieces WHERE " . $pkgCondition .
-					" ORDER BY id ASC LIMIT 1"
-				);
+			$query = $database->getQuery(true)
+				->select($database->quoteName('id'))
+				->from($database->quoteName('#__facileforms_pieces'))
+				->order($database->quoteName('id') . ($direction === 'prev' ? ' DESC' : ' ASC'))
+				->setLimit(1);
+			if ($pkg !== '') {
+				$query->where($database->quoteName('package') . ' = :package')
+					->bind(':package', $pkg);
 			}
+			$database->setQuery($query);
 			$targetId = (int) $database->loadResult();
 			if (!$targetId) {
 				$targetId = $currentId;
@@ -658,7 +650,7 @@ class PieceManager
 			$arrowPos = strpos($trimmedLine, '->');
 			if ($arrowPos === false) {
 				return array(
-					'error' => 'Ligne ' . $lineNumber . ' invalide: separateur -> manquant.',
+					'error' => Text::sprintf('COM_BREEZINGFORMSNG_TEST_MISSING_SEPARATOR', $lineNumber),
 				);
 			}
 
@@ -666,7 +658,7 @@ class PieceManager
 			$expectedText = trim(substr($trimmedLine, $arrowPos + 2));
 			if ($inputText === '' || $expectedText === '') {
 				return array(
-					'error' => 'Ligne ' . $lineNumber . ' invalide: entree ou resultat attendu manquant.',
+					'error' => Text::sprintf('COM_BREEZINGFORMSNG_TEST_MISSING_INPUT_EXPECTED', $lineNumber),
 				);
 			}
 
@@ -681,7 +673,7 @@ class PieceManager
 
 		if (!count($tests)) {
 			return array(
-				'warning' => 'Aucun test unitaire defini.',
+				'warning' => Text::_('COM_BREEZINGFORMSNG_TEST_NO_UNIT_TEST_DEFINED'),
 			);
 		}
 
@@ -691,14 +683,25 @@ class PieceManager
 				if (self::valuesEqual($execution['result'], $test['expected'])) {
 					$passedCount++;
 				} else {
-					$failures[] = 'Ligne ' . $test['line'] . ' | entree: ' . $test['input_text'] . ' | attendu: ' . var_export($test['expected'], true) . ' | obtenu: ' . var_export($execution['result'], true);
+					$failures[] = Text::sprintf(
+						'COM_BREEZINGFORMSNG_TEST_FAILURE_MISMATCH',
+						$test['line'],
+						$test['input_text'],
+						var_export($test['expected'], true),
+						var_export($execution['result'], true)
+					);
 				}
 			} else {
-				$failures[] = 'Ligne ' . $test['line'] . ' | entree: ' . $test['input_text'] . ' | erreur: ' . $execution['error'];
+				$failures[] = Text::sprintf(
+					'COM_BREEZINGFORMSNG_TEST_FAILURE_ERROR',
+					$test['line'],
+					$test['input_text'],
+					$execution['error']
+				);
 			}
 			$output = trim((string) $execution['output']);
 			if ($output !== '') {
-				$failures[] = 'Ligne ' . $test['line'] . ' | output: ' . $output;
+				$failures[] = Text::sprintf('COM_BREEZINGFORMSNG_TEST_FAILURE_OUTPUT', $test['line'], $output);
 			}
 		}
 

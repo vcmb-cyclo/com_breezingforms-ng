@@ -14,7 +14,7 @@ use Joomla\CMS\Language\Text;
 $rule        = $this->rule;
 $ruleId      = $rule ? (int) $rule->id : 0;
 $isNew       = ($ruleId === 0);
-$baseUrl     = 'index.php?option=com_breezingformsng&act=integrate&view=integrator';
+$baseUrl     = 'index.php?option=com_breezingformsng&view=integrator';
 $editUrl     = $baseUrl . '&layout=edit&id=' . $ruleId;
 
 $operators = [

@@ -108,11 +108,11 @@ fi
 
 plugin_count="$(
     docker exec -e MYSQL_PWD=joomla "${db_container}" mysql -N -ujoomla joomla \
-        -e "SELECT COUNT(*) FROM \`${table_prefix}extensions\` WHERE type = 'plugin' AND element = 'sysbreezingforms' AND folder = 'system';"
+        -e "SELECT COUNT(*) FROM \`${table_prefix}extensions\` WHERE type = 'plugin' AND element = 'bfcompat' AND folder = 'system';"
 )"
 
 if [[ "${plugin_count}" -ne 1 ]]; then
-    echo "BreezingForms NG system plugin was not installed correctly." >&2
+    echo "The BreezingForms NG compatibility plugin was not installed correctly." >&2
     exit 1
 fi
 
@@ -166,5 +166,17 @@ if [[ "${frontend_status}" != "200" ]]; then
     echo "Frontend did not respond with HTTP 200 after installation (got: ${frontend_status:-<empty>})." >&2
     exit 1
 fi
+
+# Generate an image with the bundled CAPTCHA runtime. This catches missing
+# Securimage support files and PHP/GD incompatibilities after library updates.
+docker exec "${web_container}" php -r '
+    define("_JEXEC", 1);
+    require "/var/www/html/administrator/components/com_breezingformsng/libraries/securimage/securimage.php";
+    $captcha = new Securimage(["no_exit" => true, "send_headers" => false]);
+    ob_start();
+    $captcha->show();
+    $image = ob_get_clean();
+    exit(str_starts_with($image, "\x89PNG\r\n\x1a\n") ? 0 : 1);
+'
 
 echo "Joomla installation, update and frontend smoke tests passed."

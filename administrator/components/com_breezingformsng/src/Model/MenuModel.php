@@ -9,15 +9,19 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
-use Joomla\CMS\MVC\Model\BaseModel;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Filter\OutputFilter;
+use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\Database\DatabaseInterface;
+use Joomla\Database\ParameterType;
+use Joomla\Database\QueryInterface;
 
-class MenuModel extends BaseModel
+class MenuModel extends BaseDatabaseModel
 {
     private function db(): DatabaseInterface
     {
-        return Factory::getContainer()->get(DatabaseInterface::class);
+        return $this->getDatabase();
     }
 
     public function getPackages(): array
@@ -49,7 +53,8 @@ class MenuModel extends BaseModel
             ->order([$db->quoteName('m.parent') . ' ASC', $db->quoteName('m.ordering') . ' ASC']);
 
         if ($pkg !== '') {
-            $q->where($db->quoteName('m.package') . ' = ' . $db->quote($pkg));
+            $q->where($db->quoteName('m.package') . ' = :package')
+                ->bind(':package', $pkg);
         }
 
         return $db->setQuery($q)->loadObjectList() ?: [];
@@ -78,7 +83,8 @@ class MenuModel extends BaseModel
         $q  = $db->getQuery(true)
             ->select('*')
             ->from($db->quoteName('#__facileforms_compmenus'))
-            ->where($db->quoteName('id') . ' = ' . $db->quote($id));
+            ->where($db->quoteName('id') . ' = :id')
+            ->bind(':id', $id, ParameterType::INTEGER);
 
         return $db->setQuery($q)->loadObject() ?: null;
     }
@@ -104,7 +110,8 @@ class MenuModel extends BaseModel
             ->order($db->quoteName('ordering') . ' ASC');
 
         if ($pkg !== '') {
-            $q->where($db->quoteName('package') . ' = ' . $db->quote($pkg));
+            $q->where($db->quoteName('package') . ' = :package')
+                ->bind(':package', $pkg);
         }
 
         return $db->setQuery($q)->loadObjectList() ?: [];
@@ -116,7 +123,8 @@ class MenuModel extends BaseModel
         $q   = $db->getQuery(true)
             ->select([$db->quoteName('name'), $db->quoteName('title')])
             ->from($db->quoteName('#__facileforms_forms'))
-            ->where($db->quoteName('id') . ' = ' . $db->quote($formId));
+            ->where($db->quoteName('id') . ' = :formId')
+            ->bind(':formId', $formId, ParameterType::INTEGER);
         $form = $db->setQuery($q)->loadObject();
 
         $obj            = new \stdClass();
@@ -152,32 +160,36 @@ class MenuModel extends BaseModel
         $pub     = (int) ($data['published'] ?? 1);
 
         if ($title === '') {
-            throw new \RuntimeException(\Joomla\CMS\LanguageText::_('COM_BREEZINGFORMSNG_MENUS_TITLEEMPTY'));
+            throw new \RuntimeException(Text::_('COM_BREEZINGFORMSNG_MENUS_TITLEEMPTY'));
         }
 
         if ($id > 0) {
             $q = $db->getQuery(true)
                 ->update($db->quoteName('#__facileforms_compmenus'))
                 ->set([
-                    $db->quoteName('package')   . ' = ' . $db->quote($pkg),
-                    $db->quoteName('parent')    . ' = ' . $db->quote($parent),
-                    $db->quoteName('title')     . ' = ' . $db->quote($title),
-                    $db->quoteName('name')      . ' = ' . $db->quote($name),
-                    $db->quoteName('page')      . ' = ' . $db->quote($page),
-                    $db->quoteName('frame')     . ' = ' . $db->quote($frame),
-                    $db->quoteName('border')    . ' = ' . $db->quote($border),
-                    $db->quoteName('img')       . ' = ' . $db->quote($img),
-                    $db->quoteName('params')    . ' = ' . $db->quote($params),
-                    $db->quoteName('published') . ' = ' . $db->quote($pub),
+                    $db->quoteName('package') . ' = :package',
+                    $db->quoteName('parent') . ' = :parent',
+                    $db->quoteName('title') . ' = :title',
+                    $db->quoteName('name') . ' = :name',
+                    $db->quoteName('page') . ' = :page',
+                    $db->quoteName('frame') . ' = :frame',
+                    $db->quoteName('border') . ' = :border',
+                    $db->quoteName('img') . ' = :image',
+                    $db->quoteName('params') . ' = :params',
+                    $db->quoteName('published') . ' = :published',
                 ])
-                ->where($db->quoteName('id') . ' = ' . $db->quote($id));
+                ->where($db->quoteName('id') . ' = :id')
+                ->bind(':id', $id, ParameterType::INTEGER);
+            $this->bindMenuValues($q, $pkg, $parent, $title, $name, $page, $frame, $border, $img, $params, $pub);
             $db->setQuery($q)->execute();
         } else {
             $maxQ = $db->getQuery(true)
                 ->select('COALESCE(MAX(' . $db->quoteName('ordering') . '), 0) + 1')
                 ->from($db->quoteName('#__facileforms_compmenus'))
-                ->where($db->quoteName('parent') . ' = ' . $db->quote($parent))
-                ->where($db->quoteName('package') . ' = ' . $db->quote($pkg));
+                ->where($db->quoteName('parent') . ' = :parent')
+                ->where($db->quoteName('package') . ' = :package')
+                ->bind(':parent', $parent, ParameterType::INTEGER)
+                ->bind(':package', $pkg);
             $ordering = (int) $db->setQuery($maxQ)->loadResult();
 
             $q = $db->getQuery(true)
@@ -188,12 +200,9 @@ class MenuModel extends BaseModel
                     $db->quoteName('name'), $db->quoteName('page'), $db->quoteName('frame'),
                     $db->quoteName('border'), $db->quoteName('params'),
                 ])
-                ->values(implode(',', [
-                    $db->quote($pkg), $db->quote($parent), $db->quote($ordering),
-                    $db->quote($pub), $db->quote($img), $db->quote($title),
-                    $db->quote($name), $db->quote($page), $db->quote($frame),
-                    $db->quote($border), $db->quote($params),
-                ]));
+                ->values(':package, :parent, :ordering, :published, :image, :title, :name, :page, :frame, :border, :params')
+                ->bind(':ordering', $ordering, ParameterType::INTEGER);
+            $this->bindMenuValues($q, $pkg, $parent, $title, $name, $page, $frame, $border, $img, $params, $pub);
             $db->setQuery($q)->execute();
             $id = (int) $db->insertid();
         }
@@ -209,22 +218,25 @@ class MenuModel extends BaseModel
         }
 
         $db      = $this->db();
-        $intIds  = array_map('intval', $ids);
-        $inList  = implode(',', $intIds);
+        $intIds = array_values(array_filter(array_map('intval', $ids)));
+
+        if ($intIds === []) {
+            return;
+        }
 
         $childQ = $db->getQuery(true)
             ->select($db->quoteName('id'))
             ->from($db->quoteName('#__facileforms_compmenus'))
-            ->where($db->quoteName('parent') . ' IN (' . $inList . ')');
+            ->whereIn($db->quoteName('parent'), $intIds);
         $childIds = $db->setQuery($childQ)->loadColumn();
 
         $allIds = array_merge($intIds, array_map('intval', $childIds ?: []));
-        $allIn  = implode(',', array_unique($allIds));
+        $allIds = array_values(array_unique($allIds));
 
         $db->setQuery(
             $db->getQuery(true)
                 ->delete($db->quoteName('#__facileforms_compmenus'))
-                ->where($db->quoteName('id') . ' IN (' . $allIn . ')')
+                ->whereIn($db->quoteName('id'), $allIds)
         )->execute();
     }
 
@@ -249,7 +261,8 @@ class MenuModel extends BaseModel
             $childQ = $db->getQuery(true)
                 ->select('*')
                 ->from($db->quoteName('#__facileforms_compmenus'))
-                ->where($db->quoteName('parent') . ' = ' . $db->quote($id));
+                ->where($db->quoteName('parent') . ' = :parent')
+                ->bind(':parent', $id, ParameterType::INTEGER);
             $children = $db->setQuery($childQ)->loadObjectList() ?: [];
 
             foreach ($children as $child) {
@@ -268,12 +281,18 @@ class MenuModel extends BaseModel
         }
 
         $db     = $this->db();
-        $intIds = implode(',', array_map('intval', $ids));
+        $intIds = array_values(array_filter(array_map('intval', $ids)));
+
+        if ($intIds === []) {
+            return;
+        }
+
         $db->setQuery(
             $db->getQuery(true)
                 ->update($db->quoteName('#__facileforms_compmenus'))
-                ->set($db->quoteName('published') . ' = ' . $db->quote($state))
-                ->where($db->quoteName('id') . ' IN (' . $intIds . ')')
+                ->set($db->quoteName('published') . ' = :state')
+                ->whereIn($db->quoteName('id'), $intIds)
+                ->bind(':state', $state, ParameterType::INTEGER)
         )->execute();
     }
 
@@ -288,55 +307,59 @@ class MenuModel extends BaseModel
 
         $dir      = $inc > 0 ? '>' : '<';
         $sort     = $inc > 0 ? 'ASC' : 'DESC';
+        $parent = (int) $item->parent;
+        $ordering = (int) $item->ordering;
         $neighbor = $db->setQuery(
             $db->getQuery(true)
                 ->select(['id', 'ordering'])
                 ->from($db->quoteName('#__facileforms_compmenus'))
-                ->where($db->quoteName('parent')  . ' = ' . $db->quote($item->parent))
-                ->where($db->quoteName('package') . ' = ' . $db->quote($pkg))
-                ->where($db->quoteName('ordering') . ' ' . $dir . ' ' . $db->quote($item->ordering))
+                ->where($db->quoteName('parent') . ' = :parent')
+                ->where($db->quoteName('package') . ' = :package')
+                ->where($db->quoteName('ordering') . ' ' . $dir . ' :ordering')
                 ->order($db->quoteName('ordering') . ' ' . $sort)
+                ->bind(':parent', $parent, ParameterType::INTEGER)
+                ->bind(':package', $pkg)
+                ->bind(':ordering', $ordering, ParameterType::INTEGER)
+                ->setLimit(1)
         )->loadObject();
 
         if ($neighbor === null) {
             return;
         }
 
+        $neighborId = (int) $neighbor->id;
+        $neighborOrdering = (int) $neighbor->ordering;
+
         $db->setQuery(
             $db->getQuery(true)
                 ->update($db->quoteName('#__facileforms_compmenus'))
-                ->set($db->quoteName('ordering') . ' = ' . $db->quote($neighbor->ordering))
-                ->where($db->quoteName('id') . ' = ' . $db->quote($id))
+                ->set($db->quoteName('ordering') . ' = :ordering')
+                ->where($db->quoteName('id') . ' = :id')
+                ->bind(':ordering', $neighborOrdering, ParameterType::INTEGER)
+                ->bind(':id', $id, ParameterType::INTEGER)
         )->execute();
 
         $db->setQuery(
             $db->getQuery(true)
                 ->update($db->quoteName('#__facileforms_compmenus'))
-                ->set($db->quoteName('ordering') . ' = ' . $db->quote($item->ordering))
-                ->where($db->quoteName('id') . ' = ' . $db->quote($neighbor->id))
+                ->set($db->quoteName('ordering') . ' = :ordering')
+                ->where($db->quoteName('id') . ' = :id')
+                ->bind(':ordering', $ordering, ParameterType::INTEGER)
+                ->bind(':id', $neighborId, ParameterType::INTEGER)
         )->execute();
     }
 
-    public function syncToJoomlaMenu(): void
+    public function syncToJoomlaMenu(MVCFactoryInterface $menusFactory): void
     {
         $db = $this->db();
-
-        $protectedQ = $db->getQuery(true)
+        $linkPattern = 'index.php?option=com_breezingformsng&act=run%';
+        $existingQuery = $db->getQuery(true)
             ->select($db->quoteName('id'))
             ->from($db->quoteName('#__menu'))
-            ->where($db->quoteName('link') . ' LIKE ' . $db->quote('index.php?option=com_breezingformsng&act=run%'))
-            ->where($db->quoteName('checked_out') . ' != 0');
-        $protected = $db->setQuery($protectedQ)->loadColumn() ?: [];
-
-        $deleteQ = $db->getQuery(true)
-            ->delete($db->quoteName('#__menu'))
-            ->where($db->quoteName('link') . ' LIKE ' . $db->quote('index.php?option=com_breezingformsng&act=run%'));
-
-        if (!empty($protected)) {
-            $deleteQ->where($db->quoteName('id') . ' NOT IN (' . implode(',', array_map('intval', $protected)) . ')');
-        }
-
-        $db->setQuery($deleteQ)->execute();
+            ->where($db->quoteName('link') . ' LIKE :linkPattern')
+            ->where($db->quoteName('checked_out') . ' = 0')
+            ->bind(':linkPattern', $linkPattern);
+        $existingIds = array_map('intval', $db->setQuery($existingQuery)->loadColumn() ?: []);
 
         $menuQ = $db->getQuery(true)
             ->select('*')
@@ -345,84 +368,116 @@ class MenuModel extends BaseModel
             ->order($db->quoteName('id') . ' ASC');
         $items = $db->setQuery($menuQ)->loadObjectList() ?: [];
 
+        $componentLink = 'index.php?option=com_breezingformsng';
         $parentRowQ = $db->getQuery(true)
-            ->select(['id', 'lft', 'rgt', 'level', 'client_id'])
+            ->select($db->quoteName('id'))
             ->from($db->quoteName('#__menu'))
-            ->where($db->quoteName('link') . ' = ' . $db->quote('index.php?option=com_breezingformsng'))
-            ->where($db->quoteName('client_id') . ' = 1');
-        $parentRow = $db->setQuery($parentRowQ)->loadObject();
+            ->where($db->quoteName('link') . ' = :componentLink')
+            ->where($db->quoteName('client_id') . ' = 1')
+            ->bind(':componentLink', $componentLink);
+        $rootMenuId = (int) $db->setQuery($parentRowQ)->loadResult();
 
-        if ($parentRow === null) {
+        if ($rootMenuId < 1) {
             return;
+        }
+
+        $extensionType = 'component';
+        $element = 'com_breezingformsng';
+        $extensionQuery = $db->getQuery(true)
+            ->select($db->quoteName('extension_id'))
+            ->from($db->quoteName('#__extensions'))
+            ->where($db->quoteName('type') . ' = :extensionType')
+            ->where($db->quoteName('element') . ' = :element')
+            ->bind(':extensionType', $extensionType)
+            ->bind(':element', $element);
+        $componentId = (int) $db->setQuery($extensionQuery)->loadResult();
+
+        if ($componentId < 1) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
         }
 
         $idMap = [];
 
-        foreach ($items as $item) {
-            $link  = 'index.php?option=com_breezingformsng&act=run&ff_name=' . rawurlencode((string) $item->name);
-            $title = (string) $item->title;
+        $db->transactionStart();
 
-            $parentId    = (int) $item->parent;
-            $joomlaParentId = $parentId > 0 && isset($idMap[$parentId])
-                ? $idMap[$parentId]
-                : (int) $parentRow->id;
+        try {
+            foreach ($existingIds as $existingId) {
+                $table = $menusFactory->createTable('Menu', 'Administrator');
 
-            $db->setQuery(
-                $db->getQuery(true)
-                    ->select(['rgt', 'level'])
-                    ->from($db->quoteName('#__menu'))
-                    ->where($db->quoteName('id') . ' = ' . $db->quote($joomlaParentId))
-            );
-            $parentData = $db->loadObject();
-            if ($parentData === null) {
-                continue;
+                if (!$table || !$table->delete($existingId, true)) {
+                    throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+                }
             }
 
-            $rgt   = (int) $parentData->rgt;
-            $level = (int) $parentData->level + 1;
+            foreach ($items as $item) {
+                $parentId = (int) $item->parent;
+                $joomlaParentId = $parentId > 0 && isset($idMap[$parentId])
+                    ? $idMap[$parentId]
+                    : $rootMenuId;
+                $title = (string) $item->title;
+                $alias = OutputFilter::stringURLSafe($title) . '-' . (int) $item->id;
+                $table = $menusFactory->createTable('Menu', 'Administrator');
 
-            $db->setQuery(
-                $db->getQuery(true)
-                    ->update($db->quoteName('#__menu'))
-                    ->set($db->quoteName('lft') . ' = ' . $db->quoteName('lft') . ' + 2')
-                    ->where($db->quoteName('lft') . ' >= ' . $db->quote($rgt))
-                    ->where($db->quoteName('client_id') . ' = 1')
-            )->execute();
+                if (!$table) {
+                    throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+                }
 
-            $db->setQuery(
-                $db->getQuery(true)
-                    ->update($db->quoteName('#__menu'))
-                    ->set($db->quoteName('rgt') . ' = ' . $db->quoteName('rgt') . ' + 2')
-                    ->where($db->quoteName('rgt') . ' >= ' . $db->quote($rgt))
-                    ->where($db->quoteName('client_id') . ' = 1')
-            )->execute();
+                $table->setLocation($joomlaParentId, 'last-child');
+                $data = [
+                    'menutype' => 'main',
+                    'title' => $title,
+                    'alias' => $alias,
+                    'link' => 'index.php?option=com_breezingformsng&act=run&ff_name=' . rawurlencode((string) $item->name),
+                    'type' => 'component',
+                    'published' => 1,
+                    'parent_id' => $joomlaParentId,
+                    'component_id' => $componentId,
+                    'browserNav' => 0,
+                    'access' => 0,
+                    'params' => '',
+                    'home' => 0,
+                    'language' => '*',
+                    'client_id' => 1,
+                ];
 
-            $q = $db->getQuery(true)
-                ->insert($db->quoteName('#__menu'))
-                ->columns([
-                    $db->quoteName('menutype'), $db->quoteName('title'), $db->quoteName('alias'),
-                    $db->quoteName('note'), $db->quoteName('link'), $db->quoteName('type'),
-                    $db->quoteName('published'), $db->quoteName('parent_id'), $db->quoteName('level'),
-                    $db->quoteName('component_id'), $db->quoteName('checked_out'),
-                    $db->quoteName('checked_out_time'), $db->quoteName('browserNav'),
-                    $db->quoteName('access'), $db->quoteName('img'), $db->quoteName('template_style_id'),
-                    $db->quoteName('params'), $db->quoteName('lft'), $db->quoteName('rgt'),
-                    $db->quoteName('home'), $db->quoteName('language'), $db->quoteName('client_id'),
-                ])
-                ->values(implode(',', [
-                    $db->quote(''), $db->quote($title), $db->quote($title),
-                    $db->quote(''), $db->quote($link), $db->quote('component'),
-                    $db->quote(1), $db->quote($joomlaParentId), $db->quote($level),
-                    $db->quote(0), $db->quote(0),
-                    $db->quote('0000-00-00 00:00:00'), $db->quote(0),
-                    $db->quote(0), $db->quote(''), $db->quote(0),
-                    $db->quote(''), $db->quote($rgt), $db->quote($rgt + 1),
-                    $db->quote(0), $db->quote('*'), $db->quote(1),
-                ]));
+                if (!$table->bind($data) || !$table->check() || !$table->store()) {
+                    throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+                }
 
-            $db->setQuery($q)->execute();
-            $idMap[(int) $item->id] = (int) $db->insertid();
+                $idMap[(int) $item->id] = (int) $table->id;
+            }
+
+            $db->transactionCommit();
+        } catch (\Throwable $exception) {
+            $db->transactionRollback();
+            throw $exception;
         }
+    }
+
+    private function bindMenuValues(
+        QueryInterface $query,
+        string $package,
+        int $parent,
+        string $title,
+        string $name,
+        int $page,
+        int $frame,
+        int $border,
+        string $image,
+        string $params,
+        int $published
+    ): void {
+        $query
+            ->bind(':package', $package)
+            ->bind(':parent', $parent, ParameterType::INTEGER)
+            ->bind(':title', $title)
+            ->bind(':name', $name)
+            ->bind(':page', $page, ParameterType::INTEGER)
+            ->bind(':frame', $frame, ParameterType::INTEGER)
+            ->bind(':border', $border, ParameterType::INTEGER)
+            ->bind(':image', $image)
+            ->bind(':params', $params)
+            ->bind(':published', $published, ParameterType::INTEGER);
     }
 
     private function reorder(int $parent, string $pkg): void
@@ -431,18 +486,24 @@ class MenuModel extends BaseModel
         $q  = $db->getQuery(true)
             ->select($db->quoteName('id'))
             ->from($db->quoteName('#__facileforms_compmenus'))
-            ->where($db->quoteName('parent')  . ' = ' . $db->quote($parent))
-            ->where($db->quoteName('package') . ' = ' . $db->quote($pkg))
+            ->where($db->quoteName('parent') . ' = :parent')
+            ->where($db->quoteName('package') . ' = :package')
+            ->bind(':parent', $parent, ParameterType::INTEGER)
+            ->bind(':package', $pkg)
             ->order($db->quoteName('ordering') . ' ASC');
 
         $ids = $db->setQuery($q)->loadColumn() ?: [];
 
         foreach (array_values($ids) as $pos => $rowId) {
+            $ordering = $pos + 1;
+            $rowId = (int) $rowId;
             $db->setQuery(
                 $db->getQuery(true)
                     ->update($db->quoteName('#__facileforms_compmenus'))
-                    ->set($db->quoteName('ordering') . ' = ' . $db->quote($pos + 1))
-                    ->where($db->quoteName('id') . ' = ' . $db->quote($rowId))
+                    ->set($db->quoteName('ordering') . ' = :ordering')
+                    ->where($db->quoteName('id') . ' = :id')
+                    ->bind(':ordering', $ordering, ParameterType::INTEGER)
+                    ->bind(':id', $rowId, ParameterType::INTEGER)
             )->execute();
         }
     }

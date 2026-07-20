@@ -9,15 +9,13 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
+use Joomla\Input\Input;
+use Joomla\Session\SessionInterface;
 
-class PieceModel extends LegacyPackageModel
+class PieceModel extends PackageModel
 {
-    public function prepareList(string $package): array
+    public function prepareList(string $package, Input $input, SessionInterface $session): array
     {
-        $app = Factory::getApplication();
-        $input = $app->getInput();
-        $session = $app->getSession();
         $packages = $this->getPackages();
 
         $packageOk = $package === '';
@@ -44,13 +42,6 @@ class PieceModel extends LegacyPackageModel
                 $packageName === $package,
                 $packageName,
             ];
-        }
-
-        if (!$input->exists('show_internal')) {
-            $showInternal = (int) $session->get('bf.show_internal_pieces', 0);
-        } else {
-            $showInternal = $input->getInt('show_internal', 0);
-            $session->set('bf.show_internal_pieces', $showInternal);
         }
 
         if (!$input->exists('search')) {
@@ -112,7 +103,7 @@ class PieceModel extends LegacyPackageModel
         $limitStart = $limitStartRequest >= 0 ? $limitStartRequest : (int) $session->get('bf.pieces_limitstart', 0);
         $limitStart = max(0, $limitStart);
 
-        $listData = $this->getListData($package, $search, $sort, $direction, $limit, $limitStart, (bool) $showInternal, $filterState);
+        $listData = $this->getListData($package, $search, $sort, $direction, $limit, $limitStart, $filterState);
         $session->set('bf.pieces_limitstart', $listData['limitstart']);
 
         $listOrder = (string) $this->getState('list.ordering', 'a.name');
@@ -121,7 +112,6 @@ class PieceModel extends LegacyPackageModel
         return [
             'package' => $package,
             'packageList' => $packageList,
-            'showInternal' => $showInternal,
             'search' => $search,
             'total' => $listData['total'],
             'limit' => $limit,

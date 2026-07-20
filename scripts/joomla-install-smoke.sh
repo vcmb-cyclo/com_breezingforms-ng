@@ -167,4 +167,16 @@ if [[ "${frontend_status}" != "200" ]]; then
     exit 1
 fi
 
+# Generate an image with the bundled CAPTCHA runtime. This catches missing
+# Securimage support files and PHP/GD incompatibilities after library updates.
+docker exec "${web_container}" php -r '
+    define("_JEXEC", 1);
+    require "/var/www/html/administrator/components/com_breezingformsng/libraries/securimage/securimage.php";
+    $captcha = new Securimage(["no_exit" => true, "send_headers" => false]);
+    ob_start();
+    $captcha->show();
+    $image = ob_get_clean();
+    exit(str_starts_with($image, "\x89PNG\r\n\x1a\n") ? 0 : 1);
+'
+
 echo "Joomla installation, update and frontend smoke tests passed."

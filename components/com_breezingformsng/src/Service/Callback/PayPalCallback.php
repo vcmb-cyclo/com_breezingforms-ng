@@ -52,7 +52,7 @@ final class PayPalCallback
     $list = $db->loadObjectList();
     if (count($list) == 0) {
         $this->application->setHeader('status', 200, true);
-        exit;
+        $this->application->close();
     }
 
     $form = $list[0];
@@ -60,7 +60,7 @@ final class PayPalCallback
     $areas = json_decode($form->template_areas, true);
     if (!is_array($areas)) {
         $this->application->setHeader('status', 200, true);
-        exit;
+        $this->application->close();
     }
 
     foreach ($areas as $area) {
@@ -202,7 +202,7 @@ final class PayPalCallback
     $list = $db->loadObjectList();
     if (count($list) == 0) {
         $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
-        exit;
+        $this->application->close();
     }
 
     $form = $list[0];
@@ -210,7 +210,7 @@ final class PayPalCallback
     $areas = json_decode($form->template_areas, true);
     if (!is_array($areas)) {
         $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYPAL_DATA'));
-        exit;
+        $this->application->close();
     }
 
     foreach ($areas as $area) {
@@ -375,7 +375,7 @@ final class PayPalCallback
     $list = $db->loadObjectList();
     if (count($list) == 0) {
         $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
-        exit;
+        $this->application->close();
     }
 
     $form = $list[0];

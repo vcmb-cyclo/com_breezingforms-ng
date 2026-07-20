@@ -10,27 +10,14 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Component\ComponentHelper;
-use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
-use Joomla\Event\Event;
 
 class RecordModel extends BaseDatabaseModel
 {
-    private \DateTimeZone $tz;
-
-    public function __construct($config = [])
-    {
-        parent::__construct($config);
-        $this->tz = new \DateTimeZone(Factory::getApplication()->get('offset'));
-    }
-
-    public function getTimezone(): \DateTimeZone
-    {
-        return $this->tz;
-    }
-
     public function getDatabaseConnection(): DatabaseInterface
     {
         return $this->getDatabase();
@@ -107,7 +94,7 @@ class RecordModel extends BaseDatabaseModel
         return $rows;
     }
 
-    public function saveRecord(int $recordId, array $values): void
+    public function saveRecord(int $recordId, array $values, \DateTimeZone $timezone): void
     {
         $db = $this->getDatabase();
         $query = $db->getQuery(true)
@@ -131,7 +118,7 @@ class RecordModel extends BaseDatabaseModel
         }
 
         $user = $this->getCurrentUser();
-        $now  = (new \Joomla\CMS\Date\Date('now', $this->tz))->format('Y-m-d H:i:s', true);
+        $now  = (new \Joomla\CMS\Date\Date('now', $timezone))->format('Y-m-d H:i:s', true);
         $username = (string) $user->username;
         $userId = (int) $user->id;
         $query = $db->getQuery(true)
@@ -226,7 +213,7 @@ class RecordModel extends BaseDatabaseModel
         ));
     }
 
-    public function deleteRecords(array $ids): void
+    public function deleteRecords(array $ids, MVCFactoryInterface $contentFactory): void
     {
         $ids = array_values(array_filter(array_map('intval', $ids)));
         if (!$ids) {
@@ -266,9 +253,6 @@ class RecordModel extends BaseDatabaseModel
                 $db->setQuery($delCbRecords)->execute();
 
                 if ((int) $cbRecord['delete_articles'] === 1) {
-                    $contentFactory = Factory::getApplication()
-                        ->bootComponent('com_content')
-                        ->getMVCFactory();
                     $articleQuery = $db->getQuery(true)
                         ->select($db->quoteName('article_id'))
                         ->from($db->quoteName('#__contentbuilderng_articles'))
@@ -278,28 +262,14 @@ class RecordModel extends BaseDatabaseModel
                         ->bind(':recordId', $recordId, ParameterType::INTEGER);
                     $db->setQuery($articleQuery);
 
-                    foreach ($db->loadColumn() as $article) {
-                        $articleId = (int) $article;
-                        $table = $contentFactory->createTable('Article', 'Administrator');
-                        if ($table->load($articleId)) {
-                            $this->getDispatcher()->dispatch('onContentBeforeDelete', new Event('onContentBeforeDelete', ['com_content.article', $table]));
+                    $articleIds = array_map('intval', $db->loadColumn() ?: []);
+
+                    if ($articleIds) {
+                        $articleModel = $contentFactory->createModel('Article', 'Administrator');
+
+                        if (!$articleModel || !$articleModel->delete($articleIds)) {
+                            throw new \RuntimeException((string) ($articleModel?->getError() ?: Text::_('JERROR_AN_ERROR_HAS_OCCURRED')));
                         }
-
-                        $delArticle = $db->getQuery(true)
-                            ->delete($db->quoteName('#__content'))
-                            ->where($db->quoteName('id') . ' = :articleId')
-                            ->bind(':articleId', $articleId, ParameterType::INTEGER);
-                        $db->setQuery($delArticle)->execute();
-
-                        $table->reset();
-                        $this->getDispatcher()->dispatch('onContentAfterDelete', new Event('onContentAfterDelete', ['com_content.article', $table]));
-
-                        $assetName = 'com_content.article.' . $articleId;
-                        $delAsset = $db->getQuery(true)
-                            ->delete($db->quoteName('#__assets'))
-                            ->where($db->quoteName('name') . ' = :assetName')
-                            ->bind(':assetName', $assetName, ParameterType::STRING);
-                        $db->setQuery($delAsset)->execute();
                     }
                 }
 

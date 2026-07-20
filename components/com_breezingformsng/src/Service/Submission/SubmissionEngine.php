@@ -123,10 +123,14 @@ final class SubmissionEngine
                                 }
                             }
 
-                            $uploadfiles = isset($_FILES['ff_nm_' . $row->name]) ? $_FILES['ff_nm_' . $row->name] : null;
+                            $uploadfiles = $this->processor->app->getInput()->files->get(
+                                'ff_nm_' . $row->name,
+                                null,
+                                'array'
+                            );
 
-                            if ($this->processor->formrow->template_code != '' && isset($_FILES['ff_nm_' . $row->name]) && $_FILES['ff_nm_' . $row->name]['tmp_name'][0] != '' && trim($row->data2) != '') {
-                                $fileName = $_FILES['ff_nm_' . $row->name]['name'][0];
+                            if ($this->processor->formrow->template_code != '' && ($uploadfiles['tmp_name'][0] ?? '') != '' && trim($row->data2) != '') {
+                                $fileName = (string) ($uploadfiles['name'][0] ?? '');
                                 $ext = strtolower(substr($fileName, strrpos($fileName, '.') + 1));
                                 $allowedExtensions = explode(',', strtolower(str_replace(' ', '', trim($row->data2))));
 

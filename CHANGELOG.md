@@ -77,5 +77,6 @@
   encoding instead of writing encoded strings directly to PHP output.
 - Replaced direct writes to Joomla's `#__menu` nested-set columns with the native `com_menus` MenuTable API,
   including transactional synchronization and Joomla-managed tree placement.
+- Kept administrator session state in the Forms view instead of coupling its database model to the application.
 - Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
   moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

@@ -14,6 +14,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Pagination\Pagination;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Toolbar\ToolbarHelper;
+use Joomla\Session\SessionInterface;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\FormModel;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\FormsModel;
 
@@ -128,7 +129,7 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
 
             $session = Factory::getApplication()->getSession();
             $pkgIn   = $input->getString('pkg', '__unset__');
-            $this->pkg   = $listModel->resolvedPkg($pkgIn);
+            $this->pkg   = $this->resolvePackage($pkgIn, $listModel, $session);
 
             $searchReq = $input->getString('search', '__unset__');
             if ($searchReq === '__unset__') {
@@ -179,6 +180,25 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
         }
 
         parent::display($tpl);
+    }
+
+    private function resolvePackage(string $package, FormsModel $model, SessionInterface $session): string
+    {
+        $packages = $model->getPackages();
+
+        if ($package === '__unset__') {
+            $package = (string) $session->get('bf.forms_pkg', '');
+        } elseif ($package === '- blank -') {
+            $package = '';
+        }
+
+        if ($package !== '' && !in_array($package, $packages, true)) {
+            $package = $packages[0] ?? '';
+        }
+
+        $session->set('bf.forms_pkg', $package);
+
+        return $package;
     }
 
     protected function getDetailLabel(): ?string

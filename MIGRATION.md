@@ -571,6 +571,9 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > avec Playwright sur le formulaire Bootstrap 35 : formulaire et assets attendus chargés, `JQuery` disponible,
 > zéro erreur console. Aucun formulaire OnePage n'est actuellement publié dans la base de développement ; ce
 > chemin est couvert par la conversion structurellement identique et les contrôles syntaxiques.
+> Les dernières balises injectées avec `addCustomTag()` (CSS système, CSS et JavaScript des thèmes dynamiques)
+> passent également par `WebAssetManager`; le calendrier responsive Mobile utilise le même chargeur. Une seconde
+> vérification Playwright confirme les CSS système Classic et Bootstrap, le rendu des formulaires et `JQuery`.
 >
 > **Suite (2026-07-12)** : `bfProcessorUploads.php` (1 appel), `bfProcessorNotifications.php` (13),
 > `bfProcessorExports.php` (16) et `bfProcessorSubmission.php` (45) sont également convertis — **235 appels au

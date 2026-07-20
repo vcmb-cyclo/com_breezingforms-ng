@@ -55,11 +55,6 @@ class FormsController extends BaseController
             return;
         }
 
-        // Read raw body to preserve PHP code fields from filter stripping
-        $rawBody = (string) file_get_contents('php://input');
-        $post    = [];
-        parse_str($rawBody, $post);
-
         $data = $input->post->getArray([
             'id'                       => 'INT',
             'package'                  => 'STRING',
@@ -110,11 +105,10 @@ class FormsController extends BaseController
             'piece4id'                 => 'INT',
         ]);
 
-        // Override PHP code fields with raw (unfiltered) values
         foreach (['piece1code', 'piece2code', 'piece3code', 'piece4code',
                   'script1code', 'script2code',
                   'email_custom_template', 'mb_email_custom_template'] as $field) {
-            $data[$field] = $post[$field] ?? '';
+            $data[$field] = $input->post->get($field, '', 'raw');
         }
 
         try {

@@ -55,23 +55,16 @@ class ScriptManager
 	static function save($option, $pkg)
 	{
 		$app = Factory::getApplication();
-
-		// Lire le body brut
-		$rawBody = file_get_contents('php://input');
-
-		// Parser comme application/x-www-form-urlencoded
-		$post = [];
-		parse_str($rawBody, $post);
-
-		// Récupérer code tel qu'envoyé
-		$code = $post['code'] ?? '';
-		$unitTests = $post['unit_tests'] ?? '';
+		$post = $app->getInput()->post;
+		$data = $post->getArray();
+		$code = $post->get('code', '', 'raw');
+		$unitTests = $post->get('unit_tests', '', 'raw');
 
 		$database = Factory::getContainer()->get(DatabaseInterface::class);
 		$row      = new ScriptTable($database);
 
 		try {
-			if (!$row->bind($_POST)) {
+			if (!$row->bind($data)) {
 				throw new RuntimeException(Text::_('COM_BREEZINGFORMSNG_SCRIPTS_SAVE_FAILED'));
 			}
 
@@ -80,7 +73,7 @@ class ScriptManager
 			$row->unit_tests = $unitTests;
 
 			$now = (new \Joomla\CMS\Date\Date())->toSql();
-			$userId = (string) Factory::getApplication()->getIdentity()->username;
+			$userId = (string) $app->getIdentity()->username;
 
 			if (empty($row->id)) {
 				if (empty($row->created)) {

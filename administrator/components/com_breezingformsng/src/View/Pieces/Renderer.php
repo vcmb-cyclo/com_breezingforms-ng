@@ -275,7 +275,7 @@ class Renderer
 		return '???';
 	} // typeName
 
-	static function listitems($option, &$rows, &$pkglist, $pkg, $showInternal, $search, $total, $limit, $limitstart, $pagination = null, $listOrder = 'a.name', $listDirn = 'asc', $filterState = '')
+	static function listitems($option, &$rows, &$pkglist, $pkg, $search, $total, $limit, $limitstart, $pagination = null, $listOrder = 'a.name', $listDirn = 'asc', $filterState = '')
 	{
 		Factory::getApplication()->getInput()->set('hidemainmenu', 0);
 		global $ff_config, $ff_version;
@@ -310,12 +310,6 @@ class Renderer
 					?>
 				</select>
 			</label>
-				<label class="bfPackageSelector">
-					<input type="hidden" name="show_internal" value="0" />
-					<input type="checkbox" name="show_internal" value="1" onchange="return bfPiecesSubmitList(true);"
-						<?php echo $showInternal ? 'checked' : ''; ?> />
-					<?php echo Text::_('COM_BREEZINGFORMSNG_TEST_SHOW_INTERNAL_FUNCTIONS'); ?>
-				</label>
 				<label class="bfPackageSelector bfFilterTools">
 					<?php echo Text::_('COM_BREEZINGFORMSNG_FILTER'); ?>
 					<input type="text" name="search" id="search" class="inputbox"

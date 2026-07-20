@@ -105,7 +105,7 @@ class ScriptModel extends PackageModel
         $limitStart = $limitStartRequest >= 0 ? $limitStartRequest : (int) $session->get('bf.scripts_limitstart', 0);
         $limitStart = max(0, $limitStart);
 
-        $listData = $this->getListData($package, $search, $sort, $direction, $limit, $limitStart, true, $filterState);
+        $listData = $this->getListData($package, $search, $sort, $direction, $limit, $limitStart, $filterState);
         $session->set('bf.scripts_limitstart', $listData['limitstart']);
 
         $listOrder = (string) $this->getState('list.ordering', 'a.name');

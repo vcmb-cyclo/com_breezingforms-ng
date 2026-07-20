@@ -299,13 +299,6 @@ class PieceManager
 		$app = Factory::getApplication();
 		$input = $app->getInput();
 		$session = $app->getSession();
-		$showInternalReq = $input->get('show_internal', null, 'int');
-		if ($showInternalReq === null) {
-			$showInternal = (int) $session->get('bf.show_internal_pieces', 0);
-		} else {
-			$showInternal = (int) $showInternalReq;
-			$session->set('bf.show_internal_pieces', $showInternal);
-		}
 		$searchReq = $input->get('search', null, 'string');
 		if ($searchReq === null) {
 			$search = (string) $session->get('bf.pieces_search', '');
@@ -352,7 +345,7 @@ class PieceManager
 		}
 
 		try {
-			$listData = PieceModel::create()->getListData($pkg, $search, $sort, $dir, $limit, $limitstart, $showInternal);
+			$listData = PieceModel::create()->getListData($pkg, $search, $sort, $dir, $limit, $limitstart);
 		} catch (Exception $e) {
 			echo $e->getCode() . ' : ' . $e->getMessage();
 			return false;
@@ -362,7 +355,7 @@ class PieceManager
 		$session->set('bf.pieces_limitstart', $limitstart);
 		$rows = $listData['rows'];
 
-		Renderer::listitems($option, $rows, $pkglist, $pkg, $showInternal, $search, $total, $limit, $limitstart, $pageSizes);
+		Renderer::listitems($option, $rows, $pkglist, $pkg, $search, $total, $limit, $limitstart, $pageSizes);
 	} // listitems
 
 	static function test($option, $pkg, $ids)

@@ -14,7 +14,6 @@ Renderer::listitems(
     $this->rows,
     $this->packageList,
     $this->package,
-    $this->showInternal,
     $this->search,
     $this->total,
     $this->limit,

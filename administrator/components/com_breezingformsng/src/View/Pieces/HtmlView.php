@@ -20,8 +20,6 @@ class HtmlView extends BaseHtmlView
 
     public string $package = '';
 
-    public int $showInternal = 0;
-
     public string $search = '';
 
     public int $total = 0;
@@ -63,7 +61,6 @@ class HtmlView extends BaseHtmlView
 
         $this->package = $list['package'];
         $this->packageList = $list['packageList'];
-        $this->showInternal = $list['showInternal'];
         $this->search = $list['search'];
         $this->total = $list['total'];
         $this->limit = $list['limit'];

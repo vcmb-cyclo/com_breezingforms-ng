@@ -20,11 +20,11 @@ use Joomla\CMS\Session\Session;
         <th class="w-1 text-center">
           <input type="checkbox" class="form-check-input" onclick="Joomla.checkAll(this)" title="<?= Text::_('JGLOBAL_CHECK_ALL'); ?>">
         </th>
-        <th><?= Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_RULENAME'); ?></th>
-        <th><?= Text::_('COM_BREEZINGFORMSNG_TYPE'); ?></th>
-        <th><?= Text::_('COM_BREEZINGFORMSNG_FORM'); ?></th>
-        <th><?= Text::_('COM_BREEZINGFORMSNG_INTEGRATOR_TABLE'); ?></th>
-        <th class="text-center w-10"><?= Text::_('JPUBLISHED'); ?></th>
+        <th><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_INTEGRATOR_RULENAME', 'rules.name', $this->listDirn, $this->listOrder); ?></th>
+        <th><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_TYPE', 'rules.type', $this->listDirn, $this->listOrder); ?></th>
+        <th><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_FORM', 'forms.name', $this->listDirn, $this->listOrder); ?></th>
+        <th><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_INTEGRATOR_TABLE', 'rules.reference_table', $this->listDirn, $this->listOrder); ?></th>
+        <th class="text-center w-10"><?= HTMLHelper::_('searchtools.sort', 'JPUBLISHED', 'rules.published', $this->listDirn, $this->listOrder); ?></th>
       </tr>
     </thead>
     <tbody>
@@ -57,6 +57,8 @@ use Joomla\CMS\Session\Session;
   <input type="hidden" name="task" value="">
   <input type="hidden" name="publish_id" value="0">
   <input type="hidden" name="boxchecked" value="0">
+  <input type="hidden" name="filter_order" value="<?= htmlspecialchars($this->listOrder, ENT_QUOTES, 'UTF-8'); ?>">
+  <input type="hidden" name="filter_order_Dir" value="<?= htmlspecialchars($this->listDirn, ENT_QUOTES, 'UTF-8'); ?>">
   <?= HTMLHelper::_('form.token'); ?>
 </form>
 

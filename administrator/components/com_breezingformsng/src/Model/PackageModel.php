@@ -121,12 +121,10 @@ abstract class PackageModel extends ListModel
         string $direction,
         int $limit,
         int $limitStart,
-        bool $includeInternal = true,
         string $filterState = ''
     ): array {
         $this->setState('filter.package', $package);
         $this->setState('filter.search', $search);
-        $this->setState('filter.include_internal', $includeInternal);
         $this->setState('filter.state', $filterState);
         $this->setState('list.ordering', $this->normaliseSortField($sort));
         $this->setState('list.direction', strtoupper($direction) === 'DESC' ? 'DESC' : 'ASC');
@@ -166,18 +164,11 @@ abstract class PackageModel extends ListModel
         $db = $this->getDatabase();
         $package = (string) $this->getState('filter.package', '');
         $search = (string) $this->getState('filter.search', '');
-        $includeInternal = (bool) $this->getState('filter.include_internal', true);
         $state = (string) $this->getState('filter.state', '');
 
         if ($package !== '') {
             $query->where($db->quoteName('a.package') . ' = :package');
             $query->bind(':package', $package);
-        }
-
-        if (!$includeInternal) {
-            $internalPrefix = '\\_%';
-            $query->where($db->quoteName('a.name') . ' NOT LIKE :internalPrefix');
-            $query->bind(':internalPrefix', $internalPrefix);
         }
 
         if ($state === 'P') {

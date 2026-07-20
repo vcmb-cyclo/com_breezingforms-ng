@@ -75,5 +75,7 @@
   queries to Joomla bound parameters and `whereIn()` lists.
 - Routed administrator AJAX payloads through Joomla's application body and headers with exception-safe JSON
   encoding instead of writing encoded strings directly to PHP output.
+- Replaced direct writes to Joomla's `#__menu` nested-set columns with the native `com_menus` MenuTable API,
+  including transactional synchronization and Joomla-managed tree placement.
 - Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
   moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

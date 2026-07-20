@@ -11,6 +11,8 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Filter\OutputFilter;
+use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 use Joomla\Database\QueryInterface;
@@ -347,26 +349,17 @@ class MenuModel extends BaseDatabaseModel
         )->execute();
     }
 
-    public function syncToJoomlaMenu(): void
+    public function syncToJoomlaMenu(MVCFactoryInterface $menusFactory): void
     {
         $db = $this->db();
-
-        $protectedQ = $db->getQuery(true)
+        $linkPattern = 'index.php?option=com_breezingformsng&act=run%';
+        $existingQuery = $db->getQuery(true)
             ->select($db->quoteName('id'))
             ->from($db->quoteName('#__menu'))
-            ->where($db->quoteName('link') . ' LIKE ' . $db->quote('index.php?option=com_breezingformsng&act=run%'))
-            ->where($db->quoteName('checked_out') . ' != 0');
-        $protected = $db->setQuery($protectedQ)->loadColumn() ?: [];
-
-        $deleteQ = $db->getQuery(true)
-            ->delete($db->quoteName('#__menu'))
-            ->where($db->quoteName('link') . ' LIKE ' . $db->quote('index.php?option=com_breezingformsng&act=run%'));
-
-        if (!empty($protected)) {
-            $deleteQ->where($db->quoteName('id') . ' NOT IN (' . implode(',', array_map('intval', $protected)) . ')');
-        }
-
-        $db->setQuery($deleteQ)->execute();
+            ->where($db->quoteName('link') . ' LIKE :linkPattern')
+            ->where($db->quoteName('checked_out') . ' = 0')
+            ->bind(':linkPattern', $linkPattern);
+        $existingIds = array_map('intval', $db->setQuery($existingQuery)->loadColumn() ?: []);
 
         $menuQ = $db->getQuery(true)
             ->select('*')
@@ -375,83 +368,89 @@ class MenuModel extends BaseDatabaseModel
             ->order($db->quoteName('id') . ' ASC');
         $items = $db->setQuery($menuQ)->loadObjectList() ?: [];
 
+        $componentLink = 'index.php?option=com_breezingformsng';
         $parentRowQ = $db->getQuery(true)
-            ->select(['id', 'lft', 'rgt', 'level', 'client_id'])
+            ->select($db->quoteName('id'))
             ->from($db->quoteName('#__menu'))
-            ->where($db->quoteName('link') . ' = ' . $db->quote('index.php?option=com_breezingformsng'))
-            ->where($db->quoteName('client_id') . ' = 1');
-        $parentRow = $db->setQuery($parentRowQ)->loadObject();
+            ->where($db->quoteName('link') . ' = :componentLink')
+            ->where($db->quoteName('client_id') . ' = 1')
+            ->bind(':componentLink', $componentLink);
+        $rootMenuId = (int) $db->setQuery($parentRowQ)->loadResult();
 
-        if ($parentRow === null) {
+        if ($rootMenuId < 1) {
             return;
+        }
+
+        $extensionType = 'component';
+        $element = 'com_breezingformsng';
+        $extensionQuery = $db->getQuery(true)
+            ->select($db->quoteName('extension_id'))
+            ->from($db->quoteName('#__extensions'))
+            ->where($db->quoteName('type') . ' = :extensionType')
+            ->where($db->quoteName('element') . ' = :element')
+            ->bind(':extensionType', $extensionType)
+            ->bind(':element', $element);
+        $componentId = (int) $db->setQuery($extensionQuery)->loadResult();
+
+        if ($componentId < 1) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
         }
 
         $idMap = [];
 
-        foreach ($items as $item) {
-            $link  = 'index.php?option=com_breezingformsng&act=run&ff_name=' . rawurlencode((string) $item->name);
-            $title = (string) $item->title;
+        $db->transactionStart();
 
-            $parentId    = (int) $item->parent;
-            $joomlaParentId = $parentId > 0 && isset($idMap[$parentId])
-                ? $idMap[$parentId]
-                : (int) $parentRow->id;
+        try {
+            foreach ($existingIds as $existingId) {
+                $table = $menusFactory->createTable('Menu', 'Administrator');
 
-            $db->setQuery(
-                $db->getQuery(true)
-                    ->select(['rgt', 'level'])
-                    ->from($db->quoteName('#__menu'))
-                    ->where($db->quoteName('id') . ' = ' . $db->quote($joomlaParentId))
-            );
-            $parentData = $db->loadObject();
-            if ($parentData === null) {
-                continue;
+                if (!$table || !$table->delete($existingId, true)) {
+                    throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+                }
             }
 
-            $rgt   = (int) $parentData->rgt;
-            $level = (int) $parentData->level + 1;
+            foreach ($items as $item) {
+                $parentId = (int) $item->parent;
+                $joomlaParentId = $parentId > 0 && isset($idMap[$parentId])
+                    ? $idMap[$parentId]
+                    : $rootMenuId;
+                $title = (string) $item->title;
+                $alias = OutputFilter::stringURLSafe($title) . '-' . (int) $item->id;
+                $table = $menusFactory->createTable('Menu', 'Administrator');
 
-            $db->setQuery(
-                $db->getQuery(true)
-                    ->update($db->quoteName('#__menu'))
-                    ->set($db->quoteName('lft') . ' = ' . $db->quoteName('lft') . ' + 2')
-                    ->where($db->quoteName('lft') . ' >= ' . $db->quote($rgt))
-                    ->where($db->quoteName('client_id') . ' = 1')
-            )->execute();
+                if (!$table) {
+                    throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+                }
 
-            $db->setQuery(
-                $db->getQuery(true)
-                    ->update($db->quoteName('#__menu'))
-                    ->set($db->quoteName('rgt') . ' = ' . $db->quoteName('rgt') . ' + 2')
-                    ->where($db->quoteName('rgt') . ' >= ' . $db->quote($rgt))
-                    ->where($db->quoteName('client_id') . ' = 1')
-            )->execute();
+                $table->setLocation($joomlaParentId, 'last-child');
+                $data = [
+                    'menutype' => 'main',
+                    'title' => $title,
+                    'alias' => $alias,
+                    'link' => 'index.php?option=com_breezingformsng&act=run&ff_name=' . rawurlencode((string) $item->name),
+                    'type' => 'component',
+                    'published' => 1,
+                    'parent_id' => $joomlaParentId,
+                    'component_id' => $componentId,
+                    'browserNav' => 0,
+                    'access' => 0,
+                    'params' => '',
+                    'home' => 0,
+                    'language' => '*',
+                    'client_id' => 1,
+                ];
 
-            $q = $db->getQuery(true)
-                ->insert($db->quoteName('#__menu'))
-                ->columns([
-                    $db->quoteName('menutype'), $db->quoteName('title'), $db->quoteName('alias'),
-                    $db->quoteName('note'), $db->quoteName('link'), $db->quoteName('type'),
-                    $db->quoteName('published'), $db->quoteName('parent_id'), $db->quoteName('level'),
-                    $db->quoteName('component_id'), $db->quoteName('checked_out'),
-                    $db->quoteName('checked_out_time'), $db->quoteName('browserNav'),
-                    $db->quoteName('access'), $db->quoteName('img'), $db->quoteName('template_style_id'),
-                    $db->quoteName('params'), $db->quoteName('lft'), $db->quoteName('rgt'),
-                    $db->quoteName('home'), $db->quoteName('language'), $db->quoteName('client_id'),
-                ])
-                ->values(implode(',', [
-                    $db->quote(''), $db->quote($title), $db->quote($title),
-                    $db->quote(''), $db->quote($link), $db->quote('component'),
-                    $db->quote(1), $db->quote($joomlaParentId), $db->quote($level),
-                    $db->quote(0), $db->quote(0),
-                    $db->quote('0000-00-00 00:00:00'), $db->quote(0),
-                    $db->quote(0), $db->quote(''), $db->quote(0),
-                    $db->quote(''), $db->quote($rgt), $db->quote($rgt + 1),
-                    $db->quote(0), $db->quote('*'), $db->quote(1),
-                ]));
+                if (!$table->bind($data) || !$table->check() || !$table->store()) {
+                    throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+                }
 
-            $db->setQuery($q)->execute();
-            $idMap[(int) $item->id] = (int) $db->insertid();
+                $idMap[(int) $item->id] = (int) $table->id;
+            }
+
+            $db->transactionCommit();
+        } catch (\Throwable $exception) {
+            $db->transactionRollback();
+            throw $exception;
         }
     }
 

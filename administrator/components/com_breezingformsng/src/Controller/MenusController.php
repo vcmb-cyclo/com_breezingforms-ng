@@ -166,7 +166,8 @@ class MenusController extends BaseController
             $app->enqueueMessage(Text::_('JINVALID_TOKEN'), 'error');
         } else {
             try {
-                $this->getMenuModel()->syncToJoomlaMenu();
+                $menusFactory = $app->bootComponent('com_menus')->getMVCFactory();
+                $this->getMenuModel()->syncToJoomlaMenu($menusFactory);
                 $app->enqueueMessage(Text::_('COM_BREEZINGFORMSNG_MENUS_SAVED'), 'message');
             } catch (\Throwable $e) {
                 $app->enqueueMessage($e->getMessage(), 'error');

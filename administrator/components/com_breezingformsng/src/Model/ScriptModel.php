@@ -9,15 +9,13 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
+use Joomla\Input\Input;
+use Joomla\Session\SessionInterface;
 
-class ScriptModel extends LegacyPackageModel
+class ScriptModel extends PackageModel
 {
-    public function prepareList(string $package): array
+    public function prepareList(string $package, Input $input, SessionInterface $session): array
     {
-        $app = Factory::getApplication();
-        $input = $app->getInput();
-        $session = $app->getSession();
         $packages = $this->getPackages();
 
         $packageOk = $package === '';
@@ -105,7 +103,7 @@ class ScriptModel extends LegacyPackageModel
         $limitStart = $limitStartRequest >= 0 ? $limitStartRequest : (int) $session->get('bf.scripts_limitstart', 0);
         $limitStart = max(0, $limitStart);
 
-        $listData = $this->getListData($package, $search, $sort, $direction, $limit, $limitStart, true, $filterState);
+        $listData = $this->getListData($package, $search, $sort, $direction, $limit, $limitStart, $filterState);
         $session->set('bf.scripts_limitstart', $listData['limitstart']);
 
         $listOrder = (string) $this->getState('list.ordering', 'a.name');

@@ -9,7 +9,6 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\CMS\Router\Route;
@@ -19,14 +18,14 @@ class MenusController extends BaseController
 {
     public function display($cachable = false, $urlparams = []): static
     {
-        $input = Factory::getApplication()->getInput();
+        $input = $this->app->getInput();
         $input->set('view', 'menus');
         return parent::display($cachable, $urlparams);
     }
 
     public function edit(): void
     {
-        $input  = Factory::getApplication()->getInput();
+        $input  = $this->app->getInput();
         $id     = $input->getInt('id', 0);
         $pkg    = $input->getString('pkg', '');
         $formId = $input->getInt('form_id', 0);
@@ -35,12 +34,12 @@ class MenusController extends BaseController
             . '&id=' . $id . '&pkg=' . rawurlencode($pkg)
             . ($formId > 0 ? '&form_id=' . $formId : '');
 
-        Factory::getApplication()->redirect(Route::_($url, false));
+        $this->app->redirect(Route::_($url, false));
     }
 
     public function save(): void
     {
-        $app   = Factory::getApplication();
+        $app   = $this->app;
         $input = $app->getInput();
 
         if (!$this->checkToken()) {
@@ -80,13 +79,13 @@ class MenusController extends BaseController
 
     public function cancel(): void
     {
-        $pkg = Factory::getApplication()->getInput()->getString('pkg', '');
-        Factory::getApplication()->redirect(Route::_($this->listUrl($pkg), false));
+        $pkg = $this->app->getInput()->getString('pkg', '');
+        $this->app->redirect(Route::_($this->listUrl($pkg), false));
     }
 
     public function remove(): void
     {
-        $app   = Factory::getApplication();
+        $app   = $this->app;
         $input = $app->getInput();
 
         if (!$this->checkToken()) {
@@ -104,7 +103,7 @@ class MenusController extends BaseController
 
     public function copy(): void
     {
-        $app   = Factory::getApplication();
+        $app   = $this->app;
         $input = $app->getInput();
 
         if (!$this->checkToken()) {
@@ -124,15 +123,18 @@ class MenusController extends BaseController
     {
         $this->checkToken();
 
-        @ob_end_clean();
-        $input = Factory::getApplication()->getInput();
+        if (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        $input = $this->app->getInput();
         $id    = $input->getInt('id', 0);
         $state = $input->getInt('state', 0);
         if ($id > 0) {
             $this->getMenuModel()->publish([$id], $state);
         }
-        echo json_encode(['Result' => 'OK']);
-        Factory::getApplication()->close();
+        $this->app->setHeader('Content-Type', 'application/json; charset=utf-8', true);
+        $this->app->setBody(json_encode(['Result' => 'OK'], JSON_THROW_ON_ERROR));
+        $this->app->close();
     }
 
     public function publish(): void
@@ -157,14 +159,15 @@ class MenusController extends BaseController
 
     public function sync(): void
     {
-        $app   = Factory::getApplication();
+        $app   = $this->app;
         $input = $app->getInput();
 
         if (!$this->checkToken()) {
             $app->enqueueMessage(Text::_('JINVALID_TOKEN'), 'error');
         } else {
             try {
-                $this->getMenuModel()->syncToJoomlaMenu();
+                $menusFactory = $app->bootComponent('com_menus')->getMVCFactory();
+                $this->getMenuModel()->syncToJoomlaMenu($menusFactory);
                 $app->enqueueMessage(Text::_('COM_BREEZINGFORMSNG_MENUS_SAVED'), 'message');
             } catch (\Throwable $e) {
                 $app->enqueueMessage($e->getMessage(), 'error');
@@ -176,7 +179,7 @@ class MenusController extends BaseController
 
     private function togglePublish(int $state): void
     {
-        $app   = Factory::getApplication();
+        $app   = $this->app;
         $input = $app->getInput();
 
         if (!$this->checkToken()) {
@@ -193,7 +196,7 @@ class MenusController extends BaseController
 
     private function moveOrder(int $inc): void
     {
-        $app   = Factory::getApplication();
+        $app   = $this->app;
         $input = $app->getInput();
 
         if (!$this->checkToken()) {
@@ -217,7 +220,7 @@ class MenusController extends BaseController
 
     private function getMenuModel(): MenuModel
     {
-        $model = Factory::getApplication()
+        $model = $this->app
             ->bootComponent('com_breezingformsng')
             ->getMVCFactory()
             ->createModel('Menu', 'Administrator', ['ignore_request' => true]);

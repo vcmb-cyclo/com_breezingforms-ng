@@ -11,6 +11,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Scripts;
 
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Factory;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\ScriptsModel;
 use Vcmb\Component\BreezingformsNG\Administrator\View\BreezingformsNG\HtmlView as BaseHtmlView;
 
@@ -42,22 +43,20 @@ class HtmlView extends BaseHtmlView
 
     public function display($tpl = null)
     {
-        $model = \Joomla\CMS\Factory::getApplication()
-            ->bootComponent('com_breezingformsng')
-            ->getMVCFactory()
-            ->createModel('Scripts', 'Administrator', ['ignore_request' => true]);
+        $model = $this->getModel();
 
         if (!$model instanceof ScriptsModel) {
             throw new \RuntimeException('Unable to create BreezingForms NG scripts model.');
         }
 
-        $this->setModel($model, true);
+        $app = Factory::getApplication();
+        $input = $app->getInput();
 
         if ($this->package === '') {
-            $this->package = \Joomla\CMS\Factory::getApplication()->getInput()->getString('pkg', '');
+            $this->package = $input->getString('pkg', '');
         }
 
-        $list = $model->prepareList($this->package);
+        $list = $model->prepareList($this->package, $input, $app->getSession());
 
         $this->package = $list['package'];
         $this->packageList = $list['packageList'];
@@ -70,8 +69,6 @@ class HtmlView extends BaseHtmlView
         $this->listOrder = $list['listOrder'];
         $this->listDirn = $list['listDirn'];
         $this->filterState = $list['filterState'];
-
-        \Joomla\CMS\Factory::getApplication()->getDocument()->getWebAssetManager()->useScript('table.columns');
 
         ToolbarHelper::help(
             'COM_BREEZINGFORMSNG_HELP_SCRIPTS_TITLE',

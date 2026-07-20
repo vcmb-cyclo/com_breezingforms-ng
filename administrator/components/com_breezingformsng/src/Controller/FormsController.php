@@ -9,37 +9,38 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\CMS\Response\JsonResponse;
 use Joomla\CMS\Router\Route;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\FormModel;
+use Vcmb\Component\BreezingformsNG\Administrator\Service\AjaxStateService;
 
 class FormsController extends BaseController
 {
     public function display($cachable = false, $urlparams = []): static
     {
-        Factory::getApplication()->getInput()->set('view', 'forms');
+        $this->app->getInput()->set('view', 'forms');
         return parent::display($cachable, $urlparams);
     }
 
     public function edit(): void
     {
-        $input    = Factory::getApplication()->getInput();
+        $input    = $this->app->getInput();
         $id       = $input->getInt('id', 0);
         $pkg      = $input->getString('pkg', '');
         $advanced = $input->getBool('advanced', false);
 
         if ($id > 0 && !$advanced) {
-            Factory::getApplication()->redirect(Route::_(
+            $this->app->redirect(Route::_(
                 'index.php?option=com_breezingformsng&task=quickmode.display&form=' . $id . '&pkg=' . rawurlencode($pkg),
                 false
             ));
             return;
         }
 
-        Factory::getApplication()->redirect(Route::_(
-            'index.php?option=com_breezingformsng&act=manageforms&view=forms&layout=edit&id=' . $id . '&pkg=' . rawurlencode($pkg)
+        $this->app->redirect(Route::_(
+            'index.php?option=com_breezingformsng&view=forms&layout=edit&id=' . $id . '&pkg=' . rawurlencode($pkg)
                 . ($advanced ? '&advanced=1' : ''),
             false
         ));
@@ -47,7 +48,7 @@ class FormsController extends BaseController
 
     public function save(): void
     {
-        $app   = Factory::getApplication();
+        $app   = $this->app;
         $input = $app->getInput();
 
         if (!$this->checkToken()) {
@@ -55,11 +56,6 @@ class FormsController extends BaseController
             $app->redirect(Route::_($this->listUrl($input->getString('pkg', '')), false));
             return;
         }
-
-        // Read raw body to preserve PHP code fields from filter stripping
-        $rawBody = (string) file_get_contents('php://input');
-        $post    = [];
-        parse_str($rawBody, $post);
 
         $data = $input->post->getArray([
             'id'                       => 'INT',
@@ -109,13 +105,52 @@ class FormsController extends BaseController
             'piece3id'                 => 'INT',
             'piece4cond'               => 'INT',
             'piece4id'                 => 'INT',
+            'mailchimp_email_field'    => 'STRING',
+            'mailchimp_checkbox_field' => 'STRING',
+            'mailchimp_api_key'        => 'STRING',
+            'mailchimp_list_id'        => 'STRING',
+            'mailchimp_double_optin'   => 'INT',
+            'mailchimp_mergevars'      => 'STRING',
+            'mailchimp_text_html_mobile_field' => 'STRING',
+            'mailchimp_send_errors'    => 'INT',
+            'mailchimp_default_type'   => 'CMD',
+            'mailchimp_delete_member'  => 'INT',
+            'mailchimp_unsubscribe_field' => 'STRING',
+            'salesforce_token'         => 'STRING',
+            'salesforce_username'      => 'STRING',
+            'salesforce_password'      => 'STRING',
+            'salesforce_type'          => 'STRING',
+            'salesforce_enabled'       => 'INT',
+            'dropbox_email'            => 'STRING',
+            'dropbox_password'         => 'STRING',
+            'dropbox_folder'           => 'STRING',
+            'dropbox_submission_enabled' => 'INT',
+            'dropbox_reset_auth'       => 'INT',
         ]);
 
-        // Override PHP code fields with raw (unfiltered) values
+        $data['salesforce_fields'] = implode(',', array_filter(
+            $input->post->get('salesforce_fields', [], 'array'),
+            static fn($value): bool => is_string($value) && $value !== ''
+        ));
+        $data['dropbox_submission_types'] = implode(',', array_intersect(
+            $input->post->get('dropbox_submission_types', [], 'array'),
+            ['pdf', 'csv', 'xml']
+        ));
+
+        $id = (int) ($data['id'] ?? 0);
+        if ($id > 0 && $data['salesforce_password'] === '') {
+            $data['salesforce_password'] = (string) ($this->getFormModel()->getForm($id)->salesforce_password ?? '');
+        }
+        if (!empty($data['dropbox_reset_auth'])) {
+            $data['dropbox_email'] = '';
+            $data['dropbox_password'] = '';
+        }
+        unset($data['dropbox_reset_auth']);
+
         foreach (['piece1code', 'piece2code', 'piece3code', 'piece4code',
                   'script1code', 'script2code',
                   'email_custom_template', 'mb_email_custom_template'] as $field) {
-            $data[$field] = $post[$field] ?? '';
+            $data[$field] = $input->post->get($field, '', 'raw');
         }
 
         try {
@@ -132,7 +167,7 @@ class FormsController extends BaseController
             $id  = (int) ($data['id'] ?? 0);
             $pkg = (string) ($data['package'] ?? '');
             $app->redirect(Route::_(
-                'index.php?option=com_breezingformsng&act=manageforms&view=forms&layout=edit&id=' . $id . '&pkg=' . rawurlencode($pkg),
+                'index.php?option=com_breezingformsng&view=forms&layout=edit&id=' . $id . '&pkg=' . rawurlencode($pkg),
                 false
             ));
         }
@@ -140,13 +175,13 @@ class FormsController extends BaseController
 
     public function cancel(): void
     {
-        $pkg = Factory::getApplication()->getInput()->getString('pkg', '');
-        Factory::getApplication()->redirect(Route::_($this->listUrl($pkg), false));
+        $pkg = $this->app->getInput()->getString('pkg', '');
+        $this->app->redirect(Route::_($this->listUrl($pkg), false));
     }
 
     public function remove(): void
     {
-        $app   = Factory::getApplication();
+        $app   = $this->app;
         $input = $app->getInput();
 
         if (!$this->checkToken()) {
@@ -164,7 +199,7 @@ class FormsController extends BaseController
 
     public function copy(): void
     {
-        $app   = Factory::getApplication();
+        $app   = $this->app;
         $input = $app->getInput();
 
         if (!$this->checkToken()) {
@@ -205,15 +240,15 @@ class FormsController extends BaseController
 
     public function run(): void
     {
-        $input  = Factory::getApplication()->getInput();
+        $input  = $this->app->getInput();
         $formId = $input->getInt('id', 0);
 
         if ($formId <= 0) {
-            Factory::getApplication()->redirect(Route::_($this->listUrl($input->getString('pkg', '')), false));
+            $this->app->redirect(Route::_($this->listUrl($input->getString('pkg', '')), false));
             return;
         }
 
-        Factory::getApplication()->redirect(Route::_(
+        $this->app->redirect(Route::_(
             'index.php?option=com_breezingformsng&ff_form=' . $formId,
             false
         ));
@@ -231,7 +266,7 @@ class FormsController extends BaseController
 
     private function togglePublish(int $state): void
     {
-        $app   = Factory::getApplication();
+        $app   = $this->app;
         $input = $app->getInput();
 
         if (!$this->checkToken()) {
@@ -248,21 +283,25 @@ class FormsController extends BaseController
 
     private function setAjaxState(string $property): void
     {
-        $app = Factory::getApplication();
+        $app = $this->app;
 
-        @ob_end_clean();
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
 
         if (!$this->checkToken('post')) {
-            echo json_encode(['Result' => 'ERROR', 'Message' => Text::_('JINVALID_TOKEN')]);
+            $app->setHeader('Content-Type', 'application/json; charset=utf-8', true);
+            echo new JsonResponse(AjaxStateService::error(Text::_('JINVALID_TOKEN')));
             $app->close();
         }
 
         $input = $app->getInput();
         $id    = $input->post->getInt('id', 0);
-        $state = min(1, max(0, $input->post->getInt('state', 0)));
+        $state = AjaxStateService::normalizeState($input->post->getInt('state', 0));
 
         if ($id <= 0) {
-            echo json_encode(['Result' => 'ERROR', 'Message' => Text::_('JERROR_AN_ERROR_HAS_OCCURRED')]);
+            $app->setHeader('Content-Type', 'application/json; charset=utf-8', true);
+            echo new JsonResponse(AjaxStateService::error(Text::_('JERROR_AN_ERROR_HAS_OCCURRED')));
             $app->close();
         }
 
@@ -272,13 +311,14 @@ class FormsController extends BaseController
             $this->getFormModel()->publish([$id], $state);
         }
 
-        echo json_encode(['Result' => 'OK', 'State' => $state]);
+        $app->setHeader('Content-Type', 'application/json; charset=utf-8', true);
+        echo new JsonResponse(AjaxStateService::success($state));
         $app->close();
     }
 
     private function moveOrder(int $inc): void
     {
-        $app   = Factory::getApplication();
+        $app   = $this->app;
         $input = $app->getInput();
 
         if (!$this->checkToken()) {
@@ -296,7 +336,7 @@ class FormsController extends BaseController
 
     private function listUrl(string $pkg): string
     {
-        return 'index.php?option=com_breezingformsng&act=manageforms&view=forms'
+        return 'index.php?option=com_breezingformsng&view=forms'
             . ($pkg !== '' ? '&pkg=' . rawurlencode($pkg) : '');
     }
 
@@ -316,7 +356,7 @@ class FormsController extends BaseController
 
     private function getFormModel(): FormModel
     {
-        $model = Factory::getApplication()
+        $model = $this->app
             ->bootComponent('com_breezingformsng')
             ->getMVCFactory()
             ->createModel('Form', 'Administrator', ['ignore_request' => true]);

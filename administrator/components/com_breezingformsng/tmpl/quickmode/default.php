@@ -48,7 +48,6 @@ if ($this->formId === 0 || $this->templateCode === '') {
             themebootstrapUseHeroUnit: false,
             themebootstrapUseWell: false,
             themebootstrapUseProgress: false,
-            themeusebootstraplegacy: true,
             fadeIn: false,
             lastPageThankYou: false,
             submittedScriptCondidtion: 0,
@@ -56,7 +55,6 @@ if ($this->formId === 0 || $this->templateCode === '') {
             useErrorAlerts: false,
             useDefaultErrors: true,
             useBalloonErrors: false,
-            disableJQuery: false,
             joomlaHint: false,
             mobileEnabled: false,
             forceMobile: false,
@@ -82,6 +80,5 @@ echo QuickmodeHtml::showApplication(
     $o,
     $this->elementScripts,
     $this->themes,
-    $this->themesBootstrap,
-    $this->themesBootstrap4
+    $this->themesBootstrap
 );

@@ -47,7 +47,7 @@ class AboutController extends BaseController
 
     public function display($cachable = false, $urlparams = [])
     {
-        $application = Factory::getApplication();
+        $application = $this->app;
 
         if (!$application->getIdentity()->authorise('core.manage', 'com_breezingformsng')) {
             throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'), 403);
@@ -71,7 +71,7 @@ class AboutController extends BaseController
             $this->getAuthorizedApplication();
             $db = $this->getDatabase();
 
-            $report = (new DatabaseAuditService($db))->run();
+            $report = $this->getAuditService($db)->run();
             $targetCollation = (string) ($report['target_collation'] ?? 'utf8mb4_unicode_ci');
             $currentCollations = array_column($report['tables'] ?? [], 'collation', 'table');
 
@@ -120,9 +120,9 @@ class AboutController extends BaseController
         try {
             $this->getAuthorizedApplication();
 
-            $report = (new DatabaseAuditService($this->getDatabase()))->run();
+            $report = $this->getAuditService()->run();
             $summary = (array) ($report['summary'] ?? []);
-            Factory::getApplication()->setUserState('com_breezingformsng.about.audit', $report);
+            $this->app->setUserState('com_breezingformsng.about.audit', $report);
 
             if ((int) ($summary['issues_total'] ?? 0) === 0) {
                 $this->setMessage(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_SUMMARY_CLEAN', $summary['scanned_tables'], $summary['total_rows']), 'message');
@@ -130,7 +130,7 @@ class AboutController extends BaseController
                 $this->setMessage(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_SUMMARY_ISSUES', $summary['issues_total'], $summary['scanned_tables']), 'warning');
             }
         } catch (\Throwable $exception) {
-            Factory::getApplication()->setUserState('com_breezingformsng.about.audit', []);
+            $this->app->setUserState('com_breezingformsng.about.audit', []);
             $this->setMessage(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_FAILED', $exception->getMessage()), 'error');
         }
 
@@ -149,7 +149,7 @@ class AboutController extends BaseController
             // Revalidate against a fresh audit: only a currently detected
             // "drop" candidate may be deleted, and never one still holding
             // submission records.
-            $auditService = new DatabaseAuditService($this->getDatabase());
+            $auditService = $this->getAuditService();
             $report = $auditService->run();
             $candidate = null;
 
@@ -268,7 +268,7 @@ class AboutController extends BaseController
 
     private function getAuthorizedApplication()
     {
-        $application = Factory::getApplication();
+        $application = $this->app;
 
         if (!$application->getIdentity()->authorise('core.manage', 'com_breezingformsng')) {
             throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'), 403);
@@ -280,6 +280,14 @@ class AboutController extends BaseController
     private function getDatabase(): DatabaseInterface
     {
         return Factory::getContainer()->get(DatabaseInterface::class);
+    }
+
+    private function getAuditService(?DatabaseInterface $database = null): DatabaseAuditService
+    {
+        return new DatabaseAuditService(
+            $database ?? $this->getDatabase(),
+            (string) $this->app->get('tmp_path', JPATH_ROOT . '/tmp')
+        );
     }
 
     private function tableExists(string $table): bool
@@ -349,7 +357,7 @@ class AboutController extends BaseController
         $loadedAt = '';
 
         if ($latestMtime > 0) {
-            $timezone = new \DateTimeZone((string) Factory::getApplication()->get('offset', 'UTC'));
+            $timezone = new \DateTimeZone((string) $this->app->get('offset', 'UTC'));
             $loadedAt = (new \Joomla\CMS\Date\Date('@' . $latestMtime))
                 ->setTimezone($timezone)
                 ->format('Y-m-d H:i:s', true);

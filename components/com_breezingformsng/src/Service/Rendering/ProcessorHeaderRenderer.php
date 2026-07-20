@@ -12,7 +12,6 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering;
 \defined('_JEXEC') or die;
 
 use Closure;
-use Joomla\CMS\Uri\Uri;
 
 final class ProcessorHeaderRenderer
 {
@@ -37,8 +36,6 @@ final class ProcessorHeaderRenderer
             . '<!--' . self::NEWLINE
             . ($compress ? $compressor($code) : $code)
             . '//-->' . self::NEWLINE
-            . '</script>' . self::NEWLINE
-            . '<script type="text/javascript" src="' . Uri::root(true)
-            . '/media/com_breezingformsng/js/facileforms.js"></script>' . self::NEWLINE;
+            . '</script>' . self::NEWLINE;
     }
 }

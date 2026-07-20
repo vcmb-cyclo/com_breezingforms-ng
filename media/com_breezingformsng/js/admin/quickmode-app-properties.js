@@ -2044,7 +2044,6 @@
                     mdata.mailNotification = JQuery('#bfFormMailNotification').attr('checked');
                     mdata.submitInclude = JQuery('#bfSubmitIncludeYes').prop('checked');
                     mdata.themebootstrapLabelTop = JQuery('#bfThemeBootstrapLabelTopYes').attr('checked');
-                    mdata.themeusebootstraplegacy = typeof JQuery('#bfThemeBootstrapUseLegacyYes').get(0) != "undefined" ? JQuery('#bfThemeBootstrapUseLegacyYes').attr('checked') : false;
                     mdata.themebootstrapUseHeroUnit = JQuery('#bfThemeBootstrapUseHeroUnitYes').attr('checked');
                     mdata.themebootstrapUseWell = JQuery('#bfThemeBootstrapUseWellYes').attr('checked');
                     mdata.themebootstrapUseProgress = JQuery('#bfThemeBootstrapUseProgressYes').attr('checked');
@@ -2052,9 +2051,10 @@
                     mdata.themebootstrapThemeEngine = JQuery('#bfThemeBootstrapThemeBootstrap').attr('checked') ? 'bootstrap' : 'breezingforms';
 
                     mdata.themebootstrapMode = JQuery('#bfThemeBootstrapModeYes').attr('checked');
-                    mdata.themebootstrapUse3 = JQuery('#bfThemeBootstrapUse3Yes').attr('checked');
-                    mdata.themebootstrap3builtin = JQuery('#bfThemeBootstrap3BuiltInYes').attr('checked');
-                    mdata.themebootstrap3classpfx = JQuery('#bfThemeBootstrap3Classpfx').val();
+                    delete mdata.themebootstrapUse3;
+                    delete mdata.themebootstrap3builtin;
+                    delete mdata.themebootstrap3classpfx;
+                    delete mdata.themeusebootstraplegacy;
 
                     mdata.submitLabel = JQuery('#bfFormSubmitLabel').val();
                     mdata['submitLabel_translation'+BFQMConfig.lang] = JQuery('#bfFormSubmitLabelTrans').val();
@@ -2082,7 +2082,6 @@
                     mdata.fadeIn = JQuery('#bfElementAdvancedFadeIn').attr('checked');
                     mdata.useErrorAlerts = JQuery('#bfElementAdvancedUseErrorAlerts').attr('checked');
 
-                    mdata.disableJQuery = JQuery('#bfElementAdvancedDisableJQuery').attr('checked');
                     mdata.joomlaHint = JQuery('#bfElementAdvancedJoomlaHint').attr('checked');
 
                     mdata.mobileEnabled = JQuery('#bfElementAdvancedMobileEnabled').attr('checked');
@@ -2121,7 +2120,6 @@
                         JQuery('#bfFormLastPageThankYou').attr('checked', mdata.lastPageThankYou);
                         JQuery('#bfElementAdvancedUseErrorAlerts').attr('checked', mdata.useErrorAlerts);
 
-                        JQuery('#bfElementAdvancedDisableJQuery').attr('checked', mdata.disableJQuery);
                         JQuery('#bfElementAdvancedJoomlaHint').attr('checked', mdata.joomlaHint);
 
                         JQuery('#bfElementAdvancedMobileEnabled').attr('checked', mdata.mobileEnabled);
@@ -2144,41 +2142,12 @@
                             JQuery('#bfThemeBootstrapLabelTopYes').attr('checked', false);
                             JQuery('#bfThemeBootstrapLabelTopNo').attr('checked', true);
                         }
-                        if (typeof JQuery('#bfThemeBootstrapUseLegacyYes').get(0) != "undefined" && mdata.themeusebootstraplegacy) {
-                            JQuery('#bfThemeBootstrapUseLegacyYes').attr('checked', true);
-                            JQuery('#bfThemeBootstrapUseLegacyNo').attr('checked', false);
-                        } else if (typeof JQuery('#bfThemeBootstrapUseLegacyYes').get(0) != "undefined") {
-                            JQuery('#bfThemeBootstrapUseLegacyYes').attr('checked', false);
-                            JQuery('#bfThemeBootstrapUseLegacyNo').attr('checked', true);
-                        }
-
                         if (mdata.themebootstrapMode) {
                             JQuery('#bfThemeBootstrapModeYes').attr('checked', true);
                             JQuery('#bfThemeBootstrapModeNo').attr('checked', false);
                         } else {
                             JQuery('#bfThemeBootstrapModeYes').attr('checked', false);
                             JQuery('#bfThemeBootstrapModeNo').attr('checked', true);
-                        }
-
-                        if (mdata.themebootstrapUse3) {
-                            JQuery('#bfThemeBootstrapUse3Yes').attr('checked', true);
-                            JQuery('#bfThemeBootstrapUse3No').attr('checked', false);
-                        } else {
-                            JQuery('#bfThemeBootstrapUse3Yes').attr('checked', false);
-                            JQuery('#bfThemeBootstrapUse3No').attr('checked', true);
-                        }
-
-                        if (mdata.themebootstrap3builtin) {
-                            JQuery('#bfThemeBootstrap3BuiltInYes').attr('checked', true);
-                            JQuery('#bfThemeBootstrap3BuiltInNo').attr('checked', false);
-                        } else {
-                            JQuery('#bfThemeBootstrap3BuiltInYes').attr('checked', false);
-                            JQuery('#bfThemeBootstrap3BuiltInNo').attr('checked', true);
-                        }
-
-                        if (mdata.themebootstrap3classpfx) {
-
-                            JQuery('#bfThemeBootstrap3Classpfx').val(mdata.themebootstrap3classpfx);
                         }
 
                         if (mdata.themebootstrapThemeEngine == 'bootstrap') {

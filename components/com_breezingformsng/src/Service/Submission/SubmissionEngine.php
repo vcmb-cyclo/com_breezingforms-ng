@@ -123,10 +123,14 @@ final class SubmissionEngine
                                 }
                             }
 
-                            $uploadfiles = isset($_FILES['ff_nm_' . $row->name]) ? $_FILES['ff_nm_' . $row->name] : null;
+                            $uploadfiles = $this->processor->app->getInput()->files->get(
+                                'ff_nm_' . $row->name,
+                                null,
+                                'array'
+                            );
 
-                            if ($this->processor->formrow->template_code != '' && isset($_FILES['ff_nm_' . $row->name]) && $_FILES['ff_nm_' . $row->name]['tmp_name'][0] != '' && trim($row->data2) != '') {
-                                $fileName = $_FILES['ff_nm_' . $row->name]['name'][0];
+                            if ($this->processor->formrow->template_code != '' && ($uploadfiles['tmp_name'][0] ?? '') != '' && trim($row->data2) != '') {
+                                $fileName = (string) ($uploadfiles['name'][0] ?? '');
                                 $ext = strtolower(substr($fileName, strrpos($fileName, '.') + 1));
                                 $allowedExtensions = explode(',', strtolower(str_replace(' ', '', trim($row->data2))));
 
@@ -664,7 +668,7 @@ final class SubmissionEngine
             for ($i = 0; $i < $this->processor->rowcount; $i++) {
                 $row = $this->processor->rows[$i];
                 if ($row->type == "Captcha") {
-                    require_once(JPATH_SITE . '/media/com_breezingformsng/images/site/captcha/securimage.php');
+                    require_once JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/securimage/securimage.php';
                     $securimage = new Securimage();
                     if (!$securimage->check($this->processor->app->getInput()->getString('bfCaptchaEntry', ''))) {
                         $halt = true;
@@ -924,7 +928,6 @@ final class SubmissionEngine
                 ->from($this->processor->database->quoteName('#__facileforms_records'));
             $this->processor->database->setQuery($maxIdQuery);
             $lastid = $this->processor->database->loadResult();
-            $_SESSION['virtuemart_bf_id'] = $lastid;
             $session = $this->processor->app->getSession();
             $session->set('virtuemart_bf_id', $lastid);
 
@@ -1103,28 +1106,18 @@ transition: box-shadow .15s linear;
                                     \Vcmb\Component\BreezingformsNG\Administrator\Helper\VendorHelper::load();
                                 \Stripe\Stripe::setApiKey($options['secretKey']);
                                 $stripeemail = strtolower(($this->processor->app->getInput()->get('ff_nm_' . $options['emailfield'], '', 'string')[0] ?? ''));
-                                //header('Content-Type: application/json');
                                 $returnurl = Uri::root() . "index.php?option=com_breezingformsng&confirmStripe=true&form_id=" . $this->processor->form . "&record_id=" . $this->processor->record_id;
                                 if (isset($options['emailfield']) && $options['emailfield'] !== '') {
                                     $stripeemail = strtolower(($this->processor->app->getInput()->get('ff_nm_' . $options['emailfield'], '', 'string')[0] ?? ''));
                                     $this->processor->app->getSession()->set('emailfield', $stripeemail);
                                 }
 
-                                // XDA BEGIN
-// preg_match('#\((.*?)\)#', $_POST['ff_nm_donationAmount'][0], $match);
-// $productName = $match[1];
                                 $productName = $options['itemname'];
-                                // XDA END
-
-                                // XDA $pricearr = explode(" ", $$_POST['ff_nm_donationAmount'][0], 2);
-// XDA $productPrice = $pricearr[0];
 
                                 // ---------------------------------------------------------------------------------------------------------------------------------------------
 // XDA : in the Stripe Checkout session, 2 changes :
 // 1 - To disable address collection we will either need to pass billing_address_collection parameter with value auto or send API request without it.
 //      billing_address_collection' => 'required' -> 'auto'
-// 2 - Email determination
-// 'customer_email' => $_POST['ff_nm_email'][0] -> 'customer_email' => $stripeemail
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -1157,9 +1150,7 @@ transition: box-shadow .15s linear;
                                     'cancel_url' => $returnurl . "&session_id={CHECKOUT_SESSION_ID}",
                                 ]);
 
-                                //$html .=  $_POST['ff_nm_email'][0];
-                                $html .= header("HTTP/1.1 303 See Other");
-                                $html .= header("Location: " . $checkout_session->url);
+                                $this->processor->app->redirect((string) $checkout_session->url, 303);
 
                                 $current_tag = $this->processor->app->getLanguage()->getTag();
                                 $exploded = explode('-', $current_tag);
@@ -1665,8 +1656,8 @@ transition: box-shadow .15s linear;
             }
         }
 
-        unset($_SESSION['ff_editable_overridePlg' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . $this->processor->form_id]);
-        unset($_SESSION['ff_editablePlg' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . $this->processor->form_id]);
+        $this->processor->app->getSession()->clear('ff_editable_overridePlg' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . $this->processor->form_id);
+        $this->processor->app->getSession()->clear('ff_editablePlg' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . $this->processor->form_id);
         $this->processor->app->getSession()->set('ff_editableMod' . $this->processor->app->getInput()->getInt('ff_module_id', 0) . $this->processor->form_id, 0);
         $this->processor->app->getSession()->set('ff_editable_overrideMod' . $this->processor->app->getInput()->getInt('ff_module_id', 0) . $this->processor->form_id, 0);
 

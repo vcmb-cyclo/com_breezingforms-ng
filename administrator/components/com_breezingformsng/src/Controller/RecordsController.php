@@ -9,49 +9,60 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\CMS\Response\JsonResponse;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 use Joomla\Utilities\ArrayHelper;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\RecordModel;
+use Vcmb\Component\BreezingformsNG\Administrator\Service\AjaxStateService;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\PdfDocument;
 
 class RecordsController extends BaseController
 {
     public function display($cachable = false, $urlparams = [])
     {
-        Factory::getApplication()->getInput()->set('view', 'records');
+        $this->app->getInput()->set('view', 'records');
         return parent::display($cachable, $urlparams);
     }
 
     public function edit(): void
     {
-        $input = Factory::getApplication()->getInput();
-        Factory::getApplication()->redirect(
-            'index.php?option=com_breezingformsng&act=managerecs&view=records&layout=edit'
+        $input = $this->app->getInput();
+        $this->app->redirect(
+            'index.php?option=com_breezingformsng&view=records&layout=edit'
             . '&record_id=' . $input->getInt('record_id', 0)
             . '&form_selection=' . $input->getInt('form_selection', 0)
         );
+    }
+
+    public function cancel(): void
+    {
+        $this->checkToken();
+        $this->app->redirect($this->listUrl($this->app->getInput()));
     }
 
     public function save(): void
     {
         $this->checkToken();
 
-        $app = Factory::getApplication();
+        $app = $this->app;
         $input = $app->getInput();
         $recordId = $input->getInt('record_id', 0);
         $formSelection = $input->getInt('form_selection', 0);
 
         if ($recordId > 0) {
             $values = $input->get('element', [], 'post', 'array');
-            $this->getRecordModel()->saveRecord($recordId, is_array($values) ? $values : []);
+            $this->getRecordModel()->saveRecord(
+                $recordId,
+                is_array($values) ? $values : [],
+                $this->getTimezone()
+            );
         }
 
         $app->redirect(
-            'index.php?option=com_breezingformsng&act=managerecs&view=records&layout=edit'
+            'index.php?option=com_breezingformsng&view=records&layout=edit'
             . '&record_id=' . $recordId
             . '&form_selection=' . $formSelection
         );
@@ -61,11 +72,12 @@ class RecordsController extends BaseController
     {
         $this->checkToken();
 
-        $app = Factory::getApplication();
+        $app = $this->app;
         $input = $app->getInput();
         $ids = $input->get('cid', [], 'post', 'array');
         ArrayHelper::toInteger($ids);
-        $this->getRecordModel()->deleteRecords($ids);
+        $contentFactory = $app->bootComponent('com_content')->getMVCFactory();
+        $this->getRecordModel()->deleteRecords($ids, $contentFactory);
         $app->redirect($this->listUrl($input));
     }
 
@@ -80,21 +92,27 @@ class RecordsController extends BaseController
     {
         $this->checkToken();
 
-        @ob_end_clean();
-        $input = Factory::getApplication()->getInput();
+        while (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        $input = $this->app->getInput();
         $recordId = $input->getInt('record_id', 0);
-        $column = $input->getString('column', '');
-        $flag = $input->getInt('flag', 0);
-        if ($recordId > 0) {
+        $column = AjaxStateService::normalizeRecordColumn($input->getString('column', ''));
+        $flag = AjaxStateService::normalizeState($input->getInt('flag', 0));
+        if ($recordId > 0 && $column !== null) {
             $this->getRecordModel()->setFlagSingle($recordId, $column, $flag);
         }
-        echo json_encode(['Result' => 'OK']);
-        Factory::getApplication()->close();
+        $payload = $recordId > 0 && $column !== null
+            ? AjaxStateService::success($flag)
+            : AjaxStateService::error(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        $this->app->setHeader('Content-Type', 'application/json; charset=utf-8', true);
+        echo new JsonResponse($payload);
+        $this->app->close();
     }
 
     public function csvImport(): void
     {
-        $input = Factory::getApplication()->getInput();
+        $input = $this->app->getInput();
         $input->set('view', 'records');
         $input->set('layout', 'csvimport');
         parent::display();
@@ -104,7 +122,7 @@ class RecordsController extends BaseController
     {
         $this->checkToken();
 
-        $app = Factory::getApplication();
+        $app = $this->app;
         $input = $app->getInput();
         $formId = $input->getInt('form_id', 0);
         $formSelection = $input->getInt('form_selection', $formId);
@@ -125,22 +143,22 @@ class RecordsController extends BaseController
 
         $this->getRecordModel()->importCsv($formId, $tmpFile, $encoding);
 
-        $app->redirect('index.php?option=com_breezingformsng&act=managerecs&view=records&form_selection=' . $formSelection);
+        $app->redirect('index.php?option=com_breezingformsng&view=records&form_selection=' . $formSelection);
     }
 
     public function exportPdf(): void
     {
         $this->checkToken();
 
-        $app = Factory::getApplication();
+        $app = $this->app;
         $input = $app->getInput();
         $ids = $input->get('cid', [], 'post', 'array');
         ArrayHelper::toInteger($ids);
         $formSelection = $input->getInt('form_selection', 0);
 
         $model = $this->getRecordModel();
-        $tz = $model->getTimezone();
-        $db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+        $tz = $this->getTimezone();
+        $db = $model->getDatabaseConnection();
 
         $recs = $this->fetchRecords($db, $ids, $formSelection);
 
@@ -189,14 +207,9 @@ class RecordsController extends BaseController
         $pdf->setFormName($formName);
         $pdf->setWhich('export');
 
-        // Site-customised PDF templates under media/breezingforms/pdftpl/ can
-        // predate the BFText -> Text migration and still call BFText::_(),
-        // BFJoomlaConfig::get() or reference BFPDF by name.
-        require_once JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFText.php';
-        require_once JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFJoomlaConfig.php';
-        require_once JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFPDF.php';
-
-        @ob_end_clean();
+        if (ob_get_level() > 0) {
+            ob_end_clean();
+        }
         ob_start();
         require_once $file;
         $content = ob_get_clean();
@@ -258,7 +271,7 @@ class RecordsController extends BaseController
     {
         $this->checkToken();
 
-        $app = Factory::getApplication();
+        $app = $this->app;
         $input = $app->getInput();
         $ids = $input->get('cid', [], 'post', 'array');
         ArrayHelper::toInteger($ids);
@@ -266,8 +279,8 @@ class RecordsController extends BaseController
 
         $model = $this->getRecordModel();
         $config = $model->getExportConfig();
-        $tz = $model->getTimezone();
-        $db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+        $tz = $this->getTimezone();
+        $db = $model->getDatabaseConnection();
 
         $delimiter = stripslashes((string) $config->csvdelimiter);
         $quote = stripslashes((string) $config->csvquote);
@@ -356,12 +369,15 @@ class RecordsController extends BaseController
 
         $fileName = ($formName ? $formName . '-' : '') . 'ffexport-' . date('YmdHis') . '.csv';
 
-        @ob_end_clean();
-        header('Pragma: public');
-        header('Expires: 0');
-        header('Cache-Control: private');
-        header('Content-Type: text/csv; charset=UTF-8');
-        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        if (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        $app->setHeader('Pragma', 'public', true);
+        $app->setHeader('Expires', '0', true);
+        $app->setHeader('Cache-Control', 'private', true);
+        $app->setHeader('Content-Type', 'text/csv; charset=UTF-8', true);
+        $app->setHeader('Content-Disposition', 'attachment; filename="' . $fileName . '"', true);
+        $app->sendHeaders();
         echo "\xEF\xBB\xBF";
         echo $header . $body;
         $app->close();
@@ -371,15 +387,15 @@ class RecordsController extends BaseController
     {
         $this->checkToken();
 
-        $app = Factory::getApplication();
+        $app = $this->app;
         $input = $app->getInput();
         $ids = $input->get('cid', [], 'post', 'array');
         ArrayHelper::toInteger($ids);
         $formSelection = $input->getInt('form_selection', 0);
 
         $model = $this->getRecordModel();
-        $tz = $model->getTimezone();
-        $db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+        $tz = $this->getTimezone();
+        $db = $model->getDatabaseConnection();
 
         $recs = $this->fetchRecords($db, $ids, $formSelection);
         $formName = ($formSelection && $recs) ? ($recs[0]->name ?? '') : '';
@@ -453,12 +469,15 @@ class RecordsController extends BaseController
 
         $fileName = ($formName ? $formName . '-' : '') . 'ffexport-' . $datestamp->format('YmdHis', true) . '.xml';
 
-        @ob_end_clean();
-        header('Pragma: public');
-        header('Expires: 0');
-        header('Cache-Control: private');
-        header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        if (ob_get_level() > 0) {
+            ob_end_clean();
+        }
+        $app->setHeader('Pragma', 'public', true);
+        $app->setHeader('Expires', '0', true);
+        $app->setHeader('Cache-Control', 'private', true);
+        $app->setHeader('Content-Type', 'application/octet-stream', true);
+        $app->setHeader('Content-Disposition', 'attachment; filename="' . $fileName . '"', true);
+        $app->sendHeaders();
         echo $xml;
         $app->close();
     }
@@ -467,7 +486,7 @@ class RecordsController extends BaseController
     {
         $this->checkToken();
 
-        $app = Factory::getApplication();
+        $app = $this->app;
         $input = $app->getInput();
         $ids = $input->get('cid', [], 'post', 'array');
         ArrayHelper::toInteger($ids);
@@ -487,10 +506,15 @@ class RecordsController extends BaseController
 
     private function getRecordModel(): RecordModel
     {
-        return Factory::getApplication()
+        return $this->app
             ->bootComponent('com_breezingformsng')
             ->getMVCFactory()
             ->createModel('Record', 'Administrator');
+    }
+
+    private function getTimezone(): \DateTimeZone
+    {
+        return new \DateTimeZone((string) $this->app->get('offset', 'UTC'));
     }
 
     /**
@@ -541,7 +565,7 @@ class RecordsController extends BaseController
     {
         $formSelection = $input->getInt('form_selection', 0);
         $searchTerm = $input->getString('searchterm', '');
-        return 'index.php?option=com_breezingformsng&act=managerecs&view=records'
+        return 'index.php?option=com_breezingformsng&view=records'
             . ($formSelection > 0 ? '&form_selection=' . $formSelection : '')
             . ($searchTerm !== '' ? '&searchterm=' . rawurlencode($searchTerm) : '');
     }

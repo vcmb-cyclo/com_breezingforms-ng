@@ -17,7 +17,10 @@ required=(
     "administrator/components/com_breezingformsng/services/provider.php"
     "administrator/components/com_breezingformsng/src/Extension/BreezingFormsNGComponent.php"
     "administrator/components/com_breezingformsng/sql/install.mysql.utf8.sql"
-    "administrator/components/com_breezingformsng/plugins/sysbreezingforms/sysbreezingforms.xml"
+    "administrator/components/com_breezingformsng/plugins/bfcompat/bfcompat.xml"
+    "administrator/components/com_breezingformsng/libraries/securimage/securimage.php"
+    "administrator/components/com_breezingformsng/libraries/securimage/CaptchaObject.php"
+    "administrator/components/com_breezingformsng/libraries/securimage/StorageAdapter/Session.php"
     "components/com_breezingformsng/breezingformsng.php"
     "media/com_breezingformsng/css/custom.css"
 )
@@ -36,11 +39,25 @@ forbidden_patterns=(
     '^build/'
     '/cache/'
     '/logs/'
+    '^media/com_breezingformsng/images/site/captcha/.*\.php$'
 )
 
 for pattern in "${forbidden_patterns[@]}"; do
     if grep -Eq "${pattern}" <<<"${entries}"; then
         echo "Forbidden development artifact found in package: ${pattern}" >&2
+        exit 1
+    fi
+done
+
+obsolete_entries=(
+    "administrator/components/com_breezingformsng/libraries/jquery/jq.js"
+    "components/com_breezingformsng/libraries/jquery/jq.min.legacy.js"
+    "components/com_breezingformsng/libraries/jquery/jq.min.js"
+)
+
+for path in "${obsolete_entries[@]}"; do
+    if grep -Fxq "${path}" <<<"${entries}"; then
+        echo "Obsolete package entry is still present: ${path}" >&2
         exit 1
     fi
 done

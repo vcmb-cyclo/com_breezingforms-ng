@@ -14,7 +14,9 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
+use Joomla\Database\DatabaseInterface;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\ScriptManager;
+use Vcmb\Component\BreezingformsNG\Administrator\Model\ScriptModel;
 
 class ScriptsController extends BaseController
 {
@@ -59,7 +61,7 @@ class ScriptsController extends BaseController
 
     public function unpublish(): void
     {
-        $this->checkToken();
+        $this->assertPostToken();
         $this->runLegacyTask('publish', null, 0);
     }
 
@@ -81,7 +83,6 @@ class ScriptsController extends BaseController
     private function runLegacyTask(string $method, ?array $ids = null, ?int $state = null): void
     {
         $this->assertAuthorised();
-        $this->bootstrapLegacyRuntime();
         $this->prepareDocument();
 
         $arguments = ['com_breezingformsng', $this->getPackage()];
@@ -94,12 +95,19 @@ class ScriptsController extends BaseController
             $arguments[] = $state;
         }
 
-        ScriptManager::$method(...$arguments);
+        /** @var ScriptModel $model */
+        $model = $this->getModel('Script');
+        $manager = new ScriptManager(
+            $this->app,
+            Factory::getContainer()->get(DatabaseInterface::class),
+            $model,
+        );
+        $manager->$method(...$arguments);
     }
 
     private function assertAuthorised(): void
     {
-        if (!Factory::getApplication()->getIdentity()->authorise('core.manage', 'com_breezingformsng')) {
+        if (!$this->app->getIdentity()->authorise('core.manage', 'com_breezingformsng')) {
             throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'), 403);
         }
     }
@@ -108,7 +116,7 @@ class ScriptsController extends BaseController
     {
         $title = Text::_('COM_BREEZINGFORMSNG') . ' / ' . Text::_('COM_BREEZINGFORMSNG_MANAGESCRIPTS');
 
-        $document = Factory::getApplication()->getDocument();
+        $document = $this->app->getDocument();
         $document->setTitle($title);
         $document->getWebAssetManager()->addInlineStyle(
             '.icon-logo_left{'
@@ -134,14 +142,14 @@ class ScriptsController extends BaseController
 
     private function getPackage(): string
     {
-        $package = Factory::getApplication()->getInput()->getString('pkg', '');
+        $package = $this->app->getInput()->getString('pkg', '');
 
         return $package === '- blank -' ? '' : $package;
     }
 
     private function getIds(): array
     {
-        $input = Factory::getApplication()->getInput();
+        $input = $this->app->getInput();
         $ids = (array) $input->get('ids', [], 'array');
 
         if ($ids === []) {
@@ -151,39 +159,4 @@ class ScriptsController extends BaseController
         return array_values(array_filter(array_map('intval', $ids)));
     }
 
-    private function bootstrapLegacyRuntime(): void
-    {
-        global $ff_mospath, $ff_admpath, $ff_compath;
-        global $ff_mossite, $ff_admsite, $ff_admicon, $ff_comsite;
-        global $ff_config, $ff_compatible, $ff_install;
-        global $database, $task;
-
-
-        if (isset($ff_config)) {
-            return;
-        }
-
-        $database = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
-
-        $task       = '';
-        $comppath   = '/components/com_breezingformsng';
-        $ff_admpath = str_replace('\\', '/', JPATH_ADMINISTRATOR . '/components/com_breezingformsng');
-        $ff_mospath = str_replace('\\', '/', dirname(dirname(dirname($ff_admpath))));
-        $ff_compath = $ff_mospath . $comppath;
-        $ff_admsite = $ff_mospath . '/administrator' . $comppath;
-        $ff_admicon = $ff_admsite . '/images/icons';
-
-        require_once JPATH_SITE . '/components/com_breezingformsng/src/Support/runtime_bootstrap.php';
-
-        $ff_config = (object) [
-            'areasmall'  => 4,
-            'areamedium' => 12,
-            'arealarge'  => 20,
-            'limitdesc'  => 100,
-            'piecepkg'   => '',
-            'scriptpkg'  => '',
-        ];
-        $ff_compatible = true;
-        $ff_install    = false;
-    }
 }

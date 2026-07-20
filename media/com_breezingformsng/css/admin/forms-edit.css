@@ -1,0 +1,46 @@
+.bf-forms-edit {
+    max-width: 1180px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: var(--card-bg, #fff);
+    border: 1px solid var(--border-color, #dfe3e7);
+    box-shadow: 0 1px 4px rgb(0 0 0 / 8%);
+}
+
+.bf-forms-edit > .nav-tabs .nav-link.active {
+    color: #fff;
+    background-color: var(--template-link-color, #2f70b9);
+    border-color: var(--template-link-color, #2f70b9);
+}
+
+.bf-forms-edit > .tab-content {
+    background: var(--card-bg, #fff);
+}
+
+.bf-forms-edit .form-control,
+.bf-forms-edit .form-select {
+    max-width: 32rem;
+}
+
+.bf-forms-edit textarea.form-control,
+.bf-forms-edit .CodeMirror,
+.bf-forms-edit .joomla-editor-codemirror {
+    max-width: 100%;
+}
+
+.bf-forms-edit .card-header {
+    color: #fff;
+    background-color: var(--template-link-color, #2f70b9);
+}
+
+@media (max-width: 767.98px) {
+    .bf-forms-edit {
+        margin: 1rem 0;
+        padding: 1rem;
+    }
+
+    .bf-forms-edit .form-control,
+    .bf-forms-edit .form-select {
+        max-width: 100%;
+    }
+}

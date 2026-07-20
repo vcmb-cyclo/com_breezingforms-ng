@@ -34,8 +34,7 @@ use Joomla\CMS\Language\Text;
                                                 );
                                                 ?>
 
-                                                <a href="javascript:jQuery('#bfPropertiesIntroModal').modal('show');void(0);"
-                                                    data-toggle="modal">
+                                                <a href="#bfPropertiesIntroModal" data-bs-toggle="modal">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_EDIT_INTRO'); ?>
                                                 </a>
 
@@ -63,8 +62,7 @@ use Joomla\CMS\Language\Text;
                                                 );
                                                 ?>
 
-                                                <a href="javascript:jQuery('#bfPropertiesIntroModal2').modal('show');void(0);"
-                                                    data-toggle="modal">
+                                                <a href="#bfPropertiesIntroModal2" data-bs-toggle="modal">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_EDIT_INTRO'); ?>
                                                 </a>
 

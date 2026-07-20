@@ -13,15 +13,17 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\Database\DatabaseInterface;
+use Joomla\Database\ParameterType;
 use Joomla\Filesystem\File;
 use Joomla\Filesystem\Folder;
+use Joomla\Filesystem\Path;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\QuickmodeModel;
 
 class QuickmodeController extends BaseController
 {
     public function display($cachable = false, $urlparams = []): static
     {
-        Factory::getApplication()->getInput()->set('view', 'quickmode');
+        $this->app->getInput()->set('view', 'quickmode');
         return parent::display($cachable, $urlparams);
     }
 
@@ -34,44 +36,56 @@ class QuickmodeController extends BaseController
     {
         $this->checkToken('post');
 
-        $app   = Factory::getApplication();
+        $app   = $this->app;
         $input = $app->getInput();
 
         $chunksLength = $input->getInt('chunksLength', 0);
         $form         = $input->getInt('form', 0);
         $chunkIdx     = $input->getInt('chunkIdx', 0);
-        $rndAdd       = $input->getString('rndAdd', '0');
+        $rndAdd       = $input->getAlnum('rndAdd', '');
         $chunk        = $input->getString('chunk', '');
 
-        if ($chunksLength < 1 || $chunkIdx < 0 || $chunkIdx >= $chunksLength) {
-            http_response_code(400);
-            exit;
+        if ($chunksLength < 1 || $chunkIdx < 0 || $chunkIdx >= $chunksLength || $rndAdd === '') {
+            $app->setHeader('status', 400, true);
+            $app->close();
         }
 
-        $cacheDir = JPATH_SITE . '/media/breezingforms/ajax_cache';
+        $cacheDir = Path::clean((string) $app->get('tmp_path') . '/com_breezingformsng-quickmode');
 
-        if (!is_dir($cacheDir)) {
-            Folder::create($cacheDir);
+        if (!is_dir($cacheDir) && !Folder::create($cacheDir)) {
+            $app->setHeader('status', 500, true);
+            $app->close();
         }
 
         $dest = $cacheDir . '/ajaxsave_' . $chunkIdx . '_' . $rndAdd . '.txt';
-        @File::write($dest, $chunk);
+        if (!File::write($dest, $chunk)) {
+            $app->setHeader('status', 500, true);
+            $app->close();
+        }
 
-        @ob_end_clean();
+        if (ob_get_level() > 0) {
+            ob_end_clean();
+        }
 
         if ($chunkIdx === $chunksLength - 1) {
             $contents = '';
             for ($i = 0; $i < $chunksLength; $i++) {
                 $file = $cacheDir . '/ajaxsave_' . $i . '_' . $rndAdd . '.txt';
-                $contents .= (string) @file_get_contents($file);
-                @File::delete($file);
+                if (!is_file($file)) {
+                    $app->setHeader('status', 400, true);
+                    $app->close();
+                }
+
+                $contents .= (string) file_get_contents($file);
+                File::delete($file);
             }
 
-            $dataObject = json_decode(base64_decode($contents), true);
+            $decoded = base64_decode($contents, true);
+            $dataObject = $decoded === false ? null : json_decode($decoded, true);
 
             if (!is_array($dataObject)) {
-                http_response_code(400);
-                exit;
+                $app->setHeader('status', 400, true);
+                $app->close();
             }
 
             $formId = $this->getQuickmodeModel()->save($form, $dataObject);
@@ -85,10 +99,16 @@ class QuickmodeController extends BaseController
                 require_once $cbngBasePath . '/src/Service/FormSupportService.php';
 
                 $cbForm = \CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory::getForm('com_breezingformsng', $formId);
-                $db     = Factory::getContainer()->get(DatabaseInterface::class);
-                $db->setQuery(
-                    'SELECT id FROM #__contentbuilderng_forms WHERE `type` = \'com_breezingformsng\' AND `reference_id` = ' . (int) $formId
-                );
+                $db = Factory::getContainer()->get(DatabaseInterface::class);
+                $sourceType = 'com_breezingformsng';
+                $query = $db->getQuery(true)
+                    ->select($db->quoteName('id'))
+                    ->from($db->quoteName('#__contentbuilderng_forms'))
+                    ->where($db->quoteName('type') . ' = :sourceType')
+                    ->where($db->quoteName('reference_id') . ' = :referenceId')
+                    ->bind(':sourceType', $sourceType)
+                    ->bind(':referenceId', $formId, ParameterType::INTEGER);
+                $db->setQuery($query);
                 $cbForms = $db->loadColumn();
 
                 if (is_object($cbForm) && count($cbForms)) {
@@ -103,12 +123,13 @@ class QuickmodeController extends BaseController
                 }
             }
 
-            ob_start();
+            $app->setHeader('Content-Type', 'text/plain; charset=UTF-8', true);
+            $app->sendHeaders();
             echo $formId;
-            exit;
+            $app->close();
         }
 
-        exit;
+        $app->close();
     }
 
     /**
@@ -116,7 +137,7 @@ class QuickmodeController extends BaseController
      */
     public function editor(): void
     {
-        $input = Factory::getApplication()->getInput();
+        $input = $this->app->getInput();
         $input->set('view', 'quickmode');
         $input->set('layout', 'editor');
         parent::display();
@@ -124,7 +145,7 @@ class QuickmodeController extends BaseController
 
     private function getQuickmodeModel(): QuickmodeModel
     {
-        $model = Factory::getApplication()
+        $model = $this->app
             ->bootComponent('com_breezingformsng')
             ->getMVCFactory()
             ->createModel('Quickmode', 'Administrator', ['ignore_request' => true]);

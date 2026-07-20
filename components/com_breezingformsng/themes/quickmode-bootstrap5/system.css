@@ -1,9 +1,9 @@
-.bfQuickMode .bfbs5-form-group-actions, .bfQuickMode .form-group-actions{
+.bfQuickMode .form-group-actions, .bfQuickMode .form-group-actions{
     margin-bottom: 25px;
     min-height: 34px;
 }
 
-.bfQuickMode .bfbs5-btn, .bfQuickMode .btn{
+.bfQuickMode .btn, .bfQuickMode .btn{
     font-size: 14px
 }
 
@@ -12,7 +12,7 @@
 }
 
 /* fixing if a template has the idea to change that (e.g. T3) */
-.bfQuickMode fieldset .form-group, .bfQuickMode .form-horizontal .form-group {
+.bfQuickMode fieldset .bf-form-group {
     margin-left: 0;
     margin-right: 0;
 }
@@ -24,7 +24,7 @@
     padding-left: 15px;
 }
 
-.bfQuickMode .bfbs5-nonform-control, .bfQuickMode .nonform-control{
+.bfQuickMode .nonform-control, .bfQuickMode .nonform-control{
     display: inline-block;
     vertical-align: middle;
     width: 69%;
@@ -32,7 +32,7 @@
 
 @media all and (max-width: 767px) {
 
-    .bfQuickMode .bfbs5-nonform-control, .bfQuickMode .nonform-control{
+    .bfQuickMode .nonform-control, .bfQuickMode .nonform-control{
         width: 100%;
     }
 }
@@ -43,14 +43,14 @@
 
 
 
-.bfQuickMode input[type=checkbox], .bfQuickMode .bfbs5-checkbox-inline input[type=checkbox], .bfQuickMode .bfbs5-radio input[type=radio], .bfQuickMode .bfbs5-radio-inline input[type=radio],
-.bfQuickMode .checkbox-inline input[type=checkbox], .bfQuickMode .radio input[type=radio], .bfQuickMode .radio-inline input[type=radio] {
+.bfQuickMode input[type=checkbox], .bfQuickMode .form-check-inline input[type=checkbox], .bfQuickMode .form-check-label input[type=radio], .bfQuickMode .form-check-inline input[type=radio],
+.bfQuickMode .form-check-inline input[type=checkbox], .bfQuickMode .form-check input[type=radio], .bfQuickMode .form-check-inline input[type=radio] {
     position: relative;
     margin-right: 5px;
 }
 
-.bfQuickMode .bfbs5-radio-inline.bfbs5-inline, .bfQuickMode .bfbs5-checkbox-inline.bfbs5-inline,
-.bfQuickMode .bfbs5-radio-inline.inline, .bfQuickMode .checkbox-inline.bfbs5-inline {
+.bfQuickMode .form-check-inline.form-check-inline, .bfQuickMode .form-check-inline.form-check-inline,
+.bfQuickMode .form-check-inline.inline, .bfQuickMode .form-check-inline.form-check-inline {
     padding-top: 5px;
 }
 
@@ -102,28 +102,28 @@
 }
 /* END DESIGN EMAIL INVALID */
 
-.bfQuickMode .bfbs5-radio-form-group, .bfQuickMode .bfbs5-checkbox-form-group,
+.bfQuickMode .radio-form-group, .bfQuickMode .checkbox-form-group,
 .bfQuickMode .radio-form-group, .bfQuickMode .checkbox-form-group {
     padding-top: 5px !important;
 }
 
-.bfQuickMode .bfbs5-other-form-group{
+.bfQuickMode .other-form-group{
     padding-top: 0 !important;
 }
 
-.bfQuickMode .bfbs5-radio-inline .ff_elem, .bfQuickMode .bfbs5-checkbox-inline .ff_elem,
-.bfQuickMode .radio-inline .ff_elem, .bfQuickMode .checkbox-inline .ff_elem {
+.bfQuickMode .form-check-inline .ff_elem, .bfQuickMode .form-check-inline .ff_elem,
+.bfQuickMode .form-check-inline .ff_elem, .bfQuickMode .form-check-inline .ff_elem {
     margin-top: -3px;
 }
 
 @media all and (max-width: 767px) {
 
-    .bfQuickMode .bfbs5-radio-inline.bfbs5-inline, .bfQuickMode .bfbs5-checkbox-inline.bfbs5-inline,
-    .bfQuickMode .bfbs5-radio-inline.inline, .bfQuickMode .checkbox-inline.bfbs5-inline {
+    .bfQuickMode .form-check-inline.form-check-inline, .bfQuickMode .form-check-inline.form-check-inline,
+    .bfQuickMode .form-check-inline.inline, .bfQuickMode .form-check-inline.form-check-inline {
         padding-top: 0;
     }
 
-    .bfQuickMode .bfbs5-radio-form-group, .bfQuickMode .bfbs5-checkbox-form-group,
+    .bfQuickMode .radio-form-group, .bfQuickMode .checkbox-form-group,
     .bfQuickMode .radio-form-group, .bfQuickMode .checkbox-form-group {
         padding-top: 0;
     }
@@ -143,14 +143,14 @@
     padding-right: 0px;
 }
 
-.bfQuickMode section .bfbs5-row, .bfQuickMode section .row,
-.bfQuickMode fieldset .bfbs5-row, .bfQuickMode fieldset .row{
+.bfQuickMode section .row, .bfQuickMode section .row,
+.bfQuickMode fieldset .row, .bfQuickMode fieldset .row{
     margin-left: 15px;
     margin-right: 0;
 }
 
-.bfQuickMode section section .bfbs5-row, .bfQuickMode section section .row,
-.bfQuickMode fieldset .bfbs5-row, .bfQuickMode fieldset .row{
+.bfQuickMode section section .row, .bfQuickMode section section .row,
+.bfQuickMode fieldset .row, .bfQuickMode fieldset .row{
     margin-left: 15px;
     margin-right: 0;
 }
@@ -162,14 +162,14 @@
         padding-right: 0px;
     }
 
-    .bfQuickMode section .bfbs5-row, .bfQuickMode section .row,
-    .bfQuickMode fieldset .bfbs5-row, .bfQuickMode fieldset .row{
+    .bfQuickMode section .row, .bfQuickMode section .row,
+    .bfQuickMode fieldset .row, .bfQuickMode fieldset .row{
         margin-left: 0;
         margin-right: 0;
     }
 
-    .bfQuickMode section section .bfbs5-row, .bfQuickMode section section .row,
-    .bfQuickMode fieldset .bfbs5-row, .bfQuickMode fieldset .row{
+    .bfQuickMode section section .row, .bfQuickMode section section .row,
+    .bfQuickMode fieldset .row, .bfQuickMode fieldset .row{
         margin-left: 0;
         margin-right: 0;
     }
@@ -177,8 +177,8 @@
     /* fixing if a template has the idea to deal with that */
     .bfQuickMode section [class^="col-"], .bfQuickMode section [class*=" col-"],
     .bfQuickMode fieldset [class^="col-"], .bfQuickMode fieldset [class*=" col-"],
-    .bfQuickMode section [class^="bfbs5-col-"], .bfQuickMode section [class*=" bfbs5-col-"],
-    .bfQuickMode fieldset [class^="bfbs5-col-"], .bfQuickMode fieldset [class*=" bfbs5-col-"]{
+    .bfQuickMode section [class^="col-"], .bfQuickMode section [class*=" col-"],
+    .bfQuickMode fieldset [class^="col-"], .bfQuickMode fieldset [class*=" col-"]{
         padding-right: 0;
         padding-left: 0;
     }
@@ -187,7 +187,7 @@
 /** Inputs **/
 
 
-.bfQuickMode .bfbs5-form-group .bfbs5-col-sm-12, .bfQuickMode .form-group .col-sm-12 {
+.bfQuickMode .bf-form-group .col-sm-12 {
     padding-left: 0;
     padding-right: 0;
 }
@@ -251,7 +251,7 @@
     }
 }
 
-.bfQuickMode .fas.fa-asterisk, .bfQuickMode .bfbs5-fas.bfbs5-fa-asterisk {
+.bfQuickMode .fas.fa-asterisk, .bfQuickMode .fas.fa-asterisk {
     font-size: 9px;
     vertical-align: top;
     color: red;
@@ -260,16 +260,16 @@
 .bfQuickMode input[type=text],
 .bfQuickMode textarea,
 .bfQuickMode select,
-.bfQuickMode .uneditable-input {
+.bfQuickMode .custom-form-control {
 
     min-height: 32px;
 }
 
-.bfQuickMode .bfbs5-form-inline .form-group {
+.bfQuickMode .bf-form-inline .bf-form-group {
     width: 100%;
 }
 
-.bfQuickMode .bfbs5-hero-unit {
+.bfQuickMode .bf-hero-unit {
     background-color: #f8f9fa;
     border-radius: 0.3rem;
     margin-bottom: 1.5rem;
@@ -281,7 +281,7 @@
 }
 
 
-.bfQuickMode .bfbs5-form-inline .form-group, .bfQuickMode .bfbs5-form-inline label{
+.bfQuickMode .bf-form-inline .bf-form-group, .bfQuickMode .bf-form-inline label{
     display: inline-block;
     margin-right: 10px;
     vertical-align: middle;
@@ -299,36 +299,36 @@
         min-width: 100%;
     }
 
-    .bfQuickMode .bfbs5-form-inline .col-form-label {
+    .bfQuickMode .bf-form-inline .col-form-label {
         max-width: 90% !important;
         min-width: 90% !important;
         width: 90% !important;
         display: block !important;
     }
 
-    .bfQuickMode .bfbs5-input-group{
+    .bfQuickMode .input-group{
         display: block;
     }
 
-    .bfQuickMode .bfbs5-input-group input, .bfQuickMode .input-group input {
+    .bfQuickMode .input-group input, .bfQuickMode .input-group input {
         width: 185px;
         min-width: 185px;
         max-width: 185px;
     }
 }
 
-.bfQuickMode .bfElemWrap .bfbs5-form-inline input[type="text"], 
-.bfQuickMode .bfElemWrap .bfbs5-form-inline input[type="number"],
-.bfQuickMode .bfElemWrap .bfbs5-form-inline input[type="range"],
-.bfQuickMode .bfElemWrap .bfbs5-form-inline textarea, 
-.bfQuickMode .bfElemWrap .bfbs5-form-inline select{
+.bfQuickMode .bfElemWrap .bf-form-inline input[type="text"],
+.bfQuickMode .bfElemWrap .bf-form-inline input[type="number"],
+.bfQuickMode .bfElemWrap .bf-form-inline input[type="range"],
+.bfQuickMode .bfElemWrap .bf-form-inline textarea,
+.bfQuickMode .bfElemWrap .bf-form-inline select{
     
     display: inline-block;
     max-width: 70%;
     vertical-align: middle;
 }
 
-.bfQuickMode .bfElemWrap .bfbs5-form-inline label{
+.bfQuickMode .bfElemWrap .bf-form-inline label{
     min-width: 25%;
 }
 
@@ -401,13 +401,13 @@
         margin-bottom: 0px;
     }
 
-    .bfQuickMode fieldset .bfbs5-row, .bfQuickMode fieldset .row {
+    .bfQuickMode fieldset .row, .bfQuickMode fieldset .row {
         padding-top: 18px;
     }
 
 }
 
-.bfQuickMode .bfbs5-form-group .bfbs5-col-form-label, .bfQuickMode .form-group .col-form-label {
+.bfQuickMode .bf-form-group .col-form-label {
     width: 30%;
     min-width: 110px;
     margin-left: 0;
@@ -494,15 +494,15 @@
     padding: 10px;
 }
 
-.bfQuickMode input[type="text"].bfCalendar, .bfQuickMode .bfbs5-uneditable-input.bfCalendar, .bfQuickMode .uneditable-input.bfCalendar,
-.bfQuickMode input[type="text"].custom-form-control, .bfQuickMode .bfbs5-uneditable-input.custom-form-control, .bfQuickMode .uneditable-input.custom-form-control{
+.bfQuickMode input[type="text"].bfCalendar, .bfQuickMode .custom-form-control.bfCalendar, .bfQuickMode .custom-form-control.bfCalendar,
+.bfQuickMode input[type="text"].custom-form-control, .bfQuickMode .custom-form-control.custom-form-control, .bfQuickMode .custom-form-control.custom-form-control{
     max-width: 130px !important;
     min-width: 130px !important;
     width: 130px !important;
 }
 
 @media (max-width: 767px) {
-    .bfQuickMode input[type=text].bfCalendar, .bfQuickMode .bfbs5-uneditable-input.bfCalendar, .bfQuickMode .uneditable-input.bfCalendar {
+    .bfQuickMode input[type=text].bfCalendar, .bfQuickMode .custom-form-control.bfCalendar, .bfQuickMode .custom-form-control.bfCalendar {
         width: 1%;
         min-width: 0;
     }

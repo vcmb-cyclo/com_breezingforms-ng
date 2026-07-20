@@ -11,21 +11,28 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
-use Joomla\CMS\MVC\Model\BaseModel;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 
-class IntegratorModel extends BaseModel
+class IntegratorModel extends BaseDatabaseModel
 {
     private const ALLOWED_OPERATORS = ['=', '<>', '>', '<', '>=', '<=', '%...%', '%...', '...%'];
 
+    private const RULE_SORTS = [
+        'rules.name' => 'rules.name',
+        'rules.type' => 'rules.type',
+        'forms.name' => 'forms.name',
+        'rules.reference_table' => 'rules.reference_table',
+        'rules.published' => 'rules.published',
+    ];
+
     private function db(): DatabaseInterface
     {
-        return Factory::getContainer()->get(DatabaseInterface::class);
+        return $this->getDatabase();
     }
 
-    public function getRules(): array
+    public function getRules(string $ordering = 'rules.name', string $direction = 'asc'): array
     {
         $db = $this->db();
         $query = $db->getQuery(true)
@@ -39,7 +46,11 @@ class IntegratorModel extends BaseModel
             ->from($db->quoteName('#__facileforms_integrator_rules', 'rules'))
             ->join('INNER', $db->quoteName('#__facileforms_forms', 'forms') . ' ON rules.form_id = forms.id')
             ->group('rules.id')
-            ->order('rules.id');
+            ->order(
+                $db->quoteName(self::RULE_SORTS[$ordering] ?? 'rules.name')
+                . (strtolower($direction) === 'desc' ? ' DESC' : ' ASC')
+                . ', ' . $db->quoteName('rules.id') . ' ASC'
+            );
         $db->setQuery($query);
         return $db->loadObjectList() ?: [];
     }

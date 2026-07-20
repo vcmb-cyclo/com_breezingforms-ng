@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" group="system" method="upgrade">
+	<name>PLG_SYSTEM_BFCOMPAT</name>
+	<author>XDA/GIL</author>
+	<creationDate>2026-07-20</creationDate>
+	<copyright>Copyright 2024 - 2026 by XDA+GIL</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<version>6.1.1-alpha.3</version>
+	<description>PLG_SYSTEM_BFCOMPAT_XML_DESCRIPTION</description>
+	<namespace path="src">Vcmb\Plugin\System\Bfcompat</namespace>
+	<files>
+		<folder plugin="bfcompat">services</folder>
+		<folder>src</folder>
+		<folder>language</folder>
+	</files>
+	<languages folder="language">
+		<language tag="de-DE">de-DE/plg_system_bfcompat.ini</language>
+		<language tag="de-DE">de-DE/plg_system_bfcompat.sys.ini</language>
+		<language tag="en-GB">en-GB/plg_system_bfcompat.ini</language>
+		<language tag="en-GB">en-GB/plg_system_bfcompat.sys.ini</language>
+		<language tag="es-ES">es-ES/plg_system_bfcompat.ini</language>
+		<language tag="es-ES">es-ES/plg_system_bfcompat.sys.ini</language>
+		<language tag="fr-FR">fr-FR/plg_system_bfcompat.ini</language>
+		<language tag="fr-FR">fr-FR/plg_system_bfcompat.sys.ini</language>
+		<language tag="hu-HU">hu-HU/plg_system_bfcompat.ini</language>
+		<language tag="hu-HU">hu-HU/plg_system_bfcompat.sys.ini</language>
+		<language tag="it-IT">it-IT/plg_system_bfcompat.ini</language>
+		<language tag="it-IT">it-IT/plg_system_bfcompat.sys.ini</language>
+		<language tag="nl-NL">nl-NL/plg_system_bfcompat.ini</language>
+		<language tag="nl-NL">nl-NL/plg_system_bfcompat.sys.ini</language>
+		<language tag="tr-TR">tr-TR/plg_system_bfcompat.ini</language>
+		<language tag="tr-TR">tr-TR/plg_system_bfcompat.sys.ini</language>
+	</languages>
+</extension>

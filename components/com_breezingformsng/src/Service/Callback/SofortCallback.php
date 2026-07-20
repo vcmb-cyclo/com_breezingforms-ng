@@ -62,7 +62,7 @@ final class SofortCallback
             $list = $db->loadObjectList();
             if (count($list) == 0) {
                 $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
-                exit;
+                $this->application->close();
             }
 
             $form = $list[0];
@@ -142,14 +142,14 @@ final class SofortCallback
     $db->setQuery($formQuery);
     $list = $db->loadObjectList();
     if (count($list) == 0) {
-        exit;
+        $this->application->close();
     }
 
     $form = $list[0];
 
     $areas = json_decode($form->template_areas, true);
     if (!is_array($areas)) {
-        exit;
+        $this->application->close();
     }
 
     foreach ($areas as $area) {
@@ -307,7 +307,7 @@ final class SofortCallback
     $list = $db->loadObjectList();
     if (count($list) == 0) {
         $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
-        exit;
+        $this->application->close();
     }
 
     $form = $list[0];
@@ -359,7 +359,7 @@ final class SofortCallback
                                 $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_DOWNLOAD_FILE'));
                             }
 
-                            \Vcmb\Component\BreezingformsNG\Site\Service\Support\DownloadHelper::stream($file);
+                            \Vcmb\Component\BreezingformsNG\Site\Service\Support\DownloadHelper::stream($this->application, $file);
                         } else {
 
                             $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_MAX_DOWNLOAD_TRIES_REACHED'));

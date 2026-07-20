@@ -17,6 +17,7 @@ use HTML_facileFormsProcessor;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\Uri\Uri;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RuntimeAssetLoader;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Component\ComponentHelper;
 
@@ -46,21 +47,12 @@ class OnePageRenderer
     private $htmltextareasDbIds = array();
     private $language_tag = '';
     private $hasResponsiveDatePicker = false;
-    private $bsVersion = '5';
     private $bsClasses = array();
-    private $bsClassPrefix = '';
 
     function bsClass($key)
     {
 
-        if ($this->bsVersion == '') {
-
-            $ver = 5;
-        } else {
-            $ver = $this->bsVersion;
-        }
-
-        return $this->bsClasses[$ver][$key];
+        return $this->bsClasses[5][$key];
     }
 
     public static function getEditorContent($editor)
@@ -80,72 +72,59 @@ class OnePageRenderer
 
         $this->rootMdata = $this->dataObject['properties'];
 
-        if (isset($this->rootMdata['themebootstrap3classpfx']) && trim($this->rootMdata['themebootstrap3classpfx']) != '') {
-
-            $this->bsClassPrefix = $this->rootMdata['themebootstrap3classpfx'];
-        } else {
-
-            if (isset($this->rootMdata['themebootstrapUse3']) && $this->rootMdata['themebootstrapUse3'] && isset($this->rootMdata['themebootstrap3builtin']) && $this->rootMdata['themebootstrap3builtin']) {
-                $this->bsClassPrefix = 'bfbs3-';
-            } else {
-
-                $this->bsClassPrefix = '';
-            }
-        }
-
         $this->bsClasses[5] = array(
-            'bar' => $this->bsClassPrefix . 'progress-bar',
-            'progress' => $this->bsClassPrefix . 'progress',
-            'span1' => $this->bsClassPrefix . 'col-md-1',
-            'span2' => $this->bsClassPrefix . 'col-md-2',
-            'span3' => $this->bsClassPrefix . 'col-md-3',
-            'span4' => $this->bsClassPrefix . 'col-md-4',
-            'span5' => $this->bsClassPrefix . 'col-md-5',
-            'span6' => $this->bsClassPrefix . 'col-md-6',
-            'span7' => $this->bsClassPrefix . 'col-md-7',
-            'span8' => $this->bsClassPrefix . 'col-md-8',
-            'span9' => $this->bsClassPrefix . 'col-md-9',
-            'span10' => $this->bsClassPrefix . 'col-md-10',
-            'span11' => $this->bsClassPrefix . 'col-md-11',
-            'span12' => $this->bsClassPrefix . 'col-md-12',
+            'bar' => 'progress-bar',
+            'progress' => 'progress',
+            'span1' => 'col-md-1',
+            'span2' => 'col-md-2',
+            'span3' => 'col-md-3',
+            'span4' => 'col-md-4',
+            'span5' => 'col-md-5',
+            'span6' => 'col-md-6',
+            'span7' => 'col-md-7',
+            'span8' => 'col-md-8',
+            'span9' => 'col-md-9',
+            'span10' => 'col-md-10',
+            'span11' => 'col-md-11',
+            'span12' => 'col-md-12',
             'control-group' => 'mb-3',
-            'control-label' => $this->bsClassPrefix . 'form-label',
-            'row-fluid' => $this->bsClassPrefix . 'row',
-            'icon-asterisk' => $this->bsClassPrefix . 'fas ' . $this->bsClassPrefix . 'fa-asterisk',
-            'icon-question-sign' => $this->bsClassPrefix . 'fas ' . $this->bsClassPrefix . 'fa-question-circle',
+            'control-label' => 'form-label',
+            'row-fluid' => 'row',
+            'icon-asterisk' => 'fas ' . 'fa-asterisk',
+            'icon-question-sign' => 'fas ' . 'fa-question-circle',
             'form-actions' => 'mt-3',
             'form-actions-buttons' => 'd-flex flex-wrap gap-2',
-            'btn' => $this->bsClassPrefix . 'btn',
-            'btn-primary' => $this->bsClassPrefix . 'btn-primary',
-            'btn-secondary' => $this->bsClassPrefix . 'btn-secondary',
-            'alert' => $this->bsClassPrefix . 'alert',
-            'alert-error' => $this->bsClassPrefix . 'alert-danger',
+            'btn' => 'btn',
+            'btn-primary' => 'btn-primary',
+            'btn-secondary' => 'btn-secondary',
+            'alert' => 'alert',
+            'alert-error' => 'alert-danger',
             'controls' => '',
-            'form-inline' => 'bfbs5-form-inline',
-            'form-group' => $this->bsClassPrefix . 'form-group',
-            'well' => $this->bsClassPrefix . 'card',
-            'well-small' => $this->bsClassPrefix . 'card-body',
-            'hero-unit' => 'bfbs5-hero-unit',
-            'pull-left' => $this->bsClassPrefix . 'float-start',
-            'pull-right' => $this->bsClassPrefix . 'float-end',
-            'radio' => $this->bsClassPrefix . 'form-check-label',
-            'checkbox' => $this->bsClassPrefix . 'form-check-label',
-            'inline' => $this->bsClassPrefix . 'form-check-inline',
-            'radio-form-group' => $this->bsClassPrefix . 'radio-form-group',
-            'checkbox-form-group' => $this->bsClassPrefix . 'checkbox-form-group',
-            'input-append' => $this->bsClassPrefix . 'input-group',
-            'input-group-btn' => $this->bsClassPrefix . '',
-            'form-control' => $this->bsClassPrefix . 'form-control',
-            'icon-calendar' => $this->bsClassPrefix . 'fas ' . $this->bsClassPrefix . 'fa-calendar',
-            'icon-refresh' => $this->bsClassPrefix . 'fas ' . $this->bsClassPrefix . 'fa-sync',
-            'icon-play' => $this->bsClassPrefix . 'fas ' . $this->bsClassPrefix . 'fa-play',
-            'icon-picture' => $this->bsClassPrefix . 'fas ' . $this->bsClassPrefix . 'fa-picture',
-            'img-polaroid' => $this->bsClassPrefix . 'thumbnail',
-            'icon-upload' => $this->bsClassPrefix . 'fas ' . $this->bsClassPrefix . 'fa-upload',
-            'nonform-control' => $this->bsClassPrefix . 'nonform-control',
-            'other-form-group' => $this->bsClassPrefix . 'other-form-group',
-            'custom-form-control' => $this->bsClassPrefix . 'custom-form-control',
-            'input-group-text' => $this->bsClassPrefix . 'input-group-text',
+            'form-inline' => 'bf-form-inline',
+            'form-group' => 'bf-form-group mb-3',
+            'well' => 'card',
+            'well-small' => 'card-body',
+            'hero-unit' => 'bf-hero-unit',
+            'float-start' => 'float-start',
+            'float-end' => 'float-end',
+            'radio' => 'form-check-label',
+            'checkbox' => 'form-check-label',
+            'inline' => 'form-check-inline',
+            'radio-form-group' => 'radio-form-group',
+            'checkbox-form-group' => 'checkbox-form-group',
+            'input-append' => 'input-group',
+            'input-group-btn' => '',
+            'form-control' => 'form-control',
+            'icon-calendar' => 'fas ' . 'fa-calendar',
+            'icon-refresh' => 'fas ' . 'fa-sync',
+            'icon-play' => 'fas ' . 'fa-play',
+            'icon-picture' => 'fas ' . 'fa-picture',
+            'img-thumbnail' => 'img-thumbnail',
+            'icon-upload' => 'fas ' . 'fa-upload',
+            'nonform-control' => 'nonform-control',
+            'other-form-group' => 'other-form-group',
+            'custom-form-control' => 'custom-form-control',
+            'input-group-text' => 'input-group-text',
             'row' => 'row',
             'form-select' => 'form-select'
         );
@@ -170,18 +149,13 @@ class OnePageRenderer
         mt_srand();
         $this->flashUploadTicket = md5(strtotime('now') . mt_rand(0, mt_getrandmax()));
 
-        if (isset($this->rootMdata['themebootstrapUse3']) && $this->rootMdata['themebootstrapUse3']) {
-
-            $this->bsVersion = '5';
+        $this->cancelImagePath = Uri::root(true) . '/components/com_breezingformsng/themes/quickmode-bootstrap' . '5' . '/cancel.png';
+        $this->uploadImagePath = Uri::root(true) . '/components/com_breezingformsng/themes/quickmode-bootstrap' . '5' . '/upload.png';
+        if (isset($this->rootMdata['themebootstrap']) && @file_exists(JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/images/cancel.png')) {
+            $this->cancelImagePath = Uri::root(true) . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/images/cancel.png';
         }
-
-        $this->cancelImagePath = Uri::root(true) . '/components/com_breezingformsng/themes/quickmode-bootstrap' . $this->bsVersion . '/cancel.png';
-        $this->uploadImagePath = Uri::root(true) . '/components/com_breezingformsng/themes/quickmode-bootstrap' . $this->bsVersion . '/upload.png';
-        if (isset($this->rootMdata['themebootstrap']) && @file_exists(JPATH_SITE . '/media/breezingforms/themes-bootstrap' . $this->bsVersion . '/' . $this->rootMdata['themebootstrap'] . '/images/cancel.png')) {
-            $this->cancelImagePath = Uri::root(true) . '/media/breezingforms/themes-bootstrap' . $this->bsVersion . '/' . $this->rootMdata['themebootstrap'] . '/images/cancel.png';
-        }
-        if (isset($this->rootMdata['themebootstrap']) && @file_exists(JPATH_SITE . '/media/breezingforms/themes-bootstrap' . $this->bsVersion . '/' . $this->rootMdata['themebootstrap'] . '/images/upload.png')) {
-            $this->uploadImagePath = Uri::root(true) . '/media/breezingforms/themes-bootstrap' . $this->bsVersion . '/' . $this->rootMdata['themebootstrap'] . '/images/upload.png';
+        if (isset($this->rootMdata['themebootstrap']) && @file_exists(JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/images/upload.png')) {
+            $this->uploadImagePath = Uri::root(true) . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/images/upload.png';
         }
     }
 
@@ -189,41 +163,34 @@ class OnePageRenderer
     {
 
         if ($this->hasFlashUpload) {
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/plupload/moxie.js');
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/plupload/plupload.js');
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-plupload-compat.js');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/plupload/moxie.js');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/plupload/plupload.js');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-plupload-compat.js');
         }
 
-        $this->p->app->getDocument()->addStyleSheet(Uri::root(true) . '/media/com_breezingformsng/css/site/quickmode-runtime.css');
+        RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/media/com_breezingformsng/css/site/quickmode-runtime.css');
 
-        // force jquery to be loaded after mootools but before any other js (since J! 3.4)
-        HTMLHelper::_('bootstrap.framework');
-        HTMLHelper::_('jquery.framework');
+        $this->p->app->getDocument()->getWebAssetManager()->useScript('jquery');
         HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
-        $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-tooltip-init.js');
+        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-tooltip-init.js');
 
-        $jQuery = '';
-        if (isset($this->rootMdata['disableJQuery']) && $this->rootMdata['disableJQuery']) {
-            $jQuery = 'var JQuery = jQuery;' . "\n";
-        } else {
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jq.min.js');
-        }
+        $jQuery = 'var JQuery = jQuery;' . "\n";
 
-        $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/scrollto.js');
+        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/scrollto.js');
 
         if ($this->useErrorAlerts) {
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/js/sweetalert.min.js');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/js/sweetalert.min.js');
         }
 
         if ($this->useBalloonErrors) {
-            $this->p->app->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/validationEngine.jquery.css');
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jquery.validationEngine-en.js');
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jquery.validationEngine.js');
+            RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/validationEngine.jquery.css');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jquery.validationEngine-en.js');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jquery.validationEngine.js');
         }
 
         $toggleCode = '';
         if ($this->toggleFields != '[]') {
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-toggle-fields.js');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-toggle-fields.js');
             $toggleCode = '
 var toggleFieldsArray = ' . $this->toggleFields . ';
 			';
@@ -234,9 +201,9 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
             $has_last_page = 'true';
 
             // loading remodal
-            $this->p->app->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/remodal/remodal.css');
-            $this->p->app->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/remodal/remodal-default-theme.css');
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/remodal/remodal.min.js');
+            RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/remodal/remodal.css');
+            RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/remodal/remodal-default-theme.css');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/remodal/remodal.min.js');
             $this->p->app->getDocument()->getWebAssetManager()->addInlineScript("\n" . '
                    function bf_remodal_close(){
                         if(typeof crbc_cart_url != "undefined"){
@@ -248,10 +215,10 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                    ' . "\n");
         }
 
-        $this->p->app->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/ladda/ladda-themeless.min.css');
-        $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/ladda/spin.min.js');
-        $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/ladda/ladda.min.js');
-        $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/ladda/ladda.jq.min.js');
+        RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/ladda/ladda-themeless.min.css');
+        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/ladda/spin.min.js');
+        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/ladda/ladda.min.js');
+        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/ladda/ladda.jq.min.js');
 
         $this->p->app->getDocument()->getWebAssetManager()->addInlineScript(
             $jQuery . '
@@ -434,8 +401,8 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 '
         );
 
-        $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-field-helpers-bootstrap.js');
-        $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-deactivation.js');
+        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-field-helpers-bootstrap.js');
+        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-deactivation.js');
 
         if ($this->fading || !$this->useErrorAlerts || $this->rollover) {
             if (!$this->useErrorAlerts) {
@@ -445,23 +412,22 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                     . 'var bfShowDefaultErrors = ' . ($showDefaultErrors ? 'true' : 'false') . ';' . "\n"
                     . 'var bfErrorPageScoped = true;' . "\n"
                 );
-                $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-error-alerts-bootstrap.js');
+                RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-error-alerts-bootstrap.js');
             }
             if ($this->fading) {
                 $this->fadingClass = ' bfFadingClass';
                 $this->fadingCall = 'bfFade();';
-                $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-fade.js');
+                RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-fade.js');
             }
 
             if ($this->rollover && trim($this->rolloverColor) != '') {
                 // removed in bootstrap
             }
         }
-        $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-post-init-onepage.js');
+        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-post-init-onepage.js');
         // loading system css
 
-            $stylelink = '<link rel="stylesheet" href="' . Uri::root(true) . '/components/com_breezingformsng/themes/quickmode-bootstrap' . $this->bsVersion . '/system.css" />' . "\n";
-            $this->p->app->getDocument()->addCustomTag($stylelink);
+            RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/themes/quickmode-bootstrap' . '5' . '/system.css');
 
             // loading theme
             if (isset($this->rootMdata['themebootstrap'])) {
@@ -471,10 +437,10 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                 $scriptjs = '';
                 $scriptphp = '';
 
-                $themecss_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . $this->bsVersion . '/' . $this->rootMdata['themebootstrap'] . '/theme.css';
-                $vars_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . $this->bsVersion . '/' . $this->rootMdata['themebootstrap'] . '/vars.txt';
-                $scriptjs_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . $this->bsVersion . '/' . $this->rootMdata['themebootstrap'] . '/script.js';
-                $scriptphp_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . $this->bsVersion . '/' . $this->rootMdata['themebootstrap'] . '/script.php';
+                $themecss_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/theme.css';
+                $vars_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/vars.txt';
+                $scriptjs_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/script.js';
+                $scriptphp_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/script.php';
 
                 if ($this->rootMdata['themebootstrap'] != '' && $this->rootMdata['themebootstrap'] != 'none' && file_exists($themecss_path)) {
 
@@ -502,10 +468,10 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                         }
                     }
 
-                    $style = '<style type="text/css">/** BreezingForms Bootstap Theme ' . strip_tags($this->rootMdata['themebootstrap']) . ' **/' . "\n" . $themecss . "\n" . '</style>' . "\n";
-                    $this->p->app->getDocument()->addCustomTag($style);
+                    $manager = $this->p->app->getDocument()->getWebAssetManager();
+                    $manager->addInlineStyle($themecss);
                     if ($scriptjs) {
-                        $this->p->app->getDocument()->addCustomTag('<script type="text/javascript">' . "\n" . $scriptjs . "\n" . '</script>');
+                        $manager->addInlineScript($scriptjs);
                     }
                 }
             }
@@ -1458,8 +1424,12 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
                                 $size = (isset($mdata['size']) && $mdata['size'] != '') ? $mdata['size'] : 'normal';
 
-                                $this->p->app->getDocument()->addScript($http . '://www.google.com/recaptcha/api.js?' . $reCaptchaLang . '&onload=onloadBFNewRecaptchaCallback&render=explicit', $type = "text/javascript", array('data-usercentrics' => 'reCAPTCHA'));
-                                $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-visible.js');
+                                RuntimeAssetLoader::script(
+                                    $this->p->app,
+                                    $http . '://www.google.com/recaptcha/api.js?' . $reCaptchaLang . '&onload=onloadBFNewRecaptchaCallback&render=explicit',
+                                    ['data-usercentrics' => 'reCAPTCHA']
+                                );
+                                RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-visible.js');
 
                                 echo '
                                                     <div style="display: inline-block !important; vertical-align: middle;">
@@ -1499,7 +1469,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                                         ';
                                     }
 
-                                    $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-invisible.js');
+                                    RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-invisible.js');
 
                                     echo '<script data-usercentrics="reCAPTCHA" type="text/javascript">bfInitInvisibleReCaptcha(' . json_encode([
                                         'sitekey' => $mdata['pubkey'],
@@ -1558,7 +1528,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
                         // set size of element, number input doesn't allow size attr
                         if ($mdata['size'] != '') {
-                            $this->p->app->getDocument()->addScript(
+                            RuntimeAssetLoader::script($this->p->app,
                                 Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-number-input.js'
                             );
                             echo '<script type="text/javascript">bfSetNumberInputWidth('
@@ -1575,19 +1545,17 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                         echo $label;
                         echo '<span class="' . $this->bsClass('nonform-control') . '">';
 
-                        if ($this->p->app->isClient('site')) {
-                            $captcha_url = Uri::root(true) . '/media/com_breezingformsng/images/site/captcha/securimage_show.php';
-                        } else {
-                            $captcha_url = Uri::root(true) . '/media/com_breezingformsng/images/site/captcha/securimage_show.php';
-                        }
+                        $captcha_url = Uri::root(true)
+                            . ($this->p->app->isClient('administrator') ? '/administrator' : '')
+                            . '/index.php?option=com_breezingformsng&bfCaptcha=1';
 
                         echo '<div style="display: inline-block;">';
 
-                        echo '<img alt="" ' . (isset($mdata['width']) && intval($mdata['width']) > 0 ? ' style="width: ' . intval($mdata['width']) . 'px !important;min-width: ' . intval($mdata['width']) . 'px !important;max-width: ' . intval($mdata['width']) . 'px !important;"' : 'style="width: 230px !important;min-width: 230px !important;max-width: 230px !important;"') . ' id="ff_capimgValue" class="ff_capimg ' . $this->bsClass('img-polaroid') . '" src="' . $captcha_url . '"/>' . "\n";
+                        echo '<img alt="" ' . (isset($mdata['width']) && intval($mdata['width']) > 0 ? ' style="width: ' . intval($mdata['width']) . 'px !important;min-width: ' . intval($mdata['width']) . 'px !important;max-width: ' . intval($mdata['width']) . 'px !important;"' : 'style="width: 230px !important;min-width: 230px !important;max-width: 230px !important;"') . ' id="ff_capimgValue" class="ff_capimg ' . $this->bsClass('img-thumbnail') . '" src="' . $captcha_url . '"/>' . "\n";
                         echo '<div style="height: 10px;"></div>';
                         echo '<div class="' . $this->bsClass('input-append') . '">';
                         echo '<input ' . (isset($mdata['width']) && intval($mdata['width']) > 0 ? ' style="width:' . (intval($mdata['width']) - 45) . 'px !important;min-width:' . (intval($mdata['width']) - 45) . 'px !important;max-width:' . (intval($mdata['width']) - 45) . 'px !important;"' : '') . ' autocomplete="off" class="' . $this->bsClass('form-control') . ' ' . $this->bsClass('custom-form-control') . ' ff_elem bfCaptchaField" type="text" name="bfCaptchaEntry" id="bfCaptchaEntry" />' . "\n";
-                        echo '<button type="button" class="ff_elem ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' button" onclick="document.getElementById(\'bfCaptchaEntry\').value=\'\';document.getElementById(\'bfCaptchaEntry\').focus();document.getElementById(\'ff_capimgValue\').src = \'' . $captcha_url . '?bfMathRandom=\' + Math.random(); return false"><i class="' . $this->bsClass('icon-refresh') . '"></i></button>' . "\n";
+                        echo '<button type="button" class="ff_elem ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' button" onclick="document.getElementById(\'bfCaptchaEntry\').value=\'\';document.getElementById(\'bfCaptchaEntry\').focus();document.getElementById(\'ff_capimgValue\').src = \'' . $captcha_url . '&bfMathRandom=\' + Math.random(); return false"><i class="' . $this->bsClass('icon-refresh') . '"></i></button>' . "\n";
                         echo '</div>';
                         echo '</div>';
 
@@ -1708,8 +1676,8 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                                 'var bfPickerMinusYearIcon = ' . json_encode(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/minusyear.png') . ';'
                                 . "\n" . 'var bfPickerPlusYearIcon = ' . json_encode(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/plusyear.png') . ';'
                             );
-                            $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-legacy-style.js');
-                            $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js');
+                            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-legacy-style.js');
+                            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js');
                         }
 
                         echo '<script type="text/javascript">bfInitCalendarResponsive(' . json_encode((int) $mdata['dbId']) . ', ' . json_encode([
@@ -1728,8 +1696,8 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
                     case 'bfSignature':
 
-                        $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/js/signature.js');
-                        $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-signature.js');
+                        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/js/signature.js');
+                        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-signature.js');
                         $this->p->app->getDocument()->getWebAssetManager()->addInlineScript(
                             'bfSignatureInit(' . json_encode((int) $mdata['dbId']) . ');'
                         );
@@ -1912,7 +1880,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                   $this->rootMdata['pagingPrevLabel'] = $this->rootMdata['pagingPrevLabel_translation'.$this->language_tag];
                   }
 
-                  echo '<button type="button" class="bfPrevButton ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' ' . $this->bsClass('pull-left') . ' button' . $this->fadingClass . '" type="submit" onclick="bf_validate_prevpage(' . ($dataObject['properties']['pageNumber'] - 1) . ');populateSummarizers();if(typeof bfRefreshAll != \'undefined\'){bfRefreshAll();}" value="' . htmlentities(trim($this->rootMdata['pagingPrevLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingPrevLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
+                  echo '<button type="button" class="bfPrevButton ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' ' . $this->bsClass('float-start') . ' button' . $this->fadingClass . '" type="submit" onclick="bf_validate_prevpage(' . ($dataObject['properties']['pageNumber'] - 1) . ');populateSummarizers();if(typeof bfRefreshAll != \'undefined\'){bfRefreshAll();}" value="' . htmlentities(trim($this->rootMdata['pagingPrevLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingPrevLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
                   } */
 
                 if ($this->rootMdata['pagingInclude'] && $dataObject['properties']['pageNumber'] < count($this->dataObject['children']) - $last) {
@@ -1921,7 +1889,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                         $this->rootMdata['pagingNextLabel'] = $this->rootMdata['pagingNextLabel_translation' . $this->language_tag];
                     }
                     /* translatables end */
-                    echo '<button type="button" class="bfNextButton ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' ' . $this->bsClass('pull-right') . ' button' . $this->fadingClass . '" type="submit" onclick="ff_currentpage = ' . json_encode($dataObject['properties']['pageNumber']) . ';bf_validate_nextpage(' . ($dataObject['properties']['pageNumber'] + 1) . ');populateSummarizers();if(typeof bfRefreshAll != \'undefined\'){bfRefreshAll();}" value="' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
+                    echo '<button type="button" class="bfNextButton ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' ' . $this->bsClass('float-end') . ' button' . $this->fadingClass . '" type="submit" onclick="ff_currentpage = ' . json_encode($dataObject['properties']['pageNumber']) . ';bf_validate_nextpage(' . ($dataObject['properties']['pageNumber'] + 1) . ');populateSummarizers();if(typeof bfRefreshAll != \'undefined\'){bfRefreshAll();}" value="' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
                 }
 
                 $callSubmit = 'bf_validate_submit(this, \'click\')';
@@ -1934,7 +1902,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                         $this->rootMdata['submitLabel'] = $this->rootMdata['submitLabel_translation' . $this->language_tag];
                     }
                     /* translatables end */
-                    echo '<button data-style="zoom-in" type="button" id="bfSubmitButton" class="bfSubmitButton ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' ' . $this->bsClass('pull-right') . ' button' . $this->fadingClass . '" onclick="this.disabled=true;if(typeof bf_htmltextareainit != \'undefined\'){ bf_htmltextareainit() }if(document.getElementById(\'bfPaymentMethod\')){document.getElementById(\'bfPaymentMethod\').value=\'\';};' . $callSubmit . ';" value="' . htmlentities(trim($this->rootMdata['submitLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['submitLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
+                    echo '<button data-style="zoom-in" type="button" id="bfSubmitButton" class="bfSubmitButton ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' ' . $this->bsClass('float-end') . ' button' . $this->fadingClass . '" onclick="this.disabled=true;if(typeof bf_htmltextareainit != \'undefined\'){ bf_htmltextareainit() }if(document.getElementById(\'bfPaymentMethod\')){document.getElementById(\'bfPaymentMethod\').value=\'\';};' . $callSubmit . ';" value="' . htmlentities(trim($this->rootMdata['submitLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['submitLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
                 }
 
                 if ($this->rootMdata['cancelInclude'] && $dataObject['properties']['pageNumber'] + 1 > count($this->dataObject['children']) - $last) {
@@ -1943,7 +1911,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                         $this->rootMdata['cancelLabel'] = $this->rootMdata['cancelLabel_translation' . $this->language_tag];
                     }
                     /* translatables end */
-                    echo '<button class="bfCancelButton ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-secondary') . ' ' . $this->bsClass('pull-right') . ' button' . $this->fadingClass . '" type="submit" onclick="ff_resetForm(this, \'click\');"  value="' . htmlentities(trim($this->rootMdata['cancelLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['cancelLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
+                    echo '<button class="bfCancelButton ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-secondary') . ' ' . $this->bsClass('float-end') . ' button' . $this->fadingClass . '" type="submit" onclick="ff_resetForm(this, \'click\');"  value="' . htmlentities(trim($this->rootMdata['cancelLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['cancelLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
                 }
 
                 echo '</div>';
@@ -1981,37 +1949,26 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
         $this->headers();
 
         if ($this->hasResponsiveDatePicker) {
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/picker.js');
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/picker.date.js');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/picker.js');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/picker.date.js');
 
             $lang = $this->p->app->getLanguage()->getTag();
             $lang = explode('-', $lang);
             $lang = strtolower($lang[0]);
             if (file_exists(JPATH_SITE . '/components/com_breezingformsng/libraries/jquery/pickadate/translations/' . $lang . '.js')) {
-                $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/translations/' . $lang . '.js');
+                RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/translations/' . $lang . '.js');
             }
 
-            $this->p->app->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/themes/default.css');
-            $this->p->app->getDocument()->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/themes/default.date.css');
+            RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/themes/default.css');
+            RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/themes/default.date.css');
         }
 
-        // we must make sure that everything mootools related is included after moxie and plupload
-        if (isset($this->p->app->getDocument()->_scripts)) {
-            foreach ($this->p->app->getDocument()->_scripts as $script_name => $script_value) {
-                if (
-                    basename($script_name) != 'moxie.js' && basename($script_name) != 'plupload.js' && basename($script_name) != 'calendar.js' && basename($script_name) != 'calendar-setup.js'
-                ) {
-                    unset($this->p->app->getDocument()->_scripts[$script_name]);
-                    $this->p->app->getDocument()->_scripts[$script_name] = $script_value;
-                }
-            }
-        }
         // we gonna add a blank to each textarea, since the value is transferred upon submit
         // requires a different mandatory validation than ff_valuenotempty
         $area_count = count($this->htmltextareas);
         if ($area_count) {
             $editor = Editor::getInstance('tinymce');
-            $this->p->app->getDocument()->addScript(
+            RuntimeAssetLoader::script($this->p->app,
                 Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-html-textareas.js'
             );
             for ($i = 0; $i < $area_count; $i++) {
@@ -2028,13 +1985,13 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
             $tickets[$this->flashUploadTicket] = array(); // stores file info for later processing
 	    $this->p->app->getSession()->set('bfFlashUploadTickets', $tickets);
             echo '<input type="hidden" name="bfFlashUploadTicket" value="' . $this->flashUploadTicket . '"/>' . "\n";
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/center.js');
-            $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-flash-upload-onepage.js');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/center.js');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-flash-upload-onepage.js');
             echo "<div style=\"visibility:hidden;\" id=\"bfFileQueue\"></div>";
             echo "<div style=\"visibility:hidden;display:none;\" id=\"bfSubmitMessage\">" . Text::_('COM_BREEZINGFORMSNG_SUBMIT_MESSAGE') . "</div>";
         }
         echo '<noscript>Please turn on javascript to submit your data. Thank you!</noscript>' . "\n";
-        $this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-onepage-switchpage.js');
+        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-onepage-switchpage.js');
         if ($this->rootMdata['lastPageThankYou']) {
             echo '
                         <div class="remodal" data-remodal-id="modal">

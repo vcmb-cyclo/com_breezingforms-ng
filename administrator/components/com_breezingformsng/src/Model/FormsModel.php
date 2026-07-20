@@ -9,11 +9,10 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
-use Joomla\CMS\MVC\Model\BaseModel;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\Database\DatabaseInterface;
 
-class FormsModel extends BaseModel
+class FormsModel extends BaseDatabaseModel
 {
     private const ALLOWED_SORTS = [
         'id'          => 'id',
@@ -28,7 +27,7 @@ class FormsModel extends BaseModel
 
     private function db(): DatabaseInterface
     {
-        return Factory::getContainer()->get(DatabaseInterface::class);
+        return $this->getDatabase();
     }
 
     public function getPackages(): array
@@ -125,22 +124,4 @@ class FormsModel extends BaseModel
         }
     }
 
-    public function resolvedPkg(string $pkg): string
-    {
-        $session  = Factory::getApplication()->getSession();
-        $packages = $this->getPackages();
-
-        if ($pkg === '__unset__') {
-            $pkg = (string) $session->get('bf.forms_pkg', '');
-        } elseif ($pkg === '- blank -') {
-            $pkg = '';
-        }
-
-        if ($pkg !== '' && !in_array($pkg, $packages, true)) {
-            $pkg = $packages[0] ?? '';
-        }
-
-        $session->set('bf.forms_pkg', $pkg);
-        return $pkg;
-    }
 }

@@ -185,7 +185,6 @@ class com_breezingformsngInstallerScript
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng',
             JPATH_ROOT . '/components/com_breezingformsng',
             JPATH_ROOT . '/media/com_breezingformsng',
-            JPATH_ROOT . '/plugins/system/sysbreezingforms',
         ];
     }
 
@@ -928,11 +927,13 @@ class com_breezingformsngInstallerScript
             return;
         }
 
-        $installer = new Installer();
-        $installer->setDatabase(Factory::getContainer()->get(DatabaseInterface::class));
-
         foreach ($folders as $folder) {
             $this->log("Installing plugin from folder: {$folder}");
+
+            // Installer keeps manifest state; use a fresh instance for every
+            // bundled extension so each plugin receives its own database row.
+            $installer = new Installer();
+            $installer->setDatabase(Factory::getContainer()->get(DatabaseInterface::class));
 
             if ($installer->install($basePath . '/' . $folder)) {
                 $this->log("Plugin {$folder} installed successfully.", Log::INFO);
@@ -1952,8 +1953,28 @@ class com_breezingformsngInstallerScript
         $this->deduplicateBreezingFormsComponentRows();
         $this->removeLegacyBreezingFormsComponentRows();
         $this->removeLegacyBreezingFormsComponentDirectories();
+        $this->removeObsoleteSystemPlugin();
         $this->removeObsoleteComponentFiles();
         $this->log('Legacy BreezingForms component cleanup completed in safe mode; uninstall hooks intentionally skipped.');
+    }
+
+    private function removeObsoleteSystemPlugin(): void
+    {
+        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $query = $db->getQuery(true)
+            ->select($db->quoteName('extension_id'))
+            ->from($db->quoteName('#__extensions'))
+            ->where($db->quoteName('type') . ' = ' . $db->quote('plugin'))
+            ->where($db->quoteName('folder') . ' = ' . $db->quote('system'))
+            ->where($db->quoteName('element') . ' = ' . $db->quote('sysbreezingforms'));
+        $extensionId = (int) $db->setQuery($query)->loadResult();
+
+        if ($extensionId > 0) {
+            $installer = new Installer();
+            $installer->setDatabase($db);
+            $installer->uninstall('plugin', $extensionId, 1);
+            $this->log('Obsolete sysbreezingforms plugin removed.');
+        }
     }
 
     /**
@@ -1975,10 +1996,24 @@ class com_breezingformsngInstallerScript
             JPATH_SITE . '/components/com_breezingformsng/legacy/Conf.php',
             JPATH_SITE . '/components/com_breezingformsng/legacy/tables.php',
             JPATH_SITE . '/components/com_breezingformsng/legacy/functions.php',
+            JPATH_SITE . '/components/com_breezingformsng/src/Table/RuntimeTables.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFFactory.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFIntegrate.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFJoomlaConfig.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFPDF.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFRequest.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFText.php',
+            JPATH_SITE . '/media/com_breezingformsng/images/site/captcha/securimage_show.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/images/captcha/securimage_show.php',
             JPATH_SITE . '/components/com_breezingformsng/facileforms.class.php',
             JPATH_SITE . '/components/com_breezingformsng/facileforms.process.php',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/sql/create_sql.php',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/src/Helper/LegacyClassLoader.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/jquery/jq.js',
+            JPATH_SITE . '/components/com_breezingformsng/libraries/jquery/jq.min.legacy.js',
+            JPATH_SITE . '/components/com_breezingformsng/libraries/jquery/jq.min.js',
+            JPATH_SITE . '/components/com_breezingformsng/src/Helper/legacy/route.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/src/Model/LegacyPackageModel.php',
         ];
 
         foreach ($obsolete as $file) {
@@ -1988,7 +2023,7 @@ class com_breezingformsngInstallerScript
         }
 
         $obsoleteDirectories = [
-            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/dropbox/v2',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/dropbox',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/mailchimp',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/recaptcha',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/salesforce',
@@ -2430,7 +2465,7 @@ class com_breezingformsngInstallerScript
     {
         $plugins = array();
         $plugins['system'] = array();
-        $plugins['system'][] = 'sysbreezingforms';
+        $plugins['system'][] = 'bfcompat';
         return $plugins;
     }
 

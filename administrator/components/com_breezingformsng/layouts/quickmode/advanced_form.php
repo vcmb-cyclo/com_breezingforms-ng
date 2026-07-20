@@ -77,14 +77,7 @@ use Joomla\CMS\Language\Text;
                                                         for="bfThemeBootstrap">
                                                         <?php echo Text::_('COM_BREEZINGFORMSNG_THEME_BOOTSTRAP'); ?>
                                                     </label>
-                                                    <?php
-                                                    $dbObject = self::decodeJsonArray((string) $dataObjectString);
-                                                    $useBs3 = false;
-                                                    if (isset($dbObject['properties']['themebootstrapUse3']) && $dbObject['properties']['themebootstrapUse3']) {
-                                                        $useBs3 = true;
-                                                    }
-                                                    ?>
-                                                    <select id="bfThemeBootstrap" <?php echo $useBs3 ? ' style="display: none;"' : ''; ?>>
+                                                    <select id="bfThemeBootstrap">
                                                         <option value="">Default</option>
                                                         >
                                                         <?php
@@ -94,61 +87,6 @@ use Joomla\CMS\Language\Text;
                                                         }
                                                         ?>
                                                     </select>
-                                                    <select id="bfThemeBootstrap3" <?php echo !$useBs3 ? ' style="display: none;"' : ''; ?>>
-                                                        <option value="">Default</option>
-                                                        >
-                                                        <?php
-                                                        $tCount = count($themesbootstrap3);
-                                                        for ($i = 0; $i < $tCount; $i++) {
-                                                            echo '<option value="' . $themesbootstrap3[$i] . '">' . $themesbootstrap3[$i] . '</option>' . "\n";
-                                                        }
-                                                        ?>
-                                                    </select>
-                                                </div>
-  
-                                                <div class="bfPropertyWrap" style="display:none;">
-                                                    <label class="bfPropertyLabel hasTooltip"
-                                                        title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_THEME_USE_BOOTSTRAP3_TIP')); ?>"
-                                                        for="bfThemeBootstrapUse3Yes">
-                                                        <?php echo Text::_('COM_BREEZINGFORMSNG_QM_THEME_USE_BOOTSTRAP3'); ?>
-                                                    </label>
-
-                                                    <input
-                                                        onclick="JQuery('#bfThemeBootstrap3').css('display', 'block');
-                                                                                        JQuery('#bfThemeBootstrap').css('display', 'none');"
-                                                        type="radio" name="bfThemeBootstrapUse3" value=""
-                                                        id="bfThemeBootstrapUse3Yes" />
-                                                    <?php echo Text::_('COM_BREEZINGFORMSNG_YES'); ?>
-                                                    <input checked="checked"
-                                                        onclick="JQuery('#bfThemeBootstrap').css('display', 'block');
-                                                                                        JQuery('#bfThemeBootstrap3').css('display', 'none');"
-                                                        type="radio" name="bfThemeBootstrapUse3" value=""
-                                                        id="bfThemeBootstrapUse3No" />
-                                                    <?php echo Text::_('COM_BREEZINGFORMSNG_NO'); ?>
-                                                </div>
-
-                                                <div class="bfPropertyWrap" style="display:none;">
-                                                    <label class="bfPropertyLabel hasTooltip"
-                                                        title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_THEME_BOOTSTRAP3_BUILTIN_TIP')); ?>"
-                                                        for="bfThemeBootstrap3BuiltInYes">
-                                                        <?php echo Text::_('COM_BREEZINGFORMSNG_QM_THEME_BOOTSTRAP3_BUILTIN'); ?>
-                                                    </label>
-
-                                                    <input checked="checked" type="radio" name="bfThemeBootstrap3BuiltIn"
-                                                        value="" id="bfThemeBootstrap3BuiltInYes" />
-                                                    <?php echo Text::_('COM_BREEZINGFORMSNG_YES'); ?>
-                                                    <input type="radio" name="bfThemeBootstrap3BuiltIn" value=""
-                                                        id="bfThemeBootstrap3BuiltInNo" />
-                                                    <?php echo Text::_('COM_BREEZINGFORMSNG_NO'); ?>
-                                                </div>
-
-                                                <div class="bfPropertyWrap" style="display:none;">
-                                                    <label class="bfPropertyLabel hasTooltip"
-                                                        title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_THEME_BOOTSTRAP3_CLASSPFX_TIP')); ?>"
-                                                        for="bfThemeBootstrap3Classpfx">
-                                                        <?php echo Text::_('COM_BREEZINGFORMSNG_QM_THEME_BOOTSTRAP3_CLASSPFX'); ?>
-                                                    </label>
-                                                    <input type="text" value="" id="bfThemeBootstrap3Classpfx" />
                                                 </div>
 
 
@@ -228,10 +166,7 @@ use Joomla\CMS\Language\Text;
                                                 $dbObject = self::decodeJsonArray((string) $dataObjectString);
                                                 if (isset($dbObject['properties']['themebootstrap'])) {
                                                     $themeboostrapfolder = $dbObject['properties']['themebootstrap'];
-                                                    $folder = 'themes-bootstrap';
-                                                    if (isset($dbObject['properties']['themebootstrapUse3']) && $dbObject['properties']['themebootstrapUse3']) {
-                                                        $folder = 'themes-bootstrap3';
-                                                    }
+                                                    $folder = 'themes-bootstrap5';
                                                     $themesbootstrap_path = JPATH_SITE . '/media/breezingforms/' . $folder . '/' . $themeboostrapfolder . '/';
                                                     if (is_dir($themesbootstrap_path) && file_exists($themesbootstrap_path . 'vars.txt')) {
                                                         $varscontent = htmlentities(file_get_contents($themesbootstrap_path . 'vars.txt'), ENT_QUOTES, 'UTF-8');
@@ -282,14 +217,6 @@ use Joomla\CMS\Language\Text;
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_JOOMLA_HINT'); ?>
                                                 </label>
                                                 <input type="checkbox" value="" id="bfElementAdvancedJoomlaHint" />
-                                            </div>
-                                            <div class="bfPropertyWrap">
-                                                <label class="bfPropertyLabel hasTooltip"
-                                                    title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_JQUERY_DISABLE')); ?>"
-                                                    for="bfElementAdvancedDisableJQuery">
-                                                    <?php echo Text::_('COM_BREEZINGFORMSNG_DISABLE_JQUERY'); ?>
-                                                </label>
-                                                <input type="checkbox" value="" id="bfElementAdvancedDisableJQuery" />
                                             </div>
                                             <div class="bfPropertyWrap">
                                                 <label class="bfPropertyLabel hasTooltip"

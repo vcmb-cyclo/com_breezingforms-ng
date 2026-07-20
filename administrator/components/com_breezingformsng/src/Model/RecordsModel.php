@@ -9,13 +9,12 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
-use Joomla\CMS\MVC\Model\BaseModel;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 use Joomla\Database\QueryInterface;
 
-class RecordsModel extends BaseModel
+class RecordsModel extends BaseDatabaseModel
 {
     private const ALLOWED_SORTS = [
         'records.id'        => 'records.id',
@@ -31,7 +30,7 @@ class RecordsModel extends BaseModel
 
     public function getForms(): array
     {
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $query = $db->getQuery(true)
             ->select(['id', 'title', 'name'])
             ->from($db->quoteName('#__facileforms_forms'))
@@ -42,7 +41,7 @@ class RecordsModel extends BaseModel
 
     public function getTotal(int $formSelection, string $searchTerm): int
     {
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $query = $db->getQuery(true)
             ->select('COUNT(*)')
             ->from($db->quoteName('#__facileforms_records', 'records'))
@@ -58,7 +57,7 @@ class RecordsModel extends BaseModel
         $dir = strtoupper($listDirn) === 'ASC' ? 'ASC' : 'DESC';
         $orderSql = $orderCol . ' ' . $dir . ($orderCol !== 'records.id' ? ', records.id ' . $dir : '');
 
-        $db = Factory::getContainer()->get(DatabaseInterface::class);
+        $db = $this->getDatabase();
         $query = $db->getQuery(true)
             ->select([
                 'records.id', 'records.submitted', 'records.modified', 'records.ip',

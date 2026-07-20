@@ -16,7 +16,6 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Export;
 
 \defined('_JEXEC') or die;
 
-use BFIntegrate;
 use DateTimeZone;
 use Exception;
 use Vcmb\Component\BreezingformsNG\Site\Table\RecordTable;
@@ -28,6 +27,7 @@ use Joomla\Database\ParameterType;
 use Joomla\Event\Event;
 use Joomla\Event\EventInterface;
 use Joomla\CMS\Uri\Uri;
+use Vcmb\Component\BreezingformsNG\Site\Service\Integration\IntegratorRuntime;
 use Joomla\Filesystem\Folder;
 use Joomla\Filesystem\File;
 use Joomla\CMS\Router\Route;
@@ -558,8 +558,7 @@ final class ExportEngine
             // CONTENTBUILDER END
         }
 
-        require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFIntegrate.php');
-        $integrate = new BFIntegrate($this->processor->form);
+        $integrate = new IntegratorRuntime((int) $this->processor->form, $this->processor->database);
         if (count($this->processor->savedata))
             foreach ($this->processor->savedata as $data) {
                 $integrate->field($data);

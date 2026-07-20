@@ -15,11 +15,11 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode;
 use HTML_facileFormsProcessor;
 
 use Joomla\CMS\Layout\LayoutHelper;
-use Joomla\Utilities\ArrayHelper;
+use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Language\Text;
-// use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Component\ComponentHelper;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RuntimeAssetLoader;
 
 
 class MobileRenderer
@@ -52,14 +52,6 @@ class MobileRenderer
 
 		$default = ComponentHelper::getParams('com_languages')->get('site');
 		$this->language_tag = $this->p->app->getLanguage()->getTag() != $default ? $this->p->app->getLanguage()->getTag() : 'zz-ZZ';
-
-		$head = $this->p->app->getDocument()->getHeadData();
-		$head['styleSheets'] = array();
-		$head['style'] = array();
-		$head['scripts'] = array();
-		$head['script'] = array();
-		$head['custom'] = array();
-		$this->p->app->getDocument()->setHeadData($head);
 
 		$this->dataObject = json_decode(bf_b64dec($this->p->formrow->template_code), true);
 
@@ -178,80 +170,6 @@ class MobileRenderer
 		return $range > 0 ? max(10, $range + 1) : 60;
 	}
 
-	public function fetchHead($head)
-	{
-		$app = $this->p->app;
-
-		// Get line endings
-		$lnEnd = $this->p->app->getDocument()->_getLineEnd();
-		$tab = $this->p->app->getDocument()->_getTab();
-		$tagEnd = ' />';
-		$buffer = '';
-
-		// Generate stylesheet links
-		foreach ($head['styleSheets'] as $strSrc => $strAttr) {
-			$buffer .= $tab . '<link rel="stylesheet" href="' . $strSrc . '" type="' . $strAttr['mime'] . '"';
-			if (!is_null($strAttr['media'])) {
-				$buffer .= ' media="' . $strAttr['media'] . '" ';
-			}
-			if ($temp = ArrayHelper::toString($strAttr['attribs'])) {
-				$buffer .= ' ' . $temp;
-			}
-			$buffer .= $tagEnd . $lnEnd;
-		}
-
-		// Generate stylesheet declarations
-		foreach ($head['style'] as $type => $content) {
-			$buffer .= $tab . '<style type="' . $type . '">' . $lnEnd;
-
-			// This is for full XHTML support.
-			if (isset($document) && $document->_mime != 'text/html') {
-				$buffer .= $tab . $tab . $lnEnd;
-			}
-
-			$buffer .= $content . $lnEnd;
-
-			// See above note
-			if (isset($document) && $document->_mime != 'text/html') {
-				$buffer .= $tab . $tab . $lnEnd;
-			}
-			$buffer .= $tab . '</style>' . $lnEnd;
-		}
-
-		// Generate script file links
-		foreach ($head['scripts'] as $strSrc => $strAttr) {
-			$buffer .= $tab . '<script src="' . $strSrc . '"';
-			if (isset($strAttr['mime']) && !is_null($strAttr['mime'])) {
-				$buffer .= ' type="' . ($strAttr['mime'] == 't' ? 'text/javascript' : $strAttr['mime']) . '"';
-			}
-			$buffer .= '></script>' . $lnEnd;
-		}
-
-		// Generate script declarations
-		foreach ($head['script'] as $type => $content) {
-			$buffer .= $tab . '<script type="' . $type . '">' . $lnEnd;
-
-			// This is for full XHTML support.
-			if (isset($document) && $document->_mime != 'text/html') {
-				$buffer .= $tab . $tab . $lnEnd;
-			}
-
-			$buffer .= $content . $lnEnd;
-
-			// See above note
-			if (isset($document) && $document->_mime != 'text/html') {
-				$buffer .= $tab . $tab . $lnEnd;
-			}
-			$buffer .= $tab . '</script>' . $lnEnd;
-		}
-
-		foreach ($head['custom'] as $custom) {
-			$buffer .= $tab . $custom . $lnEnd;
-		}
-
-		return $buffer;
-	}
-
 	public function headers()
 	{
 
@@ -264,10 +182,7 @@ class MobileRenderer
 		// loading system css
 		$this->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/themes/quickmode/mobile-system.css');
 
-		//$this->addScript(Uri::root(true) . '/media/vendor/jquery/js/jquery.min.js');
-		//$this->addScript(Uri::root(true) . '/media/legacy/js/jquery-noconflict.min.js');
-
-		$this->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jq.min.legacy.js');
+		$this->p->app->getDocument()->getWebAssetManager()->useScript('jquery');
 
 		if ($this->hasResponsiveDatePicker) {
 			$this->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/picker.js');
@@ -353,28 +268,29 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
 	}
 
-	public function addScript($script)
+	public function addScript($script, $type = 'text/javascript', $attributes = [])
 	{
-		echo '<script type="text/javascript" src="' . $script . '"/>' . "\n" . '</script>' . "\n";
+		RuntimeAssetLoader::script($this->p->app, (string) $script, (array) $attributes);
 	}
 
 	public function addStyleSheet($sheet)
 	{
-		echo '<link rel="stylesheet" href="' . $sheet . '" type="text/css" />' . "\n";
+		RuntimeAssetLoader::style($this->p->app, (string) $sheet);
 	}
 
 	public function addScriptDeclaration($declaration)
 	{
-		echo '<script type="text/javascript"/><!--' . "\n" . $declaration . "\n" . '//--></script>' . "\n";
+		$this->p->app->getDocument()->getWebAssetManager()->addInlineScript((string) $declaration);
 	}
 
 	public function addStyleDeclaration($declaration)
 	{
-		echo '<style type="text/css">' . "\n" . $declaration . "\n" . '</style>' . "\n";
+		$this->p->app->getDocument()->getWebAssetManager()->addInlineStyle((string) $declaration);
 	}
 
 	public function render()
 	{
+		$this->headers();
 
 		echo '<div data-role="page" data-theme="a" class="ui-page ui-page-theme-a ui-page-active">';
 
@@ -1242,18 +1158,16 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 						break;
 					case 'bfCaptcha':
 
-						if ($this->p->app->isClient('site')) {
-							$captcha_url = Uri::root(true) . '/media/com_breezingformsng/images/site/captcha/securimage_show.php';
-						} else {
-							$captcha_url = Uri::root(true) . '/media/com_breezingformsng/images/site/captcha/securimage_show.php';
-						}
+						$captcha_url = Uri::root(true)
+							. ($this->p->app->isClient('administrator') ? '/administrator' : '')
+							. '/index.php?option=com_breezingformsng&bfCaptcha=1';
 
 						echo '<div class="ui-grid-a">';
 						echo '<img alt="" border="0" width="230" id="ff_capimgValue" class="ff_capimg" src="' . $captcha_url . '"/><br/><br/>' . "\n";
 
 
 						echo '<input autocomplete="off" class="ff_elem" type="text" name="bfCaptchaEntry" id="bfCaptchaEntry" />' . "\n";
-						echo '<button data-role="button" data-icon="refresh" data-inline="true" data-iconpos="notext" data-theme="a" id="bfCaptchaReload" onclick="document.getElementById(\'bfCaptchaEntry\').value=\'\';document.getElementById(\'bfCaptchaEntry\').focus();document.getElementById(\'ff_capimgValue\').src = \'' . $captcha_url . '?bfMathRandom=\' + Math.random(); return false"><span>Reload Captcha</span></button>';
+						echo '<button data-role="button" data-icon="refresh" data-inline="true" data-iconpos="notext" data-theme="a" id="bfCaptchaReload" onclick="document.getElementById(\'bfCaptchaEntry\').value=\'\';document.getElementById(\'bfCaptchaEntry\').focus();document.getElementById(\'ff_capimgValue\').src = \'' . $captcha_url . '&bfMathRandom=\' + Math.random(); return false"><span>Reload Captcha</span></button>';
 						echo '</div>';
 						break;
 
@@ -1275,12 +1189,8 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 								}
 							}
 							/* translatables end */
-							$this->addStyleSheet(Uri::root(true) . '/media/system/css/fields/calendar.min.css');
-							$this->addScript(Uri::root(true) . '/media/system/js/fields/calendar-locales/date/gregorian/date-helper.min.js');
-							$this->addScript(Uri::root(true) . '/media/system/js/fields/calendar.min.js');
-							$this->addScript(Uri::root(true) . '/media/vendor/bootstrap/js/bootstrap.bundle.min.js');
-							$this->addScript(Uri::root(true) . '/media/system/js/core.min.js');
-							$this->addScript(Uri::root(true) . '/media/legacy/js/bootstrap-init.min.js');
+							$assets = $this->p->app->getDocument()->getWebAssetManager();
+							$assets->useStyle('field.calendar')->useScript('field.calendar');
 
 							echo '<div class="d-flex flex-wrap align-items-center gap-2">';
 							echo '<div class="mb-0 other-form-group">';
@@ -1362,7 +1272,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 							echo '<button data-theme="a" id="ff_elem' . $mdata['dbId'] . '_calendarButton" type="button" class="bfCalendar" value="' . htmlentities($right, ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities($right, ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
 
 						if (!$this->hasResponsiveDatePicker) {
-							$this->p->app->getDocument()->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js');
+							RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js');
 						}
 
 						echo '<script type="text/javascript">bfInitCalendarResponsive(' . json_encode((int) $mdata['dbId']) . ', ' . json_encode([
@@ -1627,10 +1537,13 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
 		// Format value when not nulldate ('0000-00-00 00:00:00'), otherwise blank it as it would result in 1970-01-01.
 		if ($value && $value !== $this->p->database->getNullDate() && strtotime($value) !== false) {
-			$tz = date_default_timezone_get();
-			date_default_timezone_set('UTC');
-			$inputvalue = strftime($format, strtotime($value));
-			date_default_timezone_set($tz);
+			$dateFormat = HTMLHelper::strftimeFormatToDateFormat($format);
+
+			if ($dateFormat === false) {
+				throw new \InvalidArgumentException('Unsupported calendar date format: ' . $format);
+			}
+
+			$inputvalue = (new \DateTimeImmutable($value, new \DateTimeZone('UTC')))->format($dateFormat);
 		} else {
 			$inputvalue = '';
 		}

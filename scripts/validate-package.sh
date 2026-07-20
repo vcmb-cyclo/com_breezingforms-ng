@@ -17,7 +17,6 @@ required=(
     "administrator/components/com_breezingformsng/services/provider.php"
     "administrator/components/com_breezingformsng/src/Extension/BreezingFormsNGComponent.php"
     "administrator/components/com_breezingformsng/sql/install.mysql.utf8.sql"
-    "administrator/components/com_breezingformsng/plugins/sysbreezingforms/sysbreezingforms.xml"
     "administrator/components/com_breezingformsng/plugins/bfcompat/bfcompat.xml"
     "administrator/components/com_breezingformsng/libraries/securimage/securimage.php"
     "administrator/components/com_breezingformsng/libraries/securimage/CaptchaObject.php"

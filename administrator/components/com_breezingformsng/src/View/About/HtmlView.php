@@ -196,7 +196,6 @@ class HtmlView extends BaseHtmlView
     {
         return match ($group . '.' . $element) {
             'system.bfcompat' => Text::_('COM_BREEZINGFORMSNG_EXTENSION_PURPOSE_COMPAT'),
-            'system.sysbreezingforms' => Text::_('COM_BREEZINGFORMSNG_EXTENSION_PURPOSE_SYSTEM'),
             default => Text::_('COM_BREEZINGFORMSNG_EXTENSION_PURPOSE_OTHER'),
         };
     }

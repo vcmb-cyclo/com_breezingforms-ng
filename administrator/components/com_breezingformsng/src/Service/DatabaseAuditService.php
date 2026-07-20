@@ -538,9 +538,9 @@ final class DatabaseAuditService
                 'enabled' => (int) ($row['enabled'] ?? 0),
             ];
 
-            // The NG component and its system plugin are the only expected rows.
+            // The NG component and its compatibility plugin are the expected rows.
             $isExpected = ($entry['type'] === 'component' && $element === 'com_breezingformsng')
-                || ($entry['type'] === 'plugin' && in_array($element, ['bfcompat', 'sysbreezingforms'], true) && $entry['folder'] === 'system');
+                || ($entry['type'] === 'plugin' && $element === 'bfcompat' && $entry['folder'] === 'system');
 
             if (!$isExpected && !str_contains($element, 'breezingformsng')) {
                 $legacy[] = $entry;

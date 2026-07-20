@@ -9,5 +9,7 @@
   `BFPDF`, `BFRequest`, and `BFText` APIs used by third-party plugins and PHP stored in the database.
 - Kept the required BFQuickMode public classes in the component while switching the component runtime to
   its Joomla 6 namespaced renderers and integration service.
+- Removed the obsolete sysbreezingforms plugin; its disabled licence check and Joomla 3 menu-markup cleanup
+  are no longer used by the Joomla 6 component manifest.
 - Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
   moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

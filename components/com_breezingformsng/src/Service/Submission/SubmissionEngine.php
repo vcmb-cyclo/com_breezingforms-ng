@@ -1103,7 +1103,6 @@ transition: box-shadow .15s linear;
                                     \Vcmb\Component\BreezingformsNG\Administrator\Helper\VendorHelper::load();
                                 \Stripe\Stripe::setApiKey($options['secretKey']);
                                 $stripeemail = strtolower(($this->processor->app->getInput()->get('ff_nm_' . $options['emailfield'], '', 'string')[0] ?? ''));
-                                //header('Content-Type: application/json');
                                 $returnurl = Uri::root() . "index.php?option=com_breezingformsng&confirmStripe=true&form_id=" . $this->processor->form . "&record_id=" . $this->processor->record_id;
                                 if (isset($options['emailfield']) && $options['emailfield'] !== '') {
                                     $stripeemail = strtolower(($this->processor->app->getInput()->get('ff_nm_' . $options['emailfield'], '', 'string')[0] ?? ''));
@@ -1158,8 +1157,7 @@ transition: box-shadow .15s linear;
                                 ]);
 
                                 //$html .=  $_POST['ff_nm_email'][0];
-                                $html .= header("HTTP/1.1 303 See Other");
-                                $html .= header("Location: " . $checkout_session->url);
+                                $this->processor->app->redirect((string) $checkout_session->url, 303);
 
                                 $current_tag = $this->processor->app->getLanguage()->getTag();
                                 $exploded = explode('-', $current_tag);

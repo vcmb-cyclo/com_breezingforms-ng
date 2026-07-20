@@ -31,5 +31,9 @@
   application response API.
 - Added the sortable form ID as the first data column in the Joomla administrator forms list.
 - Unified the records-list modified-date heading with the forms-list wording.
+- Migrated CAPTCHA status, Stripe checkout redirects, and paid-file download headers to Joomla 6's application
+  response API while retaining streamed file delivery.
+- Normalized integer and nullable relation fields when copying forms so strict Joomla 6 database configurations
+  no longer receive empty strings for integer columns.
 - Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
   moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

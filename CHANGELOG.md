@@ -53,5 +53,7 @@
   PHP's request, session, GET, POST, and FILES superglobals.
 - Converted the administrator Script manager from a static Factory-based utility to an instance receiving the
   Joomla application and database from its MVC controller.
+- Converted the administrator Piece manager and its interactive test paths to injected Joomla application and
+  database services instead of static Factory lookups.
 - Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
   moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

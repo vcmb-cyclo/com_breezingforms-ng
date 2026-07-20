@@ -32,6 +32,7 @@ class ScriptManager
 	public function __construct(
 		private readonly CMSApplication $app,
 		private readonly DatabaseInterface $database,
+		private readonly ScriptModel $model,
 	) {
 	}
 
@@ -134,10 +135,8 @@ class ScriptManager
 
 	function del($option, $pkg, $ids)
 	{
-		$model = ScriptModel::create();
-
 		try {
-			$total = $model->deleteByIds($ids);
+			$total = $this->model->deleteByIds($ids);
 		} catch (RuntimeException $e) {
 			$this->app->enqueueMessage($e->getMessage(), 'error');
 			$this->app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
@@ -155,7 +154,7 @@ class ScriptManager
 	function publish($option, $pkg, $ids, $publish)
 	{
 		try {
-			ScriptModel::create()->publishByIds($ids, (bool) $publish);
+			$this->model->publishByIds($ids, (bool) $publish);
 		} catch (RuntimeException $e) {
 			$this->app->enqueueMessage($e->getMessage(), 'error');
 			$this->app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
@@ -171,7 +170,7 @@ class ScriptManager
 		$session = $app->getSession();
 
 		try {
-			$pkgs = ScriptModel::create()->getPackages();
+			$pkgs = $this->model->getPackages();
 		} catch (\Exception $e) {
 			echo $e->getMessage();
 			return false;
@@ -239,7 +238,7 @@ class ScriptManager
 		}
 
 		try {
-			$listData = ScriptModel::create()->getListData($pkg, $search, $sort, $dir, $limit, $limitstart);
+			$listData = $this->model->getListData($pkg, $search, $sort, $dir, $limit, $limitstart);
 		} catch (\Exception $e) {
 			echo $e->getMessage();
 			return false;

@@ -9,13 +9,12 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
-use Joomla\Database\DatabaseInterface;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\ScriptManager;
+use Vcmb\Component\BreezingformsNG\Administrator\Model\ScriptModel;
 
 class ScriptsController extends BaseController
 {
@@ -95,9 +94,12 @@ class ScriptsController extends BaseController
             $arguments[] = $state;
         }
 
+        /** @var ScriptModel $model */
+        $model = $this->getModel('Script');
         $manager = new ScriptManager(
             $this->app,
-            Factory::getContainer()->get(DatabaseInterface::class),
+            $model->getDatabase(),
+            $model,
         );
         $manager->$method(...$arguments);
     }
@@ -168,7 +170,7 @@ class ScriptsController extends BaseController
             return;
         }
 
-        $database = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+        $database = $this->getModel('Script')->getDatabase();
 
         $task       = '';
         $comppath   = '/components/com_breezingformsng';

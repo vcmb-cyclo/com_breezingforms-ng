@@ -9,12 +9,12 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\PieceManager;
+use Vcmb\Component\BreezingformsNG\Administrator\Model\PieceModel;
 
 class PiecesController extends BaseController
 {
@@ -106,7 +106,14 @@ class PiecesController extends BaseController
             $arguments[] = $state;
         }
 
-        PieceManager::$method(...$arguments);
+        /** @var PieceModel $model */
+        $model = $this->getModel('Piece');
+        $manager = new PieceManager(
+            $this->app,
+            $model->getDatabase(),
+            $model,
+        );
+        $manager->$method(...$arguments);
     }
 
     private function assertAuthorised(): void
@@ -175,7 +182,7 @@ class PiecesController extends BaseController
             return;
         }
 
-        $database = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+        $database = $this->getModel('Piece')->getDatabase();
 
         $task       = '';
         $comppath   = '/components/com_breezingformsng';

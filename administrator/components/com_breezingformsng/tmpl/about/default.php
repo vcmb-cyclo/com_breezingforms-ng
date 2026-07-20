@@ -195,7 +195,7 @@ if (!function_exists('bf_about_get_php_libraries')) {
         $vendorInstalled = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/vendor/composer/installed.json';
 
         bf_about_collect_php_libraries_from_installed_json($indexedLibraries, $vendorInstalled);
-        bf_about_add_php_library($indexedLibraries, 'Securimage CAPTCHA', '3.6.8', false);
+        bf_about_add_php_library($indexedLibraries, 'Securimage CAPTCHA', '4.0.4', false);
 
         $libraries = array_values($indexedLibraries);
 

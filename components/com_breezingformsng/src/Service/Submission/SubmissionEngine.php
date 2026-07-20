@@ -664,7 +664,7 @@ final class SubmissionEngine
             for ($i = 0; $i < $this->processor->rowcount; $i++) {
                 $row = $this->processor->rows[$i];
                 if ($row->type == "Captcha") {
-                    require_once(JPATH_SITE . '/media/com_breezingformsng/images/site/captcha/securimage.php');
+                    require_once JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/securimage/securimage.php';
                     $securimage = new Securimage();
                     if (!$securimage->check($this->processor->app->getInput()->getString('bfCaptchaEntry', ''))) {
                         $halt = true;

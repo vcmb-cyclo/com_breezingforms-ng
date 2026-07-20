@@ -19,6 +19,9 @@ required=(
     "administrator/components/com_breezingformsng/sql/install.mysql.utf8.sql"
     "administrator/components/com_breezingformsng/plugins/sysbreezingforms/sysbreezingforms.xml"
     "administrator/components/com_breezingformsng/plugins/bfcompat/bfcompat.xml"
+    "administrator/components/com_breezingformsng/libraries/securimage/securimage.php"
+    "administrator/components/com_breezingformsng/libraries/securimage/CaptchaObject.php"
+    "administrator/components/com_breezingformsng/libraries/securimage/StorageAdapter/Session.php"
     "components/com_breezingformsng/breezingformsng.php"
     "media/com_breezingformsng/css/custom.css"
 )
@@ -37,6 +40,7 @@ forbidden_patterns=(
     '^build/'
     '/cache/'
     '/logs/'
+    '^media/com_breezingformsng/images/site/captcha/.*\.php$'
 )
 
 for pattern in "${forbidden_patterns[@]}"; do

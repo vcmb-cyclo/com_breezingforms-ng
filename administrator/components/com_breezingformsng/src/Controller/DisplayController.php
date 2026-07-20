@@ -9,7 +9,6 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\PieceModel;
@@ -103,7 +102,7 @@ class DisplayController extends BaseController
         }
 
         if ($task === '' && in_array($view, ['pieces', 'scripts'], true)) {
-            $this->bootstrapLegacyGlobals();
+            $this->bootstrapLegacyGlobals($view);
             $this->prepareListPackage($view);
 
             return parent::display($cachable, $urlparams);
@@ -113,7 +112,7 @@ class DisplayController extends BaseController
         return $this;
     }
 
-    private function bootstrapLegacyGlobals(): void
+    private function bootstrapLegacyGlobals(string $view): void
     {
         global $ff_mospath, $ff_admpath, $ff_compath;
         global $ff_mossite, $ff_admsite, $ff_admicon, $ff_comsite;
@@ -124,7 +123,19 @@ class DisplayController extends BaseController
             return;
         }
 
-        $database = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+        $model = $this->app
+            ->bootComponent('com_breezingformsng')
+            ->getMVCFactory()
+            ->createModel($view === 'pieces' ? 'Piece' : 'Script', 'Administrator', ['ignore_request' => true]);
+
+        if (
+            ($view === 'pieces' && !$model instanceof PieceModel)
+            || ($view === 'scripts' && !$model instanceof ScriptModel)
+        ) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        $database = $model->getDatabase();
 
         $task       = '';
         $comppath   = '/components/com_breezingformsng';

@@ -558,7 +558,7 @@ final class ExportEngine
             // CONTENTBUILDER END
         }
 
-        $integrate = new IntegratorRuntime($this->processor->form);
+        $integrate = new IntegratorRuntime((int) $this->processor->form, $this->processor->database);
         if (count($this->processor->savedata))
             foreach ($this->processor->savedata as $data) {
                 $integrate->field($data);

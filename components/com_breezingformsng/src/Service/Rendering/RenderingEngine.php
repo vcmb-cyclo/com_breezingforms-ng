@@ -33,10 +33,6 @@ use Joomla\CMS\Environment\Browser;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Log\Log;
-use BFQuickMode;
-use BFQuickModeBootstrap;
-use BFQuickModeMobile;
-use BFQuickModeOnePage;
 use Exception;
 use Vcmb\Component\BreezingformsNG\Site\Table\QueryColumn;
 use HTML_facileFormsProcessor;
@@ -47,6 +43,10 @@ use CB\Component\Contentbuilderng\Administrator\Service\ListSupportService;
 use CB\Component\Contentbuilderng\Administrator\Service\PermissionService;
 use CB\Component\Contentbuilderng\Administrator\Helper\RuntimeContextHelper;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\TokenizedDirectoryResolver;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\BootstrapRenderer;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\ClassicRenderer;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\MobileRenderer;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\OnePageRenderer;
 
 /**
  * Page header, ContentBuilder path handling and form view rendering.
@@ -291,8 +291,7 @@ final class RenderingEngine
 
                     ob_end_clean();
                     ob_start();
-                    require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickModeMobile.php');
-                    $quickMode = new BFQuickModeMobile($this->processor);
+                    $quickMode = new MobileRenderer($this->processor);
                     if (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile']) {
                         $quickMode->forceMobileUrl = isset($rootMdata['forceMobileUrl']) ? $rootMdata['forceMobileUrl'] : 'index.php';
                     }
@@ -2057,18 +2056,15 @@ final class RenderingEngine
 
                     if (isset($rootMdata['themebootstrapMode']) && $rootMdata['themebootstrapMode']) {
 
-                        require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickModeOnePage.php');
-                        $quickMode = new BFQuickModeOnePage($this->processor);
+                        $quickMode = new OnePageRenderer($this->processor);
                     } else {
 
-                        require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickModeBootstrap.php');
-                        $quickMode = new BFQuickModeBootstrap($this->processor);
+                        $quickMode = new BootstrapRenderer($this->processor);
                     }
 
                     $this->processor->quickmode = $quickMode;
                 } else {
-                    require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickMode.php');
-                    $quickMode = new BFQuickMode($this->processor);
+                    $quickMode = new ClassicRenderer($this->processor);
                     $this->processor->quickmode = $quickMode;
                 }
             }

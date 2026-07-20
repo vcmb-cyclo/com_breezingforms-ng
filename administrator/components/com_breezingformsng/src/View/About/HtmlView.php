@@ -125,6 +125,7 @@ class HtmlView extends BaseHtmlView
                 ->where(
                     '('
                     . $db->quoteName('element') . ' LIKE ' . $db->quote('%breezingforms%')
+                    . ' OR ' . $db->quoteName('element') . ' = ' . $db->quote('bfcompat')
                     . ' OR ' . $db->quoteName('folder') . ' LIKE ' . $db->quote('%breezingforms%')
                     . ' OR ' . $db->quoteName('name') . ' LIKE ' . $db->quote('%BreezingForms%')
                     . ')'
@@ -194,6 +195,7 @@ class HtmlView extends BaseHtmlView
     private function getPluginPurpose(string $group, string $element): string
     {
         return match ($group . '.' . $element) {
+            'system.bfcompat' => Text::_('COM_BREEZINGFORMSNG_EXTENSION_PURPOSE_COMPAT'),
             'system.sysbreezingforms' => Text::_('COM_BREEZINGFORMSNG_EXTENSION_PURPOSE_SYSTEM'),
             default => Text::_('COM_BREEZINGFORMSNG_EXTENSION_PURPOSE_OTHER'),
         };

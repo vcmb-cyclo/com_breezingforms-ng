@@ -44,8 +44,8 @@ class QuickmodeController extends BaseController
         $chunk        = $input->getString('chunk', '');
 
         if ($chunksLength < 1 || $chunkIdx < 0 || $chunkIdx >= $chunksLength) {
-            http_response_code(400);
-            exit;
+            $app->setHeader('status', 400, true);
+            $app->close();
         }
 
         $cacheDir = JPATH_SITE . '/media/breezingforms/ajax_cache';
@@ -70,8 +70,8 @@ class QuickmodeController extends BaseController
             $dataObject = json_decode(base64_decode($contents), true);
 
             if (!is_array($dataObject)) {
-                http_response_code(400);
-                exit;
+                $app->setHeader('status', 400, true);
+                $app->close();
             }
 
             $formId = $this->getQuickmodeModel()->save($form, $dataObject);
@@ -103,12 +103,13 @@ class QuickmodeController extends BaseController
                 }
             }
 
-            ob_start();
+            $app->setHeader('Content-Type', 'text/plain; charset=UTF-8', true);
+            $app->sendHeaders();
             echo $formId;
-            exit;
+            $app->close();
         }
 
-        exit;
+        $app->close();
     }
 
     /**

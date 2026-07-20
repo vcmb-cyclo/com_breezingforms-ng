@@ -25,5 +25,11 @@
   Input with explicit raw filtering, and standardized their state-changing actions on POST CSRF validation.
 - Removed the unused legacy form-route helper and renamed the shared script/piece list model to its Joomla 6
   package-model role.
+- Migrated record exports from direct PHP response headers and global database lookup to the Joomla application
+  response API and the database connection supplied by the MVC model.
+- Migrated QuickMode chunk-save status and completion responses from direct PHP response handling to Joomla's
+  application response API.
+- Added the sortable form ID as the first data column in the Joomla administrator forms list.
+- Unified the records-list modified-date heading with the forms-list wording.
 - Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
   moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

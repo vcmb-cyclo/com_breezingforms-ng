@@ -58,6 +58,7 @@ $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
         <th class="w-1 text-center">
           <input type="checkbox" class="form-check-input" onclick="Joomla.checkAll(this)" title="<?= Text::_('JGLOBAL_CHECK_ALL'); ?>">
         </th>
+        <th class="text-center"><?= HTMLHelper::_('grid.sort', 'JGRID_HEADING_ID', 'id', $this->listDirn, $this->listOrder); ?></th>
         <th><?= HTMLHelper::_('grid.sort', Text::_('COM_BREEZINGFORMSNG_FORMS_TITLE'), 'title', $this->listDirn, $this->listOrder); ?></th>
         <th><?= HTMLHelper::_('grid.sort', Text::_('COM_BREEZINGFORMSNG_FORMS_NAME'), 'name', $this->listDirn, $this->listOrder); ?></th>
         <th class="text-center"><?= HTMLHelper::_('grid.sort', Text::_('COM_BREEZINGFORMSNG_FORMS_PAGES'), 'pages', $this->listDirn, $this->listOrder); ?></th>
@@ -69,11 +70,12 @@ $pagination = new Pagination($this->total, $this->limitStart, $this->limit);
     </thead>
     <tbody>
       <?php if (empty($this->items)): ?>
-        <tr><td colspan="8" class="text-center"><?= Text::_('JGLOBAL_NO_MATCHING_RESULTS'); ?></td></tr>
+        <tr><td colspan="9" class="text-center"><?= Text::_('JGLOBAL_NO_MATCHING_RESULTS'); ?></td></tr>
       <?php else: ?>
         <?php foreach ($this->items as $i => $form): ?>
           <tr>
             <td class="text-center"><?= HTMLHelper::_('grid.id', $i, $form->id); ?></td>
+            <td class="text-center"><?= (int) $form->id; ?></td>
             <td>
               <a href="index.php?option=com_breezingformsng&task=quickmode.display&form=<?= (int) $form->id; ?>&pkg=<?= rawurlencode($pkg); ?>">
                 <?= htmlspecialchars($form->title); ?>

@@ -9,7 +9,6 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\Database\DatabaseInterface;
@@ -140,7 +139,7 @@ class RecordsController extends BaseController
 
         $model = $this->getRecordModel();
         $tz = $model->getTimezone();
-        $db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+        $db = $model->getDatabaseConnection();
 
         $recs = $this->fetchRecords($db, $ids, $formSelection);
 
@@ -260,7 +259,7 @@ class RecordsController extends BaseController
         $model = $this->getRecordModel();
         $config = $model->getExportConfig();
         $tz = $model->getTimezone();
-        $db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+        $db = $model->getDatabaseConnection();
 
         $delimiter = stripslashes((string) $config->csvdelimiter);
         $quote = stripslashes((string) $config->csvquote);
@@ -350,11 +349,12 @@ class RecordsController extends BaseController
         $fileName = ($formName ? $formName . '-' : '') . 'ffexport-' . date('YmdHis') . '.csv';
 
         @ob_end_clean();
-        header('Pragma: public');
-        header('Expires: 0');
-        header('Cache-Control: private');
-        header('Content-Type: text/csv; charset=UTF-8');
-        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        $app->setHeader('Pragma', 'public', true);
+        $app->setHeader('Expires', '0', true);
+        $app->setHeader('Cache-Control', 'private', true);
+        $app->setHeader('Content-Type', 'text/csv; charset=UTF-8', true);
+        $app->setHeader('Content-Disposition', 'attachment; filename="' . $fileName . '"', true);
+        $app->sendHeaders();
         echo "\xEF\xBB\xBF";
         echo $header . $body;
         $app->close();
@@ -372,7 +372,7 @@ class RecordsController extends BaseController
 
         $model = $this->getRecordModel();
         $tz = $model->getTimezone();
-        $db = Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+        $db = $model->getDatabaseConnection();
 
         $recs = $this->fetchRecords($db, $ids, $formSelection);
         $formName = ($formSelection && $recs) ? ($recs[0]->name ?? '') : '';
@@ -447,11 +447,12 @@ class RecordsController extends BaseController
         $fileName = ($formName ? $formName . '-' : '') . 'ffexport-' . $datestamp->format('YmdHis', true) . '.xml';
 
         @ob_end_clean();
-        header('Pragma: public');
-        header('Expires: 0');
-        header('Cache-Control: private');
-        header('Content-Type: application/octet-stream');
-        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        $app->setHeader('Pragma', 'public', true);
+        $app->setHeader('Expires', '0', true);
+        $app->setHeader('Cache-Control', 'private', true);
+        $app->setHeader('Content-Type', 'application/octet-stream', true);
+        $app->setHeader('Content-Disposition', 'attachment; filename="' . $fileName . '"', true);
+        $app->sendHeaders();
         echo $xml;
         $app->close();
     }

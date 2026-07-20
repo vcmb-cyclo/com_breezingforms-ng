@@ -70,6 +70,26 @@ class HtmlView extends BaseHtmlView
         $this->listDirn = $list['listDirn'];
         $this->filterState = $list['filterState'];
 
+        $app->getDocument()->getWebAssetManager()->registerAndUseScript(
+            'com_breezingformsng.admin-sort',
+            'media/com_breezingformsng/js/admin/admin-sort.js',
+            ['version' => 'auto'],
+            ['defer' => true],
+            ['core']
+        );
+        $app->getDocument()->getWebAssetManager()->registerAndUseScript(
+            'com_breezingformsng.scripts-list',
+            'media/com_breezingformsng/js/admin/scripts-list.js',
+            ['version' => 'auto'],
+            ['defer' => true],
+            ['core', 'com_breezingformsng.admin-sort']
+        );
+
+        ToolbarHelper::custom('scripts.add', 'new.png', 'new_f2.png', 'COM_BREEZINGFORMSNG_TOOLBAR_NEW', false);
+        ToolbarHelper::custom('scripts.copy', 'copy.png', 'copy_f2.png', 'COM_BREEZINGFORMSNG_TOOLBAR_COPY', false);
+        ToolbarHelper::custom('scripts.publish', 'publish.png', 'publish_f2.png', 'COM_BREEZINGFORMSNG_TOOLBAR_PUBLISH', false);
+        ToolbarHelper::custom('scripts.unpublish', 'unpublish.png', 'unpublish_f2.png', 'COM_BREEZINGFORMSNG_TOOLBAR_UNPUBLISH', false);
+        ToolbarHelper::custom('scripts.remove', 'delete.png', 'delete_f2.png', 'COM_BREEZINGFORMSNG_TOOLBAR_DELETE', false);
         ToolbarHelper::help(
             'COM_BREEZINGFORMSNG_HELP_SCRIPTS_TITLE',
             false,

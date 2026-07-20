@@ -21,11 +21,14 @@ function bfPiecesSyncPackage(form)
 									Joomla.submitform('', form);
 									return false;
 								}
+								window.bfPiecesSubmitList = bfPiecesSubmitList;
+
 
 								function submitbutton(pressbutton)
 								{
 									var form = document.adminForm;
-									switch (pressbutton) {
+									var action = pressbutton.indexOf('.') === -1 ? pressbutton : pressbutton.split('.').pop();
+									switch (action) {
 										case 'copy':
 										case 'publish':
 										case 'unpublish':
@@ -38,14 +41,13 @@ function bfPiecesSyncPackage(form)
 										default:
 											break;
 									} // switch
-									if (pressbutton == 'remove') {
+									if (action == 'remove') {
 										if (!confirm(Joomla.Text._('COM_BREEZINGFORMSNG_PIECES_ASKDELETE'))) {
 											return;
 										}
 									}
 									bfPiecesSyncPackage(form);
-									var task = pressbutton === 'new' ? 'add' : pressbutton;
-									Joomla.submitform('pieces.' + task, form);
+									Joomla.submitform('pieces.' + action, form);
 								} // submitbutton
 								Joomla.submitbutton = submitbutton;
 

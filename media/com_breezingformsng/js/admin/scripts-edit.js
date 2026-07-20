@@ -15,19 +15,20 @@ function checkIdentifier(value, name)
 			function submitbutton(pressbutton) {
 				var form = document.adminForm;
 				var error = '';
-				if ((pressbutton == 'test' || pressbutton == 'prev' || pressbutton == 'next') && isEditTestBlocked()) {
+				var action = pressbutton.indexOf('.') === -1 ? pressbutton : pressbutton.split('.').pop();
+				if ((action == 'test' || action == 'previous' || action == 'next') && isEditTestBlocked()) {
 					alert(Joomla.Text._('COM_BREEZINGFORMSNG_TEST_SAVE_SCRIPT_BEFORE_CONTINUE'));
 					return;
 				}
-				if (pressbutton != 'cancel' && pressbutton != 'prev' && pressbutton != 'next' && pressbutton != 'test') {
+				if (action != 'cancel' && action != 'previous' && action != 'next' && action != 'test') {
 					error += checkIdentifier(form.name.value, 'name');
 					if (form.title.value == '') error += Joomla.Text._('COM_BREEZINGFORMSNG_SCRIPTS_ENTTITLE') + "\n";
 				} // if
-				if (error != '')
+				if (error != '') {
 					alert(error);
-				else
-					var task = pressbutton === 'new' ? 'add' : (pressbutton === 'prev' ? 'previous' : pressbutton);
-					Joomla.submitform('scripts.' + task);
+					return;
+				}
+				Joomla.submitform('scripts.' + action, form);
 			} // submitbutton
 			Joomla.submitbutton = submitbutton;
 			window.submitbutton = submitbutton;

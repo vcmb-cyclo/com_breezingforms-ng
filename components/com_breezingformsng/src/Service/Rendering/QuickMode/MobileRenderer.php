@@ -16,7 +16,6 @@ use HTML_facileFormsProcessor;
 
 use Joomla\CMS\Layout\LayoutHelper;
 use Joomla\CMS\HTML\HTMLHelper;
-use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Component\ComponentHelper;
@@ -179,80 +178,6 @@ class MobileRenderer
 		return $range > 0 ? max(10, $range + 1) : 60;
 	}
 
-	public function fetchHead($head)
-	{
-		$app = $this->p->app;
-
-		// Get line endings
-		$lnEnd = $this->p->app->getDocument()->_getLineEnd();
-		$tab = $this->p->app->getDocument()->_getTab();
-		$tagEnd = ' />';
-		$buffer = '';
-
-		// Generate stylesheet links
-		foreach ($head['styleSheets'] as $strSrc => $strAttr) {
-			$buffer .= $tab . '<link rel="stylesheet" href="' . $strSrc . '" type="' . $strAttr['mime'] . '"';
-			if (!is_null($strAttr['media'])) {
-				$buffer .= ' media="' . $strAttr['media'] . '" ';
-			}
-			if ($temp = ArrayHelper::toString($strAttr['attribs'])) {
-				$buffer .= ' ' . $temp;
-			}
-			$buffer .= $tagEnd . $lnEnd;
-		}
-
-		// Generate stylesheet declarations
-		foreach ($head['style'] as $type => $content) {
-			$buffer .= $tab . '<style type="' . $type . '">' . $lnEnd;
-
-			// This is for full XHTML support.
-			if (isset($document) && $document->_mime != 'text/html') {
-				$buffer .= $tab . $tab . $lnEnd;
-			}
-
-			$buffer .= $content . $lnEnd;
-
-			// See above note
-			if (isset($document) && $document->_mime != 'text/html') {
-				$buffer .= $tab . $tab . $lnEnd;
-			}
-			$buffer .= $tab . '</style>' . $lnEnd;
-		}
-
-		// Generate script file links
-		foreach ($head['scripts'] as $strSrc => $strAttr) {
-			$buffer .= $tab . '<script src="' . $strSrc . '"';
-			if (isset($strAttr['mime']) && !is_null($strAttr['mime'])) {
-				$buffer .= ' type="' . ($strAttr['mime'] == 't' ? 'text/javascript' : $strAttr['mime']) . '"';
-			}
-			$buffer .= '></script>' . $lnEnd;
-		}
-
-		// Generate script declarations
-		foreach ($head['script'] as $type => $content) {
-			$buffer .= $tab . '<script type="' . $type . '">' . $lnEnd;
-
-			// This is for full XHTML support.
-			if (isset($document) && $document->_mime != 'text/html') {
-				$buffer .= $tab . $tab . $lnEnd;
-			}
-
-			$buffer .= $content . $lnEnd;
-
-			// See above note
-			if (isset($document) && $document->_mime != 'text/html') {
-				$buffer .= $tab . $tab . $lnEnd;
-			}
-			$buffer .= $tab . '</script>' . $lnEnd;
-		}
-
-		foreach ($head['custom'] as $custom) {
-			$buffer .= $tab . $custom . $lnEnd;
-		}
-
-		return $buffer;
-	}
-
 	public function headers()
 	{
 
@@ -354,24 +279,24 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
 	}
 
-	public function addScript($script)
+	public function addScript($script, $type = 'text/javascript', $attributes = [])
 	{
-		echo '<script type="text/javascript" src="' . $script . '"/>' . "\n" . '</script>' . "\n";
+		RuntimeAssetLoader::script($this->p->app, (string) $script, (array) $attributes);
 	}
 
 	public function addStyleSheet($sheet)
 	{
-		echo '<link rel="stylesheet" href="' . $sheet . '" type="text/css" />' . "\n";
+		RuntimeAssetLoader::style($this->p->app, (string) $sheet);
 	}
 
 	public function addScriptDeclaration($declaration)
 	{
-		echo '<script type="text/javascript"/><!--' . "\n" . $declaration . "\n" . '//--></script>' . "\n";
+		$this->p->app->getDocument()->getWebAssetManager()->addInlineScript((string) $declaration);
 	}
 
 	public function addStyleDeclaration($declaration)
 	{
-		echo '<style type="text/css">' . "\n" . $declaration . "\n" . '</style>' . "\n";
+		$this->p->app->getDocument()->getWebAssetManager()->addInlineStyle((string) $declaration);
 	}
 
 	public function render()

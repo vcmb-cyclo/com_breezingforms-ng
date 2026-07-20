@@ -544,6 +544,14 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > liée à `BFRequest`/`Callback`. `Stripe`/`PayPal`/`Sofort` restent à confirmer avec un vrai paiement de test (accès
 > à un compte sandbox nécessaire, non disponible dans cette session).
 >
+> **Image CAPTCHA routée par Joomla (2026-07-20)** : les deux scripts web autonomes
+> `securimage_show.php`, qui amorçaient Joomla manuellement et appelaient encore
+> `Factory::getApplication('site'|'administrator')`, sont supprimés. `CaptchaCallback` sert désormais le PNG
+> via `index.php?option=com_breezingformsng&bfCaptcha=1` pour le site comme pour l'administration ; tous les
+> renderers et scripts de rechargement utilisent cette route. La propriété interne `gdnoisecolor` est déclarée
+> dans Securimage afin d'éviter la création de propriété dynamique qui corrompait la réponse sous PHP 8.3.
+> Vérifié sur le conteneur Joomla 6 avec Playwright : réponse `image/png`, dimensions 230 × 80.
+>
 > **Suite (2026-07-12)** : `bfProcessorUploads.php` (1 appel), `bfProcessorNotifications.php` (13),
 > `bfProcessorExports.php` (16) et `bfProcessorSubmission.php` (45) sont également convertis — **235 appels au
 > total sur 393**. Le couplage `cb_category_id`/`cb_controller` entre Exports (écrivain) et Submission (lecteur)

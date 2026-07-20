@@ -1242,18 +1242,16 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 						break;
 					case 'bfCaptcha':
 
-						if ($this->p->app->isClient('site')) {
-							$captcha_url = Uri::root(true) . '/media/com_breezingformsng/images/site/captcha/securimage_show.php';
-						} else {
-							$captcha_url = Uri::root(true) . '/media/com_breezingformsng/images/site/captcha/securimage_show.php';
-						}
+						$captcha_url = Uri::root(true)
+							. ($this->p->app->isClient('administrator') ? '/administrator' : '')
+							. '/index.php?option=com_breezingformsng&bfCaptcha=1';
 
 						echo '<div class="ui-grid-a">';
 						echo '<img alt="" border="0" width="230" id="ff_capimgValue" class="ff_capimg" src="' . $captcha_url . '"/><br/><br/>' . "\n";
 
 
 						echo '<input autocomplete="off" class="ff_elem" type="text" name="bfCaptchaEntry" id="bfCaptchaEntry" />' . "\n";
-						echo '<button data-role="button" data-icon="refresh" data-inline="true" data-iconpos="notext" data-theme="a" id="bfCaptchaReload" onclick="document.getElementById(\'bfCaptchaEntry\').value=\'\';document.getElementById(\'bfCaptchaEntry\').focus();document.getElementById(\'ff_capimgValue\').src = \'' . $captcha_url . '?bfMathRandom=\' + Math.random(); return false"><span>Reload Captcha</span></button>';
+						echo '<button data-role="button" data-icon="refresh" data-inline="true" data-iconpos="notext" data-theme="a" id="bfCaptchaReload" onclick="document.getElementById(\'bfCaptchaEntry\').value=\'\';document.getElementById(\'bfCaptchaEntry\').focus();document.getElementById(\'ff_capimgValue\').src = \'' . $captcha_url . '&bfMathRandom=\' + Math.random(); return false"><span>Reload Captcha</span></button>';
 						echo '</div>';
 						break;
 

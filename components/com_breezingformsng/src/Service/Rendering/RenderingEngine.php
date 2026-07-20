@@ -464,7 +464,7 @@ final class RenderingEngine
                                                                                     bf_restore_submitbutton();
                                                                                 }
                                                                                 
-                                                                                        document.getElementById(\'ff_capimgValue\').src = \'' . Uri::root(true) . ($this->processor->app->isClient('administrator') ? '/administrator' : '') . '/media/com_breezingformsng/images/site/captcha/securimage_show.php?bfMathRandom=\' + Math.random();
+                                                                                        document.getElementById(\'ff_capimgValue\').src = \'' . Uri::root(true) . ($this->processor->app->isClient('administrator') ? '/administrator' : '') . '/index.php?option=com_breezingformsng&bfCaptcha=1&bfMathRandom=\' + Math.random();
                                                                                         document.getElementById(\'bfCaptchaEntry\').value = "";
                                                                                         if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
                                                                                         document.getElementById(\'bfCaptchaEntry\').focus();
@@ -1767,11 +1767,9 @@ final class RenderingEngine
                         echo indentc(1) . '</div>' . nl();
                         break;
                     case 'Captcha':
-                        if ($this->processor->app->isClient('site')) {
-                            $captcha_url = Uri::root(true) . '/media/com_breezingformsng/images/site/captcha/securimage_show.php';
-                        } else {
-                            $captcha_url = Uri::root(true) . '/media/com_breezingformsng/images/site/captcha/securimage_show.php';
-                        }
+                        $captcha_url = Uri::root(true)
+                            . ($this->processor->app->isClient('administrator') ? '/administrator' : '')
+                            . '/index.php?option=com_breezingformsng&bfCaptcha=1';
                         echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
                         $attribs = '';
                         if ($row->width > 0)
@@ -1782,7 +1780,7 @@ final class RenderingEngine
                         echo '<br/>';
                         echo '<input type="text" style="' . $attribs . '" name="bfCaptchaEntry" id="bfCaptchaEntry" />';
                         //echo '<br/>';
-                        echo '<a href="#" onclick="document.getElementById(\'bfCaptchaEntry\').value=\'\';document.getElementById(\'bfCaptchaEntry\').focus();document.getElementById(\'ff_capimgValue\').src = \'' . $captcha_url . '?bfCaptcha=true&bfMathRandom=\' + Math.random(); return false"><img src="' . Uri::root() . 'media/com_breezingformsng/images/site/captcha/refresh-captcha.png" border="0" /></a>';
+                        echo '<a href="#" onclick="document.getElementById(\'bfCaptchaEntry\').value=\'\';document.getElementById(\'bfCaptchaEntry\').focus();document.getElementById(\'ff_capimgValue\').src = \'' . $captcha_url . '&bfMathRandom=\' + Math.random(); return false"><img src="' . Uri::root() . 'media/com_breezingformsng/images/site/captcha/refresh-captcha.png" border="0" /></a>';
                         echo indentc(1) . '</div>' . nl();
                         break;
                     case 'Query List':

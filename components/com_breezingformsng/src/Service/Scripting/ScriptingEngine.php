@@ -518,7 +518,7 @@ final class ScriptingEngine
         if ($curr > 0)
             $code .= "    } // if" . nl();
         $code .= 'if(error != "" && document.getElementById(\'ff_capimgValue\')){
-                 document.getElementById(\'ff_capimgValue\').src = \'' . Uri::root(true) . ($this->processor->app->isClient('administrator') ? '/administrator' : '') . '/media/com_breezingformsng/images/site/captcha/securimage_show.php?bfMathRandom=\' + Math.random();
+                 document.getElementById(\'ff_capimgValue\').src = \'' . Uri::root(true) . ($this->processor->app->isClient('administrator') ? '/administrator' : '') . '/index.php?option=com_breezingformsng&bfCaptcha=1&bfMathRandom=\' + Math.random();
                  document.getElementById(\'bfCaptchaEntry\').value = "";
             }';
         $code .= 'if(error!="" && document.getElementById("bfSubmitButton")){document.getElementById("bfSubmitButton").disabled = false;}' . nl();

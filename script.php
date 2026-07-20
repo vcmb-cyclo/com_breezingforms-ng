@@ -1976,6 +1976,8 @@ class com_breezingformsngInstallerScript
             JPATH_SITE . '/components/com_breezingformsng/legacy/tables.php',
             JPATH_SITE . '/components/com_breezingformsng/legacy/functions.php',
             JPATH_SITE . '/components/com_breezingformsng/src/Table/RuntimeTables.php',
+            JPATH_SITE . '/media/com_breezingformsng/images/site/captcha/securimage_show.php',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/images/captcha/securimage_show.php',
             JPATH_SITE . '/components/com_breezingformsng/facileforms.class.php',
             JPATH_SITE . '/components/com_breezingformsng/facileforms.process.php',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/sql/create_sql.php',

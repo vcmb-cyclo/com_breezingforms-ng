@@ -39,4 +39,3 @@ DEFINE('_FF_RUNMODE_BACKEND', 1);
 DEFINE('_FF_RUNMODE_PREVIEW', 2);
 
 require_once __DIR__ . '/runtime_functions.php';
-require_once dirname(__DIR__) . '/Table/RuntimeTables.php';

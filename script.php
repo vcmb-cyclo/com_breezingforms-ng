@@ -1975,6 +1975,7 @@ class com_breezingformsngInstallerScript
             JPATH_SITE . '/components/com_breezingformsng/legacy/Conf.php',
             JPATH_SITE . '/components/com_breezingformsng/legacy/tables.php',
             JPATH_SITE . '/components/com_breezingformsng/legacy/functions.php',
+            JPATH_SITE . '/components/com_breezingformsng/src/Table/RuntimeTables.php',
             JPATH_SITE . '/components/com_breezingformsng/facileforms.class.php',
             JPATH_SITE . '/components/com_breezingformsng/facileforms.process.php',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/sql/create_sql.php',

@@ -485,10 +485,11 @@
   `addRequestParams()` sont supprimées de `legacy/functions.php`, qui ne résout plus l'application statiquement.
   Le helper de route des intégrations de tags ne charge plus `BFRequest.php`, inutilisé depuis la conversion
   complète des lectures de requête vers Joomla Input.
-  **Tables sorties de `legacy/`** : `legacy/tables.php` devient `Site\Table\RuntimeTables.php`. Les huit classes
-  globales sont renommées `MenuTable`, `FormTable`, `ElementTable`, `ScriptTable`, `PieceTable`, `RecordTable`,
-  `SubrecordTable` et `QueryColumn`, toutes finales et sous le namespace du site. Les consommateurs frontend et
-  administrateur utilisent leurs noms qualifiés ; l'ancien fichier est purgé lors des mises à jour.
+  **Tables sorties de `legacy/`** : les huit classes globales sont renommées `MenuTable`, `FormTable`,
+  `ElementTable`, `ScriptTable`, `PieceTable`, `RecordTable`, `SubrecordTable` et `QueryColumn`, toutes finales
+  et sous le namespace du site. Chaque classe possède désormais son propre fichier PSR-4 ; le bootstrap manuel
+  de `RuntimeTables.php` a disparu. Les consommateurs frontend et administrateur utilisent leurs noms qualifiés ;
+  l'ancien fichier est purgé lors des mises à jour.
   Le dernier fichier du dossier `legacy/`, désormais limité aux helpers globaux publics requis par les scripts
   stockés, est déplacé vers `src/Support/runtime_functions.php`. Le dossier `legacy/` disparaît du paquet ; les
   noms des fonctions restent inchangés afin de préserver le contrat d'exécution des formulaires.

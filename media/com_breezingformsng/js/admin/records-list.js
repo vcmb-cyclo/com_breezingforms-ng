@@ -34,7 +34,17 @@ function bfToggleFlag(recordId, column, link) {
 		headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 		body: 'record_id=' + recordId + '&column=' + column + '&flag=' + newFlag
 			+ '&' + __bfOpts.csrfToken + '=1'
-	}).then(function (r) { return r.json(); }).then(function (data) {
+	}).then(function (response) {
+		if (!response.ok) {
+			throw new Error('HTTP ' + response.status);
+		}
+
+		return response.json();
+	}).then(function (data) {
+		if (data && data.data) {
+			data = typeof data.data === 'string' ? JSON.parse(data.data) : data.data;
+		}
+
 		if (data.Result === 'OK') {
 			if (newFlag) {
 				span.classList.remove('icon-times', 'text-danger');
@@ -43,6 +53,10 @@ function bfToggleFlag(recordId, column, link) {
 				span.classList.remove('icon-check', 'text-success');
 				span.classList.add('icon-times', 'text-danger');
 			}
+		} else {
+			throw new Error(data.Message || 'Invalid response');
 		}
+	}).catch(function () {
+		Joomla.renderMessages({ error: [Joomla.Text._('COM_BREEZINGFORMSNG_AJAX_STATE_ERROR')] });
 	});
 }

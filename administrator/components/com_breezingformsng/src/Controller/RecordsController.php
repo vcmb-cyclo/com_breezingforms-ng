@@ -11,10 +11,12 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\CMS\Response\JsonResponse;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 use Joomla\Utilities\ArrayHelper;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\RecordModel;
+use Vcmb\Component\BreezingformsNG\Administrator\Service\AjaxStateService;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\PdfDocument;
 
 class RecordsController extends BaseController
@@ -29,10 +31,16 @@ class RecordsController extends BaseController
     {
         $input = $this->app->getInput();
         $this->app->redirect(
-            'index.php?option=com_breezingformsng&act=managerecs&view=records&layout=edit'
+            'index.php?option=com_breezingformsng&view=records&layout=edit'
             . '&record_id=' . $input->getInt('record_id', 0)
             . '&form_selection=' . $input->getInt('form_selection', 0)
         );
+    }
+
+    public function cancel(): void
+    {
+        $this->checkToken();
+        $this->app->redirect($this->listUrl($this->app->getInput()));
     }
 
     public function save(): void
@@ -54,7 +62,7 @@ class RecordsController extends BaseController
         }
 
         $app->redirect(
-            'index.php?option=com_breezingformsng&act=managerecs&view=records&layout=edit'
+            'index.php?option=com_breezingformsng&view=records&layout=edit'
             . '&record_id=' . $recordId
             . '&form_selection=' . $formSelection
         );
@@ -84,18 +92,21 @@ class RecordsController extends BaseController
     {
         $this->checkToken();
 
-        if (ob_get_level() > 0) {
+        while (ob_get_level() > 0) {
             ob_end_clean();
         }
         $input = $this->app->getInput();
         $recordId = $input->getInt('record_id', 0);
-        $column = $input->getString('column', '');
-        $flag = $input->getInt('flag', 0);
-        if ($recordId > 0) {
+        $column = AjaxStateService::normalizeRecordColumn($input->getString('column', ''));
+        $flag = AjaxStateService::normalizeState($input->getInt('flag', 0));
+        if ($recordId > 0 && $column !== null) {
             $this->getRecordModel()->setFlagSingle($recordId, $column, $flag);
         }
+        $payload = $recordId > 0 && $column !== null
+            ? AjaxStateService::success($flag)
+            : AjaxStateService::error(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
         $this->app->setHeader('Content-Type', 'application/json; charset=utf-8', true);
-        $this->app->setBody(json_encode(['Result' => 'OK'], JSON_THROW_ON_ERROR));
+        echo new JsonResponse($payload);
         $this->app->close();
     }
 
@@ -132,7 +143,7 @@ class RecordsController extends BaseController
 
         $this->getRecordModel()->importCsv($formId, $tmpFile, $encoding);
 
-        $app->redirect('index.php?option=com_breezingformsng&act=managerecs&view=records&form_selection=' . $formSelection);
+        $app->redirect('index.php?option=com_breezingformsng&view=records&form_selection=' . $formSelection);
     }
 
     public function exportPdf(): void
@@ -554,7 +565,7 @@ class RecordsController extends BaseController
     {
         $formSelection = $input->getInt('form_selection', 0);
         $searchTerm = $input->getString('searchterm', '');
-        return 'index.php?option=com_breezingformsng&act=managerecs&view=records'
+        return 'index.php?option=com_breezingformsng&view=records'
             . ($formSelection > 0 ? '&form_selection=' . $formSelection : '')
             . ($searchTerm !== '' ? '&searchterm=' . rawurlencode($searchTerm) : '');
     }

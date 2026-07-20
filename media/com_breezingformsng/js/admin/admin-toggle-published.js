@@ -26,6 +26,10 @@ function bfRequestFormState(id, task, state, stateType, link) {
 
 		return response.json();
 	}).then(function (data) {
+		if (data && data.data) {
+			data = typeof data.data === 'string' ? JSON.parse(data.data) : data.data;
+		}
+
 		if (data.Result !== 'OK') {
 			throw new Error(data.Message || 'Invalid response');
 		}

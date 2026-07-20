@@ -3,7 +3,13 @@
 bfToggleFieldsLoaded = false;
 bfSectionFieldsDeactivated = false;
 
-JQuery(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function () {
+    var JQuery = window.jQuery;
+
+    if (!JQuery) {
+        return;
+    }
+
     if (typeof bfFade != "undefined") bfFade();
     if (typeof bfRollover != "undefined") bfRollover();
     if (typeof bfRollover2 != "undefined") bfRollover2();

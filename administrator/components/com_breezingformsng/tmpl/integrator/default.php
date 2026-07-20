@@ -12,7 +12,7 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Session\Session;
 ?>
-<form action="index.php?option=com_breezingformsng&amp;act=integrate&amp;view=integrator" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_breezingformsng&amp;view=integrator" method="post" name="adminForm" id="adminForm">
 
   <table class="table table-striped table-hover">
     <thead>
@@ -35,7 +35,7 @@ use Joomla\CMS\Session\Session;
           <tr>
             <td class="text-center"><?= HTMLHelper::_('grid.id', $i, $rule->id); ?></td>
             <td>
-              <a href="index.php?option=com_breezingformsng&act=integrate&view=integrator&layout=edit&id=<?= (int) $rule->id; ?>">
+              <a href="index.php?option=com_breezingformsng&view=integrator&layout=edit&id=<?= (int) $rule->id; ?>">
                 <?= htmlspecialchars($rule->name); ?>
               </a>
             </td>

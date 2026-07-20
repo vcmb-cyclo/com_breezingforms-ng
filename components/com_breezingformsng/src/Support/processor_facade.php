@@ -397,8 +397,7 @@ function _ff_errorHandler($errno, $errstr, $errfile, $errline)
             $what = $id;
             switch ($type) {
                 case 'f':
-                    $url .= '&act=manageforms' .
-                        '&task=quickmode' .
+                    $url .= '&task=quickmode.display' .
                         '&form=' . $ff_processor->form;
                     if ($ff_processor->formrow->package != '')
                         $url .= '&pkg=' . urlencode($ff_processor->formrow->package);
@@ -415,8 +414,7 @@ function _ff_errorHandler($errno, $errstr, $errfile, $errline)
                             break;
                         } // if
                     $what = 'element ' . $what;
-                    $url .= '&act=manageforms' .
-                        '&task=quickmode' .
+                    $url .= '&task=quickmode.display' .
                         '&form=' . $ff_processor->form .
                         '&page=' . $page;
                     if ($ff_processor->formrow->package != '')
@@ -438,8 +436,7 @@ function _ff_errorHandler($errno, $errstr, $errfile, $errline)
                         $what = $rows[0]->name;
                     }
                     $what = 'piece ' . $what;
-                    $url .= '&act=managepieces' .
-                        '&task=edit' .
+                    $url .= '&task=pieces.edit' .
                         '&ids[]=' . $id;
                     if ($package != '')
                         $url .= '&pkg=' . urlencode($package);
@@ -458,8 +455,7 @@ function _ff_errorHandler($errno, $errstr, $errfile, $errline)
                         $what = $rows[0]->name;
                     }
                     $what = 'script ' . $what;
-                    $url .= '&act=managescripts' .
-                        '&task=edit' .
+                    $url .= '&task=scripts.edit' .
                         '&ids[]=' . $id;
                     if ($package != '')
                         $url .= '&pkg=' . urlencode($package);

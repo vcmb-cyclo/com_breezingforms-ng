@@ -9,10 +9,12 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
+use Joomla\Database\DatabaseInterface;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\ScriptManager;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\ScriptModel;
 
@@ -81,7 +83,6 @@ class ScriptsController extends BaseController
     private function runLegacyTask(string $method, ?array $ids = null, ?int $state = null): void
     {
         $this->assertAuthorised();
-        $this->bootstrapLegacyRuntime();
         $this->prepareDocument();
 
         $arguments = ['com_breezingformsng', $this->getPackage()];
@@ -98,7 +99,7 @@ class ScriptsController extends BaseController
         $model = $this->getModel('Script');
         $manager = new ScriptManager(
             $this->app,
-            $model->getDatabase(),
+            Factory::getContainer()->get(DatabaseInterface::class),
             $model,
         );
         $manager->$method(...$arguments);
@@ -158,39 +159,4 @@ class ScriptsController extends BaseController
         return array_values(array_filter(array_map('intval', $ids)));
     }
 
-    private function bootstrapLegacyRuntime(): void
-    {
-        global $ff_mospath, $ff_admpath, $ff_compath;
-        global $ff_mossite, $ff_admsite, $ff_admicon, $ff_comsite;
-        global $ff_config, $ff_compatible, $ff_install;
-        global $database, $task;
-
-
-        if (isset($ff_config)) {
-            return;
-        }
-
-        $database = $this->getModel('Script')->getDatabase();
-
-        $task       = '';
-        $comppath   = '/components/com_breezingformsng';
-        $ff_admpath = str_replace('\\', '/', JPATH_ADMINISTRATOR . '/components/com_breezingformsng');
-        $ff_mospath = str_replace('\\', '/', dirname(dirname(dirname($ff_admpath))));
-        $ff_compath = $ff_mospath . $comppath;
-        $ff_admsite = $ff_mospath . '/administrator' . $comppath;
-        $ff_admicon = $ff_admsite . '/images/icons';
-
-        require_once JPATH_SITE . '/components/com_breezingformsng/src/Support/runtime_bootstrap.php';
-
-        $ff_config = (object) [
-            'areasmall'  => 4,
-            'areamedium' => 12,
-            'arealarge'  => 20,
-            'limitdesc'  => 100,
-            'piecepkg'   => '',
-            'scriptpkg'  => '',
-        ];
-        $ff_compatible = true;
-        $ff_install    = false;
-    }
 }

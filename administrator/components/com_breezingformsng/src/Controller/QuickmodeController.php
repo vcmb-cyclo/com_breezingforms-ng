@@ -9,8 +9,10 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 use Joomla\Filesystem\File;
 use Joomla\Filesystem\Folder;
@@ -97,7 +99,7 @@ class QuickmodeController extends BaseController
                 require_once $cbngBasePath . '/src/Service/FormSupportService.php';
 
                 $cbForm = \CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory::getForm('com_breezingformsng', $formId);
-                $db = $this->getQuickmodeModel()->getDatabase();
+                $db = Factory::getContainer()->get(DatabaseInterface::class);
                 $sourceType = 'com_breezingformsng';
                 $query = $db->getQuery(true)
                     ->select($db->quoteName('id'))

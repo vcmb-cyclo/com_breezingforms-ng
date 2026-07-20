@@ -101,12 +101,12 @@
     outline: 0 none;
 }
 
-.bfQuickMode textarea:focus, .bfQuickMode input[type="text"]:focus, .bfQuickMode input[type="password"]:focus, .bfQuickMode input[type="datetime"]:focus, .bfQuickMode input[type="datetime-local"]:focus, .bfQuickMode input[type="date"]:focus, .bfQuickMode input[type="month"]:focus, .bfQuickMode input[type="time"]:focus, .bfQuickMode input[type="week"]:focus, .bfQuickMode input[type="number"]:focus, .bfQuickMode input[type="email"]:focus, .bfQuickMode input[type="url"]:focus, .bfQuickMode input[type="search"]:focus, .bfQuickMode input[type="tel"]:focus, .bfQuickMode input[type="color"]:focus, .bfQuickMode .uneditable-input:focus {
+.bfQuickMode textarea:focus, .bfQuickMode input[type="text"]:focus, .bfQuickMode input[type="password"]:focus, .bfQuickMode input[type="datetime"]:focus, .bfQuickMode input[type="datetime-local"]:focus, .bfQuickMode input[type="date"]:focus, .bfQuickMode input[type="month"]:focus, .bfQuickMode input[type="time"]:focus, .bfQuickMode input[type="week"]:focus, .bfQuickMode input[type="number"]:focus, .bfQuickMode input[type="email"]:focus, .bfQuickMode input[type="url"]:focus, .bfQuickMode input[type="search"]:focus, .bfQuickMode input[type="tel"]:focus, .bfQuickMode input[type="color"]:focus, .bfQuickMode .custom-form-control:focus {
     box-shadow: none;
     outline: 0 none;
 }
 
-.bfQuickMode select, .bfQuickMode textarea, .bfQuickMode input[type="text"], .bfQuickMode input[type="password"], .bfQuickMode input[type="datetime"], .bfQuickMode input[type="datetime-local"], .bfQuickMode input[type="date"], .bfQuickMode input[type="month"], .bfQuickMode input[type="time"], .bfQuickMode input[type="week"], .bfQuickMode input[type="number"], .bfQuickMode input[type="email"], .bfQuickMode input[type="url"], .bfQuickMode input[type="search"], input[type="tel"], .bfQuickMode input[type="color"], .bfQuickMode .uneditable-input {
+.bfQuickMode select, .bfQuickMode textarea, .bfQuickMode input[type="text"], .bfQuickMode input[type="password"], .bfQuickMode input[type="datetime"], .bfQuickMode input[type="datetime-local"], .bfQuickMode input[type="date"], .bfQuickMode input[type="month"], .bfQuickMode input[type="time"], .bfQuickMode input[type="week"], .bfQuickMode input[type="number"], .bfQuickMode input[type="email"], .bfQuickMode input[type="url"], .bfQuickMode input[type="search"], input[type="tel"], .bfQuickMode input[type="color"], .bfQuickMode .custom-form-control {
     /*border-radius: 0;*/
 }
 
@@ -645,13 +645,13 @@
 
     .bfQuickMode input[type=text], 
     .bfQuickMode textarea,  
-    .bfQuickMode .uneditable-input,
+    .bfQuickMode .custom-form-control,
     .bfQuickMode input[type=text]:hover, 
     .bfQuickMode textarea:hover,  
-    .bfQuickMode .uneditable-input:hover,
+    .bfQuickMode .custom-form-control:hover,
     .bfQuickMode input[type=text]:focus, 
     .bfQuickMode textarea:focus,  
-    .bfQuickMode .uneditable-input:focus{
+    .bfQuickMode .custom-form-control:focus{
          width: 90%;
          max-width: 90%;
          min-width: 90%;

@@ -450,7 +450,7 @@ class QuickmodeModel extends BaseDatabaseModel
         $dataObject = json_decode(base64_decode($templateCode), true);
         $mdata      = $dataObject['properties'];
         $now        = (new \Joomla\CMS\Date\Date())->toSql();
-        $userId     = (string) Factory::getApplication()->getIdentity()->username;
+        $userId     = (string) $this->getCurrentUser()->username;
 
         $existsQuery = $this->db->getQuery(true)
             ->select('id')

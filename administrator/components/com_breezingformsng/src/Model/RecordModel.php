@@ -125,7 +125,7 @@ class RecordModel extends BaseDatabaseModel
             $this->saveElementValue($recordId, $element, (string) $values[$elementId]);
         }
 
-        $user = Factory::getApplication()->getIdentity();
+        $user = $this->getCurrentUser();
         $now  = (new \Joomla\CMS\Date\Date('now', $this->tz))->format('Y-m-d H:i:s', true);
         $username = (string) $user->username;
         $userId = (int) $user->id;
@@ -277,7 +277,7 @@ class RecordModel extends BaseDatabaseModel
                         $articleId = (int) $article;
                         $table = $contentFactory->createTable('Article', 'Administrator');
                         if ($table->load($articleId)) {
-                            Factory::getApplication()->getDispatcher()->dispatch('onContentBeforeDelete', new Event('onContentBeforeDelete', ['com_content.article', $table]));
+                            $this->getDispatcher()->dispatch('onContentBeforeDelete', new Event('onContentBeforeDelete', ['com_content.article', $table]));
                         }
 
                         $delArticle = $db->getQuery(true)
@@ -287,7 +287,7 @@ class RecordModel extends BaseDatabaseModel
                         $db->setQuery($delArticle)->execute();
 
                         $table->reset();
-                        Factory::getApplication()->getDispatcher()->dispatch('onContentAfterDelete', new Event('onContentAfterDelete', ['com_content.article', $table]));
+                        $this->getDispatcher()->dispatch('onContentAfterDelete', new Event('onContentAfterDelete', ['com_content.article', $table]));
 
                         $assetName = 'com_content.article.' . $articleId;
                         $delAsset = $db->getQuery(true)
@@ -422,7 +422,7 @@ class RecordModel extends BaseDatabaseModel
             'user_id', 'username', 'user_full_name', 'paypal_tx_id', 'paypal_payment_date',
             'paypal_testaccount', 'paypal_download_tries', 'double_opt_in', 'opted',
         ];
-        $identity = Factory::getApplication()->getIdentity();
+        $identity = $this->getCurrentUser();
         $valueAt = static function (array $row, array $keys, string $key, mixed $default = ''): mixed {
             $index = array_search($key, $keys, true);
             return $index === false ? $default : ($row[$index] ?? $default);

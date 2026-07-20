@@ -108,7 +108,7 @@ class FormModel extends BaseDatabaseModel
     {
         $db  = $this->db();
         $now = (new \Joomla\CMS\Date\Date())->toSql();
-        $uid = (string) Factory::getApplication()->getIdentity()->username;
+        $uid = (string) $this->getCurrentUser()->username;
         $id  = (int) ($data['id'] ?? 0);
 
         $title = trim((string) ($data['title'] ?? ''));
@@ -176,7 +176,7 @@ class FormModel extends BaseDatabaseModel
         $this->reorder($sets['package'] ?? '');
 
         PluginHelper::importPlugin('breezingforms_addons');
-        Factory::getApplication()->getDispatcher()
+        $this->getDispatcher()
             ->dispatch('onPropertiesSave', new Event('onPropertiesSave', [$id]));
 
         return $id;
@@ -210,7 +210,7 @@ class FormModel extends BaseDatabaseModel
 
         $db  = $this->db();
         $now = (new \Joomla\CMS\Date\Date())->toSql();
-        $uid = (string) Factory::getApplication()->getIdentity()->username;
+        $uid = (string) $this->getCurrentUser()->username;
 
         foreach (array_map('intval', $ids) as $id) {
             $src = $this->getForm($id);

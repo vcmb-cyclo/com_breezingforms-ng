@@ -1373,7 +1373,7 @@ final class RenderingEngine
         if (trim($this->processor->formrow->template_code_processed) == '') {
 
             // fixing J3 css
-            $this->processor->app->getDocument()->addStyleDeclaration(
+            $this->processor->app->getDocument()->getWebAssetManager()->addInlineStyle(
                 '
              .bfFormDiv input[type=checkbox][id^="ff_elem"], input[type=radio][id^="ff_elem"]{
                 vertical-align: text-bottom;

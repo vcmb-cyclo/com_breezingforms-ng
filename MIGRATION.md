@@ -558,6 +558,10 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > Le renderer utilise le convertisseur de format natif `HTMLHelper::strftimeFormatToDateFormat()` de Joomla 6
 > puis `DateTimeImmutable` en UTC. Un format non pris en charge est désormais refusé explicitement.
 >
+> **Styles inline natifs (2026-07-20)** : les deux derniers appels directs à la méthode Document dépréciée
+> `addStyleDeclaration()` sont remplacés par `WebAssetManager::addInlineStyle()` dans le renderer Classic et le
+> moteur de rendu.
+>
 > **Suite (2026-07-12)** : `bfProcessorUploads.php` (1 appel), `bfProcessorNotifications.php` (13),
 > `bfProcessorExports.php` (16) et `bfProcessorSubmission.php` (45) sont également convertis — **235 appels au
 > total sur 393**. Le couplage `cb_category_id`/`cb_controller` entre Exports (écrivain) et Submission (lecteur)

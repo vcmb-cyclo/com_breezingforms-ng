@@ -9,15 +9,13 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
+use Joomla\Input\Input;
+use Joomla\Session\SessionInterface;
 
 class PieceModel extends PackageModel
 {
-    public function prepareList(string $package): array
+    public function prepareList(string $package, Input $input, SessionInterface $session): array
     {
-        $app = Factory::getApplication();
-        $input = $app->getInput();
-        $session = $app->getSession();
         $packages = $this->getPackages();
 
         $packageOk = $package === '';

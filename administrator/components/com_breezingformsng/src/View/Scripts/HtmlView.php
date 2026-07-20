@@ -11,6 +11,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Scripts;
 
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Factory;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\ScriptsModel;
 use Vcmb\Component\BreezingformsNG\Administrator\View\BreezingformsNG\HtmlView as BaseHtmlView;
 
@@ -48,11 +49,14 @@ class HtmlView extends BaseHtmlView
             throw new \RuntimeException('Unable to create BreezingForms NG scripts model.');
         }
 
+        $app = Factory::getApplication();
+        $input = $app->getInput();
+
         if ($this->package === '') {
-            $this->package = \Joomla\CMS\Factory::getApplication()->getInput()->getString('pkg', '');
+            $this->package = $input->getString('pkg', '');
         }
 
-        $list = $model->prepareList($this->package);
+        $list = $model->prepareList($this->package, $input, $app->getSession());
 
         $this->package = $list['package'];
         $this->packageList = $list['packageList'];

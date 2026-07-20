@@ -25,6 +25,10 @@ use Vcmb\Component\BreezingformsNG\Administrator\Helper\BreadcrumbHelper;
 
 class Renderer
 {
+	private const AREA_SMALL = 4;
+	private const AREA_MEDIUM = 12;
+	private const AREA_LARGE = 20;
+	private const DESCRIPTION_LIMIT = 100;
 	private static function registerEditLabels(): void
 	{
 		$keys = [
@@ -51,7 +55,6 @@ class Renderer
 	static function edit($option, $pkg, &$row, &$typelist)
 	{
 		Factory::getApplication()->getInput()->set('hidemainmenu', 1);
-		global $ff_mossite, $ff_admsite, $ff_config;
 		$action = $row->id ? Text::_('COM_BREEZINGFORMSNG_PIECES_EDITPIECE') : Text::_('COM_BREEZINGFORMSNG_PIECES_ADDPIECE');
 
 		$pageTitle = BreadcrumbHelper::render([
@@ -202,16 +205,16 @@ class Renderer
 						echo '<span><span title="' . htmlspecialchars($unitTestsHelp, ENT_QUOTES) . '" class="icon-question-circle hasTooltip" aria-hidden="true"></span></span>';
 						?>
 						<a href="javascript:void(0);"
-							onClick="textAreaResize('unit_tests',<?php echo $ff_config->areasmall; ?>);">[
-							<?php echo $ff_config->areasmall; ?>]
+							onClick="textAreaResize('unit_tests',<?php echo self::AREA_SMALL; ?>);">[
+							<?php echo self::AREA_SMALL; ?>]
 						</a>
 						<a href="javascript:void(0);"
-							onClick="textAreaResize('unit_tests',<?php echo $ff_config->areamedium; ?>);">[
-							<?php echo $ff_config->areamedium; ?>]
+							onClick="textAreaResize('unit_tests',<?php echo self::AREA_MEDIUM; ?>);">[
+							<?php echo self::AREA_MEDIUM; ?>]
 						</a>
 						<a href="javascript:void(0);"
-							onClick="textAreaResize('unit_tests',<?php echo $ff_config->arealarge; ?>);">[
-							<?php echo $ff_config->arealarge; ?>]
+							onClick="textAreaResize('unit_tests',<?php echo self::AREA_LARGE; ?>);">[
+							<?php echo self::AREA_LARGE; ?>]
 						</a>
 						<br />
 						<textarea wrap="off" name="unit_tests" id="unit_tests" style="width:100%;" rows="8"
@@ -278,7 +281,6 @@ class Renderer
 	static function listitems($option, &$rows, &$pkglist, $pkg, $search, $total, $limit, $limitstart, $pagination = null, $listOrder = 'a.name', $listDirn = 'asc', $filterState = '')
 	{
 		Factory::getApplication()->getInput()->set('hidemainmenu', 0);
-		global $ff_config, $ff_version;
 		$listOrder = (string) $listOrder;
 		$listDirn = strtolower((string) $listDirn);
 		$listDirn = $listDirn === 'desc' ? 'desc' : 'asc';
@@ -365,8 +367,8 @@ class Renderer
 				for ($i = 0; $i < count($rows); $i++) {
 					$row = $rows[$i];
 					$desc = $row->description;
-					if (strlen($desc) > $ff_config->limitdesc)
-						$desc = substr($desc, 0, $ff_config->limitdesc) . '...';
+					if (strlen($desc) > self::DESCRIPTION_LIMIT)
+						$desc = substr($desc, 0, self::DESCRIPTION_LIMIT) . '...';
 					$editLink = 'index.php?option=' . htmlspecialchars($option, ENT_QUOTES) . '&amp;view=pieces&amp;task=pieces.edit&amp;pkg=' . urlencode($pkg) . '&amp;ids[]=' . (int) $row->id;
 					?>
 					<tr>

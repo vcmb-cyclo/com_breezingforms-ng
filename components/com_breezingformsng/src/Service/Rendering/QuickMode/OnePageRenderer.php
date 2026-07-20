@@ -47,21 +47,12 @@ class OnePageRenderer
     private $htmltextareasDbIds = array();
     private $language_tag = '';
     private $hasResponsiveDatePicker = false;
-    private $bsVersion = '5';
     private $bsClasses = array();
-    private $bsClassPrefix = '';
 
     function bsClass($key)
     {
 
-        if ($this->bsVersion == '') {
-
-            $ver = 5;
-        } else {
-            $ver = $this->bsVersion;
-        }
-
-        return $this->bsClasses[$ver][$key];
+        return $this->bsClasses[5][$key];
     }
 
     public static function getEditorContent($editor)
@@ -81,72 +72,59 @@ class OnePageRenderer
 
         $this->rootMdata = $this->dataObject['properties'];
 
-        if (isset($this->rootMdata['themebootstrap3classpfx']) && trim($this->rootMdata['themebootstrap3classpfx']) != '') {
-
-            $this->bsClassPrefix = $this->rootMdata['themebootstrap3classpfx'];
-        } else {
-
-            if (isset($this->rootMdata['themebootstrapUse3']) && $this->rootMdata['themebootstrapUse3'] && isset($this->rootMdata['themebootstrap3builtin']) && $this->rootMdata['themebootstrap3builtin']) {
-                $this->bsClassPrefix = 'bfbs3-';
-            } else {
-
-                $this->bsClassPrefix = '';
-            }
-        }
-
         $this->bsClasses[5] = array(
-            'bar' => $this->bsClassPrefix . 'progress-bar',
-            'progress' => $this->bsClassPrefix . 'progress',
-            'span1' => $this->bsClassPrefix . 'col-md-1',
-            'span2' => $this->bsClassPrefix . 'col-md-2',
-            'span3' => $this->bsClassPrefix . 'col-md-3',
-            'span4' => $this->bsClassPrefix . 'col-md-4',
-            'span5' => $this->bsClassPrefix . 'col-md-5',
-            'span6' => $this->bsClassPrefix . 'col-md-6',
-            'span7' => $this->bsClassPrefix . 'col-md-7',
-            'span8' => $this->bsClassPrefix . 'col-md-8',
-            'span9' => $this->bsClassPrefix . 'col-md-9',
-            'span10' => $this->bsClassPrefix . 'col-md-10',
-            'span11' => $this->bsClassPrefix . 'col-md-11',
-            'span12' => $this->bsClassPrefix . 'col-md-12',
+            'bar' => 'progress-bar',
+            'progress' => 'progress',
+            'span1' => 'col-md-1',
+            'span2' => 'col-md-2',
+            'span3' => 'col-md-3',
+            'span4' => 'col-md-4',
+            'span5' => 'col-md-5',
+            'span6' => 'col-md-6',
+            'span7' => 'col-md-7',
+            'span8' => 'col-md-8',
+            'span9' => 'col-md-9',
+            'span10' => 'col-md-10',
+            'span11' => 'col-md-11',
+            'span12' => 'col-md-12',
             'control-group' => 'mb-3',
-            'control-label' => $this->bsClassPrefix . 'form-label',
-            'row-fluid' => $this->bsClassPrefix . 'row',
-            'icon-asterisk' => $this->bsClassPrefix . 'fas ' . $this->bsClassPrefix . 'fa-asterisk',
-            'icon-question-sign' => $this->bsClassPrefix . 'fas ' . $this->bsClassPrefix . 'fa-question-circle',
+            'control-label' => 'form-label',
+            'row-fluid' => 'row',
+            'icon-asterisk' => 'fas ' . 'fa-asterisk',
+            'icon-question-sign' => 'fas ' . 'fa-question-circle',
             'form-actions' => 'mt-3',
             'form-actions-buttons' => 'd-flex flex-wrap gap-2',
-            'btn' => $this->bsClassPrefix . 'btn',
-            'btn-primary' => $this->bsClassPrefix . 'btn-primary',
-            'btn-secondary' => $this->bsClassPrefix . 'btn-secondary',
-            'alert' => $this->bsClassPrefix . 'alert',
-            'alert-error' => $this->bsClassPrefix . 'alert-danger',
+            'btn' => 'btn',
+            'btn-primary' => 'btn-primary',
+            'btn-secondary' => 'btn-secondary',
+            'alert' => 'alert',
+            'alert-error' => 'alert-danger',
             'controls' => '',
-            'form-inline' => 'bfbs5-form-inline',
-            'form-group' => $this->bsClassPrefix . 'form-group',
-            'well' => $this->bsClassPrefix . 'card',
-            'well-small' => $this->bsClassPrefix . 'card-body',
-            'hero-unit' => 'bfbs5-hero-unit',
-            'pull-left' => $this->bsClassPrefix . 'float-start',
-            'pull-right' => $this->bsClassPrefix . 'float-end',
-            'radio' => $this->bsClassPrefix . 'form-check-label',
-            'checkbox' => $this->bsClassPrefix . 'form-check-label',
-            'inline' => $this->bsClassPrefix . 'form-check-inline',
-            'radio-form-group' => $this->bsClassPrefix . 'radio-form-group',
-            'checkbox-form-group' => $this->bsClassPrefix . 'checkbox-form-group',
-            'input-append' => $this->bsClassPrefix . 'input-group',
-            'input-group-btn' => $this->bsClassPrefix . '',
-            'form-control' => $this->bsClassPrefix . 'form-control',
-            'icon-calendar' => $this->bsClassPrefix . 'fas ' . $this->bsClassPrefix . 'fa-calendar',
-            'icon-refresh' => $this->bsClassPrefix . 'fas ' . $this->bsClassPrefix . 'fa-sync',
-            'icon-play' => $this->bsClassPrefix . 'fas ' . $this->bsClassPrefix . 'fa-play',
-            'icon-picture' => $this->bsClassPrefix . 'fas ' . $this->bsClassPrefix . 'fa-picture',
-            'img-polaroid' => $this->bsClassPrefix . 'thumbnail',
-            'icon-upload' => $this->bsClassPrefix . 'fas ' . $this->bsClassPrefix . 'fa-upload',
-            'nonform-control' => $this->bsClassPrefix . 'nonform-control',
-            'other-form-group' => $this->bsClassPrefix . 'other-form-group',
-            'custom-form-control' => $this->bsClassPrefix . 'custom-form-control',
-            'input-group-text' => $this->bsClassPrefix . 'input-group-text',
+            'form-inline' => 'bf-form-inline',
+            'form-group' => 'bf-form-group mb-3',
+            'well' => 'card',
+            'well-small' => 'card-body',
+            'hero-unit' => 'bf-hero-unit',
+            'float-start' => 'float-start',
+            'float-end' => 'float-end',
+            'radio' => 'form-check-label',
+            'checkbox' => 'form-check-label',
+            'inline' => 'form-check-inline',
+            'radio-form-group' => 'radio-form-group',
+            'checkbox-form-group' => 'checkbox-form-group',
+            'input-append' => 'input-group',
+            'input-group-btn' => '',
+            'form-control' => 'form-control',
+            'icon-calendar' => 'fas ' . 'fa-calendar',
+            'icon-refresh' => 'fas ' . 'fa-sync',
+            'icon-play' => 'fas ' . 'fa-play',
+            'icon-picture' => 'fas ' . 'fa-picture',
+            'img-thumbnail' => 'img-thumbnail',
+            'icon-upload' => 'fas ' . 'fa-upload',
+            'nonform-control' => 'nonform-control',
+            'other-form-group' => 'other-form-group',
+            'custom-form-control' => 'custom-form-control',
+            'input-group-text' => 'input-group-text',
             'row' => 'row',
             'form-select' => 'form-select'
         );
@@ -171,18 +149,13 @@ class OnePageRenderer
         mt_srand();
         $this->flashUploadTicket = md5(strtotime('now') . mt_rand(0, mt_getrandmax()));
 
-        if (isset($this->rootMdata['themebootstrapUse3']) && $this->rootMdata['themebootstrapUse3']) {
-
-            $this->bsVersion = '5';
+        $this->cancelImagePath = Uri::root(true) . '/components/com_breezingformsng/themes/quickmode-bootstrap' . '5' . '/cancel.png';
+        $this->uploadImagePath = Uri::root(true) . '/components/com_breezingformsng/themes/quickmode-bootstrap' . '5' . '/upload.png';
+        if (isset($this->rootMdata['themebootstrap']) && @file_exists(JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/images/cancel.png')) {
+            $this->cancelImagePath = Uri::root(true) . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/images/cancel.png';
         }
-
-        $this->cancelImagePath = Uri::root(true) . '/components/com_breezingformsng/themes/quickmode-bootstrap' . $this->bsVersion . '/cancel.png';
-        $this->uploadImagePath = Uri::root(true) . '/components/com_breezingformsng/themes/quickmode-bootstrap' . $this->bsVersion . '/upload.png';
-        if (isset($this->rootMdata['themebootstrap']) && @file_exists(JPATH_SITE . '/media/breezingforms/themes-bootstrap' . $this->bsVersion . '/' . $this->rootMdata['themebootstrap'] . '/images/cancel.png')) {
-            $this->cancelImagePath = Uri::root(true) . '/media/breezingforms/themes-bootstrap' . $this->bsVersion . '/' . $this->rootMdata['themebootstrap'] . '/images/cancel.png';
-        }
-        if (isset($this->rootMdata['themebootstrap']) && @file_exists(JPATH_SITE . '/media/breezingforms/themes-bootstrap' . $this->bsVersion . '/' . $this->rootMdata['themebootstrap'] . '/images/upload.png')) {
-            $this->uploadImagePath = Uri::root(true) . '/media/breezingforms/themes-bootstrap' . $this->bsVersion . '/' . $this->rootMdata['themebootstrap'] . '/images/upload.png';
+        if (isset($this->rootMdata['themebootstrap']) && @file_exists(JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/images/upload.png')) {
+            $this->uploadImagePath = Uri::root(true) . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/images/upload.png';
         }
     }
 
@@ -454,7 +427,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
         RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-post-init-onepage.js');
         // loading system css
 
-            RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/themes/quickmode-bootstrap' . $this->bsVersion . '/system.css');
+            RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/themes/quickmode-bootstrap' . '5' . '/system.css');
 
             // loading theme
             if (isset($this->rootMdata['themebootstrap'])) {
@@ -464,10 +437,10 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                 $scriptjs = '';
                 $scriptphp = '';
 
-                $themecss_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . $this->bsVersion . '/' . $this->rootMdata['themebootstrap'] . '/theme.css';
-                $vars_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . $this->bsVersion . '/' . $this->rootMdata['themebootstrap'] . '/vars.txt';
-                $scriptjs_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . $this->bsVersion . '/' . $this->rootMdata['themebootstrap'] . '/script.js';
-                $scriptphp_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . $this->bsVersion . '/' . $this->rootMdata['themebootstrap'] . '/script.php';
+                $themecss_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/theme.css';
+                $vars_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/vars.txt';
+                $scriptjs_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/script.js';
+                $scriptphp_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/script.php';
 
                 if ($this->rootMdata['themebootstrap'] != '' && $this->rootMdata['themebootstrap'] != 'none' && file_exists($themecss_path)) {
 
@@ -1578,7 +1551,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
                         echo '<div style="display: inline-block;">';
 
-                        echo '<img alt="" ' . (isset($mdata['width']) && intval($mdata['width']) > 0 ? ' style="width: ' . intval($mdata['width']) . 'px !important;min-width: ' . intval($mdata['width']) . 'px !important;max-width: ' . intval($mdata['width']) . 'px !important;"' : 'style="width: 230px !important;min-width: 230px !important;max-width: 230px !important;"') . ' id="ff_capimgValue" class="ff_capimg ' . $this->bsClass('img-polaroid') . '" src="' . $captcha_url . '"/>' . "\n";
+                        echo '<img alt="" ' . (isset($mdata['width']) && intval($mdata['width']) > 0 ? ' style="width: ' . intval($mdata['width']) . 'px !important;min-width: ' . intval($mdata['width']) . 'px !important;max-width: ' . intval($mdata['width']) . 'px !important;"' : 'style="width: 230px !important;min-width: 230px !important;max-width: 230px !important;"') . ' id="ff_capimgValue" class="ff_capimg ' . $this->bsClass('img-thumbnail') . '" src="' . $captcha_url . '"/>' . "\n";
                         echo '<div style="height: 10px;"></div>';
                         echo '<div class="' . $this->bsClass('input-append') . '">';
                         echo '<input ' . (isset($mdata['width']) && intval($mdata['width']) > 0 ? ' style="width:' . (intval($mdata['width']) - 45) . 'px !important;min-width:' . (intval($mdata['width']) - 45) . 'px !important;max-width:' . (intval($mdata['width']) - 45) . 'px !important;"' : '') . ' autocomplete="off" class="' . $this->bsClass('form-control') . ' ' . $this->bsClass('custom-form-control') . ' ff_elem bfCaptchaField" type="text" name="bfCaptchaEntry" id="bfCaptchaEntry" />' . "\n";
@@ -1907,7 +1880,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                   $this->rootMdata['pagingPrevLabel'] = $this->rootMdata['pagingPrevLabel_translation'.$this->language_tag];
                   }
 
-                  echo '<button type="button" class="bfPrevButton ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' ' . $this->bsClass('pull-left') . ' button' . $this->fadingClass . '" type="submit" onclick="bf_validate_prevpage(' . ($dataObject['properties']['pageNumber'] - 1) . ');populateSummarizers();if(typeof bfRefreshAll != \'undefined\'){bfRefreshAll();}" value="' . htmlentities(trim($this->rootMdata['pagingPrevLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingPrevLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
+                  echo '<button type="button" class="bfPrevButton ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' ' . $this->bsClass('float-start') . ' button' . $this->fadingClass . '" type="submit" onclick="bf_validate_prevpage(' . ($dataObject['properties']['pageNumber'] - 1) . ');populateSummarizers();if(typeof bfRefreshAll != \'undefined\'){bfRefreshAll();}" value="' . htmlentities(trim($this->rootMdata['pagingPrevLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingPrevLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
                   } */
 
                 if ($this->rootMdata['pagingInclude'] && $dataObject['properties']['pageNumber'] < count($this->dataObject['children']) - $last) {
@@ -1916,7 +1889,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                         $this->rootMdata['pagingNextLabel'] = $this->rootMdata['pagingNextLabel_translation' . $this->language_tag];
                     }
                     /* translatables end */
-                    echo '<button type="button" class="bfNextButton ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' ' . $this->bsClass('pull-right') . ' button' . $this->fadingClass . '" type="submit" onclick="ff_currentpage = ' . json_encode($dataObject['properties']['pageNumber']) . ';bf_validate_nextpage(' . ($dataObject['properties']['pageNumber'] + 1) . ');populateSummarizers();if(typeof bfRefreshAll != \'undefined\'){bfRefreshAll();}" value="' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
+                    echo '<button type="button" class="bfNextButton ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' ' . $this->bsClass('float-end') . ' button' . $this->fadingClass . '" type="submit" onclick="ff_currentpage = ' . json_encode($dataObject['properties']['pageNumber']) . ';bf_validate_nextpage(' . ($dataObject['properties']['pageNumber'] + 1) . ');populateSummarizers();if(typeof bfRefreshAll != \'undefined\'){bfRefreshAll();}" value="' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
                 }
 
                 $callSubmit = 'bf_validate_submit(this, \'click\')';
@@ -1929,7 +1902,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                         $this->rootMdata['submitLabel'] = $this->rootMdata['submitLabel_translation' . $this->language_tag];
                     }
                     /* translatables end */
-                    echo '<button data-style="zoom-in" type="button" id="bfSubmitButton" class="bfSubmitButton ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' ' . $this->bsClass('pull-right') . ' button' . $this->fadingClass . '" onclick="this.disabled=true;if(typeof bf_htmltextareainit != \'undefined\'){ bf_htmltextareainit() }if(document.getElementById(\'bfPaymentMethod\')){document.getElementById(\'bfPaymentMethod\').value=\'\';};' . $callSubmit . ';" value="' . htmlentities(trim($this->rootMdata['submitLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['submitLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
+                    echo '<button data-style="zoom-in" type="button" id="bfSubmitButton" class="bfSubmitButton ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' ' . $this->bsClass('float-end') . ' button' . $this->fadingClass . '" onclick="this.disabled=true;if(typeof bf_htmltextareainit != \'undefined\'){ bf_htmltextareainit() }if(document.getElementById(\'bfPaymentMethod\')){document.getElementById(\'bfPaymentMethod\').value=\'\';};' . $callSubmit . ';" value="' . htmlentities(trim($this->rootMdata['submitLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['submitLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
                 }
 
                 if ($this->rootMdata['cancelInclude'] && $dataObject['properties']['pageNumber'] + 1 > count($this->dataObject['children']) - $last) {
@@ -1938,7 +1911,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                         $this->rootMdata['cancelLabel'] = $this->rootMdata['cancelLabel_translation' . $this->language_tag];
                     }
                     /* translatables end */
-                    echo '<button class="bfCancelButton ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-secondary') . ' ' . $this->bsClass('pull-right') . ' button' . $this->fadingClass . '" type="submit" onclick="ff_resetForm(this, \'click\');"  value="' . htmlentities(trim($this->rootMdata['cancelLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['cancelLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
+                    echo '<button class="bfCancelButton ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-secondary') . ' ' . $this->bsClass('float-end') . ' button' . $this->fadingClass . '" type="submit" onclick="ff_resetForm(this, \'click\');"  value="' . htmlentities(trim($this->rootMdata['cancelLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['cancelLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
                 }
 
                 echo '</div>';

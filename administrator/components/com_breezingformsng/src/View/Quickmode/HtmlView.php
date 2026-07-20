@@ -32,7 +32,6 @@ class HtmlView extends BaseHtmlView
     public array  $elementScripts = [];
     public array  $themes         = [];
     public array  $themesBootstrap  = [];
-    public array  $themesBootstrap4 = [];
 
     public function display($tpl = null): void
     {
@@ -72,8 +71,7 @@ class HtmlView extends BaseHtmlView
         $this->templateCode    = $formId > 0 ? $model->getTemplateCode($formId) : '';
         $this->elementScripts  = $model->getElementScripts();
         $this->themes          = $model->getThemes();
-        $this->themesBootstrap  = $model->getThemesBootstrap();
-        $this->themesBootstrap4 = $model->getThemesBootstrap4();
+        $this->themesBootstrap = $model->getThemesBootstrap();
 
         // Toolbar
         $pageTitle = BreadcrumbHelper::render([

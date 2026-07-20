@@ -94,8 +94,7 @@ use Joomla\CMS\Language\Text;
                                                 );
                                                 ?>
 
-                                                <a
-                                                    href="javascript:jQuery('#bfPropertiesDescriptionModal').modal('show');void(0);">
+                                                <a href="#bfPropertiesDescriptionModal" data-bs-toggle="modal">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_EDIT_DESCRIPTION'); ?>
                                                 </a>
 
@@ -122,8 +121,7 @@ use Joomla\CMS\Language\Text;
                                                 );
                                                 ?>
 
-                                                <a
-                                                    href="javascript:jQuery('#bfPropertiesDescriptionModal').modal('show');void(0);">
+                                                <a href="#bfPropertiesDescriptionModal2" data-bs-toggle="modal">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_EDIT_DESCRIPTION'); ?>
                                                 </a>
 

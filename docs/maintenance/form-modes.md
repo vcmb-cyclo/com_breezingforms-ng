@@ -7,7 +7,7 @@ QuickMode.
 
 | Mode | Status | Storage marker | Main admin entry points |
 | --- | --- | --- | --- |
-| QuickMode | Supported | `template_code_processed = 'QuickMode'` | `act=manageforms&task=quickmode`, `act=quickmode` |
+| QuickMode | Supported | `template_code_processed = 'QuickMode'` | `task=quickmode.display` |
 
 Forms whose persisted marker is not `QuickMode` are not supported by this port.
 Frontend rendering now stops with a translated warning for those legacy form
@@ -18,14 +18,13 @@ formats.
 Known QuickMode URLs:
 
 ```text
-/administrator/index.php?option=com_breezingformsng&act=manageforms&task=quickmode&form=FORM_ID
-/administrator/index.php?option=com_breezingformsng&act=quickmode&form=FORM_ID
+/administrator/index.php?option=com_breezingformsng&task=quickmode.display&form=FORM_ID
 ```
 
 QuickMode inline editor:
 
 ```text
-/administrator/index.php?option=com_breezingformsng&tmpl=component&act=quickmode_editor
+/administrator/index.php?option=com_breezingformsng&tmpl=component&task=quickmode.editor
 ```
 
 The forms list and post-save redirects should point to QuickMode.

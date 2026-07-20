@@ -7,7 +7,13 @@
    by this form's configuration. */
 bfToggleFieldsLoaded = false;
 bfSectionFieldsDeactivated = false;
-JQuery(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function () {
+	var JQuery = window.jQuery;
+
+	if (!JQuery) {
+		return;
+	}
+
 	if(typeof bfFade != "undefined")bfFade();
 	if(typeof bfSetElemWrapBg != "undefined")bfSetElemWrapBg();
 	if(typeof bfRollover != "undefined")bfRollover();

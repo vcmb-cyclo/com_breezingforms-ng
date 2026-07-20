@@ -114,6 +114,19 @@ class FormModel extends BaseDatabaseModel
         $obj->piece4cond             = 0;
         $obj->piece4id               = 0;
         $obj->piece4code             = '';
+        foreach (['mailchimp_email_field', 'mailchimp_checkbox_field', 'mailchimp_api_key', 'mailchimp_list_id',
+            'mailchimp_mergevars', 'mailchimp_text_html_mobile_field', 'mailchimp_unsubscribe_field',
+            'salesforce_token', 'salesforce_username', 'salesforce_password', 'salesforce_type', 'salesforce_fields',
+            'dropbox_email', 'dropbox_password', 'dropbox_folder'] as $column) {
+            $obj->$column = '';
+        }
+        $obj->mailchimp_double_optin = 1;
+        $obj->mailchimp_send_errors = 0;
+        $obj->mailchimp_default_type = 'text';
+        $obj->mailchimp_delete_member = 0;
+        $obj->salesforce_enabled = 0;
+        $obj->dropbox_submission_enabled = 0;
+        $obj->dropbox_submission_types = 'pdf';
         $obj->created                = null;
         $obj->created_by             = '';
         $obj->modified               = null;
@@ -150,6 +163,12 @@ class FormModel extends BaseDatabaseModel
             'piece2cond', 'piece2id', 'piece2code',
             'piece3cond', 'piece3id', 'piece3code',
             'piece4cond', 'piece4id', 'piece4code',
+            'mailchimp_email_field', 'mailchimp_checkbox_field', 'mailchimp_api_key', 'mailchimp_list_id',
+            'mailchimp_double_optin', 'mailchimp_mergevars', 'mailchimp_text_html_mobile_field',
+            'mailchimp_send_errors', 'mailchimp_default_type', 'mailchimp_delete_member',
+            'mailchimp_unsubscribe_field', 'salesforce_token', 'salesforce_username', 'salesforce_password',
+            'salesforce_type', 'salesforce_fields', 'salesforce_enabled', 'dropbox_email', 'dropbox_password',
+            'dropbox_folder', 'dropbox_submission_enabled', 'dropbox_submission_types',
         ];
 
         $sets = [];
@@ -162,6 +181,8 @@ class FormModel extends BaseDatabaseModel
                 'script1cond', 'script1id', 'script2cond', 'script2id',
                 'piece1cond', 'piece1id', 'piece2cond', 'piece2id',
                 'piece3cond', 'piece3id', 'piece4cond', 'piece4id',
+                'mailchimp_double_optin', 'mailchimp_send_errors', 'mailchimp_delete_member',
+                'salesforce_enabled', 'dropbox_submission_enabled',
             ], true) ? (int) $val : (string) $val;
         }
 

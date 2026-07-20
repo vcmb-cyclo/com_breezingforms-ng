@@ -102,7 +102,6 @@ class DisplayController extends BaseController
         }
 
         if ($task === '' && in_array($view, ['pieces', 'scripts'], true)) {
-            $this->bootstrapLegacyGlobals($view);
             $this->prepareListPackage($view);
 
             return parent::display($cachable, $urlparams);
@@ -110,53 +109,6 @@ class DisplayController extends BaseController
 
         // No valid route matched — return without invoking the removed legacy bridge.
         return $this;
-    }
-
-    private function bootstrapLegacyGlobals(string $view): void
-    {
-        global $ff_mospath, $ff_admpath, $ff_compath;
-        global $ff_mossite, $ff_admsite, $ff_admicon, $ff_comsite;
-        global $ff_config, $ff_compatible, $ff_install;
-        global $database, $task;
-
-        if (isset($ff_config)) {
-            return;
-        }
-
-        $model = $this->app
-            ->bootComponent('com_breezingformsng')
-            ->getMVCFactory()
-            ->createModel($view === 'pieces' ? 'Piece' : 'Script', 'Administrator', ['ignore_request' => true]);
-
-        if (
-            ($view === 'pieces' && !$model instanceof PieceModel)
-            || ($view === 'scripts' && !$model instanceof ScriptModel)
-        ) {
-            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
-        }
-
-        $database = $model->getDatabase();
-
-        $task       = '';
-        $comppath   = '/components/com_breezingformsng';
-        $ff_admpath = str_replace('\\', '/', JPATH_ADMINISTRATOR . '/components/com_breezingformsng');
-        $ff_mospath = str_replace('\\', '/', dirname(dirname(dirname($ff_admpath))));
-        $ff_compath = $ff_mospath . $comppath;
-        $ff_admsite = $ff_mospath . '/administrator' . $comppath;
-        $ff_admicon = $ff_admsite . '/images/icons';
-
-        require_once JPATH_SITE . '/components/com_breezingformsng/src/Support/runtime_bootstrap.php';
-
-        $ff_config = (object) [
-            'areasmall'  => 4,
-            'areamedium' => 12,
-            'arealarge'  => 20,
-            'limitdesc'  => 100,
-            'piecepkg'   => '',
-            'scriptpkg'  => '',
-        ];
-        $ff_compatible = true;
-        $ff_install    = false;
     }
 
     private function prepareListPackage(string $view): void

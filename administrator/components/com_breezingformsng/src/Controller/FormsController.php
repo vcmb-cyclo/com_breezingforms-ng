@@ -11,8 +11,10 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\CMS\Response\JsonResponse;
 use Joomla\CMS\Router\Route;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\FormModel;
+use Vcmb\Component\BreezingformsNG\Administrator\Service\AjaxStateService;
 
 class FormsController extends BaseController
 {
@@ -38,7 +40,7 @@ class FormsController extends BaseController
         }
 
         $this->app->redirect(Route::_(
-            'index.php?option=com_breezingformsng&act=manageforms&view=forms&layout=edit&id=' . $id . '&pkg=' . rawurlencode($pkg)
+            'index.php?option=com_breezingformsng&view=forms&layout=edit&id=' . $id . '&pkg=' . rawurlencode($pkg)
                 . ($advanced ? '&advanced=1' : ''),
             false
         ));
@@ -103,7 +105,47 @@ class FormsController extends BaseController
             'piece3id'                 => 'INT',
             'piece4cond'               => 'INT',
             'piece4id'                 => 'INT',
+            'mailchimp_email_field'    => 'STRING',
+            'mailchimp_checkbox_field' => 'STRING',
+            'mailchimp_api_key'        => 'STRING',
+            'mailchimp_list_id'        => 'STRING',
+            'mailchimp_double_optin'   => 'INT',
+            'mailchimp_mergevars'      => 'STRING',
+            'mailchimp_text_html_mobile_field' => 'STRING',
+            'mailchimp_send_errors'    => 'INT',
+            'mailchimp_default_type'   => 'CMD',
+            'mailchimp_delete_member'  => 'INT',
+            'mailchimp_unsubscribe_field' => 'STRING',
+            'salesforce_token'         => 'STRING',
+            'salesforce_username'      => 'STRING',
+            'salesforce_password'      => 'STRING',
+            'salesforce_type'          => 'STRING',
+            'salesforce_enabled'       => 'INT',
+            'dropbox_email'            => 'STRING',
+            'dropbox_password'         => 'STRING',
+            'dropbox_folder'           => 'STRING',
+            'dropbox_submission_enabled' => 'INT',
+            'dropbox_reset_auth'       => 'INT',
         ]);
+
+        $data['salesforce_fields'] = implode(',', array_filter(
+            $input->post->get('salesforce_fields', [], 'array'),
+            static fn($value): bool => is_string($value) && $value !== ''
+        ));
+        $data['dropbox_submission_types'] = implode(',', array_intersect(
+            $input->post->get('dropbox_submission_types', [], 'array'),
+            ['pdf', 'csv', 'xml']
+        ));
+
+        $id = (int) ($data['id'] ?? 0);
+        if ($id > 0 && $data['salesforce_password'] === '') {
+            $data['salesforce_password'] = (string) ($this->getFormModel()->getForm($id)->salesforce_password ?? '');
+        }
+        if (!empty($data['dropbox_reset_auth'])) {
+            $data['dropbox_email'] = '';
+            $data['dropbox_password'] = '';
+        }
+        unset($data['dropbox_reset_auth']);
 
         foreach (['piece1code', 'piece2code', 'piece3code', 'piece4code',
                   'script1code', 'script2code',
@@ -125,7 +167,7 @@ class FormsController extends BaseController
             $id  = (int) ($data['id'] ?? 0);
             $pkg = (string) ($data['package'] ?? '');
             $app->redirect(Route::_(
-                'index.php?option=com_breezingformsng&act=manageforms&view=forms&layout=edit&id=' . $id . '&pkg=' . rawurlencode($pkg),
+                'index.php?option=com_breezingformsng&view=forms&layout=edit&id=' . $id . '&pkg=' . rawurlencode($pkg),
                 false
             ));
         }
@@ -243,23 +285,23 @@ class FormsController extends BaseController
     {
         $app = $this->app;
 
-        if (ob_get_level() > 0) {
+        while (ob_get_level() > 0) {
             ob_end_clean();
         }
 
         if (!$this->checkToken('post')) {
             $app->setHeader('Content-Type', 'application/json; charset=utf-8', true);
-            $app->setBody(json_encode(['Result' => 'ERROR', 'Message' => Text::_('JINVALID_TOKEN')], JSON_THROW_ON_ERROR));
+            echo new JsonResponse(AjaxStateService::error(Text::_('JINVALID_TOKEN')));
             $app->close();
         }
 
         $input = $app->getInput();
         $id    = $input->post->getInt('id', 0);
-        $state = min(1, max(0, $input->post->getInt('state', 0)));
+        $state = AjaxStateService::normalizeState($input->post->getInt('state', 0));
 
         if ($id <= 0) {
             $app->setHeader('Content-Type', 'application/json; charset=utf-8', true);
-            $app->setBody(json_encode(['Result' => 'ERROR', 'Message' => Text::_('JERROR_AN_ERROR_HAS_OCCURRED')], JSON_THROW_ON_ERROR));
+            echo new JsonResponse(AjaxStateService::error(Text::_('JERROR_AN_ERROR_HAS_OCCURRED')));
             $app->close();
         }
 
@@ -270,7 +312,7 @@ class FormsController extends BaseController
         }
 
         $app->setHeader('Content-Type', 'application/json; charset=utf-8', true);
-        $app->setBody(json_encode(['Result' => 'OK', 'State' => $state], JSON_THROW_ON_ERROR));
+        echo new JsonResponse(AjaxStateService::success($state));
         $app->close();
     }
 
@@ -294,7 +336,7 @@ class FormsController extends BaseController
 
     private function listUrl(string $pkg): string
     {
-        return 'index.php?option=com_breezingformsng&act=manageforms&view=forms'
+        return 'index.php?option=com_breezingformsng&view=forms'
             . ($pkg !== '' ? '&pkg=' . rawurlencode($pkg) : '');
     }
 

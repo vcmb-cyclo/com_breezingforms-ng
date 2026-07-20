@@ -29,6 +29,15 @@ class QuickmodeModel extends BaseDatabaseModel
 
     public function save(int $form, array $dataObject): int
     {
+        if (isset($dataObject['properties']) && is_array($dataObject['properties'])) {
+            unset(
+                $dataObject['properties']['themebootstrapUse3'],
+                $dataObject['properties']['themebootstrap3builtin'],
+                $dataObject['properties']['themebootstrap3classpfx'],
+                $dataObject['properties']['themeusebootstraplegacy']
+            );
+        }
+
         $areas = new \stdClass();
         $areas->container    = [];
         $areas->container[0] = ['elements' => [], 'elementCount' => 0];
@@ -123,12 +132,7 @@ class QuickmodeModel extends BaseDatabaseModel
 
     public function getThemesBootstrap(): array
     {
-        return $this->scanThemeDir(JPATH_SITE . '/media/breezingforms/themes-bootstrap4/');
-    }
-
-    public function getThemesBootstrap4(): array
-    {
-        return $this->scanThemeDir(JPATH_SITE . '/media/breezingforms/themes-bootstrap4/');
+        return $this->scanThemeDir(JPATH_SITE . '/media/breezingforms/themes-bootstrap5/');
     }
 
     // ── Private helpers ───────────────────────────────────────────────────────
@@ -208,7 +212,7 @@ class QuickmodeModel extends BaseDatabaseModel
                     && isset($mdata['themebootstrapbefore'])
                     && $mdata['themebootstrapbefore'] === $mdata['themebootstrap']
                 ) {
-                    $folder   = (!empty($mdata['themebootstrapUse3'])) ? 'themes-bootstrap3' : 'themes-bootstrap';
+                    $folder   = 'themes-bootstrap5';
                     $varspath = JPATH_SITE . '/media/breezingforms/' . $folder . '/' . $mdata['themebootstrap'] . '/vars.txt';
                     if (file_exists($varspath)) {
                         File::write($varspath, $mdata['themebootstrapvars']);

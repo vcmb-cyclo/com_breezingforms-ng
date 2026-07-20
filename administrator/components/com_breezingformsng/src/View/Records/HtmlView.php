@@ -64,7 +64,13 @@ class HtmlView extends BaseHtmlView
             $this->prepareListToolbar();
 
             $document = $app->getDocument();
-            $document->getWebAssetManager()->useScript('com_breezingformsng.admin-sort');
+            $document->getWebAssetManager()->registerAndUseScript(
+                'com_breezingformsng.admin-sort',
+                'media/com_breezingformsng/js/admin/admin-sort.js',
+                ['version' => 'auto'],
+                ['defer' => true],
+                ['core']
+            );
             $document->getWebAssetManager()->registerAndUseScript(
                 'com_breezingformsng.records-list',
                 'media/com_breezingformsng/js/admin/records-list.js',
@@ -77,6 +83,7 @@ class HtmlView extends BaseHtmlView
                 ['csrfToken' => \Joomla\CMS\Session\Session::getFormToken()]
             );
             Text::script('COM_BREEZINGFORMSNG_CONFIRM_DELETE_RECORDS');
+            Text::script('COM_BREEZINGFORMSNG_AJAX_STATE_ERROR');
         }
 
         parent::display($tpl);
@@ -136,7 +143,7 @@ class HtmlView extends BaseHtmlView
         $app = Factory::getApplication();
 
         if ($recordId < 1) {
-            $app->redirect('index.php?option=com_breezingformsng&act=managerecs&view=records');
+            $app->redirect('index.php?option=com_breezingformsng&view=records');
             return;
         }
 
@@ -146,7 +153,7 @@ class HtmlView extends BaseHtmlView
 
         $this->record = $model->getRecord($recordId);
         if (!$this->record) {
-            $app->redirect('index.php?option=com_breezingformsng&act=managerecs&view=records');
+            $app->redirect('index.php?option=com_breezingformsng&view=records');
             return;
         }
 
@@ -232,7 +239,7 @@ class HtmlView extends BaseHtmlView
     private function prepareEditToolbar(): void
     {
         ToolbarHelper::custom('records.save', 'save', 'save', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_SAVE'), false);
-        ToolbarHelper::cancel('records.display', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_CANCEL'));
+        ToolbarHelper::cancel('records.cancel', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_CANCEL'));
 
         $document = Factory::getApplication()->getDocument();
         $wa       = $document->getWebAssetManager();
@@ -251,7 +258,7 @@ class HtmlView extends BaseHtmlView
             ['com_breezingformsng.admin-form']
         );
         $document->addScriptOptions('com_breezingformsng.admin-form', [
-            'cancelTask' => 'records.display',
+            'cancelTask' => 'records.cancel',
             'saveTask'   => 'records.save',
         ]);
         Text::script('COM_BREEZINGFORMSNG_TEST_NO_CHANGES');

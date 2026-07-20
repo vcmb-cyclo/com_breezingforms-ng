@@ -37,7 +37,7 @@ input[type="url"],
 input[type="search"],
 input[type="tel"],
 input[type="color"],
-.uneditable-input {
+.custom-form-control {
     width: 206px;
     background-color: #fff !important;
     background-image: none !important;

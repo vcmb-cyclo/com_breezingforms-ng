@@ -46,5 +46,8 @@
   Joomla 6 document normally; migrated adjacent request and session state access to Joomla Input and Session.
 - Migrated PayPal request data, Flash uploader files, and the remaining VirtueMart bridge state from PHP
   superglobals to Joomla Input and Session; made Flash upload-size validation an encapsulated service method.
+- Replaced PayPal IPN's direct cURL/socket transport and disabled TLS verification with an injectable
+  `Joomla\\Http` client using the platform's secure transport configuration; the PayPal waiting callback no
+  longer emits a second standalone XHTML document inside Joomla's response.
 - Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
   moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

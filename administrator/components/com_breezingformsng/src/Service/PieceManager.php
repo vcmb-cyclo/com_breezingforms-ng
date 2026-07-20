@@ -124,7 +124,7 @@ class PieceManager
 				if (is_callable($callable)) {
 					$result = call_user_func_array($callable, $args);
 				} else {
-					$error = 'Function not found in piece code.';
+					$error = Text::_('COM_BREEZINGFORMSNG_TEST_INVALID_FUNCTION_NAME');
 				}
 			} else {
 				$result = $evalResult;
@@ -650,7 +650,7 @@ class PieceManager
 			$arrowPos = strpos($trimmedLine, '->');
 			if ($arrowPos === false) {
 				return array(
-					'error' => 'Ligne ' . $lineNumber . ' invalide: separateur -> manquant.',
+					'error' => Text::sprintf('COM_BREEZINGFORMSNG_TEST_MISSING_SEPARATOR', $lineNumber),
 				);
 			}
 
@@ -658,7 +658,7 @@ class PieceManager
 			$expectedText = trim(substr($trimmedLine, $arrowPos + 2));
 			if ($inputText === '' || $expectedText === '') {
 				return array(
-					'error' => 'Ligne ' . $lineNumber . ' invalide: entree ou resultat attendu manquant.',
+					'error' => Text::sprintf('COM_BREEZINGFORMSNG_TEST_MISSING_INPUT_EXPECTED', $lineNumber),
 				);
 			}
 
@@ -673,7 +673,7 @@ class PieceManager
 
 		if (!count($tests)) {
 			return array(
-				'warning' => 'Aucun test unitaire defini.',
+				'warning' => Text::_('COM_BREEZINGFORMSNG_TEST_NO_UNIT_TEST_DEFINED'),
 			);
 		}
 
@@ -683,14 +683,25 @@ class PieceManager
 				if (self::valuesEqual($execution['result'], $test['expected'])) {
 					$passedCount++;
 				} else {
-					$failures[] = 'Ligne ' . $test['line'] . ' | entree: ' . $test['input_text'] . ' | attendu: ' . var_export($test['expected'], true) . ' | obtenu: ' . var_export($execution['result'], true);
+					$failures[] = Text::sprintf(
+						'COM_BREEZINGFORMSNG_TEST_FAILURE_MISMATCH',
+						$test['line'],
+						$test['input_text'],
+						var_export($test['expected'], true),
+						var_export($execution['result'], true)
+					);
 				}
 			} else {
-				$failures[] = 'Ligne ' . $test['line'] . ' | entree: ' . $test['input_text'] . ' | erreur: ' . $execution['error'];
+				$failures[] = Text::sprintf(
+					'COM_BREEZINGFORMSNG_TEST_FAILURE_ERROR',
+					$test['line'],
+					$test['input_text'],
+					$execution['error']
+				);
 			}
 			$output = trim((string) $execution['output']);
 			if ($output !== '') {
-				$failures[] = 'Ligne ' . $test['line'] . ' | output: ' . $output;
+				$failures[] = Text::sprintf('COM_BREEZINGFORMSNG_TEST_FAILURE_OUTPUT', $test['line'], $output);
 			}
 		}
 

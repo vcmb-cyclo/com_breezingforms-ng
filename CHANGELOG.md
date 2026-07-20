@@ -69,5 +69,7 @@
   container during submission export.
 - Added a native About MVC model for extension discovery and database access, removing SQL from the view and
   the final About controller/view container lookups.
+- Routed Piece test-runner validation and failure messages through Joomla translations in all eight supported
+  administrator languages.
 - Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
   moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

@@ -123,14 +123,17 @@ class MenusController extends BaseController
     {
         $this->checkToken();
 
-        @ob_end_clean();
+        if (ob_get_level() > 0) {
+            ob_end_clean();
+        }
         $input = $this->app->getInput();
         $id    = $input->getInt('id', 0);
         $state = $input->getInt('state', 0);
         if ($id > 0) {
             $this->getMenuModel()->publish([$id], $state);
         }
-        echo json_encode(['Result' => 'OK']);
+        $this->app->setHeader('Content-Type', 'application/json; charset=utf-8', true);
+        $this->app->setBody(json_encode(['Result' => 'OK'], JSON_THROW_ON_ERROR));
         $this->app->close();
     }
 

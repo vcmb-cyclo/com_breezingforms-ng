@@ -73,5 +73,7 @@
   administrator languages.
 - Fixed the invalid menu-title translation class and migrated Menu model CRUD, ordering, publication, and copy
   queries to Joomla bound parameters and `whereIn()` lists.
+- Routed administrator AJAX payloads through Joomla's application body and headers with exception-safe JSON
+  encoding instead of writing encoded strings directly to PHP output.
 - Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
   moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

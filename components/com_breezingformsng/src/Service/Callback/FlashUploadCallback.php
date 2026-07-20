@@ -32,7 +32,9 @@ final class FlashUploadCallback
     {
         $db = $this->database;
 
-    @ob_end_clean();
+    if (ob_get_level() > 0) {
+        ob_end_clean();
+    }
     $input = $this->application->getInput();
     $uploadedFile = $input->files->get('Filedata', [], 'array');
     if (is_numeric($input->getString('form', '')) && $uploadedFile !== [] && $input->getString('bfFlashUploadTicket', '') != '') {

@@ -33,7 +33,8 @@ function bfSel(array $list, string $name, int $current, string $extra = ''): str
 
 $editor = Editor::getInstance('codemirror');
 ?>
-<form action="index.php?option=com_breezingformsng" method="post" name="adminForm" id="adminForm">
+<form action="index.php?option=com_breezingformsng" method="post" name="adminForm" id="adminForm"
+      class="bf-forms-edit">
 
   <ul class="nav nav-tabs" id="<?= $tabId; ?>" role="tablist">
     <li class="nav-item" role="presentation">

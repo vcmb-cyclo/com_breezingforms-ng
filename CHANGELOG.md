@@ -40,5 +40,7 @@
 - Removed the Pieces “show internal functions” control, session state, and underscore-prefix query filtering;
   all pieces are now listed consistently.
 - Added contextual Integrator help and Joomla 6 SearchTools sorting for every sortable rule-list column.
+- Restored the compact, panelled presentation of the advanced form settings while retaining the Joomla 6
+  tabs and form controls.
 - Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
   moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

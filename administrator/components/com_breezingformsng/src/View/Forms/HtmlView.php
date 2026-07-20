@@ -62,7 +62,13 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
             // swap which code editor is visible - defined here, not in the
             // list-only branch below.
             $document = Factory::getApplication()->getDocument();
-            $document->getWebAssetManager()->registerAndUseScript(
+            $wa = $document->getWebAssetManager();
+            $wa->registerAndUseStyle(
+                'com_breezingformsng.forms-edit',
+                'media/com_breezingformsng/css/admin/forms-edit.css',
+                ['version' => 'auto']
+            );
+            $wa->registerAndUseScript(
                 'com_breezingformsng.admin-form',
                 'media/com_breezingformsng/js/admin/admin-form.js',
                 ['version' => 'auto'],

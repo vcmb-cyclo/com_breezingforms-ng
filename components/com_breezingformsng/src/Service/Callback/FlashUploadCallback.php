@@ -98,7 +98,7 @@ final class FlashUploadCallback
                     if ($validationError !== null) {
                         File::delete($finaltargetFile);
                         echo $validationError;
-                        exit;
+                        $this->application->close();
                     }
 
                     @File::delete($targetFile);
@@ -112,7 +112,7 @@ final class FlashUploadCallback
             echo 'Form id and element do not match!';
         }
     }
-    exit;
+    $this->application->close();
     }
 
     private function validateUploadSize(array $dataObject, string $targetFile, string $itemName): ?string

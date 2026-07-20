@@ -48,7 +48,7 @@ final class StripeCallback
 
     if (count($list) == 0) {
         $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
-        exit;
+        $this->application->close();
     }
 
     $form = $list[0];
@@ -57,7 +57,7 @@ final class StripeCallback
 
     if (!is_array($areas)) {
         $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_STRIPE_DATA'));
-        exit;
+        $this->application->close();
     }
 
     $tx_token = $input->getString('token', '');
@@ -97,7 +97,7 @@ final class StripeCallback
                         /* XDA if( $this->application->getSession()->get('bf_stripe_last_payment_amount'.$record_id, null) == null ){
 
             $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_STRIPE_AMOUNT'));
-            exit;
+            $this->application->close();
                                 } XDA */
 
                         $stripearray = array();
@@ -237,7 +237,7 @@ final class StripeCallback
     $list = $db->loadObjectList();
     if (count($list) == 0) {
         $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
-        exit;
+        $this->application->close();
     }
 
     $form = $list[0];

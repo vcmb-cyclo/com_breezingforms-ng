@@ -57,5 +57,7 @@
   database services instead of static Factory lookups.
 - Switched the Scripts and Pieces views to the models assigned by Joomla's MVC dispatcher and removed their
   unused legacy `table.columns` behavior asset.
+- Replaced direct process termination in payment and Flash-upload callbacks with Joomla application response
+  closure, keeping response lifecycle control inside the CMS.
 - Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
   moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

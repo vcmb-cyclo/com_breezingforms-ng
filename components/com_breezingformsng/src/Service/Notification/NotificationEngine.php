@@ -300,10 +300,10 @@ final class NotificationEngine
 
             $RECORD_ID = '';
             if ($this->processor->record_id != '') {
-                $RECORD_ID = $this->processor->record_id;
+                $RECORD_ID = (string) $this->processor->record_id;
             }
 
-            $FORM = $this->processor->form;
+            $FORM = (string) $this->processor->form;
             $TITLE = $this->processor->formrow->title;
             $FORMNAME = $this->processor->formrow->name;
             $SUBMITTED = $this->formattedNotificationTimestamp();
@@ -312,11 +312,11 @@ final class NotificationEngine
             $PROVIDER = $this->processor->provider;
             $BROWSER = $this->processor->browser;
             $OPSYS = $this->processor->opsys;
-            $SUBMITTERID = 0;
+            $SUBMITTERID = '0';
             $SUBMITTERUSERNAME = '-';
             $SUBMITTERFULLNAME = '-';
             if ($this->processor->app->getIdentity()->get('id', 0) > 0) {
-                $SUBMITTERID = $this->processor->app->getIdentity()->get('id', 0);
+                $SUBMITTERID = (string) $this->processor->app->getIdentity()->get('id', 0);
                 $SUBMITTERUSERNAME = $this->processor->app->getIdentity()->get('username', '');
                 $SUBMITTERFULLNAME = $this->processor->app->getIdentity()->get('name', '');
             }
@@ -325,7 +325,7 @@ final class NotificationEngine
             $body = str_replace('{BF_RECORD_ID:value}', $RECORD_ID, $body);
 
             $body = str_replace('{BF_FORM_ID:label}', Text::_('Form ID'), $body);
-            $body = str_replace('{BF_FORM_ID:value}', $this->processor->form_id, $body);
+            $body = str_replace('{BF_FORM_ID:value}', (string) $this->processor->form_id, $body);
 
             $body = str_replace('{BF_FORM:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMID'), $body);
             $body = str_replace('{BF_FORM:value}', $FORM, $body);
@@ -1051,10 +1051,10 @@ final class NotificationEngine
 
             $RECORD_ID = '';
             if ($this->processor->record_id != '') {
-                $RECORD_ID = $this->processor->record_id;
+                $RECORD_ID = (string) $this->processor->record_id;
             }
 
-            $FORM = $this->processor->form;
+            $FORM = (string) $this->processor->form;
 
             $form_title_translated = $this->processor->getFormTitleTranslated();
 
@@ -1066,11 +1066,11 @@ final class NotificationEngine
             $PROVIDER = $this->processor->provider;
             $BROWSER = $this->processor->browser;
             $OPSYS = $this->processor->opsys;
-            $SUBMITTERID = 0;
+            $SUBMITTERID = '0';
             $SUBMITTERUSERNAME = '-';
             $SUBMITTERFULLNAME = '-';
             if ($this->processor->app->getIdentity()->get('id', 0) > 0) {
-                $SUBMITTERID = $this->processor->app->getIdentity()->get('id', 0);
+                $SUBMITTERID = (string) $this->processor->app->getIdentity()->get('id', 0);
                 $SUBMITTERUSERNAME = $this->processor->app->getIdentity()->get('username', '');
                 $SUBMITTERFULLNAME = $this->processor->app->getIdentity()->get('name', '');
             }
@@ -1079,7 +1079,7 @@ final class NotificationEngine
             $body = str_replace('{BF_RECORD_ID:value}', $RECORD_ID, $body);
 
             $body = str_replace('{BF_FORM_ID:label}', Text::_('Form ID'), $body);
-            $body = str_replace('{BF_FORM_ID:value}', $this->processor->form_id, $body);
+            $body = str_replace('{BF_FORM_ID:value}', (string) $this->processor->form_id, $body);
 
             $body = str_replace('{BF_FORM:label}', Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMID'), $body);
             $body = str_replace('{BF_FORM:value}', $FORM, $body);

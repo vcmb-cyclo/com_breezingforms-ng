@@ -10,7 +10,6 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Service;
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Date\Date;
-use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 
 final class DatabaseAuditService
@@ -36,7 +35,10 @@ final class DatabaseAuditService
 
     private ?string $resolvedTargetCollation = null;
 
-    public function __construct(private readonly DatabaseInterface $db)
+    public function __construct(
+        private readonly DatabaseInterface $db,
+        private readonly string $temporaryPath
+    )
     {
     }
 
@@ -398,11 +400,7 @@ final class DatabaseAuditService
      */
     private function findStaleInstallerTempDirectories(): array
     {
-        try {
-            $tmpPath = (string) Factory::getApplication()->get('tmp_path', JPATH_ROOT . '/tmp');
-        } catch (\Throwable) {
-            return [];
-        }
+        $tmpPath = $this->temporaryPath;
 
         if (!is_dir($tmpPath)) {
             return [];

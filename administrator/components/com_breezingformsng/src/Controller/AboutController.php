@@ -71,7 +71,7 @@ class AboutController extends BaseController
             $this->getAuthorizedApplication();
             $db = $this->getDatabase();
 
-            $report = (new DatabaseAuditService($db))->run();
+            $report = $this->getAuditService($db)->run();
             $targetCollation = (string) ($report['target_collation'] ?? 'utf8mb4_unicode_ci');
             $currentCollations = array_column($report['tables'] ?? [], 'collation', 'table');
 
@@ -120,7 +120,7 @@ class AboutController extends BaseController
         try {
             $this->getAuthorizedApplication();
 
-            $report = (new DatabaseAuditService($this->getDatabase()))->run();
+            $report = $this->getAuditService()->run();
             $summary = (array) ($report['summary'] ?? []);
             $this->app->setUserState('com_breezingformsng.about.audit', $report);
 
@@ -149,7 +149,7 @@ class AboutController extends BaseController
             // Revalidate against a fresh audit: only a currently detected
             // "drop" candidate may be deleted, and never one still holding
             // submission records.
-            $auditService = new DatabaseAuditService($this->getDatabase());
+            $auditService = $this->getAuditService();
             $report = $auditService->run();
             $candidate = null;
 
@@ -286,6 +286,14 @@ class AboutController extends BaseController
         }
 
         return $model->getDatabase();
+    }
+
+    private function getAuditService(?DatabaseInterface $database = null): DatabaseAuditService
+    {
+        return new DatabaseAuditService(
+            $database ?? $this->getDatabase(),
+            (string) $this->app->get('tmp_path', JPATH_ROOT . '/tmp')
+        );
     }
 
     private function tableExists(string $table): bool

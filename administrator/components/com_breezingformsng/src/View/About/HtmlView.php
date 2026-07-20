@@ -15,7 +15,7 @@ use Joomla\CMS\Router\Route;
 use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
-use Joomla\Database\DatabaseInterface;
+use Vcmb\Component\BreezingformsNG\Administrator\Model\AboutModel;
 use Vcmb\Component\BreezingformsNG\Administrator\View\BreezingformsNG\HtmlView as BaseHtmlView;
 
 class HtmlView extends BaseHtmlView
@@ -110,30 +110,13 @@ class HtmlView extends BaseHtmlView
     private function getInstalledPlugins(): array
     {
         try {
-            $db = Factory::getContainer()->get(DatabaseInterface::class);
-            $query = $db->getQuery(true)
-                ->select([
-                    $db->quoteName('extension_id'),
-                    $db->quoteName('name'),
-                    $db->quoteName('element'),
-                    $db->quoteName('folder'),
-                    $db->quoteName('enabled'),
-                    $db->quoteName('manifest_cache'),
-                ])
-                ->from($db->quoteName('#__extensions'))
-                ->where($db->quoteName('type') . ' = ' . $db->quote('plugin'))
-                ->where(
-                    '('
-                    . $db->quoteName('element') . ' LIKE ' . $db->quote('%breezingforms%')
-                    . ' OR ' . $db->quoteName('element') . ' = ' . $db->quote('bfcompat')
-                    . ' OR ' . $db->quoteName('folder') . ' LIKE ' . $db->quote('%breezingforms%')
-                    . ' OR ' . $db->quoteName('name') . ' LIKE ' . $db->quote('%BreezingForms%')
-                    . ')'
-                )
-                ->order([$db->quoteName('folder') . ' ASC', $db->quoteName('element') . ' ASC']);
+            $model = $this->getModel();
 
-            $db->setQuery($query);
-            $rows = $db->loadAssocList() ?: [];
+            if (!$model instanceof AboutModel) {
+                throw new \RuntimeException('Unable to create BreezingForms NG About model.');
+            }
+
+            $rows = $model->getInstalledPluginRows();
         } catch (\Throwable) {
             return [];
         }

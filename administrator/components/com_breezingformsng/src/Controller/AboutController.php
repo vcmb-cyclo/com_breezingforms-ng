@@ -9,12 +9,12 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\CMS\Router\Route;
 use Joomla\Database\DatabaseInterface;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\DatabaseAuditService;
+use Vcmb\Component\BreezingformsNG\Administrator\Model\AboutModel;
 
 class AboutController extends BaseController
 {
@@ -279,7 +279,13 @@ class AboutController extends BaseController
 
     private function getDatabase(): DatabaseInterface
     {
-        return Factory::getContainer()->get(DatabaseInterface::class);
+        $model = $this->getModel('About');
+
+        if (!$model instanceof AboutModel) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        return $model->getDatabase();
     }
 
     private function tableExists(string $table): bool

@@ -67,5 +67,7 @@
   globals now receive the database owned by the active Joomla MVC model.
 - Injected the form engine's database into the frontend Integrator runtime instead of resolving Joomla's global
   container during submission export.
+- Added a native About MVC model for extension discovery and database access, removing SQL from the view and
+  the final About controller/view container lookups.
 - Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
   moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

@@ -10,10 +10,6 @@
  * SPDX-License-Identifier: GPL-2.0-or-later
  **/
 
-if(!defined('_JEXEC')){
-    define('_JEXEC', 1);
-}
-
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 

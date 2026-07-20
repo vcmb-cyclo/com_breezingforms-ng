@@ -15,10 +15,10 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode;
 use HTML_facileFormsProcessor;
 
 use Joomla\CMS\Layout\LayoutHelper;
+use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\Utilities\ArrayHelper;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Language\Text;
-// use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Component\ComponentHelper;
 
 
@@ -1625,10 +1625,13 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
 		// Format value when not nulldate ('0000-00-00 00:00:00'), otherwise blank it as it would result in 1970-01-01.
 		if ($value && $value !== $this->p->database->getNullDate() && strtotime($value) !== false) {
-			$tz = date_default_timezone_get();
-			date_default_timezone_set('UTC');
-			$inputvalue = strftime($format, strtotime($value));
-			date_default_timezone_set($tz);
+			$dateFormat = HTMLHelper::strftimeFormatToDateFormat($format);
+
+			if ($dateFormat === false) {
+				throw new \InvalidArgumentException('Unsupported calendar date format: ' . $format);
+			}
+
+			$inputvalue = (new \DateTimeImmutable($value, new \DateTimeZone('UTC')))->format($dateFormat);
 		} else {
 			$inputvalue = '';
 		}

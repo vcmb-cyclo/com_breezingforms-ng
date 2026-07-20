@@ -549,8 +549,13 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > `Factory::getApplication('site'|'administrator')`, sont supprimés. `CaptchaCallback` sert désormais le PNG
 > via `index.php?option=com_breezingformsng&bfCaptcha=1` pour le site comme pour l'administration ; tous les
 > renderers et scripts de rechargement utilisent cette route. La propriété interne `gdnoisecolor` est déclarée
-> dans Securimage afin d'éviter la création de propriété dynamique qui corrompait la réponse sous PHP 8.3.
+> dans Securimage afin d'éviter la création de propriété dynamique qui corrompait la réponse sous PHP 8.3 ; la
+> bibliothèque ne définit plus elle-même `_JEXEC` et exige désormais un contexte Joomla déjà amorcé.
 > Vérifié sur le conteneur Joomla 6 avec Playwright : réponse `image/png`, dimensions 230 × 80.
+>
+> **Calendrier Mobile PHP 8.1+ (2026-07-20)** : le dernier appel PHP à `strftime()`, déprécié, est supprimé.
+> Le renderer utilise le convertisseur de format natif `HTMLHelper::strftimeFormatToDateFormat()` de Joomla 6
+> puis `DateTimeImmutable` en UTC. Un format non pris en charge est désormais refusé explicitement.
 >
 > **Suite (2026-07-12)** : `bfProcessorUploads.php` (1 appel), `bfProcessorNotifications.php` (13),
 > `bfProcessorExports.php` (16) et `bfProcessorSubmission.php` (45) sont également convertis — **235 appels au

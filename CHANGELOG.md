@@ -44,5 +44,7 @@
   tabs and form controls.
 - Removed the obsolete standalone QuickMode mobile document reconstruction and routed its assets through the
   Joomla 6 document normally; migrated adjacent request and session state access to Joomla Input and Session.
+- Migrated PayPal request data, Flash uploader files, and the remaining VirtueMart bridge state from PHP
+  superglobals to Joomla Input and Session; made Flash upload-size validation an encapsulated service method.
 - Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
   moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

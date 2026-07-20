@@ -12,7 +12,6 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Records;
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\Toolbar\Toolbar;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\RecordModel;
@@ -158,7 +157,9 @@ class HtmlView extends BaseHtmlView
 
     private function prepareListToolbar(): void
     {
-        $exportDropdown = Toolbar::getInstance()
+        $toolbar = $this->getDocument()->getToolbar();
+
+        $exportDropdown = $toolbar
             ->dropdownButton('export-options')
             ->text(Text::_('COM_BREEZINGFORMSNG_EXPORT_DOWNLOAD'))
             ->toggleSplit(false)
@@ -171,7 +172,7 @@ class HtmlView extends BaseHtmlView
 
         ToolbarHelper::custom('records.csvImport', 'upload', 'upload', Text::_('COM_BREEZINGFORMSNG_BTN_IMPORT_CSV'), false);
 
-        $markDropdown = Toolbar::getInstance()
+        $markDropdown = $toolbar
             ->dropdownButton('mark-options')
             ->text(Text::_('COM_BREEZINGFORMSNG_TOOLBAR_MARK'))
             ->toggleSplit(false)
@@ -216,7 +217,7 @@ class HtmlView extends BaseHtmlView
             ->listCheck(true);
 
         ToolbarHelper::custom('records.remove', 'delete', 'delete', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_DELETE'), false);
-        Toolbar::getInstance()
+        $toolbar
             ->popupButton('help', 'JHELP')
             ->popupType('iframe')
             ->url(Uri::base() . 'index.php?option=com_breezingformsng&view=help&section=records&tmpl=component')

@@ -12,19 +12,19 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Factory;
-use Joomla\CMS\MVC\Model\BaseModel;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 use Joomla\Filesystem\File;
 
-class QuickmodeModel extends BaseModel
+class QuickmodeModel extends BaseDatabaseModel
 {
     private DatabaseInterface $db;
 
     public function __construct(array $config = [])
     {
         parent::__construct($config);
-        $this->db = Factory::getContainer()->get(DatabaseInterface::class);
+        $this->db = $this->getDatabase();
     }
 
     public function save(int $form, array $dataObject): int

@@ -21,7 +21,7 @@ class QuickmodeController extends BaseController
 {
     public function display($cachable = false, $urlparams = []): static
     {
-        Factory::getApplication()->getInput()->set('view', 'quickmode');
+        $this->app->getInput()->set('view', 'quickmode');
         return parent::display($cachable, $urlparams);
     }
 
@@ -34,7 +34,7 @@ class QuickmodeController extends BaseController
     {
         $this->checkToken('post');
 
-        $app   = Factory::getApplication();
+        $app   = $this->app;
         $input = $app->getInput();
 
         $chunksLength = $input->getInt('chunksLength', 0);
@@ -116,7 +116,7 @@ class QuickmodeController extends BaseController
      */
     public function editor(): void
     {
-        $input = Factory::getApplication()->getInput();
+        $input = $this->app->getInput();
         $input->set('view', 'quickmode');
         $input->set('layout', 'editor');
         parent::display();
@@ -124,7 +124,7 @@ class QuickmodeController extends BaseController
 
     private function getQuickmodeModel(): QuickmodeModel
     {
-        $model = Factory::getApplication()
+        $model = $this->app
             ->bootComponent('com_breezingformsng')
             ->getMVCFactory()
             ->createModel('Quickmode', 'Administrator', ['ignore_request' => true]);

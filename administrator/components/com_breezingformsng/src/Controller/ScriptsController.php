@@ -99,7 +99,7 @@ class ScriptsController extends BaseController
 
     private function assertAuthorised(): void
     {
-        if (!Factory::getApplication()->getIdentity()->authorise('core.manage', 'com_breezingformsng')) {
+        if (!$this->app->getIdentity()->authorise('core.manage', 'com_breezingformsng')) {
             throw new \RuntimeException(Text::_('JERROR_ALERTNOAUTHOR'), 403);
         }
     }
@@ -108,7 +108,7 @@ class ScriptsController extends BaseController
     {
         $title = Text::_('COM_BREEZINGFORMSNG') . ' / ' . Text::_('COM_BREEZINGFORMSNG_MANAGESCRIPTS');
 
-        $document = Factory::getApplication()->getDocument();
+        $document = $this->app->getDocument();
         $document->setTitle($title);
         $document->getWebAssetManager()->addInlineStyle(
             '.icon-logo_left{'
@@ -134,14 +134,14 @@ class ScriptsController extends BaseController
 
     private function getPackage(): string
     {
-        $package = Factory::getApplication()->getInput()->getString('pkg', '');
+        $package = $this->app->getInput()->getString('pkg', '');
 
         return $package === '- blank -' ? '' : $package;
     }
 
     private function getIds(): array
     {
-        $input = Factory::getApplication()->getInput();
+        $input = $this->app->getInput();
         $ids = (array) $input->get('ids', [], 'array');
 
         if ($ids === []) {

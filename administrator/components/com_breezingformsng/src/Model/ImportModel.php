@@ -11,7 +11,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\MVC\Model\BaseModel;
+use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 
@@ -22,7 +22,7 @@ use Joomla\Database\ParameterType;
  * legacy package types are not produced anymore and their import
  * relied on the removed legacy runtime.
  */
-class ImportModel extends BaseModel
+class ImportModel extends BaseDatabaseModel
 {
     public bool $reinstallOnlyIfChanged = false;
 
@@ -61,7 +61,7 @@ class ImportModel extends BaseModel
         $this->createdPieces = $this->updatedPieces = [];
         $this->warnings = [];
 
-        $this->db = Factory::getContainer()->get(DatabaseInterface::class);
+        $this->db = $this->getDatabase();
 
         if (!is_file($filename)) {
             throw new \RuntimeException(Text::sprintf('COM_BREEZINGFORMSNG_IMPORT_FILE_NOT_FOUND', $filename));

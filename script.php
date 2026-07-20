@@ -2018,7 +2018,7 @@ class com_breezingformsngInstallerScript
         }
 
         $obsoleteDirectories = [
-            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/dropbox/v2',
+            JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/dropbox',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/mailchimp',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/recaptcha',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/salesforce',

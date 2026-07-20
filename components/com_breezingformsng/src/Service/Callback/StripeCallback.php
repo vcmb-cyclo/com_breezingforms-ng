@@ -140,7 +140,7 @@ final class StripeCallback
                     }
 
                     //                                      $tx_token = $charge->id;
-                    $session_id = $_GET['session_id'];
+                    $session_id = $input->getString('session_id');
                     $session = $stripe->checkout->sessions->retrieve(
                         "$session_id",
                         []

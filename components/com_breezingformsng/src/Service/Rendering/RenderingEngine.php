@@ -255,9 +255,9 @@ final class RenderingEngine
 
         if (trim($this->processor->formrow->template_code_processed) == 'QuickMode') {
 
-            if (isset($_GET['non_mobile']) && $this->processor->app->getInput()->getBool('non_mobile', false)) {
+            if ($this->processor->app->getInput()->getBool('non_mobile', false)) {
                 $this->processor->app->getSession()->clear('com_breezingformsng.mobile');
-            } else if (isset($_GET['mobile']) && $this->processor->app->getInput()->getBool('mobile', false)) {
+            } else if ($this->processor->app->getInput()->getBool('mobile', false)) {
                 $this->processor->app->getSession()->set('com_breezingformsng.mobile', true);
             }
 
@@ -266,12 +266,6 @@ final class RenderingEngine
             $dataObject = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
             $rootMdata = $dataObject['properties'];
             $is_device = false;
-
-            $useragent = 'Unknown';
-
-            if (isset($_SERVER['HTTP_USER_AGENT'])) {
-                $useragent = $_SERVER['HTTP_USER_AGENT'];
-            }
 
             if ($this->processor->app->getInput()->getString('ff_applic', '') != 'mod_facileforms' && $this->processor->app->getInput()->getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
                 $is_device = true;
@@ -295,8 +289,6 @@ final class RenderingEngine
 
                 if ($this->processor->isMobile) {
 
-                    ob_end_clean();
-                    ob_start();
                     $quickMode = new MobileRenderer($this->processor);
                     if (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile']) {
                         $quickMode->forceMobileUrl = isset($rootMdata['forceMobileUrl']) ? $rootMdata['forceMobileUrl'] : 'index.php';
@@ -2351,29 +2343,6 @@ final class RenderingEngine
         } // if
         restore_error_handler();
 
-        if (trim($this->processor->formrow->template_code_processed) == 'QuickMode' && $this->processor->isMobile) {
-            $contents = ob_get_contents();
-            $ob = 0;
-            while (ob_get_level() > 0 && $ob <= 32) {
-                ob_end_clean();
-                $ob++;
-            }
-
-            echo '<!DOCTYPE html> 
-<html> 
-<head> 
-<title>' . $this->processor->app->getDocument()->getTitle() . '</title>
-<meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1">';
-            echo $quickMode->headers();
-            echo $quickMode->fetchHead($this->processor->app->getDocument()->getHeadData());
-            echo '</head>' . "\n";
-            echo '<body>' . "\n";
-            echo $contents;
-            echo '
-</body>' . "\n" . '</html>';
-            exit;
-        }
     }
 
     // view

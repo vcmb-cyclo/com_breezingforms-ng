@@ -53,14 +53,6 @@ class MobileRenderer
 		$default = ComponentHelper::getParams('com_languages')->get('site');
 		$this->language_tag = $this->p->app->getLanguage()->getTag() != $default ? $this->p->app->getLanguage()->getTag() : 'zz-ZZ';
 
-		$head = $this->p->app->getDocument()->getHeadData();
-		$head['styleSheets'] = array();
-		$head['style'] = array();
-		$head['scripts'] = array();
-		$head['script'] = array();
-		$head['custom'] = array();
-		$this->p->app->getDocument()->setHeadData($head);
-
 		$this->dataObject = json_decode(bf_b64dec($this->p->formrow->template_code), true);
 
 		$this->rootMdata = $this->dataObject['properties'];
@@ -298,6 +290,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
 	public function render()
 	{
+		$this->headers();
 
 		echo '<div data-role="page" data-theme="a" class="ui-page ui-page-theme-a ui-page-active">';
 

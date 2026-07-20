@@ -42,5 +42,7 @@
 - Added contextual Integrator help and Joomla 6 SearchTools sorting for every sortable rule-list column.
 - Restored the compact, panelled presentation of the advanced form settings while retaining the Joomla 6
   tabs and form controls.
+- Removed the obsolete standalone QuickMode mobile document reconstruction and routed its assets through the
+  Joomla 6 document normally; migrated adjacent request and session state access to Joomla Input and Session.
 - Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
   moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

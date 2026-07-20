@@ -11,12 +11,12 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Callback;
 
 use Joomla\CMS\Application\CMSApplication;
 use Vcmb\Component\BreezingformsNG\Site\Service\Support\RedirectHelper;
-use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Database\ParameterType;
 use Joomla\Database\DatabaseInterface;
-use Joomla\Filesystem\File;
+use Joomla\Http\Http;
+use Joomla\Http\HttpFactory;
 
 /**
  * PayPal payment callbacks: IPN notification, return-URL confirmation,
@@ -24,11 +24,15 @@ use Joomla\Filesystem\File;
  */
 final class PayPalCallback
 {
+    private readonly Http $http;
+
     public function __construct(
         private readonly CMSApplication $application,
         private readonly DatabaseInterface $database,
         private readonly RedirectHelper $redirectHelper,
+        ?Http $http = null,
     ) {
+        $this->http = $http ?? HttpFactory::getHttp();
     }
 
     public function confirmIpn(): void
@@ -85,44 +89,9 @@ final class PayPalCallback
                     $req .= "&$key=$value";
                 }
 
-                $header = "POST /cgi-bin/webscr HTTP/1.0\r\n";
-                $header .= "Content-Type: application/x-www-form-urlencoded\r\n";
-                $header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
+                $verification = $this->requestVerification($paypal, $req);
 
-                $pointer = null;
-                $res = '';
-
-                if (function_exists('curl_init')) {
-                    $ch = curl_init();
-                    $pointer = $ch;
-                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-                    curl_setopt($ch, CURLOPT_URL, $paypal . '/cgi-bin/webscr');
-                    curl_setopt($ch, CURLOPT_POST, 1);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $req);
-                    curl_setopt($ch, CURLOPT_SSLVERSION, 6); //6 is for TLSV1.2
-
-                    ob_start();
-                    curl_exec($ch);
-                    $res = ob_get_contents();
-                } else {
-                    // try fsockopen
-                    $fp = fsockopen($paypal, 80, $errno, $errstr, 30);
-                    $pointer = $fp;
-                    fputs($fp, $header . $req);
-                    $headerdone = false;
-                    while (!feof($fp)) {
-                        $line = fgets($fp, 1024);
-                        if (strcmp($line, "\r\n") == 0) {
-                            $headerdone = true;
-                        } else if ($headerdone) {
-                            $res .= $line;
-                        }
-                    }
-                }
-
-                $lines = explode("\n", $res);
-
-                if (strcmp($lines[0], "VERIFIED") == 0) {
+                if ($verification === 'VERIFIED') {
 
                     $recordId = $input->getInt('record_id', -1);
                     $recordQuery = $db->getQuery(true)
@@ -172,7 +141,7 @@ final class PayPalCallback
                     }
 
                     $this->application->setHeader('status', 200, true);
-                } else if (strcmp($lines[0], "INVALID") == 0) {
+                } else if ($verification === 'INVALID') {
 
                     $recordId = $input->getInt('record_id', -1);
                     $recordQuery = $db->getQuery(true)
@@ -209,14 +178,6 @@ final class PayPalCallback
                 }
 
                 $this->application->setHeader('status', 200, true);
-
-                // should be kept open until sending the status headers
-                if (function_exists('curl_init')) {
-                    curl_close($pointer);
-                    ob_end_clean();
-                } else {
-                    fclose($pointer);
-                }
 
                 break;
             }
@@ -277,42 +238,7 @@ final class PayPalCallback
                 $tx_token = $input->getString('tx', '0');
                 $req .= "&tx=" . urlencode($tx_token) . "&at=" . urlencode($auth_token);
 
-                $header = "POST /cgi-bin/webscr HTTP/1.0\r\n";
-                $header .= "Content-Type: application/x-www-form-urlencoded\r\n";
-                $header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
-
-                if (function_exists('curl_init')) {
-                    $ch = curl_init();
-
-                    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-                    curl_setopt($ch, CURLOPT_URL, $paypal . '/cgi-bin/webscr');
-                    curl_setopt($ch, CURLOPT_POST, 1);
-                    curl_setopt($ch, CURLOPT_POSTFIELDS, $req);
-                    curl_setopt($ch, CURLOPT_SSLVERSION, 6); //6 is for TLSV1.2
-
-                    ob_start();
-                    curl_exec($ch);
-                    $res = ob_get_contents();
-                    curl_close($ch);
-                    ob_end_clean();
-                } else {
-                    // try fsockopen
-                    $fp = fsockopen($paypal, 80, $errno, $errstr, 30);
-                    fputs($fp, $header . $req);
-                    $res = '';
-                    $headerdone = false;
-                    while (!feof($fp)) {
-                        $line = fgets($fp, 1024);
-                        if (strcmp($line, "\r\n") == 0) {
-                            $headerdone = true;
-                        } else if ($headerdone) {
-                            $res .= $line;
-                        }
-                    }
-                    fclose($fp);
-                }
-
-                $lines = explode("\n", $res);
+                $lines = explode("\n", $this->requestVerification($paypal, $req));
                 $keyarray = array();
 
                 if (strcmp($lines[0], "SUCCESS") == 0) {
@@ -533,20 +459,23 @@ final class PayPalCallback
 
     public function connectMessage(): void
     {
-        $db = $this->database;
+        echo '<div class="payPalConnectMsg"><div class="paymentConnectMsg">'
+            . htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_PLEASE_WAIT_REQUEST'), ENT_QUOTES, 'UTF-8')
+            . '</div></div>';
+    }
 
+    private function requestVerification(string $paypalUrl, string $body): string
+    {
+        try {
+            $response = $this->http->post(
+                $paypalUrl . '/cgi-bin/webscr',
+                $body,
+                ['Content-Type' => 'application/x-www-form-urlencoded'],
+            );
 
-
-    $style = '<link rel="stylesheet" href="' . Uri::root() . 'templates/' . $this->application->getTemplate() . '/css/template.css" type="text/css" />';
-
-    echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="' . strtolower($this->application->getLanguage()->getTag()) . '" lang="' . strtolower($this->application->getLanguage()->getTag()) . '" >
-<head>' . $style . '</head>
-<div class="payPalConnectMsg">
-<div class="paymentConnectMsg">
-' . Text::_('COM_BREEZINGFORMSNG_PLEASE_WAIT_REQUEST') . '
-</div>
-</div>
-</body>';
+            return trim((string) $response->body);
+        } catch (\RuntimeException) {
+            return '';
+        }
     }
 }

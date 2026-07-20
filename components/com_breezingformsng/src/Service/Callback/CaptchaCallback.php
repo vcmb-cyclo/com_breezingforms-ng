@@ -61,7 +61,7 @@ final class CaptchaCallback
 
     private function createSecurimage(): Securimage
     {
-        require_once JPATH_SITE . '/media/com_breezingformsng/images/site/captcha/securimage.php';
+        require_once JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/securimage/securimage.php';
 
         return new Securimage();
     }

@@ -9,4 +9,5 @@
   `BFPDF`, `BFRequest`, and `BFText` APIs used by third-party plugins and PHP stored in the database.
 - Kept the required BFQuickMode public classes in the component while switching the component runtime to
   its Joomla 6 namespaced renderers and integration service.
-- Updated the bundled Securimage CAPTCHA library from 3.5.1 to 3.6.8 and added Google reCAPTCHA to About.
+- Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
+  moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

@@ -14,5 +14,6 @@
 - Switched administrator controllers to the application supplied by Joomla's MVC base controller and moved
   database-backed administrator models to `BaseDatabaseModel`/`getDatabase()`.
 - Switched database models to Joomla's injected current-user and event-dispatcher services.
+- Removed the unused legacy Dropbox configuration containing obsolete embedded application credentials.
 - Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
   moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

@@ -243,10 +243,13 @@ class FormsController extends BaseController
     {
         $app = $this->app;
 
-        @ob_end_clean();
+        if (ob_get_level() > 0) {
+            ob_end_clean();
+        }
 
         if (!$this->checkToken('post')) {
-            echo json_encode(['Result' => 'ERROR', 'Message' => Text::_('JINVALID_TOKEN')]);
+            $app->setHeader('Content-Type', 'application/json; charset=utf-8', true);
+            $app->setBody(json_encode(['Result' => 'ERROR', 'Message' => Text::_('JINVALID_TOKEN')], JSON_THROW_ON_ERROR));
             $app->close();
         }
 
@@ -255,7 +258,8 @@ class FormsController extends BaseController
         $state = min(1, max(0, $input->post->getInt('state', 0)));
 
         if ($id <= 0) {
-            echo json_encode(['Result' => 'ERROR', 'Message' => Text::_('JERROR_AN_ERROR_HAS_OCCURRED')]);
+            $app->setHeader('Content-Type', 'application/json; charset=utf-8', true);
+            $app->setBody(json_encode(['Result' => 'ERROR', 'Message' => Text::_('JERROR_AN_ERROR_HAS_OCCURRED')], JSON_THROW_ON_ERROR));
             $app->close();
         }
 
@@ -265,7 +269,8 @@ class FormsController extends BaseController
             $this->getFormModel()->publish([$id], $state);
         }
 
-        echo json_encode(['Result' => 'OK', 'State' => $state]);
+        $app->setHeader('Content-Type', 'application/json; charset=utf-8', true);
+        $app->setBody(json_encode(['Result' => 'OK', 'State' => $state], JSON_THROW_ON_ERROR));
         $app->close();
     }
 

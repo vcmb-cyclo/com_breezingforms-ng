@@ -508,7 +508,7 @@ class PieceManager
 	function testrunajax($option, $pkg, $ids)
 	{
 		$app = $this->app;
-		$app->setHeader('Content-Type', 'application/json', true);
+		$app->setHeader('Content-Type', 'application/json; charset=utf-8', true);
 		$post = $app->getInput()->post;
 
 		$database = $this->database;
@@ -519,7 +519,7 @@ class PieceManager
 		$functionName = $post->getString('test_function', '');
 
 		$result = self::runUnitTests($row, $functionName, $database);
-		echo json_encode($result);
+		$app->setBody(json_encode($result, JSON_THROW_ON_ERROR));
 		$app->close();
 	}
 

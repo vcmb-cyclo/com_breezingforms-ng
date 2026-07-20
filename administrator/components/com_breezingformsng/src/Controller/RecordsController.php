@@ -79,7 +79,9 @@ class RecordsController extends BaseController
     {
         $this->checkToken();
 
-        @ob_end_clean();
+        if (ob_get_level() > 0) {
+            ob_end_clean();
+        }
         $input = $this->app->getInput();
         $recordId = $input->getInt('record_id', 0);
         $column = $input->getString('column', '');
@@ -87,7 +89,8 @@ class RecordsController extends BaseController
         if ($recordId > 0) {
             $this->getRecordModel()->setFlagSingle($recordId, $column, $flag);
         }
-        echo json_encode(['Result' => 'OK']);
+        $this->app->setHeader('Content-Type', 'application/json; charset=utf-8', true);
+        $this->app->setBody(json_encode(['Result' => 'OK'], JSON_THROW_ON_ERROR));
         $this->app->close();
     }
 
@@ -188,7 +191,9 @@ class RecordsController extends BaseController
         $pdf->setFormName($formName);
         $pdf->setWhich('export');
 
-        @ob_end_clean();
+        if (ob_get_level() > 0) {
+            ob_end_clean();
+        }
         ob_start();
         require_once $file;
         $content = ob_get_clean();
@@ -348,7 +353,9 @@ class RecordsController extends BaseController
 
         $fileName = ($formName ? $formName . '-' : '') . 'ffexport-' . date('YmdHis') . '.csv';
 
-        @ob_end_clean();
+        if (ob_get_level() > 0) {
+            ob_end_clean();
+        }
         $app->setHeader('Pragma', 'public', true);
         $app->setHeader('Expires', '0', true);
         $app->setHeader('Cache-Control', 'private', true);
@@ -446,7 +453,9 @@ class RecordsController extends BaseController
 
         $fileName = ($formName ? $formName . '-' : '') . 'ffexport-' . $datestamp->format('YmdHis', true) . '.xml';
 
-        @ob_end_clean();
+        if (ob_get_level() > 0) {
+            ob_end_clean();
+        }
         $app->setHeader('Pragma', 'public', true);
         $app->setHeader('Expires', '0', true);
         $app->setHeader('Cache-Control', 'private', true);

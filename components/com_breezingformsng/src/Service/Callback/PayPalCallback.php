@@ -76,7 +76,11 @@ final class PayPalCallback
                 $req = 'cmd=_notify-validate';
 
                 $tx_token = $input->getString('txn_id', '0');
-                foreach ($_POST as $key => $value) {
+                foreach ($input->post->getArray() as $key => $value) {
+                    if (is_array($value)) {
+                        continue;
+                    }
+
                     $value = urlencode(stripslashes($value));
                     $req .= "&$key=$value";
                 }

@@ -924,7 +924,6 @@ final class SubmissionEngine
                 ->from($this->processor->database->quoteName('#__facileforms_records'));
             $this->processor->database->setQuery($maxIdQuery);
             $lastid = $this->processor->database->loadResult();
-            $_SESSION['virtuemart_bf_id'] = $lastid;
             $session = $this->processor->app->getSession();
             $session->set('virtuemart_bf_id', $lastid);
 
@@ -1109,21 +1108,12 @@ transition: box-shadow .15s linear;
                                     $this->processor->app->getSession()->set('emailfield', $stripeemail);
                                 }
 
-                                // XDA BEGIN
-// preg_match('#\((.*?)\)#', $_POST['ff_nm_donationAmount'][0], $match);
-// $productName = $match[1];
                                 $productName = $options['itemname'];
-                                // XDA END
-
-                                // XDA $pricearr = explode(" ", $$_POST['ff_nm_donationAmount'][0], 2);
-// XDA $productPrice = $pricearr[0];
 
                                 // ---------------------------------------------------------------------------------------------------------------------------------------------
 // XDA : in the Stripe Checkout session, 2 changes :
 // 1 - To disable address collection we will either need to pass billing_address_collection parameter with value auto or send API request without it.
 //      billing_address_collection' => 'required' -> 'auto'
-// 2 - Email determination
-// 'customer_email' => $_POST['ff_nm_email'][0] -> 'customer_email' => $stripeemail
 // ---------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -1156,7 +1146,6 @@ transition: box-shadow .15s linear;
                                     'cancel_url' => $returnurl . "&session_id={CHECKOUT_SESSION_ID}",
                                 ]);
 
-                                //$html .=  $_POST['ff_nm_email'][0];
                                 $this->processor->app->redirect((string) $checkout_session->url, 303);
 
                                 $current_tag = $this->processor->app->getLanguage()->getTag();

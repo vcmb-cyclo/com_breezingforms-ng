@@ -32,37 +32,10 @@ final class FlashUploadCallback
     {
         $db = $this->database;
 
-
-    if (!function_exists('bfProcess')) {
-    function bfProcess(&$dataObject, $finaltargetFile, $parent = null, $index = 0, $childrenLength = 0)
-    {
-        $mdata = $dataObject['properties'];
-        if ($mdata['type'] == 'element') {
-            switch ($mdata['bfType']) {
-                case 'bfFile':
-                    if (isset($mdata['flashUploaderBytes']) && intval($mdata['flashUploaderBytes']) > 0 && isset($mdata['bfName']) && trim($mdata['bfName']) == trim($this->application->getInput()->getString('itemName', ''))) {
-                        if (file_exists($finaltargetFile) && @filesize($finaltargetFile) > intval($mdata['flashUploaderBytes'])) {
-                            @File::delete($finaltargetFile);
-                            echo trim($mdata['label']) . ': ' . Text::_('COM_BREEZINGFORMSNG_FLASH_UPLOADER_TOO_LARGE');
-                            exit;
-                        }
-                        break;
-                    }
-                    break;
-            }
-        }
-        if (isset($dataObject['children']) && count($dataObject['children']) != 0) {
-            $childrenAmount = count($dataObject['children']);
-            for ($i = 0; $i < $childrenAmount; $i++) {
-                bfProcess($dataObject['children'][$i], $finaltargetFile, $mdata, $i, $childrenAmount);
-            }
-        }
-    }
-    }
-
     @ob_end_clean();
     $input = $this->application->getInput();
-    if (is_numeric($input->getString('form', '')) && !empty($_FILES) && $input->getString('bfFlashUploadTicket', '') != '') {
+    $uploadedFile = $input->files->get('Filedata', [], 'array');
+    if (is_numeric($input->getString('form', '')) && $uploadedFile !== [] && $input->getString('bfFlashUploadTicket', '') != '') {
 
         $formId = $input->getInt('form', -1);
         $itemName = $input->getString('itemName', '');
@@ -80,7 +53,8 @@ final class FlashUploadCallback
         $objectList = $db->loadObjectList();
         $formIdCount = count($objectList);
         if ($formIdCount > 0) {
-            $tempFile = $_FILES['Filedata']['tmp_name'];
+            $tempFile = (string) ($uploadedFile['tmp_name'] ?? '');
+            $uploadedName = (string) ($uploadedFile['name'] ?? '');
             $targetPath = JPATH_SITE . '/components/com_breezingformsng/uploads/';
             if (@file_exists($targetPath) && @is_dir($targetPath)) {
                 $secureTicket = $this->application->getSession()->get('secure_ticket', '', 'com_breezingformsng');
@@ -119,18 +93,56 @@ final class FlashUploadCallback
 
                     $dataObject = json_decode(bf_b64dec($objectList[0]->template_code), true);
 
-                    bfProcess($dataObject, $finaltargetFile);
+                    $validationError = $this->validateUploadSize($dataObject, $finaltargetFile, $itemName);
+
+                    if ($validationError !== null) {
+                        File::delete($finaltargetFile);
+                        echo $validationError;
+                        exit;
+                    }
+
                     @File::delete($targetFile);
                 } else {
-                    echo 'Could not upload file ' . addslashes($_FILES['Filedata']['name']) . '!';
+                    echo 'Could not upload file ' . addslashes($uploadedName) . '!';
                 }
             } else {
-                echo 'Invalid file storage path for file ' . addslashes($_FILES['Filedata']['name']) . '! Please check the upload folder path and its permissions!';
+                echo 'Invalid file storage path for file ' . addslashes($uploadedName) . '! Please check the upload folder path and its permissions!';
             }
         } else {
             echo 'Form id and element do not match!';
         }
     }
     exit;
+    }
+
+    private function validateUploadSize(array $dataObject, string $targetFile, string $itemName): ?string
+    {
+        $metadata = $dataObject['properties'] ?? [];
+
+        if (
+            ($metadata['type'] ?? '') === 'element'
+            && ($metadata['bfType'] ?? '') === 'bfFile'
+            && (int) ($metadata['flashUploaderBytes'] ?? 0) > 0
+            && trim((string) ($metadata['bfName'] ?? '')) === trim($itemName)
+            && is_file($targetFile)
+            && filesize($targetFile) > (int) $metadata['flashUploaderBytes']
+        ) {
+            return trim((string) ($metadata['label'] ?? '')) . ': '
+                . Text::_('COM_BREEZINGFORMSNG_FLASH_UPLOADER_TOO_LARGE');
+        }
+
+        foreach (($dataObject['children'] ?? []) as $child) {
+            if (!is_array($child)) {
+                continue;
+            }
+
+            $error = $this->validateUploadSize($child, $targetFile, $itemName);
+
+            if ($error !== null) {
+                return $error;
+            }
+        }
+
+        return null;
     }
 }

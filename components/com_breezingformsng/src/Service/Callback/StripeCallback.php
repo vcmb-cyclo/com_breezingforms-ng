@@ -148,7 +148,6 @@ final class StripeCallback
 
                     if ($session->payment_status != 'paid') {
 
-                        //echo $_GET['session_id'].'<br>bf dont understand new stripe and says it was diclined lol: <br>'.var_dump($session);
                         $msg = Text::_("COM_BREEZINGFORMSNG_STRIPE_DECLINED");
 
                         require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');

@@ -1822,8 +1822,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
         RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-post-init.js');
         // loading system css
             // loading theme
-            $stylelink = '<link rel="stylesheet" href="' . Uri::root(true) . '/components/com_breezingformsng/themes/quickmode-bootstrap' . $this->bsVersion . '/system.css" />' . "\n";
-            $this->p->app->getDocument()->addCustomTag($stylelink);
+            RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/themes/quickmode-bootstrap' . $this->bsVersion . '/system.css');
 
             if (isset($this->rootMdata['themebootstrap'])) {
 
@@ -1864,10 +1863,10 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                         }
                     }
 
-                    $style = '<style type="text/css">/** BreezingForms Bootstap Theme ' . strip_tags($this->rootMdata['themebootstrap']) . ' **/' . "\n" . $themecss . "\n" . '</style>' . "\n";
-                    $this->p->app->getDocument()->addCustomTag($style);
+                    $manager = $this->p->app->getDocument()->getWebAssetManager();
+                    $manager->addInlineStyle($themecss);
                     if ($scriptjs) {
-                        $this->p->app->getDocument()->addCustomTag('<script type="text/javascript">' . "\n" . $scriptjs . "\n" . '</script>');
+                        $manager->addInlineScript($scriptjs);
                     }
                 }
             }

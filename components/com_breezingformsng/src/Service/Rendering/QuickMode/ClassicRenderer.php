@@ -146,14 +146,11 @@ float:left;
 		}
 		RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-post-init.js');
 		// loading system css
-		$document = $this->p->app->getDocument();
-		$stylelink = '<link rel="stylesheet" href="' . Uri::root(true) . '/components/com_breezingformsng/themes/quickmode/system.css" />' . "\n";
-		$document->addCustomTag($stylelink);
+		RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/themes/quickmode/system.css');
 
 		// loading theme
 		if ($this->rootMdata['theme'] != 'none' && @file_exists(JPATH_SITE . '/media/breezingforms/themes/' . $this->rootMdata['theme'] . '/theme.css')) {
-			$stylelink = '<link rel="stylesheet" href="' . Uri::root(true) . '/media/breezingforms/themes/' . $this->rootMdata['theme'] . '/theme.css" />' . "\n";
-			$document->addCustomTag($stylelink);
+			RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/media/breezingforms/themes/' . $this->rootMdata['theme'] . '/theme.css');
 		}
 	}
 

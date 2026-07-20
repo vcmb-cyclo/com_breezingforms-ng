@@ -290,7 +290,7 @@ final class StripeCallback
                                 $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_DOWNLOAD_FILE'));
                             }
 
-                            \Vcmb\Component\BreezingformsNG\Site\Service\Support\DownloadHelper::stream($file);
+                            \Vcmb\Component\BreezingformsNG\Site\Service\Support\DownloadHelper::stream($this->application, $file);
                         } else {
 
                             $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_MAX_DOWNLOAD_TRIES_REACHED'));

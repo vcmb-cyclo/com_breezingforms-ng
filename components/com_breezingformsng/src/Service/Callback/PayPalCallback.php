@@ -47,7 +47,7 @@ final class PayPalCallback
     $db->setQuery($query);
     $list = $db->loadObjectList();
     if (count($list) == 0) {
-        header("Status: 200 OK");
+        $this->application->setHeader('status', 200, true);
         exit;
     }
 
@@ -55,7 +55,7 @@ final class PayPalCallback
 
     $areas = json_decode($form->template_areas, true);
     if (!is_array($areas)) {
-        header("Status: 200 OK");
+        $this->application->setHeader('status', 200, true);
         exit;
     }
 
@@ -164,10 +164,10 @@ final class PayPalCallback
                             }
                         }
 
-                        header("Status: 200 OK");
+                        $this->application->setHeader('status', 200, true);
                     }
 
-                    header("Status: 200 OK");
+                    $this->application->setHeader('status', 200, true);
                 } else if (strcmp($lines[0], "INVALID") == 0) {
 
                     $recordId = $input->getInt('record_id', -1);
@@ -201,10 +201,10 @@ final class PayPalCallback
                         $db->execute();
                     }
 
-                    header("Status: 200 OK");
+                    $this->application->setHeader('status', 200, true);
                 }
 
-                header("Status: 200 OK");
+                $this->application->setHeader('status', 200, true);
 
                 // should be kept open until sending the status headers
                 if (function_exists('curl_init')) {
@@ -507,7 +507,7 @@ final class PayPalCallback
                                 $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_DOWNLOAD_FILE'));
                             }
 
-                            \Vcmb\Component\BreezingformsNG\Site\Service\Support\DownloadHelper::stream($file);
+                            \Vcmb\Component\BreezingformsNG\Site\Service\Support\DownloadHelper::stream($this->application, $file);
                         } else {
 
                             $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_MAX_DOWNLOAD_TRIES_REACHED'));

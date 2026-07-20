@@ -18,6 +18,24 @@ use Joomla\Event\Event;
 
 class FormModel extends BaseDatabaseModel
 {
+    private const INTEGER_COLUMNS = [
+        'autoheight', 'ordering', 'published', 'debug_mode', 'runmode',
+        'width', 'widthmode', 'height', 'heightmode', 'pages',
+        'emailntf', 'mb_emailntf', 'emaillog', 'mb_emaillog',
+        'emailxml', 'mb_emailxml', 'email_type', 'mb_email_type',
+        'email_custom_html', 'mb_email_custom_html', 'dblog',
+        'script1cond', 'script2cond', 'piece1cond', 'piece2cond',
+        'piece3cond', 'piece4cond', 'prevmode', 'double_opt',
+        'mailchimp_double_optin', 'mailchimp_send_errors',
+        'mailchimp_delete_member', 'salesforce_enabled',
+        'dropbox_submission_enabled',
+    ];
+
+    private const NULLABLE_INTEGER_COLUMNS = [
+        'script1id', 'script2id', 'piece1id', 'piece2id', 'piece3id', 'piece4id',
+        'prevwidth',
+    ];
+
     private function db(): DatabaseInterface
     {
         return $this->getDatabase();
@@ -229,11 +247,15 @@ class FormModel extends BaseDatabaseModel
             $data['modified_by']= $uid;
 
             unset($data['id']);
+            $data = $this->normaliseCloneData($data);
 
             $q = $db->getQuery(true)
                 ->insert($db->quoteName('#__facileforms_forms'))
                 ->columns(array_map(fn($c) => $db->quoteName($c), array_keys($data)))
-                ->values(implode(',', array_map(fn($v) => $db->quote($v), array_values($data))));
+                ->values(implode(',', array_map(
+                    fn($value) => $value === null ? 'NULL' : $db->quote($value),
+                    array_values($data)
+                )));
             $db->setQuery($q)->execute();
             $newId = (int) $db->insertid();
 
@@ -256,6 +278,25 @@ class FormModel extends BaseDatabaseModel
 
             $this->reorder((string) ($src->package ?? ''));
         }
+    }
+
+    private function normaliseCloneData(array $data): array
+    {
+        foreach (self::INTEGER_COLUMNS as $column) {
+            if (array_key_exists($column, $data)) {
+                $data[$column] = (int) $data[$column];
+            }
+        }
+
+        foreach (self::NULLABLE_INTEGER_COLUMNS as $column) {
+            if (array_key_exists($column, $data)) {
+                $data[$column] = $data[$column] === '' || $data[$column] === null
+                    ? null
+                    : (int) $data[$column];
+            }
+        }
+
+        return $data;
     }
 
     public function publish(array $ids, int $state): void

@@ -76,7 +76,7 @@ class ClassicRenderer {
 		}
         HTMLHelper::_('jquery.framework');
 		$this->p->app->getDocument()->addStyleSheet(Uri::root(true) . '/media/com_breezingformsng/css/site/quickmode-runtime.css');
-		$this->p->app->getDocument()->addStyleDeclaration('
+		$this->p->app->getDocument()->getWebAssetManager()->addInlineStyle('
 .bfInline{
 float:left;
 }

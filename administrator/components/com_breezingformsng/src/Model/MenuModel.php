@@ -10,7 +10,10 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
+use Joomla\CMS\Language\Text;
 use Joomla\Database\DatabaseInterface;
+use Joomla\Database\ParameterType;
+use Joomla\Database\QueryInterface;
 
 class MenuModel extends BaseDatabaseModel
 {
@@ -48,7 +51,8 @@ class MenuModel extends BaseDatabaseModel
             ->order([$db->quoteName('m.parent') . ' ASC', $db->quoteName('m.ordering') . ' ASC']);
 
         if ($pkg !== '') {
-            $q->where($db->quoteName('m.package') . ' = ' . $db->quote($pkg));
+            $q->where($db->quoteName('m.package') . ' = :package')
+                ->bind(':package', $pkg);
         }
 
         return $db->setQuery($q)->loadObjectList() ?: [];
@@ -77,7 +81,8 @@ class MenuModel extends BaseDatabaseModel
         $q  = $db->getQuery(true)
             ->select('*')
             ->from($db->quoteName('#__facileforms_compmenus'))
-            ->where($db->quoteName('id') . ' = ' . $db->quote($id));
+            ->where($db->quoteName('id') . ' = :id')
+            ->bind(':id', $id, ParameterType::INTEGER);
 
         return $db->setQuery($q)->loadObject() ?: null;
     }
@@ -103,7 +108,8 @@ class MenuModel extends BaseDatabaseModel
             ->order($db->quoteName('ordering') . ' ASC');
 
         if ($pkg !== '') {
-            $q->where($db->quoteName('package') . ' = ' . $db->quote($pkg));
+            $q->where($db->quoteName('package') . ' = :package')
+                ->bind(':package', $pkg);
         }
 
         return $db->setQuery($q)->loadObjectList() ?: [];
@@ -115,7 +121,8 @@ class MenuModel extends BaseDatabaseModel
         $q   = $db->getQuery(true)
             ->select([$db->quoteName('name'), $db->quoteName('title')])
             ->from($db->quoteName('#__facileforms_forms'))
-            ->where($db->quoteName('id') . ' = ' . $db->quote($formId));
+            ->where($db->quoteName('id') . ' = :formId')
+            ->bind(':formId', $formId, ParameterType::INTEGER);
         $form = $db->setQuery($q)->loadObject();
 
         $obj            = new \stdClass();
@@ -151,32 +158,36 @@ class MenuModel extends BaseDatabaseModel
         $pub     = (int) ($data['published'] ?? 1);
 
         if ($title === '') {
-            throw new \RuntimeException(\Joomla\CMS\LanguageText::_('COM_BREEZINGFORMSNG_MENUS_TITLEEMPTY'));
+            throw new \RuntimeException(Text::_('COM_BREEZINGFORMSNG_MENUS_TITLEEMPTY'));
         }
 
         if ($id > 0) {
             $q = $db->getQuery(true)
                 ->update($db->quoteName('#__facileforms_compmenus'))
                 ->set([
-                    $db->quoteName('package')   . ' = ' . $db->quote($pkg),
-                    $db->quoteName('parent')    . ' = ' . $db->quote($parent),
-                    $db->quoteName('title')     . ' = ' . $db->quote($title),
-                    $db->quoteName('name')      . ' = ' . $db->quote($name),
-                    $db->quoteName('page')      . ' = ' . $db->quote($page),
-                    $db->quoteName('frame')     . ' = ' . $db->quote($frame),
-                    $db->quoteName('border')    . ' = ' . $db->quote($border),
-                    $db->quoteName('img')       . ' = ' . $db->quote($img),
-                    $db->quoteName('params')    . ' = ' . $db->quote($params),
-                    $db->quoteName('published') . ' = ' . $db->quote($pub),
+                    $db->quoteName('package') . ' = :package',
+                    $db->quoteName('parent') . ' = :parent',
+                    $db->quoteName('title') . ' = :title',
+                    $db->quoteName('name') . ' = :name',
+                    $db->quoteName('page') . ' = :page',
+                    $db->quoteName('frame') . ' = :frame',
+                    $db->quoteName('border') . ' = :border',
+                    $db->quoteName('img') . ' = :image',
+                    $db->quoteName('params') . ' = :params',
+                    $db->quoteName('published') . ' = :published',
                 ])
-                ->where($db->quoteName('id') . ' = ' . $db->quote($id));
+                ->where($db->quoteName('id') . ' = :id')
+                ->bind(':id', $id, ParameterType::INTEGER);
+            $this->bindMenuValues($q, $pkg, $parent, $title, $name, $page, $frame, $border, $img, $params, $pub);
             $db->setQuery($q)->execute();
         } else {
             $maxQ = $db->getQuery(true)
                 ->select('COALESCE(MAX(' . $db->quoteName('ordering') . '), 0) + 1')
                 ->from($db->quoteName('#__facileforms_compmenus'))
-                ->where($db->quoteName('parent') . ' = ' . $db->quote($parent))
-                ->where($db->quoteName('package') . ' = ' . $db->quote($pkg));
+                ->where($db->quoteName('parent') . ' = :parent')
+                ->where($db->quoteName('package') . ' = :package')
+                ->bind(':parent', $parent, ParameterType::INTEGER)
+                ->bind(':package', $pkg);
             $ordering = (int) $db->setQuery($maxQ)->loadResult();
 
             $q = $db->getQuery(true)
@@ -187,12 +198,9 @@ class MenuModel extends BaseDatabaseModel
                     $db->quoteName('name'), $db->quoteName('page'), $db->quoteName('frame'),
                     $db->quoteName('border'), $db->quoteName('params'),
                 ])
-                ->values(implode(',', [
-                    $db->quote($pkg), $db->quote($parent), $db->quote($ordering),
-                    $db->quote($pub), $db->quote($img), $db->quote($title),
-                    $db->quote($name), $db->quote($page), $db->quote($frame),
-                    $db->quote($border), $db->quote($params),
-                ]));
+                ->values(':package, :parent, :ordering, :published, :image, :title, :name, :page, :frame, :border, :params')
+                ->bind(':ordering', $ordering, ParameterType::INTEGER);
+            $this->bindMenuValues($q, $pkg, $parent, $title, $name, $page, $frame, $border, $img, $params, $pub);
             $db->setQuery($q)->execute();
             $id = (int) $db->insertid();
         }
@@ -208,22 +216,25 @@ class MenuModel extends BaseDatabaseModel
         }
 
         $db      = $this->db();
-        $intIds  = array_map('intval', $ids);
-        $inList  = implode(',', $intIds);
+        $intIds = array_values(array_filter(array_map('intval', $ids)));
+
+        if ($intIds === []) {
+            return;
+        }
 
         $childQ = $db->getQuery(true)
             ->select($db->quoteName('id'))
             ->from($db->quoteName('#__facileforms_compmenus'))
-            ->where($db->quoteName('parent') . ' IN (' . $inList . ')');
+            ->whereIn($db->quoteName('parent'), $intIds);
         $childIds = $db->setQuery($childQ)->loadColumn();
 
         $allIds = array_merge($intIds, array_map('intval', $childIds ?: []));
-        $allIn  = implode(',', array_unique($allIds));
+        $allIds = array_values(array_unique($allIds));
 
         $db->setQuery(
             $db->getQuery(true)
                 ->delete($db->quoteName('#__facileforms_compmenus'))
-                ->where($db->quoteName('id') . ' IN (' . $allIn . ')')
+                ->whereIn($db->quoteName('id'), $allIds)
         )->execute();
     }
 
@@ -248,7 +259,8 @@ class MenuModel extends BaseDatabaseModel
             $childQ = $db->getQuery(true)
                 ->select('*')
                 ->from($db->quoteName('#__facileforms_compmenus'))
-                ->where($db->quoteName('parent') . ' = ' . $db->quote($id));
+                ->where($db->quoteName('parent') . ' = :parent')
+                ->bind(':parent', $id, ParameterType::INTEGER);
             $children = $db->setQuery($childQ)->loadObjectList() ?: [];
 
             foreach ($children as $child) {
@@ -267,12 +279,18 @@ class MenuModel extends BaseDatabaseModel
         }
 
         $db     = $this->db();
-        $intIds = implode(',', array_map('intval', $ids));
+        $intIds = array_values(array_filter(array_map('intval', $ids)));
+
+        if ($intIds === []) {
+            return;
+        }
+
         $db->setQuery(
             $db->getQuery(true)
                 ->update($db->quoteName('#__facileforms_compmenus'))
-                ->set($db->quoteName('published') . ' = ' . $db->quote($state))
-                ->where($db->quoteName('id') . ' IN (' . $intIds . ')')
+                ->set($db->quoteName('published') . ' = :state')
+                ->whereIn($db->quoteName('id'), $intIds)
+                ->bind(':state', $state, ParameterType::INTEGER)
         )->execute();
     }
 
@@ -287,32 +305,45 @@ class MenuModel extends BaseDatabaseModel
 
         $dir      = $inc > 0 ? '>' : '<';
         $sort     = $inc > 0 ? 'ASC' : 'DESC';
+        $parent = (int) $item->parent;
+        $ordering = (int) $item->ordering;
         $neighbor = $db->setQuery(
             $db->getQuery(true)
                 ->select(['id', 'ordering'])
                 ->from($db->quoteName('#__facileforms_compmenus'))
-                ->where($db->quoteName('parent')  . ' = ' . $db->quote($item->parent))
-                ->where($db->quoteName('package') . ' = ' . $db->quote($pkg))
-                ->where($db->quoteName('ordering') . ' ' . $dir . ' ' . $db->quote($item->ordering))
+                ->where($db->quoteName('parent') . ' = :parent')
+                ->where($db->quoteName('package') . ' = :package')
+                ->where($db->quoteName('ordering') . ' ' . $dir . ' :ordering')
                 ->order($db->quoteName('ordering') . ' ' . $sort)
+                ->bind(':parent', $parent, ParameterType::INTEGER)
+                ->bind(':package', $pkg)
+                ->bind(':ordering', $ordering, ParameterType::INTEGER)
+                ->setLimit(1)
         )->loadObject();
 
         if ($neighbor === null) {
             return;
         }
 
+        $neighborId = (int) $neighbor->id;
+        $neighborOrdering = (int) $neighbor->ordering;
+
         $db->setQuery(
             $db->getQuery(true)
                 ->update($db->quoteName('#__facileforms_compmenus'))
-                ->set($db->quoteName('ordering') . ' = ' . $db->quote($neighbor->ordering))
-                ->where($db->quoteName('id') . ' = ' . $db->quote($id))
+                ->set($db->quoteName('ordering') . ' = :ordering')
+                ->where($db->quoteName('id') . ' = :id')
+                ->bind(':ordering', $neighborOrdering, ParameterType::INTEGER)
+                ->bind(':id', $id, ParameterType::INTEGER)
         )->execute();
 
         $db->setQuery(
             $db->getQuery(true)
                 ->update($db->quoteName('#__facileforms_compmenus'))
-                ->set($db->quoteName('ordering') . ' = ' . $db->quote($item->ordering))
-                ->where($db->quoteName('id') . ' = ' . $db->quote($neighbor->id))
+                ->set($db->quoteName('ordering') . ' = :ordering')
+                ->where($db->quoteName('id') . ' = :id')
+                ->bind(':ordering', $ordering, ParameterType::INTEGER)
+                ->bind(':id', $neighborId, ParameterType::INTEGER)
         )->execute();
     }
 
@@ -424,24 +455,56 @@ class MenuModel extends BaseDatabaseModel
         }
     }
 
+    private function bindMenuValues(
+        QueryInterface $query,
+        string $package,
+        int $parent,
+        string $title,
+        string $name,
+        int $page,
+        int $frame,
+        int $border,
+        string $image,
+        string $params,
+        int $published
+    ): void {
+        $query
+            ->bind(':package', $package)
+            ->bind(':parent', $parent, ParameterType::INTEGER)
+            ->bind(':title', $title)
+            ->bind(':name', $name)
+            ->bind(':page', $page, ParameterType::INTEGER)
+            ->bind(':frame', $frame, ParameterType::INTEGER)
+            ->bind(':border', $border, ParameterType::INTEGER)
+            ->bind(':image', $image)
+            ->bind(':params', $params)
+            ->bind(':published', $published, ParameterType::INTEGER);
+    }
+
     private function reorder(int $parent, string $pkg): void
     {
         $db = $this->db();
         $q  = $db->getQuery(true)
             ->select($db->quoteName('id'))
             ->from($db->quoteName('#__facileforms_compmenus'))
-            ->where($db->quoteName('parent')  . ' = ' . $db->quote($parent))
-            ->where($db->quoteName('package') . ' = ' . $db->quote($pkg))
+            ->where($db->quoteName('parent') . ' = :parent')
+            ->where($db->quoteName('package') . ' = :package')
+            ->bind(':parent', $parent, ParameterType::INTEGER)
+            ->bind(':package', $pkg)
             ->order($db->quoteName('ordering') . ' ASC');
 
         $ids = $db->setQuery($q)->loadColumn() ?: [];
 
         foreach (array_values($ids) as $pos => $rowId) {
+            $ordering = $pos + 1;
+            $rowId = (int) $rowId;
             $db->setQuery(
                 $db->getQuery(true)
                     ->update($db->quoteName('#__facileforms_compmenus'))
-                    ->set($db->quoteName('ordering') . ' = ' . $db->quote($pos + 1))
-                    ->where($db->quoteName('id') . ' = ' . $db->quote($rowId))
+                    ->set($db->quoteName('ordering') . ' = :ordering')
+                    ->where($db->quoteName('id') . ' = :id')
+                    ->bind(':ordering', $ordering, ParameterType::INTEGER)
+                    ->bind(':id', $rowId, ParameterType::INTEGER)
             )->execute();
         }
     }

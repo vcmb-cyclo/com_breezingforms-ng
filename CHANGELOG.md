@@ -71,5 +71,7 @@
   the final About controller/view container lookups.
 - Routed Piece test-runner validation and failure messages through Joomla translations in all eight supported
   administrator languages.
+- Fixed the invalid menu-title translation class and migrated Menu model CRUD, ordering, publication, and copy
+  queries to Joomla bound parameters and `whereIn()` lists.
 - Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
   moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

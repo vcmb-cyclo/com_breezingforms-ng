@@ -55,5 +55,7 @@
   Joomla application and database from its MVC controller.
 - Converted the administrator Piece manager and its interactive test paths to injected Joomla application and
   database services instead of static Factory lookups.
+- Switched the Scripts and Pieces views to the models assigned by Joomla's MVC dispatcher and removed their
+  unused legacy `table.columns` behavior asset.
 - Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
   moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

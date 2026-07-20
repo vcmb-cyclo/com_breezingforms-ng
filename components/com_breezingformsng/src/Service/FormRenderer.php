@@ -359,7 +359,7 @@ $ff_request = array();
                 'allowtransparency="true" ' .
                 'scrolling="no" ';
             if ($form->autoheight == 1) {
-                RuntimeAssetLoader::script($this->application, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jq.min.js');
+                $this->application->getDocument()->getWebAssetManager()->useScript('jquery');
                 RuntimeAssetLoader::script($this->application, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jq.iframeautoheight.js');
                 $this->application->getDocument()->getWebAssetManager()->addInlineScript("<!--
                             JQuery(document).ready(function() {

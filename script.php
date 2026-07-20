@@ -2011,6 +2011,7 @@ class com_breezingformsngInstallerScript
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/src/Helper/LegacyClassLoader.php',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/jquery/jq.js',
             JPATH_SITE . '/components/com_breezingformsng/libraries/jquery/jq.min.legacy.js',
+            JPATH_SITE . '/components/com_breezingformsng/libraries/jquery/jq.min.js',
         ];
 
         foreach ($obsolete as $file) {

@@ -285,14 +285,6 @@ use Joomla\CMS\Language\Text;
                                             </div>
                                             <div class="bfPropertyWrap">
                                                 <label class="bfPropertyLabel hasTooltip"
-                                                    title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_JQUERY_DISABLE')); ?>"
-                                                    for="bfElementAdvancedDisableJQuery">
-                                                    <?php echo Text::_('COM_BREEZINGFORMSNG_DISABLE_JQUERY'); ?>
-                                                </label>
-                                                <input type="checkbox" value="" id="bfElementAdvancedDisableJQuery" />
-                                            </div>
-                                            <div class="bfPropertyWrap">
-                                                <label class="bfPropertyLabel hasTooltip"
                                                     title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_ERROR_ALERTS')); ?>"
                                                     for="bfElementAdvancedUseErrorAlerts">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_USE_ERROR_ALERTS'); ?>

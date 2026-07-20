@@ -22,7 +22,6 @@ required=(
     "administrator/components/com_breezingformsng/libraries/securimage/CaptchaObject.php"
     "administrator/components/com_breezingformsng/libraries/securimage/StorageAdapter/Session.php"
     "components/com_breezingformsng/breezingformsng.php"
-    "components/com_breezingformsng/libraries/jquery/jq.min.js"
     "media/com_breezingformsng/css/custom.css"
 )
 
@@ -50,15 +49,10 @@ for pattern in "${forbidden_patterns[@]}"; do
     fi
 done
 
-if ! unzip -p "${archive}" components/com_breezingformsng/libraries/jquery/jq.min.js \
-    | grep -F 'jQuery v2.2.4' >/dev/null; then
-    echo "The embedded jQuery library is not version 2.2.4." >&2
-    exit 1
-fi
-
 obsolete_entries=(
     "administrator/components/com_breezingformsng/libraries/jquery/jq.js"
     "components/com_breezingformsng/libraries/jquery/jq.min.legacy.js"
+    "components/com_breezingformsng/libraries/jquery/jq.min.js"
 )
 
 for path in "${obsolete_entries[@]}"; do

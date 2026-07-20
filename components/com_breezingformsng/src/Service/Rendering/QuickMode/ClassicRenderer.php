@@ -82,12 +82,7 @@ class ClassicRenderer {
 float:left;
 }
 ');
-		$jQuery = '';
-		if (isset($this->rootMdata['disableJQuery']) && $this->rootMdata['disableJQuery']) {
-			$jQuery = "\n" . 'var JQuery = jQuery;' . "\n";
-		} else {
-			RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jq.min.js');
-		}
+		$jQuery = "\n" . 'var JQuery = jQuery;' . "\n";
 		if (!isset($this->rootMdata['joomlaHint']) || !$this->rootMdata['joomlaHint']) {
 			RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/tooltip.css');
 			RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/tooltip.js');

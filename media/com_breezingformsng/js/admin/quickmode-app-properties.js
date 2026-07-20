@@ -2082,7 +2082,6 @@
                     mdata.fadeIn = JQuery('#bfElementAdvancedFadeIn').attr('checked');
                     mdata.useErrorAlerts = JQuery('#bfElementAdvancedUseErrorAlerts').attr('checked');
 
-                    mdata.disableJQuery = JQuery('#bfElementAdvancedDisableJQuery').attr('checked');
                     mdata.joomlaHint = JQuery('#bfElementAdvancedJoomlaHint').attr('checked');
 
                     mdata.mobileEnabled = JQuery('#bfElementAdvancedMobileEnabled').attr('checked');
@@ -2121,7 +2120,6 @@
                         JQuery('#bfFormLastPageThankYou').attr('checked', mdata.lastPageThankYou);
                         JQuery('#bfElementAdvancedUseErrorAlerts').attr('checked', mdata.useErrorAlerts);
 
-                        JQuery('#bfElementAdvancedDisableJQuery').attr('checked', mdata.disableJQuery);
                         JQuery('#bfElementAdvancedJoomlaHint').attr('checked', mdata.joomlaHint);
 
                         JQuery('#bfElementAdvancedMobileEnabled').attr('checked', mdata.mobileEnabled);

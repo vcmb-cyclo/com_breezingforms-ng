@@ -249,7 +249,7 @@ if (!function_exists('bf_about_get_javascript_libraries')) {
         $candidates = array(
             array(
                 'name' => 'jQuery',
-                'script_path' => JPATH_ROOT . '/components/com_breezingformsng/libraries/jquery/jq.min.js',
+                'script_path' => JPATH_ROOT . '/media/vendor/jquery/js/jquery.min.js',
                 'css_path' => '',
             ),
             array(

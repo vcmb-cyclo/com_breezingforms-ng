@@ -18,8 +18,9 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 use Exception;
 use Vcmb\Component\BreezingformsNG\Site\Table\PieceTable;
 use Joomla\Utilities\ArrayHelper;
-use Joomla\CMS\Factory;
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\Database\DatabaseInterface;
+use Joomla\Database\ParameterType;
 use RuntimeException;
 use Throwable;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\PieceModel;
@@ -71,6 +72,13 @@ class BFAdminPieceTestContext
 
 class PieceManager
 {
+	public function __construct(
+		private readonly CMSApplication $app,
+		private readonly DatabaseInterface $database,
+		private readonly PieceModel $model,
+	) {
+	}
+
 	private static function buildIsolatedNamespace()
 	{
 		try {
@@ -136,9 +144,9 @@ class PieceManager
 		);
 	}
 
-	static function edit($option, $pkg, $ids)
+	function edit($option, $pkg, $ids)
 	{
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
+		$database = $this->database;
 		ArrayHelper::toInteger($ids);
 		$typelist = array();
 		$typelist[] = array('Untyped', Text::_('COM_BREEZINGFORMSNG_PIECES_UNTYPED'));
@@ -159,15 +167,15 @@ class PieceManager
 
 
 	// ✅ FORCER le champ code en RAW (conserve < et >)
-	static function save($option, $pkg)
+	function save($option, $pkg)
 	{
-		$app = Factory::getApplication();
+		$app = $this->app;
 		$post = $app->getInput()->post;
 		$data = $post->getArray();
 		$code = $post->get('code', '', 'raw');
 		$unitTests = $post->get('unit_tests', '', 'raw');
 
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
+		$database = $this->database;
 		$row      = new PieceTable($database);
 
 		try {
@@ -208,15 +216,15 @@ class PieceManager
 		$app->redirect("index.php?option=$option&task=pieces.edit&pkg=$pkg&ids[]=" . (int) $row->id);
 	}
 
-	static function cancel($option, $pkg)
+	function cancel($option, $pkg)
 	{
-		Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
+		$this->app->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 	} // cancel
 
 
-	static function copy($option, $pkg, $ids)
+	function copy($option, $pkg, $ids)
 	{
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
+		$database = $this->database;
 		ArrayHelper::toInteger($ids);
 		$total = count($ids);
 		$row = new PieceTable($database);
@@ -225,55 +233,53 @@ class PieceManager
 				$row->load(intval($id));
 				$row->id = NULL;
 				$row->created = (new \Joomla\CMS\Date\Date())->toSql();
-				$row->created_by = (string) Factory::getApplication()->getIdentity()->username;
+				$row->created_by = (string) $this->app->getIdentity()->username;
 				$row->modified = $row->created;
 				$row->modified_by = $row->created_by;
 				$row->store();
 			} // foreach
 		$msg = $total . ' ' . Text::_('COM_BREEZINGFORMSNG_PIECES_SUCCOPIED');
-		Factory::getApplication()->enqueueMessage($msg);
-		Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
+		$this->app->enqueueMessage($msg);
+		$this->app->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 	} // copy
 
 
-	static function del($option, $pkg, $ids)
+	function del($option, $pkg, $ids)
 	{
-		$model = PieceModel::create();
-
 		try {
-			$total = $model->deleteByIds($ids);
+			$total = $this->model->deleteByIds($ids);
 		} catch (RuntimeException $e) {
-			Factory::getApplication()->enqueueMessage($e->getMessage(), 'error');
-			Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
+			$this->app->enqueueMessage($e->getMessage(), 'error');
+			$this->app->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 		}
 
 		if ($total) {
 			$msg = $total . ' ' . Text::_('COM_BREEZINGFORMSNG_PIECES_SUCCDELETED');
-			Factory::getApplication()->enqueueMessage($msg);
-			Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
+			$this->app->enqueueMessage($msg);
+			$this->app->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 			return;
 		}
-		Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
+		$this->app->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 	} // del
 
 
-	static function publish($option, $pkg, $ids, $publish)
+	function publish($option, $pkg, $ids, $publish)
 	{
 		try {
-			PieceModel::create()->publishByIds($ids, (bool) $publish);
+			$this->model->publishByIds($ids, (bool) $publish);
 		} catch (RuntimeException $e) {
-			Factory::getApplication()->enqueueMessage($e->getMessage(), 'error');
-			Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
+			$this->app->enqueueMessage($e->getMessage(), 'error');
+			$this->app->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 		}
 
-		Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
+		$this->app->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 	} // publish
 
 
-	static function listitems($option, $pkg)
+	function listitems($option, $pkg)
 	{
 		try {
-			$pkgs = PieceModel::create()->getPackages();
+			$pkgs = $this->model->getPackages();
 		} catch (Exception $e) {
 			echo $e->getCode() . ' : ' . $e->getMessage();
 			return false;
@@ -296,7 +302,7 @@ class PieceManager
 			foreach ($pkgs as $p)
 				$pkglist[] = array($p->name == $pkg, $p->name);
 
-		$app = Factory::getApplication();
+		$app = $this->app;
 		$input = $app->getInput();
 		$session = $app->getSession();
 		$searchReq = $input->get('search', null, 'string');
@@ -345,7 +351,7 @@ class PieceManager
 		}
 
 		try {
-			$listData = PieceModel::create()->getListData($pkg, $search, $sort, $dir, $limit, $limitstart);
+			$listData = $this->model->getListData($pkg, $search, $sort, $dir, $limit, $limitstart);
 		} catch (Exception $e) {
 			echo $e->getCode() . ' : ' . $e->getMessage();
 			return false;
@@ -358,18 +364,18 @@ class PieceManager
 		Renderer::listitems($option, $rows, $pkglist, $pkg, $search, $total, $limit, $limitstart, $pageSizes);
 	} // listitems
 
-	static function test($option, $pkg, $ids)
+	function test($option, $pkg, $ids)
 	{
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
+		$database = $this->database;
 		ArrayHelper::toInteger($ids);
 		if (!count($ids)) {
-			$id = Factory::getApplication()->getInput()->getInt('id', 0);
+			$id = $this->app->getInput()->getInt('id', 0);
 			if ($id) {
 				$ids = array($id);
 			}
 		}
 		if (!count($ids)) {
-			Factory::getApplication()->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
+			$this->app->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 			return;
 		}
 
@@ -407,14 +413,14 @@ class PieceManager
 			}
 			$autoRun = $allDefaults;
 		}
-		$testMode = Factory::getApplication()->getInput()->getCmd('test_mode', '');
+		$testMode = $this->app->getInput()->getCmd('test_mode', '');
 		Renderer::test($option, $pkg, $row, $functionName, $params, $paramDefaults, array(), null, '', '', 0, $autoRun, array(), $testMode, array());
 	}
 
-	static function testrun($option, $pkg, $ids)
+	function testrun($option, $pkg, $ids)
 	{
-		$app = Factory::getApplication();
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
+		$app = $this->app;
+		$database = $this->database;
 		ArrayHelper::toInteger($ids);
 		if (!count($ids)) {
 			$id = $app->getInput()->getInt('id', 0);
@@ -495,13 +501,13 @@ class PieceManager
 		Renderer::test($option, $pkg, $row, $functionName, $paramNames, $paramDefaults, $paramValues, $result, $output, $error, $safeMode, false, $errorDetails, $testMode, $unitTestResult, $autoOpened);
 	}
 
-	static function testrunajax($option, $pkg, $ids)
+	function testrunajax($option, $pkg, $ids)
 	{
-		$app = Factory::getApplication();
+		$app = $this->app;
 		$app->setHeader('Content-Type', 'application/json', true);
 		$post = $app->getInput()->post;
 
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
+		$database = $this->database;
 		$row = new PieceTable($database);
 		$row->id = $post->getInt('id', 0);
 		$row->code = $post->get('code', '', 'raw');
@@ -513,20 +519,20 @@ class PieceManager
 		$app->close();
 	}
 
-	static function prev($option, $pkg, $ids)
+	function prev($option, $pkg, $ids)
 	{
-		self::navigate($option, $pkg, $ids, 'prev');
+		$this->navigate($option, $pkg, $ids, 'prev');
 	}
 
-	static function next($option, $pkg, $ids)
+	function next($option, $pkg, $ids)
 	{
-		self::navigate($option, $pkg, $ids, 'next');
+		$this->navigate($option, $pkg, $ids, 'next');
 	}
 
-	private static function navigate($option, $pkg, $ids, $direction)
+	private function navigate($option, $pkg, $ids, $direction)
 	{
-		$app = Factory::getApplication();
-		$database = Factory::getContainer()->get(DatabaseInterface::class);
+		$app = $this->app;
+		$database = $this->database;
 		ArrayHelper::toInteger($ids);
 		if (!count($ids)) {
 			$id = $app->getInput()->getInt('id', 0);
@@ -540,31 +546,30 @@ class PieceManager
 		}
 
 		$currentId = (int) $ids[0];
-		$pkgCondition = $pkg !== '' ? "package = " . $database->Quote($pkg) : "1=1";
-		if ($direction === 'prev') {
-			$database->setQuery(
-				"SELECT id FROM #__facileforms_pieces WHERE " . $pkgCondition .
-				" AND id < " . $currentId . " ORDER BY id DESC LIMIT 1"
-			);
-		} else {
-			$database->setQuery(
-				"SELECT id FROM #__facileforms_pieces WHERE " . $pkgCondition .
-				" AND id > " . $currentId . " ORDER BY id ASC LIMIT 1"
-			);
+		$query = $database->getQuery(true)
+			->select($database->quoteName('id'))
+			->from($database->quoteName('#__facileforms_pieces'))
+			->where($database->quoteName('id') . ($direction === 'prev' ? ' < :currentId' : ' > :currentId'))
+			->order($database->quoteName('id') . ($direction === 'prev' ? ' DESC' : ' ASC'))
+			->bind(':currentId', $currentId, ParameterType::INTEGER)
+			->setLimit(1);
+		if ($pkg !== '') {
+			$query->where($database->quoteName('package') . ' = :package')
+				->bind(':package', $pkg);
 		}
+		$database->setQuery($query);
 		$targetId = (int) $database->loadResult();
 		if (!$targetId) {
-			if ($direction === 'prev') {
-				$database->setQuery(
-					"SELECT id FROM #__facileforms_pieces WHERE " . $pkgCondition .
-					" ORDER BY id DESC LIMIT 1"
-				);
-			} else {
-				$database->setQuery(
-					"SELECT id FROM #__facileforms_pieces WHERE " . $pkgCondition .
-					" ORDER BY id ASC LIMIT 1"
-				);
+			$query = $database->getQuery(true)
+				->select($database->quoteName('id'))
+				->from($database->quoteName('#__facileforms_pieces'))
+				->order($database->quoteName('id') . ($direction === 'prev' ? ' DESC' : ' ASC'))
+				->setLimit(1);
+			if ($pkg !== '') {
+				$query->where($database->quoteName('package') . ' = :package')
+					->bind(':package', $pkg);
 			}
+			$database->setQuery($query);
 			$targetId = (int) $database->loadResult();
 			if (!$targetId) {
 				$targetId = $currentId;

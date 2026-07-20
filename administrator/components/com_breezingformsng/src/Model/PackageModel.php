@@ -9,37 +9,12 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\ListModel;
-use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 use Joomla\Database\QueryInterface;
 
 abstract class PackageModel extends ListModel
 {
-    public static function create(): static
-    {
-        $model = new static([
-            'dbo' => null,
-            'filter_fields' => [
-                'a.description',
-                'a.id',
-                'a.modified',
-                'a.name',
-                'a.package',
-                'a.published',
-                'a.title',
-                'a.type',
-            ],
-            'ignore_request' => true,
-            'option' => 'com_breezingformsng',
-        ]);
-
-        $model->setDatabase(Factory::getContainer()->get(DatabaseInterface::class));
-
-        return $model;
-    }
-
     public function deleteByIds(array $ids): int
     {
         $ids = $this->filterIds($ids);

@@ -15,7 +15,7 @@ use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 use Joomla\Database\QueryInterface;
 
-abstract class LegacyPackageModel extends ListModel
+abstract class PackageModel extends ListModel
 {
     public static function create(): static
     {

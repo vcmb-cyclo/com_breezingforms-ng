@@ -11,7 +11,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 
 use Joomla\CMS\Factory;
 
-class ScriptModel extends LegacyPackageModel
+class ScriptModel extends PackageModel
 {
     public function prepareList(string $package): array
     {

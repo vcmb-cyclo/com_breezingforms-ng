@@ -61,5 +61,7 @@
   closure, keeping response lifecycle control inside the CMS.
 - Replaced the remaining assembled SQL in QuickMode ContentBuilder synchronization and Piece test execution
   with Joomla database queries and bound parameters.
+- Moved QuickMode's chunked-save workspace from public media into Joomla's temporary directory, restricted
+  chunk identifiers to alphanumeric input, and stopped suppressing filesystem and Base64 errors.
 - Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
   moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

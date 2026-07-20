@@ -928,11 +928,13 @@ class com_breezingformsngInstallerScript
             return;
         }
 
-        $installer = new Installer();
-        $installer->setDatabase(Factory::getContainer()->get(DatabaseInterface::class));
-
         foreach ($folders as $folder) {
             $this->log("Installing plugin from folder: {$folder}");
+
+            // Installer keeps manifest state; use a fresh instance for every
+            // bundled extension so each plugin receives its own database row.
+            $installer = new Installer();
+            $installer->setDatabase(Factory::getContainer()->get(DatabaseInterface::class));
 
             if ($installer->install($basePath . '/' . $folder)) {
                 $this->log("Plugin {$folder} installed successfully.", Log::INFO);

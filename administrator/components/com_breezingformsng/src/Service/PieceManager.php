@@ -29,11 +29,11 @@ use Joomla\CMS\Language\Text;
 
 class BFAdminPieceTestContext
 {
-	private $db;
+	private DatabaseInterface $db;
 	public $formrow;
 	public $form_id;
 
-	public function __construct($db)
+	public function __construct(DatabaseInterface $db)
 	{
 		$this->db = $db;
 		$this->formrow = (object) array('id' => 0, 'name' => '');
@@ -46,9 +46,13 @@ class BFAdminPieceTestContext
 			return null;
 		}
 
-		$this->db->setQuery(
-			"SELECT code FROM #__facileforms_pieces WHERE name = " . $this->db->Quote($name) . " LIMIT 1"
-		);
+		$query = $this->db->getQuery(true)
+			->select($this->db->quoteName('code'))
+			->from($this->db->quoteName('#__facileforms_pieces'))
+			->where($this->db->quoteName('name') . ' = :name')
+			->bind(':name', $name)
+			->setLimit(1);
+		$this->db->setQuery($query);
 		$code = (string) $this->db->loadResult();
 		if ($code === '') {
 			return null;

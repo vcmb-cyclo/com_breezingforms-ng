@@ -9,10 +9,9 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
-use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
-use Joomla\Database\DatabaseInterface;
+use Joomla\Database\ParameterType;
 use Joomla\Filesystem\File;
 use Joomla\Filesystem\Folder;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\QuickmodeModel;
@@ -85,10 +84,16 @@ class QuickmodeController extends BaseController
                 require_once $cbngBasePath . '/src/Service/FormSupportService.php';
 
                 $cbForm = \CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory::getForm('com_breezingformsng', $formId);
-                $db     = Factory::getContainer()->get(DatabaseInterface::class);
-                $db->setQuery(
-                    'SELECT id FROM #__contentbuilderng_forms WHERE `type` = \'com_breezingformsng\' AND `reference_id` = ' . (int) $formId
-                );
+                $db = $this->getQuickmodeModel()->getDatabase();
+                $sourceType = 'com_breezingformsng';
+                $query = $db->getQuery(true)
+                    ->select($db->quoteName('id'))
+                    ->from($db->quoteName('#__contentbuilderng_forms'))
+                    ->where($db->quoteName('type') . ' = :sourceType')
+                    ->where($db->quoteName('reference_id') . ' = :referenceId')
+                    ->bind(':sourceType', $sourceType)
+                    ->bind(':referenceId', $formId, ParameterType::INTEGER);
+                $db->setQuery($query);
                 $cbForms = $db->loadColumn();
 
                 if (is_object($cbForm) && count($cbForms)) {

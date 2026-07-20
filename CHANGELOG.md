@@ -59,5 +59,7 @@
   unused legacy `table.columns` behavior asset.
 - Replaced direct process termination in payment and Flash-upload callbacks with Joomla application response
   closure, keeping response lifecycle control inside the CMS.
+- Replaced the remaining assembled SQL in QuickMode ContentBuilder synchronization and Piece test execution
+  with Joomla database queries and bound parameters.
 - Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
   moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

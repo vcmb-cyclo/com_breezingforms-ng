@@ -141,7 +141,7 @@ class ImportModel extends BaseDatabaseModel
         }
 
         $now = (new \Joomla\CMS\Date\Date())->toSql();
-        $userName = (string) (Factory::getApplication()->getIdentity()?->username ?? '');
+        $userName = (string) ($this->getCurrentUser()?->username ?? '');
 
         if ($existing !== null) {
             $item['modified'] = $now;

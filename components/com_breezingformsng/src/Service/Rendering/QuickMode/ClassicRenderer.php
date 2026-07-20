@@ -75,7 +75,7 @@ class ClassicRenderer {
 			RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/plupload/plupload.js');
 			RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-plupload-compat.js');
 		}
-        HTMLHelper::_('jquery.framework');
+		$this->p->app->getDocument()->getWebAssetManager()->useScript('jquery');
 		RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/media/com_breezingformsng/css/site/quickmode-runtime.css');
 		$this->p->app->getDocument()->getWebAssetManager()->addInlineStyle('
 .bfInline{

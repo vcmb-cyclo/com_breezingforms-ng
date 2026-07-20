@@ -197,9 +197,8 @@ class OnePageRenderer
 
         RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/media/com_breezingformsng/css/site/quickmode-runtime.css');
 
-        // force jquery to be loaded after mootools but before any other js (since J! 3.4)
         HTMLHelper::_('bootstrap.framework');
-        HTMLHelper::_('jquery.framework');
+        $this->p->app->getDocument()->getWebAssetManager()->useScript('jquery');
         HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
         RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-tooltip-init.js');
 

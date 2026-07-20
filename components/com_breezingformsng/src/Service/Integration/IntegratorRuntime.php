@@ -6,7 +6,6 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Integration;
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
-use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 
@@ -28,10 +27,7 @@ use Joomla\Database\ParameterType;
  **/
 class IntegratorRuntime
 {
-    /**
-     * JDatabase
-     */
-    private $db = null;
+    private DatabaseInterface $db;
 
     private $rules = array();
 
@@ -39,9 +35,9 @@ class IntegratorRuntime
 
     private $data = array();
 
-    function __construct($formId)
+    public function __construct(int $formId, DatabaseInterface $database)
     {
-        $this->db = Factory::getContainer()->get(DatabaseInterface::class);
+        $this->db = $database;
         $this->rules = $this->getRules($formId);
         $this->formId = $formId;
     }

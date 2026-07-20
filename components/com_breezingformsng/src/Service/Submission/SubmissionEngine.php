@@ -1663,8 +1663,8 @@ transition: box-shadow .15s linear;
             }
         }
 
-        unset($_SESSION['ff_editable_overridePlg' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . $this->processor->form_id]);
-        unset($_SESSION['ff_editablePlg' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . $this->processor->form_id]);
+        $this->processor->app->getSession()->clear('ff_editable_overridePlg' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . $this->processor->form_id);
+        $this->processor->app->getSession()->clear('ff_editablePlg' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . $this->processor->form_id);
         $this->processor->app->getSession()->set('ff_editableMod' . $this->processor->app->getInput()->getInt('ff_module_id', 0) . $this->processor->form_id, 0);
         $this->processor->app->getSession()->set('ff_editable_overrideMod' . $this->processor->app->getInput()->getInt('ff_module_id', 0) . $this->processor->form_id, 0);
 

@@ -251,14 +251,19 @@ $ff_request = array();
 
     if ($ok) {
 
+        $session = $this->application->getSession();
+        $contentId = $this->application->getInput()->getInt('ff_contentid', 0);
+        $pluginEditableKey = 'ff_editablePlg' . $contentId . $form->name;
+        $pluginEditableOverrideKey = 'ff_editable_overridePlg' . $contentId . $form->name;
+
         // set by plugin
-        if (isset($_SESSION['ff_editablePlg' . $form->name]) && $_SESSION['ff_editablePlg' . $this->application->getInput()->getInt('ff_contentid', 0) . $form->name] != 0 && ($this->application->getInput()->getString('ff_applic', '') == 'plg_facileforms' || (isset($ff_applic) && $ff_applic == 'plg_facileforms'))) {
-            $editable = $_SESSION['ff_editablePlg' . $this->application->getInput()->getInt('ff_contentid', 0) . $form->name];
+        if ($session->get($pluginEditableKey, 0) != 0 && ($this->application->getInput()->getString('ff_applic', '') == 'plg_facileforms' || (isset($ff_applic) && $ff_applic == 'plg_facileforms'))) {
+            $editable = $session->get($pluginEditableKey, 0);
         }
 
         // set by plugin
-        if (isset($_SESSION['ff_editable_overridePlg' . $form->name]) && $_SESSION['ff_editable_overridePlg' . $this->application->getInput()->getInt('ff_contentid', 0) . $form->name] != 0 && ($this->application->getInput()->getString('ff_applic', '') == 'plg_facileforms' || (isset($ff_applic) && $ff_applic == 'plg_facileforms'))) {
-            $editable_override = $_SESSION['ff_editable_overridePlg' . $this->application->getInput()->getInt('ff_contentid', 0) . $form->name];
+        if ($session->get($pluginEditableOverrideKey, 0) != 0 && ($this->application->getInput()->getString('ff_applic', '') == 'plg_facileforms' || (isset($ff_applic) && $ff_applic == 'plg_facileforms'))) {
+            $editable_override = $session->get($pluginEditableOverrideKey, 0);
         }
 
         // set by module
@@ -293,15 +298,11 @@ $ff_request = array();
                 $this->requestParameterParser->parse((string) $parprv)
             );
         if ($my_ff_params) {
-            // reset($_REQUEST);
-            foreach ($_REQUEST as $prop => $val) {
-                if (!is_array($val) && substr($prop, 0, 9) == 'ff_param_')
-                    $ff_request[$prop] = $val;
+            foreach (array_keys($this->application->getInput()->getArray()) as $prop) {
+                if (str_starts_with($prop, 'ff_param_')) {
+                    $ff_request[$prop] = $this->application->getInput()->getString($prop);
+                }
             }
-            // Deprecated in PHP 7.2 version so code above is used
-            // while (list($prop, $val) = each($_REQUEST))
-            // 	if (!is_array($val) && substr($prop,0,9)=='ff_param_')
-            // 		$ff_request[$prop] = $val;
         } // if
 
         if ($inframe && !$plainform) {

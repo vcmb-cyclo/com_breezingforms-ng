@@ -139,8 +139,8 @@ var __bfOpts = Joomla.getOptions('com_breezingformsng.scripts-test') || {};
 					}
 
 				window.submitbutton = function (pressbutton) {
-					var task = pressbutton === 'prev' ? 'previous' : pressbutton;
-					Joomla.submitform('scripts.' + task, document.getElementById('adminForm'));
+					var action = pressbutton.indexOf('.') === -1 ? pressbutton : pressbutton.split('.').pop();
+					Joomla.submitform('scripts.' + action, document.getElementById('adminForm'));
 				};
 
 				window.bfRunScriptTest = function () {

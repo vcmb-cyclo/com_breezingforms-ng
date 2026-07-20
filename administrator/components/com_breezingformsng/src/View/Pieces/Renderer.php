@@ -81,12 +81,12 @@ class Renderer
 		$unitTestsHelp = Text::_('COM_BREEZINGFORMSNG_TEST_UNIT_TESTS_HELP');
 		HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
 		if ($row->id) {
-			ToolBarHelper::custom('prev', 'arrow-left', '', Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV'), false);
-			ToolBarHelper::custom('next', 'arrow-right', '', Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT'), false);
-			ToolBarHelper::custom('test', 'eye', '', Text::_('COM_BREEZINGFORMSNG_TEST'), false);
+			ToolBarHelper::custom('pieces.previous', 'arrow-left', '', Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV'), false);
+			ToolBarHelper::custom('pieces.next', 'arrow-right', '', Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT'), false);
+			ToolBarHelper::custom('pieces.test', 'eye', '', Text::_('COM_BREEZINGFORMSNG_TEST'), false);
 		}
-		ToolBarHelper::custom('save', 'save.png', 'save_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_SAVE'), false);
-		ToolBarHelper::custom('cancel', 'cancel.png', 'cancel_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_QUICKMODE_CLOSE'), false);
+		ToolBarHelper::custom('pieces.save', 'save.png', 'save_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_SAVE'), false);
+		ToolBarHelper::custom('pieces.cancel', 'cancel.png', 'cancel_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_QUICKMODE_CLOSE'), false);
 		?>
 		<?php
 		$document = Factory::getApplication()->getDocument();
@@ -284,14 +284,8 @@ class Renderer
 		$listOrder = (string) $listOrder;
 		$listDirn = strtolower((string) $listDirn);
 		$listDirn = $listDirn === 'desc' ? 'desc' : 'asc';
-		ToolBarHelper::custom('new', 'new.png', 'new_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_NEW'), false);
-		ToolBarHelper::custom('copy', 'copy.png', 'copy_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_COPY'), false);
-		ToolBarHelper::custom('publish', 'publish.png', 'publish_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_PUBLISH'), false);
-		ToolBarHelper::custom('unpublish', 'unpublish.png', 'unpublish_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_UNPUBLISH'), false);
-		ToolBarHelper::custom('remove', 'delete.png', 'delete_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_DELETE'), false);
 		?>
 		<?php
-		Factory::getApplication()->getDocument()->getWebAssetManager()->useScript('com_breezingformsng.pieces-list');
 		Text::script('COM_BREEZINGFORMSNG_PIECES_SELPIECESFIRST');
 		Text::script('COM_BREEZINGFORMSNG_PIECES_ASKDELETE');
 		?>
@@ -445,9 +439,9 @@ class Renderer
 	static function test($option, $pkg, &$row, $functionName, $paramNames, $paramDefaults, $paramValues = array(), $result = null, $output = '', $error = '', $safeMode = 1, $autoRun = false, $errorDetails = array(), $testMode = '', $unitTestResult = array(), $autoOpened = 0)
 	{
 		Factory::getApplication()->getInput()->set('hidemainmenu', 1);
-		ToolBarHelper::custom('edit', 'undo', '', Text::_('COM_BREEZINGFORMSNG_TEST_BACK'), false);
-		ToolBarHelper::custom('prev', 'arrow-left', '', Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV'), false);
-		ToolBarHelper::custom('next', 'arrow-right', '', Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT'), false);
+		ToolBarHelper::custom('pieces.edit', 'undo', '', Text::_('COM_BREEZINGFORMSNG_TEST_BACK'), false);
+		ToolBarHelper::custom('pieces.previous', 'arrow-left', '', Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV'), false);
+		ToolBarHelper::custom('pieces.next', 'arrow-right', '', Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT'), false);
 			$hasUnitTests = trim((string) $row->unit_tests) !== '';
 			$shouldAutoRunUnitTestsOnly = !$autoRun && $hasUnitTests && $testMode !== 'unit' && $result === null && $error === '' && empty($unitTestResult);
 			$showAutoOpenUnitWarning = ((int) $autoOpened === 1) &&

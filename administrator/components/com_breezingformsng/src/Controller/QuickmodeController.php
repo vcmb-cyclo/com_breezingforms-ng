@@ -14,6 +14,7 @@ use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\Database\ParameterType;
 use Joomla\Filesystem\File;
 use Joomla\Filesystem\Folder;
+use Joomla\Filesystem\Path;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\QuickmodeModel;
 
 class QuickmodeController extends BaseController
@@ -39,34 +40,46 @@ class QuickmodeController extends BaseController
         $chunksLength = $input->getInt('chunksLength', 0);
         $form         = $input->getInt('form', 0);
         $chunkIdx     = $input->getInt('chunkIdx', 0);
-        $rndAdd       = $input->getString('rndAdd', '0');
+        $rndAdd       = $input->getAlnum('rndAdd', '');
         $chunk        = $input->getString('chunk', '');
 
-        if ($chunksLength < 1 || $chunkIdx < 0 || $chunkIdx >= $chunksLength) {
+        if ($chunksLength < 1 || $chunkIdx < 0 || $chunkIdx >= $chunksLength || $rndAdd === '') {
             $app->setHeader('status', 400, true);
             $app->close();
         }
 
-        $cacheDir = JPATH_SITE . '/media/breezingforms/ajax_cache';
+        $cacheDir = Path::clean((string) $app->get('tmp_path') . '/com_breezingformsng-quickmode');
 
-        if (!is_dir($cacheDir)) {
-            Folder::create($cacheDir);
+        if (!is_dir($cacheDir) && !Folder::create($cacheDir)) {
+            $app->setHeader('status', 500, true);
+            $app->close();
         }
 
         $dest = $cacheDir . '/ajaxsave_' . $chunkIdx . '_' . $rndAdd . '.txt';
-        @File::write($dest, $chunk);
+        if (!File::write($dest, $chunk)) {
+            $app->setHeader('status', 500, true);
+            $app->close();
+        }
 
-        @ob_end_clean();
+        if (ob_get_level() > 0) {
+            ob_end_clean();
+        }
 
         if ($chunkIdx === $chunksLength - 1) {
             $contents = '';
             for ($i = 0; $i < $chunksLength; $i++) {
                 $file = $cacheDir . '/ajaxsave_' . $i . '_' . $rndAdd . '.txt';
-                $contents .= (string) @file_get_contents($file);
-                @File::delete($file);
+                if (!is_file($file)) {
+                    $app->setHeader('status', 400, true);
+                    $app->close();
+                }
+
+                $contents .= (string) file_get_contents($file);
+                File::delete($file);
             }
 
-            $dataObject = json_decode(base64_decode($contents), true);
+            $decoded = base64_decode($contents, true);
+            $dataObject = $decoded === false ? null : json_decode($decoded, true);
 
             if (!is_array($dataObject)) {
                 $app->setHeader('status', 400, true);

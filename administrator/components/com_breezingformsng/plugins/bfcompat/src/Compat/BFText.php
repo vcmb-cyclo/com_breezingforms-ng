@@ -20,6 +20,12 @@ use Joomla\CMS\Language\Text;
  * 
  * SPDX-License-Identifier: GPL-2.0-or-later
  **/
+
+/**
+ * Not a Joomla-version compatibility shim: kept as the BreezingForms legacy
+ * API surface so PHP stored in the database (facileforms_pieces.code,
+ * forms.piece*code) can keep calling BFText::* directly.
+ */
 final class BFText
 {
 

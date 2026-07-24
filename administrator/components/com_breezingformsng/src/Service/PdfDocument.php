@@ -13,6 +13,19 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 use Vcmb\Component\BreezingformsNG\Administrator\Helper\VendorHelper;
 
+// TCPDF's own tcpdf_autoconfig.php assumes tc-lib-pdf-font is nested inside
+// its own vendor/ dir (a standalone, non-Composer install layout). Under a
+// flat top-level Composer install the package is a sibling instead, so the
+// built-in default resolves to a directory that never exists. Point it at
+// the real location before class_exists() below can trigger TCPDF's
+// classmapped autoload (which would otherwise lock in the wrong default).
+if (!defined('K_PATH_FONTS')) {
+    define(
+        'K_PATH_FONTS',
+        JPATH_ADMINISTRATOR . '/components/com_breezingformsng/vendor/tecnickcom/tc-lib-pdf-font/target/fonts/'
+    );
+}
+
 if (!class_exists(\TCPDF::class)) {
     VendorHelper::load();
 }
@@ -44,6 +57,26 @@ class PdfDocument extends \TCPDF
         $this->which = $which;
     }
 
+    /**
+     * Imports a TTF file into TCPDF's font cache and returns its family name.
+     * Com\Tecnick\Pdf\Font\Import throws if the definition file it would
+     * write already exists (e.g. Header() and Footer() importing the same
+     * font in one request), so skip the import once the cached definition
+     * is on disk and return the deterministic name TCPDF derives from the
+     * filename (see Com\Tecnick\Pdf\Font\Import::makeFontName).
+     */
+    public static function importTtfFont(string $path): string
+    {
+        $name = strtolower((string) preg_replace('/[^a-z0-9_]/', '', pathinfo($path, PATHINFO_FILENAME)));
+        $name = str_replace(['bold', 'oblique', 'italic', 'regular'], ['b', 'i', 'i', ''], $name);
+
+        if (!file_exists(K_PATH_FONTS . $name . '.json')) {
+            new \Com\Tecnick\Pdf\Font\Import($path, '', 'TrueTypeUnicode');
+        }
+
+        return $name;
+    }
+
     function Header(){
 
         $pdf = $this;
@@ -64,12 +97,8 @@ class PdfDocument extends \TCPDF
                         }
                     }
                     if($file!="." && $file!=".." && $this->endsWith(strtolower($file), '.ttf')) {
-                        $file_sep = explode('.', $file);
-                        if(count($file_sep) > 1){
-                            unset($file_sep[count($file_sep)-1]);
-                            $ttf_name = \TCPDF_FONTS::addTTFfont($sourcePath.$file, 'TrueTypeUnicode');
-                            $font_loaded = true;
-                        }
+                        $ttf_name = self::importTtfFont($sourcePath.$file);
+                        $font_loaded = true;
                     }
                     if($this->endsWith(strtolower($file), '_active')){
                         $active = explode('_', $file);
@@ -93,7 +122,7 @@ class PdfDocument extends \TCPDF
         }
 
         if(!$active_found){
-            \TCPDF_FONTS::addTTFfont(JPATH_SITE . '/media/com_breezingformsng/fonts/verdana.ttf', 'TrueTypeUnicode');
+            self::importTtfFont(JPATH_SITE . '/media/com_breezingformsng/fonts/verdana.ttf');
             $pdf->SetFont('verdana');
         }
 
@@ -130,12 +159,8 @@ class PdfDocument extends \TCPDF
                         }
                     }
                     if($file!="." && $file!=".." && $this->endsWith(strtolower($file), '.ttf')) {
-                        $file_sep = explode('.', $file);
-                        if(count($file_sep) > 1){
-                            unset($file_sep[count($file_sep)-1]);
-                            $ttf_name = \TCPDF_FONTS::addTTFfont($sourcePath.$file, 'TrueTypeUnicode');
-                            $font_loaded = true;
-                        }
+                        $ttf_name = self::importTtfFont($sourcePath.$file);
+                        $font_loaded = true;
                     }
                     if($this->endsWith(strtolower($file), '_active')){
                         $active = explode('_', $file);
@@ -159,7 +184,7 @@ class PdfDocument extends \TCPDF
         }
 
         if(!$active_found){
-            \TCPDF_FONTS::addTTFfont(JPATH_SITE . '/media/com_breezingformsng/fonts/verdana.ttf', 'TrueTypeUnicode');
+            self::importTtfFont(JPATH_SITE . '/media/com_breezingformsng/fonts/verdana.ttf');
             $pdf->SetFont('verdana');
         }
 

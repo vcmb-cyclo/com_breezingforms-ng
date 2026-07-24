@@ -18,14 +18,14 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 use Vcmb\Component\BreezingformsNG\Administrator\Service\PdfDocument;
 
 /**
- * Facade kept for backward compatibility: PHP stored in the database
- * (facileforms_pieces.code, forms.piece*code) and external callers may
- * reference this class by name to build a custom PDF (e.g. a custom
- * export or mailback attachment). The implementation now lives in
- * Administrator\Service\PdfDocument (the same class the component's own
- * export/notification code uses), so this facade never drifts out of
- * sync with it - see BFQuickModeBootstrap/Mobile/OnePage for the same
- * pattern applied to the Phase 9c renderers.
+ * Not a Joomla-version compatibility shim: kept as the BreezingForms legacy
+ * API surface. PHP stored in the database (facileforms_pieces.code,
+ * forms.piece*code) and external callers may reference this class by name
+ * to build a custom PDF (e.g. a custom export or mailback attachment). The
+ * implementation now lives in Administrator\Service\PdfDocument (the same
+ * class the component's own export/notification code uses), so this facade
+ * never drifts out of sync with it - see BFQuickModeBootstrap/Mobile/OnePage
+ * for the same pattern applied to the Phase 9c renderers.
  */
 class BFPDF extends PdfDocument
 {

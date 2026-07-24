@@ -55,7 +55,7 @@ input[type="color"],
     transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s !important;
 }
 
-main input:focus:not([type=checkbox]):not([type=radio]) {
+main input:focus:not([type="checkbox"]):not([type="radio"]) {
     background: #f8f8f8 none repeat scroll 0 0 !important;
     border-color: #3f51b5 !important;
     box-shadow: none !important;
@@ -204,8 +204,8 @@ a[onclick^="addOption"]:focus {
 custom radio and checkbox style
 */
 
-main input[type=checkbox]:not(old),
-main input[type=radio]:not(old) {
+main input[type="checkbox"]:not(old),
+main input[type="radio"]:not(old) {
     width: 2em !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -218,8 +218,8 @@ main input[type=radio]:not(old) {
    visible control; the QuickMode editor's own Yes/No property toggles don't
    follow that markup, so they'd otherwise render fully invisible (opacity: 0
    with nothing drawn in its place). Exempt them. */
-.bfPropertyWrap input[type=checkbox],
-.bfPropertyWrap input[type=radio] {
+.bfPropertyWrap input[type="checkbox"],
+.bfPropertyWrap input[type="radio"] {
     opacity: 1 !important;
 }
 
@@ -231,15 +231,15 @@ main input[type=radio]:not(old) {
     margin-left: 0;
 }
 
-main input[type=checkbox]:not(old) + label,
-main input[type=radio]:not(old) + label {
+main input[type="checkbox"]:not(old) + label,
+main input[type="radio"]:not(old) + label {
     display: inline-block;
     margin-left: -1.5em;
     line-height: 1.5em;
 }
 
-main input[type=checkbox]:not([style*="none"]) + label > span,
-main input[type=radio]:not([style*="none"]) + label > span {
+main input[type="checkbox"]:not([style*="none"]) + label > span,
+main input[type="radio"]:not([style*="none"]) + label > span {
     display: inline-block;
     width: 0.875em;
     height: 0.875em;
@@ -248,35 +248,35 @@ main input[type=radio]:not([style*="none"]) + label > span {
     border: 1px solid #c0c0c0;
     border-radius: 0;
     background: rgb(224, 224, 224);
-    background-image: -moz-linear-gradient(rgb(240, 240, 240), rgb(224, 224, 224));
-    background-image: -ms-linear-gradient(rgb(240, 240, 240), rgb(224, 224, 224));
-    background-image: -o-linear-gradient(rgb(240, 240, 240), rgb(224, 224, 224));
-    background-image: -webkit-linear-gradient(rgb(240, 240, 240), rgb(224, 224, 224));
+    background-image: linear-gradient(rgb(240, 240, 240), rgb(224, 224, 224));
+    background-image: linear-gradient(rgb(240, 240, 240), rgb(224, 224, 224));
+    background-image: linear-gradient(rgb(240, 240, 240), rgb(224, 224, 224));
+    background-image: linear-gradient(rgb(240, 240, 240), rgb(224, 224, 224));
     background-image: linear-gradient(rgb(240, 240, 240), rgb(224, 224, 224));
     vertical-align: bottom;
 }
 
-main input[type=checkbox]:not(old) + label > span {
+main input[type="checkbox"]:not(old) + label > span {
     background: transparent !important;
 }
 
-main input[type=radio]:not(old) + label > span {
+main input[type="radio"]:not(old) + label > span {
     border-radius: 1em !important;
     border: 3px solid #ddd;
     width: 0.6em;
     height: 0.6em;
 }
 
-main input[type=checkbox]:not(old):checked + label > span,
-main input[type=radio]:not(old):checked + label > span {
-    background-image: -moz-linear-gradient(rgb(224, 224, 224), rgb(240, 240, 240));
-    background-image: -ms-linear-gradient(rgb(224, 224, 224), rgb(240, 240, 240));
-    background-image: -o-linear-gradient(rgb(224, 224, 224), rgb(240, 240, 240));
-    background-image: -webkit-linear-gradient(rgb(224, 224, 224), rgb(240, 240, 240));
+main input[type="checkbox"]:not(old):checked + label > span,
+main input[type="radio"]:not(old):checked + label > span {
+    background-image: linear-gradient(rgb(224, 224, 224), rgb(240, 240, 240));
+    background-image: linear-gradient(rgb(224, 224, 224), rgb(240, 240, 240));
+    background-image: linear-gradient(rgb(224, 224, 224), rgb(240, 240, 240));
+    background-image: linear-gradient(rgb(224, 224, 224), rgb(240, 240, 240));
     background-image: linear-gradient(rgb(224, 224, 224), rgb(240, 240, 240));
 }
 
-main input[type=checkbox]:not(old):checked + label > span:before {
+main input[type="checkbox"]:not(old):checked + label > span::before {
     content: "\2713 ";
     display: block;
     width: 1em;
@@ -288,7 +288,7 @@ main input[type=checkbox]:not(old):checked + label > span:before {
     font-weight: bold;
 }
 
-main input[type=radio]:not(old):checked + label > span > span {
+main input[type="radio"]:not(old):checked + label > span > span {
     display: block;
     height: 100%;
     margin: 0;
@@ -296,10 +296,10 @@ main input[type=radio]:not(old):checked + label > span > span {
     border: 3px solid #ddd;
     border-radius: 1em;
     background: rgb(118, 181, 55);
-    background-image: -moz-linear-gradient(rgb(179, 217, 140), rgb(153, 204, 102));
-    background-image: -ms-linear-gradient(rgb(179, 217, 140), rgb(153, 204, 102));
-    background-image: -o-linear-gradient(rgb(179, 217, 140), rgb(153, 204, 102));
-    background-image: -webkit-linear-gradient(rgb(179, 217, 140), rgb(153, 204, 102));
+    background-image: linear-gradient(rgb(179, 217, 140), rgb(153, 204, 102));
+    background-image: linear-gradient(rgb(179, 217, 140), rgb(153, 204, 102));
+    background-image: linear-gradient(rgb(179, 217, 140), rgb(153, 204, 102));
+    background-image: linear-gradient(rgb(179, 217, 140), rgb(153, 204, 102));
     background-image: linear-gradient(rgb(179, 217, 140), rgb(153, 204, 102));
 }
 
@@ -393,7 +393,7 @@ joomla-toolbar-button {
 .toggle_fullscreen {
     display: block;
     text-align: right;
-    /*margin-bottom: 15px;*/
+    /* margin-bottom: 15px; */
 }
 
 .toggle_fullscreen_managerecords {
@@ -453,7 +453,7 @@ sidebar
     right: 0 !important;
 }
 
-#sidebar .sidebar-nav a:before{
+#sidebar .sidebar-nav a::before{
     display: none !important;
 }
 
@@ -507,7 +507,7 @@ sidebar
 }
 
 #sidebar {
-    /*eight: calc(100vh - 69px);*/
+    /* eight: calc(100vh - 69px); */
     right: 0 !important;
     position: relative !important;
     background-color: #ffffff;
@@ -629,7 +629,7 @@ main {
     /*
     font-size: 0;
     margin-bottom: 9px;
-    margin-top: 15px !important;*/
+    margin-top: 15px !important; */
 }
 
 .btn-toolbar .btn-wrapper {
@@ -660,7 +660,7 @@ main .icon-publish, main .icon-unpublish{
 .btn-toolbar .icon-cancel::before,
 .icon-edit::before {
     color: #fff !important;
-}*/
+} */
 
 .bfPropertyWrap:hover {
     background-color: #fcfcfc;
@@ -705,7 +705,7 @@ table
 */
 
 main #adminForm table.adminheading {
-    /* font-family: "Segoe UI Semilight","Open Sans",Verdana,Arial,Helvetica,sans-serif;*/
+    /* font-family: "Segoe UI Semilight","Open Sans",Verdana,Arial,Helvetica,sans-serif; */
 }
 
 main #adminForm table.top-table {
@@ -713,11 +713,11 @@ main #adminForm table.top-table {
     padding-bottom: 25px;
     /*
     border-bottom: 1px solid #ddd;
-    border-bottom-style: dotted;*/
+    border-bottom-style: dotted; */
 }
 
 main #adminForm table.top-table tbody tr td {
-    /*  width: 100% !important;*/
+    /*  width: 100% !important; */
 }
 
 main .modal-dialog{
@@ -767,8 +767,8 @@ main .adminlist a:hover, main .adminlist a:focus {
     text-decoration: underline !important;
 }
 
-main [role=tablist] a, main fieldset a,
-main [role=tablist] a:focus, main fieldset a:focus{
+main [role="tablist"] a, main fieldset a,
+main [role="tablist"] a:focus, main fieldset a:focus{
     text-decoration: none !important;
 }
 
@@ -873,31 +873,31 @@ a {
 
 /* custom full-screen styles */
 
-:-webkit-full-screen .main {
+:full-screen .main {
     background-color: #ccc;
     font-size: 24px;
     width: 95%;
 }
 
-:-moz-full-screen .main {
+:full-screen .main {
     background-color: #ccc;
     font-size: 24px;
     width: 95%;
 }
 
-:-webkit-full-screen .fs {
+:full-screen .fs {
     display: none
 }
 
-:-moz-full-screen .fs {
+:full-screen .fs {
     display: none
 }
 
-:-webkit-full-screen .rs {
+:full-screen .rs {
     display: block
 }
 
-:-moz-full-screen .rs {
+:full-screen .rs {
     display: block
 }
 
@@ -990,7 +990,7 @@ quick mode
     background: transparent !important;
     height: 30px;
     padding: 3px;
-    margin: 0px !important;
+    margin: 0 !important;
     color: #333333;
 }
 
@@ -1175,7 +1175,7 @@ More options
     border: 1px solid #d5d5d5;
 }
 
-main joomla-tab[view=tabs] ul li{
+main joomla-tab[view="tabs"] ul li{
     border: 1px solid #eaeaea;
     border-bottom: 0 !important;
     float: left !important;
@@ -1184,12 +1184,12 @@ main joomla-tab[view=tabs] ul li{
     background: #F5F5F5;
 }
 
-main joomla-tab[view=tabs] ul li:hover {
+main joomla-tab[view="tabs"] ul li:hover {
     background: #fff;
     border-bottom: 1px solid #fff;
 }
 
-main joomla-tab[view=tabs] > ul a[role=tab][active], main joomla-tab[view=tabs] > ul a[role=tab]:hover {
+main joomla-tab[view="tabs"] > ul a[role="tab"][active], main joomla-tab[view="tabs"] > ul a[role="tab"]:hover {
     margin: 0 !important;
     background-color: unset !important;
     background-image: none !important;
@@ -1199,41 +1199,41 @@ main joomla-tab[view=tabs] > ul a[role=tab][active], main joomla-tab[view=tabs] 
     box-shadow: none !important;
 }
 
-main joomla-tab[view=tabs] > ul a[role=tab][active] {
+main joomla-tab[view="tabs"] > ul a[role="tab"][active] {
     font-weight: inherit !important;
 }
 
-main joomla-tab[view=tabs] > ul a[role=tab][active]::after, main joomla-tab[view=tabs] > ul a[role=tab]:hover::after {
+main joomla-tab[view="tabs"] > ul a[role="tab"][active]::after, main joomla-tab[view="tabs"] > ul a[role="tab"]:hover::after {
     position: unset !important;
     top: 0 !important;
     right: 0 !important;
     left: 0 !important;
-    height: 0; !important
+    height: 0 !important;
     content: "" !important;
     background-color: unset !important;
     opacity: unset !important;
 }
 
-main joomla-tab[view=tabs] .bfTabSelected{
+main joomla-tab[view="tabs"] .bfTabSelected{
     background: #fff;
 }
 
-main joomla-tab[view=tabs] > section {
+main joomla-tab[view="tabs"] > section {
     border-top: 1px solid #eaeaea !important;
     border-left: 1px solid #eaeaea !important;
     border-right: 1px solid #eaeaea !important;
     border-bottom: 1px solid #eaeaea !important;
 }
 
-[dir=ltr] main joomla-tab[view=tabs] > section {
-    margin-left: 0px !important;
+[dir="ltr"] main joomla-tab[view="tabs"] > section {
+    margin-left: 0 !important;
 }
 
-[dir=rtl] main joomla-tab[view=tabs] > section {
-    margin-right: 0px !important;
+[dir="rtl"] main joomla-tab[view="tabs"] > section {
+    margin-right: 0 !important;
 }
 
-main joomla-tab[view=tabs] > ul a[role=tab] {
+main joomla-tab[view="tabs"] > ul a[role="tab"] {
     color: #676767 !important;
 }
 
@@ -1426,7 +1426,7 @@ Manage records table
         position: relative !important;
         z-index: 1000;
     }
-    main #bfRecordsTableContainer input[type=checkbox]:not(old) + label, main #bfRecordsTableContainer input[type=radio]:not(old) + label {
+    main #bfRecordsTableContainer input[type="checkbox"]:not(old) + label, main #bfRecordsTableContainer input[type="radio"]:not(old) + label {
         margin-left: 0 !important;
         top: -9px !important;
         position: relative !important;
@@ -1534,8 +1534,8 @@ Manage records table > pagination
     #bfScriptsPaginationContainer > div.jtable-bottom-panel span.jtable-goto-page {
         margin-left: 0;
     }
-    #bfPiecesPaginationContainer > div.jtable-bottom-panel span.jtable-goto-page input[type=text],
-    #bfScriptsPaginationContainer > div.jtable-bottom-panel span.jtable-goto-page input[type=text] {
+    #bfPiecesPaginationContainer > div.jtable-bottom-panel span.jtable-goto-page input[type="text"],
+    #bfScriptsPaginationContainer > div.jtable-bottom-panel span.jtable-goto-page input[type="text"] {
         width: 50px;
     }
     div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number,
@@ -1622,7 +1622,7 @@ main #bfAvailableFieldsWrapper input[type="checkbox"]:not(old) {
     padding: 0;
     font-size: 1em;
     opacity: 1;
-}*/
+} */
     #bfAvailableFields {
         display: none;
         margin-top: 10px;
@@ -1879,12 +1879,12 @@ toogle sidebar and main-content
         z-index: 20000000 !important;
     }
 
-    main joomla-tab[view=tabs] ul{
+    main joomla-tab[view="tabs"] ul{
         display: inline-block;
         white-space: normal;
     }
 
-    main joomla-tab[view=tabs] ul li{
+    main joomla-tab[view="tabs"] ul li{
 
         display: inline-block;
         white-space: normal;
@@ -1981,8 +1981,8 @@ toogle sidebar and main-content
 Mobile view 
 *********************************/
 	@media (max-width:1124px) {
-		#bfQuickModeWrapper input[type=text],
-		#bfQuickModeWrapper input[type=password],
+		#bfQuickModeWrapper input[type="text"],
+		#bfQuickModeWrapper input[type="password"],
 		#bfQuickModeWrapper textarea,
 		#bfQuickModeWrapper select {
 			width:100%;
@@ -1993,8 +1993,8 @@ Mobile view
 		}
 	}
     @media (max-width:767px) {
-		#bfQuickModeWrapper input[type=text],
-		#bfQuickModeWrapper input[type=password],
+		#bfQuickModeWrapper input[type="text"],
+		#bfQuickModeWrapper input[type="password"],
 		#bfQuickModeWrapper textarea,
 		#bfQuickModeWrapper select {
 			width:100%;

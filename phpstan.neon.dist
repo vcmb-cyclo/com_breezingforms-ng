@@ -1,0 +1,24 @@
+includes:
+    - phpstan-baseline.neon
+
+parameters:
+    level: 2
+    bootstrapFiles:
+        - phpstan-bootstrap.php
+    paths:
+        - administrator/components/com_breezingformsng/src
+        - administrator/components/com_breezingformsng/layouts
+        - administrator/components/com_breezingformsng/tmpl
+        - components/com_breezingformsng/src
+        - components/com_breezingformsng/tmpl
+        - script.php
+    excludePaths:
+        - administrator/components/com_breezingformsng/vendor
+        - administrator/components/com_breezingformsng/libraries
+        - components/com_breezingformsng/libraries
+    scanDirectories:
+        - joomla-stubs/libraries
+    treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        - '#^Path in (require|include)(_once)?\(\) ".*" is not a file or it does not exist\.$#'
+    reportUnmatchedIgnoredErrors: false

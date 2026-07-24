@@ -52,5 +52,6 @@ final class DownloadHelper
         fpassthru($stream);
         fclose($stream);
         $application->close();
+        exit;
     }
 }

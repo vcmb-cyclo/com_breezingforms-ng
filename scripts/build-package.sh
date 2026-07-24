@@ -69,6 +69,16 @@ if [[ -d "${pdf_font_dir}" ]]; then
     rm -rf "${pdf_font_dir}/util"
 fi
 
+# TCPDF v7's dependency tree is 15 separate tecnickcom/* packages (vs. one
+# self-contained package for v6). Each ships its own test suite, CI config
+# and examples, none of which are needed at runtime - prune them.
+tecnickcom_dir="${package_dir}/administrator/components/com_breezingformsng/vendor/tecnickcom"
+if [[ -d "${tecnickcom_dir}" ]]; then
+    find "${tecnickcom_dir}" -mindepth 2 -maxdepth 2 -type d \
+        \( -iname 'test' -o -iname 'tests' -o -iname '.github' -o -iname 'examples' \) \
+        -exec rm -rf {} +
+fi
+
 archive="${output_dir}/com_breezingformsng-${version}.zip"
 rm -f "${archive}"
 

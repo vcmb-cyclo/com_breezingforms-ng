@@ -486,3 +486,12 @@ div.jtable-main-container > table.jtable > tbody > tr.jtable-row-selected {
 #bfQuickModeRight #menutab {
     width: 100%;
 }
+
+/* Prevent admin area panels from overflowing the Joomla control panel window */
+@media (min-width: 1024px) {
+    body.admin .container-fluid, body.admin .admin { max-width: 100%; box-sizing: border-box; }
+    body.admin .container-fluid { overflow-x: hidden; }
+}
+
+/* Ensure right-side helper panels don't force the page to grow beyond viewport */
+.bf-sidebar, .bf-panel, .bfQuickModeRight { max-height: calc(100vh - 80px); overflow: auto; }

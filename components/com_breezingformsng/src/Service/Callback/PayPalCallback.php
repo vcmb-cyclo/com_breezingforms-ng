@@ -252,7 +252,7 @@ final class PayPalCallback
                     if ($checkPP && (($options['amount'] > 0 && $keyarray['mc_gross'] != (doubleval($options['amount']) + doubleval($options['tax']))) || $keyarray['mc_currency'] != strtoupper($options['currencyCode']))) {
 
                         $success = false;
-                        $msg = Text::_("Payment was not correct (amount/currency)");
+                        $msg = Text::_('COM_BREEZINGFORMSNG_PAYMENT_AMOUNT_CURRENCY_INVALID');
                         require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
                     } else {
 
@@ -331,24 +331,24 @@ final class PayPalCallback
                                         }
                                     } else {
                                         $success = false;
-                                        $msg = Text::_("This transaction was already processed");
+                                        $msg = Text::_('COM_BREEZINGFORMSNG_PAYMENT_TRANSACTION_ALREADY_PROCESSED');
                                         require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
                                     }
                                 }
                             }
                         } else {
                             $success = false;
-                            $msg = Text::_("Could not find record!");
+                            $msg = Text::_('COM_BREEZINGFORMSNG_PAYMENT_RECORD_NOT_FOUND');
                             require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
                         }
                     }
                 } else if (strcmp($lines[0], "FAIL") == 0) {
                     $success = false;
-                    $msg = Text::_("Verification failed");
+                    $msg = Text::_('COM_BREEZINGFORMSNG_PAYMENT_VERIFICATION_FAILED');
                     require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
                 } else {
                     $success = false;
-                    $msg = Text::_("Verification did not return any values");
+                    $msg = Text::_('COM_BREEZINGFORMSNG_PAYMENT_VERIFICATION_EMPTY');
                     require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
                 }
 

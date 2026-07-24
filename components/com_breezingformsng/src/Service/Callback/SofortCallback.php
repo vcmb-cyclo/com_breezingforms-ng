@@ -42,7 +42,7 @@ final class SofortCallback
     $input = $this->application->getInput();
     $tx_token = $input->getString('tx', '');
     if ($tx_token == '') {
-        $msg = Text::_("This transaction id is empty!");
+        $msg = Text::_('COM_BREEZINGFORMSNG_PAYMENT_TRANSACTION_ID_EMPTY');
         require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
     } else {
 

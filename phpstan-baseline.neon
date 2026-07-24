@@ -1,0 +1,1507 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Calling self\:\:renderCodeMirror\(\) outside of class scope\.$#'
+			identifier: outOfClass.self
+			count: 2
+			path: administrator/components/com_breezingformsng/layouts/quickmode/advanced_element.php
+
+		-
+			message: '#^Function bf_tooltipText not found\.$#'
+			identifier: function.notFound
+			count: 106
+			path: administrator/components/com_breezingformsng/layouts/quickmode/advanced_element.php
+
+		-
+			message: '#^Function bf_tooltiptext not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/layouts/quickmode/advanced_element.php
+
+		-
+			message: '#^Variable \$active_language_code might not be defined\.$#'
+			identifier: variable.undefined
+			count: 4
+			path: administrator/components/com_breezingformsng/layouts/quickmode/advanced_element.php
+
+		-
+			message: '#^Calling self\:\:decodeJsonArray\(\) outside of class scope\.$#'
+			identifier: outOfClass.self
+			count: 1
+			path: administrator/components/com_breezingformsng/layouts/quickmode/advanced_form.php
+
+		-
+			message: '#^Function bf_tooltipText not found\.$#'
+			identifier: function.notFound
+			count: 19
+			path: administrator/components/com_breezingformsng/layouts/quickmode/advanced_form.php
+
+		-
+			message: '#^Variable \$dataObjectString might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: administrator/components/com_breezingformsng/layouts/quickmode/advanced_form.php
+
+		-
+			message: '#^Variable \$formId might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: administrator/components/com_breezingformsng/layouts/quickmode/advanced_form.php
+
+		-
+			message: '#^Variable \$themes might not be defined\.$#'
+			identifier: variable.undefined
+			count: 3
+			path: administrator/components/com_breezingformsng/layouts/quickmode/advanced_form.php
+
+		-
+			message: '#^Variable \$themesbootstrap might not be defined\.$#'
+			identifier: variable.undefined
+			count: 3
+			path: administrator/components/com_breezingformsng/layouts/quickmode/advanced_form.php
+
+		-
+			message: '#^Variable \$debugMode might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: administrator/components/com_breezingformsng/layouts/quickmode/form_state_actions.php
+
+		-
+			message: '#^Variable \$formId might not be defined\.$#'
+			identifier: variable.undefined
+			count: 8
+			path: administrator/components/com_breezingformsng/layouts/quickmode/form_state_actions.php
+
+		-
+			message: '#^Variable \$published might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: administrator/components/com_breezingformsng/layouts/quickmode/form_state_actions.php
+
+		-
+			message: '#^Calling self\:\:renderCodeMirror\(\) outside of class scope\.$#'
+			identifier: outOfClass.self
+			count: 1
+			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_element.php
+
+		-
+			message: '#^Function bf_tooltipText not found\.$#'
+			identifier: function.notFound
+			count: 136
+			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_element.php
+
+		-
+			message: '#^Variable \$active_language_code might not be defined\.$#'
+			identifier: variable.undefined
+			count: 33
+			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_element.php
+
+		-
+			message: '#^Variable \$isAzureBootstrapTheme might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_element.php
+
+		-
+			message: '#^Function bf_tooltipText not found\.$#'
+			identifier: function.notFound
+			count: 18
+			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_form.php
+
+		-
+			message: '#^Variable \$active_language_code might not be defined\.$#'
+			identifier: variable.undefined
+			count: 5
+			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_form.php
+
+		-
+			message: '#^Variable \$formDesc might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_form.php
+
+		-
+			message: '#^Variable \$formEmailadr might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_form.php
+
+		-
+			message: '#^Variable \$formEmailntf might not be defined\.$#'
+			identifier: variable.undefined
+			count: 3
+			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_form.php
+
+		-
+			message: '#^Variable \$formName might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_form.php
+
+		-
+			message: '#^Variable \$formTitle might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_form.php
+
+		-
+			message: '#^Function bf_tooltipText not found\.$#'
+			identifier: function.notFound
+			count: 2
+			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_page.php
+
+		-
+			message: '#^Variable \$active_language_code might not be defined\.$#'
+			identifier: variable.undefined
+			count: 2
+			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_page.php
+
+		-
+			message: '#^Function bf_tooltipText not found\.$#'
+			identifier: function.notFound
+			count: 7
+			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_section.php
+
+		-
+			message: '#^Variable \$active_language_code might not be defined\.$#'
+			identifier: variable.undefined
+			count: 3
+			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_section.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:setUserState\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: administrator/components/com_breezingformsng/src/Controller/AboutController.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getSession\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/DisplayController.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:redirect\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/DisplayController.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Extension\\ComponentInterface\:\:getMVCFactory\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/DisplayController.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:redirect\(\)\.$#'
+			identifier: method.notFound
+			count: 12
+			path: administrator/components/com_breezingformsng/src/Controller/FormsController.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:setHeader\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: administrator/components/com_breezingformsng/src/Controller/FormsController.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Extension\\ComponentInterface\:\:getMVCFactory\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/FormsController.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:setBody\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/IntegratorController.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:setHeader\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/IntegratorController.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Extension\\ComponentInterface\:\:getMVCFactory\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/IntegratorController.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:redirect\(\)\.$#'
+			identifier: method.notFound
+			count: 10
+			path: administrator/components/com_breezingformsng/src/Controller/MenusController.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:setBody\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/MenusController.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:setHeader\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/MenusController.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Extension\\ComponentInterface\:\:getMVCFactory\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: administrator/components/com_breezingformsng/src/Controller/MenusController.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/PiecesController.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:sendHeaders\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/QuickmodeController.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:setHeader\(\)\.$#'
+			identifier: method.notFound
+			count: 6
+			path: administrator/components/com_breezingformsng/src/Controller/QuickmodeController.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Extension\\ComponentInterface\:\:getMVCFactory\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/QuickmodeController.php
+
+		-
+			message: '#^Call to method synchElements\(\) on an unknown class CB\\Component\\Contentbuilderng\\Administrator\\Service\\FormSupportService\.$#'
+			identifier: class.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/QuickmodeController.php
+
+		-
+			message: '#^Call to static method getForm\(\) on an unknown class CB\\Component\\Contentbuilderng\\Administrator\\Helper\\FormSourceFactory\.$#'
+			identifier: class.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/QuickmodeController.php
+
+		-
+			message: '#^Instantiated class CB\\Component\\Contentbuilderng\\Administrator\\Service\\FormSupportService not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/QuickmodeController.php
+
+		-
+			message: '#^Instantiated class CB\\Component\\Contentbuilderng\\Administrator\\Service\\PathService not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/QuickmodeController.php
+
+		-
+			message: '#^Instantiated class CB\\Component\\Contentbuilderng\\Administrator\\Service\\TemplateSampleService not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/QuickmodeController.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:redirect\(\)\.$#'
+			identifier: method.notFound
+			count: 8
+			path: administrator/components/com_breezingformsng/src/Controller/RecordsController.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:sendHeaders\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: administrator/components/com_breezingformsng/src/Controller/RecordsController.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:setHeader\(\)\.$#'
+			identifier: method.notFound
+			count: 11
+			path: administrator/components/com_breezingformsng/src/Controller/RecordsController.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Extension\\ComponentInterface\:\:getMVCFactory\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: administrator/components/com_breezingformsng/src/Controller/RecordsController.php
+
+		-
+			message: '#^Call to an undefined method Vcmb\\Component\\BreezingformsNG\\Administrator\\Service\\PdfDocument\:\:AddFont\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/RecordsController.php
+
+		-
+			message: '#^Call to an undefined method Vcmb\\Component\\BreezingformsNG\\Administrator\\Service\\PdfDocument\:\:AddPage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/RecordsController.php
+
+		-
+			message: '#^Call to an undefined method Vcmb\\Component\\BreezingformsNG\\Administrator\\Service\\PdfDocument\:\:Output\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/RecordsController.php
+
+		-
+			message: '#^Call to an undefined method Vcmb\\Component\\BreezingformsNG\\Administrator\\Service\\PdfDocument\:\:SetFont\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: administrator/components/com_breezingformsng/src/Controller/RecordsController.php
+
+		-
+			message: '#^Call to an undefined method Vcmb\\Component\\BreezingformsNG\\Administrator\\Service\\PdfDocument\:\:lastPage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/RecordsController.php
+
+		-
+			message: '#^Call to an undefined method Vcmb\\Component\\BreezingformsNG\\Administrator\\Service\\PdfDocument\:\:setPrintFooter\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/RecordsController.php
+
+		-
+			message: '#^Call to an undefined method Vcmb\\Component\\BreezingformsNG\\Administrator\\Service\\PdfDocument\:\:setPrintHeader\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/RecordsController.php
+
+		-
+			message: '#^Call to an undefined method Vcmb\\Component\\BreezingformsNG\\Administrator\\Service\\PdfDocument\:\:writeHTML\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/RecordsController.php
+
+		-
+			message: '#^Call to static method addTTFfont\(\) on an unknown class TCPDF_FONTS\.$#'
+			identifier: class.notFound
+			count: 2
+			path: administrator/components/com_breezingformsng/src/Controller/RecordsController.php
+
+		-
+			message: '#^Method Joomla\\Input\\Input\:\:get\(\) invoked with 4 parameters, 1\-3 required\.$#'
+			identifier: arguments.count
+			count: 6
+			path: administrator/components/com_breezingformsng/src/Controller/RecordsController.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Controller/ScriptsController.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Helper/QuickmodeHtml.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Table\\Table\:\:setLocation\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Model/MenuModel.php
+
+		-
+			message: '#^Method Joomla\\CMS\\Table\\Table\:\:delete\(\) invoked with 2 parameters, 0\-1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Model/MenuModel.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\MVC\\Model\\ModelInterface\:\:delete\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Model/RecordModel.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\MVC\\Model\\ModelInterface\:\:getError\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Model/RecordModel.php
+
+		-
+			message: '#^Call to an undefined method Vcmb\\Component\\BreezingformsNG\\Administrator\\Service\\PdfDocument\:\:AddFont\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: administrator/components/com_breezingformsng/src/Service/PdfDocument.php
+
+		-
+			message: '#^Call to an undefined method Vcmb\\Component\\BreezingformsNG\\Administrator\\Service\\PdfDocument\:\:SetFont\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: administrator/components/com_breezingformsng/src/Service/PdfDocument.php
+
+		-
+			message: '#^Call to an undefined method Vcmb\\Component\\BreezingformsNG\\Administrator\\Service\\PdfDocument\:\:writeHTML\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: administrator/components/com_breezingformsng/src/Service/PdfDocument.php
+
+		-
+			message: '#^Call to static method addTTFfont\(\) on an unknown class TCPDF_FONTS\.$#'
+			identifier: class.notFound
+			count: 4
+			path: administrator/components/com_breezingformsng/src/Service/PdfDocument.php
+
+		-
+			message: '#^Variable \$font_loaded might not be defined\.$#'
+			identifier: variable.undefined
+			count: 2
+			path: administrator/components/com_breezingformsng/src/Service/PdfDocument.php
+
+		-
+			message: '#^Variable \$ttf_name might not be defined\.$#'
+			identifier: variable.undefined
+			count: 2
+			path: administrator/components/com_breezingformsng/src/Service/PdfDocument.php
+
+		-
+			message: '#^Vcmb\\Component\\BreezingformsNG\\Administrator\\Service\\PdfDocument\:\:__construct\(\) calls parent\:\:__construct\(\) but Vcmb\\Component\\BreezingformsNG\\Administrator\\Service\\PdfDocument does not extend any class\.$#'
+			identifier: class.noParent
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Service/PdfDocument.php
+
+		-
+			message: '#^Variable \$total might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Service/PieceManager.php
+
+		-
+			message: '#^Variable \$total might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: administrator/components/com_breezingformsng/src/Service/ScriptManager.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/View/About/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getUserState\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: administrator/components/com_breezingformsng/src/View/About/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:setUserState\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: administrator/components/com_breezingformsng/src/View/About/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/View/BreezingformsNG/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: administrator/components/com_breezingformsng/src/View/Forms/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getSession\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/View/Forms/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getUserStateFromRequest\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/View/Forms/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:redirect\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/View/Forms/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Extension\\ComponentInterface\:\:getMVCFactory\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/View/Forms/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/View/Integrator/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Extension\\ComponentInterface\:\:getMVCFactory\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/View/Integrator/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/View/Menus/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getSession\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/View/Menus/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Extension\\ComponentInterface\:\:getMVCFactory\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/View/Menus/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: administrator/components/com_breezingformsng/src/View/Pieces/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getSession\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/View/Pieces/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: administrator/components/com_breezingformsng/src/View/Pieces/Renderer.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/View/Quickmode/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Extension\\ComponentInterface\:\:getMVCFactory\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/View/Quickmode/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: administrator/components/com_breezingformsng/src/View/Records/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:redirect\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: administrator/components/com_breezingformsng/src/View/Records/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Document\\Document\:\:getToolbar\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/View/Records/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Extension\\ComponentInterface\:\:getMVCFactory\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: administrator/components/com_breezingformsng/src/View/Records/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: administrator/components/com_breezingformsng/src/View/Scripts/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getSession\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/src/View/Scripts/HtmlView.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
+			identifier: method.notFound
+			count: 3
+			path: administrator/components/com_breezingformsng/src/View/Scripts/Renderer.php
+
+		-
+			message: '#^Variable \$this might not be defined\.$#'
+			identifier: variable.undefined
+			count: 2
+			path: administrator/components/com_breezingformsng/tmpl/about/default.php
+
+		-
+			message: '#^Variable \$this might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: administrator/components/com_breezingformsng/tmpl/about/extensions.php
+
+		-
+			message: '#^Variable \$this might not be defined\.$#'
+			identifier: variable.undefined
+			count: 28
+			path: administrator/components/com_breezingformsng/tmpl/forms/default.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/tmpl/forms/edit.php
+
+		-
+			message: '#^Variable \$this might not be defined\.$#'
+			identifier: variable.undefined
+			count: 8
+			path: administrator/components/com_breezingformsng/tmpl/forms/edit.php
+
+		-
+			message: '#^Variable \$this might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: administrator/components/com_breezingformsng/tmpl/help/default.php
+
+		-
+			message: '#^Variable \$this might not be defined\.$#'
+			identifier: variable.undefined
+			count: 12
+			path: administrator/components/com_breezingformsng/tmpl/integrator/default.php
+
+		-
+			message: '#^Variable \$this might not be defined\.$#'
+			identifier: variable.undefined
+			count: 16
+			path: administrator/components/com_breezingformsng/tmpl/integrator/edit.php
+
+		-
+			message: '#^Variable \$this might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: administrator/components/com_breezingformsng/tmpl/menus/default.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/tmpl/menus/edit.php
+
+		-
+			message: '#^Variable \$this might not be defined\.$#'
+			identifier: variable.undefined
+			count: 3
+			path: administrator/components/com_breezingformsng/tmpl/menus/edit.php
+
+		-
+			message: '#^Variable \$this might not be defined\.$#'
+			identifier: variable.undefined
+			count: 10
+			path: administrator/components/com_breezingformsng/tmpl/pieces/default.php
+
+		-
+			message: '#^Variable \$this might not be defined\.$#'
+			identifier: variable.undefined
+			count: 17
+			path: administrator/components/com_breezingformsng/tmpl/quickmode/default.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: administrator/components/com_breezingformsng/tmpl/quickmode/editor.php
+
+		-
+			message: '#^Variable \$this might not be defined\.$#'
+			identifier: variable.undefined
+			count: 3
+			path: administrator/components/com_breezingformsng/tmpl/records/csvimport.php
+
+		-
+			message: '#^Variable \$this might not be defined\.$#'
+			identifier: variable.undefined
+			count: 13
+			path: administrator/components/com_breezingformsng/tmpl/records/default.php
+
+		-
+			message: '#^Variable \$this might not be defined\.$#'
+			identifier: variable.undefined
+			count: 2
+			path: administrator/components/com_breezingformsng/tmpl/records/edit.php
+
+		-
+			message: '#^Variable \$this might not be defined\.$#'
+			identifier: variable.undefined
+			count: 10
+			path: administrator/components/com_breezingformsng/tmpl/scripts/default.php
+
+		-
+			message: '#^Access to property \$image_bg_color on an unknown class Securimage\.$#'
+			identifier: class.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php
+
+		-
+			message: '#^Access to property \$image_height on an unknown class Securimage\.$#'
+			identifier: class.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php
+
+		-
+			message: '#^Access to property \$image_signature on an unknown class Securimage\.$#'
+			identifier: class.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php
+
+		-
+			message: '#^Access to property \$image_width on an unknown class Securimage\.$#'
+			identifier: class.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php
+
+		-
+			message: '#^Access to property \$line_color on an unknown class Securimage\.$#'
+			identifier: class.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php
+
+		-
+			message: '#^Access to property \$noise_color on an unknown class Securimage\.$#'
+			identifier: class.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php
+
+		-
+			message: '#^Access to property \$num_lines on an unknown class Securimage\.$#'
+			identifier: class.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php
+
+		-
+			message: '#^Access to property \$perturbation on an unknown class Securimage\.$#'
+			identifier: class.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php
+
+		-
+			message: '#^Access to property \$text_color on an unknown class Securimage\.$#'
+			identifier: class.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php
+
+		-
+			message: '#^Access to property \$text_transparency_percentage on an unknown class Securimage\.$#'
+			identifier: class.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php
+
+		-
+			message: '#^Access to property \$use_transparent_text on an unknown class Securimage\.$#'
+			identifier: class.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php
+
+		-
+			message: '#^Access to property \$use_wordlist on an unknown class Securimage\.$#'
+			identifier: class.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php
+
+		-
+			message: '#^Call to method check\(\) on an unknown class Securimage\.$#'
+			identifier: class.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php
+
+		-
+			message: '#^Call to method show\(\) on an unknown class Securimage\.$#'
+			identifier: class.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php
+
+		-
+			message: '#^Instantiated class Securimage not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php
+
+		-
+			message: '#^Instantiated class Securimage_Color not found\.$#'
+			identifier: class.notFound
+			count: 4
+			path: components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php
+
+		-
+			message: '#^Method Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Callback\\CaptchaCallback\:\:createSecurimage\(\) has invalid return type Securimage\.$#'
+			identifier: class.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php
+
+		-
+			message: '#^Function bf_b64dec not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Callback/FlashUploadCallback.php
+
+		-
+			message: '#^Function bf_sanitizeFilename not found\.$#'
+			identifier: function.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Callback/FlashUploadCallback.php
+
+		-
+			message: '#^Method Joomla\\Session\\SessionInterface\:\:get\(\) invoked with 3 parameters, 1\-2 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: components/com_breezingformsng/src/Service/Callback/FlashUploadCallback.php
+
+		-
+			message: '#^Method Joomla\\Session\\SessionInterface\:\:set\(\) invoked with 3 parameters, 1\-2 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: components/com_breezingformsng/src/Service/Callback/FlashUploadCallback.php
+
+		-
+			message: '#^Access to an undefined property Joomla\\Http\\Response\:\:\$body\.$#'
+			identifier: property.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Callback/PayPalCallback.php
+
+		-
+			message: '#^Function bf_sendNotificationByPaymentCache not found\.$#'
+			identifier: function.notFound
+			count: 4
+			path: components/com_breezingformsng/src/Service/Callback/PayPalCallback.php
+
+		-
+			message: '#^Static call to instance method Joomla\\Http\\HttpFactory\:\:getHttp\(\)\.$#'
+			identifier: method.staticCall
+			count: 1
+			path: components/com_breezingformsng/src/Service/Callback/PayPalCallback.php
+
+		-
+			message: '#^Access to an undefined property Joomla\\CMS\\Mail\\MailerInterface\:\:\$Body\.$#'
+			identifier: property.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Callback/SofortCallback.php
+
+		-
+			message: '#^Access to an undefined property Joomla\\CMS\\Mail\\MailerInterface\:\:\$Subject\.$#'
+			identifier: property.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Callback/SofortCallback.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Mail\\MailerInterface\:\:AddAddress\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Callback/SofortCallback.php
+
+		-
+			message: '#^Function bf_is_email not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Callback/SofortCallback.php
+
+		-
+			message: '#^Function bf_sendNotificationByPaymentCache not found\.$#'
+			identifier: function.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Callback/SofortCallback.php
+
+		-
+			message: '#^Access to property \$checkout on an unknown class Stripe\\StripeClient\.$#'
+			identifier: class.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Callback/StripeCallback.php
+
+		-
+			message: '#^Access to property \$paymentIntents on an unknown class Stripe\\StripeClient\.$#'
+			identifier: class.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Callback/StripeCallback.php
+
+		-
+			message: '#^Call to static method setApiKey\(\) on an unknown class Stripe\\Stripe\.$#'
+			identifier: class.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Callback/StripeCallback.php
+
+		-
+			message: '#^Caught class Stripe\\Exception\\CardException not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Callback/StripeCallback.php
+
+		-
+			message: '#^Function bf_sendNotificationByPaymentCache not found\.$#'
+			identifier: function.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Callback/StripeCallback.php
+
+		-
+			message: '#^Instantiated class Stripe\\StripeClient not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Callback/StripeCallback.php
+
+		-
+			message: '#^Method Joomla\\Session\\SessionInterface\:\:clear\(\) invoked with 1 parameter, 0 required\.$#'
+			identifier: arguments.count
+			count: 2
+			path: components/com_breezingformsng/src/Service/Callback/StripeCallback.php
+
+		-
+			message: '#^Call to an undefined method Vcmb\\Component\\BreezingformsNG\\Administrator\\Service\\PdfDocument\:\:AddFont\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Export/ExportEngine.php
+
+		-
+			message: '#^Call to an undefined method Vcmb\\Component\\BreezingformsNG\\Administrator\\Service\\PdfDocument\:\:AddPage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Export/ExportEngine.php
+
+		-
+			message: '#^Call to an undefined method Vcmb\\Component\\BreezingformsNG\\Administrator\\Service\\PdfDocument\:\:Output\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Export/ExportEngine.php
+
+		-
+			message: '#^Call to an undefined method Vcmb\\Component\\BreezingformsNG\\Administrator\\Service\\PdfDocument\:\:SetFont\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Export/ExportEngine.php
+
+		-
+			message: '#^Call to an undefined method Vcmb\\Component\\BreezingformsNG\\Administrator\\Service\\PdfDocument\:\:lastPage\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Export/ExportEngine.php
+
+		-
+			message: '#^Call to an undefined method Vcmb\\Component\\BreezingformsNG\\Administrator\\Service\\PdfDocument\:\:setPrintFooter\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Export/ExportEngine.php
+
+		-
+			message: '#^Call to an undefined method Vcmb\\Component\\BreezingformsNG\\Administrator\\Service\\PdfDocument\:\:setPrintHeader\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Export/ExportEngine.php
+
+		-
+			message: '#^Call to an undefined method Vcmb\\Component\\BreezingformsNG\\Administrator\\Service\\PdfDocument\:\:writeHTML\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Export/ExportEngine.php
+
+		-
+			message: '#^Call to static method addTTFfont\(\) on an unknown class Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Export\\TCPDF_FONTS\.$#'
+			identifier: class.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Export/ExportEngine.php
+
+		-
+			message: '#^Call to static method createFromRuntimeContext\(\) on an unknown class CB\\Component\\Contentbuilderng\\Administrator\\Service\\ListSupportService\.$#'
+			identifier: class.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Export/ExportEngine.php
+
+		-
+			message: '#^Class CB\\Component\\Contentbuilderng\\Administrator\\Service\\ArticleService not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Export/ExportEngine.php
+
+		-
+			message: '#^Undefined variable\: \$created_up$#'
+			identifier: variable.undefined
+			count: 1
+			path: components/com_breezingformsng/src/Service/Export/ExportEngine.php
+
+		-
+			message: '#^Constant _FF_RUNMODE_FRONTEND not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/FormRenderer.php
+
+		-
+			message: '#^Constant _FF_RUNMODE_PREVIEW not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/FormRenderer.php
+
+		-
+			message: '#^Variable \$ff_applic in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.variable
+			count: 7
+			path: components/com_breezingformsng/src/Service/FormRenderer.php
+
+		-
+			message: '#^Access to an undefined property Joomla\\Http\\Response\:\:\$body\.$#'
+			identifier: property.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Integration/DropboxUploader.php
+
+		-
+			message: '#^Access to an undefined property Joomla\\Http\\Response\:\:\$code\.$#'
+			identifier: property.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Integration/DropboxUploader.php
+
+		-
+			message: '#^Static call to instance method Joomla\\Http\\HttpFactory\:\:getHttp\(\)\.$#'
+			identifier: method.staticCall
+			count: 1
+			path: components/com_breezingformsng/src/Service/Integration/DropboxUploader.php
+
+		-
+			message: '#^Call to static method getApplication\(\) on an unknown class Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Integration\\Factory\.$#'
+			identifier: class.notFound
+			count: 3
+			path: components/com_breezingformsng/src/Service/Integration/IntegratorRuntime.php
+
+		-
+			message: '#^Variable \$ret might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: components/com_breezingformsng/src/Service/Integration/IntegratorRuntime.php
+
+		-
+			message: '#^Access to an undefined property Joomla\\Http\\Response\:\:\$body\.$#'
+			identifier: property.notFound
+			count: 3
+			path: components/com_breezingformsng/src/Service/Integration/MailchimpClient.php
+
+		-
+			message: '#^Access to an undefined property Joomla\\Http\\Response\:\:\$code\.$#'
+			identifier: property.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Integration/MailchimpClient.php
+
+		-
+			message: '#^Static call to instance method Joomla\\Http\\HttpFactory\:\:getHttp\(\)\.$#'
+			identifier: method.staticCall
+			count: 1
+			path: components/com_breezingformsng/src/Service/Integration/MailchimpClient.php
+
+		-
+			message: '#^Access to an undefined property Joomla\\Http\\Response\:\:\$body\.$#'
+			identifier: property.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Integration/RecaptchaVerifier.php
+
+		-
+			message: '#^Access to an undefined property Joomla\\Http\\Response\:\:\$code\.$#'
+			identifier: property.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Integration/RecaptchaVerifier.php
+
+		-
+			message: '#^Static call to instance method Joomla\\Http\\HttpFactory\:\:getHttp\(\)\.$#'
+			identifier: method.staticCall
+			count: 1
+			path: components/com_breezingformsng/src/Service/Integration/RecaptchaVerifier.php
+
+		-
+			message: '#^Access to an undefined property Joomla\\Http\\Response\:\:\$body\.$#'
+			identifier: property.notFound
+			count: 6
+			path: components/com_breezingformsng/src/Service/Integration/SalesforceClient.php
+
+		-
+			message: '#^Access to an undefined property Joomla\\Http\\Response\:\:\$code\.$#'
+			identifier: property.notFound
+			count: 3
+			path: components/com_breezingformsng/src/Service/Integration/SalesforceClient.php
+
+		-
+			message: '#^Static call to instance method Joomla\\Http\\HttpFactory\:\:getHttp\(\)\.$#'
+			identifier: method.staticCall
+			count: 1
+			path: components/com_breezingformsng/src/Service/Integration/SalesforceClient.php
+
+		-
+			message: '#^Function bf_b64dec not found\.$#'
+			identifier: function.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Notification/NotificationEngine.php
+
+		-
+			message: '#^Function bf_endsWith not found\.$#'
+			identifier: function.notFound
+			count: 5
+			path: components/com_breezingformsng/src/Service/Notification/NotificationEngine.php
+
+		-
+			message: '#^Function bf_is_email not found\.$#'
+			identifier: function.notFound
+			count: 3
+			path: components/com_breezingformsng/src/Service/Notification/NotificationEngine.php
+
+		-
+			message: '#^Function bf_startsWith not found\.$#'
+			identifier: function.notFound
+			count: 5
+			path: components/com_breezingformsng/src/Service/Notification/NotificationEngine.php
+
+		-
+			message: '#^Function bf_b64dec not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Rendering/QuickMode/BootstrapRenderer.php
+
+		-
+			message: '#^Variable \$mdata might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: components/com_breezingformsng/src/Service/Rendering/QuickMode/BootstrapRenderer.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Editor\\Editor\:\:getContent\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Rendering/QuickMode/ClassicRenderer.php
+
+		-
+			message: '#^Function bf_b64dec not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Rendering/QuickMode/ClassicRenderer.php
+
+		-
+			message: '#^Variable \$mdata might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: components/com_breezingformsng/src/Service/Rendering/QuickMode/ClassicRenderer.php
+
+		-
+			message: '#^Function bf_b64dec not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Rendering/QuickMode/MobileRenderer.php
+
+		-
+			message: '#^Variable \$mdata might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: components/com_breezingformsng/src/Service/Rendering/QuickMode/MobileRenderer.php
+
+		-
+			message: '#^Function bf_b64dec not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Rendering/QuickMode/OnePageRenderer.php
+
+		-
+			message: '#^Variable \$mdata might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: components/com_breezingformsng/src/Service/Rendering/QuickMode/OnePageRenderer.php
+
+		-
+			message: '#^Call to static method contentbuilderng_wordwrap\(\) on an unknown class CB\\Component\\Contentbuilderng\\Administrator\\Helper\\ContentbuilderngHelper\.$#'
+			identifier: class.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
+
+		-
+			message: '#^Call to static method createFromRuntimeContext\(\) on an unknown class CB\\Component\\Contentbuilderng\\Administrator\\Service\\ListSupportService\.$#'
+			identifier: class.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
+
+		-
+			message: '#^Call to static method createFromRuntimeContext\(\) on an unknown class CB\\Component\\Contentbuilderng\\Administrator\\Service\\PermissionService\.$#'
+			identifier: class.notFound
+			count: 6
+			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
+
+		-
+			message: '#^Call to static method getForm\(\) on an unknown class CB\\Component\\Contentbuilderng\\Administrator\\Helper\\FormSourceFactory\.$#'
+			identifier: class.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
+
+		-
+			message: '#^Cannot access property \$recValue on string\.$#'
+			identifier: property.nonObject
+			count: 1
+			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
+
+		-
+			message: '#^Comparison operation "\=\=" between \*NEVER\* and 0 results in an error\.$#'
+			identifier: equal.invalid
+			count: 2
+			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
+
+		-
+			message: '#^Constant _FF_RUNMODE_BACKEND not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
+
+		-
+			message: '#^Constant _FF_RUNMODE_FRONTEND not found\.$#'
+			identifier: constant.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
+
+		-
+			message: '#^Constant _FF_RUNMODE_PREVIEW not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
+
+		-
+			message: '#^Function bf_b64dec not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
+
+		-
+			message: '#^Function bf_b64enc not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
+
+		-
+			message: '#^Function bf_is_mobile not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
+
+		-
+			message: '#^Variable \$data1 might not be defined\.$#'
+			identifier: variable.undefined
+			count: 20
+			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
+
+		-
+			message: '#^Variable \$data2 might not be defined\.$#'
+			identifier: variable.undefined
+			count: 18
+			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
+
+		-
+			message: '#^Variable \$data3 might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
+
+		-
+			message: '#^Variable \$quickMode might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
+
+		-
+			message: '#^Variable \$text might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
+
+		-
+			message: '#^Constant _FF_RUNMODE_PREVIEW not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Scripting/ScriptingEngine.php
+
+		-
+			message: '#^Undefined variable\: \$name$#'
+			identifier: variable.undefined
+			count: 4
+			path: components/com_breezingformsng/src/Service/Scripting/ScriptingEngine.php
+
+		-
+			message: '#^Anonymous function has an unused use \$coldef\.$#'
+			identifier: closure.unusedUse
+			count: 1
+			path: components/com_breezingformsng/src/Service/Scripting/StoredPhpExecutor.php
+
+		-
+			message: '#^Anonymous function has an unused use \$coldefs\.$#'
+			identifier: closure.unusedUse
+			count: 1
+			path: components/com_breezingformsng/src/Service/Scripting/StoredPhpExecutor.php
+
+		-
+			message: '#^Anonymous function has an unused use \$elem\.$#'
+			identifier: closure.unusedUse
+			count: 2
+			path: components/com_breezingformsng/src/Service/Scripting/StoredPhpExecutor.php
+
+		-
+			message: '#^Anonymous function has an unused use \$id\.$#'
+			identifier: closure.unusedUse
+			count: 1
+			path: components/com_breezingformsng/src/Service/Scripting/StoredPhpExecutor.php
+
+		-
+			message: '#^Anonymous function has an unused use \$name\.$#'
+			identifier: closure.unusedUse
+			count: 1
+			path: components/com_breezingformsng/src/Service/Scripting/StoredPhpExecutor.php
+
+		-
+			message: '#^Anonymous function has an unused use \$pane\.$#'
+			identifier: closure.unusedUse
+			count: 1
+			path: components/com_breezingformsng/src/Service/Scripting/StoredPhpExecutor.php
+
+		-
+			message: '#^Anonymous function has an unused use \$row\.$#'
+			identifier: closure.unusedUse
+			count: 1
+			path: components/com_breezingformsng/src/Service/Scripting/StoredPhpExecutor.php
+
+		-
+			message: '#^Anonymous function has an unused use \$type\.$#'
+			identifier: closure.unusedUse
+			count: 1
+			path: components/com_breezingformsng/src/Service/Scripting/StoredPhpExecutor.php
+
+		-
+			message: '#^Anonymous function has an unused use \$valrows\.$#'
+			identifier: closure.unusedUse
+			count: 1
+			path: components/com_breezingformsng/src/Service/Scripting/StoredPhpExecutor.php
+
+		-
+			message: '#^Anonymous function has an unused use \$value\.$#'
+			identifier: closure.unusedUse
+			count: 1
+			path: components/com_breezingformsng/src/Service/Scripting/StoredPhpExecutor.php
+
+		-
+			message: '#^Access to an undefined property HTML_facileFormsProcessor\:\:\$sfadata\.$#'
+			identifier: property.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
+
+		-
+			message: '#^Call to an undefined method Joomla\\CMS\\Mail\\MailerInterface\:\:isHtml\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
+
+		-
+			message: '#^Call to method check\(\) on an unknown class Securimage\.$#'
+			identifier: class.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
+
+		-
+			message: '#^Call to static method create\(\) on an unknown class Stripe\\Checkout\\Session\.$#'
+			identifier: class.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
+
+		-
+			message: '#^Call to static method setApiKey\(\) on an unknown class Stripe\\Stripe\.$#'
+			identifier: class.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
+
+		-
+			message: '#^Constant _FF_RUNMODE_BACKEND not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
+
+		-
+			message: '#^Constant _FF_RUNMODE_FRONTEND not found\.$#'
+			identifier: constant.notFound
+			count: 2
+			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
+
+		-
+			message: '#^Function bf_b64dec not found\.$#'
+			identifier: function.notFound
+			count: 5
+			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
+
+		-
+			message: '#^Function bf_b64enc not found\.$#'
+			identifier: function.notFound
+			count: 3
+			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
+
+		-
+			message: '#^Function bf_is_email not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
+
+		-
+			message: '#^Function bf_is_mobile not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
+
+		-
+			message: '#^Function bf_sanitizeFilename not found\.$#'
+			identifier: function.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
+
+		-
+			message: '#^Instantiated class Securimage not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
+
+		-
+			message: '#^Variable \$area might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
+
+		-
+			message: '#^Variable \$stripeemail in isset\(\) always exists and is not nullable\.$#'
+			identifier: isset.variable
+			count: 1
+			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
+
+		-
+			message: '#^Binary operation "\+" between float and string results in an error\.$#'
+			identifier: binaryOp.invalid
+			count: 1
+			path: components/com_breezingformsng/src/Support/processor_facade.php
+
+		-
+			message: '#^Constant _FACILEFORMS_PROCESS_UNKTYPE not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Support/processor_facade.php
+
+		-
+			message: '#^Constant _FF_RUNMODE_FRONTEND not found\.$#'
+			identifier: constant.notFound
+			count: 1
+			path: components/com_breezingformsng/src/Support/processor_facade.php
+
+		-
+			message: '#^Method Joomla\\CMS\\Installer\\Installer\:\:uninstall\(\) invoked with 3 parameters, 2 required\.$#'
+			identifier: arguments.count
+			count: 2
+			path: script.php
+
+		-
+			message: '#^PHPDoc tag @return with type void is incompatible with native type bool\.$#'
+			identifier: return.phpDocType
+			count: 1
+			path: script.php

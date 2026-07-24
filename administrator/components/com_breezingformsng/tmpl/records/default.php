@@ -138,7 +138,7 @@ $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key)
     </ul>
   </nav>
   <div class="text-center text-muted small mb-3">
-    <?= Text::sprintf('COM_BREEZINGFORMSNG_PAGINATION_INFO', $limitStart + 1, min($limitStart + $limit, $total), $total); ?>
+    <?= Text::plural('COM_BREEZINGFORMSNG_PAGINATION_INFO', $total, $limitStart + 1, min($limitStart + $limit, $total)); ?>
   </div>
   <?php endif; ?>
 

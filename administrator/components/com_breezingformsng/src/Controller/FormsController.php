@@ -209,7 +209,7 @@ class FormsController extends BaseController
             if (!empty($ids)) {
                 $this->getFormModel()->copyItems($ids);
                 $app->enqueueMessage(
-                    count($ids) . ' ' . Text::_('COM_BREEZINGFORMSNG_FORMS_SUCOPIED'),
+                    Text::plural('COM_BREEZINGFORMSNG_FORMS_N_COPIED', count($ids)),
                     'message'
                 );
             }

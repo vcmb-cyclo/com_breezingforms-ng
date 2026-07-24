@@ -452,7 +452,7 @@ class Renderer
 				);
 			$autoOpenUnitFailureCount = !empty($unitTestResult['failures']) ? count($unitTestResult['failures']) : 0;
 			$autoOpenUnitWarningText = $autoOpenUnitFailureCount > 0
-				? $autoOpenUnitFailureCount . ' ' . Text::_($autoOpenUnitFailureCount > 1 ? 'COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES_PLURAL' : 'COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES_SINGULAR')
+				? Text::plural('COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES', $autoOpenUnitFailureCount)
 				: Text::_('COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES_ON_OPEN');
 			$document = Factory::getApplication()->getDocument();
 			$document->getWebAssetManager()->useScript('com_breezingformsng.pieces-test');

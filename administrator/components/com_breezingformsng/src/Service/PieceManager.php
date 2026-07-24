@@ -242,7 +242,7 @@ class PieceManager
 				$row->modified_by = $row->created_by;
 				$row->store();
 			} // foreach
-		$msg = $total . ' ' . Text::_('COM_BREEZINGFORMSNG_PIECES_SUCCOPIED');
+		$msg = Text::plural('COM_BREEZINGFORMSNG_PIECES_N_COPIED', $total);
 		$this->app->enqueueMessage($msg);
 		$this->app->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 	} // copy
@@ -258,7 +258,7 @@ class PieceManager
 		}
 
 		if ($total) {
-			$msg = $total . ' ' . Text::_('COM_BREEZINGFORMSNG_PIECES_SUCCDELETED');
+			$msg = Text::plural('COM_BREEZINGFORMSNG_PIECES_N_DELETED', $total);
 			$this->app->enqueueMessage($msg);
 			$this->app->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 			return;

@@ -112,7 +112,7 @@ class MenusController extends BaseController
             $ids = (array) $input->get('cid', [], 'INT');
             if (!empty($ids)) {
                 $this->getMenuModel()->copyItems($ids);
-                $app->enqueueMessage(Text::_('COM_BREEZINGFORMSNG_MENUS_SUCOPIED'), 'message');
+                $app->enqueueMessage(Text::plural('COM_BREEZINGFORMSNG_MENUS_N_COPIED', count($ids)), 'message');
             }
         }
 

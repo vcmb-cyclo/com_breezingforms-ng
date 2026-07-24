@@ -726,7 +726,7 @@ final class ExportEngine
                         $file_sep = explode('.', $file);
                         if (count($file_sep) > 1) {
                             unset($file_sep[count($file_sep) - 1]);
-                            $ttf_name = TCPDF_FONTS::addTTFfont($sourcePath . $file, 'TrueTypeUnicode');
+                            $ttf_name = PdfDocument::importTtfFont($sourcePath . $file);
                             $font_loaded = true;
                         }
                     }
@@ -752,7 +752,7 @@ final class ExportEngine
         }
 
         if (!$active_found) {
-            TCPDF_FONTS::addTTFfont(JPATH_SITE . '/media/com_breezingformsng/fonts/verdana.ttf', 'TrueTypeUnicode');
+            PdfDocument::importTtfFont(JPATH_SITE . '/media/com_breezingformsng/fonts/verdana.ttf');
             $pdf->SetFont('verdana');
         }
 

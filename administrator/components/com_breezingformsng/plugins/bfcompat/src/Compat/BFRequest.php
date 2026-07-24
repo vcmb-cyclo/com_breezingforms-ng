@@ -32,8 +32,12 @@ const BFREQUEST_ALLOWHTML = 4;
  * request variables.  This includes $_POST, $_GET, and naturally $_REQUEST.  Variables
  * can be passed through an input filter to avoid injection or returned raw.
  *
+ * Not a Joomla-version compatibility shim: kept as the BreezingForms legacy
+ * API surface so PHP stored in the database (facileforms_pieces.code,
+ * forms.piece*code) can keep calling BFRequest::* directly.
+ *
  * @since       1.5
- * #deprecated  1.7 Get the JInput object from the application instead
+ * #deprecated  1.7 Get the Joomla\CMS\Input\Input object from the application instead
  */
 class BFRequest
 {
@@ -58,7 +62,7 @@ class BFRequest
      * @return  string
      *
      * @since   1.5
-     * #deprecated  1.7 Use JInput::getMethod() instead
+     * #deprecated  1.7 Use Joomla\CMS\Input\Input::getMethod() instead
      */
     public static function getMethod()
     {
@@ -93,7 +97,7 @@ class BFRequest
      * @return  mixed  Requested variable.
      *
      * @since   1.5
-     * #deprecated  1.7  Use JInput::get()
+     * #deprecated  1.7  Use Joomla\CMS\Input\Input::get()
      */
     public static function getVar($name, $default = null, $hash = 'default', $type = 'none', $mask = 0)
     {
@@ -394,8 +398,8 @@ class BFRequest
      * @return  mixed    Request hash.
      *
      * @since   1.5
-     * #deprecated  1.7  Use JInput::get()
-     * @see     JInput
+     * #deprecated  1.7  Use Joomla\CMS\Input\Input::get()
+     * @see     Joomla\CMS\Input\Input
      */
     public static function get($hash = 'default', $mask = 0)
     {
@@ -448,7 +452,7 @@ class BFRequest
      * @return  void
      *
      * @since   1.5
-     * #deprecated  1.7  Use JInput::set()
+     * #deprecated  1.7  Use Joomla\CMS\Input\Input::set()
      */
     public static function set($array, $hash = 'default', $overwrite = true)
     {

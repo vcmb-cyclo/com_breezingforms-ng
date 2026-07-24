@@ -33,7 +33,7 @@ entre bump de version et remplacement complet.
 ## Ordre de traitement recommandé
 
 1. ✅ **Nettoyage mort (aujourd'hui)** : suppression des binaires Flash/Silverlight inertes de Plupload (`Moxie.swf`, `Moxie.xap`) — zéro risque, zéro changement de comportement observable (Flash Player n'existe plus nulle part).
-2. **overLIB → tooltip Bootstrap natif** — un seul point d'appel, remplacement contenu, cohérent avec la règle AGENTS.md "préférer les patterns natifs Joomla/Bootstrap".
+2. ✅ **overLIB → tooltip Bootstrap natif (aujourd'hui)** — `RenderingEngine.php` (élément "Tooltip") migré vers `HTMLHelper::_('bootstrap.tooltip', '.hasTooltip')`, même pattern déjà utilisé par les renderers QuickMode sur le frontend. `overlib_mini.js` supprimé (fichier + entrée `joomla.asset.json` orpheline).
 3. **wz_dragdrop → API HTML5 native ou Sortable.js** — un seul point d'appel.
 4. **SweetAlert v1 → SweetAlert2** — 3 points d'appel mais confinés aux renderers QuickMode ; SweetAlert2 fournit toujours un bundle `<script>` classique, pas besoin de bundler.
 5. **Ladda 1.0.6 → 2.0.3** — nécessite d'introduire un mini-bundler ou de vendoriser un build UMD tiers de Ladda 2.x ; à programmer une fois qu'un pipeline de build JS existe pour le composant (actuellement absent).

@@ -249,13 +249,6 @@
     },
 
     {
-      "name": "com_breezingformsng.overlib",
-      "type": "script",
-      "uri": "components/com_breezingformsng/libraries/js/overlib_mini.js",
-      "version": "auto"
-    },
-
-    {
       "name": "com_breezingformsng.wz-dragdrop",
       "type": "script",
       "uri": "administrator/components/com_breezingformsng/libraries/wz_dragdrop/wz_dragdrop.js",

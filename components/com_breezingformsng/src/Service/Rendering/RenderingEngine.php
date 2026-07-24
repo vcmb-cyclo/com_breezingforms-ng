@@ -1000,12 +1000,7 @@ final class RenderingEngine
             );
         }
         if ($tooltips > 0) {
-            RuntimeAssetLoader::script(
-                $this->processor->app,
-                Uri::root(true) . '/components/com_breezingformsng/libraries/js/overlib_mini.js'
-            );
-            if ($this->processor->inframe)
-                echo '<div id="overDiv" style="position:absolute;visibility:hidden;z-index:1000;"></div>' . nl();
+            HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
         } // if
 
         if (!$this->processor->inline) {
@@ -1501,7 +1496,15 @@ final class RenderingEngine
                         echo indentc(1) . '</div>' . nl();
                         break;
                     case 'Tooltip':
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '" onMouseOver="return overlib(\'' . expstring($data2) . '\',CAPTION,\'' . $row->title . '\',BELOW,RIGHT);" onMouseOut="return nd();"' . $class1 . '>' . nlc();
+                        $tooltipTitle = '<strong>' . htmlspecialchars(strip_tags(trim((string) $row->title)), ENT_QUOTES, 'UTF-8') . '</strong><br />' . str_replace(
+                            ["\n", "\r"],
+                            ["", ""],
+                            htmlentities(trim((string) $data2), ENT_QUOTES, 'UTF-8')
+                        );
+                        $tooltipClass = $class1 !== ''
+                            ? str_replace(' class="', ' class="hasTooltip ', $class1)
+                            : ' class="hasTooltip"';
+                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '" title="' . $tooltipTitle . '"' . $tooltipClass . '>' . nlc();
                         switch ($row->flag1) {
                             case 0:
                                 $url = $ff_mossite . '/media/com_breezingformsng/images/site/tooltip.png';

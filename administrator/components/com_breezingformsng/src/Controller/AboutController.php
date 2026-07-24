@@ -167,10 +167,10 @@ class AboutController extends BaseController
             }
 
             if ((int) ($candidate['record_count'] ?? 0) > 0) {
-                throw new \RuntimeException(Text::sprintf(
+                throw new \RuntimeException(Text::plural(
                     'COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_FORM_RECORDS_BLOCK',
-                    $formId,
-                    (int) $candidate['record_count']
+                    (int) $candidate['record_count'],
+                    $formId
                 ));
             }
 

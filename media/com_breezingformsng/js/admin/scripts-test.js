@@ -135,7 +135,11 @@ var __bfOpts = Joomla.getOptions('com_breezingformsng.scripts-test') || {};
 						if (count <= 0) {
 							return Joomla.Text._('COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES_ON_OPEN');
 						}
-						return count + ' ' + (count > 1 ? Joomla.Text._('COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES_PLURAL') : Joomla.Text._('COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES_SINGULAR'));
+						return Joomla.Text._(
+							count === 1
+								? 'COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES_1'
+								: 'COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES_MORE'
+						).replace('%d', count);
 					}
 
 				window.submitbutton = function (pressbutton) {

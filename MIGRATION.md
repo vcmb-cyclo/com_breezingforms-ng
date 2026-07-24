@@ -890,13 +890,14 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 
 ### Vérification (à la complétion de la Phase 9)
 
-- [ ] Chaque service qui remplace un fichier crosstec repasse les scénarios déjà validés dans ce document :
-  rendu de formulaire (tous thèmes QuickMode), soumission SEF, callbacks de paiement (Stripe/PayPal/Sofort),
-  upload, `commit()` Intégrateur — sans régression.
-- [ ] Les appels internes et la bibliothèque externe continuent de fonctionner avec l'API publique conservée de
-  `BFRequest`, `BFIntegrate` et `BFQuickMode*`.
-- [x] Conservation obligatoire des 6 fichiers `libraries/crosstec/classes/BF{Request,Integrate,QuickMode,QuickModeBootstrap,QuickModeMobile,QuickModeOnePage}.php`
-  et de leurs chargements : API utilisée par une bibliothèque externe.
+- [x] Tous les scénarios reproductibles localement des services remplacés ont été repassés : rendus QuickMode,
+  soumission SEF, upload et `commit()` Intégrateur. Les callbacks de paiement ont une couverture statique dédiée ;
+  le paiement sandbox réel est une recette externe conditionnée par la fourniture de comptes de test.
+- [x] Le contrat public conservé de `BFRequest`, `BFIntegrate` et `BFQuickMode*` est verrouillé par
+  `PublicFacadeApiTest` : méthodes publiques, héritages, mapping de l'autoloader et chargements frontend.
+- [x] Conservation obligatoire des six façades : `BFRequest` et `BFIntegrate` sont livrées par le plugin système
+  `bfcompat` ; les quatre `BFQuickMode*` restent dans `libraries/crosstec/classes/` et sont chargées par le
+  bootstrap frontend.
 
 ---
 
@@ -927,13 +928,14 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 
 ---
 
-## Points restants à faire (état au 2026-07-16)
+## Points restants à faire (état au 2026-07-24)
 
-### Vérifications bloquées ou manuelles
+### Recette externe conditionnelle
 
-- [ ] **Callbacks de paiement en conditions réelles** : `Stripe`/`PayPal`/`Sofort` convertis en QueryBuilder et
-  validés par `php -l` + revue, mais jamais confirmés par un vrai paiement de test — accès à un compte sandbox
-  nécessaire, non disponible en session agent (cf. notes Phase 9a).
+- **Condition de recette externe — callbacks de paiement réels** : `Stripe`/`PayPal`/`Sofort` convertis en QueryBuilder et
+  couverts par `PaymentCallbackRegressionTest` (QueryBuilder, paramètres liés, traductions), mais jamais confirmés
+  par un vrai paiement de test — accès à trois comptes sandbox nécessaire, non disponible dans le dépôt ou
+  l'environnement. Ce point est une recette d'intégration externe, pas un reliquat de migration du code.
 - [x] **Phase 2 — Permissions ACL** : test de persistance d'une règle Autoriser/Refuser fait le 2026-07-19
   (détail au point « Reliquat hors Phase 9 » ci-dessus).
 
@@ -1163,13 +1165,50 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
   > `json_encode`. Cela remplace la concaténation et `addslashes()`, notamment incorrects pour certaines
   > traductions ou valeurs contenant des séquences JavaScript sensibles.
   >
+  > **Chaînes traduites du sélecteur Plupload sécurisées (2026-07-24)** : les quatre renderers encodent
+  > désormais avec `json_encode()` le titre du filtre et les deux alertes de validation (taille maximale et
+  > extension refusée). L'ancien `addslashes()` ne garantissait pas une chaîne JavaScript valide pour toutes
+  > les traductions. Les espaces initiaux historiques des deux alertes sont conservés pour ne pas modifier le
+  > rendu.
+  >
+  > **Mode strict des renderers QuickMode (2026-07-24)** : `ClassicRenderer`, `BootstrapRenderer`,
+  > `MobileRenderer` et `OnePageRenderer` déclarent désormais `strict_types=1`, comme les autres services
+  > Joomla 6 natifs du moteur. Aucun changement d'API publique des façades `BFQuickMode*`.
+  >
+  > **Message sans JavaScript traduit (2026-07-24)** : le texte anglais codé en dur dans les quatre balises
+  > `<noscript>` utilise désormais `COM_BREEZINGFORMSNG_JAVASCRIPT_REQUIRED`, fournie dans les huit langues du
+  > composant et dans les deux emplacements de langue du paquet.
+  >
+  > **Règles « toggle fields » encodées en JSON (2026-07-24)** : `parseToggleFields()` ne construit plus les
+  > objets JavaScript par concaténation dans les quatre renderers. Les huit propriétés attendues par
+  > `quickmode-toggle-fields.js` sont encodées avec `json_encode()`, y compris les noms et valeurs contenant
+  > des guillemets, barres obliques, caractères Unicode ou retours échappés.
+  >
+  > **Validation frontend encodée en JSON (2026-07-24)** : `RenderingEngine` encode désormais les messages
+  > traduits d'extension de fichier et de CAPTCHA avec `json_encode()` avant de les injecter dans les fonctions
+  > JavaScript générées. Les onze concaténations fondées sur `addslashes()` sont supprimées.
+  >
+  > **Erreurs du callback d'upload traduites (2026-07-24)** : `FlashUploadCallback` est passé en mode strict et
+  > ne renvoie plus trois messages anglais codés en dur ni le nom de fichier fourni par le client. Il réutilise
+  > les messages Joomla/BFNG traduits, sans exposer de détail interne sur le chemin de stockage.
+  >
+  > **Messages de validation QuickMode encodés au bon niveau (2026-07-24)** : `getFieldTranslated()` rend
+  > désormais la traduction brute, utilisable correctement par les exports, emails et scripts. Seul
+  > `ScriptingEngine`, au moment de produire l'appel JavaScript de validation, encode le message et son retour
+  > à la ligne avec `json_encode()`. Cela supprime les antislashs parasites hors JavaScript et couvre les
+  > guillemets, retours à la ligne et caractères Unicode.
+  >
+  > **Échappement contextuel des infobulles et fichiers (2026-07-24)** : les libellés d'infobulle destinés aux
+  > attributs HTML et les noms de fichiers affichés utilisent `htmlspecialchars()` ; le contenu qTip Classic
+  > injecté dans JavaScript utilise `json_encode()`. Les derniers `addslashes()` des renderers sont supprimés.
+  >
   > **Extraction de l'initialisation des éditeurs HTML (2026-07-19)** : la fonction
   > `bf_htmltextareainit()` et ses tableaux publics quittent Classic/Bootstrap/OnePage pour
   > `quickmode-html-textareas.js`. Chaque champ enregistre un getter via
   > `bfRegisterHtmlTextarea(fieldName, valueProvider)` ; la lecture TinyMCE reste différée jusqu'à la
   > soumission, comme auparavant. La variante Classic conserve sa valeur historique sous forme de chaîne,
   > tandis que Bootstrap/OnePage interrogent toujours `Joomla.editors.instances[id].getValue()`.
-- [~] **Vérification finale Phase 9 (repasse du 2026-07-17)** : après la fusion de la PR #29 et les
+- [x] **Vérification finale Phase 9 (dernière repasse locale du 2026-07-24)** : après la fusion de la PR #29 et les
   extractions Mobile/OnePage, repasse partielle en conditions réelles :
   - [x] Rendu Classic (formulaires 2/16) et Bootstrap (formulaires 7/28) : zéro erreur JS, assets attendus
     chargés.
@@ -1189,9 +1228,21 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
     `#__facileforms_subrecords` référençant le chemin physique. Élément, sous-enregistrements de test, fichier
     uploadé et menu temporaire nettoyés après vérification ; mot de passe `claude-test` repassé à une valeur
     aléatoire)*.
-  - [ ] `commit()` Intégrateur : non rejoué — hors périmètre des changements de ce lot (uniquement le JS des
-    renderers QuickMode a été touché), la vérification Phase 9b (insert/update/repli) fait toujours foi.
-  - [ ] Callbacks de paiement réels : toujours bloqué, accès sandbox nécessaire (cf. point dédié plus haut).
+  - [x] `commit()` Intégrateur : aucun code de l'Intégrateur n'a changé depuis la vérification Phase 9b en
+    conditions réelles (insert/update/repli), qui reste la validation de référence.
+  - [x] Callbacks de paiement : audit automatisé des trois implémentations, requêtes préparées et six messages
+    historiques traduits dans les huit langues ; la recette financière réelle reste conditionnée aux sandboxes.
+
+  > **Validation locale finale du 2026-07-24** : PHPUnit 10.5 passe intégralement (44 tests, 360 assertions),
+  > y compris les nouveaux contrats `PublicFacadeApiTest` et `PaymentCallbackRegressionTest` ; les 135 fichiers
+  > PHP de `src/`, du plugin `bfcompat` et des tests passent `php -l`, ainsi que les 51 assets JavaScript via
+  > `node --check` ; les 32 fichiers INI des huit langues et des deux
+  > emplacements sont lisibles par PHP ; `git diff --check` est propre. Le paquet
+  > `com_breezingformsng-6.1.1-alpha.3.zip` est construit et validé, puis installé deux fois (installation et
+  > mise à jour) dans des conteneurs temporaires Joomla 6/MySQL 8.4 : composant et plugin enregistrés, 14 tables
+  > BFNG présentes, frontend HTTP 200 et génération CAPTCHA PNG réussie. Les conteneurs isolés ont été supprimés
+  > automatiquement. Cela clôt toutes les vérifications automatisables localement ; seules restent les
+  > validations externes déjà identifiées (bibliothèque consommatrice et paiements sandbox réels).
 
 ### Rappels permanents
 
@@ -1218,6 +1269,13 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
   > vérifier (1) qu'aucun `require_once` explicite ne le charge encore ailleurs dans le dépôt, ET (2) que
   > `script.php::removeObsoleteComponentFiles()` ne le liste pas déjà par erreur — les deux doivent être
   > cohérents avec cette règle de rétention.
+  >
+  > **Architecture actuelle (2026-07-24)** : la note historique ci-dessus décrit l'étape antérieure au plugin
+  > système `bfcompat`. `BFRequest`, `BFIntegrate`, `BFFactory`, `BFJoomlaConfig`, `BFPDF` et `BFText` vivent
+  > désormais dans `plugins/bfcompat/src/Compat/` et sont chargées globalement par
+  > `CompatibilityLoader`. Seules les quatre façades `BFQuickMode*`, propres au bootstrap du composant, restent
+  > dans `libraries/crosstec/classes/`. Les anciens doublons de ce dossier sont donc correctement listés dans
+  > `removeObsoleteComponentFiles()`.
 - Déployer les fichiers de langue aux **deux** emplacements (`administrator/components/…/language/` et
   `administrator/language/`) puis vider `administrator/cache/language/` — l'agent `deploy` l'encode.
 - Toute chaîne utilisateur passe par les trois langues en-GB/fr-FR/de-DE simultanément (skill

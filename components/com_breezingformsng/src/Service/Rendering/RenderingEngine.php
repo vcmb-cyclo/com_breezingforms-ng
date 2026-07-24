@@ -357,6 +357,10 @@ final class RenderingEngine
             return;
 
         $cntFiles = 0;
+        $fileExtensionError = json_encode(
+            Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED'),
+            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE
+        );
         $fileExtensionsCheck = 'function checkFileExtensions(){';
         for ($i = 0; $i < $this->processor->rowcount; $i++) {
             $row = $this->processor->rows[$i];
@@ -376,9 +380,9 @@ final class RenderingEngine
                     $fileExtensionsCheck .= '
 					if(!ff_elem' . $row->id . 'Exts){
 						if(typeof bfUseErrorAlerts == "undefined"){
-							alert("' . addslashes(Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED')) . '");
+							alert(' . $fileExtensionError . ');
 						} else {
-							bfShowErrors("' . addslashes(Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED')) . '");
+							bfShowErrors(' . $fileExtensionError . ');
 						}
 						if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
                                                 if(document.getElementById("bfSubmitButton")){
@@ -397,6 +401,10 @@ final class RenderingEngine
 		}
 		';
 
+        $captchaError = json_encode(
+            Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG'),
+            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE
+        );
         $capFunc = 'function bfCheckCaptcha(){if(checkFileExtensions())ff_submitForm2();}';
 
         for ($i = 0; $i < $this->processor->rowcount; $i++) {
@@ -452,12 +460,12 @@ final class RenderingEngine
                                                                                     JQuery("#bfSubmitMessage").css("display","none");
 									        }
                                                                                 if(typeof bfUseErrorAlerts == "undefined"){
-                                                                                    alert("' . addslashes(Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
+                                                                                    alert(' . $captchaError . ');
 									        } else {
                                                                                    if(typeof inlineErrorElements != "undefined"){
-                                                                                     inlineErrorElements.push(["bfCaptchaEntry","' . addslashes(Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '"]);
+                                                                                     inlineErrorElements.push(["bfCaptchaEntry",' . $captchaError . ']);
                                                                                    }
-									           bfShowErrors("' . addslashes(Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
+									           bfShowErrors(' . $captchaError . ');
 									        }
                                                                                 if(typeof ladda_button != "undefined"){
                                                                                     
@@ -531,12 +539,12 @@ final class RenderingEngine
                                                         else
                                                         {
                                                                 if(typeof bfUseErrorAlerts == "undefined"){
-                                                                        alert("' . addslashes(Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
+                                                                        alert(' . $captchaError . ');
                                                                 } else {
                                                                     if(typeof inlineErrorElements != "undefined"){
-                                                                        inlineErrorElements.push(["bfReCaptchaEntry","' . addslashes(Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '"]);
+                                                                        inlineErrorElements.push(["bfReCaptchaEntry",' . $captchaError . ']);
                                                                     }
-                                                                    bfShowErrors("' . addslashes(Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
+                                                                    bfShowErrors(' . $captchaError . ');
                                                                 }
 
                                                                 if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
@@ -568,12 +576,12 @@ final class RenderingEngine
                                                             if(typeof bfInvisibleRecaptcha == "undefined"){
                                                             
 	                                                            if(typeof bfUseErrorAlerts == "undefined"){
-	                                                                    alert("' . addslashes(Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
+	                                                                    alert(' . $captchaError . ');
 	                                                            } else {
 	                                                                if(typeof inlineErrorElements != "undefined"){
-	                                                                    inlineErrorElements.push(["bfReCaptchaEntry","' . addslashes(Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '"]);
+	                                                                    inlineErrorElements.push(["bfReCaptchaEntry",' . $captchaError . ']);
 	                                                                }
-	                                                                bfShowErrors("' . addslashes(Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')) . '");
+	                                                                bfShowErrors(' . $captchaError . ');
 	                                                            }
                                                             
                                                             
@@ -1179,7 +1187,13 @@ final class RenderingEngine
                                 $cbDeac = '';
                                 foreach ($cbFiles as $cbFile) {
                                     if (trim($cbFile)) {
-                                        $cbOut .= '<div><input type=\"checkbox\" onchange=\"bfCheckUploadValidation(\'ff_elem' . $cbEntry->recElementId . '\', this, \'ff_nm_' . $cbEntry->recName . '[]\')\" value=\"1\" name=\"cb_delete_' . $cbEntry->recElementId . '[' . $i . ']\" id=\"cb_delete_' . $cbEntry->recElementId . '_' . $i . '\"/> <label style=\"margin-left: 5px; float: none !important; display: inline !important;\" for=\"cb_delete_' . $cbEntry->recElementId . '_' . $i . '\">' . addslashes(basename(ContentbuilderngHelper::contentbuilderng_wordwrap($cbFile->recValue, 150, "<br>", true))) . '</label></div>';
+                                        $displayName = htmlspecialchars(
+                                            basename(ContentbuilderngHelper::contentbuilderng_wordwrap($cbFile->recValue, 150, '<br>', true)),
+                                            ENT_QUOTES,
+                                            'UTF-8'
+                                        );
+                                        $displayName = str_replace('&lt;br&gt;', '<br>', $displayName);
+                                        $cbOut .= '<div><input type=\"checkbox\" onchange=\"bfCheckUploadValidation(\'ff_elem' . $cbEntry->recElementId . '\', this, \'ff_nm_' . $cbEntry->recName . '[]\')\" value=\"1\" name=\"cb_delete_' . $cbEntry->recElementId . '[' . $i . ']\" id=\"cb_delete_' . $cbEntry->recElementId . '_' . $i . '\"/> <label style=\"margin-left: 5px; float: none !important; display: inline !important;\" for=\"cb_delete_' . $cbEntry->recElementId . '_' . $i . '\">' . $displayName . '</label></div>';
                                         if ($cbDeac == '') {
                                             $cbDeac = 'bfDeactivateField["ff_nm_' . $cbEntry->recName . '[]"]=true;' . nl();
                                         }

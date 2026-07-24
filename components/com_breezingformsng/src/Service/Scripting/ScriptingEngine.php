@@ -497,17 +497,21 @@ final class ScriptingEngine
                     $curr = $row->page;
                 } // if
                 if ($this->processor->trim($row->script3msg)) {
-                    $msg = addslashes($row->script3msg) . "\\n";
+                    $message = (string) $row->script3msg;
                     $res_msg = '';
                     $this->processor->getFieldTranslated('validationMessage', $row->name, $res_msg);
                     if ($res_msg != '') {
-                        $msg = $res_msg . "\\n";
+                        $message = $res_msg;
                     }
+                    $msg = json_encode(
+                        $message . "\n",
+                        JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE
+                    );
                 } else {
-                    $msg = "";
+                    $msg = '""';
                 }
                 $code .= " if( typeof bfDeactivateField == 'undefined' || !bfDeactivateField['ff_nm_" . $row->name . "[]'] ){ " . nl();
-                $code .= "        errorout = " . $funcname . "(document." . $this->processor->form_id . "['ff_nm_" . $row->name . "[]'],\"" . $msg . "\");" . nl();
+                $code .= "        errorout = " . $funcname . "(document." . $this->processor->form_id . "['ff_nm_" . $row->name . "[]']," . $msg . ");" . nl();
                 $code .= "        error += errorout" . nl();
                 $code .= "        if(typeof inlineErrorElements != 'undefined'){" . nl();
                 $code .= "             inlineErrorElements.push([\"" . $row->name . "\",errorout]);" . nl();

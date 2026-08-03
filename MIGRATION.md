@@ -207,7 +207,7 @@
 - [x] `administrator/components/com_breezingformsng/admin/import.class.php` (git mv → ImportModel)
 
 ### Périmètre différé
-- [x] Import de paquets — `ImportModel` réécrit (SimpleXML, requêtes paramétrées, transaction) ; consommé par `script.php::importStandardLibrary()`. Limité aux bibliothèques de scripts/pièces (seul cas réel : `packages/stdlib.english.xml`) ; les paquets avec formulaires/menus sont refusés avec un message clair. Vérifié de bout en bout le 2026-07-10 : installation du paquet 6.1.1-alpha.2 dans le conteneur `joomla6-joomla-1`, import stdlib OK (71 scripts inchangés ignorés, 3 pièces mises à jour, métadonnées paquet actualisées).
+- [x] Import de paquets — `ImportModel` réécrit (SimpleXML, requêtes paramétrées, transaction) ; consommé par `script.php::importStandardLibrary()`. Limité aux bibliothèques de scripts/pièces (seul cas réel : `packages/stdlib.english.xml`) ; les paquets avec formulaires/menus sont refusés avec un message clair. Vérifié de bout en bout le 2026-07-10 : installation du paquet 6.1.0 dans le conteneur `joomla6-joomla-1`, import stdlib OK (71 scripts inchangés ignorés, 3 pièces mises à jour, métadonnées paquet actualisées).
 
 ### Migré depuis cette phase
 - QuickMode — déplacé en Phase 7 vers `QuickmodeController`, `QuickmodeModel`, `QuickmodeHtml` et routes `task=quickmode.*`
@@ -1238,7 +1238,7 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
   > PHP de `src/`, du plugin `bfcompat` et des tests passent `php -l`, ainsi que les 51 assets JavaScript via
   > `node --check` ; les 32 fichiers INI des huit langues et des deux
   > emplacements sont lisibles par PHP ; `git diff --check` est propre. Le paquet
-  > `com_breezingformsng-6.1.1-alpha.3.zip` est construit et validé, puis installé deux fois (installation et
+  > `com_breezingformsng-6.1.0.zip` est construit et validé, puis installé deux fois (installation et
   > mise à jour) dans des conteneurs temporaires Joomla 6/MySQL 8.4 : composant et plugin enregistrés, 14 tables
   > BFNG présentes, frontend HTTP 200 et génération CAPTCHA PNG réussie. Les conteneurs isolés ont été supprimés
   > automatiquement. Cela clôt toutes les vérifications automatisables localement ; seules restent les

@@ -668,7 +668,7 @@ final class NotificationEngine
         );
 
         if ($translation !== null) {
-            $res = addslashes($translation);
+            $res = $translation;
         }
     }
 

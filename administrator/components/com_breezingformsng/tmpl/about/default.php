@@ -435,7 +435,7 @@ $aboutDescription = str_replace(
                     </div>
                 <?php else : ?>
                     <div class="alert alert-warning bf-audit-warning-alert">
-                        <?php echo Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_REPORT_ISSUES', (int) ($auditSummary['issues_total'] ?? 0)); ?>
+                        <?php echo Text::plural('COM_BREEZINGFORMSNG_ABOUT_AUDIT_REPORT_ISSUES', (int) ($auditSummary['issues_total'] ?? 0)); ?>
                     </div>
                 <?php endif; ?>
 
@@ -528,10 +528,10 @@ $aboutDescription = str_replace(
                                         <span class="text-muted">(<?php echo htmlspecialchars((string) $group['package'], ENT_QUOTES, 'UTF-8'); ?>)</span>
                                     <?php endif; ?>
                                     &mdash;
-                                    <?php echo Text::sprintf(
+                                    <?php echo Text::plural(
                                         'COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_FORMS_HINT_KEEP',
-                                        (int) ($group['keep']['id'] ?? 0),
-                                        (int) ($group['keep']['record_count'] ?? 0)
+                                        (int) ($group['keep']['record_count'] ?? 0),
+                                        (int) ($group['keep']['id'] ?? 0)
                                     ); ?>
                                     <?php foreach ((array) ($group['drop'] ?? array()) as $entry) : ?>
                                         <?php
@@ -762,7 +762,7 @@ $aboutDescription = str_replace(
                 </div>
             <?php else : ?>
                 <p class="text-muted small">
-                    <?php echo sprintf(Text::_('COM_BREEZINGFORMSNG_PHP_LIBRARIES_COUNT'), count($phpLibraries)); ?>
+                    <?php echo Text::plural('COM_BREEZINGFORMSNG_PHP_LIBRARIES_COUNT', count($phpLibraries)); ?>
                 </p>
                 <div class="table-responsive">
                     <table class="table table-sm table-striped align-middle mb-0">
@@ -797,7 +797,7 @@ $aboutDescription = str_replace(
                 </div>
             <?php else : ?>
                 <p class="text-muted small">
-                    <?php echo sprintf(Text::_('COM_BREEZINGFORMSNG_JS_LIBRARIES_COUNT'), count($javascriptLibraries)); ?>
+                    <?php echo Text::plural('COM_BREEZINGFORMSNG_JS_LIBRARIES_COUNT', count($javascriptLibraries)); ?>
                 </p>
                 <div class="table-responsive">
                     <table class="table table-sm table-striped align-middle mb-0">

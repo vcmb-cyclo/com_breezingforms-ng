@@ -80,7 +80,7 @@ overflow:hidden;width: 100%;
         display:block;
     }
     
-    #bfQuickModeWrapper input[type=text], #bfQuickModeWrapper input[type=password], #bfQuickModeWrapper textarea, #bfQuickModeWrapper select {
+    #bfQuickModeWrapper input[type="text"], #bfQuickModeWrapper input[type="password"], #bfQuickModeWrapper textarea, #bfQuickModeWrapper select {
         width: 100% !important;
     }
 }
@@ -97,7 +97,7 @@ overflow:hidden;width: 100%;
 	background-color:#ccc;
 	height:1px;
 	border:none;
-	margin: 10px 0px 10px 0px;
+	margin: 10px 0 10px 0;
 }
 
 /* ##### inputs ##### */
@@ -116,7 +116,7 @@ overflow:hidden;width: 100%;
 	height: 100px;
 }
 
-#bfQuickModeWrapper input[type=text], #bfQuickModeWrapper input[type=password], #bfQuickModeWrapper textarea, #bfQuickModeWrapper select {
+#bfQuickModeWrapper input[type="text"], #bfQuickModeWrapper input[type="password"], #bfQuickModeWrapper textarea, #bfQuickModeWrapper select {
     border: 1px solid #bbb;
     padding: 2px;
     line-height: normal;
@@ -139,7 +139,7 @@ overflow:hidden;width: 100%;
 
 #bfQuickModeWrapper input[type='hidden'] { display: none; }
 
-.bfClearfix:after {
+.bfClearfix::after {
     content: ".";
     display: block;
     height: 0;
@@ -486,3 +486,12 @@ div.jtable-main-container > table.jtable > tbody > tr.jtable-row-selected {
 #bfQuickModeRight #menutab {
     width: 100%;
 }
+
+/* Prevent admin area panels from overflowing the Joomla control panel window */
+@media (min-width: 1024px) {
+    body.admin .container-fluid, body.admin .admin { max-width: 100%; box-sizing: border-box; }
+    body.admin .container-fluid { overflow-x: hidden; }
+}
+
+/* Ensure right-side helper panels don't force the page to grow beyond viewport */
+.bf-sidebar, .bf-panel, .bfQuickModeRight { max-height: calc(100vh - 80px); overflow: auto; }

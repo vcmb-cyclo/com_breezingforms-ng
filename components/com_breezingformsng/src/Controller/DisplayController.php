@@ -21,7 +21,7 @@ class DisplayController extends BaseController
     {
         $input = $this->input;
 
-        if ($input->getCmd('ff_task') === 'submit' && !Session::checkToken('request')) {
+        if ($input->getCmd('ff_task') === 'submit' && !Session::checkToken('post')) {
             throw new \Exception(Text::_('JINVALID_TOKEN_NOTICE'), 403);
         }
 

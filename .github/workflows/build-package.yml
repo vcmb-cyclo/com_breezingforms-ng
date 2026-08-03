@@ -9,96 +9,207 @@ on:
     tags:
       - 'v*'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 jobs:
-  quality:
+  lint:
+    name: PHP, XML and translation checks
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
-      - name: Setup PHP
+      - name: Setup PHP 8.3
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
           tools: composer:v2
           coverage: none
 
-      - name: Check PHP syntax
+      - name: PHP syntax check
         run: |
           set -o pipefail
-          if ! git ls-files -z '*.php' | xargs -0 -n1 php -l > php-lint.log 2>&1; then
-            cat php-lint.log
+          git ls-files -z '*.php' | xargs -0 -n1 -P4 php -l > /dev/null
+
+      - name: Install xmllint
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libxml2-utils
+
+      - name: Validate XML files
+        run: git ls-files -z '*.xml' | xargs -0 xmllint --noout
+
+      - name: Check version consistency
+        run: |
+          manifest_version="$(grep -oPm1 '(?<=<version>)[^<]+' com_breezingformsng.xml)"
+          update_version="$(grep -oPm1 '(?<=<version>)[^<]+' com_breezingformsng_update.xml)"
+          if [ "${manifest_version}" != "${update_version}" ]; then
+            echo "::error::Version mismatch: manifest ${manifest_version} vs update stream ${update_version}."
             exit 1
           fi
-          echo "PHP syntax check passed."
-
-      - name: Validate XML manifests
-        run: |
-          php -r '
-          foreach (["com_breezingformsng.xml", "com_breezingformsng_update.xml"] as $path) {
-              libxml_use_internal_errors(true);
-              if (simplexml_load_file($path) === false) {
-                  fwrite(STDERR, "Invalid XML manifest: {$path}\n");
-                  exit(1);
-              }
-          }
-          '
 
       - name: Check translations
         run: python3 scripts/check-translations.py
 
-      - name: Audit composer dependencies
+      - name: Audit Composer dependencies
         working-directory: administrator/components/com_breezingformsng
         run: composer audit --locked --no-interaction
 
-  unit-tests:
+  css-lint:
+    name: CSS checks
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
-      - name: Setup PHP with coverage
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install CSS lint dependencies
+        run: npm ci
+
+      - name: Lint CSS
+        run: npm run lint:css
+
+  phpstan:
+    name: PHPStan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+          coverage: none
+
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer packages
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-phpstan-8.3-${{ hashFiles('composer.lock', 'administrator/components/com_breezingformsng/composer.lock') }}
+          restore-keys: composer-phpstan-8.3-
+
+      - name: Install analysis dependencies
+        run: |
+          composer install --prefer-dist --no-interaction --no-progress
+          composer install \
+            --working-dir=administrator/components/com_breezingformsng \
+            --prefer-dist \
+            --no-interaction \
+            --no-progress
+
+      - name: Cache extracted Joomla core stubs
+        id: joomla-stubs-cache
+        uses: actions/cache@v6
+        with:
+          path: joomla-stubs
+          key: joomla-stubs-6.1.2-php8.3
+
+      - name: Extract Joomla core for class discovery
+        if: steps.joomla-stubs-cache.outputs.cache-hit != 'true'
+        run: |
+          container="$(docker create joomla:6.1.2-php8.3-apache)"
+          mkdir -p joomla-stubs
+          docker cp "${container}:/usr/src/joomla/libraries" joomla-stubs/libraries
+          docker rm "${container}"
+
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse -c phpstan.neon.dist --no-progress --error-format=github
+
+  unit-tests:
+    name: Unit tests and coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup PHP 8.3 with coverage
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
           tools: composer:v2
           coverage: pcov
 
+      - name: Get Composer cache directory
+        id: composer-cache
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer packages
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-tests-8.3-${{ hashFiles('composer.json') }}
+          restore-keys: composer-tests-8.3-
+
       - name: Install test dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
 
-      - name: Run unit tests and measure coverage
-        run: vendor/bin/phpunit --coverage-clover=coverage.xml --coverage-text
+      - name: Run unit tests and generate coverage reports
+        run: |
+          vendor/bin/phpunit \
+            --coverage-clover=coverage/clover.xml \
+            --coverage-html=coverage/html \
+            --coverage-text
 
-      - name: Upload coverage report
+      - name: Enforce coverage threshold
+        run: php scripts/check-coverage.php coverage/clover.xml 0.05
+
+      - name: Upload coverage reports
         uses: actions/upload-artifact@v7
         with:
           name: phpunit-coverage
-          path: coverage.xml
+          path: coverage
+          retention-days: 14
 
   package:
-    needs: [quality, unit-tests]
+    name: Build and smoke-test package
+    needs: [lint, css-lint, phpstan, unit-tests]
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
-      - name: Setup PHP
+      - name: Setup PHP 8.3
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
           tools: composer:v2
+          coverage: none
 
-      - name: Resolve package version
-        id: version
-        run: |
-          version="$(grep -oPm1 '(?<=<version>)[^<]+' com_breezingformsng.xml)"
-          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - name: Get Composer cache directory
+        id: composer-cache
+        working-directory: administrator/components/com_breezingformsng
+        run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Composer packages
+        uses: actions/cache@v6
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: composer-package-8.3-${{ hashFiles('administrator/components/com_breezingformsng/composer.lock') }}
+          restore-keys: composer-package-8.3-
 
       - name: Set package creation date
         run: |
@@ -112,12 +223,6 @@ jobs:
         id: package
         run: echo "archive=$(scripts/build-package.sh)" >> "$GITHUB_OUTPUT"
 
-      - name: Calculate package checksum
-        id: checksum
-        run: |
-          sha256="$(sha256sum "${{ steps.package.outputs.archive }}" | awk '{print $1}')"
-          echo "sha256=${sha256}" >> "$GITHUB_OUTPUT"
-
       - name: Validate package contents
         run: scripts/validate-package.sh "${{ steps.package.outputs.archive }}"
 
@@ -127,22 +232,67 @@ jobs:
       - name: Upload installation package
         uses: actions/upload-artifact@v7
         with:
-          name: com_breezingformsng-${{ steps.version.outputs.version }}
+          name: installation-package
           path: ${{ steps.package.outputs.archive }}
+          retention-days: 14
 
-      - name: Create GitHub release
-        if: startsWith(github.ref, 'refs/tags/v')
+  release:
+    name: Publish release
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: package
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Download installation package
+        uses: actions/download-artifact@v8
+        with:
+          name: installation-package
+          path: build
+
+      - name: Resolve release metadata
+        id: release
+        run: |
+          version="$(grep -oPm1 '(?<=<version>)[^<]+' com_breezingformsng.xml)"
+          archive="build/com_breezingformsng-${version}.zip"
+          test -f "${archive}"
+          if [ "${GITHUB_REF_NAME}" != "v${version}" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match manifest version v${version}."
+            exit 1
+          fi
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "archive=${archive}" >> "$GITHUB_OUTPUT"
+
+      - name: Calculate package checksum
+        id: checksum
+        run: |
+          sha256="$(sha256sum "${{ steps.release.outputs.archive }}" | awk '{print $1}')"
+          echo "sha256=${sha256}" >> "$GITHUB_OUTPUT"
+
+      - name: Publish GitHub release
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          gh release create "${GITHUB_REF_NAME}" \
-            "${{ steps.package.outputs.archive }}" \
-            --title "BreezingForms NG ${GITHUB_REF_NAME}" \
-            --generate-notes \
-            --notes "SHA-256: ${{ steps.checksum.outputs.sha256 }}"
+          archive="${{ steps.release.outputs.archive }}"
+          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
+            gh release upload "${GITHUB_REF_NAME}" "${archive}" --clobber
+          else
+            gh release create "${GITHUB_REF_NAME}" \
+              "${archive}" \
+              --target "${GITHUB_SHA}" \
+              --title "BreezingForms NG ${GITHUB_REF_NAME}" \
+              --generate-notes \
+              --notes "SHA-256: ${{ steps.checksum.outputs.sha256 }}"
+          fi
 
-      - name: Ensure release is published, not draft
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Ensure release is published and latest
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: gh release edit "${GITHUB_REF_NAME}" --draft=false --latest

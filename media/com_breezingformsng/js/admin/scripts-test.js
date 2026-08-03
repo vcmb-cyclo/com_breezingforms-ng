@@ -135,12 +135,16 @@ var __bfOpts = Joomla.getOptions('com_breezingformsng.scripts-test') || {};
 						if (count <= 0) {
 							return Joomla.Text._('COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES_ON_OPEN');
 						}
-						return count + ' ' + (count > 1 ? Joomla.Text._('COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES_PLURAL') : Joomla.Text._('COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES_SINGULAR'));
+						return Joomla.Text._(
+							count === 1
+								? 'COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES_1'
+								: 'COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES_MORE'
+						).replace('%d', count);
 					}
 
 				window.submitbutton = function (pressbutton) {
-					var task = pressbutton === 'prev' ? 'previous' : pressbutton;
-					Joomla.submitform('scripts.' + task, document.getElementById('adminForm'));
+					var action = pressbutton.indexOf('.') === -1 ? pressbutton : pressbutton.split('.').pop();
+					Joomla.submitform('scripts.' + action, document.getElementById('adminForm'));
 				};
 
 				window.bfRunScriptTest = function () {

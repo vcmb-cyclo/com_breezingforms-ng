@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * @package BreezingFormsNG
  * @copyright Copyright (C) 2024-2026 by XDA+GIL
@@ -56,7 +59,6 @@ final class FlashUploadCallback
         $formIdCount = count($objectList);
         if ($formIdCount > 0) {
             $tempFile = (string) ($uploadedFile['tmp_name'] ?? '');
-            $uploadedName = (string) ($uploadedFile['name'] ?? '');
             $targetPath = JPATH_SITE . '/components/com_breezingformsng/uploads/';
             if (@file_exists($targetPath) && @is_dir($targetPath)) {
                 $secureTicket = $this->application->getSession()->get('secure_ticket', '', 'com_breezingformsng');
@@ -105,13 +107,13 @@ final class FlashUploadCallback
 
                     @File::delete($targetFile);
                 } else {
-                    echo 'Could not upload file ' . addslashes($uploadedName) . '!';
+                    echo Text::_('COM_BREEZINGFORMSNG_PROCESS_UPLOADFAILED');
                 }
             } else {
-                echo 'Invalid file storage path for file ' . addslashes($uploadedName) . '! Please check the upload folder path and its permissions!';
+                echo Text::_('COM_BREEZINGFORMSNG_PROCESS_UPLOADFAILED');
             }
         } else {
-            echo 'Form id and element do not match!';
+            echo Text::_('JERROR_AN_ERROR_HAS_OCCURRED');
         }
     }
     $this->application->close();

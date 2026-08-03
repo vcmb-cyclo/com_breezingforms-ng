@@ -128,7 +128,7 @@ class ScriptManager
 			$row->modified_by = $row->created_by;
 			$row->store();
 		} // foreach
-		$msg = $total . ' ' . Text::_('COM_BREEZINGFORMSNG_SCRIPTS_SUCCOPIED');
+		$msg = Text::plural('COM_BREEZINGFORMSNG_SCRIPTS_N_COPIED', $total);
 		$this->app->enqueueMessage($msg);
 		$this->app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 	} // copy
@@ -144,7 +144,7 @@ class ScriptManager
 
 		if ($total) {
 			$this->app->enqueueMessage(
-				$total . ' ' . Text::_('COM_BREEZINGFORMSNG_SCRIPTS_SUCCDELETED'),
+				Text::plural('COM_BREEZINGFORMSNG_SCRIPTS_N_DELETED', $total),
 				'message'
 			);
 		}

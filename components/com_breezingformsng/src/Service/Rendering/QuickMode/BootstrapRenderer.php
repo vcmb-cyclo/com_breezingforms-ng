@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * BreezingForms NG - A Joomla Forms Application
  * @version   5.0
@@ -194,7 +197,16 @@ class BootstrapRenderer
                     else
                         $state .= $tokens[$j];
                 }
-                $parsed .= '{ action: "' . $tokens[0] . '", state: "' . $tokens[1] . '", tCat: "' . $tokens[2] . '", tName: "' . $tokens[3] . '", statement: "' . $tokens[4] . '", sName: "' . $tokens[5] . '", condition: "' . $tokens[6] . '", value: "' . addslashes($state) . '" },';
+                $parsed .= json_encode([
+                    'action' => $tokens[0],
+                    'state' => $tokens[1],
+                    'tCat' => $tokens[2],
+                    'tName' => $tokens[3],
+                    'statement' => $tokens[4],
+                    'sName' => $tokens[5],
+                    'condition' => $tokens[6],
+                    'value' => $state,
+                ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE) . ',';
             }
         }
 
@@ -271,7 +283,7 @@ class BootstrapRenderer
             echo "<div style=\"visibility:hidden;\" id=\"bfFileQueue\"></div>";
             echo "<div style=\"visibility:hidden;display:none;\" id=\"bfSubmitMessage\">" . Text::_('COM_BREEZINGFORMSNG_SUBMIT_MESSAGE') . "</div>";
         }
-        echo '<noscript>Please turn on javascript to submit your data. Thank you!</noscript>' . "\n";
+        echo '<noscript>' . Text::_('COM_BREEZINGFORMSNG_JAVASCRIPT_REQUIRED') . '</noscript>' . "\n";
         $this->p->app->getDocument()->getWebAssetManager()->addInlineScript('//-->');
     }
 
@@ -512,7 +524,7 @@ class BootstrapRenderer
                             if (isset($this->rootMdata['joomlaHint']) && $this->rootMdata['joomlaHint']) {
                                 HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
                                 $content = trim($mdata['hint']);
-                                $tipOpen = '<span title="' . addslashes(trim($mdata['label'])) . '::' . str_replace(
+                                $tipOpen = '<span title="' . htmlspecialchars(trim($mdata['label']), ENT_QUOTES, 'UTF-8') . '::' . str_replace(
                                     array(
                                         "\n",
                                         "\r"
@@ -1040,7 +1052,7 @@ class BootstrapRenderer
                                                                         url : '" . $base . ($this->p->app->getConfig()->get('sef') && !$this->p->app->getConfig()->get('sef_rewrite') ? 'index.php/' : '') . ($this->p->app->getInput()->getCmd('lang', '') && $this->p->app->getConfig()->get('sef') ? ($this->p->app->getConfig()->get('sef_rewrite') ? 'index.php' : '') : 'index.php') . "',
                                                                         flash_swf_url : '" . $base . "components/com_breezingformsng/libraries/jquery/plupload/Moxie.swf',
                                                                         filters : [
-                                                                                {title : '" . addslashes(Text::_('COM_BREEZINGFORMSNG_CHOOSE_FILE')) . "', extensions : '" . $exts . "'}
+                                                                                {title : " . json_encode(Text::_('COM_BREEZINGFORMSNG_CHOOSE_FILE')) . ", extensions : '" . $exts . "'}
                                                                         ]
                                                                 });
                                                                 uploader.bind('FilesAdded', function(up, files) {
@@ -1093,7 +1105,7 @@ class BootstrapRenderer
                                                                                 );
                                                                                 var thebytes = " . (isset($mdata['flashUploaderBytes']) && is_numeric($mdata['flashUploaderBytes']) && $mdata['flashUploaderBytes'] > 0 ? intval($mdata['flashUploaderBytes']) : '0') . ";
                                                                                 if(thebytes > 0 && typeof files[i].size != 'undefined' && files[i].size > thebytes){
-                                                                                     alert(' " . addslashes(Text::_('COM_BREEZINGFORMSNG_FLASH_UPLOADER_TOO_LARGE')) . "');
+                                                                                     alert(" . json_encode(' ' . Text::_('COM_BREEZINGFORMSNG_FLASH_UPLOADER_TOO_LARGE')) . ");
                                                                                      error = true;
                                                                                 }
                                                                                 var ext = files[i].name.replace(/[/\\?%*:|\"<>]/g, '').split('.').pop().toLowerCase();
@@ -1105,7 +1117,7 @@ class BootstrapRenderer
                                                                                     }
                                                                                 }
                                                                                 if(found == 0){
-                                                                                    alert( ' " . addslashes(Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED')) . "' );
+                                                                                    alert(" . json_encode(' ' . Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED')) . ");
                                                                                     error = true;
                                                                                 }
                                                                                 if(error){

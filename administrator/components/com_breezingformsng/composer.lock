@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "911c2abfa6b156c09d687d9c8b727d89",
+    "content-hash": "bc91cc53df6280063316cfc29c82302c",
     "packages": [
         {
             "name": "stripe/stripe-php",
-            "version": "v20.3.1",
+            "version": "v21.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/stripe/stripe-php.git",
-                "reference": "bf2c6caf886a88e35f831a68f3b6a49ac85cb357"
+                "reference": "5f68d5a285d206a757ebbd9bf0e037759a61c379"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/bf2c6caf886a88e35f831a68f3b6a49ac85cb357",
-                "reference": "bf2c6caf886a88e35f831a68f3b6a49ac85cb357",
+                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/5f68d5a285d206a757ebbd9bf0e037759a61c379",
+                "reference": "5f68d5a285d206a757ebbd9bf0e037759a61c379",
                 "shasum": ""
             },
             "require": {
@@ -64,9 +64,9 @@
             ],
             "support": {
                 "issues": "https://github.com/stripe/stripe-php/issues",
-                "source": "https://github.com/stripe/stripe-php/tree/v20.3.1"
+                "source": "https://github.com/stripe/stripe-php/tree/v21.1.1"
             },
-            "time": "2026-07-09T17:57:50+00:00"
+            "time": "2026-07-30T18:43:28+00:00"
         },
         {
             "name": "tecnickcom/tcpdf",
@@ -149,12 +149,12 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": ">=8.1"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.9.0"
 }

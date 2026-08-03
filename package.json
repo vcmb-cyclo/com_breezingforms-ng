@@ -1,0 +1,11 @@
+{
+  "name": "com-breezingformsng-ci",
+  "private": true,
+  "scripts": {
+    "lint:css": "stylelint \"media/com_breezingformsng/css/**/*.css\""
+  },
+  "devDependencies": {
+    "stylelint": "17.14.1",
+    "stylelint-config-standard": "40.0.0"
+  }
+}

@@ -1,5 +1,5 @@
 /* Shared runtime helpers for Classic, Bootstrap and OnePage QuickMode. */
-.bfClearfix:after {
+.bfClearfix::after {
     content: ".";
     display: block;
     height: 0;

@@ -98,6 +98,11 @@ abstract class PackageModel extends ListModel
         int $limitStart,
         string $filterState = ''
     ): array {
+        // Initialise Joomla's ListModel state before applying the explicit
+        // request values, otherwise populateState() overwrites the requested
+        // ordering when getItems() first reads the state.
+        $this->getState();
+
         $this->setState('filter.package', $package);
         $this->setState('filter.search', $search);
         $this->setState('filter.state', $filterState);

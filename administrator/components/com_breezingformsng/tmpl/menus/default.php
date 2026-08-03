@@ -10,7 +10,6 @@
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\Session\Session;
 
 $pkg = $this->pkg;
 ?>
@@ -68,14 +67,18 @@ $pkg = $this->pkg;
               </a>
             </td>
             <td class="text-center">
-              <a href="index.php?option=com_breezingformsng&task=menus.orderup&cid[]=<?= (int) $row->id; ?>&pkg=<?= rawurlencode($pkg); ?>&<?= Session::getFormToken(); ?>=1"
+              <button type="button"
+                 class="btn btn-sm btn-link p-0"
+                 onclick="return Joomla.listItemTask('cb<?= (int) $i; ?>', 'menus.orderup');"
                  title="<?= Text::_('JLIB_HTML_MOVE_UP'); ?>">
                 <span class="icon-arrow-up-2" aria-hidden="true"></span>
-              </a>
-              <a href="index.php?option=com_breezingformsng&task=menus.orderdown&cid[]=<?= (int) $row->id; ?>&pkg=<?= rawurlencode($pkg); ?>&<?= Session::getFormToken(); ?>=1"
+              </button>
+              <button type="button"
+                 class="btn btn-sm btn-link p-0"
+                 onclick="return Joomla.listItemTask('cb<?= (int) $i; ?>', 'menus.orderdown');"
                  title="<?= Text::_('JLIB_HTML_MOVE_DOWN'); ?>">
                 <span class="icon-arrow-down-2" aria-hidden="true"></span>
-              </a>
+              </button>
             </td>
           </tr>
         <?php endforeach; ?>

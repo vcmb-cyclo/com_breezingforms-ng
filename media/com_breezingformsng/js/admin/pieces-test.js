@@ -1,8 +1,8 @@
 var __bfOpts = Joomla.getOptions('com_breezingformsng.pieces-test') || {};
 
 Joomla.submitbutton = function (pressbutton) {
-	var task = pressbutton === 'prev' ? 'previous' : pressbutton;
-	Joomla.submitform('pieces.' + task, document.getElementById('adminForm'));
+	var action = pressbutton.indexOf('.') === -1 ? pressbutton : pressbutton.split('.').pop();
+	Joomla.submitform('pieces.' + action, document.getElementById('adminForm'));
 };
 window.submitbutton = Joomla.submitbutton;
 

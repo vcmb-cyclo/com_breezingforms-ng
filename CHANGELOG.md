@@ -1,5 +1,9 @@
 # Changelog
 
+## 6.0.8-RC7
+
+- Fixed the QuickMode page and section text editor initialization on its first opening with Joomla 6 editors.
+
 ## Unreleased
 
 - Switched BreezingForms integration from legacy `com_contentbuilder` to `com_contentbuilderng`.

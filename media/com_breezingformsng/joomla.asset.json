@@ -237,6 +237,7 @@
       "type": "script",
       "uri": "com_breezingformsng/js/admin/quickmode-editor.js",
       "dependencies": ["core"],
+      "attributes": {"type": "module"},
       "version": "auto"
     },
 

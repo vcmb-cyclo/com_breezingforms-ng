@@ -1,7 +1,7 @@
 {
   "$schema": "https://developer.joomla.org/schemas/json-schema/web_assets.json",
   "name": "com_breezingformsng",
-  "version": "6.1.0-RC01",
+  "version": "6.1.0-RC02",
   "description": "BreezingForms NG Web Assets",
   "license": "GPL-2.0-or-later",
   "assets": [
@@ -245,13 +245,6 @@
       "type": "script",
       "uri": "com_breezingformsng/js/admin/pieces-test.js",
       "dependencies": ["core"],
-      "version": "auto"
-    },
-
-    {
-      "name": "com_breezingformsng.overlib",
-      "type": "script",
-      "uri": "components/com_breezingformsng/libraries/js/overlib_mini.js",
       "version": "auto"
     },
 

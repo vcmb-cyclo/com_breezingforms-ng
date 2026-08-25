@@ -1,3 +1,5 @@
+import { JoomlaEditor } from 'editor-api';
+
 var __bfOpts = Joomla.getOptions('com_breezingformsng.quickmode-editor') || {};
 var bfLangSuffix = __bfOpts.langSuffix || '';
 
@@ -14,11 +16,7 @@ function bfEditorSet(value) {
 }
 
 function bfEditorInstance() {
-	if (typeof Joomla === 'undefined' || !Joomla.editors || !Joomla.editors.instances) {
-		return null;
-	}
-
-	return Joomla.editors.instances.bfEditor || null;
+	return JoomlaEditor.get('bfEditor');
 }
 
 function bfLoadText(attempt) {
@@ -163,4 +161,5 @@ function setDescription() {
 	bfEditorSet('' + item.properties[key] + '');
 }
 
-setTimeout(bfLoadText, 500);
+window.saveText = saveText;
+bfLoadText(0);

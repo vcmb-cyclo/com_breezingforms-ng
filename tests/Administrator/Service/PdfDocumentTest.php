@@ -27,7 +27,11 @@ final class PdfDocumentTest extends TestCase
             define('K_PATH_FONTS', self::$fontDirectory . '/');
         }
 
-        require_once self::ROOT . '/administrator/components/com_breezingformsng/vendor/autoload.php';
+        if (!class_exists('TCPDF', false)) {
+            class_alias(\stdClass::class, 'TCPDF');
+        }
+
+        require_once self::ROOT . '/administrator/components/com_breezingformsng/src/Service/PdfDocument.php';
     }
 
     public static function tearDownAfterClass(): void

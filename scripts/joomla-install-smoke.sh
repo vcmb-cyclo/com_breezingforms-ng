@@ -33,14 +33,21 @@ docker run -d \
     -e MYSQL_ROOT_PASSWORD=root \
     "${mysql_image}" >/dev/null
 
+mysql_ready=0
 for _ in $(seq 1 60); do
     if docker exec -e MYSQL_PWD=root "${db_container}" mysqladmin ping -uroot --silent >/dev/null 2>&1; then
+        mysql_ready=1
         break
     fi
     sleep 2
 done
 
-docker exec -e MYSQL_PWD=root "${db_container}" mysqladmin ping -uroot --silent >/dev/null
+if [[ "${mysql_ready}" -ne 1 ]]; then
+    echo "MySQL did not become ready within 120s - dumping container state for diagnosis:" >&2
+    docker ps -a --filter "name=${db_container}" >&2 || true
+    docker logs "${db_container}" >&2 || true
+    exit 1
+fi
 
 docker run -d \
     --name "${web_container}" \
@@ -57,14 +64,21 @@ docker run -d \
     -e JOOMLA_INSTALLATION_DISABLE_LOCALHOST_CHECK=1 \
     "${joomla_image}" >/dev/null
 
+joomla_ready=0
 for _ in $(seq 1 90); do
     if docker exec "${web_container}" test -f /var/www/html/configuration.php; then
+        joomla_ready=1
         break
     fi
     sleep 2
 done
 
-docker exec "${web_container}" test -f /var/www/html/configuration.php
+if [[ "${joomla_ready}" -ne 1 ]]; then
+    echo "Joomla did not finish installing within 180s - dumping container state for diagnosis:" >&2
+    docker ps -a --filter "name=${web_container}" >&2 || true
+    docker logs "${web_container}" >&2 || true
+    exit 1
+fi
 
 for _ in $(seq 1 60); do
     if docker exec "${web_container}" php -r '

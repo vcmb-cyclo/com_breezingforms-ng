@@ -52,7 +52,12 @@ composer install --no-dev --no-interaction --quiet \
 # generation. Compile them from the bundled AFM/TTF sources.
 pdf_font_dir="${package_dir}/administrator/components/com_breezingformsng/vendor/tecnickcom/tc-lib-pdf-font"
 if [[ -d "${pdf_font_dir}" ]]; then
-    (cd "${pdf_font_dir}" && make fonts)
+    # Redirected to stderr: this script's stdout is the archive path callers
+    # capture via `$(scripts/build-package.sh)` (see build-package.yml), and
+    # "make fonts" is chatty - left on stdout it corrupts that capture (and,
+    # in CI, breaks $GITHUB_OUTPUT parsing since none of its lines are
+    # "key=value").
+    (cd "${pdf_font_dir}" && make fonts >&2)
 
     # Prune TCPDF font families the component does not use: it relies on
     # the helvetica core fonts plus a runtime TTF conversion of

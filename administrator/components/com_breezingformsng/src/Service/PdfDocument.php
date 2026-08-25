@@ -67,7 +67,11 @@ class PdfDocument extends \TCPDF
      */
     public static function importTtfFont(string $path): string
     {
-        $name = strtolower((string) preg_replace('/[^a-z0-9_]/', '', pathinfo($path, PATHINFO_FILENAME)));
+        $name = (string) preg_replace(
+            '/[^a-z0-9_]/',
+            '',
+            strtolower(pathinfo($path, PATHINFO_FILENAME))
+        );
         $name = str_replace(['bold', 'oblique', 'italic', 'regular'], ['b', 'i', 'i', ''], $name);
 
         if (!file_exists(K_PATH_FONTS . $name . '.json')) {

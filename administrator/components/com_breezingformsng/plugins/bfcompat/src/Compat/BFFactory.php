@@ -13,6 +13,13 @@
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
 /**
+ * Not a Joomla-version compatibility shim: this is the BreezingForms legacy
+ * API surface (pre-Joomla-6 BFFactory/BFRequest/... classes) kept so that
+ * user-authored PHP stored in the database (Pieces, "Before Form" code) keeps
+ * running unmodified. It is intentionally exempt from AGENTS.md's "no
+ * fallbacks/polyfills/compat workarounds" rule, which targets Joomla-version
+ * shims in first-party source, not this database-code compatibility layer.
+ *
  * Reintroduced 2026-07-12 (production incident): a repo-wide grep found no
  * internal caller and this was removed, but production Pieces and a form's
  * "Before Form" code — PHP stored in the database, evaluated at runtime, not

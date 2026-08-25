@@ -229,7 +229,7 @@ class RecordsController extends BaseController
                     $pdf->AddFont(implode('_', $parts), '', $fontDir . $f);
                 }
                 if (str_ends_with($lower, '.ttf')) {
-                    $ttfName = \TCPDF_FONTS::addTTFfont($fontDir . $f, 'TrueTypeUnicode');
+                    $ttfName = PdfDocument::importTtfFont($fontDir . $f);
                 }
                 if (str_ends_with($lower, '_active')) {
                     $parts = explode('_', $f);
@@ -242,10 +242,7 @@ class RecordsController extends BaseController
         }
 
         if (!$activeFound) {
-            \TCPDF_FONTS::addTTFfont(
-                JPATH_SITE . '/media/com_breezingformsng/fonts/verdana.ttf',
-                'TrueTypeUnicode'
-            );
+            PdfDocument::importTtfFont(JPATH_SITE . '/media/com_breezingformsng/fonts/verdana.ttf');
             $pdf->SetFont('verdana');
         }
 

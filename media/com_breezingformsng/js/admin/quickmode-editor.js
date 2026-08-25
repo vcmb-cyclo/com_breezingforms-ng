@@ -2,21 +2,56 @@ var __bfOpts = Joomla.getOptions('com_breezingformsng.quickmode-editor') || {};
 var bfLangSuffix = __bfOpts.langSuffix || '';
 
 function bfEditorGet() {
-	return Joomla.editors.instances['bfEditor'].getValue();
+	var editor = bfEditorInstance();
+	return editor ? editor.getValue() : '';
 }
 
 function bfEditorSet(value) {
-	Joomla.editors.instances['bfEditor'].setValue(value);
+	var editor = bfEditorInstance();
+	if (editor) {
+		editor.setValue(value);
+	}
 }
 
-function bfLoadText() {
+function bfEditorInstance() {
+	if (typeof Joomla === 'undefined' || !Joomla.editors || !Joomla.editors.instances) {
+		return null;
+	}
+
+	return Joomla.editors.instances.bfEditor || null;
+}
+
+function bfLoadText(attempt) {
+	attempt = attempt || 0;
+
+	var editor = bfEditorInstance();
+	var appReady = parent.app
+		&& typeof parent.app.findDataObjectItem === 'function'
+		&& parent.app.selectedTreeElement
+		&& parent.app.dataObject;
+
+	if (!editor || !appReady) {
+		setTimeout(function () {
+			bfLoadText(attempt + 1);
+		}, 250);
+
+		return;
+	}
+
 	var keyPageIntro = 'pageIntro' + bfLangSuffix;
 	var keyDescription = 'description' + bfLangSuffix;
 
 	var item = parent.app.findDataObjectItem(parent.app.selectedTreeElement.id, parent.app.dataObject);
+	if (!item) {
+		setTimeout(function () {
+			bfLoadText(attempt + 1);
+		}, 250);
+
+		return;
+	}
 
 	// workaround for quote bug with jce
-	var testEditor = bfEditorGet();
+	var testEditor = editor.getValue();
 
 	if (testEditor == 'item.properties[keyPageIntro]' || testEditor == 'item.properties[keyDescription]') {
 		if (item && item.properties.type == 'page') {

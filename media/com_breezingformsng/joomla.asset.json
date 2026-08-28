@@ -250,13 +250,6 @@
     },
 
     {
-      "name": "com_breezingformsng.wz-dragdrop",
-      "type": "script",
-      "uri": "administrator/components/com_breezingformsng/libraries/wz_dragdrop/wz_dragdrop.js",
-      "version": "auto"
-    },
-
-    {
       "name": "com_breezingformsng.jtable",
       "type": "script",
       "uri": "components/com_breezingformsng/libraries/jquery/jtable/jq.jtable.js",

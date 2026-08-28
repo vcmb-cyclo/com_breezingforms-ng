@@ -27,14 +27,14 @@ entre bump de version et remplacement complet.
 | **SweetAlert** (v1) | 1.x | 3 (QuickMode Bootstrap/Classic/OnePage) | v1 abandonnée depuis 2017 au profit de **SweetAlert2**, API incompatible (`swal()` → `Swal.fire()`) | 🟡 Moyen — API différente mais SweetAlert2 fournit toujours un bundle UMD `<script>` prêt à l'emploi |
 | **jQuery Mobile** (`jq.mobile.min.js`) | 1.4.5 (2014) | 1 (MobileRenderer) | ⚠️ Projet **officiellement abandonné** par jQuery Foundation en 2015. Pas de version plus récente, jamais. | 🔴 Très élevé — réécriture complète du rendu mobile (hors scope JS pur) |
 | **overLIB** | 4.21 (2004) | 1 (RenderingEngine, tooltips) | Techno pré-jQuery, auteur inactif depuis longtemps | 🟡 Moyen — remplacement par tooltip Bootstrap natif (déjà utilisé ailleurs dans le composant) |
-| **wz_dragdrop** | non versionné (~2000s) | 1 (RenderingEngine) | Bibliothèque drag & drop très ancienne, pré-HTML5 Drag and Drop API | 🟡 Moyen — remplacement par l'API HTML5 native ou Sortable.js |
+| **wz_dragdrop** | non versionné (~2000s) | 0 — chargée mais jamais appelée | Audit du dépôt entier : aucun code (PHP inline ou JS) n'appelle l'API exposée (`dd.setCe`, `dd.regImg`, etc.). Le `<script>` était chargé en mode preview sans jamais être utilisé — **code mort pur**, pas une lib legacy active | ✅ Fait — suppression pure, pas de remplacement nécessaire |
 | **jQuery core** | — | — | Déjà migré : le composant utilise le jQuery natif de Joomla via `jquery-alias.js`/`jquery-restore.js`. Rien à faire. | ✅ Fait |
 
 ## Ordre de traitement recommandé
 
 1. ✅ **Nettoyage mort (aujourd'hui)** : suppression des binaires Flash/Silverlight inertes de Plupload (`Moxie.swf`, `Moxie.xap`) — zéro risque, zéro changement de comportement observable (Flash Player n'existe plus nulle part).
 2. ✅ **overLIB → tooltip Bootstrap natif (aujourd'hui)** — `RenderingEngine.php` (élément "Tooltip") migré vers `HTMLHelper::_('bootstrap.tooltip', '.hasTooltip')`, même pattern déjà utilisé par les renderers QuickMode sur le frontend. `overlib_mini.js` supprimé (fichier + entrée `joomla.asset.json` orpheline).
-3. **wz_dragdrop → API HTML5 native ou Sortable.js** — un seul point d'appel.
+3. ✅ **wz_dragdrop supprimé (aujourd'hui)** — audit du dépôt : zéro appel à son API n'importe où dans le code. Le chargement conditionnel en mode preview (`RenderingEngine.php`), l'entrée `joomla.asset.json` orpheline et le dossier vendorisé (`wz_dragdrop.js`, `transparentpixel.gif`) ont été retirés. Pas de remplacement — il n'y avait rien à remplacer.
 4. **SweetAlert v1 → SweetAlert2** — 3 points d'appel mais confinés aux renderers QuickMode ; SweetAlert2 fournit toujours un bundle `<script>` classique, pas besoin de bundler.
 5. **Ladda 1.0.6 → 2.0.3** — nécessite d'introduire un mini-bundler ou de vendoriser un build UMD tiers de Ladda 2.x ; à programmer une fois qu'un pipeline de build JS existe pour le composant (actuellement absent).
 6. **jTable → Joomla `searchtools`** — périmètre admin uniquement (Pieces/Scripts), formulaire net à circonscrire.

@@ -55,6 +55,7 @@ obsolete_entries=(
     "components/com_breezingformsng/libraries/jquery/jq.min.js"
     "components/com_breezingformsng/libraries/jquery/plupload/Moxie.swf"
     "components/com_breezingformsng/libraries/js/overlib_mini.js"
+    "administrator/components/com_breezingformsng/libraries/wz_dragdrop/wz_dragdrop.js"
 )
 
 for path in "${obsolete_entries[@]}"; do

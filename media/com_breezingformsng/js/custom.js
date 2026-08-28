@@ -141,7 +141,6 @@ jQuery(document).ready(function () {
 });
 
 jQuery(document).ajaxComplete(function () {
-    jQuery('.jtable-main-container input[type="checkbox"]').after('<label ><span><span></span></span></label>');
     jQuery('#bfAvailableFieldsWrapper input[type="checkbox"]').after('<label ><span><span></span></span></label>');
 });
 

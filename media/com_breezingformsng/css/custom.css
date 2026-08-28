@@ -1356,88 +1356,10 @@ Manage records delete win
         vertical-align: middle;
         width: 113px;
     }
-    /*
-Manage records table
-*/
-    div.jtable-main-container > table.jtable {
-        border: none;
-        border-collapse: collapse;
-        border-spacing: 0;
-    }
-    div.jtable-main-container > div.jtable-title {
-        background-color: transparent;
-        padding: 10px;
-    }
-    div.jtable-main-container > div.jtable-title div.jtable-title-text {
-        color: #000;
-        font-family: "Segoe UI Semilight", "Open Sans", Verdana, Arial, Helvetica, sans-serif;
-        font-size: 19px;
-        font-weight: 300;
-        line-height: 34px;
-    }
-    div.jtable-main-container > table.jtable > thead {
-        background-color: #fff;
-    }
-    div.jtable-main-container > table.jtable > thead th.jtable-column-header-sortable div.jtable-column-header-container {
-        color: rgba(118, 118, 118, 1);
-        font-weight: 900;
-    }
-    div.jtable-main-container > table.jtable > thead th {
-        padding: 10px;
-    }
-    div.jtable-main-container > table.jtable > tbody > tr.jtable-data-row > td {
-        padding: 10px;
-    }
-    div.jtable-main-container table.jtable tbody tr > td.jtable-command-column {
-        background: #999 none repeat scroll 0 0;
-        text-align: center;
-        vertical-align: middle;
-    }
-    div.jtable-main-container > table.jtable > tbody > tr > td {
-        border: none;
-    }
-    div.jtable-main-container > table.jtable > tbody > tr.jtable-data-row > td > .jtable-delete-command-button {
-        height: 16px;
-        opacity: 0.76;
-        width: 16px;
-    }
-    div.jtable-main-container > table.jtable > tbody > tr.jtable-data-row > td > .jtable-edit-command-button {
-        height: 16px;
-        opacity: 0.76;
-        width: 16px;
-    }
-    div.jtable-main-container > div.jtable-bottom-panel {
-        -moz-border-bottom-colors: none;
-        -moz-border-left-colors: none;
-        -moz-border-right-colors: none;
-        -moz-border-top-colors: none;
-        background-color: transparent;
-        border: none;
-        color: rgba(118, 118, 118, 1);
-        font-size: 13px;
-        min-height: 22.9px;
-        margin-top: 20px;
-    }
-    div.jtable-main-container table.jtable thead th.jtable-column-header-selecting input,
-    div.jtable-main-container table.jtable tbody tr > td.jtable-selecting-column input
-    {
-        top: 13px !important;
-        left: 0 !important;
-        position: relative !important;
-        z-index: 1000;
-    }
     main #bfRecordsTableContainer input[type="checkbox"]:not(old) + label, main #bfRecordsTableContainer input[type="radio"]:not(old) + label {
         margin-left: 0 !important;
         top: -9px !important;
         position: relative !important;
-    }
-    #bfRecordsTableContainer div.jtable-main-container > div.jtable-bottom-panel span.jtable-page-info {
-        display: inline-block;
-        font-weight: 400;
-        padding: 4px;
-    }
-    #bfRecordsTableContainer .jtable-title:first-child{
-        display: none !important;
     }
     main .picker__nav--prev:hover, .picker__nav--next:hover {
         background: none !important;
@@ -1468,105 +1390,12 @@ Manage records table
     html {
         font-size: 100%;
     }
-    .jtable-main-container div.jtable-main-container > div.jtable-title {
-        background-color: #E8E8E8;
-    }
     .bfDetailsTableLabelCol strong {
         color: #999;
     }
     .bfDetailsTableHead {
         background-color: #3F51B5;
         color: #fff;
-    }
-    /*
-Manage records table > pagination
-*/
-    #bfRecordsTableContainer div.jtable-main-container > div.jtable-bottom-panel {
-        position: relative;
-    }
-    #bfRecordsTableContainer div.jtable-main-container > div.jtable-bottom-panel div.jtable-left-area {
-        position: relative;
-        z-index: 20;
-        background: #fff;
-    }
-    #bfRecordsTableContainer div.jtable-main-container > div.jtable-bottom-panel div.jtable-right-area {
-        z-index: 10;
-        pointer-events: none;
-    }
-    #bfRecordsTableContainer div.jtable-main-container > div.jtable-bottom-panel div.jtable-right-area * {
-        pointer-events: none;
-    }
-    #bfRecordsTableContainer div.jtable-main-container > div.jtable-bottom-panel span.jtable-page-size-change,
-    #bfRecordsTableContainer div.jtable-main-container > div.jtable-bottom-panel span.jtable-page-size-change select,
-    #bfRecordsTableContainer div.jtable-main-container > div.jtable-bottom-panel span.jtable-goto-page,
-    #bfRecordsTableContainer div.jtable-main-container > div.jtable-bottom-panel span.jtable-goto-page select,
-    #bfRecordsTableContainer div.jtable-main-container > div.jtable-bottom-panel span.jtable-page-list {
-        position: relative;
-        z-index: 30;
-    }
-    #bfPiecesPaginationContainer > div.jtable-bottom-panel,
-    #bfScriptsPaginationContainer > div.jtable-bottom-panel {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 8px 12px;
-    }
-    #bfPiecesPaginationContainer > div.jtable-bottom-panel > div.jtable-left-area,
-    #bfScriptsPaginationContainer > div.jtable-bottom-panel > div.jtable-left-area {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 8px 12px;
-    }
-    #bfPiecesPaginationContainer > div.jtable-bottom-panel > div.jtable-right-area,
-    #bfScriptsPaginationContainer > div.jtable-bottom-panel > div.jtable-right-area {
-        margin-left: auto;
-    }
-    #bfPiecesPaginationContainer > div.jtable-bottom-panel span.jtable-page-info,
-    #bfScriptsPaginationContainer > div.jtable-bottom-panel span.jtable-page-info {
-        display: inline-block;
-        font-weight: 400;
-        padding: 4px 0;
-    }
-    #bfPiecesPaginationContainer > div.jtable-bottom-panel span.jtable-page-size-change,
-    #bfPiecesPaginationContainer > div.jtable-bottom-panel span.jtable-goto-page,
-    #bfScriptsPaginationContainer > div.jtable-bottom-panel span.jtable-page-size-change,
-    #bfScriptsPaginationContainer > div.jtable-bottom-panel span.jtable-goto-page {
-        margin-left: 0;
-    }
-    #bfPiecesPaginationContainer > div.jtable-bottom-panel span.jtable-goto-page input[type="text"],
-    #bfScriptsPaginationContainer > div.jtable-bottom-panel span.jtable-goto-page input[type="text"] {
-        width: 50px;
-    }
-    div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number,
-    div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-space,
-    div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-first,
-    div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-last,
-    div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-previous,
-    div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-next,
-    div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active {
-        background-color: #fff;
-        border: 1px solid #eaeaea;
-        color: #777777;
-        margin: 0;
-        line-height: 1.42857;
-        margin-left: -1px;
-        padding: 6px 12px;
-        position: relative;
-        text-decoration: none;
-    }
-    div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-active {
-        background-color: #3f51b5 !important;
-        border-color: #3f51b5 !important;
-        color: #fff !important;
-        opacity: 1;
-    }
-    div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number:hover,
-    div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-first:hover,
-    div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-last:hover,
-    div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-previous:hover,
-    div.jtable-main-container > div.jtable-bottom-panel .jtable-page-list .jtable-page-number-next:hover {
-        background-color: #ddd;
     }
     /*
 Manage records select list and filter button
@@ -1850,15 +1679,7 @@ toogle sidebar and main-content
         #bfQuickModeRight {
             margin-left: 300px;
         }
-        .jtable-page-list {
-            margin-bottom: 10px !important;
-        }
     }
-
-    main .jtable {
-        margin-right: calc(0vw - 1280px);
-    }
-
     main .modal-header {
         border-bottom: 0 !important;
     }
@@ -1898,54 +1719,34 @@ toogle sidebar and main-content
         padding-top: 1.25rem;
     }
 
-    main .table td,
-    main .jtable td {
-
+    main .table td {
         max-width: 150px !important;
         overflow: auto !important;
     }
 
-
     @media (max-width:1280px) {
-
-        main .table,
-        main .jtable {
+        main .table {
             margin-bottom: 18px;
             width: 100%;
             overflow-x: auto !important;
             display: block;
             margin-right: calc(0vw - 1280px);
         }
-        .jtable-right-area {
-            position: relative !important;
-            display: block !important;
-        }
-        .jtable-goto-page {
-            position: relative !important;
-            display: block !important;
-        }
 
-        main .table td,
-        main .jtable td {
-
+        main .table td {
             max-width: unset !important;
             overflow: visible !important;
         }
 
-        main .table td:nth-child(2),
-        main .jtable td:nth-child(2) {
-
+        main .table td:nth-child(2) {
             max-width: unset !important;
             overflow: visible !important;
         }
 
-        main .table td:last-child,
-        main .jtable td:last-child {
-
+        main .table td:last-child {
             max-width: unset !important;
             overflow: visible !important;
         }
-
     }
     @media (max-width:900px) {
         #sidebar li m {

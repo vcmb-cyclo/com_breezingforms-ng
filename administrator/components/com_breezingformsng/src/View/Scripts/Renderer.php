@@ -365,7 +365,7 @@ class Renderer
 				</label>
 			<div style="clear: both;"></div>
 
-				<div class="jtable-main-container bf-manage-list-pagination-container table-responsive" id="bfScriptsPaginationContainer">
+				<div class="bf-manage-list-pagination-container table-responsive" id="bfScriptsPaginationContainer">
 				<table class="adminlist table table-striped" id="bfScriptsList" data-name="breezingformsng-scripts">
 				<thead>
 				<tr>

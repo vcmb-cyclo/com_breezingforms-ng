@@ -397,53 +397,8 @@ overflow:hidden;width: 100%;
 
 /** RecordManager Custom CSS */
 
-.jtable-column-header{
-    overflow: hidden;
-}
-
-.jtable-data-row td{
-    overflow: auto;
-    max-width: 100px !important;
-}
-
-.jtable-main-container div.jtable-main-container > div.jtable-title{
-    background-color: #92c1ff;
-}
-
-.jtable-main-container .jtable-main-container .jtable th{
-    display: none;
-}
-
-.jtable-main-container div.jtable-main-container .jtable-command-column{
-    width: 1%;
-}
-
-.jtable-main-container div.jtable-main-container > table.jtable > tbody > tr{
-    background-color: #ffffff;
-}
-
-.jtable-main-container div.jtable-main-container .jtable-command-column{
-    vertical-align: top !important;
-}
-
-.jtable-no-data-row{
-    display: none;
-}
-
-
-
 .ui-dialog{
     z-index: 200001;
-}
-
-div.jtable-main-container > table.jtable > tbody > tr.jtable-row-even.jtable-row-selected {
-    color: #333;
-    background-color: #f9f9f9;
-}
-
-div.jtable-main-container > table.jtable > tbody > tr.jtable-row-selected {
-    color: #333;
-    background-color: inherit;
 }
 
 .bfDetailsTable{

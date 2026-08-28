@@ -250,21 +250,6 @@
     },
 
     {
-      "name": "com_breezingformsng.wz-dragdrop",
-      "type": "script",
-      "uri": "administrator/components/com_breezingformsng/libraries/wz_dragdrop/wz_dragdrop.js",
-      "version": "auto"
-    },
-
-    {
-      "name": "com_breezingformsng.jtable",
-      "type": "script",
-      "uri": "components/com_breezingformsng/libraries/jquery/jtable/jq.jtable.js",
-      "dependencies": ["com_breezingformsng.jq-ui"],
-      "version": "auto"
-    },
-
-    {
       "name": "com_breezingformsng.picker",
       "type": "script",
       "uri": "components/com_breezingformsng/libraries/jquery/pickadate/picker.js",
@@ -322,21 +307,6 @@
       "name": "com_breezingformsng.jtree-style",
       "type": "style",
       "uri": "administrator/components/com_breezingformsng/libraries/jquery/jtree/tree_component.css",
-      "version": "auto"
-    },
-
-    {
-      "name": "com_breezingformsng.jq-ui-css",
-      "type": "style",
-      "uri": "components/com_breezingformsng/libraries/jquery/jtable/themes/metro/jq.ui.css",
-      "version": "auto"
-    },
-
-    {
-      "name": "com_breezingformsng.jtable-style",
-      "type": "style",
-      "uri": "components/com_breezingformsng/libraries/jquery/jtable/themes/metro/blue/jtable.css",
-      "dependencies": ["com_breezingformsng.jq-ui-css"],
       "version": "auto"
     },
 

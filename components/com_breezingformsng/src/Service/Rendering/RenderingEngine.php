@@ -313,12 +313,6 @@ final class RenderingEngine
         echo $this->processor->header();
         $this->processor->queryCols = array();
         $this->processor->queryRows = array();
-        if ($this->processor->runmode == _FF_RUNMODE_PREVIEW) {
-            RuntimeAssetLoader::script(
-                $this->processor->app,
-                Uri::root(true) . '/administrator/components/com_breezingformsng/libraries/wz_dragdrop/wz_dragdrop.js'
-            );
-        }
         if (trim($this->processor->formrow->template_code_processed) == 'QuickMode' && $this->processor->legacy_wrap)
             echo '<table style="display:none;width:100%;" id="bfReCaptchaWrap"><tr><td><div id="bfReCaptchaDiv"></div></td></tr></table>';
         echo '<div id="ff_formdiv' . $this->processor->form . '"';

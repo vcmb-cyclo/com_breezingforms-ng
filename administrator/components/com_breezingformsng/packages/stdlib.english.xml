@@ -545,7 +545,7 @@
 		<title>Validate and FIN page</title>
 		<type>Element Action</type>
 		<description>Validates the current page\x2C and if everything is ok is switches to Submit page (Last -1)\x2C before Thanks you page.</description>
-		<code>function gn_validate_page_fin(element\x2C action)\r\n{\r\n    if (typeof bfUseErrorAlerts != \x27undefined\x27){\r\n     JQuery(\x22.bfErrorMessage\x22).html(\x27\x27)\x3B\r\n     JQuery(\x22.bfErrorMessage\x22).css(\x22display\x22\x2C\x22none\x22)\x3B\r\n    }\r\n\r\n    error = ff_validation(ff_currentpage)\x3B\r\n    if (error != \x27\x27) {\r\n       if (typeof bfUseErrorAlerts == \x27undefined\x27){\r\n           swal(error)\x3B\r\n        } else {\r\n           bfShowErrors(error)\x3B\r\n        }\r\n        ff_validationFocus(\x27\x27)\x3B\r\n    } else {\r\n        ff_switchpage(ff_lastpage-1)\x3B\r\n        self.scrollTo(0\x2C0)\x3B   \r\n    }\r\n} // gn_validate_page_fin</code>
+		<code>function gn_validate_page_fin(element\x2C action)\r\n{\r\n    if (typeof bfUseErrorAlerts != \x27undefined\x27){\r\n     JQuery(\x22.bfErrorMessage\x22).html(\x27\x27)\x3B\r\n     JQuery(\x22.bfErrorMessage\x22).css(\x22display\x22\x2C\x22none\x22)\x3B\r\n    }\r\n\r\n    error = ff_validation(ff_currentpage)\x3B\r\n    if (error != \x27\x27) {\r\n       if (typeof bfUseErrorAlerts == \x27undefined\x27){\r\n           Swal.fire(error)\x3B\r\n        } else {\r\n           bfShowErrors(error)\x3B\r\n        }\r\n        ff_validationFocus(\x27\x27)\x3B\r\n    } else {\r\n        ff_switchpage(ff_lastpage-1)\x3B\r\n        self.scrollTo(0\x2C0)\x3B   \r\n    }\r\n} // gn_validate_page_fin</code>
 	</script>
 	<script id="60">
 		<package>GN</package>

@@ -61,6 +61,8 @@ obsolete_entries=(
     "administrator/components/com_breezingformsng/libraries/jquery/jq-ui.min.js"
     "components/com_breezingformsng/libraries/jquery/jq-ui.min.js"
     "administrator/components/com_breezingformsng/libraries/jquery/themes/easymode/easymode.tabs.css"
+    "components/com_breezingformsng/libraries/jquery/jquery.validationEngine.js"
+    "administrator/components/com_breezingformsng/libraries/jquery/jquery.validationEngine.js"
 )
 
 for path in "${obsolete_entries[@]}"; do

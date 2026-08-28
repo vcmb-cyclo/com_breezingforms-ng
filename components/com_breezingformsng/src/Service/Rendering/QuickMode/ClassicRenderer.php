@@ -91,7 +91,7 @@ float:left;
 			RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/tooltip.js');
 		}
 		if($this->useErrorAlerts) {
-			RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/js/sweetalert.min.js');
+			RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/js/sweetalert2.min.js');
 		}
 		if ($this->useBalloonErrors) {
 			RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/validationEngine.jquery.css');

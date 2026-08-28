@@ -58,6 +58,10 @@ obsolete_entries=(
     "administrator/components/com_breezingformsng/libraries/wz_dragdrop/wz_dragdrop.js"
     "components/com_breezingformsng/libraries/js/sweetalert.min.js"
     "components/com_breezingformsng/libraries/jquery/jtable/jq.jtable.js"
+    "components/com_breezingformsng/libraries/jquery/jq.mobile.min.js"
+    "components/com_breezingformsng/themes/quickmode/jq.mobile.1.4.5.min.css"
+    "components/com_breezingformsng/themes/quickmode/jq.mobile.1.4.5.icons.min.css"
+    "components/com_breezingformsng/themes/quickmode/jq.mobile.min.css"
 )
 
 for path in "${obsolete_entries[@]}"; do

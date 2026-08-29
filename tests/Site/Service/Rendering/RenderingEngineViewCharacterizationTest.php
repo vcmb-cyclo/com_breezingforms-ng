@@ -209,6 +209,13 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertStringContainsString('lastIndexOf(".jpg")', $script);
         self::assertStringContainsString('return true;', $script);
         self::assertStringNotContainsString('ff_elem22Exts', $script);
+
+        $processor->formrow->template_code = '';
+        [$emptyTemplateScript, $emptyTemplateCount] = $method->invoke($engine);
+
+        self::assertSame(0, $emptyTemplateCount);
+        self::assertStringContainsString('return true;', $emptyTemplateScript);
+        self::assertStringNotContainsString('ff_elem21Exts', $emptyTemplateScript);
     }
 
     public function testScriptLibraryStateLoadsBuiltinsAndScripts(): void

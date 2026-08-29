@@ -33,9 +33,9 @@ if (!class_exists(\TCPDF::class)) {
 class PdfDocument extends \TCPDF
 {
 
-    public $form_name = '';
-    public $mailback = false;
-    public $which = 'attachment';
+    public string $form_name = '';
+    public bool $mailback = false;
+    public string $which = 'attachment';
 
     public function __construct($orientation='P', $unit='mm', $format='A4', $unicode=true, $encoding='UTF-8', $diskcache=false, $pdfa=false){
 
@@ -43,17 +43,17 @@ class PdfDocument extends \TCPDF
 
     }
 
-    public function setFormName($name){
+    public function setFormName(string $name): void{
 
         $this->form_name = $name;
     }
 
-    public function setMailback($mailback){
+    public function setMailback(bool $mailback): void{
 
         $this->mailback = $mailback;
     }
 
-    public function setWhich($which = 'attachment'){
+    public function setWhich(string $which = 'attachment'): void{
         $this->which = $which;
     }
 

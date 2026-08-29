@@ -203,6 +203,18 @@ final class MobileRendererCharacterizationTest extends TestCase
         self::assertStringContainsString('name="attachToAdminMail[photo]"', $html);
     }
 
+    public function testCaptchaElement(): void
+    {
+        $html = $this->renderElement('bfCaptcha', [
+            'dbId' => 56,
+            'hideLabel' => true,
+        ]);
+
+        self::assertStringContainsString('id="ff_capimgValue"', $html);
+        self::assertStringContainsString('bfCaptcha=1', $html);
+        self::assertStringContainsString('name="bfCaptchaEntry"', $html);
+    }
+
     /**
      * @param array<string, mixed> $overrides
      */

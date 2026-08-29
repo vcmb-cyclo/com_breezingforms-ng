@@ -199,6 +199,19 @@ final class OnePageRendererCharacterizationTest extends TestCase
         self::assertStringNotContainsString('type="file"', $html);
     }
 
+    public function testCaptchaElement(): void
+    {
+        $html = $this->renderElement('bfCaptcha', [
+            'dbId' => 56,
+            'hideLabel' => true,
+            'width' => '',
+        ]);
+
+        self::assertStringContainsString('id="ff_capimgValue"', $html);
+        self::assertStringContainsString('bfCaptcha=1', $html);
+        self::assertStringContainsString('name="bfCaptchaEntry"', $html);
+    }
+
     /**
      * @param array<string, mixed> $overrides
      */
@@ -282,6 +295,10 @@ final class OnePageRendererCharacterizationTest extends TestCase
             'btn-primary' => 'btn-primary',
             'icon-upload' => 'fas fa-upload',
             'row' => 'row',
+            'img-thumbnail' => 'img-thumbnail',
+            'input-append' => 'input-group',
+            'custom-form-control' => 'custom-form-control',
+            'icon-refresh' => 'fas fa-sync',
         ]]);
 
         return $renderer;

@@ -61,6 +61,10 @@ final class BootstrapRendererCharacterizationTest extends TestCase
         'btn-primary' => 'btn-primary',
         'icon-upload' => 'fas fa-upload',
         'row' => 'row',
+        'img-thumbnail' => 'img-thumbnail',
+        'input-append' => 'input-group',
+        'custom-form-control' => 'custom-form-control',
+        'icon-refresh' => 'fas fa-sync',
     ];
 
     public function testTextfieldElement(): void
@@ -239,6 +243,19 @@ final class BootstrapRendererCharacterizationTest extends TestCase
         ]));
 
         $this->assertMatchesSnapshot('bootstrap_bfFile_flashUploader.html', $html);
+    }
+
+    public function testCaptchaElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfCaptcha', [
+            'dbId' => 56,
+            'hideLabel' => true,
+            'width' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfCaptcha.html', $html);
     }
 
     /**

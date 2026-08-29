@@ -2071,21 +2071,8 @@ final class RenderingEngine
             } else {
                 //if(true){
 
-                if (isset($rootMdata['themebootstrapThemeEngine']) && $rootMdata['themebootstrapThemeEngine'] == 'bootstrap') {
-
-                    if (isset($rootMdata['themebootstrapMode']) && $rootMdata['themebootstrapMode']) {
-
-                        $quickMode = new OnePageRenderer($this->processor);
-                    } else {
-
-                        $quickMode = new BootstrapRenderer($this->processor);
-                    }
-
-                    $this->processor->quickmode = $quickMode;
-                } else {
-                    $quickMode = new ClassicRenderer($this->processor);
-                    $this->processor->quickmode = $quickMode;
-                }
+                $quickMode = $this->createQuickModeRenderer($rootMdata);
+                $this->processor->quickmode = $quickMode;
             }
 
             if ($is_mobile_type == 'choose') {
@@ -2354,6 +2341,24 @@ final class RenderingEngine
         } // if
         restore_error_handler();
 
+    }
+
+    /**
+     * Create the renderer selected by the QuickMode theme settings.
+     *
+     * @param array<string, mixed> $rootMdata
+     */
+    private function createQuickModeRenderer(array $rootMdata): object
+    {
+        if (isset($rootMdata['themebootstrapThemeEngine']) && $rootMdata['themebootstrapThemeEngine'] == 'bootstrap') {
+            if (isset($rootMdata['themebootstrapMode']) && $rootMdata['themebootstrapMode']) {
+                return new OnePageRenderer($this->processor);
+            }
+
+            return new BootstrapRenderer($this->processor);
+        }
+
+        return new ClassicRenderer($this->processor);
     }
 
     // view

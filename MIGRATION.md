@@ -45,8 +45,19 @@ restent inchangées afin de conserver la traçabilité des migrations précéden
   **couverture complète des 4 renderers close le 2026-08-29** : chaque type
   de champ de chaque renderer a désormais au moins un test figeant sa sortie
   actuelle, à l'exception des deux cas documentés ci-dessus.
-- [ ] Extraire ensuite la couche Strategy par type de champ, uniquement lorsque
-  les quatre sorties correspondantes sont figées par tests.
+- [x] Extraire ensuite la couche Strategy par type de champ, uniquement lorsque
+  les quatre sorties correspondantes sont figées par tests — **en cours,
+  démarré le 2026-08-29** (garde levée explicitement, voir ci-dessous).
+  `HiddenFieldTrait` partagé par les 4 renderers (`bfHidden`).
+  `BootstrapStyleFieldTrait` partagé par Bootstrap et OnePage seulement
+  (même convention Bootstrap 5 via `$this->bsClass()`, absente de Classic
+  et différente sur Mobile) : `bfSummarize`, `bfCalendar`, `bfCheckbox`,
+  `bfSelect`, `bfSubmitButton`, `bfPayPal`, `bfSofortueberweisung`,
+  `bfSignature`, `bfRadioGroup`, `bfCheckboxGroup`, `bfStripe`,
+  `bfTextfield`, `bfNumberInput` mutualisés à date. Restent à vérifier :
+  `bfFile`, `bfCaptcha` (bug de markup réel span/button non corrigé),
+  `bfReCaptcha`. `bfTextarea` diffère d'un espace cosmétique entre
+  Bootstrap et OnePage — délibérément non mutualisé.
 
 ### Travaux parallélisables
 

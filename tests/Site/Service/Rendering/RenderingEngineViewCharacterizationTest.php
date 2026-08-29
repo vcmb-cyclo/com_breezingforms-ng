@@ -722,6 +722,47 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertStringContainsString('bfPage-m bfClearfix', $html);
     }
 
+    public function testFormRenderingInitializationUsesModernWrapperWithoutRecaptchaTable(): void
+    {
+        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
+        $processor->form = 4;
+        $processor->legacy_wrap = false;
+        $processor->formrow = (object) [
+            'template_code_processed' => 'QuickMode',
+            'class1' => '',
+        ];
+        $processor->app = new class {
+            public function getInput(): object
+            {
+                return new class {
+                    public function getCmd(string $name, string $default = ''): string
+                    {
+                        return $default;
+                    }
+
+                    public function getString(string $name, string $default = ''): string
+                    {
+                        return $default;
+                    }
+                };
+            }
+        };
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+
+        ob_start();
+        try {
+            (new ReflectionClass($engine))->getMethod('initializeFormRendering')->invoke($engine);
+            $html = ob_get_contents();
+        } finally {
+            ob_end_clean();
+        }
+
+        self::assertSame('<div id="ff_formdiv4" class="bfFormDiv">', $html);
+        self::assertSame('', $processor->status);
+        self::assertSame('', $processor->message);
+    }
+
     public function testBeforeFormCustomPieceRendersAndPropagatesBuryState(): void
     {
         $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();

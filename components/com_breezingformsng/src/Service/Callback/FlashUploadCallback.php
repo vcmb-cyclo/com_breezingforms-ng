@@ -29,6 +29,7 @@ final class FlashUploadCallback
     public function __construct(
         private readonly CMSApplication $application,
         private readonly DatabaseInterface $database,
+        private readonly FlashUploadSizeValidator $uploadSizeValidator,
     ) {
     }
 
@@ -98,7 +99,7 @@ final class FlashUploadCallback
 
                     $dataObject = json_decode(bf_b64dec($objectList[0]->template_code), true);
 
-                    $validationLabel = (new FlashUploadSizeValidator())->findOversizedLabel(
+                    $validationLabel = $this->uploadSizeValidator->findOversizedLabel(
                         $dataObject,
                         $finaltargetFile,
                         $itemName

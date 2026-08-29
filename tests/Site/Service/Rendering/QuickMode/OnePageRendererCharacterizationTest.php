@@ -6,6 +6,7 @@ namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Rendering\QuickMode;
 
 use HTML_facileFormsProcessor;
 use Joomla\CMS\Application\CMSApplication;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\OnePageRenderer;
@@ -294,6 +295,77 @@ final class OnePageRendererCharacterizationTest extends TestCase
 
         self::assertStringContainsString('type="number"', $html);
         self::assertStringContainsString('name="ff_nm_age[]"', $html);
+    }
+
+    /**
+     * Regression coverage for a real fix, not the "Azure theme" field types
+     * generally: bfTextfield, bfTextarea and bfNumberInput each build a
+     * field-label icon only when the "Azure" bootstrap theme is active, and
+     * OnePageRenderer used the obsolete FontAwesome 4 'fa' prefix for it
+     * while BootstrapRenderer already used the correct FontAwesome 5+ 'fas'
+     * prefix - a real inconsistency (found comparing the two renderers'
+     * source directly), not a duplicate worth mutualizing. 'fa' alone
+     * renders no icon at all under FA5+, so this was a real visual bug on
+     * OnePage specifically. None of the other characterization tests here
+     * exercise this branch (they don't set themebootstrap to 'Azure'),
+     * so it had no coverage before this test.
+     */
+    #[DataProvider('azureThemeIconFieldProvider')]
+    public function testAzureThemeIconUsesFontAwesome5Prefix(string $bfType, array $overrides): void
+    {
+        $renderer = $this->makeRenderer();
+        $this->setPrivate($renderer, 'rootMdata', [
+            'themebootstrapThemeEngine' => 'bootstrap',
+            'themebootstrap' => 'Azure',
+            'useErrorAlerts' => true,
+        ]);
+
+        $defaults = [
+            'type' => 'element',
+            'bfType' => $bfType,
+            'dbId' => 1,
+            'bfName' => 'field',
+            'label' => 'Label',
+            'hint' => '',
+            'required' => false,
+            'hideLabel' => false,
+            'password' => false,
+            'maxLength' => '',
+            'size' => '',
+            'placeholder' => '',
+            'value' => '',
+            'tabIndex' => -1,
+            'readonly' => false,
+            'off' => false,
+            'mailbackAsSender' => false,
+            'icon' => '',
+        ];
+
+        $node = [
+            'attributes' => ['id' => 'element1'],
+            'properties' => array_merge($defaults, $overrides),
+        ];
+
+        ob_start();
+        try {
+            $renderer->process($node);
+            $html = ob_get_contents();
+        } finally {
+            ob_end_clean();
+        }
+
+        self::assertStringContainsString('fas fa-pencil', (string) $html);
+        self::assertStringNotContainsString('"fa fa-pencil"', (string) $html);
+    }
+
+    /**
+     * @return iterable<string, array{string, array<string, mixed>}>
+     */
+    public static function azureThemeIconFieldProvider(): iterable
+    {
+        yield 'bfTextfield' => ['bfTextfield', ['bfName' => 'name']];
+        yield 'bfTextarea' => ['bfTextarea', ['bfName' => 'message', 'width' => '', 'height' => '']];
+        yield 'bfNumberInput' => ['bfNumberInput', ['bfName' => 'age', 'range' => false, 'step' => 1, 'max' => 120, 'min' => 0]];
     }
 
     public function testSummarizeElement(): void

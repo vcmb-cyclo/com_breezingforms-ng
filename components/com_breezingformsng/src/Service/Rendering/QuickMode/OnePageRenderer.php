@@ -857,9 +857,9 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                         $icon = '';
                         if ($this->rootMdata['themebootstrapThemeEngine'] == 'bootstrap' && $this->rootMdata['themebootstrap'] == 'Azure') {
                             if (!isset($mdata['icon']) || $mdata['icon'] == '') {
-                                $icon = '<i class="fa fa-pencil iconf--fumi" aria-hidden="true"></i>';
+                                $icon = '<i class="fas fa-pencil iconf--fumi" aria-hidden="true"></i>';
                             } else {
-                                $icon = '<i class="fa ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8') . ' iconf--fumi" aria-hidden="true"></i>';
+                                $icon = '<i class="fas ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8') . ' iconf--fumi" aria-hidden="true"></i>';
                             }
                         }
 
@@ -903,9 +903,9 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                         $icon = '';
                         if ($this->rootMdata['themebootstrapThemeEngine'] == 'bootstrap' && $this->rootMdata['themebootstrap'] == 'Azure') {
                             if (!isset($mdata['icon']) || $mdata['icon'] == '') {
-                                $icon = '<i class="fa fa-pencil iconf--fumi" aria-hidden="true"></i>';
+                                $icon = '<i class="fas fa-pencil iconf--fumi" aria-hidden="true"></i>';
                             } else {
-                                $icon = '<i class="fa ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8') . ' iconf--fumi" aria-hidden="true"></i>';
+                                $icon = '<i class="fas ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8') . ' iconf--fumi" aria-hidden="true"></i>';
                             }
                         }
 
@@ -1315,9 +1315,9 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                         $icon = '';
                         if ($this->rootMdata['themebootstrapThemeEngine'] == 'bootstrap' && $this->rootMdata['themebootstrap'] == 'Azure') {
                             if (!isset($mdata['icon']) || $mdata['icon'] == '') {
-                                $icon = '<i class="fa fa-pencil iconf--fumi" aria-hidden="true"></i>';
+                                $icon = '<i class="fas fa-pencil iconf--fumi" aria-hidden="true"></i>';
                             } else {
-                                $icon = '<i class="fa ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8') . ' iconf--fumi" aria-hidden="true"></i>';
+                                $icon = '<i class="fas ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8') . ' iconf--fumi" aria-hidden="true"></i>';
                             }
                         }
                         /* translatables */

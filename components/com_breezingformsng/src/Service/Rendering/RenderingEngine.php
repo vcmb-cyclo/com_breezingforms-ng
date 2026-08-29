@@ -255,11 +255,7 @@ final class RenderingEngine
 
         if (trim($this->processor->formrow->template_code_processed) == 'QuickMode') {
 
-            if ($this->processor->app->getInput()->getBool('non_mobile', false)) {
-                $this->processor->app->getSession()->clear('com_breezingformsng.mobile');
-            } else if ($this->processor->app->getInput()->getBool('mobile', false)) {
-                $this->processor->app->getSession()->set('com_breezingformsng.mobile', true);
-            }
+            $this->syncMobileSessionPreference();
 
             require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
 
@@ -2376,6 +2372,15 @@ final class RenderingEngine
                 //-->
                 </script>';
         echo '<div style="display: block; text-align: center;"><button class="ff_elem btn btn-primary" onclick="location.href=bf_mobile_url;"><span>' . Text::_('COM_BREEZINGFORMSNG_MOBILE_VERSION') . '</span></button></div><div></div>';
+    }
+
+    private function syncMobileSessionPreference(): void
+    {
+        if ($this->processor->app->getInput()->getBool('non_mobile', false)) {
+            $this->processor->app->getSession()->clear('com_breezingformsng.mobile');
+        } elseif ($this->processor->app->getInput()->getBool('mobile', false)) {
+            $this->processor->app->getSession()->set('com_breezingformsng.mobile', true);
+        }
     }
 
     // view

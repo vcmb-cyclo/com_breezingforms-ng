@@ -266,6 +266,106 @@ final class OnePageRendererCharacterizationTest extends TestCase
         self::assertStringContainsString('name="ff_nm_eventdate[]"', $html);
     }
 
+    public function testHiddenElement(): void
+    {
+        $html = $this->renderElement('bfHidden', [
+            'dbId' => 45,
+            'bfName' => 'source',
+            'hideLabel' => true,
+            'value' => 'newsletter-2026',
+        ]);
+
+        self::assertStringContainsString('type="hidden"', $html);
+        self::assertStringContainsString('value="newsletter-2026"', $html);
+    }
+
+    public function testNumberInputElement(): void
+    {
+        $html = $this->renderElement('bfNumberInput', [
+            'dbId' => 50,
+            'bfName' => 'age',
+            'label' => 'Âge',
+            'range' => false,
+            'value' => '',
+            'step' => 1,
+            'max' => 120,
+            'min' => 0,
+        ]);
+
+        self::assertStringContainsString('type="number"', $html);
+        self::assertStringContainsString('name="ff_nm_age[]"', $html);
+    }
+
+    public function testSummarizeElement(): void
+    {
+        $html = $this->renderElement('bfSummarize', [
+            'dbId' => 51,
+            'hideLabel' => true,
+            'connectWith' => ['price', 'qty'],
+            'connectType' => 'multiply',
+            'emptyMessage' => '0',
+            'hideIfEmpty' => false,
+            'fieldCalc' => '',
+        ]);
+
+        self::assertStringContainsString('bfRegisterSummarize', $html);
+        self::assertStringContainsString('"multiply"', $html);
+    }
+
+    public function testSignatureElement(): void
+    {
+        $html = $this->renderElement('bfSignature', [
+            'dbId' => 57,
+            'bfName' => 'signature',
+            'hideLabel' => true,
+        ]);
+
+        self::assertStringContainsString('bfSignature57', $html);
+        self::assertStringContainsString('name="ff_nm_signature[]"', $html);
+    }
+
+    public function testStripeElement(): void
+    {
+        $html = $this->renderElement('bfStripe', [
+            'dbId' => 53,
+            'hideLabel' => true,
+            'image' => '',
+            'actionClick' => 0,
+            'actionFunctionName' => '',
+        ]);
+
+        self::assertStringContainsString("'bfPaymentMethod'", $html);
+        self::assertStringContainsString("'Stripe'", $html);
+    }
+
+    public function testPayPalElement(): void
+    {
+        $html = $this->renderElement('bfPayPal', [
+            'dbId' => 54,
+            'hideLabel' => true,
+            'image' => '',
+            'actionClick' => 0,
+            'actionFunctionName' => '',
+        ]);
+
+        self::assertStringContainsString("'bfPaymentMethod'", $html);
+        self::assertStringContainsString("'PayPal'", $html);
+    }
+
+    public function testSofortueberweisungElement(): void
+    {
+        $html = $this->renderElement('bfSofortueberweisung', [
+            'dbId' => 55,
+            'hideLabel' => true,
+            'image' => '',
+            'actionClick' => 0,
+            'actionFunctionName' => '',
+        ]);
+
+        self::assertStringContainsString("'bfPaymentMethod'", $html);
+        self::assertStringContainsString("'Sofortueberweisung'", $html);
+    }
+
     /**
      * @param array<string, mixed> $overrides
      */

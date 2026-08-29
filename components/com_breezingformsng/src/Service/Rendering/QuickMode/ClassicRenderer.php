@@ -777,37 +777,7 @@ float:left;
 						break;
 
 					case 'bfSubmitButton':
-
-						/* translatables */
-						if (isset($mdata['src_translation' . $this->language_tag]) && $mdata['src_translation' . $this->language_tag] != '') {
-							$mdata['src'] = $mdata['src_translation' . $this->language_tag];
-						}
-						if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
-							$mdata['value'] = $mdata['value_translation' . $this->language_tag];
-						}
-						/* translatables end */
-
-						$value = '';
-						$type = 'submit';
-						$src = '';
-
-						if ($mdata['src'] != '') {
-							$type = 'image';
-							$src = 'src="' . $mdata['src'] . '" ';
-						}
-						if ($mdata['value'] != '') {
-							$value = 'value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" ';
-						}
-						if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
-							$onclick = 'onclick="if(typeof bf_htmltextareainit != \'undefined\'){ bf_htmltextareainit() }populateSummarizers();if(document.getElementById(\'bfPaymentMethod\')){document.getElementById(\'bfPaymentMethod\').value=\'\';};' . $mdata['actionFunctionName'] . '(this,\'click\');return false;" ';
-						} else {
-							$onclick = 'onclick="if(typeof bf_htmltextareainit != \'undefined\'){ bf_htmltextareainit() }populateSummarizers();if(document.getElementById(\'bfPaymentMethod\')){document.getElementById(\'bfPaymentMethod\').value=\'\';};return false;" ';
-						}
-						if ($src == '') {
-							echo '<button type="button" class="ff_elem btn btn-primary bfCustomSubmitButton" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"><span>' . $mdata['value'] . '</span></button>' . "\n";
-						} else {
-							echo '<input type="image" class="ff_elem btn btn-primary bfCustomSubmitButton" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '" value="' . $mdata['value'] . '"/>' . "\n";
-						}
+						$this->renderSubmitButtonField($mdata, $tabIndex, $onblur, $onchange, $onfocus, $onselect, $readonly);
 						break;
 
 					case 'bfHidden':
@@ -815,309 +785,39 @@ float:left;
 						break;
 
 					case 'bfSummarize':
-						/* translatables */
-						if (isset($mdata['emptyMessage_translation' . $this->language_tag]) && $mdata['emptyMessage_translation' . $this->language_tag] != '') {
-							$mdata['emptyMessage'] = $mdata['emptyMessage_translation' . $this->language_tag];
-						}
-						/* translatables end */
-
-						echo '<span class="ff_elem bfSummarize" id="ff_elem' . $mdata['dbId'] . '"></span>' . "\n";
-						echo '<script type="text/javascript">bfRegisterSummarize('
-							. json_encode('ff_elem' . $mdata['dbId']) . ', '
-							. json_encode($mdata['connectWith']) . ', '
-							. json_encode($mdata['connectType']) . ', '
-							. json_encode($mdata['emptyMessage']) . ', '
-							. json_encode((bool) $mdata['hideIfEmpty']) . ');</script>';
-						if (trim($mdata['fieldCalc']) != '') {
-							echo '<script type="text/javascript">
-                                                        <!--
-							function bfFieldCalcff_elem' . $mdata['dbId'] . '(value){
-								if(!isNaN(value)){
-									value = Number(value);
-								}
-								' . $mdata['fieldCalc'] . '
-								return value;
-							}
-                                                        //-->
-							</script>';
-						}
+						$this->renderSummarizeField($mdata);
 						break;
 
 					case 'bfReCaptcha':
-
-						if (isset($mdata['pubkey']) && $mdata['pubkey'] != '') {
-
-							if (!isset($mdata['invisibleCaptcha']) || !$mdata['invisibleCaptcha']) {
-
-								$http = 'https'; // forcing https now
-
-                                $getLangTag = $this->p->app->getLanguage()->getTag();
-                                $getLangSlug = explode('-', $getLangTag);
-                                $reCaptchaLang = 'hl='. $getLangSlug[0];
-
-								$size = (isset($mdata['size']) && $mdata['size'] != '') ? $mdata['size'] : 'normal';
-
-								RuntimeAssetLoader::script(
-									$this->p->app,
-									$http . '://www.google.com/recaptcha/api.js?' . $reCaptchaLang . '&onload=onloadBFNewRecaptchaCallback&render=explicit',
-									['data-usercentrics' => 'reCAPTCHA']
-								);
-								RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-visible.js');
-
-								echo '
-                                                    <div style="display: inline-block !important; vertical-align: middle;">
-                                                        <div id="newrecaptcha"></div>
-                                                    </div>
-                                                    <script data-usercentrics="reCAPTCHA" type="text/javascript">bfInitVisibleReCaptcha(' . json_encode([
-									'sitekey' => $mdata['pubkey'],
-									'theme' => trim($mdata['theme']) == '' ? 'light' : trim($mdata['theme']),
-									'size' => $size,
-									'resetOnRerender' => true,
-								]) . ');</script>';
-							}
-							else
-							if (isset($mdata['invisibleCaptcha']) && $mdata['invisibleCaptcha']) {
-
-								$http = 'https';
-
-                                $badge = str_replace('invisible_','', trim($mdata['theme']));
-
-								if($badge == 'inline') {
-                                ?>
-                                    <div style="display: inline-block !important; vertical-align: middle;"
-                                    <div id="bfInvisibleReCaptchaContainer"></div>
-                                    <div id="bfInvisibleReCaptcha"></div>
-                                    </div>
-                                    <?php
-                                }else{
-                                ?>
-                                    <div id="bfInvisibleReCaptchaContainer"></div>
-                                    <div id="bfInvisibleReCaptcha"></div>
-                                <?php
-                                }
-
-								RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-invisible.js');
-								?>
-									<script data-usercentrics="reCAPTCHA" type="text/javascript">bfInitInvisibleReCaptcha(<?php echo json_encode([
-										'sitekey' => $mdata['pubkey'],
-										'badge' => $badge == 'red' ? '' : $badge,
-										'hasFlashUpload' => $this->hasFlashUpload,
-										'resetFlagOnCallback' => true,
-									]); ?>);</script>
-									<script data-usercentrics="reCAPTCHA" src="https://www.google.com/recaptcha/api.js?onload=onloadBFNewRecaptchaCallback&render=explicit" async defer></script>
-									<?php
-							}
-
-						} else {
-							echo '<span class="bfCaptcha">' . "\n";
-							echo 'WARNING: No public key given for ReCaptcha element!';
-							echo '</span>' . "\n";
-						}
+						$this->renderReCaptchaField($mdata);
 						break;
 
 					case 'bfCaptcha':
-
-						$captcha_url = Uri::root(true)
-							. ($this->p->app->isClient('administrator') ? '/administrator' : '')
-							. '/index.php?option=com_breezingformsng&bfCaptcha=1';
-
-						echo '<span class="bfCaptcha">' . "\n";
-
-						echo '<img alt="" ' . (isset($mdata['width']) && intval($mdata['width']) > 0 ? ' width="' . intval($mdata['width']) . '"' : 'width="230"' ) . ' id="ff_capimgValue" class="ff_capimg" src="' . $captcha_url . '"/>' . "\n";
-
-						echo '<br/>';
-						echo '<input ' . (isset($mdata['width']) && intval($mdata['width']) > 0 && (intval($mdata['width']) - 45 >= 230) ? ' style="width:' . (intval($mdata['width']) - 45) . 'px;"' : '' ) . ' autocomplete="off" class="ff_elem" type="text" name="bfCaptchaEntry" id="bfCaptchaEntry" />' . "\n";
-						echo '<a href="#" class="ff_elem" onclick="document.getElementById(\'bfCaptchaEntry\').value=\'\';document.getElementById(\'bfCaptchaEntry\').focus();document.getElementById(\'ff_capimgValue\').src = \'' . $captcha_url . '&bfMathRandom=\' + Math.random(); return false"><img alt="captcha" src="' . Uri::root(true) . '/media/com_breezingformsng/images/site/captcha/refresh-captcha.png" /></a>' . "\n";
-						echo '</span>' . "\n";
-
+						$this->renderCaptchaField($mdata);
 						break;
 
 						case 'bfCalendar':
-
-							/* translatables */
-							if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
-								$mdata['value'] = $mdata['value_translation' . $this->language_tag];
-							}
-							if (isset($mdata['format_translation' . $this->language_tag]) && $mdata['format_translation' . $this->language_tag] != '') {
-								$mdata['format'] = $mdata['format_translation' . $this->language_tag];
-							}
-							/* translatables end */
-							$exploded = explode('::', trim((string) $mdata['value']));
-							$left = '';
-
-							if (count($exploded) == 2) {
-								$left = trim($exploded[0]);
-							} elseif (count($exploded) == 1) {
-								$left = trim($exploded[0]);
-
-								if ($left === '...') {
-									$left = '';
-								}
-							}
-
-							// public static function calendar($value, $name, $id, $format = '%Y-%m-%d', $attribs = array())
-							$calAttr = [
-								'class' => 'ff_elem bfCalendar',
-								'showTime' => $this->bfCalendarShowTimeEnabled($mdata),
-								'timeFormat' => $this->bfCalendarIsTruthy($mdata, 'timeFormat') ? '24' : '12',
-								'singleHeader' => $this->bfCalendarIsTruthy($mdata, 'singleHeader'),
-								'todayBtn' => $this->bfCalendarIsTruthy($mdata, 'todayButton'),
-								'weekNumbers' => $this->bfCalendarIsTruthy($mdata, 'weekNumbers'),
-								'minYear' => (isset($mdata['minYear']) && $mdata['minYear'] != '') ? '-' . $mdata['minYear'] : '',
-								'maxYear' => (isset($mdata['maxYear']) && $mdata['maxYear'] != '') ? '+' . $mdata['maxYear'] : '',
-								'firstDay' => (isset($mdata['firstDay']) && $mdata['firstDay'] != '') ? $mdata['firstDay'] : '7',
-							];
-
-							echo HTMLHelper::_('calendar', $left, "ff_nm_" . $mdata['bfName'] . "[]" , "ff_elem" . $mdata['dbId'], $mdata['format'], $calAttr);
+							$this->renderCalendarField($mdata);
 							break;
 
 						case 'bfCalendarResponsive':
-
-						/* translatables */
-						if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
-							$mdata['value'] = $mdata['value_translation' . $this->language_tag];
-						}
-						if (isset($mdata['format_translation' . $this->language_tag]) && $mdata['format_translation' . $this->language_tag] != '') {
-							$mdata['format'] = $mdata['format_translation' . $this->language_tag];
-						}
-							/* translatables end */
-							$mdata['format'] = $this->bfCalendarToPickadateFormat($mdata['format']);
-							$pickerFirstDay = $this->bfCalendarToPickadateFirstDay(isset($mdata['firstDay']) ? $mdata['firstDay'] : '');
-							$pickerSelectYears = $this->bfCalendarSelectYears($mdata);
-
-							$size = 'style="width: 65%;min-width: 65%;max-width: 65%;" ';
-							if ($mdata['size'] != '') {
-							$size = 'style="width:' . htmlentities(strip_tags($mdata['size'])) . ';max-width:' . htmlentities(strip_tags($mdata['size'])) . ';min-width:' . htmlentities(strip_tags($mdata['size'])) . ';" ';
-						}
-
-						$exploded = explode('::', trim($mdata['value']));
-
-						$left = '';
-						$right = '';
-							if (count($exploded) == 2) {
-								$left = trim($exploded[0]);
-								$right = trim($exploded[1]);
-							} else {
-								$right = trim($exploded[0]);
-							}
-							if ($right === '') {
-								$right = '...';
-							}
-
-							echo '<span class="bfElementGroupNoWrap" id="bfElementGroupNoWrap' . $mdata['dbId'] . '">' . "\n";
-							echo '<input autocomplete="off" class="ff_elem bfCalendarInput" ' . $size . 'type="text" name="ff_nm_' . $mdata['bfName'] . '[]"  id="ff_elem' . $mdata['dbId'] . '" value="' . htmlentities($left, ENT_QUOTES, 'UTF-8') . '"/>' . "\n";
-							echo '<button type="button" id="ff_elem' . $mdata['dbId'] . '_calendarButton" class="bfCalendar btn btn-secondary" value="' . htmlentities($right, ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities($right, ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
-							echo '</span>' . "\n";
-
-						if (!$this->hasResponsiveDatePicker) {
-							$this->p->app->getDocument()->getWebAssetManager()->addInlineScript(
-								'var bfPickerMinusYearIcon = ' . json_encode(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/minusyear.png') . ';'
-								. "\n" . 'var bfPickerPlusYearIcon = ' . json_encode(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/plusyear.png') . ';'
-							);
-							RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive.js');
-							RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js');
-						}
-
-						echo '<script type="text/javascript">bfInitCalendarResponsive(' . json_encode((int) $mdata['dbId']) . ', ' . json_encode([
-							'format' => $mdata['format'],
-							'selectYears' => $pickerSelectYears,
-							'firstDay' => $pickerFirstDay,
-							'hasYearScroller' => true,
-						]) . ');</script>' . "\n";
-
-						$this->hasResponsiveDatePicker = true;
-
-						break;
+							$this->renderCalendarResponsiveField($mdata);
+							break;
 
 					case 'bfSignature':
-
-						RuntimeAssetLoader::script($this->p->app, Uri::root(true).'/components/com_breezingformsng/libraries/js/signature.js');
-						RuntimeAssetLoader::script($this->p->app, Uri::root(true).'/media/com_breezingformsng/js/site/quickmode-signature.js');
-						$this->p->app->getDocument()->getWebAssetManager()->addInlineScript(
-							'bfSignatureInit(' . json_encode((int) $mdata['dbId']) . ');'
-						);
-
-						echo '<div class="bfSignature" id="bfSignature' . $mdata['dbId'] . '"><div class="bfSignatureCanvasBorder"><canvas></canvas></div>'."\n";
-						echo '<button class="btn btn-primary" onclick="bfSignatureReset(' . json_encode((int) $mdata['dbId']) . ');" class="bfSignatureResetButton button"><span>'.Text::_('COM_BREEZINGFORMSNG_SIGNATURE_RESET_BUTTON').'</span></button>'."\n";
-						echo '<span class=\'bfSignature' . $mdata['bfName'] . '\'></span>';
-						echo '</div>';
-						echo '<input class="ff_elem" type="hidden" name="ff_nm_' . $mdata['bfName'] . '[]" value="" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
-
+						$this->renderSignatureField($mdata);
 						break;
 
 					case 'bfStripe':
-
-						/* translatables */
-						if (isset($mdata['image_translation' . $this->language_tag]) && $mdata['image_translation' . $this->language_tag] != '') {
-							$mdata['image'] = $mdata['image_translation' . $this->language_tag];
-						}
-						/* translatables end */
-
-						$value = '';
-						$type = 'submit';
-						$src = '';
-						if ($mdata['image'] != '') {
-							$type = 'image';
-							$src = 'src="' . $mdata['image'] . '" ';
-						} else {
-							$value = 'value="PayPal" ';
-						}
-						if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
-							$onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Stripe\';' . $mdata['actionFunctionName'] . '(this,\'click\');" ';
-						} else {
-							$onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Stripe\';" ';
-						}
-						echo '<input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+						$this->renderStripeField($mdata, $tabIndex, $onblur, $onchange, $onfocus, $onselect, $readonly);
 						break;
 
 					case 'bfPayPal':
-
-						/* translatables */
-						if (isset($mdata['image_translation' . $this->language_tag]) && $mdata['image_translation' . $this->language_tag] != '') {
-							$mdata['image'] = $mdata['image_translation' . $this->language_tag];
-						}
-						/* translatables end */
-
-						$value = '';
-						$type = 'submit';
-						$src = '';
-						if ($mdata['image'] != '') {
-							$type = 'image';
-							$src = 'src="' . $mdata['image'] . '" ';
-						} else {
-							$value = 'value="PayPal" ';
-						}
-						if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
-							$onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'PayPal\';' . $mdata['actionFunctionName'] . '(this,\'click\');" ';
-						} else {
-							$onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'PayPal\';" ';
-						}
-						echo '<input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+						$this->renderPayPalField($mdata, $tabIndex, $onblur, $onchange, $onfocus, $onselect, $readonly);
 						break;
 
 					case 'bfSofortueberweisung':
-
-						/* translatables */
-						if (isset($mdata['image_translation' . $this->language_tag]) && $mdata['image_translation' . $this->language_tag] != '') {
-							$mdata['image'] = $mdata['image_translation' . $this->language_tag];
-						}
-						/* translatables end */
-
-						$value = '';
-						$type = 'submit';
-						$src = '';
-						if ($mdata['image'] != '') {
-							$type = 'image';
-							$src = 'src="' . $mdata['image'] . '" ';
-						} else {
-							$value = 'value="Sofortueberweisung" ';
-						}
-						if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
-							$onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Sofortueberweisung\';' . $mdata['actionFunctionName'] . '(this,\'click\');" ';
-						} else {
-							$onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Sofortueberweisung\';" ';
-						}
-						echo '<input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+						$this->renderSofortueberweisungField($mdata, $tabIndex, $onblur, $onchange, $onfocus, $onselect, $readonly);
 						break;
 				}
 
@@ -1461,6 +1161,334 @@ float:left;
 
 	private function renderHiddenField(array $mdata): void {
 		echo '<input class="ff_elem" type="hidden" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+	}
+
+	private function renderSubmitButtonField(array $mdata, string $tabIndex, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void {
+		/* translatables */
+		if (isset($mdata['src_translation' . $this->language_tag]) && $mdata['src_translation' . $this->language_tag] != '') {
+			$mdata['src'] = $mdata['src_translation' . $this->language_tag];
+		}
+		if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
+			$mdata['value'] = $mdata['value_translation' . $this->language_tag];
+		}
+		/* translatables end */
+
+		$value = '';
+		$type = 'submit';
+		$src = '';
+
+		if ($mdata['src'] != '') {
+			$type = 'image';
+			$src = 'src="' . $mdata['src'] . '" ';
+		}
+		if ($mdata['value'] != '') {
+			$value = 'value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" ';
+		}
+		if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
+			$onclick = 'onclick="if(typeof bf_htmltextareainit != \'undefined\'){ bf_htmltextareainit() }populateSummarizers();if(document.getElementById(\'bfPaymentMethod\')){document.getElementById(\'bfPaymentMethod\').value=\'\';};' . $mdata['actionFunctionName'] . '(this,\'click\');return false;" ';
+		} else {
+			$onclick = 'onclick="if(typeof bf_htmltextareainit != \'undefined\'){ bf_htmltextareainit() }populateSummarizers();if(document.getElementById(\'bfPaymentMethod\')){document.getElementById(\'bfPaymentMethod\').value=\'\';};return false;" ';
+		}
+		if ($src == '') {
+			echo '<button type="button" class="ff_elem btn btn-primary bfCustomSubmitButton" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"><span>' . $mdata['value'] . '</span></button>' . "\n";
+		} else {
+			echo '<input type="image" class="ff_elem btn btn-primary bfCustomSubmitButton" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '" value="' . $mdata['value'] . '"/>' . "\n";
+		}
+	}
+
+	private function renderSummarizeField(array $mdata): void {
+		/* translatables */
+		if (isset($mdata['emptyMessage_translation' . $this->language_tag]) && $mdata['emptyMessage_translation' . $this->language_tag] != '') {
+			$mdata['emptyMessage'] = $mdata['emptyMessage_translation' . $this->language_tag];
+		}
+		/* translatables end */
+
+		echo '<span class="ff_elem bfSummarize" id="ff_elem' . $mdata['dbId'] . '"></span>' . "\n";
+		echo '<script type="text/javascript">bfRegisterSummarize('
+			. json_encode('ff_elem' . $mdata['dbId']) . ', '
+			. json_encode($mdata['connectWith']) . ', '
+			. json_encode($mdata['connectType']) . ', '
+			. json_encode($mdata['emptyMessage']) . ', '
+			. json_encode((bool) $mdata['hideIfEmpty']) . ');</script>';
+		if (trim($mdata['fieldCalc']) != '') {
+			echo '<script type="text/javascript">
+                                                        <!--
+					function bfFieldCalcff_elem' . $mdata['dbId'] . '(value){
+						if(!isNaN(value)){
+							value = Number(value);
+						}
+						' . $mdata['fieldCalc'] . '
+						return value;
+					}
+                                                        //-->
+					</script>';
+		}
+	}
+
+	private function renderReCaptchaField(array $mdata): void {
+		if (isset($mdata['pubkey']) && $mdata['pubkey'] != '') {
+
+			if (!isset($mdata['invisibleCaptcha']) || !$mdata['invisibleCaptcha']) {
+
+				$http = 'https'; // forcing https now
+
+                                $getLangTag = $this->p->app->getLanguage()->getTag();
+                                $getLangSlug = explode('-', $getLangTag);
+                                $reCaptchaLang = 'hl='. $getLangSlug[0];
+
+				$size = (isset($mdata['size']) && $mdata['size'] != '') ? $mdata['size'] : 'normal';
+
+				RuntimeAssetLoader::script(
+					$this->p->app,
+					$http . '://www.google.com/recaptcha/api.js?' . $reCaptchaLang . '&onload=onloadBFNewRecaptchaCallback&render=explicit',
+					['data-usercentrics' => 'reCAPTCHA']
+				);
+				RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-visible.js');
+
+				echo '
+                                                    <div style="display: inline-block !important; vertical-align: middle;">
+                                                        <div id="newrecaptcha"></div>
+                                                    </div>
+                                                    <script data-usercentrics="reCAPTCHA" type="text/javascript">bfInitVisibleReCaptcha(' . json_encode([
+					'sitekey' => $mdata['pubkey'],
+					'theme' => trim($mdata['theme']) == '' ? 'light' : trim($mdata['theme']),
+					'size' => $size,
+					'resetOnRerender' => true,
+				]) . ');</script>';
+			}
+			else
+			if (isset($mdata['invisibleCaptcha']) && $mdata['invisibleCaptcha']) {
+
+				$http = 'https';
+
+                                $badge = str_replace('invisible_','', trim($mdata['theme']));
+
+				if($badge == 'inline') {
+                                ?>
+                                    <div style="display: inline-block !important; vertical-align: middle;"
+                                    <div id="bfInvisibleReCaptchaContainer"></div>
+                                    <div id="bfInvisibleReCaptcha"></div>
+                                    </div>
+                                    <?php
+                                }else{
+                                ?>
+                                    <div id="bfInvisibleReCaptchaContainer"></div>
+                                    <div id="bfInvisibleReCaptcha"></div>
+                                <?php
+                                }
+
+				RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-invisible.js');
+				?>
+					<script data-usercentrics="reCAPTCHA" type="text/javascript">bfInitInvisibleReCaptcha(<?php echo json_encode([
+						'sitekey' => $mdata['pubkey'],
+						'badge' => $badge == 'red' ? '' : $badge,
+						'hasFlashUpload' => $this->hasFlashUpload,
+						'resetFlagOnCallback' => true,
+					]); ?>);</script>
+					<script data-usercentrics="reCAPTCHA" src="https://www.google.com/recaptcha/api.js?onload=onloadBFNewRecaptchaCallback&render=explicit" async defer></script>
+					<?php
+			}
+
+		} else {
+			echo '<span class="bfCaptcha">' . "\n";
+			echo 'WARNING: No public key given for ReCaptcha element!';
+			echo '</span>' . "\n";
+		}
+	}
+
+	private function renderCaptchaField(array $mdata): void {
+		$captcha_url = Uri::root(true)
+			. ($this->p->app->isClient('administrator') ? '/administrator' : '')
+			. '/index.php?option=com_breezingformsng&bfCaptcha=1';
+
+		echo '<span class="bfCaptcha">' . "\n";
+
+		echo '<img alt="" ' . (isset($mdata['width']) && intval($mdata['width']) > 0 ? ' width="' . intval($mdata['width']) . '"' : 'width="230"' ) . ' id="ff_capimgValue" class="ff_capimg" src="' . $captcha_url . '"/>' . "\n";
+
+		echo '<br/>';
+		echo '<input ' . (isset($mdata['width']) && intval($mdata['width']) > 0 && (intval($mdata['width']) - 45 >= 230) ? ' style="width:' . (intval($mdata['width']) - 45) . 'px;"' : '' ) . ' autocomplete="off" class="ff_elem" type="text" name="bfCaptchaEntry" id="bfCaptchaEntry" />' . "\n";
+		echo '<a href="#" class="ff_elem" onclick="document.getElementById(\'bfCaptchaEntry\').value=\'\';document.getElementById(\'bfCaptchaEntry\').focus();document.getElementById(\'ff_capimgValue\').src = \'' . $captcha_url . '&bfMathRandom=\' + Math.random(); return false"><img alt="captcha" src="' . Uri::root(true) . '/media/com_breezingformsng/images/site/captcha/refresh-captcha.png" /></a>' . "\n";
+		echo '</span>' . "\n";
+	}
+
+	private function renderCalendarField(array $mdata): void {
+		/* translatables */
+		if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
+			$mdata['value'] = $mdata['value_translation' . $this->language_tag];
+		}
+		if (isset($mdata['format_translation' . $this->language_tag]) && $mdata['format_translation' . $this->language_tag] != '') {
+			$mdata['format'] = $mdata['format_translation' . $this->language_tag];
+		}
+		/* translatables end */
+		$exploded = explode('::', trim((string) $mdata['value']));
+		$left = '';
+
+		if (count($exploded) == 2) {
+			$left = trim($exploded[0]);
+		} elseif (count($exploded) == 1) {
+			$left = trim($exploded[0]);
+
+			if ($left === '...') {
+				$left = '';
+			}
+		}
+
+		// public static function calendar($value, $name, $id, $format = '%Y-%m-%d', $attribs = array())
+		$calAttr = [
+			'class' => 'ff_elem bfCalendar',
+			'showTime' => $this->bfCalendarShowTimeEnabled($mdata),
+			'timeFormat' => $this->bfCalendarIsTruthy($mdata, 'timeFormat') ? '24' : '12',
+			'singleHeader' => $this->bfCalendarIsTruthy($mdata, 'singleHeader'),
+			'todayBtn' => $this->bfCalendarIsTruthy($mdata, 'todayButton'),
+			'weekNumbers' => $this->bfCalendarIsTruthy($mdata, 'weekNumbers'),
+			'minYear' => (isset($mdata['minYear']) && $mdata['minYear'] != '') ? '-' . $mdata['minYear'] : '',
+			'maxYear' => (isset($mdata['maxYear']) && $mdata['maxYear'] != '') ? '+' . $mdata['maxYear'] : '',
+			'firstDay' => (isset($mdata['firstDay']) && $mdata['firstDay'] != '') ? $mdata['firstDay'] : '7',
+		];
+
+		echo HTMLHelper::_('calendar', $left, "ff_nm_" . $mdata['bfName'] . "[]" , "ff_elem" . $mdata['dbId'], $mdata['format'], $calAttr);
+	}
+
+	private function renderCalendarResponsiveField(array $mdata): void {
+		/* translatables */
+		if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
+			$mdata['value'] = $mdata['value_translation' . $this->language_tag];
+		}
+		if (isset($mdata['format_translation' . $this->language_tag]) && $mdata['format_translation' . $this->language_tag] != '') {
+			$mdata['format'] = $mdata['format_translation' . $this->language_tag];
+		}
+		/* translatables end */
+		$mdata['format'] = $this->bfCalendarToPickadateFormat($mdata['format']);
+		$pickerFirstDay = $this->bfCalendarToPickadateFirstDay(isset($mdata['firstDay']) ? $mdata['firstDay'] : '');
+		$pickerSelectYears = $this->bfCalendarSelectYears($mdata);
+
+		$size = 'style="width: 65%;min-width: 65%;max-width: 65%;" ';
+		if ($mdata['size'] != '') {
+			$size = 'style="width:' . htmlentities(strip_tags($mdata['size'])) . ';max-width:' . htmlentities(strip_tags($mdata['size'])) . ';min-width:' . htmlentities(strip_tags($mdata['size'])) . ';" ';
+		}
+
+		$exploded = explode('::', trim($mdata['value']));
+
+		$left = '';
+		$right = '';
+		if (count($exploded) == 2) {
+			$left = trim($exploded[0]);
+			$right = trim($exploded[1]);
+		} else {
+			$right = trim($exploded[0]);
+		}
+		if ($right === '') {
+			$right = '...';
+		}
+
+		echo '<span class="bfElementGroupNoWrap" id="bfElementGroupNoWrap' . $mdata['dbId'] . '">' . "\n";
+		echo '<input autocomplete="off" class="ff_elem bfCalendarInput" ' . $size . 'type="text" name="ff_nm_' . $mdata['bfName'] . '[]"  id="ff_elem' . $mdata['dbId'] . '" value="' . htmlentities($left, ENT_QUOTES, 'UTF-8') . '"/>' . "\n";
+		echo '<button type="button" id="ff_elem' . $mdata['dbId'] . '_calendarButton" class="bfCalendar btn btn-secondary" value="' . htmlentities($right, ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities($right, ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
+		echo '</span>' . "\n";
+
+		if (!$this->hasResponsiveDatePicker) {
+			$this->p->app->getDocument()->getWebAssetManager()->addInlineScript(
+				'var bfPickerMinusYearIcon = ' . json_encode(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/minusyear.png') . ';'
+				. "\n" . 'var bfPickerPlusYearIcon = ' . json_encode(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/plusyear.png') . ';'
+			);
+			RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive.js');
+			RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js');
+		}
+
+		echo '<script type="text/javascript">bfInitCalendarResponsive(' . json_encode((int) $mdata['dbId']) . ', ' . json_encode([
+			'format' => $mdata['format'],
+			'selectYears' => $pickerSelectYears,
+			'firstDay' => $pickerFirstDay,
+			'hasYearScroller' => true,
+		]) . ');</script>' . "\n";
+
+		$this->hasResponsiveDatePicker = true;
+	}
+
+	private function renderSignatureField(array $mdata): void {
+		RuntimeAssetLoader::script($this->p->app, Uri::root(true).'/components/com_breezingformsng/libraries/js/signature.js');
+		RuntimeAssetLoader::script($this->p->app, Uri::root(true).'/media/com_breezingformsng/js/site/quickmode-signature.js');
+		$this->p->app->getDocument()->getWebAssetManager()->addInlineScript(
+			'bfSignatureInit(' . json_encode((int) $mdata['dbId']) . ');'
+		);
+
+		echo '<div class="bfSignature" id="bfSignature' . $mdata['dbId'] . '"><div class="bfSignatureCanvasBorder"><canvas></canvas></div>'."\n";
+		echo '<button class="btn btn-primary" onclick="bfSignatureReset(' . json_encode((int) $mdata['dbId']) . ');" class="bfSignatureResetButton button"><span>'.Text::_('COM_BREEZINGFORMSNG_SIGNATURE_RESET_BUTTON').'</span></button>'."\n";
+		echo '<span class=\'bfSignature' . $mdata['bfName'] . '\'></span>';
+		echo '</div>';
+		echo '<input class="ff_elem" type="hidden" name="ff_nm_' . $mdata['bfName'] . '[]" value="" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+	}
+
+	private function renderStripeField(array $mdata, string $tabIndex, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void {
+		/* translatables */
+		if (isset($mdata['image_translation' . $this->language_tag]) && $mdata['image_translation' . $this->language_tag] != '') {
+			$mdata['image'] = $mdata['image_translation' . $this->language_tag];
+		}
+		/* translatables end */
+
+		$value = '';
+		$type = 'submit';
+		$src = '';
+		if ($mdata['image'] != '') {
+			$type = 'image';
+			$src = 'src="' . $mdata['image'] . '" ';
+		} else {
+			$value = 'value="PayPal" ';
+		}
+		if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
+			$onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Stripe\';' . $mdata['actionFunctionName'] . '(this,\'click\');" ';
+		} else {
+			$onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Stripe\';" ';
+		}
+		echo '<input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+	}
+
+	private function renderPayPalField(array $mdata, string $tabIndex, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void {
+		/* translatables */
+		if (isset($mdata['image_translation' . $this->language_tag]) && $mdata['image_translation' . $this->language_tag] != '') {
+			$mdata['image'] = $mdata['image_translation' . $this->language_tag];
+		}
+		/* translatables end */
+
+		$value = '';
+		$type = 'submit';
+		$src = '';
+		if ($mdata['image'] != '') {
+			$type = 'image';
+			$src = 'src="' . $mdata['image'] . '" ';
+		} else {
+			$value = 'value="PayPal" ';
+		}
+		if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
+			$onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'PayPal\';' . $mdata['actionFunctionName'] . '(this,\'click\');" ';
+		} else {
+			$onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'PayPal\';" ';
+		}
+		echo '<input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+	}
+
+	private function renderSofortueberweisungField(array $mdata, string $tabIndex, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void {
+		/* translatables */
+		if (isset($mdata['image_translation' . $this->language_tag]) && $mdata['image_translation' . $this->language_tag] != '') {
+			$mdata['image'] = $mdata['image_translation' . $this->language_tag];
+		}
+		/* translatables end */
+
+		$value = '';
+		$type = 'submit';
+		$src = '';
+		if ($mdata['image'] != '') {
+			$type = 'image';
+			$src = 'src="' . $mdata['image'] . '" ';
+		} else {
+			$value = 'value="Sofortueberweisung" ';
+		}
+		if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
+			$onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Sofortueberweisung\';' . $mdata['actionFunctionName'] . '(this,\'click\');" ';
+		} else {
+			$onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Sofortueberweisung\';" ';
+		}
+		echo '<input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
 	}
 
 	public function render() {

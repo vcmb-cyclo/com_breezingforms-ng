@@ -590,7 +590,7 @@ class PieceManager
 		}
 	}
 
-	private static function parseTestValue($value)
+	private static function parseTestValue(mixed $value): mixed
 	{
 		$value = trim((string) $value);
 		$lower = strtolower($value);
@@ -620,12 +620,12 @@ class PieceManager
 			return stripcslashes(substr($value, 1, -1));
 		}
 		if (is_numeric($value)) {
-			return strpos($value, '.') !== false ? (float) $value : (int) $value;
+			return str_contains($value, '.') ? (float) $value : (int) $value;
 		}
 		return $value;
 	}
 
-	private static function valuesEqual($actual, $expected)
+	private static function valuesEqual(mixed $actual, mixed $expected): bool
 	{
 		if ($actual === $expected) {
 			return true;

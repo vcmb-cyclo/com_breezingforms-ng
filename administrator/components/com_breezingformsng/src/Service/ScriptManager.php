@@ -121,7 +121,7 @@ class ScriptManager
 		$row = new ScriptTable($database);
 		if (count($ids)) foreach ($ids as $id) {
 			$row->load(intval($id));
-			$row->id       = NULL;
+			$row->id       = null;
 			$row->created = (new \Joomla\CMS\Date\Date())->toSql();
 			$row->created_by = (string) $this->app->getIdentity()->username;
 			$row->modified = $row->created;

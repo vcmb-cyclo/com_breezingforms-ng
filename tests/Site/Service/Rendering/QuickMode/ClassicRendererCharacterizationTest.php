@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Rendering\QuickMode;
 
 use HTML_facileFormsProcessor;
+use Joomla\CMS\Application\CMSApplication;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\ClassicRenderer;
@@ -22,6 +23,11 @@ if (!defined('JPATH_ADMINISTRATOR')) {
 if (!class_exists(HTML_facileFormsProcessor::class)) {
     require_once __DIR__ . '/../../../../../components/com_breezingformsng/src/Support/processor_facade.php';
 }
+
+require_once __DIR__ . '/joomla-htmlhelper-stub.php';
+require_once __DIR__ . '/joomla-text-stub.php';
+require_once __DIR__ . '/joomla-uri-stub.php';
+require_once __DIR__ . '/joomla-cmsapplication-stub.php';
 
 /**
  * Characterization tests for ClassicRenderer::process().
@@ -240,6 +246,168 @@ final class ClassicRendererCharacterizationTest extends TestCase
         $this->assertMatchesSnapshot('classic_bfNumberInput.html', $html);
     }
 
+    public function testSummarizeElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfSummarize', [
+            'dbId' => 51,
+            'hideLabel' => true,
+            'connectWith' => ['price', 'qty'],
+            'connectType' => 'multiply',
+            'emptyMessage' => '0',
+            'hideIfEmpty' => false,
+            'fieldCalc' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('classic_bfSummarize.html', $html);
+    }
+
+    public function testSubmitButtonElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfSubmitButton', [
+            'dbId' => 52,
+            'hideLabel' => true,
+            'src' => '',
+            'value' => 'Envoyer',
+            'actionClick' => 0,
+            'actionFunctionName' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('classic_bfSubmitButton.html', $html);
+    }
+
+    public function testStripeElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfStripe', [
+            'dbId' => 53,
+            'hideLabel' => true,
+            'image' => '',
+            'actionClick' => 0,
+            'actionFunctionName' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('classic_bfStripe.html', $html);
+    }
+
+    public function testPayPalElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfPayPal', [
+            'dbId' => 54,
+            'hideLabel' => true,
+            'image' => '',
+            'actionClick' => 0,
+            'actionFunctionName' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('classic_bfPayPal.html', $html);
+    }
+
+    public function testSofortueberweisungElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfSofortueberweisung', [
+            'dbId' => 55,
+            'hideLabel' => true,
+            'image' => '',
+            'actionClick' => 0,
+            'actionFunctionName' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('classic_bfSofortueberweisung.html', $html);
+    }
+
+    public function testCaptchaElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfCaptcha', [
+            'dbId' => 56,
+            'hideLabel' => true,
+            'width' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('classic_bfCaptcha.html', $html);
+    }
+
+    public function testSignatureElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfSignature', [
+            'dbId' => 57,
+            'bfName' => 'signature',
+            'hideLabel' => true,
+        ]));
+
+        $this->assertMatchesSnapshot('classic_bfSignature.html', $html);
+    }
+
+    public function testCalendarResponsiveElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfCalendarResponsive', [
+            'dbId' => 58,
+            'bfName' => 'eventdate',
+            'label' => 'Date',
+            'hint' => '',
+            'required' => true,
+            'value' => '',
+            'format' => '%Y-%m-%d',
+            'firstDay' => '1',
+        ]));
+
+        $this->assertMatchesSnapshot('classic_bfCalendarResponsive.html', $html);
+    }
+
+    public function testReCaptchaElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfReCaptcha', [
+            'dbId' => 59,
+            'hideLabel' => true,
+            'pubkey' => '6Lc-test-pubkey',
+            'invisibleCaptcha' => false,
+            'theme' => '',
+            'size' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('classic_bfReCaptcha.html', $html);
+    }
+
+    public function testCalendarElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfCalendar', [
+            'dbId' => 60,
+            'bfName' => 'birthdate',
+            'label' => 'Date de naissance',
+            'hint' => '',
+            'required' => false,
+            'value' => '',
+            'format' => '%Y-%m-%d',
+            'timeFormat' => false,
+            'singleHeader' => false,
+            'todayButton' => false,
+            'weekNumbers' => false,
+            'minYear' => '',
+            'maxYear' => '',
+            'firstDay' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('classic_bfCalendar.html', $html);
+    }
+
     /**
      * @param array<string, mixed> $overrides
      * @return array<string, mixed>
@@ -281,6 +449,7 @@ final class ClassicRendererCharacterizationTest extends TestCase
         $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();
         $processor->rowcount = 0;
         $processor->rows = [];
+        $processor->app = new CMSApplication();
 
         $renderer = (new ReflectionClass(ClassicRenderer::class))->newInstanceWithoutConstructor();
 

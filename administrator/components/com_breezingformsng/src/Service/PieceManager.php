@@ -40,7 +40,7 @@ class BFAdminPieceTestContext
 		$this->form_id = 0;
 	}
 
-	public function execPieceByName($name, ...$args)
+	public function execPieceByName($name, ...$args): mixed
 	{
 		if ($name === '') {
 			return null;
@@ -83,7 +83,7 @@ class PieceManager
 	) {
 	}
 
-	private static function buildIsolatedNamespace()
+	private static function buildIsolatedNamespace(): string
 	{
 		try {
 			return 'BFPieceTest_' . bin2hex(random_bytes(8));
@@ -92,7 +92,7 @@ class PieceManager
 		}
 	}
 
-	private static function normalizePieceCode($code)
+	private static function normalizePieceCode(mixed $code): string
 	{
 		$code = trim((string) $code);
 		$code = preg_replace('/^<\\?php\\s*/', '', $code);
@@ -100,7 +100,7 @@ class PieceManager
 		return $code;
 	}
 
-	private static function executePieceCode($row, $functionName, array $args, $database)
+	private static function executePieceCode($row, $functionName, array $args, $database): array
 	{
 		$context = new BFAdminPieceTestContext($database);
 		$result = null;
@@ -533,7 +533,7 @@ class PieceManager
 		$this->navigate($option, $pkg, $ids, 'next');
 	}
 
-	private function navigate($option, $pkg, $ids, $direction)
+	private function navigate($option, $pkg, $ids, $direction): void
 	{
 		$app = $this->app;
 		$database = $this->database;
@@ -633,7 +633,7 @@ class PieceManager
 		return json_encode($actual) === json_encode($expected);
 	}
 
-	private static function runUnitTests($row, $functionName, $database)
+	private static function runUnitTests($row, $functionName, $database): array
 	{
 		$lines = preg_split('/\\r?\\n/', (string) $row->unit_tests);
 		$tests = array();

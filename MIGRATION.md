@@ -39,9 +39,12 @@ restent inchangées afin de conserver la traçabilité des migrations précéden
   pure-logic) et `OnePageRenderer::bfFile` (condition flashUploader/html5
   entièrement commentée en prod — le widget flash s'affiche toujours, le
   fallback `<input type="file">` est du code mort inatteignable ; comportement
-  documenté tel quel, pas "corrigé"). Types encore non couverts sur
-  Bootstrap/Mobile/OnePage (déjà faits sur Classic) : bfSignature, bfStripe,
-  bfPayPal, bfSofortueberweisung, bfSummarize, bfHidden, bfNumberInput.
+  documenté tel quel, pas "corrigé"). Couverture ensuite étendue aux 7 types
+  restants (bfSignature, bfStripe, bfPayPal, bfSofortueberweisung,
+  bfSummarize, bfHidden, bfNumberInput) sur Bootstrap, Mobile et OnePage —
+  **couverture complète des 4 renderers close le 2026-08-29** : chaque type
+  de champ de chaque renderer a désormais au moins un test figeant sa sortie
+  actuelle, à l'exception des deux cas documentés ci-dessus.
 - [ ] Extraire ensuite la couche Strategy par type de champ, uniquement lorsque
   les quatre sorties correspondantes sont figées par tests.
 

@@ -58,7 +58,7 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
 {
     public function testNonQuickModeRendersWarningAndStopsBeforeRuntimeSetup(): void
     {
-        $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();
+        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
         $processor->formrow = (object) ['template_code_processed' => 'LegacyTemplate'];
 
         $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
@@ -76,6 +76,7 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
             '<div class="alert alert-warning">COM_BREEZINGFORMSNG_QUICKMODE_ONLY</div>',
             $html
         );
+        self::assertSame(0, $processor->permissionChecks);
     }
 
     public function testQuickModeStopsBeforeRenderingWhenProcessorCannotRun(): void

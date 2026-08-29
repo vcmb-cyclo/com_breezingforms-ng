@@ -136,6 +136,83 @@ trait BootstrapStyleFieldTrait
     /**
      * @param array<string, mixed> $mdata
      */
+    private function renderBootstrapStyleCalendarResponsiveField(array $mdata, string $label): void
+    {
+        /* translatables */
+        if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
+            $mdata['value'] = $mdata['value_translation' . $this->language_tag];
+        }
+        if (isset($mdata['format_translation' . $this->language_tag]) && $mdata['format_translation' . $this->language_tag] != '') {
+            $mdata['format'] = $mdata['format_translation' . $this->language_tag];
+        }
+        $icon = '';
+        if ($this->rootMdata['themebootstrapThemeEngine'] == 'bootstrap' && $this->rootMdata['themebootstrap'] == 'Azure') {
+            if (!isset($mdata['icon']) || $mdata['icon'] == '') {
+                $icon = '<i class="fas fa-calendar iconf--fumi" aria-hidden="true"></i>';
+            } else {
+                $icon = '<i class="fas ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8') . ' iconf--fumi" aria-hidden="true"></i>';
+            }
+        }
+        /* translatables end */
+        $mdata['format'] = $this->bfCalendarToPickadateFormat($mdata['format']);
+        $pickerFirstDay = $this->bfCalendarToPickadateFirstDay(isset($mdata['firstDay']) ? $mdata['firstDay'] : '');
+        $pickerSelectYears = $this->bfCalendarSelectYears($mdata);
+        echo '<div class="' . $this->bsClass('controls') . ' ' . $this->bsClass('form-inline') . '">';
+        echo '<div class="' . $this->bsClass('form-group') . ' ' . $this->bsClass('other-form-group') . '">';
+        echo $label;
+        echo $icon;
+        echo '<span class="' . $this->bsClass('nonform-control') . '">';
+
+        $size = '';
+        if ($mdata['size'] != '') {
+            $size = 'style="width:' . htmlentities(strip_tags($mdata['size'])) . '" ';
+        }
+
+        $exploded = explode('::', trim($mdata['value']));
+
+        $left = '';
+        $right = '';
+        if (count($exploded) == 2) {
+            $left = trim($exploded[0]);
+            $right = trim($exploded[1]);
+        } else {
+            $right = trim($exploded[0]);
+        }
+        if ($right === '') {
+            $right = '...';
+        }
+
+        echo '<div class="' . $this->bsClass('input-append') . '">';
+        echo '<input autocomplete="off" class="' . $this->bsClass('form-control') . ' ' . $this->bsClass('custom-form-control') . ' ff_elem" ' . $size . 'type="text" name="ff_nm_' . $mdata['bfName'] . '[]"  id="ff_elem' . $mdata['dbId'] . '" value="' . htmlentities($left, ENT_QUOTES, 'UTF-8') . '"/>' . "\n";
+        echo '<button style="cursor:pointer !important;" type="button" id="ff_elem' . $mdata['dbId'] . '_calendarButton" class="bfCalendar ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' button" value="' . htmlentities($right, ENT_QUOTES, 'UTF-8') . '"><i class="' . $this->bsClass('icon-calendar') . '"></i>' . htmlentities($right == '...' ? '' : $right, ENT_QUOTES, 'UTF-8') . '</button>' . "\n";
+        echo '</div>' . "\n";
+
+        if (!$this->hasResponsiveDatePicker) {
+            $this->p->app->getDocument()->getWebAssetManager()->addInlineScript(
+                'var bfPickerMinusYearIcon = ' . json_encode(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/minusyear.png') . ';'
+                . "\n" . 'var bfPickerPlusYearIcon = ' . json_encode(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/plusyear.png') . ';'
+            );
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-legacy-style.js');
+            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js');
+        }
+
+        echo '<script type="text/javascript">bfInitCalendarResponsive(' . json_encode((int) $mdata['dbId']) . ', ' . json_encode([
+            'format' => $mdata['format'],
+            'selectYears' => $pickerSelectYears,
+            'firstDay' => $pickerFirstDay,
+            'hasYearScroller' => true,
+        ]) . ');</script>' . "\n";
+
+        $this->hasResponsiveDatePicker = true;
+
+        echo '</span>';
+        echo '</div>';
+        echo '</div>';
+    }
+
+    /**
+     * @param array<string, mixed> $mdata
+     */
     private function renderBootstrapStyleTextfieldField(array $mdata, string $label, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
     {
         $type = 'text';

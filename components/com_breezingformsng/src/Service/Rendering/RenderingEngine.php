@@ -288,11 +288,7 @@ final class RenderingEngine
             } else {
 
                 if ($this->processor->isMobile) {
-
-                    $quickMode = new MobileRenderer($this->processor);
-                    if (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile']) {
-                        $quickMode->forceMobileUrl = isset($rootMdata['forceMobileUrl']) ? $rootMdata['forceMobileUrl'] : 'index.php';
-                    }
+                    $quickMode = $this->createMobileRenderer($rootMdata);
                 }
             }
         }
@@ -2359,6 +2355,22 @@ final class RenderingEngine
         }
 
         return new ClassicRenderer($this->processor);
+    }
+
+    /**
+     * Create and configure the renderer used for a mobile QuickMode request.
+     *
+     * @param array<string, mixed> $rootMdata
+     */
+    private function createMobileRenderer(array $rootMdata): MobileRenderer
+    {
+        $quickMode = new MobileRenderer($this->processor);
+
+        if (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile']) {
+            $quickMode->forceMobileUrl = isset($rootMdata['forceMobileUrl']) ? $rootMdata['forceMobileUrl'] : 'index.php';
+        }
+
+        return $quickMode;
     }
 
     // view

@@ -927,6 +927,36 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertStringContainsString('COM_BREEZINGFORMSNG_PROCESS_AFPIECE After library piece', $processor->executedPieces[0]['name']);
     }
 
+    public function testFormRenderingClosureMatchesLegacyWrapperMode(): void
+    {
+        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+        $method = (new ReflectionClass($engine))->getMethod('closeFormRendering');
+
+        $processor->legacy_wrap = false;
+        ob_start();
+        try {
+            $method->invoke($engine);
+            $modernHtml = ob_get_contents();
+        } finally {
+            ob_end_clean();
+        }
+
+        $processor->legacy_wrap = true;
+        ob_start();
+        try {
+            $method->invoke($engine);
+            $legacyHtml = ob_get_contents();
+        } finally {
+            ob_end_clean();
+        }
+
+        self::assertSame("</div><!-- form end -->\n", $modernHtml);
+        self::assertStringContainsString('bfPage-bl', $legacyHtml);
+        self::assertStringContainsString('<!-- form end -->', $legacyHtml);
+    }
+
     public function testHeaderRendersProcessorVariablesThroughSharedHeaderRenderer(): void
     {
         $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();

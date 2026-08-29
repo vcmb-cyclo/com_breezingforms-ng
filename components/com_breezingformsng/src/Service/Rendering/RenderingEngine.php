@@ -2104,11 +2104,7 @@ final class RenderingEngine
         if ($this->executeAfterFormPiece())
             return;
 
-        if ($this->processor->legacy_wrap) {
-            echo '</div></div></div><div class="bfPage-bl"><div class="bfPage-br"><div class="bfPage-b"></div></div></div></div><!-- form end -->' . nl();
-        } else {
-            echo '</div><!-- form end -->' . nl();
-        }
+        $this->closeFormRendering();
         if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT) {
             $this->processor->dumpTrace();
             ob_end_flush();
@@ -2282,6 +2278,17 @@ final class RenderingEngine
 
         $this->processor->status = $this->processor->app->getInput()->getCmd('ff_status', '');
         $this->processor->message = $this->processor->app->getInput()->getString('ff_message', '');
+    }
+
+    private function closeFormRendering(): void
+    {
+        if ($this->processor->legacy_wrap) {
+            echo '</div></div></div><div class="bfPage-bl"><div class="bfPage-br"><div class="bfPage-b"></div></div></div></div><!-- form end -->' . nl();
+
+            return;
+        }
+
+        echo '</div><!-- form end -->' . nl();
     }
 
     private function executeBeforeFormPiece(): bool

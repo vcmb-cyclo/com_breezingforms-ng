@@ -31,8 +31,17 @@ restent inchangées afin de conserver la traçabilité des migrations précéden
 - [ ] Compléter `RenderingEngine::view()` avant toute extraction : header,
   toolbar, arbre de nœuds, aperçu, permissions, sélection mobile et sorties
   anticipées.
-- [ ] Étendre les filets des quatre renderers aux familles de champs à risque
-  (textarea, groupes, select, upload, CAPTCHA, calendrier et submit).
+- [x] Étendre les filets des quatre renderers aux familles de champs à risque
+  (textarea, groupes, select, upload, CAPTCHA, calendrier et submit) — clos
+  le 2026-08-29. Exceptions documentées dans les tests eux-mêmes plutôt que
+  contournées : `MobileRenderer::bfCalendar` (implémentation native propre,
+  `LayoutHelper::render()` + connexion DB réelle, hors périmètre du harnais
+  pure-logic) et `OnePageRenderer::bfFile` (condition flashUploader/html5
+  entièrement commentée en prod — le widget flash s'affiche toujours, le
+  fallback `<input type="file">` est du code mort inatteignable ; comportement
+  documenté tel quel, pas "corrigé"). Types encore non couverts sur
+  Bootstrap/Mobile/OnePage (déjà faits sur Classic) : bfSignature, bfStripe,
+  bfPayPal, bfSofortueberweisung, bfSummarize, bfHidden, bfNumberInput.
 - [ ] Extraire ensuite la couche Strategy par type de champ, uniquement lorsque
   les quatre sorties correspondantes sont figées par tests.
 
@@ -43,7 +52,7 @@ distincts :
 
 | Lot | Périmètre | Dépendance | Conflit probable |
 |---|---|---|---|
-| A | Filets Bootstrap, Mobile et OnePage supplémentaires | `bfTextfield` couvert | Faible |
+| A | ~~Filets Bootstrap, Mobile et OnePage supplémentaires~~ — **clos le 2026-08-29** | — | — |
 | B | ~~Filets Classic supplémentaires~~ — **clos le 2026-08-29** : 21/21 types couverts et extraits | — | — |
 | C | Tests purs callbacks, uploads, exports et parsers | Aucun runtime Joomla réel | Faible |
 | D | Branches simples de `RenderingEngine::view()` | Harness/stubs existants | Moyen |

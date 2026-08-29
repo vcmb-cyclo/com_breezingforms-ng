@@ -52,6 +52,9 @@ final class BootstrapRendererCharacterizationTest extends TestCase
         'radio' => 'form-check-label',
         'checkbox' => 'form-check-label',
         'form-select' => 'form-select',
+        'other-form-group' => 'other-form-group',
+        'btn' => 'btn',
+        'btn-primary' => 'btn-primary',
     ];
 
     public function testTextfieldElement(): void
@@ -177,6 +180,22 @@ final class BootstrapRendererCharacterizationTest extends TestCase
         ]));
 
         $this->assertMatchesSnapshot('bootstrap_bfSelect.html', $html);
+    }
+
+    public function testSubmitButtonElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfSubmitButton', [
+            'dbId' => 52,
+            'hideLabel' => true,
+            'src' => '',
+            'value' => 'Envoyer',
+            'actionClick' => 0,
+            'actionFunctionName' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfSubmitButton.html', $html);
     }
 
     /**

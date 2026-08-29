@@ -149,6 +149,22 @@ final class MobileRendererCharacterizationTest extends TestCase
         self::assertStringContainsString('<option value="be">Belgique</option>', $html);
     }
 
+    public function testSubmitButtonElement(): void
+    {
+        $html = $this->renderElement('bfSubmitButton', [
+            'dbId' => 52,
+            'hideLabel' => true,
+            'src' => '',
+            'value' => 'Envoyer',
+            'actionClick' => 0,
+            'actionFunctionName' => '',
+        ]);
+
+        self::assertStringContainsString('type="submit"', $html);
+        self::assertStringContainsString('name="ff_nm_field[]"', $html);
+        self::assertStringContainsString('Envoyer</span>', $html);
+    }
+
     /**
      * @param array<string, mixed> $overrides
      */

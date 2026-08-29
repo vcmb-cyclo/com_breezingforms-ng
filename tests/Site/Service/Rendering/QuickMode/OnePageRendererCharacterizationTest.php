@@ -152,6 +152,22 @@ final class OnePageRendererCharacterizationTest extends TestCase
         self::assertStringContainsString('<option value="be">Belgique</option>', $html);
     }
 
+    public function testSubmitButtonElement(): void
+    {
+        $html = $this->renderElement('bfSubmitButton', [
+            'dbId' => 52,
+            'hideLabel' => true,
+            'src' => '',
+            'value' => 'Envoyer',
+            'actionClick' => 0,
+            'actionFunctionName' => '',
+        ]);
+
+        self::assertStringContainsString('type="submit"', $html);
+        self::assertStringContainsString('name="ff_nm_field[]"', $html);
+        self::assertStringContainsString('>Envoyer<', $html);
+    }
+
     /**
      * @param array<string, mixed> $overrides
      */
@@ -228,6 +244,9 @@ final class OnePageRendererCharacterizationTest extends TestCase
             'radio' => 'form-check-label',
             'checkbox' => 'form-check-label',
             'form-select' => 'form-select',
+            'other-form-group' => 'other-form-group',
+            'btn' => 'btn',
+            'btn-primary' => 'btn-primary',
         ]]);
 
         return $renderer;

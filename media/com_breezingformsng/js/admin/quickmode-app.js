@@ -547,7 +547,7 @@
                             attributes: {
                                 "class": 'bfQuickModeSectionClass',
                                 id: id,
-                                mdata: JQuery.toJSON({ deletable: true, type: 'section' })
+                                mdata: JSON.stringify({ deletable: true, type: 'section' })
                             },
                             properties: {
                                 bfType: 'normal',
@@ -729,7 +729,7 @@
                             attributes: {
                                 "class": 'bfQuickModePageClass',
                                 id: id,
-                                mdata: JQuery.toJSON({ deletable: true, type: 'page' })
+                                mdata: JSON.stringify({ deletable: true, type: 'page' })
                             },
                             properties: { type: 'page', pageNumber: pageNumber, pageIntro: '' },
                             state: "open",

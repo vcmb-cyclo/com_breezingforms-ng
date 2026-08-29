@@ -11,6 +11,7 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Callback;
 
 use Securimage;
 use Joomla\CMS\Application\CMSApplication;
+use Vcmb\Component\BreezingformsNG\Administrator\Helper\VendorHelper;
 
 /**
  * Securimage captcha validation callback (checkCaptcha=1).
@@ -61,7 +62,7 @@ final class CaptchaCallback
 
     private function createSecurimage(): Securimage
     {
-        require_once JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/securimage/securimage.php';
+        VendorHelper::load();
 
         return new Securimage();
     }

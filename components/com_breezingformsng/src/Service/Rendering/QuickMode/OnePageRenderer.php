@@ -1456,35 +1456,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                         break;
 
                     case 'bfStripe':
-                        /* translatables */
-                        if (isset($mdata['image_translation' . $this->language_tag]) && $mdata['image_translation' . $this->language_tag] != '') {
-                            $mdata['image'] = $mdata['image_translation' . $this->language_tag];
-                        }
-                        /* translatables end */
-                        echo '<div class="' . $this->bsClass('controls') . ' ' . $this->bsClass('form-inline') . '">';
-                        echo '<div class="' . $this->bsClass('form-group') . ' ' . $this->bsClass('other-form-group') . '">';
-                        echo $label;
-                        echo '<span class="' . $this->bsClass('nonform-control') . '">';
-
-                        $value = '';
-                        $type = 'submit';
-                        $src = '';
-                        if ($mdata['image'] != '') {
-                            $type = 'image';
-                            $src = 'src="' . $mdata['image'] . '" alt="Stripe" ';
-                        } else {
-                            $value = 'value="Stripe" ';
-                        }
-                        if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
-                            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Stripe\';' . $mdata['actionFunctionName'] . '(this,\'click\');" ';
-                        } else {
-                            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Stripe\';" ';
-                        }
-                        echo '<input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
-
-                        echo '</span>';
-                        echo '</div>';
-                        echo '</div>';
+                        $this->renderBootstrapStyleStripeField($mdata, $label, $tabIndex, $onblur, $onchange, $onfocus, $onselect, $readonly);
                         break;
 
                     case 'bfPayPal':

@@ -148,7 +148,7 @@ class PieceManager
 		);
 	}
 
-	function edit($option, $pkg, $ids)
+	public function edit($option, $pkg, $ids)
 	{
 		$database = $this->database;
 		ArrayHelper::toInteger($ids);
@@ -171,7 +171,7 @@ class PieceManager
 
 
 	// ✅ FORCER le champ code en RAW (conserve < et >)
-	function save($option, $pkg)
+	public function save($option, $pkg)
 	{
 		$app = $this->app;
 		$post = $app->getInput()->post;
@@ -220,13 +220,13 @@ class PieceManager
 		$app->redirect("index.php?option=$option&task=pieces.edit&pkg=$pkg&ids[]=" . (int) $row->id);
 	}
 
-	function cancel($option, $pkg)
+	public function cancel($option, $pkg)
 	{
 		$this->app->redirect("index.php?option=$option&view=pieces&pkg=$pkg");
 	} // cancel
 
 
-	function copy($option, $pkg, $ids)
+	public function copy($option, $pkg, $ids)
 	{
 		$database = $this->database;
 		ArrayHelper::toInteger($ids);
@@ -248,7 +248,7 @@ class PieceManager
 	} // copy
 
 
-	function del($option, $pkg, $ids)
+	public function del($option, $pkg, $ids)
 	{
 		try {
 			$total = $this->model->deleteByIds($ids);
@@ -267,7 +267,7 @@ class PieceManager
 	} // del
 
 
-	function publish($option, $pkg, $ids, $publish)
+	public function publish($option, $pkg, $ids, $publish)
 	{
 		try {
 			$this->model->publishByIds($ids, (bool) $publish);
@@ -280,7 +280,7 @@ class PieceManager
 	} // publish
 
 
-	function listitems($option, $pkg)
+	public function listitems($option, $pkg)
 	{
 		try {
 			$pkgs = $this->model->getPackages();
@@ -368,7 +368,7 @@ class PieceManager
 		Renderer::listitems($option, $rows, $pkglist, $pkg, $search, $total, $limit, $limitstart, $pageSizes);
 	} // listitems
 
-	function test($option, $pkg, $ids)
+	public function test($option, $pkg, $ids)
 	{
 		$database = $this->database;
 		ArrayHelper::toInteger($ids);
@@ -421,7 +421,7 @@ class PieceManager
 		Renderer::test($option, $pkg, $row, $functionName, $params, $paramDefaults, array(), null, '', '', 0, $autoRun, array(), $testMode, array());
 	}
 
-	function testrun($option, $pkg, $ids)
+	public function testrun($option, $pkg, $ids)
 	{
 		$app = $this->app;
 		$database = $this->database;
@@ -505,7 +505,7 @@ class PieceManager
 		Renderer::test($option, $pkg, $row, $functionName, $paramNames, $paramDefaults, $paramValues, $result, $output, $error, $safeMode, false, $errorDetails, $testMode, $unitTestResult, $autoOpened);
 	}
 
-	function testrunajax($option, $pkg, $ids)
+	public function testrunajax($option, $pkg, $ids)
 	{
 		$app = $this->app;
 		$app->setHeader('Content-Type', 'application/json; charset=utf-8', true);
@@ -523,12 +523,12 @@ class PieceManager
 		$app->close();
 	}
 
-	function prev($option, $pkg, $ids)
+	public function prev($option, $pkg, $ids)
 	{
 		$this->navigate($option, $pkg, $ids, 'prev');
 	}
 
-	function next($option, $pkg, $ids)
+	public function next($option, $pkg, $ids)
 	{
 		$this->navigate($option, $pkg, $ids, 'next');
 	}

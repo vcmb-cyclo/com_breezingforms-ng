@@ -43,17 +43,17 @@ class PdfDocument extends \TCPDF
 
     }
 
-    function setFormName($name){
+    public function setFormName($name){
 
         $this->form_name = $name;
     }
 
-    function setMailback($mailback){
+    public function setMailback($mailback){
 
         $this->mailback = $mailback;
     }
 
-    function setWhich($which = 'attachment'){
+    public function setWhich($which = 'attachment'){
         $this->which = $which;
     }
 
@@ -81,7 +81,7 @@ class PdfDocument extends \TCPDF
         return $name;
     }
 
-    function Header(){
+    public function Header(){
 
         $pdf = $this;
 
@@ -143,7 +143,7 @@ class PdfDocument extends \TCPDF
         }
     }
 
-    function Footer(){
+    public function Footer(){
 
         $pdf = $this;
 
@@ -205,7 +205,7 @@ class PdfDocument extends \TCPDF
         }
     }
 
-    function getHeaderTemplate(){
+    public function getHeaderTemplate(){
 
         $file = '';
 
@@ -253,7 +253,7 @@ class PdfDocument extends \TCPDF
         return $file;
     }
 
-    function getFooterTemplate(){
+    public function getFooterTemplate(){
 
         $file = '';
 
@@ -300,8 +300,8 @@ class PdfDocument extends \TCPDF
         return $file;
     }
 
-    function endsWith($haystack, $needle)
+    public function endsWith(string $haystack, string $needle): bool
     {
-        return $needle === "" || substr($haystack, -strlen($needle)) === $needle;
+        return str_ends_with($haystack, $needle);
     }
 }

@@ -36,7 +36,7 @@ class ScriptManager
 	) {
 	}
 
-	function edit($option, $pkg, $ids)
+	public function edit($option, $pkg, $ids)
 	{
 		$database = $this->database;
 		ArrayHelper::toInteger($ids);
@@ -60,7 +60,7 @@ class ScriptManager
 
 
 	// ✅ FORCER le champ code en RAW (conserve < et >)
-	function save($option, $pkg)
+	public function save($option, $pkg)
 	{
 		$app = $this->app;
 		$post = $app->getInput()->post;
@@ -109,12 +109,12 @@ class ScriptManager
 	}
 
 
-	function cancel($option, $pkg)
+	public function cancel($option, $pkg)
 	{
 		$this->app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 	} // cancel
 
-	function copy($option, $pkg, $ids)
+	public function copy($option, $pkg, $ids)
 	{
 		$database = $this->database;
 		$total = count($ids);
@@ -133,7 +133,7 @@ class ScriptManager
 		$this->app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 	} // copy
 
-	function del($option, $pkg, $ids)
+	public function del($option, $pkg, $ids)
 	{
 		try {
 			$total = $this->model->deleteByIds($ids);
@@ -151,7 +151,7 @@ class ScriptManager
 		$this->app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 	} // del
 
-	function publish($option, $pkg, $ids, $publish)
+	public function publish($option, $pkg, $ids, $publish)
 	{
 		try {
 			$this->model->publishByIds($ids, (bool) $publish);
@@ -163,7 +163,7 @@ class ScriptManager
 		$this->app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 	} // publish
 
-	function listitems($option, $pkg)
+	public function listitems($option, $pkg)
 	{
 		$app = $this->app;
 		$input = $app->getInput();
@@ -252,7 +252,7 @@ class ScriptManager
 		Renderer::listitems($option, $rows, $pkglist, $pkg, $search, $total, $limit, $limitstart, $pageSizes);
 	} // listitems
 
-	function test($option, $pkg, $ids)
+	public function test($option, $pkg, $ids)
 	{
 		$app = $this->app;
 		$database = $this->database;
@@ -294,12 +294,12 @@ class ScriptManager
 		Renderer::test($option, $pkg, $row, $functionName, $params, $paramDefaults, $autoRun, $testMode);
 	}
 
-	function prev($option, $pkg, $ids)
+	public function prev($option, $pkg, $ids)
 	{
 		$this->navigate($option, $pkg, $ids, 'prev');
 	}
 
-	function next($option, $pkg, $ids)
+	public function next($option, $pkg, $ids)
 	{
 		$this->navigate($option, $pkg, $ids, 'next');
 	}

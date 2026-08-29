@@ -658,7 +658,10 @@ class HTML_facileFormsProcessor
         return $this->exportEngine()->logToDatabase($cbResult);
     }
 
-    public function random_str($length, $keyspace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+    public function random_str(
+        int $length,
+        string $keyspace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    ): string
     {
         return $this->exportEngine()->random_str($length, $keyspace);
     }
@@ -679,7 +682,7 @@ class HTML_facileFormsProcessor
         );
     }
 
-    public function endsWith($haystack, $needle)
+    public function endsWith(string $haystack, string $needle): bool
     {
         return $this->exportEngine()->endsWith($haystack, $needle);
     }

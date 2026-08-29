@@ -65,7 +65,7 @@ final class ExportEngine
     ) {
     }
 
-    function logToDatabase($cbResult = null)
+    public function logToDatabase($cbResult = null)
     { // CONTENTBUILDER
         global $ff_config;
         if ($this->processor->dying)
@@ -589,7 +589,7 @@ final class ExportEngine
 
     // logToDatabase
 
-    function sendMail($from, $fromname, $recipient, $subject, $body, $attachment = NULL, $html = NULL, $cc = NULL, $bcc = NULL, $alt_sender = '')
+    public function sendMail($from, $fromname, $recipient, $subject, $body, $attachment = null, $html = null, $cc = null, $bcc = null, $alt_sender = '')
     {
         if ($this->processor->dying)
             return;
@@ -641,7 +641,7 @@ final class ExportEngine
         return str_ends_with($haystack, $needle);
     }
 
-    function exppdf($filter = array(), $mailback = false, $translate = true)
+    public function exppdf($filter = [], $mailback = false, $translate = true)
     {
         global $ff_compath;
 
@@ -832,7 +832,7 @@ final class ExportEngine
         return $pdfname;
     }
 
-    function expcsv($filter = array(), $mailback = false)
+    public function expcsv($filter = [], $mailback = false)
     {
         global $ff_config;
 
@@ -934,7 +934,7 @@ final class ExportEngine
         return $csvname;
     }
 
-    function expxml($filter = array(), $mailback = false, $translate = false)
+    public function expxml($filter = [], $mailback = false, $translate = false)
     {
         global $ff_compath, $ff_version, $mosConfig_fileperms;
 

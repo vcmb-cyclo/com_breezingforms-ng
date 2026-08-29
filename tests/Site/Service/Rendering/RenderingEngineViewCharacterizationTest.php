@@ -327,6 +327,12 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
             ]));
             self::assertTrue($processor->isMobile);
             self::assertTrue($processor->legacy_wrap);
+
+            self::assertTrue($method->invoke($engine, [
+                'mobileEnabled' => false,
+                'forceMobile' => false,
+            ]));
+            self::assertFalse($processor->isMobile);
         } finally {
             if ($previousUserAgent === null) {
                 unset($_SERVER['HTTP_USER_AGENT']);

@@ -465,6 +465,13 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
             'clear:com_breezingformsng.mobile',
             'set:com_breezingformsng.mobile:1',
         ], $session->actions);
+
+        $input->values = [];
+        $method->invoke($engine);
+        self::assertSame([
+            'clear:com_breezingformsng.mobile',
+            'set:com_breezingformsng.mobile:1',
+        ], $session->actions);
     }
 
     public function testHeaderRendersProcessorVariablesThroughSharedHeaderRenderer(): void

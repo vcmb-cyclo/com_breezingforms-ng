@@ -45,6 +45,13 @@ final class BootstrapRendererCharacterizationTest extends TestCase
         'form-group' => 'bf-form-group mb-3',
         'icon-question-sign' => 'fas fa-question-circle',
         'icon-asterisk' => 'fas fa-asterisk',
+        'nonform-control' => 'nonform-control',
+        'radio-form-group' => 'radio-form-group',
+        'checkbox-form-group' => 'checkbox-form-group',
+        'inline' => 'form-check-inline',
+        'radio' => 'form-check-label',
+        'checkbox' => 'form-check-label',
+        'form-select' => 'form-select',
     ];
 
     public function testTextfieldElement(): void
@@ -87,6 +94,89 @@ final class BootstrapRendererCharacterizationTest extends TestCase
         ]));
 
         $this->assertMatchesSnapshot('bootstrap_bfTextfield_prefilled.html', $html);
+    }
+
+    public function testTextareaElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfTextarea', [
+            'dbId' => 44,
+            'bfName' => 'message',
+            'label' => 'Message',
+            'required' => true,
+            'width' => '',
+            'height' => '',
+            'value' => "Ligne 1\nLigne 2",
+            'is_html' => false,
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfTextarea.html', $html);
+    }
+
+    public function testRadioGroupElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfRadioGroup', [
+            'dbId' => 48,
+            'bfName' => 'gender',
+            'label' => 'Civilité',
+            'required' => true,
+            'wrap' => true,
+            'group' => "0;Madame;mme\n1;Monsieur;mr",
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfRadioGroup.html', $html);
+    }
+
+    public function testCheckboxGroupElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfCheckboxGroup', [
+            'dbId' => 49,
+            'bfName' => 'interests',
+            'label' => "Centres d'intérêt",
+            'wrap' => false,
+            'group' => "0;Route;road\n1;VTT;mtb\n0;Piste;track",
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfCheckboxGroup.html', $html);
+    }
+
+    public function testCheckboxElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfCheckbox', [
+            'dbId' => 46,
+            'bfName' => 'accept',
+            'label' => "J'accepte les conditions",
+            'required' => true,
+            'checked' => false,
+            'value' => '1',
+            'mailbackAccept' => false,
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfCheckbox.html', $html);
+    }
+
+    public function testSelectElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfSelect', [
+            'dbId' => 47,
+            'bfName' => 'country',
+            'label' => 'Pays',
+            'multiple' => false,
+            'width' => '',
+            'height' => '',
+            'list' => "1;France;fr\n0;Belgique;be\n0;Suisse;ch",
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfSelect.html', $html);
     }
 
     /**

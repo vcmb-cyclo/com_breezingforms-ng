@@ -180,6 +180,66 @@ final class ClassicRendererCharacterizationTest extends TestCase
         $this->assertMatchesSnapshot('classic_bfSelect.html', $html);
     }
 
+    public function testRadioGroupElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfRadioGroup', [
+            'dbId' => 48,
+            'bfName' => 'gender',
+            'label' => 'Civilité',
+            'hint' => '',
+            'required' => true,
+            'wrap' => true,
+            'group' => "0;Madame;mme\n1;Monsieur;mr",
+        ]));
+
+        $this->assertMatchesSnapshot('classic_bfRadioGroup.html', $html);
+    }
+
+    public function testCheckboxGroupElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfCheckboxGroup', [
+            'dbId' => 49,
+            'bfName' => 'interests',
+            'label' => 'Centres d\'intérêt',
+            'hint' => '',
+            'required' => false,
+            'wrap' => false,
+            'group' => "0;Route;road\n1;VTT;mtb\n0;Piste;track",
+        ]));
+
+        $this->assertMatchesSnapshot('classic_bfCheckboxGroup.html', $html);
+    }
+
+    /**
+     * bfNumberInput's `size` attribute path (RuntimeAssetLoader::script())
+     * touches $this->p->app - out of scope for this fixture, so `size` stays
+     * empty here to keep this a pure string-building assertion, same as the
+     * other covered types.
+     */
+    public function testNumberInputElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfNumberInput', [
+            'dbId' => 50,
+            'bfName' => 'age',
+            'label' => 'Âge',
+            'hint' => '',
+            'required' => false,
+            'range' => false,
+            'value' => '',
+            'step' => 1,
+            'max' => 120,
+            'min' => 0,
+        ]));
+
+        $this->assertMatchesSnapshot('classic_bfNumberInput.html', $html);
+    }
+
     /**
      * @param array<string, mixed> $overrides
      * @return array<string, mixed>

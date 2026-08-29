@@ -61,7 +61,7 @@ final class RenderingEngine
     {
     }
 
-    function header()
+    public function header()
     {
         global $ff_config;
 
@@ -107,7 +107,7 @@ final class RenderingEngine
 
     // header
 
-    function cbCreatePathByTokens($path, array $rows, $field_name)
+    public function cbCreatePathByTokens($path, array $rows, $field_name)
     {
         $identity = $this->processor->app->getIdentity();
 
@@ -127,7 +127,7 @@ final class RenderingEngine
         );
     }
 
-    function makeSafeFolder($path)
+    public function makeSafeFolder($path)
     {
         return $this->tokenizedDirectoryResolver()->makeSafeFolder((string) $path);
     }
@@ -144,7 +144,7 @@ final class RenderingEngine
             new ProcessorHeaderRenderer(new JavascriptValueExporter());
     }
 
-    function cbCheckPermissions()
+    public function cbCheckPermissions()
     {
         // CONTENTBUILDER BEGIN
 
@@ -241,7 +241,7 @@ final class RenderingEngine
         // CONTENTBUILDER END
     }
 
-    function view()
+    public function view()
     {
         global $ff_mospath, $ff_mossite, $my;
         global $ff_config, $ff_version, $ff_comsite, $ff_otherparams;

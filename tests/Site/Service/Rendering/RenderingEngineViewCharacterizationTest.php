@@ -35,6 +35,10 @@ if (!function_exists('Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering
     eval('namespace Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering; function nl(): string { return "\\n"; }');
 }
 
+if (!class_exists('Joomla\\Database\\ParameterType')) {
+    eval('namespace Joomla\\Database; final class ParameterType { public const INTEGER = 1; }');
+}
+
 final class RenderingEngineProcessorDouble extends HTML_facileFormsProcessor
 {
     public int $permissionChecks = 0;
@@ -554,6 +558,70 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         (new ReflectionClass($engine))->getMethod('linkSubmittedOnload')->invokeArgs($engine, [&$library, &$linked]);
 
         self::assertSame([], $processor->linkedCallbacks);
+    }
+
+    public function testSubmittedOnloadResolvesLibraryCallback(): void
+    {
+        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
+        $processor->status = 2;
+        $processor->message = 'saved';
+        $processor->showgrid = false;
+        $processor->formrow = (object) [
+            'name' => 'contact',
+            'script2cond' => 1,
+            'script2id' => 18,
+            'heightmode' => 0,
+            'height' => 0,
+        ];
+        $processor->database = new class {
+            public function getQuery(bool $new = false): object
+            {
+                return new class {
+                    public function select(string $columns): self
+                    {
+                        return $this;
+                    }
+
+                    public function from(string $table): self
+                    {
+                        return $this;
+                    }
+
+                    public function where(string $condition): self
+                    {
+                        return $this;
+                    }
+
+                    public function bind(string $key, int $value, mixed $type): self
+                    {
+                        return $this;
+                    }
+                };
+            }
+
+            public function quoteName(string $name): string
+            {
+                return $name;
+            }
+
+            public function setQuery(object $query): void
+            {
+            }
+
+            public function loadResult(): string
+            {
+                return 'ff_library_submitted';
+            }
+        };
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+        $library = [];
+        $linked = [];
+
+        (new ReflectionClass($engine))->getMethod('linkSubmittedOnload')->invokeArgs($engine, [&$library, &$linked]);
+
+        self::assertCount(1, $processor->linkedCallbacks);
+        self::assertStringContainsString('ff_library_submitted(2,"saved");', $processor->linkedCallbacks[0]['code']);
     }
 
     public function testHeaderRendersProcessorVariablesThroughSharedHeaderRenderer(): void

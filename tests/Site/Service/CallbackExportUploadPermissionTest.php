@@ -27,6 +27,15 @@ final class CallbackExportUploadPermissionTest extends TestCase
         self::assertFalse($engine->endsWith('submission.csv', '.xml'));
     }
 
+    public function testExportHelpersHandleEmptySuffixAndRejectEmptyAlphabet(): void
+    {
+        $engine = (new ReflectionClass(ExportEngine::class))->newInstanceWithoutConstructor();
+
+        self::assertTrue($engine->endsWith('submission.csv', ''));
+        $this->expectException(\ValueError::class);
+        $engine->random_str(1, '');
+    }
+
     public function testUploadStorageReportsMissingDirectoryWithoutMovingFile(): void
     {
         $moved = false;
@@ -115,6 +124,11 @@ final class CallbackExportUploadPermissionTest extends TestCase
         );
     }
 
+    public function testImageTypeReturnsFalseForMissingFile(): void
+    {
+        self::assertFalse((new ImageResizer())->imageType('/tmp/bfng-missing-image-' . bin2hex(random_bytes(4))));
+    }
+
     public function testFlashUploadValidationTraversesNestedElements(): void
     {
         $callback = (new ReflectionClass(FlashUploadCallback::class))->newInstanceWithoutConstructor();
@@ -151,7 +165,10 @@ final class CallbackExportUploadPermissionTest extends TestCase
             self::assertStringContainsString('getInput()', $source, $callback);
         }
 
-        foreach (['DisplayController.php', 'ScriptsController.php', 'PiecesController.php'] as $controller) {
+        foreach (
+            ['AboutController.php', 'DisplayController.php', 'ScriptsController.php', 'PiecesController.php']
+            as $controller
+        ) {
             $source = $this->read("administrator/components/com_breezingformsng/src/Controller/{$controller}");
 
             self::assertStringContainsString("authorise('core.manage', 'com_breezingformsng')", $source, $controller);

@@ -320,6 +320,29 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertFalse($processor->legacy_wrap);
     }
 
+    public function testQuickModeMetadataLoadsPropertiesFromEncodedTemplate(): void
+    {
+        $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();
+        $processor->formrow = (object) [
+            'template_code' => base64_encode(json_encode([
+                'properties' => [
+                    'themebootstrapThemeEngine' => 'bootstrap',
+                    'themebootstrapMode' => true,
+                ],
+                'elements' => [['type' => 'bfTextfield']],
+            ], JSON_THROW_ON_ERROR)),
+        ];
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+
+        $method = (new ReflectionClass($engine))->getMethod('loadQuickModeMetadata');
+
+        self::assertSame([
+            'themebootstrapThemeEngine' => 'bootstrap',
+            'themebootstrapMode' => true,
+        ], $method->invoke($engine));
+    }
+
     public function testHeaderRendersProcessorVariablesThroughSharedHeaderRenderer(): void
     {
         $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();

@@ -46,18 +46,33 @@ restent inchangées afin de conserver la traçabilité des migrations précéden
   de champ de chaque renderer a désormais au moins un test figeant sa sortie
   actuelle, à l'exception des deux cas documentés ci-dessus.
 - [x] Extraire ensuite la couche Strategy par type de champ, uniquement lorsque
-  les quatre sorties correspondantes sont figées par tests — **en cours,
-  démarré le 2026-08-29** (garde levée explicitement, voir ci-dessous).
-  `HiddenFieldTrait` partagé par les 4 renderers (`bfHidden`).
+  les quatre sorties correspondantes sont figées par tests — **balayage
+  Bootstrap/OnePage clos le 2026-08-29** (garde levée explicitement, voir
+  ci-dessous). `HiddenFieldTrait` partagé par les 4 renderers (`bfHidden`).
   `BootstrapStyleFieldTrait` partagé par Bootstrap et OnePage seulement
   (même convention Bootstrap 5 via `$this->bsClass()`, absente de Classic
-  et différente sur Mobile) : `bfSummarize`, `bfCalendar`, `bfCheckbox`,
-  `bfSelect`, `bfSubmitButton`, `bfPayPal`, `bfSofortueberweisung`,
-  `bfSignature`, `bfRadioGroup`, `bfCheckboxGroup`, `bfStripe`,
-  `bfTextfield`, `bfNumberInput` mutualisés à date. Restent à vérifier :
-  `bfFile`, `bfCaptcha` (bug de markup réel span/button non corrigé),
-  `bfReCaptcha`. `bfTextarea` diffère d'un espace cosmétique entre
-  Bootstrap et OnePage — délibérément non mutualisé.
+  et différente sur Mobile) : `bfSummarize`, `bfCalendar`,
+  `bfCalendarResponsive`, `bfCheckbox`, `bfSelect`, `bfSubmitButton`,
+  `bfPayPal`, `bfSofortueberweisung`, `bfSignature`, `bfRadioGroup`,
+  `bfCheckboxGroup`, `bfStripe`, `bfTextfield`, `bfNumberInput` mutualisés.
+  Tous les types de champ des deux renderers ont été examinés ; les 4
+  restants sont des exceptions documentées, pas des oublis :
+  - `bfTextarea` : diffère d'un espace cosmétique entre Bootstrap et
+    OnePage — sans impact, délibérément non mutualisé.
+  - `bfFile` : différences réelles — chez OnePage la condition
+    flashUploader/html5 est entièrement commentée en prod (branche morte),
+    et le markup du bouton diffère (`<label><div class="btn">` chez
+    Bootstrap vs `<span><button type="button">` chez OnePage).
+  - `bfCaptcha` : bug de markup réel déjà identifié — Bootstrap ouvre
+    `<span type="button">` et ferme `</button>`, OnePage utilise
+    correctement `<button>`. Non corrigé.
+  - `bfReCaptcha` : **nouvelle découverte du 2026-08-29**, deux
+    divergences réelles, non corrigées, à trancher :
+    1. branche visible : OnePage ajoute un `<div class="g-recaptcha"
+       data-sitekey="...">` absent chez Bootstrap ;
+    2. branche invisible : `resetFlagOnCallback` vaut `true` chez
+       Bootstrap et `false` chez OnePage — incohérence de comportement,
+       pas une simple différence de forme.
 
 ### Travaux parallélisables
 

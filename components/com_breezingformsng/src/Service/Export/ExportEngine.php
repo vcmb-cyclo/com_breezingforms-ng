@@ -574,7 +574,10 @@ final class ExportEngine
      * https://stackoverflow.com/questions/4356289/php-random-string-generator/31107425#31107425
      */
 
-    function random_str($length, $keyspace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+    public function random_str(
+        int $length,
+        string $keyspace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    ): string
     {
         $pieces = [];
         $max = mb_strlen($keyspace, '8bit') - 1;
@@ -633,9 +636,9 @@ final class ExportEngine
         return array_map('strval', is_array($values) ? array_values($values) : [$values]);
     }
 
-    function endsWith($haystack, $needle)
+    public function endsWith(string $haystack, string $needle): bool
     {
-        return $needle === "" || substr($haystack, -strlen($needle)) === $needle;
+        return str_ends_with($haystack, $needle);
     }
 
     function exppdf($filter = array(), $mailback = false, $translate = true)

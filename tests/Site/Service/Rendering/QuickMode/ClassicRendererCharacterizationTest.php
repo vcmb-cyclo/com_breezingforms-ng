@@ -1,0 +1,191 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Rendering\QuickMode;
+
+use HTML_facileFormsProcessor;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\ClassicRenderer;
+
+// HTML_facileFormsProcessor lives in the global namespace with no PSR-4
+// mapping to it (it is normally require_once'd at runtime by FormRenderer,
+// not autoloaded) - pull it in the same way here. Its file-scope code
+// probes JPATH_ADMINISTRATOR for an optional ContentBuilderNG integration
+// (com_contentbuilderng doesn't exist in this repo, so that probe just
+// resolves to false and is skipped) - same convention as PdfDocumentTest.
+if (!defined('JPATH_ADMINISTRATOR')) {
+    define('JPATH_ADMINISTRATOR', __DIR__ . '/../../../../../administrator');
+}
+
+if (!class_exists(HTML_facileFormsProcessor::class)) {
+    require_once __DIR__ . '/../../../../../components/com_breezingformsng/src/Support/processor_facade.php';
+}
+
+/**
+ * Characterization tests for ClassicRenderer::process().
+ *
+ * These pin down the *current* HTML output for one field type at a time, as
+ * ground truth to protect against accidental regressions while the QuickMode
+ * renderers are split up (see docs/maintenance/js-libraries-migration-plan.md
+ * discussion on renderer file size). They are NOT a spec of "correct"
+ * behaviour - if a snapshot legitimately needs to change, update it
+ * deliberately and say why in the commit, the same way you would review a
+ * diff of generated code.
+ *
+ * ClassicRenderer::process() is far too coupled to the Joomla runtime
+ * (CMSApplication, ComponentHelper, the WebAssetManager, ...) to construct
+ * normally in a unit test. Both HTML_facileFormsProcessor and ClassicRenderer
+ * are built via ReflectionClass::newInstanceWithoutConstructor() here,
+ * skipping their real constructors entirely, then only the handful of
+ * private properties process() actually reads for a given field type are
+ * injected directly. This is deliberately narrow: each test documents, via
+ * its stub, exactly which collaborators that field type's rendering path
+ * touches - if a future change makes a type touch something new, the test
+ * fails loudly (missing property/type error) rather than silently mocking
+ * around it.
+ */
+final class ClassicRendererCharacterizationTest extends TestCase
+{
+    private const SNAPSHOT_DIR = __DIR__ . '/__snapshots__';
+
+    public function testTextfieldElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfTextfield', [
+            'dbId' => 42,
+            'bfName' => 'firstname',
+            'label' => 'Prénom',
+            'hint' => '',
+            'required' => true,
+            'password' => false,
+            'maxLength' => '',
+            'size' => '',
+            'placeholder' => 'Votre prénom',
+            'value' => '',
+            'mailbackAsSender' => false,
+        ]));
+
+        $this->assertMatchesSnapshot('classic_bfTextfield.html', $html);
+    }
+
+    public function testTextfieldElementWithExistingValue(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfTextfield', [
+            'dbId' => 43,
+            'bfName' => 'lastname',
+            'label' => 'Nom <script>',
+            'hint' => '',
+            'required' => false,
+            'password' => false,
+            'maxLength' => 40,
+            'size' => '20em',
+            'placeholder' => '',
+            'value' => 'Valeur "pré-remplie" & spéciale',
+            'mailbackAsSender' => false,
+        ]));
+
+        $this->assertMatchesSnapshot('classic_bfTextfield_prefilled.html', $html);
+    }
+
+    /**
+     * @param array<string, mixed> $overrides
+     * @return array<string, mixed>
+     */
+    private function elementNode(string $bfType, array $overrides): array
+    {
+        $defaults = [
+            'type' => 'element',
+            'bfType' => $bfType,
+            'dbId' => 1,
+            'bfName' => 'field',
+            'label' => 'Label',
+            'hint' => '',
+            'required' => false,
+            'hideLabel' => false,
+            'labelPosition' => 'left',
+            'readonly' => false,
+            'tabIndex' => -1,
+            'off' => false,
+            'theme' => '',
+            'password' => false,
+            'maxLength' => '',
+            'size' => '',
+            'placeholder' => '',
+            'value' => '',
+            'mailbackAsSender' => false,
+        ];
+
+        $properties = array_merge($defaults, $overrides);
+
+        return [
+            'attributes' => ['id' => 'element' . $properties['dbId']],
+            'properties' => $properties,
+        ];
+    }
+
+    private function makeRenderer(): ClassicRenderer
+    {
+        $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();
+        $processor->rowcount = 0;
+        $processor->rows = [];
+
+        $renderer = (new ReflectionClass(ClassicRenderer::class))->newInstanceWithoutConstructor();
+
+        $this->setPrivate($renderer, 'p', $processor);
+        $this->setPrivate($renderer, 'rootMdata', [
+            'joomlaHint' => false,
+            'useErrorAlerts' => true,
+        ]);
+        $this->setPrivate($renderer, 'fadingClass', '');
+        $this->setPrivate($renderer, 'language_tag', 'zz-ZZ');
+
+        return $renderer;
+    }
+
+    /**
+     * @param array<string, mixed> $node
+     */
+    private function render(ClassicRenderer $renderer, array $node): string
+    {
+        ob_start();
+        try {
+            $renderer->process($node);
+        } finally {
+            $html = ob_get_clean();
+        }
+
+        return $html;
+    }
+
+    private function setPrivate(object $object, string $property, mixed $value): void
+    {
+        $ref = new ReflectionClass($object);
+        $ref->getProperty($property)->setValue($object, $value);
+    }
+
+    private function assertMatchesSnapshot(string $file, string $actual): void
+    {
+        $path = self::SNAPSHOT_DIR . '/' . $file;
+        $updating = getenv('BF_UPDATE_SNAPSHOTS') === '1';
+
+        if (!is_file($path)) {
+            if (!$updating) {
+                self::markTestIncomplete(
+                    "No snapshot yet at tests/Site/Service/Rendering/QuickMode/__snapshots__/{$file} - "
+                    . 'run with BF_UPDATE_SNAPSHOTS=1 to create it, review it, then commit it.'
+                );
+            }
+
+            file_put_contents($path, $actual);
+        } elseif ($updating) {
+            file_put_contents($path, $actual);
+        }
+
+        self::assertSame(file_get_contents($path), $actual);
+    }
+}

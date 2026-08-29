@@ -76,6 +76,11 @@ final class RenderingEngineProcessorDouble extends HTML_facileFormsProcessor
         return $this->buryAfterFirstCallback && count($this->callbackNames) >= 1;
     }
 
+    public function getClassName($className)
+    {
+        return 'resolved-' . $className;
+    }
+
     public function cbCheckPermissions(): array
     {
         $this->permissionChecks++;
@@ -648,6 +653,54 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertStringContainsString('ff_resizepage(3, 420);', $processor->linkedCallbacks[0]['code']);
         self::assertStringContainsString('ff_showgrid();', $processor->linkedCallbacks[0]['code']);
         self::assertStringNotContainsString('_submitted(', $processor->linkedCallbacks[0]['code']);
+    }
+
+    public function testFormRenderingInitializationBuildsQuickModeWrapperAndRequestState(): void
+    {
+        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
+        $processor->form = 12;
+        $processor->legacy_wrap = true;
+        $processor->queryCols = ['stale'];
+        $processor->queryRows = ['stale'];
+        $processor->formrow = (object) [
+            'template_code_processed' => 'QuickMode',
+            'class1' => 'form-class',
+        ];
+        $processor->app = new class {
+            public function getInput(): object
+            {
+                return new class {
+                    public function getCmd(string $name, string $default = ''): string
+                    {
+                        return $name === 'ff_status' ? 'completed' : $default;
+                    }
+
+                    public function getString(string $name, string $default = ''): string
+                    {
+                        return $name === 'ff_message' ? 'Saved' : $default;
+                    }
+                };
+            }
+        };
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+
+        ob_start();
+        try {
+            (new ReflectionClass($engine))->getMethod('initializeFormRendering')->invoke($engine);
+            $html = ob_get_contents();
+        } finally {
+            ob_end_clean();
+        }
+
+        self::assertSame([], $processor->queryCols);
+        self::assertSame([], $processor->queryRows);
+        self::assertSame('completed', $processor->status);
+        self::assertSame('Saved', $processor->message);
+        self::assertStringContainsString('id="bfReCaptchaWrap"', $html);
+        self::assertStringContainsString('id="ff_formdiv12"', $html);
+        self::assertStringContainsString('bfFormDiv resolved-form-class', $html);
+        self::assertStringContainsString('bfPage-m bfClearfix', $html);
     }
 
     public function testHeaderRendersProcessorVariablesThroughSharedHeaderRenderer(): void

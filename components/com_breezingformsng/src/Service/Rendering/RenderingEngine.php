@@ -289,19 +289,7 @@ final class RenderingEngine
         set_error_handler('_ff_errorHandler');
         ob_start();
         echo $this->processor->header();
-        $this->processor->queryCols = array();
-        $this->processor->queryRows = array();
-        if (trim($this->processor->formrow->template_code_processed) == 'QuickMode' && $this->processor->legacy_wrap)
-            echo '<table style="display:none;width:100%;" id="bfReCaptchaWrap"><tr><td><div id="bfReCaptchaDiv"></div></td></tr></table>';
-        echo '<div id="ff_formdiv' . $this->processor->form . '"';
-        echo ' class="bfFormDiv' . ($this->processor->formrow->class1 != '' ? ' ' . $this->processor->getClassName($this->processor->formrow->class1) : '') . '"';
-        if ($this->processor->legacy_wrap) {
-            echo '><div class="bfPage-tl"><div class="bfPage-tr"><div class="bfPage-t"></div></div></div><div class="bfPage-l"><div class="bfPage-r"><div class="bfPage-m bfClearfix">' . nl();
-        } else {
-            echo '>';
-        }
-        $this->processor->status = $this->processor->app->getInput()->getCmd('ff_status', '');
-        $this->processor->message = $this->processor->app->getInput()->getString('ff_message', '');
+        $this->initializeFormRendering();
 
         // handle Before Form piece
         $code = '';
@@ -2330,6 +2318,27 @@ final class RenderingEngine
         $code .= "    if (ff_processor && ff_processor.traceBuffer) ff_traceWindow();" . nl() .
             "} // onload";
         $this->processor->linkcode('onload', $library, $linked, $code);
+    }
+
+    private function initializeFormRendering(): void
+    {
+        $this->processor->queryCols = [];
+        $this->processor->queryRows = [];
+
+        if (trim($this->processor->formrow->template_code_processed) == 'QuickMode' && $this->processor->legacy_wrap) {
+            echo '<table style="display:none;width:100%;" id="bfReCaptchaWrap"><tr><td><div id="bfReCaptchaDiv"></div></td></tr></table>';
+        }
+
+        echo '<div id="ff_formdiv' . $this->processor->form . '"';
+        echo ' class="bfFormDiv' . ($this->processor->formrow->class1 != '' ? ' ' . $this->processor->getClassName($this->processor->formrow->class1) : '') . '"';
+        if ($this->processor->legacy_wrap) {
+            echo '><div class="bfPage-tl"><div class="bfPage-tr"><div class="bfPage-t"></div></div></div><div class="bfPage-l"><div class="bfPage-r"><div class="bfPage-m bfClearfix">' . nl();
+        } else {
+            echo '>';
+        }
+
+        $this->processor->status = $this->processor->app->getInput()->getCmd('ff_status', '');
+        $this->processor->message = $this->processor->app->getInput()->getString('ff_message', '');
     }
 
     /**

@@ -32,8 +32,12 @@ if (!function_exists('Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering
 
 final class RenderingEngineProcessorDouble extends HTML_facileFormsProcessor
 {
+    public int $permissionChecks = 0;
+
     public function cbCheckPermissions(): array
     {
+        $this->permissionChecks++;
+
         return [
             'form' => null,
             'record' => null,
@@ -135,6 +139,7 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         }
 
         self::assertSame('', $html);
+        self::assertSame(1, $processor->permissionChecks);
     }
 
     public function testPermissionsReturnNeutralContextWhenContentBuilderIsUnavailable(): void

@@ -306,9 +306,11 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
             public function getSession(): object
             {
                 return new class {
+                    public bool $mobilePreference = true;
+
                     public function get(string $name, mixed $default = null): mixed
                     {
-                        return $default;
+                        return $name === 'com_breezingformsng.mobile' ? $this->mobilePreference : $default;
                     }
                 };
             }
@@ -333,6 +335,12 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
                 'forceMobile' => false,
             ]));
             self::assertFalse($processor->isMobile);
+
+            self::assertTrue($method->invoke($engine, [
+                'mobileEnabled' => true,
+                'forceMobile' => false,
+            ]));
+            self::assertTrue($processor->isMobile);
         } finally {
             if ($previousUserAgent === null) {
                 unset($_SERVER['HTTP_USER_AGENT']);

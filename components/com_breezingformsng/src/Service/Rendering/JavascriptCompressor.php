@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package BreezingFormsNG
  * @copyright Copyright (C) 2024-2026 by XDA+GIL
@@ -97,7 +98,8 @@ final class JavascriptCompressor
                 }
 
                 if ($whitespace) {
-                    if ($this->isIdentifierCharacter($character)
+                    if (
+                        $this->isIdentifierCharacter($character)
                         && $this->isIdentifierCharacter(substr($code, -1))
                     ) {
                         $code .= ' ';

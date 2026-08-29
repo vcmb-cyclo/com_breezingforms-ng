@@ -33,6 +33,12 @@ jobs:
           tools: composer:v2
           coverage: none
 
+      - name: Install PHP lint dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Check PHP coding standards
+        run: composer lint:php
+
       - name: PHP syntax check
         run: |
           set -o pipefail

@@ -28,6 +28,8 @@ require_once __DIR__ . '/joomla-cmsapplication-stub.php';
  */
 final class MobileRendererCharacterizationTest extends TestCase
 {
+    private const SNAPSHOT_DIR = __DIR__ . '/__snapshots__';
+
     public function testTextfieldElement(): void
     {
         $renderer = $this->makeRenderer();
@@ -66,6 +68,7 @@ final class MobileRendererCharacterizationTest extends TestCase
         self::assertStringContainsString('value="Jean"', $html);
         self::assertStringContainsString('id="ff_elem42"', $html);
         self::assertStringContainsString('Votre pr&eacute;nom', $html);
+        $this->assertMatchesSnapshot('mobile_bfTextfield.html', $html);
     }
 
     public function testTextareaElement(): void
@@ -177,7 +180,7 @@ final class MobileRendererCharacterizationTest extends TestCase
             'html5' => false,
             'attachToAdminMail' => false,
             'attachToUserMail' => false,
-        ]);
+        ], 'plain');
 
         self::assertStringContainsString('type="file"', $html);
         self::assertStringContainsString('name="ff_nm_attachment[]"', $html);
@@ -196,7 +199,7 @@ final class MobileRendererCharacterizationTest extends TestCase
             'allowedFileExtensions' => 'jpg,png',
             'attachToAdminMail' => true,
             'attachToUserMail' => false,
-        ]);
+        ], 'flashUploader');
 
         self::assertStringContainsString('flashUploadphoto', $html);
         self::assertStringContainsString('plupload.Uploader', $html);
@@ -359,7 +362,7 @@ final class MobileRendererCharacterizationTest extends TestCase
     /**
      * @param array<string, mixed> $overrides
      */
-    private function renderElement(string $bfType, array $overrides): string
+    private function renderElement(string $bfType, array $overrides, string $variant = ''): string
     {
         $renderer = $this->makeRenderer();
 
@@ -396,6 +399,8 @@ final class MobileRendererCharacterizationTest extends TestCase
         }
 
         self::assertIsString($html);
+        $snapshotVariant = $variant === '' ? '' : '_' . $variant;
+        $this->assertMatchesSnapshot('mobile_' . $bfType . $snapshotVariant . '.html', $html);
 
         return $html;
     }
@@ -419,5 +424,26 @@ final class MobileRendererCharacterizationTest extends TestCase
     private function setPrivate(object $object, string $property, mixed $value): void
     {
         (new ReflectionClass($object))->getProperty($property)->setValue($object, $value);
+    }
+
+    private function assertMatchesSnapshot(string $file, string $actual): void
+    {
+        $path = self::SNAPSHOT_DIR . '/' . $file;
+        $updating = getenv('BF_UPDATE_SNAPSHOTS') === '1';
+
+        if (!is_file($path)) {
+            if (!$updating) {
+                self::markTestIncomplete(
+                    "No snapshot yet at tests/Site/Service/Rendering/QuickMode/__snapshots__/{$file} - "
+                    . 'run with BF_UPDATE_SNAPSHOTS=1 to create it, review it, then commit it.'
+                );
+            }
+
+            file_put_contents($path, $actual);
+        } elseif ($updating) {
+            file_put_contents($path, $actual);
+        }
+
+        self::assertSame(file_get_contents($path), $actual);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package BreezingFormsNG
  * @copyright Copyright (C) 2024-2026 by XDA+GIL
@@ -38,8 +39,7 @@ final class DatabaseAuditService
     public function __construct(
         private readonly DatabaseInterface $db,
         private readonly string $temporaryPath
-    )
-    {
+    ) {
     }
 
     public function run(): array
@@ -309,14 +309,24 @@ final class DatabaseAuditService
         $checks = [
             'records_without_form' => ['facileforms_records', 'facileforms_forms', 'child.form = parent.id'],
             'elements_without_form' => ['facileforms_elements', 'facileforms_forms', 'child.form = parent.id'],
-            'subrecords_without_record' => ['facileforms_subrecords', 'facileforms_records', 'child.record = parent.id'],
-            'subrecords_without_element' => ['facileforms_subrecords', 'facileforms_elements', 'child.element = parent.id'],
+            'subrecords_without_record' => [
+                'facileforms_subrecords',
+                'facileforms_records',
+                'child.record = parent.id',
+            ],
+            'subrecords_without_element' => [
+                'facileforms_subrecords',
+                'facileforms_elements',
+                'child.element = parent.id',
+            ],
         ];
         $result = [];
 
         foreach ($checks as $id => [$child, $parent, $join]) {
-            if (!in_array($this->db->getPrefix() . $child, $tableList, true)
-                || !in_array($this->db->getPrefix() . $parent, $tableList, true)) {
+            if (
+                !in_array($this->db->getPrefix() . $child, $tableList, true)
+                || !in_array($this->db->getPrefix() . $parent, $tableList, true)
+            ) {
                 continue;
             }
 
@@ -512,7 +522,15 @@ final class DatabaseAuditService
     {
         try {
             $query = $this->db->getQuery(true)
-                ->select($this->db->quoteName(['extension_id', 'name', 'type', 'element', 'folder', 'client_id', 'enabled']))
+                ->select($this->db->quoteName([
+                    'extension_id',
+                    'name',
+                    'type',
+                    'element',
+                    'folder',
+                    'client_id',
+                    'enabled',
+                ]))
                 ->from($this->db->quoteName('#__extensions'))
                 ->where($this->db->quoteName('element') . ' LIKE ' . $this->db->quote('%breezingforms%'))
                 ->order($this->db->quoteName('extension_id') . ' ASC');
@@ -544,7 +562,12 @@ final class DatabaseAuditService
                 $legacy[] = $entry;
             }
 
-            $key = implode('|', [$entry['type'], $element, strtolower($entry['folder']), (int) ($row['client_id'] ?? 0)]);
+            $key = implode('|', [
+                $entry['type'],
+                $element,
+                strtolower($entry['folder']),
+                (int) ($row['client_id'] ?? 0),
+            ]);
             $byKey[$key][] = $entry;
         }
 

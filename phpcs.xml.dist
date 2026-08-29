@@ -28,6 +28,12 @@
 
     <rule ref="PSR12"/>
 
+    <!-- Joomla extension entry points intentionally combine the class symbol
+         with the native direct-access guard. -->
+    <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
+        <severity>0</severity>
+    </rule>
+
     <!-- Joomla task names are part of the public controller routing contract. -->
     <rule ref="PSR1.Methods.CamelCapsMethodName">
         <exclude-pattern>*/Controller/*</exclude-pattern>

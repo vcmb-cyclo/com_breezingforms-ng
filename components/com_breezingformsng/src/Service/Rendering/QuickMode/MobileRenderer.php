@@ -211,9 +211,6 @@ class MobileRenderer
 			$this->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/themes/default.date.css');
 		}
 
-		$this->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/tooltip.css');
-		$this->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/tooltip.js');
-
 		if ($this->hasFlashUpload) {
 			$tickets = $this->p->app->getSession()->get('bfFlashUploadTickets', array());
 			$tickets[$this->flashUploadTicket] = array(); // stores file info for later processing

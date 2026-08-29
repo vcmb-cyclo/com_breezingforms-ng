@@ -67,6 +67,10 @@ obsolete_entries=(
     "components/com_breezingformsng/themes/quickmode/jq.mobile.1.4.5.min.css"
     "components/com_breezingformsng/themes/quickmode/jq.mobile.1.4.5.icons.min.css"
     "components/com_breezingformsng/themes/quickmode/jq.mobile.min.css"
+    "administrator/components/com_breezingformsng/libraries/jquery/tooltip.js"
+    "components/com_breezingformsng/libraries/jquery/tooltip.js"
+    "components/com_breezingformsng/libraries/jquery/tooltip.css"
+    "administrator/components/com_breezingformsng/libraries/jquery/plugins/md5.js"
 )
 
 for path in "${obsolete_entries[@]}"; do

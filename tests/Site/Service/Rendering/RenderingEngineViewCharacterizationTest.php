@@ -859,6 +859,74 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         }
     }
 
+    public function testAfterFormLibraryPieceResolvesAndRenders(): void
+    {
+        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
+        $processor->form = 9;
+        $processor->formrow = (object) [
+            'piece2cond' => 1,
+            'piece2id' => 25,
+        ];
+        $processor->database = new class {
+            public function getQuery(bool $new = false): object
+            {
+                return new class {
+                    public function select(mixed $columns): self
+                    {
+                        return $this;
+                    }
+
+                    public function from(string $table): self
+                    {
+                        return $this;
+                    }
+
+                    public function where(string $condition): self
+                    {
+                        return $this;
+                    }
+
+                    public function bind(string $key, int $value, mixed $type): self
+                    {
+                        return $this;
+                    }
+                };
+            }
+
+            public function quoteName(string $name): string
+            {
+                return $name;
+            }
+
+            public function setQuery(object $query): void
+            {
+            }
+
+            /** @return list<object> */
+            public function loadObjectList(): array
+            {
+                return [(object) ['name' => 'After library piece', 'code' => 'echo "after library";']];
+            }
+        };
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+        $method = (new ReflectionClass($engine))->getMethod('executeAfterFormPiece');
+
+        ob_start();
+        try {
+            self::assertFalse($method->invoke($engine));
+            $html = ob_get_contents();
+        } finally {
+            ob_end_clean();
+        }
+
+        self::assertSame('<piece>echo "after library";</piece>', $html);
+        self::assertSame('p', $processor->executedPieces[0]['type']);
+        self::assertSame(25, $processor->executedPieces[0]['id']);
+        self::assertNull($processor->executedPieces[0]['pane']);
+        self::assertStringContainsString('COM_BREEZINGFORMSNG_PROCESS_AFPIECE After library piece', $processor->executedPieces[0]['name']);
+    }
+
     public function testHeaderRendersProcessorVariablesThroughSharedHeaderRenderer(): void
     {
         $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();

@@ -33,9 +33,9 @@ if (!class_exists(\TCPDF::class)) {
 class PdfDocument extends \TCPDF
 {
 
-    public $form_name = '';
-    public $mailback = false;
-    public $which = 'attachment';
+    public string $form_name = '';
+    public bool $mailback = false;
+    public string $which = 'attachment';
 
     public function __construct($orientation='P', $unit='mm', $format='A4', $unicode=true, $encoding='UTF-8', $diskcache=false, $pdfa=false){
 
@@ -43,17 +43,17 @@ class PdfDocument extends \TCPDF
 
     }
 
-    function setFormName($name){
+    public function setFormName(string $name): void{
 
         $this->form_name = $name;
     }
 
-    function setMailback($mailback){
+    public function setMailback(bool $mailback): void{
 
         $this->mailback = $mailback;
     }
 
-    function setWhich($which = 'attachment'){
+    public function setWhich(string $which = 'attachment'): void{
         $this->which = $which;
     }
 
@@ -81,7 +81,7 @@ class PdfDocument extends \TCPDF
         return $name;
     }
 
-    function Header(){
+    public function Header(){
 
         $pdf = $this;
 
@@ -143,7 +143,7 @@ class PdfDocument extends \TCPDF
         }
     }
 
-    function Footer(){
+    public function Footer(){
 
         $pdf = $this;
 
@@ -205,7 +205,7 @@ class PdfDocument extends \TCPDF
         }
     }
 
-    function getHeaderTemplate(){
+    public function getHeaderTemplate(){
 
         $file = '';
 
@@ -253,7 +253,7 @@ class PdfDocument extends \TCPDF
         return $file;
     }
 
-    function getFooterTemplate(){
+    public function getFooterTemplate(){
 
         $file = '';
 
@@ -300,8 +300,8 @@ class PdfDocument extends \TCPDF
         return $file;
     }
 
-    function endsWith($haystack, $needle)
+    public function endsWith(string $haystack, string $needle): bool
     {
-        return $needle === "" || substr($haystack, -strlen($needle)) === $needle;
+        return str_ends_with($haystack, $needle);
     }
 }

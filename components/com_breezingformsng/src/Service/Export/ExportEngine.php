@@ -65,7 +65,7 @@ final class ExportEngine
     ) {
     }
 
-    function logToDatabase($cbResult = null)
+    public function logToDatabase($cbResult = null)
     { // CONTENTBUILDER
         global $ff_config;
         if ($this->processor->dying)
@@ -212,7 +212,7 @@ final class ExportEngine
                             if ($_arr == 1) {
                                 $_values = explode("\n", $_rec->recValue);
                                 if (isset($_values[$_key])) {
-                                    if (strpos(strtolower($_values[$_key]), '{cbsite}') === 0) {
+                                    if (str_starts_with(strtolower($_values[$_key]), '{cbsite}')) {
                                         $_values[$_key] = str_replace(array('{cbsite}', '{CBSite}'), array(JPATH_SITE, JPATH_SITE), $_values[$_key]);
                                     }
                                     if (file_exists($_values[$_key])) {
@@ -277,7 +277,7 @@ final class ExportEngine
             foreach ($this->processor->savedata as $data) {
                 // CONTENTBUILDER WILL TAKE OVER SAVING/UPDATE IF EXISTS
                 if (!is_object($cbResult['form'])) {
-                    $subrecord->id = NULL;
+        $subrecord->id = null;
                     $subrecord->element = $data[_FF_DATA_ID];
                     $subrecord->name = $data[_FF_DATA_NAME];
                     $subrecord->title = strip_tags($data[_FF_DATA_TITLE]);
@@ -574,7 +574,10 @@ final class ExportEngine
      * https://stackoverflow.com/questions/4356289/php-random-string-generator/31107425#31107425
      */
 
-    function random_str($length, $keyspace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
+    public function random_str(
+        int $length,
+        string $keyspace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    ): string
     {
         $pieces = [];
         $max = mb_strlen($keyspace, '8bit') - 1;
@@ -586,7 +589,7 @@ final class ExportEngine
 
     // logToDatabase
 
-    function sendMail($from, $fromname, $recipient, $subject, $body, $attachment = NULL, $html = NULL, $cc = NULL, $bcc = NULL, $alt_sender = '')
+    public function sendMail($from, $fromname, $recipient, $subject, $body, $attachment = null, $html = null, $cc = null, $bcc = null, $alt_sender = '')
     {
         if ($this->processor->dying)
             return;
@@ -633,12 +636,12 @@ final class ExportEngine
         return array_map('strval', is_array($values) ? array_values($values) : [$values]);
     }
 
-    function endsWith($haystack, $needle)
+    public function endsWith(string $haystack, string $needle): bool
     {
-        return $needle === "" || substr($haystack, -strlen($needle)) === $needle;
+        return str_ends_with($haystack, $needle);
     }
 
-    function exppdf($filter = array(), $mailback = false, $translate = true)
+    public function exppdf($filter = [], $mailback = false, $translate = true)
     {
         global $ff_compath;
 
@@ -784,7 +787,7 @@ final class ExportEngine
 
             $fm = $matches_array[2][0];
 
-            if (substr(trim($fm), 0, strlen('{mospath}')) === '{mospath}') {
+            if (str_starts_with(trim($fm), '{mospath}')) {
                 $fm = str_replace('{mospath}', $this->processor->mospath, $fm);
             }
 
@@ -809,7 +812,8 @@ final class ExportEngine
 
             $uploads = $this->processor->uploads . '/';
 
-            if (substr(trim($fm), 0, 1) === '/' || substr(trim($fm), 1, 1) === ':') {
+            $trimmedFilename = trim($fm);
+            if (str_starts_with($trimmedFilename, '/') || (($trimmedFilename[1] ?? '') === ':')) {
                 $uploads = '';
             }
 
@@ -829,7 +833,7 @@ final class ExportEngine
         return $pdfname;
     }
 
-    function expcsv($filter = array(), $mailback = false)
+    public function expcsv($filter = [], $mailback = false)
     {
         global $ff_config;
 
@@ -890,7 +894,7 @@ final class ExportEngine
         }
 
         if ($inverted == false) {
-            $head = substr($head, 0, strlen($head) - 1) . nl();
+            $head = substr($head, 0, -1) . nl();
         }
 
         $out = '';
@@ -908,7 +912,7 @@ final class ExportEngine
             }
 
             if ($inverted == false) {
-                $out = substr($out, 0, strlen($out) - 1);
+                $out = substr($out, 0, -1);
                 $out .= nl();
             }
         }
@@ -931,7 +935,7 @@ final class ExportEngine
         return $csvname;
     }
 
-    function expxml($filter = array(), $mailback = false, $translate = false)
+    public function expxml($filter = [], $mailback = false, $translate = false)
     {
         global $ff_compath, $ff_version, $mosConfig_fileperms;
 

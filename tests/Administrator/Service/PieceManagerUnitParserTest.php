@@ -1,0 +1,49 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Vcmb\Component\BreezingformsNG\Tests\Administrator\Service;
+
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use ReflectionMethod;
+use Vcmb\Component\BreezingformsNG\Administrator\Service\PieceManager;
+
+final class PieceManagerUnitParserTest extends TestCase
+{
+    #[DataProvider('pieceValueProvider')]
+    public function testParsesStoredUnitTestValues(string $value, mixed $expected): void
+    {
+        self::assertSame($expected, $this->invokeStatic('parseTestValue', $value));
+    }
+
+    public static function pieceValueProvider(): iterable
+    {
+        yield 'null' => ['null', null];
+        yield 'true' => ['true', true];
+        yield 'false' => ['false', false];
+        yield 'integer' => ['5', 5];
+        yield 'decimal' => ['5.25', 5.25];
+        yield 'quoted string' => ['"hello\\nworld"', "hello\nworld"];
+        yield 'json object' => ['{"enabled":true,"count":2}', ['enabled' => true, 'count' => 2]];
+        yield 'json array' => ['["first",2]', ['first', 2]];
+        yield 'plain string' => ['submitted', 'submitted'];
+    }
+
+    public function testValuesEqualPreservesStrictScalarSemantics(): void
+    {
+        self::assertTrue($this->invokeStatic('valuesEqual', 5, 5));
+        self::assertFalse($this->invokeStatic('valuesEqual', 5, false));
+        self::assertTrue($this->invokeStatic('valuesEqual', ['a' => 1], ['a' => 1]));
+        self::assertFalse($this->invokeStatic('valuesEqual', ['a' => 1], ['a' => 2]));
+    }
+
+    private function invokeStatic(string $methodName, mixed ...$arguments): mixed
+    {
+        $method = new ReflectionMethod(PieceManager::class, $methodName);
+        $method->setAccessible(true);
+
+        return $method->invoke(null, ...$arguments);
+    }
+}

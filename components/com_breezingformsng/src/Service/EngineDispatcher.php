@@ -13,6 +13,7 @@ use Joomla\Input\Input;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\CaptchaCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\FlashUploadCallback;
+use Vcmb\Component\BreezingformsNG\Site\Service\Upload\FlashUploadSizeValidator;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\OptCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\PayPalCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\SofortCallback;
@@ -71,7 +72,7 @@ final class EngineDispatcher
         } elseif ($this->input->getBool('sofortueberweisungDownload', false) && $application === '') {
             (new SofortCallback($this->application, $this->database, $this->redirectHelper(), $this->mailerFactory))->download();
         } elseif ($this->input->getBool('flashUpload', false)) {
-            (new FlashUploadCallback($this->application, $this->database))->handle();
+            (new FlashUploadCallback($this->application, $this->database, new FlashUploadSizeValidator()))->handle();
         } elseif ($this->input->getString('opt_in', '') === 'true') {
             (new OptCallback($this->application, $this->database))->optIn();
         } elseif ($this->input->getString('opt_out', '') === 'true') {

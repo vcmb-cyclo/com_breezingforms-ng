@@ -30,6 +30,8 @@ use Joomla\CMS\Editor\Editor;
 
 class ClassicRenderer {
 
+	use HiddenFieldTrait;
+
 	/**
 	 * @var HTML_facileFormsProcessor
 	 */
@@ -536,244 +538,7 @@ float:left;
 						break;
 
 					case 'bfFile':
-						if (( isset($mdata['flashUploader']) && $mdata['flashUploader'] ) || ( isset($mdata['html5']) && $mdata['html5'] )) {
-
-							$base = explode('/', Uri::base());
-							if (isset($base[count($base) - 2]) && $base[count($base) - 2] == 'administrator') {
-								unset($base[count($base) - 2]);
-								$base = array_merge($base);
-							}
-							$base = implode('/', $base);
-
-							echo '<input type="hidden" id="flashUpload' . $mdata['bfName'] . '" name="flashUpload' . $mdata['bfName'] . '" value="bfFlashFileQueue' . $mdata['dbId'] . '"/>' . "\n";
-							$this->hasFlashUpload = true;
-							//allowedFileExtensions
-							$allowedExts = explode(',', $mdata['allowedFileExtensions']);
-							$allowedExtsCnt = count($allowedExts);
-							for ($i = 0; $i < $allowedExtsCnt; $i++) {
-								$allowedExts[$i] = $allowedExts[$i];
-							}
-							$exts = '';
-							if ($allowedExtsCnt != 0) {
-								$exts = implode(',', $allowedExts);
-							}
-							$bytes = (isset($mdata['flashUploaderBytes']) && is_numeric($mdata['flashUploaderBytes']) && $mdata['flashUploaderBytes'] > 0 ? "max_file_size : '" . intval($mdata['flashUploaderBytes']) . "'," : '');
-							$flashUploader = "
-                                                        <label id=\"bfUploadContainer" . $mdata['dbId'] . "\">
-							<img alt=\"\" style=\"cursor: pointer;\" id=\"bfPickFiles" . $mdata['dbId'] . "\" src=\"" . $this->uploadImagePath . "\" width=\"" . (isset($mdata['flashUploaderWidth']) && is_numeric($mdata['flashUploaderWidth']) && $mdata['flashUploaderWidth'] > 0 ? intval($mdata['flashUploaderWidth']) : '64') . "\" height=\"" . (isset($mdata['flashUploaderHeight']) && is_numeric($mdata['flashUploaderHeight']) && $mdata['flashUploaderHeight'] > 0 ? intval($mdata['flashUploaderHeight']) : '64') . "\"/>
-                                                        <div id=\"bfPickFiles" . $mdata['dbId'] . "holder\" style=\"display:none;\">&nbsp;</div>
-                                                        </label>
-                                                        <span id=\"bfUploader" . $mdata['bfName'] . "\"></span>
-                                                        <div class=\"bfFlashFileQueueClass\" id=\"bfFlashFileQueue" . $mdata['dbId'] . "\"></div>
-                                                        <script type=\"text/javascript\">
-                                                        <!--
-							bfFlashUploaders.push('ff_elem" . $mdata['dbId'] . "');
-                                                        var bfFlashFileQueue" . $mdata['dbId'] . " = {};
-                                                        function bfUploadImageThumb(file) {
-                                                                var img;
-                                                                var thumbId = '#' + file.id + 'thumb';
-                                                                var thumbEl = JQuery(thumbId).get(0);
-
-                                                                function bfIsImage(f) {
-                                                                        var name = (f && f.name) ? f.name : '';
-                                                                        var ext = name.split('.').pop().toLowerCase();
-                                                                        if (f && f.type && f.type.indexOf('image/') === 0) {
-                                                                                return true;
-                                                                        }
-                                                                        return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'].indexOf(ext) !== -1;
-                                                                }
-
-                                                                function bfFallbackThumb() {
-                                                                        if (!thumbEl || !bfIsImage(file) || !window.FileReader) {
-                                                                                return;
-                                                                        }
-                                                                        var nativeFile = null;
-                                                                        if (file && typeof file.getNative === 'function') {
-                                                                                nativeFile = file.getNative();
-                                                                        }
-                                                                        if (!nativeFile && file && typeof file.getSource === 'function') {
-                                                                                var src = file.getSource();
-                                                                                if (src && typeof src.getSource === 'function') {
-                                                                                        nativeFile = src.getSource();
-                                                                                }
-                                                                        }
-                                                                        if (!nativeFile) {
-                                                                                return;
-                                                                        }
-                                                                        var reader = new FileReader();
-                                                                        reader.onload = function(e) {
-                                                                                try {
-                                                                                        var imgTag = new Image();
-                                                                                        imgTag.onload = function() {
-                                                                                                imgTag.style.maxWidth = '100px';
-                                                                                                imgTag.style.maxHeight = '60px';
-                                                                                                thumbEl.innerHTML = '';
-                                                                                                thumbEl.appendChild(imgTag);
-                                                                                        };
-                                                                                        imgTag.src = e.target.result;
-                                                                                } catch (err) {}
-                                                                        };
-                                                                        reader.readAsDataURL(nativeFile);
-                                                                }
-
-                                                                if (window.moxie && window.moxie.image && window.moxie.image.Image && thumbEl) {
-                                                                        try {
-                                                                                img = new moxie.image.Image;
-                                                                                img.onload = function() {
-                                                                                        img.embed(thumbEl, {
-                                                                                                width: 100,
-                                                                                                height: 60,
-                                                                                                crop: true,
-                                                                                                swf_url: moxie.core.utils.Url.resolveUrl('" . $base . "components/com_breezingformsng/libraries/jquery/plupload/Moxie.swf')
-                                                                                        });
-                                                                                };
-
-                                                                                img.onembedded = function() {
-                                                                                        img.destroy();
-                                                                                };
-
-                                                                                img.onerror = function() {
-                                                                                        bfFallbackThumb();
-                                                                                };
-
-                                                                                img.load(file.getSource());
-                                                                                return;
-                                                                        } catch (e) {}
-                                                                }
-
-                                                                bfFallbackThumb();
-                                                        }
-                                                        JQuery(document).ready(
-                                                            function() {
-                                                                var iOS = ( navigator.userAgent.match(/(iPad|iPhone|iPod)/i) ? true : false );
-                                                                var uploader = new plupload.Uploader({
-                                                                        max_retries: 10,
-                                                                        multi_selection: " . ( isset($mdata['flashUploaderMulti']) && $mdata['flashUploaderMulti'] ? 'true' : 'false' ) . ",
-                                                                        unique_names: iOS,
-                                                                        chunk_size: '100kb',
-                                                                        runtimes : '" . ( isset($mdata['html5']) && $mdata['html5'] ? 'html5,' : '' ) . ( isset($mdata['flashUploader']) && $mdata['flashUploader'] ? 'flash,' : '') . "html4',
-                                                                        browse_button : 'bfPickFiles" . $mdata['dbId'] . "',
-                                                                        container: 'bfUploadContainer" . $mdata['dbId'] . "',
-                                                                        file_data_name: 'Filedata',
-                                                                        multipart_params: { form: " . $this->p->form . ", itemName : '" . $mdata['bfName'] . "', bfFlashUploadTicket: '" . $this->flashUploadTicket . "', option: 'com_breezingformsng', format: 'html', flashUpload: 'true', Itemid: 0 },
-                                                                        url : '" . $base . "index.php',
-                                                                        flash_swf_url : '" . $base . "components/com_breezingformsng/libraries/jquery/plupload/Moxie.swf',
-                                                                        filters : [
-                                                                                {title : " . json_encode(Text::_('COM_BREEZINGFORMSNG_CHOOSE_FILE')) . ", extensions : '" . $exts . "'}
-                                                                        ]
-                                                                });
-                                                                uploader.bind('FilesAdded', function(up, files) {
-                                                                        for (var i in files) {
-                                                                                if(typeof files[i].id != 'undefined' && files[i].id != null){
-                                                                                    var fsize = '';
-                                                                                    if(typeof files[i].size != 'undefined'){
-                                                                                        fsize = '(' + plupload.formatSize(files[i].size) + ') ';
-                                                                                    }
-                                                                                    if(typeof bfUploadFileAdded == 'function'){
-                                                                                        bfUploadFileAdded(files[i]);
-                                                                                    }
-                                                                                    JQuery('#bfFileQueue').append( '<div id=\"' + files[i].id + 'queue\">' + (iOS ? '' : files[i].name.replace(/[/\\?%*:|\"<>]/g, '')) + ' '+fsize+'<b></b></div>' );
-                                                                                }
-                                                                        }
-                                                                        for (var i in files) {
-                                                                            if(typeof files[i].id != 'undefined' && files[i].id != null){
-                                                                                var error = false;
-                                                                                var fsize = '';
-                                                                                if(typeof files[i].size != 'undefined'){
-                                                                                    fsize = '(' + plupload.formatSize(files[i].size) + ') ';
-                                                                                }
-                                                                                JQuery('#bfFlashFileQueue" . $mdata['dbId'] . "').append('<div class=\"bfFileQueueItem\" id=\"' + files[i].id + 'queueitem\"><div id=\"' + files[i].id + 'thumb\"></div><div id=\"' + files[i].id + '\"><img id=\"' + files[i].id + 'cancel\" src=\"" . $this->cancelImagePath . "\" style=\"cursor: pointer; padding-right: 10px;\" />' + (iOS ? '' : files[i].name.replace(/[/\\?%*:|\"<>]/g, '')) + ' ' + fsize + '<b id=\"' + files[i].id + 'msg\" style=\"color:red;\"></b></div></div>');
-                                                                                var file_ = files[i];
-                                                                                var uploader_ = uploader;
-                                                                                var bfUploaders_ = bfUploaders;
-                                                                                JQuery('#' + files[i].id + 'cancel').click(
-                                                                                    function(){
-                                                                                        for( var i = 0; i < bfUploaders_.length; i++ ){
-                                                                                            bfUploaders_[i].stop();
-                                                                                        }
-                                                                                        var id_ = this.id.split('cancel');
-                                                                                        id_ = id_[0];
-                                                                                        uploader_.removeFile(id_);
-                                                                                        JQuery('#'+id_+'queue').remove();
-                                                                                        JQuery('#'+id_+'queueitem').remove();
-                                                                                        bfFlashUploadersLength--;
-                                                                                        for( var i = 0; i < bfUploaders_.length; i++ ){
-                                                                                            bfUploaders_[i].start();
-                                                                                        }
-                                                                                        // re-enable button if there is none left
-                                                                                        if( " . ( isset($mdata['flashUploaderMulti']) && $mdata['flashUploaderMulti'] ? 'true' : 'false' ) . " == false ){
-                                                                                            var the_size = JQuery('#bfFlashFileQueue" . $mdata['dbId'] . " .bfFileQueueItem').size();
-                                                                                            if( the_size == 0 ){
-                                                                                                JQuery('#bfPickFiles" . $mdata['dbId'] . "').css('display','block');
-                                                                                                JQuery('#bfPickFiles" . $mdata['dbId'] . "holder').css('display','none');
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                );
-                                                                                var thebytes = " . (isset($mdata['flashUploaderBytes']) && is_numeric($mdata['flashUploaderBytes']) && $mdata['flashUploaderBytes'] > 0 ? intval($mdata['flashUploaderBytes']) : '0') . ";
-                                                                                if(thebytes > 0 && typeof files[i].size != 'undefined' && files[i].size > thebytes){
-                                                                                     alert(" . json_encode(' ' . Text::_('COM_BREEZINGFORMSNG_FLASH_UPLOADER_TOO_LARGE')) . ");
-                                                                                     error = true;
-                                                                                }
-                                                                                var ext = files[i].name.replace(/[/\\?%*:|\"<>]/g, '').split('.').pop().toLowerCase();
-                                                                                var exts = '" . strtolower($exts) . "'.split(',');
-                                                                                var found = 0;
-                                                                                for (var x in exts){
-                                                                                    if(exts[x] == ext){
-                                                                                        found++;
-                                                                                    }
-                                                                                }
-                                                                                if(found == 0){
-                                                                                    alert(" . json_encode(' ' . Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED')) . ");
-                                                                                    error = true;
-                                                                                }
-                                                                                if(error){
-                                                                                    JQuery('#'+files[i].id+'queue').remove();
-                                                                                    JQuery('#'+files[i].id+'queueitem').remove();
-                                                                                }else{
-                                                                                    bfFlashUploadersLength++;
-                                                                                }
-                                                                                bfUploadImageThumb(files[i]);
-                                                                            }
-                                                                        }
-                                                                        // disable the button if no multi upload
-                                                                        if( " . ( isset($mdata['flashUploaderMulti']) && $mdata['flashUploaderMulti'] ? 'true' : 'false' ) . " == false ){
-                                                                            var the_size = JQuery('#bfFlashFileQueue" . $mdata['dbId'] . " .bfFileQueueItem').size();
-                                                                            if( the_size > 0 ){
-                                                                                JQuery('#bfPickFiles" . $mdata['dbId'] . "').css('display','none');
-                                                                                JQuery('#bfPickFiles" . $mdata['dbId'] . "holder').css('display','block');
-                                                                            }
-                                                                        }
-                                                                });
-                                                                uploader.bind('UploadProgress', function(up, file) {
-                                                                    if(typeof JQuery('#'+file.id+'queue').get(0) != 'undefined'){
-                                                                        JQuery('#'+file.id+'queue').get(0).getElementsByTagName('b')[0].innerHTML = file.percent + '% <div style=\"height: 5px;width: ' + (file.percent*1.5) + 'px;background-color: #9de24f;\"></div>';
-                                                                    }
-                                                                });
-                                                                uploader.bind('FileUploaded', function(up, file, response) {
-                                                                    if(response.response!=''){
-                                                                        if(response.response !== null){
-                                                                            alert(response.response);
-                                                                        }
-                                                                    }
-                                                                    JQuery('#'+file.id+'queue').remove();
-                                                                });
-                                                                uploader.init();
-                                                                bfUploaders.push(uploader);
-                                                            });
-							//-->
-                                                        </script>
-							";
-							echo '<input class="ff_elem" ' . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="hidden" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
-						} else {
-							echo '<input class="ff_elem" ' . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="file" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
-						}
-						if ($mdata['attachToAdminMail']) {
-							echo '<input type="hidden" name="attachToAdminMail[' . $mdata['bfName'] . ']" value="true"/>' . "\n";
-						}
-						if ($mdata['attachToUserMail']) {
-							echo '<input type="hidden" name="attachToUserMail[' . $mdata['bfName'] . ']" value="true"/>' . "\n";
-						}
+						$flashUploader = $this->renderFileField($mdata, $tabIndex, $onclick, $onblur, $onchange, $onfocus, $onselect, $readonly);
 						break;
 
 					case 'bfSubmitButton':
@@ -1159,10 +924,6 @@ float:left;
 		}
 	}
 
-	private function renderHiddenField(array $mdata): void {
-		echo '<input class="ff_elem" type="hidden" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
-	}
-
 	private function renderSubmitButtonField(array $mdata, string $tabIndex, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void {
 		/* translatables */
 		if (isset($mdata['src_translation' . $this->language_tag]) && $mdata['src_translation' . $this->language_tag] != '') {
@@ -1489,6 +1250,250 @@ float:left;
 			$onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Sofortueberweisung\';" ';
 		}
 		echo '<input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+	}
+
+	private function renderFileField(array $mdata, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): string {
+					$flashUploader = '';
+						if (( isset($mdata['flashUploader']) && $mdata['flashUploader'] ) || ( isset($mdata['html5']) && $mdata['html5'] )) {
+
+							$base = explode('/', Uri::base());
+							if (isset($base[count($base) - 2]) && $base[count($base) - 2] == 'administrator') {
+								unset($base[count($base) - 2]);
+								$base = array_merge($base);
+							}
+							$base = implode('/', $base);
+
+							echo '<input type="hidden" id="flashUpload' . $mdata['bfName'] . '" name="flashUpload' . $mdata['bfName'] . '" value="bfFlashFileQueue' . $mdata['dbId'] . '"/>' . "\n";
+							$this->hasFlashUpload = true;
+							//allowedFileExtensions
+							$allowedExts = explode(',', $mdata['allowedFileExtensions']);
+							$allowedExtsCnt = count($allowedExts);
+							for ($i = 0; $i < $allowedExtsCnt; $i++) {
+								$allowedExts[$i] = $allowedExts[$i];
+							}
+							$exts = '';
+							if ($allowedExtsCnt != 0) {
+								$exts = implode(',', $allowedExts);
+							}
+							$bytes = (isset($mdata['flashUploaderBytes']) && is_numeric($mdata['flashUploaderBytes']) && $mdata['flashUploaderBytes'] > 0 ? "max_file_size : '" . intval($mdata['flashUploaderBytes']) . "'," : '');
+							$flashUploader = "
+                                                        <label id=\"bfUploadContainer" . $mdata['dbId'] . "\">
+							<img alt=\"\" style=\"cursor: pointer;\" id=\"bfPickFiles" . $mdata['dbId'] . "\" src=\"" . $this->uploadImagePath . "\" width=\"" . (isset($mdata['flashUploaderWidth']) && is_numeric($mdata['flashUploaderWidth']) && $mdata['flashUploaderWidth'] > 0 ? intval($mdata['flashUploaderWidth']) : '64') . "\" height=\"" . (isset($mdata['flashUploaderHeight']) && is_numeric($mdata['flashUploaderHeight']) && $mdata['flashUploaderHeight'] > 0 ? intval($mdata['flashUploaderHeight']) : '64') . "\"/>
+                                                        <div id=\"bfPickFiles" . $mdata['dbId'] . "holder\" style=\"display:none;\">&nbsp;</div>
+                                                        </label>
+                                                        <span id=\"bfUploader" . $mdata['bfName'] . "\"></span>
+                                                        <div class=\"bfFlashFileQueueClass\" id=\"bfFlashFileQueue" . $mdata['dbId'] . "\"></div>
+                                                        <script type=\"text/javascript\">
+                                                        <!--
+							bfFlashUploaders.push('ff_elem" . $mdata['dbId'] . "');
+                                                        var bfFlashFileQueue" . $mdata['dbId'] . " = {};
+                                                        function bfUploadImageThumb(file) {
+                                                                var img;
+                                                                var thumbId = '#' + file.id + 'thumb';
+                                                                var thumbEl = JQuery(thumbId).get(0);
+
+                                                                function bfIsImage(f) {
+                                                                        var name = (f && f.name) ? f.name : '';
+                                                                        var ext = name.split('.').pop().toLowerCase();
+                                                                        if (f && f.type && f.type.indexOf('image/') === 0) {
+                                                                                return true;
+                                                                        }
+                                                                        return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'].indexOf(ext) !== -1;
+                                                                }
+
+                                                                function bfFallbackThumb() {
+                                                                        if (!thumbEl || !bfIsImage(file) || !window.FileReader) {
+                                                                                return;
+                                                                        }
+                                                                        var nativeFile = null;
+                                                                        if (file && typeof file.getNative === 'function') {
+                                                                                nativeFile = file.getNative();
+                                                                        }
+                                                                        if (!nativeFile && file && typeof file.getSource === 'function') {
+                                                                                var src = file.getSource();
+                                                                                if (src && typeof src.getSource === 'function') {
+                                                                                        nativeFile = src.getSource();
+                                                                                }
+                                                                        }
+                                                                        if (!nativeFile) {
+                                                                                return;
+                                                                        }
+                                                                        var reader = new FileReader();
+                                                                        reader.onload = function(e) {
+                                                                                try {
+                                                                                        var imgTag = new Image();
+                                                                                        imgTag.onload = function() {
+                                                                                                imgTag.style.maxWidth = '100px';
+                                                                                                imgTag.style.maxHeight = '60px';
+                                                                                                thumbEl.innerHTML = '';
+                                                                                                thumbEl.appendChild(imgTag);
+                                                                                        };
+                                                                                        imgTag.src = e.target.result;
+                                                                                } catch (err) {}
+                                                                        };
+                                                                        reader.readAsDataURL(nativeFile);
+                                                                }
+
+                                                                if (window.moxie && window.moxie.image && window.moxie.image.Image && thumbEl) {
+                                                                        try {
+                                                                                img = new moxie.image.Image;
+                                                                                img.onload = function() {
+                                                                                        img.embed(thumbEl, {
+                                                                                                width: 100,
+                                                                                                height: 60,
+                                                                                                crop: true,
+                                                                                                swf_url: moxie.core.utils.Url.resolveUrl('" . $base . "components/com_breezingformsng/libraries/jquery/plupload/Moxie.swf')
+                                                                                        });
+                                                                                };
+
+                                                                                img.onembedded = function() {
+                                                                                        img.destroy();
+                                                                                };
+
+                                                                                img.onerror = function() {
+                                                                                        bfFallbackThumb();
+                                                                                };
+
+                                                                                img.load(file.getSource());
+                                                                                return;
+                                                                        } catch (e) {}
+                                                                }
+
+                                                                bfFallbackThumb();
+                                                        }
+                                                        JQuery(document).ready(
+                                                            function() {
+                                                                var iOS = ( navigator.userAgent.match(/(iPad|iPhone|iPod)/i) ? true : false );
+                                                                var uploader = new plupload.Uploader({
+                                                                        max_retries: 10,
+                                                                        multi_selection: " . ( isset($mdata['flashUploaderMulti']) && $mdata['flashUploaderMulti'] ? 'true' : 'false' ) . ",
+                                                                        unique_names: iOS,
+                                                                        chunk_size: '100kb',
+                                                                        runtimes : '" . ( isset($mdata['html5']) && $mdata['html5'] ? 'html5,' : '' ) . ( isset($mdata['flashUploader']) && $mdata['flashUploader'] ? 'flash,' : '') . "html4',
+                                                                        browse_button : 'bfPickFiles" . $mdata['dbId'] . "',
+                                                                        container: 'bfUploadContainer" . $mdata['dbId'] . "',
+                                                                        file_data_name: 'Filedata',
+                                                                        multipart_params: { form: " . $this->p->form . ", itemName : '" . $mdata['bfName'] . "', bfFlashUploadTicket: '" . $this->flashUploadTicket . "', option: 'com_breezingformsng', format: 'html', flashUpload: 'true', Itemid: 0 },
+                                                                        url : '" . $base . "index.php',
+                                                                        flash_swf_url : '" . $base . "components/com_breezingformsng/libraries/jquery/plupload/Moxie.swf',
+                                                                        filters : [
+                                                                                {title : " . json_encode(Text::_('COM_BREEZINGFORMSNG_CHOOSE_FILE')) . ", extensions : '" . $exts . "'}
+                                                                        ]
+                                                                });
+                                                                uploader.bind('FilesAdded', function(up, files) {
+                                                                        for (var i in files) {
+                                                                                if(typeof files[i].id != 'undefined' && files[i].id != null){
+                                                                                    var fsize = '';
+                                                                                    if(typeof files[i].size != 'undefined'){
+                                                                                        fsize = '(' + plupload.formatSize(files[i].size) + ') ';
+                                                                                    }
+                                                                                    if(typeof bfUploadFileAdded == 'function'){
+                                                                                        bfUploadFileAdded(files[i]);
+                                                                                    }
+                                                                                    JQuery('#bfFileQueue').append( '<div id=\"' + files[i].id + 'queue\">' + (iOS ? '' : files[i].name.replace(/[/\\?%*:|\"<>]/g, '')) + ' '+fsize+'<b></b></div>' );
+                                                                                }
+                                                                        }
+                                                                        for (var i in files) {
+                                                                            if(typeof files[i].id != 'undefined' && files[i].id != null){
+                                                                                var error = false;
+                                                                                var fsize = '';
+                                                                                if(typeof files[i].size != 'undefined'){
+                                                                                    fsize = '(' + plupload.formatSize(files[i].size) + ') ';
+                                                                                }
+                                                                                JQuery('#bfFlashFileQueue" . $mdata['dbId'] . "').append('<div class=\"bfFileQueueItem\" id=\"' + files[i].id + 'queueitem\"><div id=\"' + files[i].id + 'thumb\"></div><div id=\"' + files[i].id + '\"><img id=\"' + files[i].id + 'cancel\" src=\"" . $this->cancelImagePath . "\" style=\"cursor: pointer; padding-right: 10px;\" />' + (iOS ? '' : files[i].name.replace(/[/\\?%*:|\"<>]/g, '')) + ' ' + fsize + '<b id=\"' + files[i].id + 'msg\" style=\"color:red;\"></b></div></div>');
+                                                                                var file_ = files[i];
+                                                                                var uploader_ = uploader;
+                                                                                var bfUploaders_ = bfUploaders;
+                                                                                JQuery('#' + files[i].id + 'cancel').click(
+                                                                                    function(){
+                                                                                        for( var i = 0; i < bfUploaders_.length; i++ ){
+                                                                                            bfUploaders_[i].stop();
+                                                                                        }
+                                                                                        var id_ = this.id.split('cancel');
+                                                                                        id_ = id_[0];
+                                                                                        uploader_.removeFile(id_);
+                                                                                        JQuery('#'+id_+'queue').remove();
+                                                                                        JQuery('#'+id_+'queueitem').remove();
+                                                                                        bfFlashUploadersLength--;
+                                                                                        for( var i = 0; i < bfUploaders_.length; i++ ){
+                                                                                            bfUploaders_[i].start();
+                                                                                        }
+                                                                                        // re-enable button if there is none left
+                                                                                        if( " . ( isset($mdata['flashUploaderMulti']) && $mdata['flashUploaderMulti'] ? 'true' : 'false' ) . " == false ){
+                                                                                            var the_size = JQuery('#bfFlashFileQueue" . $mdata['dbId'] . " .bfFileQueueItem').size();
+                                                                                            if( the_size == 0 ){
+                                                                                                JQuery('#bfPickFiles" . $mdata['dbId'] . "').css('display','block');
+                                                                                                JQuery('#bfPickFiles" . $mdata['dbId'] . "holder').css('display','none');
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                );
+                                                                                var thebytes = " . (isset($mdata['flashUploaderBytes']) && is_numeric($mdata['flashUploaderBytes']) && $mdata['flashUploaderBytes'] > 0 ? intval($mdata['flashUploaderBytes']) : '0') . ";
+                                                                                if(thebytes > 0 && typeof files[i].size != 'undefined' && files[i].size > thebytes){
+                                                                                     alert(" . json_encode(' ' . Text::_('COM_BREEZINGFORMSNG_FLASH_UPLOADER_TOO_LARGE')) . ");
+                                                                                     error = true;
+                                                                                }
+                                                                                var ext = files[i].name.replace(/[/\\?%*:|\"<>]/g, '').split('.').pop().toLowerCase();
+                                                                                var exts = '" . strtolower($exts) . "'.split(',');
+                                                                                var found = 0;
+                                                                                for (var x in exts){
+                                                                                    if(exts[x] == ext){
+                                                                                        found++;
+                                                                                    }
+                                                                                }
+                                                                                if(found == 0){
+                                                                                    alert(" . json_encode(' ' . Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED')) . ");
+                                                                                    error = true;
+                                                                                }
+                                                                                if(error){
+                                                                                    JQuery('#'+files[i].id+'queue').remove();
+                                                                                    JQuery('#'+files[i].id+'queueitem').remove();
+                                                                                }else{
+                                                                                    bfFlashUploadersLength++;
+                                                                                }
+                                                                                bfUploadImageThumb(files[i]);
+                                                                            }
+                                                                        }
+                                                                        // disable the button if no multi upload
+                                                                        if( " . ( isset($mdata['flashUploaderMulti']) && $mdata['flashUploaderMulti'] ? 'true' : 'false' ) . " == false ){
+                                                                            var the_size = JQuery('#bfFlashFileQueue" . $mdata['dbId'] . " .bfFileQueueItem').size();
+                                                                            if( the_size > 0 ){
+                                                                                JQuery('#bfPickFiles" . $mdata['dbId'] . "').css('display','none');
+                                                                                JQuery('#bfPickFiles" . $mdata['dbId'] . "holder').css('display','block');
+                                                                            }
+                                                                        }
+                                                                });
+                                                                uploader.bind('UploadProgress', function(up, file) {
+                                                                    if(typeof JQuery('#'+file.id+'queue').get(0) != 'undefined'){
+                                                                        JQuery('#'+file.id+'queue').get(0).getElementsByTagName('b')[0].innerHTML = file.percent + '% <div style=\"height: 5px;width: ' + (file.percent*1.5) + 'px;background-color: #9de24f;\"></div>';
+                                                                    }
+                                                                });
+                                                                uploader.bind('FileUploaded', function(up, file, response) {
+                                                                    if(response.response!=''){
+                                                                        if(response.response !== null){
+                                                                            alert(response.response);
+                                                                        }
+                                                                    }
+                                                                    JQuery('#'+file.id+'queue').remove();
+                                                                });
+                                                                uploader.init();
+                                                                bfUploaders.push(uploader);
+                                                            });
+							//-->
+                                                        </script>
+							";
+							echo '<input class="ff_elem" ' . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="hidden" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+						} else {
+							echo '<input class="ff_elem" ' . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="file" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+						}
+						if ($mdata['attachToAdminMail']) {
+							echo '<input type="hidden" name="attachToAdminMail[' . $mdata['bfName'] . ']" value="true"/>' . "\n";
+						}
+						if ($mdata['attachToUserMail']) {
+							echo '<input type="hidden" name="attachToUserMail[' . $mdata['bfName'] . ']" value="true"/>' . "\n";
+						}
+
+					return $flashUploader;
 	}
 
 	public function render() {

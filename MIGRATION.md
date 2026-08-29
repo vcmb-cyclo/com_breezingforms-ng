@@ -3,6 +3,119 @@
 > Document de suivi destiné aux agents. Cocher chaque tâche à la complétion.  
 > Branche de travail recommandée : `migration-j6` (déjà active).
 
+## Mise à jour du plan — 2026-08-29
+
+Cette section complète l'historique avec l'état du chantier de modernisation
+mené sur la branche `modernize-legacy-services`. Les sections historiques
+restent inchangées afin de conserver la traçabilité des migrations précédentes.
+
+### État courant
+
+- [x] Outillage PHPCS ajouté à Composer (`squizlabs/php_codesniffer`, scripts
+  `lint:php` et `lint:php:fix`) avec un périmètre initial ciblé sur les services
+  modernisés.
+- [x] Tests renforcés pour callbacks, exports, uploads, permissions, signatures
+  de scripts, parsing des tests de pièces et état PDF.
+- [x] Validation Flash Upload extraite dans `FlashUploadSizeValidator`, injecté
+  dans `FlashUploadCallback`.
+- [x] Filets minimaux sur `bfTextfield` pour les quatre renderers QuickMode :
+  Classic, Bootstrap, Mobile et OnePage.
+- [x] Premier filet sur `RenderingEngine::view()` : branche non-QuickMode,
+  avertissement et arrêt avant initialisation du runtime.
+- [x] `ClassicRenderer` : les 21 types de champs couverts par filet de
+  caractérisation et extraits de `process()` en méthodes privées dédiées
+  (`renderTextfieldField`, `renderFileField`, etc. — `bfFile`, dernier type,
+  terminé le 2026-08-29). `process()` : ~1250 → ~510 lignes. Lot B ci-dessous
+  clos ; le fichier n'est plus « en cours local », il peut être touché par
+  d'autres lots (D, mutualisation Strategy) sans conflit particulier.
+- [ ] Compléter `RenderingEngine::view()` avant toute extraction : header,
+  toolbar, arbre de nœuds, aperçu, permissions, sélection mobile et sorties
+  anticipées.
+- [x] Étendre les filets des quatre renderers aux familles de champs à risque
+  (textarea, groupes, select, upload, CAPTCHA, calendrier et submit) — clos
+  le 2026-08-29. Exceptions documentées dans les tests eux-mêmes plutôt que
+  contournées : `MobileRenderer::bfCalendar` (implémentation native propre,
+  `LayoutHelper::render()` + connexion DB réelle, hors périmètre du harnais
+  pure-logic) et `OnePageRenderer::bfFile` (condition flashUploader/html5
+  entièrement commentée en prod — le widget flash s'affiche toujours, le
+  fallback `<input type="file">` est du code mort inatteignable ; comportement
+  documenté tel quel, pas "corrigé"). Couverture ensuite étendue aux 7 types
+  restants (bfSignature, bfStripe, bfPayPal, bfSofortueberweisung,
+  bfSummarize, bfHidden, bfNumberInput) sur Bootstrap, Mobile et OnePage —
+  **couverture complète des 4 renderers close le 2026-08-29** : chaque type
+  de champ de chaque renderer a désormais au moins un test figeant sa sortie
+  actuelle, à l'exception des deux cas documentés ci-dessus.
+- [x] Extraire ensuite la couche Strategy par type de champ, uniquement lorsque
+  les quatre sorties correspondantes sont figées par tests — **balayage
+  Bootstrap/OnePage clos le 2026-08-29** (garde levée explicitement, voir
+  ci-dessous). `HiddenFieldTrait` partagé par les 4 renderers (`bfHidden`).
+  `BootstrapStyleFieldTrait` partagé par Bootstrap et OnePage seulement
+  (même convention Bootstrap 5 via `$this->bsClass()`, absente de Classic
+  et différente sur Mobile) : `bfSummarize`, `bfCalendar`,
+  `bfCalendarResponsive`, `bfCheckbox`, `bfSelect`, `bfSubmitButton`,
+  `bfPayPal`, `bfSofortueberweisung`, `bfSignature`, `bfRadioGroup`,
+  `bfCheckboxGroup`, `bfStripe`, `bfTextfield`, `bfNumberInput` mutualisés.
+  Tous les types de champ des deux renderers ont été examinés ; les 4
+  restants sont des exceptions documentées, pas des oublis :
+  - `bfTextarea` : diffère d'un espace cosmétique entre Bootstrap et
+    OnePage — sans impact, délibérément non mutualisé.
+  - `bfFile` : différences réelles — chez OnePage la condition
+    flashUploader/html5 est entièrement commentée en prod (branche morte),
+    et le markup du bouton diffère (`<label><div class="btn">` chez
+    Bootstrap vs `<span><button type="button">` chez OnePage).
+  - `bfCaptcha` : bug de markup réel déjà identifié — Bootstrap ouvre
+    `<span type="button">` et ferme `</button>`, OnePage utilise
+    correctement `<button>`. Non corrigé.
+  - `bfReCaptcha` : **nouvelle découverte du 2026-08-29**, deux
+    divergences réelles, non corrigées, à trancher :
+    1. branche visible : OnePage ajoute un `<div class="g-recaptcha"
+       data-sitekey="...">` absent chez Bootstrap ;
+    2. branche invisible : `resetFlagOnCallback` vaut `true` chez
+       Bootstrap et `false` chez OnePage — incohérence de comportement,
+       pas une simple différence de forme.
+
+### Travaux parallélisables
+
+Les lots suivants peuvent avancer en parallèle s'ils restent dans des fichiers
+distincts :
+
+| Lot | Périmètre | Dépendance | Conflit probable |
+|---|---|---|---|
+| A | ~~Filets Bootstrap, Mobile et OnePage supplémentaires~~ — **clos le 2026-08-29** | — | — |
+| B | ~~Filets Classic supplémentaires~~ — **clos le 2026-08-29** : 21/21 types couverts et extraits | — | — |
+| C | Tests purs callbacks, uploads, exports et parsers | Aucun runtime Joomla réel | Faible |
+| D | Branches simples de `RenderingEngine::view()` | Harness/stubs existants | Moyen |
+| E | Nettoyage PHPCS par petits groupes de services | PHPCS installé | Faible si un fichier par lot |
+| F | Inventaire des différences par type de champ | Filets des quatre renderers | Faible, aucun code production |
+| G | Package, PHPStan, installation Joomla et tests navigateur | Builds isolés | Faible |
+
+### Ordre recommandé
+
+1. Terminer les filets individuels des quatre renderers, en gardant Classic
+   séparé tant que ses snapshots locaux ne sont pas arbitrés.
+2. Compléter `RenderingEngine::view()` par sorties observables et stubs
+   explicites ; ne pas extraire de section avant qu'elle soit couverte.
+3. Traiter en parallèle les tests purs (C), le nettoyage PHPCS (E) et
+   l'inventaire comparatif (F).
+4. Lancer les validations package/browser (G) après chaque groupe de rendu.
+5. Construire la Strategy par type de champ avec comparaison des snapshots
+   avant/après.
+
+### Ne pas paralléliser pour l'instant
+
+- ~~La couche Strategy commune~~ — **garde levée explicitement le 2026-08-29** :
+  les 4 filets complets sont en place, décision prise de démarrer sans
+  attendre la caractérisation de `RenderingEngine::view()`. À surveiller :
+  ce chantier touche les 4 renderers en même temps, coordination requise
+  avec tout travail parallèle sur ces fichiers.
+- Les modifications simultanées de `ClassicRenderer.php`, de son harness et de
+  ses snapshots : ce périmètre contient déjà du travail local non commité.
+- La suppression des façades/classes legacy appelables depuis du PHP stocké en
+  base : elle nécessite une décision de compatibilité et une recette dédiée.
+- Les extractions qui changent à la fois le dispatcher, le renderer et les
+  templates PDF : les regrouper par flux pour garder les régressions
+  attribuables.
+
 ---
 
 ## État actuel

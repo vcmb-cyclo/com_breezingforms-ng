@@ -19,6 +19,7 @@ use Joomla\CMS\Uri\Uri;
 use Joomla\Database\ParameterType;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Filesystem\File;
+use Vcmb\Component\BreezingformsNG\Site\Service\Upload\FlashUploadSizeValidator;
 
 /**
  * Chunked (legacy flash) upload endpoint (flashUpload=1).
@@ -28,6 +29,7 @@ final class FlashUploadCallback
     public function __construct(
         private readonly CMSApplication $application,
         private readonly DatabaseInterface $database,
+        private readonly FlashUploadSizeValidator $uploadSizeValidator,
     ) {
     }
 
@@ -97,11 +99,16 @@ final class FlashUploadCallback
 
                     $dataObject = json_decode(bf_b64dec($objectList[0]->template_code), true);
 
-                    $validationError = $this->validateUploadSize($dataObject, $finaltargetFile, $itemName);
+                    $validationLabel = $this->uploadSizeValidator->findOversizedLabel(
+                        $dataObject,
+                        $finaltargetFile,
+                        $itemName
+                    );
 
-                    if ($validationError !== null) {
+                    if ($validationLabel !== null) {
                         File::delete($finaltargetFile);
-                        echo $validationError;
+                        echo $validationLabel . ': '
+                            . Text::_('COM_BREEZINGFORMSNG_FLASH_UPLOADER_TOO_LARGE');
                         $this->application->close();
                     }
 
@@ -119,34 +126,4 @@ final class FlashUploadCallback
     $this->application->close();
     }
 
-    private function validateUploadSize(array $dataObject, string $targetFile, string $itemName): ?string
-    {
-        $metadata = $dataObject['properties'] ?? [];
-
-        if (
-            ($metadata['type'] ?? '') === 'element'
-            && ($metadata['bfType'] ?? '') === 'bfFile'
-            && (int) ($metadata['flashUploaderBytes'] ?? 0) > 0
-            && trim((string) ($metadata['bfName'] ?? '')) === trim($itemName)
-            && is_file($targetFile)
-            && filesize($targetFile) > (int) $metadata['flashUploaderBytes']
-        ) {
-            return trim((string) ($metadata['label'] ?? '')) . ': '
-                . Text::_('COM_BREEZINGFORMSNG_FLASH_UPLOADER_TOO_LARGE');
-        }
-
-        foreach (($dataObject['children'] ?? []) as $child) {
-            if (!is_array($child)) {
-                continue;
-            }
-
-            $error = $this->validateUploadSize($child, $targetFile, $itemName);
-
-            if ($error !== null) {
-                return $error;
-            }
-        }
-
-        return null;
-    }
 }

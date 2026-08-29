@@ -33,10 +33,11 @@ class ScriptManager
 		private readonly CMSApplication $app,
 		private readonly DatabaseInterface $database,
 		private readonly ScriptModel $model,
+		private readonly ScriptSignatureParser $signatureParser,
 	) {
 	}
 
-	function edit($option, $pkg, $ids)
+	public function edit($option, $pkg, $ids)
 	{
 		$database = $this->database;
 		ArrayHelper::toInteger($ids);
@@ -60,7 +61,7 @@ class ScriptManager
 
 
 	// ✅ FORCER le champ code en RAW (conserve < et >)
-	function save($option, $pkg)
+	public function save($option, $pkg)
 	{
 		$app = $this->app;
 		$post = $app->getInput()->post;
@@ -109,19 +110,19 @@ class ScriptManager
 	}
 
 
-	function cancel($option, $pkg)
+	public function cancel($option, $pkg)
 	{
 		$this->app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 	} // cancel
 
-	function copy($option, $pkg, $ids)
+	public function copy($option, $pkg, $ids)
 	{
 		$database = $this->database;
 		$total = count($ids);
 		$row = new ScriptTable($database);
 		if (count($ids)) foreach ($ids as $id) {
 			$row->load(intval($id));
-			$row->id       = NULL;
+			$row->id       = null;
 			$row->created = (new \Joomla\CMS\Date\Date())->toSql();
 			$row->created_by = (string) $this->app->getIdentity()->username;
 			$row->modified = $row->created;
@@ -133,7 +134,7 @@ class ScriptManager
 		$this->app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 	} // copy
 
-	function del($option, $pkg, $ids)
+	public function del($option, $pkg, $ids)
 	{
 		try {
 			$total = $this->model->deleteByIds($ids);
@@ -151,7 +152,7 @@ class ScriptManager
 		$this->app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 	} // del
 
-	function publish($option, $pkg, $ids, $publish)
+	public function publish($option, $pkg, $ids, $publish)
 	{
 		try {
 			$this->model->publishByIds($ids, (bool) $publish);
@@ -163,7 +164,7 @@ class ScriptManager
 		$this->app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
 	} // publish
 
-	function listitems($option, $pkg)
+	public function listitems($option, $pkg)
 	{
 		$app = $this->app;
 		$input = $app->getInput();
@@ -252,7 +253,7 @@ class ScriptManager
 		Renderer::listitems($option, $rows, $pkglist, $pkg, $search, $total, $limit, $limitstart, $pageSizes);
 	} // listitems
 
-	function test($option, $pkg, $ids)
+	public function test($option, $pkg, $ids)
 	{
 		$app = $this->app;
 		$database = $this->database;
@@ -275,7 +276,10 @@ class ScriptManager
 			return;
 		}
 
-		list($functionName, $params, $paramDefaults) = self::extractFunctionSignature((string) $row->code, (string) $row->name);
+		[$functionName, $params, $paramDefaults] = $this->signatureParser->parse(
+			(string) $row->code,
+			(string) $row->name
+		);
 		$autoRun = false;
 		if (count($params) === 0) {
 			$autoRun = true;
@@ -294,17 +298,17 @@ class ScriptManager
 		Renderer::test($option, $pkg, $row, $functionName, $params, $paramDefaults, $autoRun, $testMode);
 	}
 
-	function prev($option, $pkg, $ids)
+	public function prev($option, $pkg, $ids): void
 	{
 		$this->navigate($option, $pkg, $ids, 'prev');
 	}
 
-	function next($option, $pkg, $ids)
+	public function next($option, $pkg, $ids): void
 	{
 		$this->navigate($option, $pkg, $ids, 'next');
 	}
 
-	private function navigate($option, $pkg, $ids, $direction)
+	private function navigate($option, $pkg, $ids, $direction): void
 	{
 		$app = $this->app;
 		$database = $this->database;
@@ -359,50 +363,6 @@ class ScriptManager
 		} else {
 			$app->redirect("index.php?option=$option&task=scripts.edit&pkg=$pkg&ids[]=" . $targetId);
 		}
-	}
-
-	private static function extractFunctionSignature($code, $fallbackName = '')
-	{
-		$functionName = '';
-		$params = array();
-		$defaults = array();
-
-		$patterns = array(
-			'/function\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(([^)]*)\)/m',
-			'/(?:const|let|var)?\s*([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=\s*function\s*\(([^)]*)\)/m',
-			'/(?:const|let|var)?\s*([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=\s*\(([^)]*)\)\s*=>/m',
-		);
-
-		foreach ($patterns as $pattern) {
-			if (preg_match($pattern, $code, $matches)) {
-				$functionName = $matches[1];
-				$paramList = trim($matches[2]);
-				if ($paramList !== '') {
-					$parts = explode(',', $paramList);
-					foreach ($parts as $part) {
-						$part = trim($part);
-						if ($part === '') {
-							continue;
-						}
-						$part = preg_replace('/^\.{3}/', '', $part);
-						$segments = explode('=', $part, 2);
-						$name = trim($segments[0]);
-						if (!preg_match('/^[a-zA-Z_$][a-zA-Z0-9_$]*$/', $name)) {
-							continue;
-						}
-						$params[] = $name;
-						$defaults[] = isset($segments[1]) ? trim($segments[1]) : '';
-					}
-				}
-				break;
-			}
-		}
-
-		if ($functionName === '') {
-			$functionName = trim((string) $fallbackName);
-		}
-
-		return array($functionName, $params, $defaults);
 	}
 
 }

@@ -61,7 +61,7 @@ final class RenderingEngine
     {
     }
 
-    function header()
+    public function header(): string
     {
         global $ff_config;
 
@@ -107,14 +107,14 @@ final class RenderingEngine
 
     // header
 
-    function cbCreatePathByTokens($path, array $rows, $field_name)
+    public function cbCreatePathByTokens(mixed $path, array $rows, mixed $fieldName): string
     {
         $identity = $this->processor->app->getIdentity();
 
         return $this->tokenizedDirectoryResolver()->resolve(
             (string) $path,
             $rows,
-            (string) $field_name,
+            (string) $fieldName,
             $this->processor->findtags,
             $this->processor->replacetags,
             [
@@ -127,7 +127,7 @@ final class RenderingEngine
         );
     }
 
-    function makeSafeFolder($path)
+    public function makeSafeFolder(mixed $path): string
     {
         return $this->tokenizedDirectoryResolver()->makeSafeFolder((string) $path);
     }
@@ -144,7 +144,7 @@ final class RenderingEngine
             new ProcessorHeaderRenderer(new JavascriptValueExporter());
     }
 
-    function cbCheckPermissions()
+    public function cbCheckPermissions(): array
     {
         // CONTENTBUILDER BEGIN
 
@@ -241,7 +241,7 @@ final class RenderingEngine
         // CONTENTBUILDER END
     }
 
-    function view()
+    public function view(): void
     {
         global $ff_mospath, $ff_mossite, $my;
         global $ff_config, $ff_version, $ff_comsite, $ff_otherparams;
@@ -252,35 +252,18 @@ final class RenderingEngine
         }
 
         $is_mobile_type = '';
+        $rootMdata = [];
 
         if (trim($this->processor->formrow->template_code_processed) == 'QuickMode') {
 
-            if ($this->processor->app->getInput()->getBool('non_mobile', false)) {
-                $this->processor->app->getSession()->clear('com_breezingformsng.mobile');
-            } else if ($this->processor->app->getInput()->getBool('mobile', false)) {
-                $this->processor->app->getSession()->set('com_breezingformsng.mobile', true);
-            }
+            $this->syncMobileSessionPreference();
 
             require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
 
-            $dataObject = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
-            $rootMdata = $dataObject['properties'];
-            $is_device = false;
+            $rootMdata = $this->loadQuickModeMetadata();
+            $is_device = $this->applyMobileMode($rootMdata);
 
-            if ($this->processor->app->getInput()->getString('ff_applic', '') != 'mod_facileforms' && $this->processor->app->getInput()->getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
-                $is_device = true;
-                $this->processor->isMobile = isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile'] ? true : (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $this->processor->app->getSession()->get('com_breezingformsng.mobile', false) ? true : false);
-            } else {
-                $this->processor->isMobile = false;
-
-                if (isset($rootMdata['themebootstrapThemeEngine']) && $rootMdata['themebootstrapThemeEngine'] == 'bootstrap') {
-                    $this->processor->legacy_wrap = false;
-                }
-            }
-
-            if ($is_device && isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && !$rootMdata['forceMobile']) {
-                $is_mobile_type = 'choose';
-            }
+            $is_mobile_type = $this->mobileChoiceType($is_device, $rootMdata);
 
             if (!$this->processor->isMobile || ($this->processor->isMobile && $this->processor->app->getInput()->getString('ff_task', '') == 'submit')) {
 
@@ -288,11 +271,7 @@ final class RenderingEngine
             } else {
 
                 if ($this->processor->isMobile) {
-
-                    $quickMode = new MobileRenderer($this->processor);
-                    if (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile']) {
-                        $quickMode->forceMobileUrl = isset($rootMdata['forceMobileUrl']) ? $rootMdata['forceMobileUrl'] : 'index.php';
-                    }
+                    $quickMode = $this->createMobileRenderer($rootMdata);
                 }
             }
         }
@@ -311,95 +290,14 @@ final class RenderingEngine
         set_error_handler('_ff_errorHandler');
         ob_start();
         echo $this->processor->header();
-        $this->processor->queryCols = array();
-        $this->processor->queryRows = array();
-        if (trim($this->processor->formrow->template_code_processed) == 'QuickMode' && $this->processor->legacy_wrap)
-            echo '<table style="display:none;width:100%;" id="bfReCaptchaWrap"><tr><td><div id="bfReCaptchaDiv"></div></td></tr></table>';
-        echo '<div id="ff_formdiv' . $this->processor->form . '"';
-        echo ' class="bfFormDiv' . ($this->processor->formrow->class1 != '' ? ' ' . $this->processor->getClassName($this->processor->formrow->class1) : '') . '"';
-        if ($this->processor->legacy_wrap) {
-            echo '><div class="bfPage-tl"><div class="bfPage-tr"><div class="bfPage-t"></div></div></div><div class="bfPage-l"><div class="bfPage-r"><div class="bfPage-m bfClearfix">' . nl();
-        } else {
-            echo '>';
-        }
-        $this->processor->status = $this->processor->app->getInput()->getCmd('ff_status', '');
-        $this->processor->message = $this->processor->app->getInput()->getString('ff_message', '');
+        $this->initializeFormRendering();
 
-        // handle Before Form piece
-        $code = '';
-        switch ($this->processor->formrow->piece1cond) {
-            case 1: // library
-                $piece1id = (int) $this->processor->formrow->piece1id;
-                $query = $this->processor->database->getQuery(true)
-                    ->select(['name', 'code'])
-                    ->from($this->processor->database->quoteName('#__facileforms_pieces'))
-                    ->where($this->processor->database->quoteName('id') . ' = :piece1id')
-                    ->where($this->processor->database->quoteName('published') . ' = 1')
-                    ->bind(':piece1id', $piece1id, ParameterType::INTEGER);
-                $this->processor->database->setQuery($query);
-                $rows = $this->processor->database->loadObjectList();
-                if (count($rows))
-                    echo $this->processor->execPiece($rows[0]->code, Text::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECE') . " " . $rows[0]->name, 'p', $this->processor->formrow->piece1id, null);
-                break;
-            case 2: // custom code
-                echo $this->processor->execPiece($this->processor->formrow->piece1code, Text::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECEC'), 'f', $this->processor->form, 2);
-                break;
-            default:
-                break;
-        } // switch
-        if ($this->processor->bury())
+        if ($this->executeBeforeFormPiece())
             return;
 
-        $cntFiles = 0;
-        $fileExtensionError = json_encode(
-            Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED'),
-            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE
-        );
-        $fileExtensionsCheck = 'function checkFileExtensions(){';
-        for ($i = 0; $i < $this->processor->rowcount; $i++) {
-            $row = $this->processor->rows[$i];
-            if ($row->type == 'File Upload' && trim($this->processor->formrow->template_code) != '') {
-                if (trim($row->data2) != '') {
-                    $exts = explode(',', $row->data2);
-                    $extsCount = count($exts);
-                    $fileExtensionsCheck .= 'var ff_elem' . $row->id . 'Exts = false;';
-                    for ($x = 0; $x < $extsCount; $x++) {
-                        $fileExtensionsCheck .= '
-							if(!ff_elem' . $row->id . 'Exts && document.getElementById("ff_elem' . $row->id . '").value.toLowerCase().lastIndexOf(".' . strtolower(trim($exts[$x])) . '") != -1){
-								ff_elem' . $row->id . 'Exts = true;
-							}else if(!ff_elem' . $row->id . 'Exts && document.getElementById("ff_elem' . $row->id . '").value == ""){
-								ff_elem' . $row->id . 'Exts = true;
-							}';
-                    }
-                    $fileExtensionsCheck .= '
-					if(!ff_elem' . $row->id . 'Exts){
-						if(typeof bfUseErrorAlerts == "undefined"){
-							alert(' . $fileExtensionError . ');
-						} else {
-							bfShowErrors(' . $fileExtensionError . ');
-						}
-						if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
-                                                if(document.getElementById("bfSubmitButton")){
-                                                    document.getElementById("bfSubmitButton").disabled = false;
-                                                }
-                                                if(typeof JQuery != "undefined"){JQuery(".bfCustomSubmitButton").prop("disabled", false);}
-						return false;
-					}
-					';
-                    $cntFiles++;
-                }
-            }
-        }
-        $fileExtensionsCheck .= '
-			return true;
-		}
-		';
+        [$fileExtensionsCheck, $cntFiles] = $this->buildFileExtensionsCheck();
 
-        $captchaError = json_encode(
-            Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG'),
-            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE
-        );
-        $capFunc = 'function bfCheckCaptcha(){if(checkFileExtensions())ff_submitForm2();}';
+        [$captchaError, $capFunc] = $this->createCaptchaDefaults();
 
         for ($i = 0; $i < $this->processor->rowcount; $i++) {
             $row = $this->processor->rows[$i];
@@ -615,93 +513,18 @@ final class RenderingEngine
             $fileExtensionsCheck .
             $capFunc;
 
-        // create library list
-        $library = array();
-        $this->processor->loadBuiltins($library);
-        $this->processor->loadScripts($library);
-
-        // start linking
-        $linked = array();
+        [$library, $linked] = $this->createScriptLibraryState();
 
         if ($this->processor->status == '') {
-            $code = "onload = function()" . nl() .
-                "{" . nl() .
-                "    ff_initialize('formentry');" . nl() .
-                "    ff_initialize('pageentry');" . nl();
-            if ($this->processor->formrow->heightmode)
-                $code .= "    ff_resizepage(" . $this->processor->formrow->heightmode . ", " . $this->processor->formrow->height . ");" . nl();
-            if ($this->processor->showgrid)
-                $code .= "    ff_showgrid();" . nl();
-            $code .= "    if (ff_processor && ff_processor.traceBuffer) ff_traceWindow();" . nl() .
-                "} // onload";
-            $this->processor->linkcode('onload', $library, $linked, $code);
+            $this->linkInitialOnload($library, $linked);
         } else {
-            $funcname = "";
-            switch ($this->processor->formrow->script2cond) {
-                case 1:
-                    $script2id = (int) $this->processor->formrow->script2id;
-                    $query = $this->processor->database->getQuery(true)
-                        ->select('name')
-                        ->from($this->processor->database->quoteName('#__facileforms_scripts'))
-                        ->where($this->processor->database->quoteName('id') . ' = :script2id')
-                        ->where($this->processor->database->quoteName('published') . ' = 1')
-                        ->bind(':script2id', $script2id, ParameterType::INTEGER);
-                    $this->processor->database->setQuery($query);
-                    $funcname = $this->processor->database->loadResult();
-                    break;
-                case 2:
-                    $funcname = "ff_" . $this->processor->formrow->name . "_submitted";
-                    break;
-                default:
-                    break;
-            } // switch
-            if ($funcname != '' || $this->processor->formrow->heightmode || $this->processor->showgrid) {
-                $code = "onload = function()" . nl() .
-                    "{" . nl();
-                if ($this->processor->formrow->heightmode)
-                    $code .= "    ff_resizepage(" . $this->processor->formrow->heightmode . ", " . $this->processor->formrow->height . ");" . nl();
-                if ($this->processor->showgrid)
-                    $code .= "    ff_showgrid();" . nl();
-                if ($funcname != '') {
-                    $json_return = json_encode($this->processor->message, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS);
-                    if (trim($json_return) == '') {
-                        $json_return = '""';
-                    }
-                    $code .= "    " . $funcname . "(" . $this->processor->status . "," . $json_return . ");" . nl();
-                }
-                $code .= "} // onload";
-                $this->processor->linkcode('onload', $library, $linked, $code);
-            } // if
+            $this->linkSubmittedOnload($library, $linked);
         } // if
         if ($this->processor->bury())
             return;
 
         // add form scripts
-        $this->processor->addFunction(
-            $this->processor->formrow->script1cond,
-            $this->processor->formrow->script1id,
-            'ff_' . $this->processor->formrow->name . '_init',
-            $this->processor->formrow->script1code,
-            $library,
-            $linked,
-            'f',
-            $this->processor->form,
-            1
-        );
-        if ($this->processor->bury())
-            return;
-        $this->processor->addFunction(
-            $this->processor->formrow->script2cond,
-            $this->processor->formrow->script2id,
-            'ff_' . $this->processor->formrow->name . '_submitted',
-            $this->processor->formrow->script2code,
-            $library,
-            $linked,
-            'f',
-            $this->processor->form,
-            1
-        );
-        if ($this->processor->bury())
+        if ($this->addFormScripts($library, $linked))
             return;
 
         // all element scripts & static text/HTML
@@ -2071,34 +1894,12 @@ final class RenderingEngine
             } else {
                 //if(true){
 
-                if (isset($rootMdata['themebootstrapThemeEngine']) && $rootMdata['themebootstrapThemeEngine'] == 'bootstrap') {
-
-                    if (isset($rootMdata['themebootstrapMode']) && $rootMdata['themebootstrapMode']) {
-
-                        $quickMode = new OnePageRenderer($this->processor);
-                    } else {
-
-                        $quickMode = new BootstrapRenderer($this->processor);
-                    }
-
-                    $this->processor->quickmode = $quickMode;
-                } else {
-                    $quickMode = new ClassicRenderer($this->processor);
-                    $this->processor->quickmode = $quickMode;
-                }
+                $quickMode = $this->createQuickModeRenderer($rootMdata);
+                $this->processor->quickmode = $quickMode;
             }
 
             if ($is_mobile_type == 'choose') {
-                $current_url = Uri::getInstance()->toString();
-                $return_url = $current_url;
-                $return_url = (strstr($return_url, '?non_mobile=1') !== false ? str_replace('?non_mobile=1', '', $return_url) : str_replace('&non_mobile=1', '', $return_url));
-                $return_url = $return_url . (strstr($return_url, '?') !== false ? '&' : '?') . 'mobile=1';
-                echo '<script type="text/javascript">
-                <!--
-                var bf_mobile_url = ' . json_encode($return_url) . ';
-                //-->
-                </script>';
-                echo '<div style="display: block; text-align: center;"><button class="ff_elem btn btn-primary" onclick="location.href=bf_mobile_url;"><span>' . Text::_('COM_BREEZINGFORMSNG_MOBILE_VERSION') . '</span></button></div><div></div>';
+                $this->renderMobileChoice();
             }
 
             $quickMode->render();
@@ -2301,49 +2102,10 @@ final class RenderingEngine
                     echo '</form>' . nl();
                 } // if
         } // if
-        // handle After Form piece
-        $code = '';
-
-        switch ($this->processor->formrow->piece2cond) {
-            case 1: // library
-                $piece2id = (int) $this->processor->formrow->piece2id;
-                $query = $this->processor->database->getQuery(true)
-                    ->select(['name', 'code'])
-                    ->from($this->processor->database->quoteName('#__facileforms_pieces'))
-                    ->where($this->processor->database->quoteName('id') . ' = :piece2id')
-                    ->where($this->processor->database->quoteName('published') . ' = 1')
-                    ->bind(':piece2id', $piece2id, ParameterType::INTEGER);
-                $this->processor->database->setQuery($query);
-                $rows = $this->processor->database->loadObjectList();
-                if (count($rows))
-                    echo $this->processor->execPiece(
-                        $rows[0]->code,
-                        Text::_('COM_BREEZINGFORMSNG_PROCESS_AFPIECE') . " " . $rows[0]->name,
-                        'p',
-                        $this->processor->formrow->piece2id,
-                        null
-                    );
-                break;
-            case 2: // custom code
-                echo $this->processor->execPiece(
-                    $this->processor->formrow->piece2code,
-                    Text::_('COM_BREEZINGFORMSNG_PROCESS_AFPIECEC'),
-                    'f',
-                    $this->processor->form,
-                    2
-                );
-                break;
-            default:
-                break;
-        } // switch
-        if ($this->processor->bury())
+        if ($this->executeAfterFormPiece())
             return;
 
-        if ($this->processor->legacy_wrap) {
-            echo '</div></div></div><div class="bfPage-bl"><div class="bfPage-br"><div class="bfPage-b"></div></div></div></div><!-- form end -->' . nl();
-        } else {
-            echo '</div><!-- form end -->' . nl();
-        }
+        $this->closeFormRendering();
         if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT) {
             $this->processor->dumpTrace();
             ob_end_flush();
@@ -2354,6 +2116,406 @@ final class RenderingEngine
         } // if
         restore_error_handler();
 
+    }
+
+    /**
+     * Create the renderer selected by the QuickMode theme settings.
+     *
+     * @param array<string, mixed> $rootMdata
+     */
+    private function createQuickModeRenderer(array $rootMdata): object
+    {
+        if (isset($rootMdata['themebootstrapThemeEngine']) && $rootMdata['themebootstrapThemeEngine'] == 'bootstrap') {
+            if (isset($rootMdata['themebootstrapMode']) && $rootMdata['themebootstrapMode']) {
+                return new OnePageRenderer($this->processor);
+            }
+
+            return new BootstrapRenderer($this->processor);
+        }
+
+        return new ClassicRenderer($this->processor);
+    }
+
+    /**
+     * Create and configure the renderer used for a mobile QuickMode request.
+     *
+     * @param array<string, mixed> $rootMdata
+     */
+    private function createMobileRenderer(array $rootMdata): MobileRenderer
+    {
+        $quickMode = new MobileRenderer($this->processor);
+
+        if (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile']) {
+            $quickMode->forceMobileUrl = isset($rootMdata['forceMobileUrl']) ? $rootMdata['forceMobileUrl'] : 'index.php';
+        }
+
+        return $quickMode;
+    }
+
+    private function renderMobileChoice(): void
+    {
+        $currentUrl = Uri::getInstance()->toString();
+        $returnUrl = $currentUrl;
+        $returnUrl = (strstr($returnUrl, '?non_mobile=1') !== false ? str_replace('?non_mobile=1', '', $returnUrl) : str_replace('&non_mobile=1', '', $returnUrl));
+        $returnUrl = $returnUrl . (strstr($returnUrl, '?') !== false ? '&' : '?') . 'mobile=1';
+        echo '<script type="text/javascript">
+                <!--
+                var bf_mobile_url = ' . json_encode($returnUrl) . ';
+                //-->
+                </script>';
+        echo '<div style="display: block; text-align: center;"><button class="ff_elem btn btn-primary" onclick="location.href=bf_mobile_url;"><span>' . Text::_('COM_BREEZINGFORMSNG_MOBILE_VERSION') . '</span></button></div><div></div>';
+    }
+
+    private function syncMobileSessionPreference(): void
+    {
+        if ($this->processor->app->getInput()->getBool('non_mobile', false)) {
+            $this->processor->app->getSession()->clear('com_breezingformsng.mobile');
+        } elseif ($this->processor->app->getInput()->getBool('mobile', false)) {
+            $this->processor->app->getSession()->set('com_breezingformsng.mobile', true);
+        }
+    }
+
+    /**
+     * Apply the mobile mode selected by the request and template settings.
+     *
+     * @param array<string, mixed> $rootMdata
+     */
+    private function applyMobileMode(array $rootMdata): bool
+    {
+        if ($this->processor->app->getInput()->getString('ff_applic', '') != 'mod_facileforms' && $this->processor->app->getInput()->getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
+            $this->processor->isMobile = isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile'] ? true : (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $this->processor->app->getSession()->get('com_breezingformsng.mobile', false) ? true : false);
+
+            return true;
+        }
+
+        $this->processor->isMobile = false;
+
+        if (isset($rootMdata['themebootstrapThemeEngine']) && $rootMdata['themebootstrapThemeEngine'] == 'bootstrap') {
+            $this->processor->legacy_wrap = false;
+        }
+
+        return false;
+    }
+
+    /**
+     * Decode the QuickMode template metadata used by the rendering stages.
+     *
+     * @return array<string, mixed>
+     */
+    private function loadQuickModeMetadata(): array
+    {
+        $dataObject = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
+
+        return $dataObject['properties'];
+    }
+
+    /**
+     * Determine whether the visitor should be offered the mobile version.
+     *
+     * @param array<string, mixed> $rootMdata
+     */
+    private function mobileChoiceType(bool $isDevice, array $rootMdata): string
+    {
+        if ($isDevice && isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && !$rootMdata['forceMobile']) {
+            return 'choose';
+        }
+
+        return '';
+    }
+
+    /**
+     * Build the script library and the registry used while linking callbacks.
+     *
+     * @return array{0: array<int|string, mixed>, 1: array<int|string, mixed>}
+     */
+    private function createScriptLibraryState(): array
+    {
+        $library = [];
+        $this->processor->loadBuiltins($library);
+        $this->processor->loadScripts($library);
+
+        return [$library, []];
+    }
+
+    /**
+     * Link the onload callback used when a form is displayed for the first time.
+     *
+     * @param array<int|string, mixed> $library
+     * @param array<int|string, mixed> $linked
+     */
+    private function linkInitialOnload(array &$library, array &$linked): void
+    {
+        $code = "onload = function()" . nl() .
+            "{" . nl() .
+            "    ff_initialize('formentry');" . nl() .
+            "    ff_initialize('pageentry');" . nl();
+        if ($this->processor->formrow->heightmode) {
+            $code .= "    ff_resizepage(" . $this->processor->formrow->heightmode . ", " . $this->processor->formrow->height . ");" . nl();
+        }
+        if ($this->processor->showgrid) {
+            $code .= "    ff_showgrid();" . nl();
+        }
+        $code .= "    if (ff_processor && ff_processor.traceBuffer) ff_traceWindow();" . nl() .
+            "} // onload";
+        $this->processor->linkcode('onload', $library, $linked, $code);
+    }
+
+    private function initializeFormRendering(): void
+    {
+        $this->processor->queryCols = [];
+        $this->processor->queryRows = [];
+
+        if (trim($this->processor->formrow->template_code_processed) == 'QuickMode' && $this->processor->legacy_wrap) {
+            echo '<table style="display:none;width:100%;" id="bfReCaptchaWrap"><tr><td><div id="bfReCaptchaDiv"></div></td></tr></table>';
+        }
+
+        echo '<div id="ff_formdiv' . $this->processor->form . '"';
+        echo ' class="bfFormDiv' . ($this->processor->formrow->class1 != '' ? ' ' . $this->processor->getClassName($this->processor->formrow->class1) : '') . '"';
+        if ($this->processor->legacy_wrap) {
+            echo '><div class="bfPage-tl"><div class="bfPage-tr"><div class="bfPage-t"></div></div></div><div class="bfPage-l"><div class="bfPage-r"><div class="bfPage-m bfClearfix">' . nl();
+        } else {
+            echo '>';
+        }
+
+        $this->processor->status = $this->processor->app->getInput()->getCmd('ff_status', '');
+        $this->processor->message = $this->processor->app->getInput()->getString('ff_message', '');
+    }
+
+    private function closeFormRendering(): void
+    {
+        if ($this->processor->legacy_wrap) {
+            echo '</div></div></div><div class="bfPage-bl"><div class="bfPage-br"><div class="bfPage-b"></div></div></div></div><!-- form end -->' . nl();
+
+            return;
+        }
+
+        echo '</div><!-- form end -->' . nl();
+    }
+
+    private function executeBeforeFormPiece(): bool
+    {
+        switch ($this->processor->formrow->piece1cond) {
+            case 1:
+                $piece1id = (int) $this->processor->formrow->piece1id;
+                $query = $this->processor->database->getQuery(true)
+                    ->select(['name', 'code'])
+                    ->from($this->processor->database->quoteName('#__facileforms_pieces'))
+                    ->where($this->processor->database->quoteName('id') . ' = :piece1id')
+                    ->where($this->processor->database->quoteName('published') . ' = 1')
+                    ->bind(':piece1id', $piece1id, ParameterType::INTEGER);
+                $this->processor->database->setQuery($query);
+                $rows = $this->processor->database->loadObjectList();
+                if (count($rows)) {
+                    echo $this->processor->execPiece($rows[0]->code, Text::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECE') . ' ' . $rows[0]->name, 'p', $this->processor->formrow->piece1id, null);
+                }
+                break;
+            case 2:
+                echo $this->processor->execPiece($this->processor->formrow->piece1code, Text::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECEC'), 'f', $this->processor->form, 2);
+                break;
+            default:
+                break;
+        }
+
+        return $this->processor->bury();
+    }
+
+    private function executeAfterFormPiece(): bool
+    {
+        switch ($this->processor->formrow->piece2cond) {
+            case 1:
+                $piece2id = (int) $this->processor->formrow->piece2id;
+                $query = $this->processor->database->getQuery(true)
+                    ->select(['name', 'code'])
+                    ->from($this->processor->database->quoteName('#__facileforms_pieces'))
+                    ->where($this->processor->database->quoteName('id') . ' = :piece2id')
+                    ->where($this->processor->database->quoteName('published') . ' = 1')
+                    ->bind(':piece2id', $piece2id, ParameterType::INTEGER);
+                $this->processor->database->setQuery($query);
+                $rows = $this->processor->database->loadObjectList();
+                if (count($rows)) {
+                    echo $this->processor->execPiece(
+                        $rows[0]->code,
+                        Text::_('COM_BREEZINGFORMSNG_PROCESS_AFPIECE') . ' ' . $rows[0]->name,
+                        'p',
+                        $this->processor->formrow->piece2id,
+                        null
+                    );
+                }
+                break;
+            case 2:
+                echo $this->processor->execPiece(
+                    $this->processor->formrow->piece2code,
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_AFPIECEC'),
+                    'f',
+                    $this->processor->form,
+                    2
+                );
+                break;
+            default:
+                break;
+        }
+
+        return $this->processor->bury();
+    }
+
+    /**
+     * Link the onload callback used after a form submission.
+     *
+     * @param array<int|string, mixed> $library
+     * @param array<int|string, mixed> $linked
+     */
+    private function linkSubmittedOnload(array &$library, array &$linked): void
+    {
+        $functionName = '';
+
+        switch ($this->processor->formrow->script2cond) {
+            case 1:
+                $script2id = (int) $this->processor->formrow->script2id;
+                $query = $this->processor->database->getQuery(true)
+                    ->select('name')
+                    ->from($this->processor->database->quoteName('#__facileforms_scripts'))
+                    ->where($this->processor->database->quoteName('id') . ' = :script2id')
+                    ->where($this->processor->database->quoteName('published') . ' = 1')
+                    ->bind(':script2id', $script2id, ParameterType::INTEGER);
+                $this->processor->database->setQuery($query);
+                $functionName = $this->processor->database->loadResult();
+                break;
+            case 2:
+                $functionName = 'ff_' . $this->processor->formrow->name . '_submitted';
+                break;
+            default:
+                break;
+        }
+
+        if ($functionName == '' && !$this->processor->formrow->heightmode && !$this->processor->showgrid) {
+            return;
+        }
+
+        $code = "onload = function()" . nl() .
+            "{" . nl();
+        if ($this->processor->formrow->heightmode) {
+            $code .= "    ff_resizepage(" . $this->processor->formrow->heightmode . ", " . $this->processor->formrow->height . ");" . nl();
+        }
+        if ($this->processor->showgrid) {
+            $code .= "    ff_showgrid();" . nl();
+        }
+        if ($functionName != '') {
+            $jsonReturn = json_encode($this->processor->message, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS);
+            if (trim($jsonReturn) === '') {
+                $jsonReturn = '""';
+            }
+            $code .= "    " . $functionName . "(" . $this->processor->status . "," . $jsonReturn . ");" . nl();
+        }
+        $code .= '} // onload';
+        $this->processor->linkcode('onload', $library, $linked, $code);
+    }
+
+    /**
+     * Build the client-side file extension validator.
+     *
+     * @return array{0: string, 1: int}
+     */
+    private function buildFileExtensionsCheck(): array
+    {
+        $cntFiles = 0;
+        $fileExtensionError = json_encode(
+            Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED'),
+            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE
+        );
+        $fileExtensionsCheck = 'function checkFileExtensions(){';
+        for ($i = 0; $i < $this->processor->rowcount; $i++) {
+            $row = $this->processor->rows[$i];
+            if ($row->type == 'File Upload' && trim($this->processor->formrow->template_code) != '') {
+                if (trim($row->data2) != '') {
+                    $exts = explode(',', $row->data2);
+                    $extsCount = count($exts);
+                    $fileExtensionsCheck .= 'var ff_elem' . $row->id . 'Exts = false;';
+                    for ($x = 0; $x < $extsCount; $x++) {
+                        $fileExtensionsCheck .= '
+							if(!ff_elem' . $row->id . 'Exts && document.getElementById("ff_elem' . $row->id . '").value.toLowerCase().lastIndexOf(".' . strtolower(trim($exts[$x])) . '") != -1){
+								ff_elem' . $row->id . 'Exts = true;
+							}else if(!ff_elem' . $row->id . 'Exts && document.getElementById("ff_elem' . $row->id . '").value == ""){
+								ff_elem' . $row->id . 'Exts = true;
+							}';
+                    }
+                    $fileExtensionsCheck .= '
+					if(!ff_elem' . $row->id . 'Exts){
+						if(typeof bfUseErrorAlerts == "undefined"){
+							alert(' . $fileExtensionError . ');
+						} else {
+							bfShowErrors(' . $fileExtensionError . ');
+						}
+						if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
+                                                if(document.getElementById("bfSubmitButton")){
+                                                    document.getElementById("bfSubmitButton").disabled = false;
+                                                }
+                                                if(typeof JQuery != "undefined"){JQuery(".bfCustomSubmitButton").prop("disabled", false);}
+						return false;
+					}
+					';
+                    $cntFiles++;
+                }
+            }
+        }
+        $fileExtensionsCheck .= '
+			return true;
+		}
+		';
+
+        return [$fileExtensionsCheck, $cntFiles];
+    }
+
+    /**
+     * Create the default CAPTCHA error payload and submit callback.
+     *
+     * @return array{0: string, 1: string}
+     */
+    private function createCaptchaDefaults(): array
+    {
+        $captchaError = json_encode(
+            Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG'),
+            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE
+        );
+
+        return [$captchaError, 'function bfCheckCaptcha(){if(checkFileExtensions())ff_submitForm2();}'];
+    }
+
+    /**
+     * Link the form-level init and submission callbacks.
+     *
+     * @param array<int|string, mixed> $library
+     * @param array<int|string, mixed> $linked
+     */
+    private function addFormScripts(array &$library, array &$linked): bool
+    {
+        $this->processor->addFunction(
+            $this->processor->formrow->script1cond,
+            $this->processor->formrow->script1id,
+            'ff_' . $this->processor->formrow->name . '_init',
+            $this->processor->formrow->script1code,
+            $library,
+            $linked,
+            'f',
+            $this->processor->form,
+            1
+        );
+        if ($this->processor->bury()) {
+            return true;
+        }
+
+        $this->processor->addFunction(
+            $this->processor->formrow->script2cond,
+            $this->processor->formrow->script2id,
+            'ff_' . $this->processor->formrow->name . '_submitted',
+            $this->processor->formrow->script2code,
+            $library,
+            $linked,
+            'f',
+            $this->processor->form,
+            1
+        );
+
+        return $this->processor->bury();
     }
 
     // view

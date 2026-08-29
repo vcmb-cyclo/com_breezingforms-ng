@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Rendering\QuickMode;
 
 use HTML_facileFormsProcessor;
+use Joomla\CMS\Application\CMSApplication;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\BootstrapRenderer;
@@ -18,6 +19,9 @@ if (!class_exists(HTML_facileFormsProcessor::class)) {
 }
 
 require_once __DIR__ . '/joomla-htmlhelper-stub.php';
+require_once __DIR__ . '/joomla-text-stub.php';
+require_once __DIR__ . '/joomla-uri-stub.php';
+require_once __DIR__ . '/joomla-cmsapplication-stub.php';
 
 /**
  * Characterization tests for BootstrapRenderer::process() - proves the same
@@ -45,6 +49,25 @@ final class BootstrapRendererCharacterizationTest extends TestCase
         'form-group' => 'bf-form-group mb-3',
         'icon-question-sign' => 'fas fa-question-circle',
         'icon-asterisk' => 'fas fa-asterisk',
+        'nonform-control' => 'nonform-control',
+        'radio-form-group' => 'radio-form-group',
+        'checkbox-form-group' => 'checkbox-form-group',
+        'inline' => 'form-check-inline',
+        'radio' => 'form-check-label',
+        'checkbox' => 'form-check-label',
+        'form-select' => 'form-select',
+        'other-form-group' => 'other-form-group',
+        'btn' => 'btn',
+        'btn-primary' => 'btn-primary',
+        'icon-upload' => 'fas fa-upload',
+        'row' => 'row',
+        'img-thumbnail' => 'img-thumbnail',
+        'input-append' => 'input-group',
+        'custom-form-control' => 'custom-form-control',
+        'icon-refresh' => 'fas fa-sync',
+        'well' => 'card',
+        'well-small' => 'card-body',
+        'icon-calendar' => 'fas fa-calendar',
     ];
 
     public function testTextfieldElement(): void
@@ -89,6 +112,319 @@ final class BootstrapRendererCharacterizationTest extends TestCase
         $this->assertMatchesSnapshot('bootstrap_bfTextfield_prefilled.html', $html);
     }
 
+    public function testTextareaElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfTextarea', [
+            'dbId' => 44,
+            'bfName' => 'message',
+            'label' => 'Message',
+            'required' => true,
+            'width' => '',
+            'height' => '',
+            'value' => "Ligne 1\nLigne 2",
+            'is_html' => false,
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfTextarea.html', $html);
+    }
+
+    public function testRadioGroupElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfRadioGroup', [
+            'dbId' => 48,
+            'bfName' => 'gender',
+            'label' => 'Civilité',
+            'required' => true,
+            'wrap' => true,
+            'group' => "0;Madame;mme\n1;Monsieur;mr",
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfRadioGroup.html', $html);
+    }
+
+    public function testCheckboxGroupElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfCheckboxGroup', [
+            'dbId' => 49,
+            'bfName' => 'interests',
+            'label' => "Centres d'intérêt",
+            'wrap' => false,
+            'group' => "0;Route;road\n1;VTT;mtb\n0;Piste;track",
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfCheckboxGroup.html', $html);
+    }
+
+    public function testCheckboxElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfCheckbox', [
+            'dbId' => 46,
+            'bfName' => 'accept',
+            'label' => "J'accepte les conditions",
+            'required' => true,
+            'checked' => false,
+            'value' => '1',
+            'mailbackAccept' => false,
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfCheckbox.html', $html);
+    }
+
+    public function testSelectElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfSelect', [
+            'dbId' => 47,
+            'bfName' => 'country',
+            'label' => 'Pays',
+            'multiple' => false,
+            'width' => '',
+            'height' => '',
+            'list' => "1;France;fr\n0;Belgique;be\n0;Suisse;ch",
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfSelect.html', $html);
+    }
+
+    public function testSubmitButtonElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfSubmitButton', [
+            'dbId' => 52,
+            'hideLabel' => true,
+            'src' => '',
+            'value' => 'Envoyer',
+            'actionClick' => 0,
+            'actionFunctionName' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfSubmitButton.html', $html);
+    }
+
+    public function testFileElementPlain(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfFile', [
+            'dbId' => 61,
+            'bfName' => 'attachment',
+            'hideLabel' => true,
+            'flashUploader' => false,
+            'html5' => false,
+            'attachToAdminMail' => false,
+            'attachToUserMail' => false,
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfFile_plain.html', $html);
+    }
+
+    public function testFileElementFlashUploader(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfFile', [
+            'dbId' => 62,
+            'bfName' => 'photo',
+            'hideLabel' => true,
+            'flashUploader' => true,
+            'html5' => true,
+            'flashUploaderMulti' => false,
+            'flashUploaderBytes' => 2097152,
+            'allowedFileExtensions' => 'jpg,png',
+            'attachToAdminMail' => true,
+            'attachToUserMail' => false,
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfFile_flashUploader.html', $html);
+    }
+
+    public function testCaptchaElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfCaptcha', [
+            'dbId' => 56,
+            'hideLabel' => true,
+            'width' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfCaptcha.html', $html);
+    }
+
+    public function testReCaptchaElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfReCaptcha', [
+            'dbId' => 59,
+            'hideLabel' => true,
+            'pubkey' => '6Lc-test-pubkey',
+            'invisibleCaptcha' => false,
+            'theme' => '',
+            'size' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfReCaptcha.html', $html);
+    }
+
+    public function testCalendarElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfCalendar', [
+            'dbId' => 60,
+            'bfName' => 'birthdate',
+            'label' => 'Date de naissance',
+            'value' => '',
+            'format' => '%Y-%m-%d',
+            'timeFormat' => false,
+            'singleHeader' => false,
+            'todayButton' => false,
+            'weekNumbers' => false,
+            'minYear' => '',
+            'maxYear' => '',
+            'firstDay' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfCalendar.html', $html);
+    }
+
+    public function testCalendarResponsiveElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfCalendarResponsive', [
+            'dbId' => 58,
+            'bfName' => 'eventdate',
+            'label' => 'Date',
+            'required' => true,
+            'value' => '',
+            'format' => '%Y-%m-%d',
+            'firstDay' => '1',
+            'size' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfCalendarResponsive.html', $html);
+    }
+
+    public function testHiddenElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfHidden', [
+            'dbId' => 45,
+            'bfName' => 'source',
+            'hideLabel' => true,
+            'value' => 'newsletter-2026',
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfHidden.html', $html);
+    }
+
+    public function testNumberInputElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfNumberInput', [
+            'dbId' => 50,
+            'bfName' => 'age',
+            'label' => 'Âge',
+            'range' => false,
+            'value' => '',
+            'step' => 1,
+            'max' => 120,
+            'min' => 0,
+            'size' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfNumberInput.html', $html);
+    }
+
+    public function testSummarizeElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfSummarize', [
+            'dbId' => 51,
+            'hideLabel' => true,
+            'connectWith' => ['price', 'qty'],
+            'connectType' => 'multiply',
+            'emptyMessage' => '0',
+            'hideIfEmpty' => false,
+            'fieldCalc' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfSummarize.html', $html);
+    }
+
+    public function testSignatureElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfSignature', [
+            'dbId' => 57,
+            'bfName' => 'signature',
+            'hideLabel' => true,
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfSignature.html', $html);
+    }
+
+    public function testStripeElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfStripe', [
+            'dbId' => 53,
+            'hideLabel' => true,
+            'image' => '',
+            'actionClick' => 0,
+            'actionFunctionName' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfStripe.html', $html);
+    }
+
+    public function testPayPalElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfPayPal', [
+            'dbId' => 54,
+            'hideLabel' => true,
+            'image' => '',
+            'actionClick' => 0,
+            'actionFunctionName' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfPayPal.html', $html);
+    }
+
+    public function testSofortueberweisungElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfSofortueberweisung', [
+            'dbId' => 55,
+            'hideLabel' => true,
+            'image' => '',
+            'actionClick' => 0,
+            'actionFunctionName' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfSofortueberweisung.html', $html);
+    }
+
     /**
      * @param array<string, mixed> $overrides
      * @return array<string, mixed>
@@ -131,6 +467,8 @@ final class BootstrapRendererCharacterizationTest extends TestCase
         $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();
         $processor->rowcount = 0;
         $processor->rows = [];
+        $processor->app = new CMSApplication();
+        $processor->form = 27;
 
         $renderer = (new ReflectionClass(BootstrapRenderer::class))->newInstanceWithoutConstructor();
 

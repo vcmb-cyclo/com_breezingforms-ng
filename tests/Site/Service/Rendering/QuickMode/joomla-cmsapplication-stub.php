@@ -43,6 +43,11 @@ namespace Joomla\CMS\Application {
                 return $this->config[$key] ?? $default;
             }
 
+            public function getConfig(): FakeRegistry
+            {
+                return new FakeRegistry($this->config);
+            }
+
             public function getLanguage(): FakeLanguage
             {
                 return new FakeLanguage($this->languageTag);
@@ -60,6 +65,23 @@ namespace Joomla\CMS\Application {
 
             public function setTitle(string $title): void
             {
+            }
+        }
+    }
+
+    if (!class_exists(FakeRegistry::class, false)) {
+        final class FakeRegistry
+        {
+            /**
+             * @param array<string, mixed> $values
+             */
+            public function __construct(private readonly array $values)
+            {
+            }
+
+            public function get(string $key, mixed $default = null): mixed
+            {
+                return $this->values[$key] ?? $default;
             }
         }
     }
@@ -165,6 +187,11 @@ namespace Joomla\CMS\Application {
             }
 
             public function getString(string $name, string $default = ''): string
+            {
+                return (string) ($this->values[$name] ?? $default);
+            }
+
+            public function getCmd(string $name, string $default = ''): string
             {
                 return (string) ($this->values[$name] ?? $default);
             }

@@ -3,6 +3,72 @@
 > Document de suivi destiné aux agents. Cocher chaque tâche à la complétion.  
 > Branche de travail recommandée : `migration-j6` (déjà active).
 
+## Mise à jour du plan — 2026-08-29
+
+Cette section complète l'historique avec l'état du chantier de modernisation
+mené sur la branche `modernize-legacy-services`. Les sections historiques
+restent inchangées afin de conserver la traçabilité des migrations précédentes.
+
+### État courant
+
+- [x] Outillage PHPCS ajouté à Composer (`squizlabs/php_codesniffer`, scripts
+  `lint:php` et `lint:php:fix`) avec un périmètre initial ciblé sur les services
+  modernisés.
+- [x] Tests renforcés pour callbacks, exports, uploads, permissions, signatures
+  de scripts, parsing des tests de pièces et état PDF.
+- [x] Validation Flash Upload extraite dans `FlashUploadSizeValidator`, injecté
+  dans `FlashUploadCallback`.
+- [x] Filets minimaux sur `bfTextfield` pour les quatre renderers QuickMode :
+  Classic, Bootstrap, Mobile et OnePage.
+- [x] Premier filet sur `RenderingEngine::view()` : branche non-QuickMode,
+  avertissement et arrêt avant initialisation du runtime.
+- [ ] Compléter `RenderingEngine::view()` avant toute extraction : header,
+  toolbar, arbre de nœuds, aperçu, permissions, sélection mobile et sorties
+  anticipées.
+- [ ] Étendre les filets des quatre renderers aux familles de champs à risque
+  (textarea, groupes, select, upload, CAPTCHA, calendrier et submit).
+- [ ] Extraire ensuite la couche Strategy par type de champ, uniquement lorsque
+  les quatre sorties correspondantes sont figées par tests.
+
+### Travaux parallélisables
+
+Les lots suivants peuvent avancer en parallèle s'ils restent dans des fichiers
+distincts :
+
+| Lot | Périmètre | Dépendance | Conflit probable |
+|---|---|---|---|
+| A | Filets Bootstrap, Mobile et OnePage supplémentaires | `bfTextfield` couvert | Faible |
+| B | Filets Classic supplémentaires | Travail Classic local | Élevé — mainteneur actif |
+| C | Tests purs callbacks, uploads, exports et parsers | Aucun runtime Joomla réel | Faible |
+| D | Branches simples de `RenderingEngine::view()` | Harness/stubs existants | Moyen |
+| E | Nettoyage PHPCS par petits groupes de services | PHPCS installé | Faible si un fichier par lot |
+| F | Inventaire des différences par type de champ | Filets des quatre renderers | Faible, aucun code production |
+| G | Package, PHPStan, installation Joomla et tests navigateur | Builds isolés | Faible |
+
+### Ordre recommandé
+
+1. Terminer les filets individuels des quatre renderers, en gardant Classic
+   séparé tant que ses snapshots locaux ne sont pas arbitrés.
+2. Compléter `RenderingEngine::view()` par sorties observables et stubs
+   explicites ; ne pas extraire de section avant qu'elle soit couverte.
+3. Traiter en parallèle les tests purs (C), le nettoyage PHPCS (E) et
+   l'inventaire comparatif (F).
+4. Lancer les validations package/browser (G) après chaque groupe de rendu.
+5. Construire la Strategy par type de champ avec comparaison des snapshots
+   avant/après.
+
+### Ne pas paralléliser pour l'instant
+
+- La couche Strategy commune : elle dépend des quatre filets complets et serait
+  prématurée avant la caractérisation de `RenderingEngine::view()`.
+- Les modifications simultanées de `ClassicRenderer.php`, de son harness et de
+  ses snapshots : ce périmètre contient déjà du travail local non commité.
+- La suppression des façades/classes legacy appelables depuis du PHP stocké en
+  base : elle nécessite une décision de compatibilité et une recette dédiée.
+- Les extractions qui changent à la fois le dispatcher, le renderer et les
+  templates PDF : les regrouper par flux pour garder les régressions
+  attribuables.
+
 ---
 
 ## État actuel

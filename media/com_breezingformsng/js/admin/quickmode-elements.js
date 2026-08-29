@@ -11,7 +11,7 @@ var BFQMElements = (function () {
 				"class": "bfQuickModeElementClass",
 
 				id: id,
-				mdata: JQuery.toJSON(
+				mdata: JSON.stringify(
 					{
 						deletable: true,
 						type: 'element'
@@ -76,7 +76,7 @@ var BFQMElements = (function () {
 				"class": "bfQuickModeElementClass",
 
 				id: id,
-				mdata: JQuery.toJSON(
+				mdata: JSON.stringify(
 					{
 						deletable: true,
 						type: 'element'
@@ -139,7 +139,7 @@ var BFQMElements = (function () {
 			attributes: {
 				"class": 'bfQuickModeElementClass',
 				id: id,
-				mdata: JQuery.toJSON(
+				mdata: JSON.stringify(
 					{
 						deletable: true,
 						type: 'element'
@@ -201,7 +201,7 @@ var BFQMElements = (function () {
 			attributes: {
 				"class": 'bfQuickModeElementClass',
 				id: id,
-				mdata: JQuery.toJSON(
+				mdata: JSON.stringify(
 					{
 						deletable: true,
 						type: 'element'
@@ -258,7 +258,7 @@ var BFQMElements = (function () {
 			attributes: {
 				"class": 'bfQuickModeElementClass',
 				id: id,
-				mdata: JQuery.toJSON(
+				mdata: JSON.stringify(
 					{
 						deletable: true,
 						type: 'element'
@@ -313,7 +313,7 @@ var BFQMElements = (function () {
 			attributes: {
 				"class": 'bfQuickModeElementClass',
 				id: id,
-				mdata: JQuery.toJSON(
+				mdata: JSON.stringify(
 					{
 						deletable: true,
 						type: 'element'
@@ -371,7 +371,7 @@ var BFQMElements = (function () {
 			attributes: {
 				"class": 'bfQuickModeElementClass',
 				id: id,
-				mdata: JQuery.toJSON(
+				mdata: JSON.stringify(
 					{
 						deletable: true,
 						type: 'element'
@@ -430,7 +430,7 @@ var BFQMElements = (function () {
 			attributes: {
 				"class": 'bfQuickModeElementClass',
 				id: id,
-				mdata: JQuery.toJSON(
+				mdata: JSON.stringify(
 					{
 						deletable: true,
 						type: 'element'
@@ -490,7 +490,7 @@ var BFQMElements = (function () {
 			attributes: {
 				"class": 'bfQuickModeElementClass',
 				id: id,
-				mdata: JQuery.toJSON(
+				mdata: JSON.stringify(
 					{
 						deletable: true,
 						type: 'element'
@@ -565,7 +565,7 @@ var BFQMElements = (function () {
 			attributes: {
 				"class": 'bfQuickModeElementClass',
 				id: id,
-				mdata: JQuery.toJSON(
+				mdata: JSON.stringify(
 					{
 						deletable: true,
 						type: 'element'
@@ -622,7 +622,7 @@ var BFQMElements = (function () {
 			attributes: {
 				"class": 'bfQuickModeElementClass',
 				id: id,
-				mdata: JQuery.toJSON(
+				mdata: JSON.stringify(
 					{
 						deletable: true,
 						type: 'element'
@@ -678,7 +678,7 @@ var BFQMElements = (function () {
 			attributes: {
 				"class": 'bfQuickModeElementClass',
 				id: id,
-				mdata: JQuery.toJSON(
+				mdata: JSON.stringify(
 					{
 						deletable: true,
 						type: 'element'
@@ -733,7 +733,7 @@ var BFQMElements = (function () {
 			attributes: {
 				"class": 'bfQuickModeElementClass',
 				id: id,
-				mdata: JQuery.toJSON(
+				mdata: JSON.stringify(
 					{
 						deletable: true,
 						type: 'element'
@@ -792,7 +792,7 @@ var BFQMElements = (function () {
 			attributes: {
 				"class": 'bfQuickModeElementClass',
 				id: id,
-				mdata: JQuery.toJSON(
+				mdata: JSON.stringify(
 					{
 						deletable: true,
 						type: 'element'
@@ -858,7 +858,7 @@ var BFQMElements = (function () {
 			attributes: {
 				"class": 'bfQuickModeElementClass',
 				id: id,
-				mdata: JQuery.toJSON(
+				mdata: JSON.stringify(
 					{
 						deletable: true,
 						type: 'element'
@@ -918,7 +918,7 @@ var BFQMElements = (function () {
 			attributes: {
 				"class": 'bfQuickModeElementClass',
 				id: id,
-				mdata: JQuery.toJSON(
+				mdata: JSON.stringify(
 					{
 						deletable: true,
 						type: 'element'
@@ -992,7 +992,7 @@ var BFQMElements = (function () {
 			attributes: {
 				"class": 'bfQuickModeElementClass',
 				id: id,
-				mdata: JQuery.toJSON(
+				mdata: JSON.stringify(
 					{
 						deletable: true,
 						type: 'element'
@@ -1062,7 +1062,7 @@ var BFQMElements = (function () {
 			attributes: {
 				"class": 'bfQuickModeElementClass',
 				id: id,
-				mdata: JQuery.toJSON(
+				mdata: JSON.stringify(
 					{
 						deletable: true,
 						type: 'element'
@@ -1124,7 +1124,7 @@ var BFQMElements = (function () {
 			attributes: {
 				"class": 'bfQuickModeElementClass',
 				id: id,
-				mdata: JQuery.toJSON(
+				mdata: JSON.stringify(
 					{
 						deletable: true,
 						type: 'element'

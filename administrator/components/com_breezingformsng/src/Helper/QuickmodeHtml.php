@@ -150,7 +150,6 @@ final class QuickmodeHtml
         $wa->useScript('com_breezingformsng.jtree');
         $wa->useScript('bootstrap.tab');
         $wa->useScript('com_breezingformsng.base64');
-        $wa->useScript('com_breezingformsng.json-plugin');
         $wa->useScript('com_breezingformsng.center');
         $wa->useScript('com_breezingformsng.scroll');
         $wa->useScript('com_breezingformsng.quickmode-elements');

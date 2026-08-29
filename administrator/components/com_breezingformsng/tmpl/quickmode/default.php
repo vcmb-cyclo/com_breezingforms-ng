@@ -21,7 +21,7 @@ if ($this->formId === 0 || $this->templateCode === '') {
         attributes: {
             "class": "bfQuickModeRootClass",
             id: "bfQuickModeRoot",
-            mdata: JQuery.toJSON({ type: "root" })
+            mdata: JSON.stringify({ type: "root" })
         },
         properties: {
             type: "root",

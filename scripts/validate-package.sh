@@ -71,6 +71,7 @@ obsolete_entries=(
     "components/com_breezingformsng/libraries/jquery/tooltip.js"
     "components/com_breezingformsng/libraries/jquery/tooltip.css"
     "administrator/components/com_breezingformsng/libraries/jquery/plugins/md5.js"
+    "administrator/components/com_breezingformsng/libraries/jquery/plugins/json.js"
 )
 
 for path in "${obsolete_entries[@]}"; do

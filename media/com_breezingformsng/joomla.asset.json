@@ -23,14 +23,6 @@
     },
 
     {
-      "name": "com_breezingformsng.json-plugin",
-      "type": "script",
-      "uri": "administrator/components/com_breezingformsng/libraries/jquery/plugins/json.js",
-      "dependencies": ["com_breezingformsng.jquery-alias"],
-      "version": "auto"
-    },
-
-    {
       "name": "com_breezingformsng.jtree-lib",
       "type": "script",
       "uri": "administrator/components/com_breezingformsng/libraries/jquery/jtree/_lib.js",
@@ -81,7 +73,6 @@
         "com_breezingformsng.jtree",
         "bootstrap.tab",
         "com_breezingformsng.base64",
-        "com_breezingformsng.json-plugin",
         "com_breezingformsng.center",
         "com_breezingformsng.scroll"
       ],

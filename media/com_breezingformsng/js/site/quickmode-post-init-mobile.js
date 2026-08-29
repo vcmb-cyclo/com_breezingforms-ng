@@ -1,9 +1,17 @@
-/* Mobile QuickMode initializer. jQuery Mobile uses pageinit rather than the
-   regular document-ready hook used by the other renderers. */
+/* Mobile QuickMode initializer. Runs on the standard DOMContentLoaded hook
+   (jQuery Mobile's pageinit/mobileinit events and its checkboxradio/
+   textinput/selectmenu widget refresh calls were removed along with the
+   jQuery Mobile library - see docs/maintenance/js-libraries-migration-plan.md). */
 bfToggleFieldsLoaded = false;
 bfSectionFieldsDeactivated = false;
 
-JQuery(document).bind("pageinit", function() {
+document.addEventListener('DOMContentLoaded', function () {
+    var JQuery = window.jQuery;
+
+    if (!JQuery) {
+        return;
+    }
+
     if (typeof bfSetElemWrapBg != "undefined") bfSetElemWrapBg();
     if (typeof bfRegisterToggleFields != "undefined") {
         bfRegisterToggleFields();
@@ -23,19 +31,4 @@ JQuery(document).bind("pageinit", function() {
         }
     });
     JQuery(".tooltip").hide();
-    setInterval(function() {
-        JQuery("input[type='checkbox']").checkboxradio("refresh");
-        JQuery("input[type='radio']").checkboxradio("refresh");
-        JQuery("input[type='text']").textinput();
-        try {
-            JQuery("select").selectmenu("refresh");
-        } catch (e) {}
-        JQuery("textarea").textinput();
-    }, 500);
-});
-
-JQuery(document).bind("mobileinit", function() {
-    JQuery.mobile.loadingMessage = false;
-    JQuery.mobile.ignoreContentEnabled = false;
-    JQuery.mobile.selectmenu.prototype.options.nativeMenu = false;
 });

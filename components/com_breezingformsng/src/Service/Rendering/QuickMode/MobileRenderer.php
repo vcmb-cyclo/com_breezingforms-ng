@@ -211,20 +211,6 @@ class MobileRenderer
 			$this->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/themes/default.date.css');
 		}
 
-		if (file_exists(JPATH_SITE . '/media/breezingforms/themes/jq.mobile.external-png.1.4.5.min.css')) {
-			$this->addStyleSheet(Uri::root(true) . '/media/breezingforms/themes/jq.mobile.external-png.1.4.5.min.css');
-		} else {
-			$this->addStyleSheet(Uri::root(true) . '/media/breezingforms/themes/jq.mobile.1.4.5.icons.min.css');
-		}
-
-		$this->addStyleSheet(Uri::root(true) . '/media/breezingforms/themes/jq.mobile.1.4.5.min.css');
-
-		if (file_exists(JPATH_SITE . '/media/breezingforms/themes/jq.mobile.1.4.5.custom.css')) {
-			$this->addStyleSheet(Uri::root(true) . '/media/breezingforms/themes/jq.mobile.1.4.5.custom.css');
-		}
-
-		$this->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jq.mobile.min.js');
-
 		$this->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/tooltip.css');
 		$this->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/tooltip.js');
 
@@ -298,20 +284,27 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 	{
 		$this->headers();
 
-		echo '<div data-role="page" data-theme="a" class="ui-page ui-page-theme-a ui-page-active">';
+		echo '<div class="bfMobilePage">';
 
-		//  data-position="fixed"
-		echo '<div data-role="header" class="ui-header ui-bar-inherit">';
-		echo '<h1>' . $this->p->app->getDocument()->getTitle() . '</h1>';
+		$pageTitle = $this->p->app->getDocument()->getTitle();
 		$current_url = Uri::getInstance()->toString();
 
 		$return_url = $current_url;
 		$return_url = (strstr($return_url, '?mobile=1') !== false ? str_replace('?mobile=1', '', $return_url) : str_replace('&mobile=1', '', $return_url));
 		$return_url = $return_url . (strstr($return_url, '?') !== false ? '&' : '?') . 'non_mobile=1';
-		echo '<a rel="external" href="' . ($this->forceMobileUrl != '' ? $this->forceMobileUrl : $return_url) . '" data-role="button" data-icon="back">' . Text::_('COM_BREEZINGFORMSNG_DESKTOP') . '</a>';
-		echo '</div>';
+		$desktopUrl = $this->forceMobileUrl != '' ? $this->forceMobileUrl : $return_url;
+		$desktopLabel = Text::_('COM_BREEZINGFORMSNG_DESKTOP');
 
-		echo '<div data-role="content" class="ui-content ui-body-a" role="main">';
+		echo <<<HTML
+			<div class="bfMobileHeader d-flex justify-content-between align-items-center">
+				<h1>{$pageTitle}</h1>
+				<a rel="external" href="{$desktopUrl}" class="btn btn-secondary btn-sm">
+					<span class="icon-arrow-left" aria-hidden="true"></span> {$desktopLabel}
+				</a>
+			</div>
+			HTML;
+
+		echo '<div class="bfMobileContent" role="main">';
 
 		$this->process($this->dataObject);
 		echo '</div>' . "\n"; // closing last page
@@ -420,10 +413,14 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 				/* translatables end */
 
 				if ($mdata['bfType'] == 'section') {
-					echo '<div data-theme="a" data-role="collapsible-set"' . (isset($mdata['off']) && $mdata['off'] ? ' style="display:none" ' : '') . (isset($dataObject['properties']['name']) && $dataObject['properties']['name'] != "" ? ' id="' . $dataObject['properties']['name'] . '"' : '') . '><div data-role="collapsible" data-collapsed="false">' . "\n";
+					$sectionId = (isset($dataObject['properties']['name']) && $dataObject['properties']['name'] != "") ? $dataObject['properties']['name'] : 'bfMobileSection' . uniqid();
+					$sectionCollapseId = $sectionId . '-collapse';
+					echo '<div class="bfMobileCollapsibleSection mb-3"' . (isset($mdata['off']) && $mdata['off'] ? ' style="display:none" ' : '') . ' id="' . $sectionId . '">'
+						. '<button class="btn btn-link w-100 text-start p-0" type="button" data-bs-toggle="collapse" data-bs-target="#' . $sectionCollapseId . '" aria-expanded="true" aria-controls="' . $sectionCollapseId . '">';
 					if (trim($mdata['title']) != '') {
 						echo '<h3>' . htmlentities(trim($mdata['title']), ENT_QUOTES, 'UTF-8') . '</h3>' . "\n";
 					}
+					echo '</button><div id="' . $sectionCollapseId . '" class="collapse show">' . "\n";
 				} else if ($mdata['bfType'] == 'normal') {
 					if (isset($dataObject['properties']['name']) && $dataObject['properties']['name'] != '') {
 						echo '<div ' . (isset($mdata['off']) && $mdata['off'] ? 'style="display:none" ' : '') . 'class="bfNoSection"' . (isset($dataObject['properties']['name']) && $dataObject['properties']['name'] != "" ? ' id="' . $dataObject['properties']['name'] . '"' : '') . '>' . "\n";
@@ -469,7 +466,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
 				// if labels left
 				if (true) {
-					echo '<div' . (isset($mdata['off']) && $mdata['off'] ? ' style="display:none" ' : '') . ' id="fieldcontain' . $mdata['bfName'] . '" class="bfElemWrap" data-role="fieldcontain">';
+					echo '<div' . (isset($mdata['off']) && $mdata['off'] ? ' style="display:none" ' : '') . ' id="fieldcontain' . $mdata['bfName'] . '" class="bfElemWrap mb-3">';
 				}
 
 				$onclick = '';
@@ -704,7 +701,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 							$gEx = explode("\n", $mdata['group']);
 							$lines = count($gEx);
 
-							$wrapOpen = '<div data-role="fieldcontain">' . "\n" . '<fieldset ' . ($lines <= 3 ? 'data-type="horizontal" ' : '') . 'data-role="controlgroup">' . $legend . "\n";
+							$wrapOpen = '<div class="mb-3">' . "\n" . '<fieldset class="' . ($lines <= 3 ? 'd-flex flex-wrap gap-3' : 'd-flex flex-column gap-1') . '">' . $legend . "\n";
 							$wrapClose = '</fieldset>' . "\n" . '</div>' . "\n";
 
 							echo $wrapOpen;
@@ -734,7 +731,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 							$gEx = explode("\n", $mdata['group']);
 							$lines = count($gEx);
 
-							$wrapOpen = '<div data-role="fieldcontain">' . "\n" . '<fieldset data-role="controlgroup">' . $legend . "\n";
+							$wrapOpen = '<div class="mb-3">' . "\n" . '<fieldset class="d-flex flex-column gap-1">' . $legend . "\n";
 							$wrapClose = '</fieldset>' . "\n" . '</div>' . "\n";
 
 							echo $wrapOpen;
@@ -772,8 +769,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 							$mdata['list'] = str_replace("\r", '', $mdata['list']);
 							$gEx = explode("\n", $mdata['list']);
 							$lines = count($gEx);
-							// data-native-menu="false"
-							echo '<select class="ff_elem" ' . ($mdata['multiple'] ? 'multiple="multiple" data-native-menu="false" ' : '') . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '">' . "\n";
+							echo '<select class="ff_elem form-select" ' . ($mdata['multiple'] ? 'multiple="multiple" ' : '') . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '">' . "\n";
 							for ($i = 0; $i < $lines; $i++) {
 								$iEx = explode(";", $gEx[$i]);
 								$iCnt = count($iEx);
@@ -1068,7 +1064,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 							$onclick = 'onclick="populateSummarizers();if(document.getElementById(\'bfPaymentMethod\')){document.getElementById(\'bfPaymentMethod\').value=\'\';};return false;" ';
 						}
 						if ($src == '') {
-							echo '<button data-theme="a" class="ff_elem bfCustomSubmitButton" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"><span>' . $mdata['value'] . '</span></button>' . "\n";
+							echo '<button class="ff_elem bfCustomSubmitButton btn btn-primary" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"><span>' . $mdata['value'] . '</span></button>' . "\n";
 						} else {
 							echo '<input class="ff_elem bfCustomSubmitButton" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '" value="' . $mdata['value'] . '"/>' . "\n";
 						}
@@ -1087,9 +1083,9 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 						}
 						/* translatables end */
 
-						echo '<div class="ui-grid-a">
-                                                            <div class="ui-block-a"><strong>' . $legend . '</strong></div>
-                                                            <div class="ui-block-b ff_elem bfSummarize" id="ff_elem' . $mdata['dbId'] . '"></div>
+						echo '<div class="row">
+                                                            <div class="col-6"><strong>' . $legend . '</strong></div>
+                                                            <div class="col-6 ff_elem bfSummarize" id="ff_elem' . $mdata['dbId'] . '"></div>
                                                     </div>';
 						echo '<script type="text/javascript">bfRegisterSummarize('
 							. json_encode('ff_elem' . $mdata['dbId']) . ', '
@@ -1168,12 +1164,12 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 							. ($this->p->app->isClient('administrator') ? '/administrator' : '')
 							. '/index.php?option=com_breezingformsng&bfCaptcha=1';
 
-						echo '<div class="ui-grid-a">';
+						echo '<div class="d-flex flex-wrap align-items-center gap-2">';
 						echo '<img alt="" border="0" width="230" id="ff_capimgValue" class="ff_capimg" src="' . $captcha_url . '"/><br/><br/>' . "\n";
 
 
 						echo '<input autocomplete="off" class="ff_elem" type="text" name="bfCaptchaEntry" id="bfCaptchaEntry" />' . "\n";
-						echo '<button data-role="button" data-icon="refresh" data-inline="true" data-iconpos="notext" data-theme="a" id="bfCaptchaReload" onclick="document.getElementById(\'bfCaptchaEntry\').value=\'\';document.getElementById(\'bfCaptchaEntry\').focus();document.getElementById(\'ff_capimgValue\').src = \'' . $captcha_url . '&bfMathRandom=\' + Math.random(); return false"><span>Reload Captcha</span></button>';
+						echo '<button type="button" class="btn btn-secondary btn-sm" id="bfCaptchaReload" onclick="document.getElementById(\'bfCaptchaEntry\').value=\'\';document.getElementById(\'bfCaptchaEntry\').focus();document.getElementById(\'ff_capimgValue\').src = \'' . $captcha_url . '&bfMathRandom=\' + Math.random(); return false"><span class="icon-refresh" aria-hidden="true"></span><span>Reload Captcha</span></button>';
 						echo '</div>';
 						break;
 
@@ -1275,7 +1271,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
 							echo '<input autocomplete="off" class="ff_elem" type="text" name="ff_nm_' . $mdata['bfName'] . '[]"  id="ff_elem' . $mdata['dbId'] . '" value="' . htmlentities($left, ENT_QUOTES, 'UTF-8') . '"/>' . "\n";
 							echo '<label for="ff_elem' . $mdata['dbId'] . '_calendarButton"></label>';
-							echo '<button data-theme="a" id="ff_elem' . $mdata['dbId'] . '_calendarButton" type="button" class="bfCalendar" value="' . htmlentities($right, ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities($right, ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
+							echo '<button id="ff_elem' . $mdata['dbId'] . '_calendarButton" type="button" class="bfCalendar btn btn-secondary btn-sm" value="' . htmlentities($right, ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities($right, ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
 
 						if (!$this->hasResponsiveDatePicker) {
 							RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js');
@@ -1329,7 +1325,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 						} else {
 							$onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Stripe\';" ';
 						}
-						echo '<div align="center"><input data-role="none" class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/></div>' . "\n";
+						echo '<div align="center"><input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/></div>' . "\n";
 						break;
 
 					case 'bfPayPal':
@@ -1354,7 +1350,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 						} else {
 							$onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'PayPal\';" ';
 						}
-						echo '<div align="center"><input data-role="none" class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/></div>' . "\n";
+						echo '<div align="center"><input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/></div>' . "\n";
 						break;
 
 					case 'bfSofortueberweisung':
@@ -1379,7 +1375,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 						} else {
 							$onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Sofortueberweisung\';" ';
 						}
-						echo '<div align="center"><input data-role="none" class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/></div>' . "\n";
+						echo '<div align="center"><input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/></div>' . "\n";
 						break;
 				}
 
@@ -1391,7 +1387,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
 				if (trim($mdata['hint']) != '') {
 					$labid = uniqid();
-					echo '<div><button class="bfTooltipButton" data-theme="a" onclick="JQuery(\'.tooltip\').hide(\'fast\');JQuery(\'#' . $labid . '_tip\').show(\'fast\');" data-role="button" data-icon="info" data-inline="true" data-iconpos="notext" id="' . $labid . '">' . trim($mdata['hint']) . '</button><span id="' . $labid . '_tip" class="tooltip">' . trim($mdata['hint']) . '</span></div>';
+					echo '<div><button type="button" class="bfTooltipButton btn btn-secondary btn-sm" onclick="JQuery(\'.tooltip\').hide(\'fast\');JQuery(\'#' . $labid . '_tip\').show(\'fast\');" id="' . $labid . '"><span class="icon-info-circle" aria-hidden="true"></span><span class="visually-hidden">' . trim($mdata['hint']) . '</span></button><span id="' . $labid . '_tip" class="tooltip">' . trim($mdata['hint']) . '</span></div>';
 				}
 
 				if (isset($mdata['bfName']) && isset($mdata['off']) && $mdata['off']) {
@@ -1427,7 +1423,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
 		if (isset($dataObject['properties']) && $dataObject['properties']['type'] == 'section' && $dataObject['properties']['bfType'] == 'section') {
 
-			echo '</div></div>' . "\n";
+			echo '</div></div>' . "\n"; // closing the collapse div and the bfMobileCollapsibleSection div
 
 		} else if (isset($dataObject['properties']) && $dataObject['properties']['type'] == 'section' && $dataObject['properties']['bfType'] == 'normal') {
 			if (isset($dataObject['properties']['name']) && $dataObject['properties']['name'] != '') {
@@ -1453,7 +1449,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 						$this->rootMdata['pagingPrevLabel'] = $this->rootMdata['pagingPrevLabel_translation' . $this->language_tag];
 					}
 					/* translatables end */
-					echo '<button data-theme="a" class="bfPrevButton" type="submit" onclick="ff_validate_prevpage(this, \'click\');populateSummarizers();if(typeof bfRefreshAll != \'undefined\'){bfRefreshAll();}" value="' . htmlentities(trim($this->rootMdata['pagingPrevLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingPrevLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
+					echo '<button class="bfPrevButton btn btn-secondary" type="submit" onclick="ff_validate_prevpage(this, \'click\');populateSummarizers();if(typeof bfRefreshAll != \'undefined\'){bfRefreshAll();}" value="' . htmlentities(trim($this->rootMdata['pagingPrevLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingPrevLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
 				}
 
 				if ($this->rootMdata['pagingInclude'] && $dataObject['properties']['pageNumber'] < count($this->dataObject['children']) - $last) {
@@ -1462,7 +1458,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 						$this->rootMdata['pagingNextLabel'] = $this->rootMdata['pagingNextLabel_translation' . $this->language_tag];
 					}
 					/* translatables end */
-					echo '<button data-theme="a" class="bfNextButton" type="submit" onclick="ff_validate_nextpage(this, \'click\');populateSummarizers();if(typeof bfRefreshAll != \'undefined\'){bfRefreshAll();}" value="' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
+					echo '<button class="bfNextButton btn btn-secondary" type="submit" onclick="ff_validate_nextpage(this, \'click\');populateSummarizers();if(typeof bfRefreshAll != \'undefined\'){bfRefreshAll();}" value="' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
 				}
 
 				if ($this->rootMdata['cancelInclude'] && $dataObject['properties']['pageNumber'] + 1 > count($this->dataObject['children']) - $last) {
@@ -1471,7 +1467,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 						$this->rootMdata['cancelLabel'] = $this->rootMdata['cancelLabel_translation' . $this->language_tag];
 					}
 					/* translatables end */
-					echo '<button data-theme="a" class="bfCancelButton" type="submit" onclick="ff_resetForm(this, \'click\');"  value="' . htmlentities(trim($this->rootMdata['cancelLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['cancelLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
+					echo '<button class="bfCancelButton btn btn-secondary" type="submit" onclick="ff_resetForm(this, \'click\');"  value="' . htmlentities(trim($this->rootMdata['cancelLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['cancelLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
 				}
 
 				$callSubmit = 'ff_validate_submit(this, \'click\')';
@@ -1484,7 +1480,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 						$this->rootMdata['submitLabel'] = $this->rootMdata['submitLabel_translation' . $this->language_tag];
 					}
 					/* translatables end */
-					echo '<button data-theme="a" id="bfSubmitButton" class="bfSubmitButton" type="submit" onclick="if(document.getElementById(\'bfPaymentMethod\')){document.getElementById(\'bfPaymentMethod\').value=\'\';};' . $callSubmit . ';" value="' . htmlentities(trim($this->rootMdata['submitLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['submitLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
+					echo '<button id="bfSubmitButton" class="bfSubmitButton btn btn-primary" type="submit" onclick="if(document.getElementById(\'bfPaymentMethod\')){document.getElementById(\'bfPaymentMethod\').value=\'\';};' . $callSubmit . ';" value="' . htmlentities(trim($this->rootMdata['submitLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['submitLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
 				}
 
 			}

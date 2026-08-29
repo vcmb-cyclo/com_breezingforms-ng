@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Rendering;
 
 use HTML_facileFormsProcessor;
+use Joomla\CMS\Application\CMSApplication;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\RenderingEngine;
@@ -22,6 +23,8 @@ if (!class_exists(HTML_facileFormsProcessor::class)) {
 }
 
 require_once __DIR__ . '/QuickMode/joomla-text-stub.php';
+require_once __DIR__ . '/QuickMode/joomla-uri-stub.php';
+require_once __DIR__ . '/QuickMode/joomla-cmsapplication-stub.php';
 
 if (!function_exists('Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering\\bf_b64dec')) {
     eval('namespace Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering; function bf_b64dec(string $value): string { return (string) base64_decode($value, true); }');
@@ -150,6 +153,52 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
             ],
             $engine->cbCheckPermissions()
         );
+    }
+
+    public function testHeaderRendersProcessorVariablesThroughSharedHeaderRenderer(): void
+    {
+        $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();
+        $processor->app = new CMSApplication();
+        $processor->okrun = true;
+        $processor->ip = '127.0.0.1';
+        $processor->agent = 'Test Agent';
+        $processor->browser = 'Test Browser';
+        $processor->opsys = 'Test OS';
+        $processor->provider = 'Test Provider';
+        $processor->submitted = 0;
+        $processor->form = 12;
+        $processor->form_id = 12;
+        $processor->page = 1;
+        $processor->target = '';
+        $processor->runmode = 0;
+        $processor->inframe = 0;
+        $processor->inline = 0;
+        $processor->template = 0;
+        $processor->homepage = 'https://example.test';
+        $processor->mossite = 'https://example.test';
+        $processor->images = 0;
+        $processor->border = 0;
+        $processor->align = '';
+        $processor->top = 0;
+        $processor->suffix = '';
+        $processor->status = '';
+        $processor->message = '';
+        $processor->record_id = 0;
+        $processor->showgrid = false;
+        $processor->traceBuffer = '';
+
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+
+        $GLOBALS['ff_config'] = (object) ['compress' => false];
+
+        $script = $engine->header();
+
+        self::assertStringContainsString('ff_processor = new Object();', $script);
+        self::assertStringContainsString('ff_processor.form', $script);
+        self::assertStringContainsString('= 12;', $script);
+        self::assertStringContainsString("ff_processor.ip", $script);
+        self::assertStringContainsString("'127.0.0.1';", $script);
     }
 
 }

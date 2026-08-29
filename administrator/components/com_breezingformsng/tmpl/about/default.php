@@ -221,7 +221,6 @@ if (!function_exists('bf_about_extract_version_from_file')) {
         }
 
         $patterns = array(
-            '/Inline Form Validation Engine\s+([0-9A-Za-z\.\-]+)/i',
             '/jsTree\s+([0-9A-Za-z\.\-]+)/i',
             '/JQuery\s+([0-9A-Za-z\.\-]+)/i',
             '/version\s*[:=]\s*[\'"]([0-9A-Za-z\.\-]+)/i',
@@ -253,19 +252,9 @@ if (!function_exists('bf_about_get_javascript_libraries')) {
                 'css_path' => '',
             ),
             array(
-                'name' => 'jQuery UI',
-                'script_path' => $basePath . 'jq-ui.min.js',
-                'css_path' => '',
-            ),
-            array(
                 'name' => 'jsTree',
                 'script_path' => $basePath . 'jtree/tree_component.min.js',
                 'css_path' => $basePath . 'jtree/tree_component.css',
-            ),
-            array(
-                'name' => 'ValidationEngine',
-                'script_path' => $basePath . 'jquery.validationEngine.js',
-                'css_path' => $basePath . 'validationEngine.jquery.css',
             ),
         );
 

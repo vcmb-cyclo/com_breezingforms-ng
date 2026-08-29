@@ -31,14 +31,6 @@
     },
 
     {
-      "name": "com_breezingformsng.md5",
-      "type": "script",
-      "uri": "administrator/components/com_breezingformsng/libraries/jquery/plugins/md5.js",
-      "dependencies": ["com_breezingformsng.jquery-alias"],
-      "version": "auto"
-    },
-
-    {
       "name": "com_breezingformsng.jtree-lib",
       "type": "script",
       "uri": "administrator/components/com_breezingformsng/libraries/jquery/jtree/_lib.js",
@@ -90,7 +82,6 @@
         "bootstrap.tab",
         "com_breezingformsng.base64",
         "com_breezingformsng.json-plugin",
-        "com_breezingformsng.md5",
         "com_breezingformsng.center",
         "com_breezingformsng.scroll"
       ],

@@ -80,16 +80,13 @@ class ClassicRenderer {
 		}
 		$this->p->app->getDocument()->getWebAssetManager()->useScript('jquery');
 		RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/media/com_breezingformsng/css/site/quickmode-runtime.css');
+		HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
 		$this->p->app->getDocument()->getWebAssetManager()->addInlineStyle('
 .bfInline{
 float:left;
 }
 ');
 		$jQuery = "\n" . 'var JQuery = jQuery;' . "\n";
-		if (!isset($this->rootMdata['joomlaHint']) || !$this->rootMdata['joomlaHint']) {
-			RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/tooltip.css');
-			RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/tooltip.js');
-		}
 		if($this->useErrorAlerts) {
 			RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/js/sweetalert2.min.js');
 		}
@@ -392,7 +389,6 @@ float:left;
 						$labelText = trim( $mdata['label'] ) . str_replace( "***", "\"", $maxlengthCounter );
 						if ( trim( $mdata['hint'] ) != '' ) {
 							if ( isset( $this->rootMdata['joomlaHint'] ) && $this->rootMdata['joomlaHint'] ) {
-                                HTMLHelper::_('bootstrap.tooltip');
 								$content   = trim( $mdata['hint'] );
 								$tipOpen   = '<span title="<strong>' . htmlspecialchars(strip_tags(trim($mdata['label'])), ENT_QUOTES, 'UTF-8') . '</strong><br />' . str_replace( array(
 										"\n",
@@ -404,24 +400,15 @@ float:left;
 								$tipClose  = '</span></span>';
 								$tipScript = '';
 							} else {
-								$tipOpen     = '<span id="bfTooltip' . $mdata['dbId'] . '" class="bfTooltip">&nbsp;';
-								$tipClose    = '</span>';
-								$style       = ',style: {tip: !JQuery.browser.ie, background: "#ffc", color: "#000000", border : { color: "#C0C0C0", width: 1 }, name: "cream" }';
-								$content     = trim( $mdata['hint'] );
-								$explodeHint = explode( '<<<style', trim( $mdata['hint'] ) );
-								if ( count( $explodeHint ) > 1 && trim( $explodeHint[0] ) != '' ) {
-									$style   = ',style: {tip: !JQuery.browser.ie,' . trim( $explodeHint[0] ) . '}'; // assuming style entry
-									$content = trim( $explodeHint[1] );
-								}
-								$tooltipContent = '<div class="bfToolTipLabel"><strong>'
+								$tipOpen = '<span title="<strong>'
 									. htmlspecialchars(strip_tags(trim($mdata['label'])), ENT_QUOTES, 'UTF-8')
-									. '</strong><div/>'
-									. str_replace(["\n", "\r"], ["\\n", ''], $content);
-								$tipScript = '<script type="text/javascript"><!--' . "\n"
-									. 'JQuery(document).ready(function() {JQuery("#bfTooltip' . $mdata['dbId']
-									. '").qtip({ position: { adjust: { screen: true } }, content: '
-									. json_encode($tooltipContent, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE)
-									. $style . ' });});' . "\n" . '//--></script>';
+									. '</strong><br />' . str_replace(
+										array("\n", "\r"),
+										array('', ''),
+										htmlentities(trim($mdata['hint']), ENT_QUOTES, 'UTF-8')
+									) . '" id="bfTooltip' . $mdata['dbId'] . '" class="editlinktip hasTooltip"><span class="bfTooltip">&nbsp;';
+								$tipClose = '</span></span>';
+								$tipScript = '';
 							}
 						}
 

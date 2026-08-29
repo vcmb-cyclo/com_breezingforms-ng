@@ -259,8 +259,7 @@ final class RenderingEngine
 
             require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
 
-            $dataObject = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
-            $rootMdata = $dataObject['properties'];
+            $rootMdata = $this->loadQuickModeMetadata();
             $is_device = $this->applyMobileMode($rootMdata);
 
             if ($is_device && isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && !$rootMdata['forceMobile']) {
@@ -2392,6 +2391,18 @@ final class RenderingEngine
         }
 
         return false;
+    }
+
+    /**
+     * Decode the QuickMode template metadata used by the rendering stages.
+     *
+     * @return array<string, mixed>
+     */
+    private function loadQuickModeMetadata(): array
+    {
+        $dataObject = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
+
+        return $dataObject['properties'];
     }
 
     // view

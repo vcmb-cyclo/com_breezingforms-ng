@@ -2072,16 +2072,7 @@ final class RenderingEngine
             }
 
             if ($is_mobile_type == 'choose') {
-                $current_url = Uri::getInstance()->toString();
-                $return_url = $current_url;
-                $return_url = (strstr($return_url, '?non_mobile=1') !== false ? str_replace('?non_mobile=1', '', $return_url) : str_replace('&non_mobile=1', '', $return_url));
-                $return_url = $return_url . (strstr($return_url, '?') !== false ? '&' : '?') . 'mobile=1';
-                echo '<script type="text/javascript">
-                <!--
-                var bf_mobile_url = ' . json_encode($return_url) . ';
-                //-->
-                </script>';
-                echo '<div style="display: block; text-align: center;"><button class="ff_elem btn btn-primary" onclick="location.href=bf_mobile_url;"><span>' . Text::_('COM_BREEZINGFORMSNG_MOBILE_VERSION') . '</span></button></div><div></div>';
+                $this->renderMobileChoice();
             }
 
             $quickMode->render();
@@ -2371,6 +2362,20 @@ final class RenderingEngine
         }
 
         return $quickMode;
+    }
+
+    private function renderMobileChoice(): void
+    {
+        $currentUrl = Uri::getInstance()->toString();
+        $returnUrl = $currentUrl;
+        $returnUrl = (strstr($returnUrl, '?non_mobile=1') !== false ? str_replace('?non_mobile=1', '', $returnUrl) : str_replace('&non_mobile=1', '', $returnUrl));
+        $returnUrl = $returnUrl . (strstr($returnUrl, '?') !== false ? '&' : '?') . 'mobile=1';
+        echo '<script type="text/javascript">
+                <!--
+                var bf_mobile_url = ' . json_encode($returnUrl) . ';
+                //-->
+                </script>';
+        echo '<div style="display: block; text-align: center;"><button class="ff_elem btn btn-primary" onclick="location.href=bf_mobile_url;"><span>' . Text::_('COM_BREEZINGFORMSNG_MOBILE_VERSION') . '</span></button></div><div></div>';
     }
 
     // view

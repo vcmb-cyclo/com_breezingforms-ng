@@ -161,6 +161,30 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         );
     }
 
+    public function testFileExtensionValidationScriptCoversConfiguredUploads(): void
+    {
+        $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();
+        $processor->formrow = (object) ['template_code' => 'encoded-template'];
+        $processor->rowcount = 2;
+        $processor->rows = [
+            (object) ['type' => 'File Upload', 'data2' => 'PDF, jpg', 'id' => 21, 'page' => 2],
+            (object) ['type' => 'File Upload', 'data2' => '', 'id' => 22, 'page' => 1],
+        ];
+
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+
+        $method = (new ReflectionClass($engine))->getMethod('buildFileExtensionsCheck');
+        [$script, $count] = $method->invoke($engine);
+
+        self::assertSame(1, $count);
+        self::assertStringContainsString('ff_elem21Exts', $script);
+        self::assertStringContainsString('lastIndexOf(".pdf")', $script);
+        self::assertStringContainsString('lastIndexOf(".jpg")', $script);
+        self::assertStringContainsString('return true;', $script);
+        self::assertStringNotContainsString('ff_elem22Exts', $script);
+    }
+
     public function testHeaderRendersProcessorVariablesThroughSharedHeaderRenderer(): void
     {
         $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();

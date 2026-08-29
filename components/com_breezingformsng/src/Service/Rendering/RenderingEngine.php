@@ -649,31 +649,7 @@ final class RenderingEngine
             return;
 
         // add form scripts
-        $this->processor->addFunction(
-            $this->processor->formrow->script1cond,
-            $this->processor->formrow->script1id,
-            'ff_' . $this->processor->formrow->name . '_init',
-            $this->processor->formrow->script1code,
-            $library,
-            $linked,
-            'f',
-            $this->processor->form,
-            1
-        );
-        if ($this->processor->bury())
-            return;
-        $this->processor->addFunction(
-            $this->processor->formrow->script2cond,
-            $this->processor->formrow->script2id,
-            'ff_' . $this->processor->formrow->name . '_submitted',
-            $this->processor->formrow->script2code,
-            $library,
-            $linked,
-            'f',
-            $this->processor->form,
-            1
-        );
-        if ($this->processor->bury())
+        if ($this->addFormScripts($library, $linked))
             return;
 
         // all element scripts & static text/HTML
@@ -2423,6 +2399,44 @@ final class RenderingEngine
         $this->processor->loadScripts($library);
 
         return [$library, []];
+    }
+
+    /**
+     * Link the form-level init and submission callbacks.
+     *
+     * @param array<int|string, mixed> $library
+     * @param array<int|string, mixed> $linked
+     */
+    private function addFormScripts(array &$library, array &$linked): bool
+    {
+        $this->processor->addFunction(
+            $this->processor->formrow->script1cond,
+            $this->processor->formrow->script1id,
+            'ff_' . $this->processor->formrow->name . '_init',
+            $this->processor->formrow->script1code,
+            $library,
+            $linked,
+            'f',
+            $this->processor->form,
+            1
+        );
+        if ($this->processor->bury()) {
+            return true;
+        }
+
+        $this->processor->addFunction(
+            $this->processor->formrow->script2cond,
+            $this->processor->formrow->script2id,
+            'ff_' . $this->processor->formrow->name . '_submitted',
+            $this->processor->formrow->script2code,
+            $library,
+            $linked,
+            'f',
+            $this->processor->form,
+            1
+        );
+
+        return $this->processor->bury();
     }
 
     // view

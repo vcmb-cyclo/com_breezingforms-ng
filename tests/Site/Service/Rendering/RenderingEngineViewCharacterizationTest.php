@@ -533,6 +533,29 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertStringContainsString('ff_contact_submitted(5,"\\u003Csaved\\u003E");', $processor->linkedCallbacks[0]['code']);
     }
 
+    public function testSubmittedOnloadIsOmittedWithoutCallbackOrPresentationHooks(): void
+    {
+        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
+        $processor->status = 1;
+        $processor->message = '';
+        $processor->showgrid = false;
+        $processor->formrow = (object) [
+            'name' => 'contact',
+            'script2cond' => 0,
+            'script2id' => 0,
+            'heightmode' => 0,
+            'height' => 0,
+        ];
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+        $library = [];
+        $linked = [];
+
+        (new ReflectionClass($engine))->getMethod('linkSubmittedOnload')->invokeArgs($engine, [&$library, &$linked]);
+
+        self::assertSame([], $processor->linkedCallbacks);
+    }
+
     public function testHeaderRendersProcessorVariablesThroughSharedHeaderRenderer(): void
     {
         $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();

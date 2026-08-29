@@ -232,6 +232,34 @@ final class MobileRendererCharacterizationTest extends TestCase
     }
 
     /**
+     * bfCalendar itself is deliberately not covered: unlike the other
+     * renderers (which delegate to HTMLHelper::_('calendar', ...)),
+     * MobileRenderer implements its own calendar() widget builder that
+     * calls LayoutHelper::render('joomla.form.field.calendar', ...) and
+     * $this->p->database->getNullDate() - a real Joomla core layout file
+     * plus a live DB connection, neither reasonably fakeable in this
+     * pure-logic harness without adding far more risk of the double
+     * silently diverging from the real thing than it's worth for one
+     * field type. bfCalendarResponsive (below) doesn't touch either and
+     * is fully covered.
+     */
+    public function testCalendarResponsiveElement(): void
+    {
+        $html = $this->renderElement('bfCalendarResponsive', [
+            'dbId' => 58,
+            'bfName' => 'eventdate',
+            'label' => 'Date',
+            'required' => true,
+            'value' => '',
+            'format' => '%Y-%m-%d',
+            'firstDay' => '1',
+        ]);
+
+        self::assertStringContainsString('bfInitCalendarResponsive', $html);
+        self::assertStringContainsString('name="ff_nm_eventdate[]"', $html);
+    }
+
+    /**
      * @param array<string, mixed> $overrides
      */
     private function renderElement(string $bfType, array $overrides): string

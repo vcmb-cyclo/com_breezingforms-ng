@@ -67,6 +67,7 @@ final class BootstrapRendererCharacterizationTest extends TestCase
         'icon-refresh' => 'fas fa-sync',
         'well' => 'card',
         'well-small' => 'card-body',
+        'icon-calendar' => 'fas fa-calendar',
     ];
 
     public function testTextfieldElement(): void
@@ -274,6 +275,46 @@ final class BootstrapRendererCharacterizationTest extends TestCase
         ]));
 
         $this->assertMatchesSnapshot('bootstrap_bfReCaptcha.html', $html);
+    }
+
+    public function testCalendarElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfCalendar', [
+            'dbId' => 60,
+            'bfName' => 'birthdate',
+            'label' => 'Date de naissance',
+            'value' => '',
+            'format' => '%Y-%m-%d',
+            'timeFormat' => false,
+            'singleHeader' => false,
+            'todayButton' => false,
+            'weekNumbers' => false,
+            'minYear' => '',
+            'maxYear' => '',
+            'firstDay' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfCalendar.html', $html);
+    }
+
+    public function testCalendarResponsiveElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfCalendarResponsive', [
+            'dbId' => 58,
+            'bfName' => 'eventdate',
+            'label' => 'Date',
+            'required' => true,
+            'value' => '',
+            'format' => '%Y-%m-%d',
+            'firstDay' => '1',
+            'size' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfCalendarResponsive.html', $html);
     }
 
     /**

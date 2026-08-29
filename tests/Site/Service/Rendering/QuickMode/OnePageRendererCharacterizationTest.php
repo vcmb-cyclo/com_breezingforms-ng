@@ -228,6 +228,44 @@ final class OnePageRendererCharacterizationTest extends TestCase
         self::assertStringContainsString('"sitekey":"6Lc-test-pubkey"', $html);
     }
 
+    public function testCalendarElement(): void
+    {
+        $html = $this->renderElement('bfCalendar', [
+            'dbId' => 60,
+            'bfName' => 'birthdate',
+            'label' => 'Date de naissance',
+            'value' => '',
+            'format' => '%Y-%m-%d',
+            'timeFormat' => false,
+            'singleHeader' => false,
+            'todayButton' => false,
+            'weekNumbers' => false,
+            'minYear' => '',
+            'maxYear' => '',
+            'firstDay' => '',
+        ]);
+
+        self::assertStringContainsString('HTMLHelper::_(["calendar"', $html);
+        self::assertStringContainsString('ff_nm_birthdate[]', $html);
+    }
+
+    public function testCalendarResponsiveElement(): void
+    {
+        $html = $this->renderElement('bfCalendarResponsive', [
+            'dbId' => 58,
+            'bfName' => 'eventdate',
+            'label' => 'Date',
+            'required' => true,
+            'value' => '',
+            'format' => '%Y-%m-%d',
+            'firstDay' => '1',
+            'size' => '',
+        ]);
+
+        self::assertStringContainsString('bfInitCalendarResponsive', $html);
+        self::assertStringContainsString('name="ff_nm_eventdate[]"', $html);
+    }
+
     /**
      * @param array<string, mixed> $overrides
      */
@@ -317,6 +355,7 @@ final class OnePageRendererCharacterizationTest extends TestCase
             'icon-refresh' => 'fas fa-sync',
             'well' => 'card',
             'well-small' => 'card-body',
+            'icon-calendar' => 'fas fa-calendar',
         ]]);
 
         return $renderer;

@@ -260,6 +260,66 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         ]));
     }
 
+    public function testApplyMobileModeActivatesForcedMobileAndDisablesDesktopWrapper(): void
+    {
+        require_once JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/functions/helpers.php';
+
+        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
+        $processor->app = new class {
+            public function getInput(): object
+            {
+                return new class {
+                    public function getString(string $name, string $default = ''): string
+                    {
+                        return $default;
+                    }
+
+                    public function getInt(string $name, int $default = 0): int
+                    {
+                        return $default;
+                    }
+                };
+            }
+
+            public function getSession(): object
+            {
+                return new class {
+                    public function get(string $name, mixed $default = null): mixed
+                    {
+                        return $default;
+                    }
+                };
+            }
+        };
+        $processor->legacy_wrap = true;
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+        $method = (new ReflectionClass($engine))->getMethod('applyMobileMode');
+
+        $previousUserAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
+        $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Linux; Android 14; Mobile)';
+        try {
+            self::assertTrue($method->invoke($engine, [
+                'mobileEnabled' => true,
+                'forceMobile' => true,
+            ]));
+            self::assertTrue($processor->isMobile);
+            self::assertTrue($processor->legacy_wrap);
+        } finally {
+            if ($previousUserAgent === null) {
+                unset($_SERVER['HTTP_USER_AGENT']);
+            } else {
+                $_SERVER['HTTP_USER_AGENT'] = $previousUserAgent;
+            }
+        }
+
+        self::assertFalse($method->invoke($engine, [
+            'themebootstrapThemeEngine' => 'bootstrap',
+        ]));
+        self::assertFalse($processor->isMobile);
+        self::assertFalse($processor->legacy_wrap);
+    }
+
     public function testHeaderRendersProcessorVariablesThroughSharedHeaderRenderer(): void
     {
         $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();

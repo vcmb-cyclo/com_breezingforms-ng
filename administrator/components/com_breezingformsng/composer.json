@@ -5,6 +5,7 @@
     "type": "project",
     "require": {
         "php": ">=8.3",
+        "bgli100/securimage": "^4.0",
         "ext-bcmath": "*",
         "stripe/stripe-php": "^21.1",
         "tecnickcom/tcpdf": "^7.0"

@@ -185,7 +185,7 @@ fi
 # Securimage support files and PHP/GD incompatibilities after library updates.
 docker exec "${web_container}" php -r '
     define("_JEXEC", 1);
-    require "/var/www/html/administrator/components/com_breezingformsng/libraries/securimage/securimage.php";
+    require "/var/www/html/administrator/components/com_breezingformsng/vendor/bgli100/securimage/securimage.php";
     $captcha = new Securimage(["no_exit" => true, "send_headers" => false]);
     ob_start();
     $captcha->show();

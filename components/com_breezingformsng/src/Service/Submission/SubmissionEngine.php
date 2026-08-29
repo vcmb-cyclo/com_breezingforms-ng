@@ -41,6 +41,7 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Integration\DropboxUploader;
 use Vcmb\Component\BreezingformsNG\Site\Service\Integration\RecaptchaVerifier;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampFormatter;
 use Vcmb\Component\BreezingformsNG\Site\Service\Security\HtmlSanitizer;
+use Vcmb\Component\BreezingformsNG\Administrator\Helper\VendorHelper;
 use CB\Component\Contentbuilderng\Administrator\Helper\ContentbuilderngHelper;
 use CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory;
 use CB\Component\Contentbuilderng\Administrator\Service\ArticleService;
@@ -668,7 +669,7 @@ final class SubmissionEngine
             for ($i = 0; $i < $this->processor->rowcount; $i++) {
                 $row = $this->processor->rows[$i];
                 if ($row->type == "Captcha") {
-                    require_once JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/securimage/securimage.php';
+                    VendorHelper::load();
                     $securimage = new Securimage();
                     if (!$securimage->check($this->processor->app->getInput()->getString('bfCaptchaEntry', ''))) {
                         $halt = true;

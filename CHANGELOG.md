@@ -84,5 +84,5 @@
   the Records model's global application dependency.
 - Injected Joomla's configured temporary path into the database audit service instead of reading the global
   application from the service layer.
-- Replaced the bundled Securimage CAPTCHA library with the maintained adythree/securimage 4.0.4 fork,
+- Replaced the bundled Securimage CAPTCHA library with the Composer-managed bgli100/securimage 4.0.2 fork,
   moved its PHP runtime out of public media, and added Google reCAPTCHA to About.

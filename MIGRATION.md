@@ -36,7 +36,8 @@
   `DropboxUploader`, `MailchimpClient` et `SalesforceClient`, chacun avec client HTTP injectable ; ancien
   `RemoteApiClient` conservé dans l'historique source et SDK embarqués supprimés)
 - [x] Stripe PHP `17.6.0` → `20.3.1` (2026-07-12 — classes utilisées et package Joomla 6 vérifiés)
-- [x] PDF : TCPDF maintenu en `6.11.3` tant que PHP 8.1 reste supporté ; `tc-lib-pdf 8.x` exige PHP 8.2 minimum
+- [x] PDF : TCPDF 7.x géré par Composer, avec génération déléguée à `tc-lib-pdf 8.x` ; PHP 8.3 minimum
+- [x] CAPTCHA : Securimage 4.0.2 géré par Composer (`bgli100/securimage`), chargement via `VendorHelper`
 - [x] Audit About enrichi depuis les concepts CBNG (2026-07-12) : rapport persistant sur un affichage, inventaire des
   14 tables BFNG, volumes et tailles, tables manquantes, collations, index dupliqués et références orphelines ;
   aucune réparation destructive automatique.
@@ -540,7 +541,7 @@ Chiffres mesurés le 2026-07-12 sur l'état actuel du dépôt.
 > renvoie le message de confirmation attendu (« Merci de vous être désinscrit… ») sans erreur ; `checkCaptcha`
 > (`?checkCaptcha=1&value=test`) renvoie `capResult=>false` comme attendu pour un code invalide, avec pour seul bruit
 > deux avertissements PHP 8 de dépréciation de propriété dynamique dans la librairie tierce vendorée `Securimage`
-> (`media/com_breezingformsng/images/site/captcha/securimage.php`, sans rapport avec ce changement — nettoyage
+> (ancienne copie embarquée de Securimage, sans rapport avec ce changement — nettoyage
 > possible mais hors périmètre de la Phase 9). Journal Joomla surveillé sur toute la fenêtre de test : aucune entrée
 > liée à `BFRequest`/`Callback`. `Stripe`/`PayPal`/`Sofort` restent à confirmer avec un vrai paiement de test (accès
 > à un compte sandbox nécessaire, non disponible dans cette session).

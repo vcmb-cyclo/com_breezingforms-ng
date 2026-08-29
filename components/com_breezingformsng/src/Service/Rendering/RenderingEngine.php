@@ -330,11 +330,7 @@ final class RenderingEngine
 
         [$fileExtensionsCheck, $cntFiles] = $this->buildFileExtensionsCheck();
 
-        $captchaError = json_encode(
-            Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG'),
-            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE
-        );
-        $capFunc = 'function bfCheckCaptcha(){if(checkFileExtensions())ff_submitForm2();}';
+        [$captchaError, $capFunc] = $this->createCaptchaDefaults();
 
         for ($i = 0; $i < $this->processor->rowcount; $i++) {
             $row = $this->processor->rows[$i];
@@ -2411,6 +2407,21 @@ final class RenderingEngine
 		';
 
         return [$fileExtensionsCheck, $cntFiles];
+    }
+
+    /**
+     * Create the default CAPTCHA error payload and submit callback.
+     *
+     * @return array{0: string, 1: string}
+     */
+    private function createCaptchaDefaults(): array
+    {
+        $captchaError = json_encode(
+            Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG'),
+            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE
+        );
+
+        return [$captchaError, 'function bfCheckCaptcha(){if(checkFileExtensions())ff_submitForm2();}'];
     }
 
     /**

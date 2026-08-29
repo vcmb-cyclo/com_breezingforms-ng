@@ -231,6 +231,16 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertStringContainsString('COM_BREEZINGFORMSNG_MOBILE_VERSION', $html);
     }
 
+    public function testCaptchaDefaultsUseFileExtensionCheckBeforeSubmit(): void
+    {
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        $method = (new ReflectionClass($engine))->getMethod('createCaptchaDefaults');
+        [$error, $callback] = $method->invoke($engine);
+
+        self::assertSame('"COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG"', $error);
+        self::assertSame('function bfCheckCaptcha(){if(checkFileExtensions())ff_submitForm2();}', $callback);
+    }
+
     public function testHeaderRendersProcessorVariablesThroughSharedHeaderRenderer(): void
     {
         $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();

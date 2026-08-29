@@ -35,6 +35,11 @@ final class RenderingEngineProcessorDouble extends HTML_facileFormsProcessor
 {
     public int $permissionChecks = 0;
 
+    /** @var list<string> */
+    public array $callbackNames = [];
+
+    public bool $buryAfterFirstCallback = false;
+
     public function loadBuiltins(&$library)
     {
         $library['builtin'] = 'loaded';
@@ -43,6 +48,16 @@ final class RenderingEngineProcessorDouble extends HTML_facileFormsProcessor
     public function loadScripts(&$library)
     {
         $library['script'] = 'loaded';
+    }
+
+    public function addFunction($cond, $id, $name, $code, &$library, &$linked, $type, $rowid, $pane)
+    {
+        $this->callbackNames[] = $name;
+    }
+
+    public function bury()
+    {
+        return $this->buryAfterFirstCallback && count($this->callbackNames) >= 1;
     }
 
     public function cbCheckPermissions(): array
@@ -341,6 +356,37 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
             'themebootstrapThemeEngine' => 'bootstrap',
             'themebootstrapMode' => true,
         ], $method->invoke($engine));
+    }
+
+    public function testFormScriptsStopBetweenInitAndSubmittedWhenProcessorIsBuried(): void
+    {
+        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
+        $processor->form = 7;
+        $processor->formrow = (object) [
+            'name' => 'contact',
+            'script1cond' => 0,
+            'script1id' => 0,
+            'script1code' => '',
+            'script2cond' => 0,
+            'script2id' => 0,
+            'script2code' => '',
+        ];
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+        $method = (new ReflectionClass($engine))->getMethod('addFormScripts');
+        $library = [];
+        $linked = [];
+
+        self::assertFalse($method->invokeArgs($engine, [&$library, &$linked]));
+        self::assertSame([
+            'ff_contact_init',
+            'ff_contact_submitted',
+        ], $processor->callbackNames);
+
+        $processor->callbackNames = [];
+        $processor->buryAfterFirstCallback = true;
+        self::assertTrue($method->invokeArgs($engine, [&$library, &$linked]));
+        self::assertSame(['ff_contact_init'], $processor->callbackNames);
     }
 
     public function testHeaderRendersProcessorVariablesThroughSharedHeaderRenderer(): void

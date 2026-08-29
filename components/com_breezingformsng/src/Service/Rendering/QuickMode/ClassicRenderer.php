@@ -400,12 +400,17 @@ float:left;
 								$tipClose  = '</span></span>';
 								$tipScript = '';
 							} else {
+								$tooltipContent = trim($mdata['hint']);
+								$hintParts = explode('<<<style', $tooltipContent, 2);
+								if (count($hintParts) > 1 && trim($hintParts[0]) !== '') {
+									$tooltipContent = trim($hintParts[1]);
+								}
 								$tipOpen = '<span title="<strong>'
 									. htmlspecialchars(strip_tags(trim($mdata['label'])), ENT_QUOTES, 'UTF-8')
 									. '</strong><br />' . str_replace(
 										array("\n", "\r"),
 										array('', ''),
-										htmlentities(trim($mdata['hint']), ENT_QUOTES, 'UTF-8')
+										htmlentities($tooltipContent, ENT_QUOTES, 'UTF-8')
 									) . '" id="bfTooltip' . $mdata['dbId'] . '" class="editlinktip hasTooltip"><span class="bfTooltip">&nbsp;';
 								$tipClose = '</span></span>';
 								$tipScript = '';

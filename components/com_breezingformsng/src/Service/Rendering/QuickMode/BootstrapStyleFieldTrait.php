@@ -332,4 +332,97 @@ trait BootstrapStyleFieldTrait
         echo '</div>';
         echo '<input class="ff_elem" type="hidden" name="ff_nm_' . $mdata['bfName'] . '[]" value="" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
     }
+
+    /**
+     * bfRadioGroup and bfCheckboxGroup are identical between the two
+     * renderers except for one CSS class on the optional wrap <div>
+     * (`bfRadioGroupWrap`/`bfCheckboxGroupWrap` on OnePage, absent on
+     * Bootstrap) - passed explicitly as $wrapClass rather than silently
+     * dropped or added, so each renderer's current output is preserved
+     * exactly.
+     *
+     * @param array<string, mixed> $mdata
+     */
+    private function renderBootstrapStyleRadioGroupField(array $mdata, string $label, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly, string $wrapClass = ''): void
+    {
+        /* translatables */
+        if (isset($mdata['group_translation' . $this->language_tag]) && $mdata['group_translation' . $this->language_tag] != '') {
+            $mdata['group'] = $mdata['group_translation' . $this->language_tag];
+        }
+        /* translatables end */
+
+        if ($mdata['group'] != '') {
+            echo '<div class="' . $this->bsClass('controls') . ' ' . $this->bsClass('form-inline') . '">';
+            echo '<div class="' . $this->bsClass('form-group') . ' ' . $this->bsClass('radio-form-group') . '">';
+            echo $label;
+            echo '<span class="' . $this->bsClass('nonform-control') . '">';
+            if ($mdata['wrap']) {
+                echo '<div' . ($wrapClass !== '' ? ' class="' . $wrapClass . '"' : '') . ' style="display: inline-block; vertical-align: top;">';
+            }
+            $mdata['group'] = str_replace("\r", '', $mdata['group']);
+            $gEx = explode("\n", $mdata['group']);
+            $lines = count($gEx);
+            for ($i = 0; $i < $lines; $i++) {
+                $idExt = $i != 0 ? '_' . $i : '';
+                $iEx = explode(";", $gEx[$i]);
+                $iCnt = count($iEx);
+                if ($iCnt == 3) {
+                    $inlineClass = $mdata['wrap'] ? '' : ' ' . $this->bsClass('inline');
+                    echo '<div class="form-check' . $inlineClass . '">';
+                    echo '<input ' . ($iEx[0] == 1 ? 'checked="checked" ' : '') . ' class="ff_elem form-check-input" ' . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . ($readonly ? ' disabled="disabled" ' : '') . 'type="radio" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($iEx[2]), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . $idExt . '"/>' . "\n";
+                    echo '<label class="' . $this->bsClass('radio') . '" id="bfGroupLabel' . $mdata['dbId'] . $idExt . '" for="ff_elem' . $mdata['dbId'] . $idExt . '">' . trim($iEx[1]) . '</label>';
+                    echo '</div>';
+                }
+            }
+            if ($mdata['wrap']) {
+                echo '</div>';
+            }
+            echo '</span>';
+            echo '</div>';
+            echo '</div>';
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $mdata
+     */
+    private function renderBootstrapStyleCheckboxGroupField(array $mdata, string $label, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly, string $wrapClass = ''): void
+    {
+        /* translatables */
+        if (isset($mdata['group_translation' . $this->language_tag]) && $mdata['group_translation' . $this->language_tag] != '') {
+            $mdata['group'] = $mdata['group_translation' . $this->language_tag];
+        }
+        /* translatables end */
+        if ($mdata['group'] != '') {
+            echo '<div class="' . $this->bsClass('controls') . ' ' . $this->bsClass('form-inline') . '">';
+            echo '<div class="' . $this->bsClass('form-group') . ' ' . $this->bsClass('radio-form-group') . '">';
+            echo $label;
+            echo '<span class="' . $this->bsClass('nonform-control') . '">';
+            if ($mdata['wrap']) {
+                echo '<div' . ($wrapClass !== '' ? ' class="' . $wrapClass . '"' : '') . ' style="display: inline-block; vertical-align: top;">';
+            }
+            $mdata['group'] = str_replace("\r", '', $mdata['group']);
+            $gEx = explode("\n", $mdata['group']);
+            $lines = count($gEx);
+
+            for ($i = 0; $i < $lines; $i++) {
+                $idExt = $i != 0 ? '_' . $i : '';
+                $iEx = explode(";", $gEx[$i]);
+                $iCnt = count($iEx);
+                if ($iCnt == 3) {
+                    $inlineClass = $mdata['wrap'] ? '' : ' ' . $this->bsClass('inline');
+                    echo '<div class="form-check' . $inlineClass . '">';
+                    echo '<input ' . ($iEx[0] == 1 ? 'checked="checked" ' : '') . ' class="ff_elem form-check-input" ' . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . ($readonly ? ' disabled="disabled" ' : '') . 'type="checkbox" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($iEx[2]), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . $idExt . '"/>' . "\n";
+                    echo '<label class="' . $this->bsClass('checkbox') . '" id="bfGroupLabel' . $mdata['dbId'] . $idExt . '" for="ff_elem' . $mdata['dbId'] . $idExt . '">' . trim($iEx[1]) . '</label>';
+                    echo '</div>';
+                }
+            }
+            if ($mdata['wrap']) {
+                echo '</div>';
+            }
+            echo '</span>';
+            echo '</div>';
+            echo '</div>';
+        }
+    }
 }

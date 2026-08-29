@@ -33,6 +33,7 @@ class ScriptManager
 		private readonly CMSApplication $app,
 		private readonly DatabaseInterface $database,
 		private readonly ScriptModel $model,
+		private readonly ScriptSignatureParser $signatureParser,
 	) {
 	}
 
@@ -275,7 +276,10 @@ class ScriptManager
 			return;
 		}
 
-		list($functionName, $params, $paramDefaults) = self::extractFunctionSignature((string) $row->code, (string) $row->name);
+		[$functionName, $params, $paramDefaults] = $this->signatureParser->parse(
+			(string) $row->code,
+			(string) $row->name
+		);
 		$autoRun = false;
 		if (count($params) === 0) {
 			$autoRun = true;
@@ -359,50 +363,6 @@ class ScriptManager
 		} else {
 			$app->redirect("index.php?option=$option&task=scripts.edit&pkg=$pkg&ids[]=" . $targetId);
 		}
-	}
-
-	private static function extractFunctionSignature(string $code, string $fallbackName = ''): array
-	{
-		$functionName = '';
-		$params = array();
-		$defaults = array();
-
-		$patterns = array(
-			'/function\s+([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(([^)]*)\)/m',
-			'/(?:const|let|var)?\s*([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=\s*function\s*\(([^)]*)\)/m',
-			'/(?:const|let|var)?\s*([a-zA-Z_$][a-zA-Z0-9_$]*)\s*=\s*\(([^)]*)\)\s*=>/m',
-		);
-
-		foreach ($patterns as $pattern) {
-			if (preg_match($pattern, $code, $matches)) {
-				$functionName = $matches[1];
-				$paramList = trim($matches[2]);
-				if ($paramList !== '') {
-					$parts = explode(',', $paramList);
-					foreach ($parts as $part) {
-						$part = trim($part);
-						if ($part === '') {
-							continue;
-						}
-						$part = preg_replace('/^\.{3}/', '', $part);
-						$segments = explode('=', $part, 2);
-						$name = trim($segments[0]);
-						if (!preg_match('/^[a-zA-Z_$][a-zA-Z0-9_$]*$/', $name)) {
-							continue;
-						}
-						$params[] = $name;
-						$defaults[] = isset($segments[1]) ? trim($segments[1]) : '';
-					}
-				}
-				break;
-			}
-		}
-
-		if ($functionName === '') {
-			$functionName = trim((string) $fallbackName);
-		}
-
-		return array($functionName, $params, $defaults);
 	}
 
 }

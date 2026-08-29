@@ -6,18 +6,14 @@ namespace Vcmb\Component\BreezingformsNG\Tests\Administrator\Service;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use ReflectionMethod;
-use Vcmb\Component\BreezingformsNG\Administrator\Service\ScriptManager;
+use Vcmb\Component\BreezingformsNG\Administrator\Service\ScriptSignatureParser;
 
 final class ScriptManagerSignatureTest extends TestCase
 {
     #[DataProvider('signatureProvider')]
     public function testExtractsJavaScriptCallbackSignatures(string $code, array $expected): void
     {
-        $method = new ReflectionMethod(ScriptManager::class, 'extractFunctionSignature');
-        $method->setAccessible(true);
-
-        self::assertSame($expected, $method->invoke(null, $code, 'fallback'));
+        self::assertSame($expected, (new ScriptSignatureParser())->parse($code, 'fallback'));
     }
 
     public static function signatureProvider(): iterable

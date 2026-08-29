@@ -101,6 +101,7 @@ class ScriptsController extends BaseController
             $this->app,
             Factory::getContainer()->get(DatabaseInterface::class),
             $model,
+            new \Vcmb\Component\BreezingformsNG\Administrator\Service\ScriptSignatureParser(),
         );
         $manager->$method(...$arguments);
     }

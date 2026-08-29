@@ -294,17 +294,17 @@ class ScriptManager
 		Renderer::test($option, $pkg, $row, $functionName, $params, $paramDefaults, $autoRun, $testMode);
 	}
 
-	public function prev($option, $pkg, $ids)
+	public function prev($option, $pkg, $ids): void
 	{
 		$this->navigate($option, $pkg, $ids, 'prev');
 	}
 
-	public function next($option, $pkg, $ids)
+	public function next($option, $pkg, $ids): void
 	{
 		$this->navigate($option, $pkg, $ids, 'next');
 	}
 
-	private function navigate($option, $pkg, $ids, $direction)
+	private function navigate($option, $pkg, $ids, $direction): void
 	{
 		$app = $this->app;
 		$database = $this->database;
@@ -361,7 +361,7 @@ class ScriptManager
 		}
 	}
 
-	private static function extractFunctionSignature($code, $fallbackName = '')
+	private static function extractFunctionSignature(string $code, string $fallbackName = ''): array
 	{
 		$functionName = '';
 		$params = array();

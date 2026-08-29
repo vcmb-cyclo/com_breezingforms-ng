@@ -215,6 +215,22 @@ final class MobileRendererCharacterizationTest extends TestCase
         self::assertStringContainsString('name="bfCaptchaEntry"', $html);
     }
 
+    public function testReCaptchaElement(): void
+    {
+        $html = $this->renderElement('bfReCaptcha', [
+            'dbId' => 59,
+            'hideLabel' => true,
+            'pubkey' => '6Lc-test-pubkey',
+            'invisibleCaptcha' => false,
+            'theme' => '',
+            'size' => '',
+        ]);
+
+        self::assertStringContainsString('newrecaptcha', $html);
+        self::assertStringContainsString('bfInitVisibleReCaptcha', $html);
+        self::assertStringContainsString('"sitekey":"6Lc-test-pubkey"', $html);
+    }
+
     /**
      * @param array<string, mixed> $overrides
      */

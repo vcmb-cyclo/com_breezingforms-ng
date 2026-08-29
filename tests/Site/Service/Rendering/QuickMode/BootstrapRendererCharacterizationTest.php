@@ -65,6 +65,8 @@ final class BootstrapRendererCharacterizationTest extends TestCase
         'input-append' => 'input-group',
         'custom-form-control' => 'custom-form-control',
         'icon-refresh' => 'fas fa-sync',
+        'well' => 'card',
+        'well-small' => 'card-body',
     ];
 
     public function testTextfieldElement(): void
@@ -256,6 +258,22 @@ final class BootstrapRendererCharacterizationTest extends TestCase
         ]));
 
         $this->assertMatchesSnapshot('bootstrap_bfCaptcha.html', $html);
+    }
+
+    public function testReCaptchaElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfReCaptcha', [
+            'dbId' => 59,
+            'hideLabel' => true,
+            'pubkey' => '6Lc-test-pubkey',
+            'invisibleCaptcha' => false,
+            'theme' => '',
+            'size' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfReCaptcha.html', $html);
     }
 
     /**

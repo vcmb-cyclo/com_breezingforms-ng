@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Rendering\QuickMode;
 
 use HTML_facileFormsProcessor;
+use Joomla\CMS\Application\CMSApplication;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\BootstrapRenderer;
@@ -18,6 +19,9 @@ if (!class_exists(HTML_facileFormsProcessor::class)) {
 }
 
 require_once __DIR__ . '/joomla-htmlhelper-stub.php';
+require_once __DIR__ . '/joomla-text-stub.php';
+require_once __DIR__ . '/joomla-uri-stub.php';
+require_once __DIR__ . '/joomla-cmsapplication-stub.php';
 
 /**
  * Characterization tests for BootstrapRenderer::process() - proves the same
@@ -55,6 +59,8 @@ final class BootstrapRendererCharacterizationTest extends TestCase
         'other-form-group' => 'other-form-group',
         'btn' => 'btn',
         'btn-primary' => 'btn-primary',
+        'icon-upload' => 'fas fa-upload',
+        'row' => 'row',
     ];
 
     public function testTextfieldElement(): void
@@ -198,6 +204,43 @@ final class BootstrapRendererCharacterizationTest extends TestCase
         $this->assertMatchesSnapshot('bootstrap_bfSubmitButton.html', $html);
     }
 
+    public function testFileElementPlain(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfFile', [
+            'dbId' => 61,
+            'bfName' => 'attachment',
+            'hideLabel' => true,
+            'flashUploader' => false,
+            'html5' => false,
+            'attachToAdminMail' => false,
+            'attachToUserMail' => false,
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfFile_plain.html', $html);
+    }
+
+    public function testFileElementFlashUploader(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfFile', [
+            'dbId' => 62,
+            'bfName' => 'photo',
+            'hideLabel' => true,
+            'flashUploader' => true,
+            'html5' => true,
+            'flashUploaderMulti' => false,
+            'flashUploaderBytes' => 2097152,
+            'allowedFileExtensions' => 'jpg,png',
+            'attachToAdminMail' => true,
+            'attachToUserMail' => false,
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfFile_flashUploader.html', $html);
+    }
+
     /**
      * @param array<string, mixed> $overrides
      * @return array<string, mixed>
@@ -240,6 +283,8 @@ final class BootstrapRendererCharacterizationTest extends TestCase
         $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();
         $processor->rowcount = 0;
         $processor->rows = [];
+        $processor->app = new CMSApplication();
+        $processor->form = 27;
 
         $renderer = (new ReflectionClass(BootstrapRenderer::class))->newInstanceWithoutConstructor();
 

@@ -38,5 +38,9 @@ final class ScriptManagerSignatureTest extends TestCase
             'return value;',
             ['fallback', [], []],
         ];
+        yield 'invalid parameter names are ignored' => [
+            'function submit(123invalid, valid) {}',
+            ['submit', ['valid'], ['']],
+        ];
     }
 }

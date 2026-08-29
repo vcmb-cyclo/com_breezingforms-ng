@@ -6,9 +6,8 @@ namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service;
 
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
-use ReflectionMethod;
-use Vcmb\Component\BreezingformsNG\Site\Service\Callback\FlashUploadCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Export\ExportEngine;
+use Vcmb\Component\BreezingformsNG\Site\Service\Upload\FlashUploadSizeValidator;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\ImageResizer;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\TokenizedDirectoryResolver;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\UploadError;
@@ -131,15 +130,13 @@ final class CallbackExportUploadPermissionTest extends TestCase
 
     public function testFlashUploadValidationTraversesNestedElements(): void
     {
-        $callback = (new ReflectionClass(FlashUploadCallback::class))->newInstanceWithoutConstructor();
-        $method = new ReflectionMethod($callback, 'validateUploadSize');
-        $method->setAccessible(true);
+        $validator = new FlashUploadSizeValidator();
         $file = tempnam(sys_get_temp_dir(), 'bfng-upload-test-');
         self::assertNotFalse($file);
         self::assertSame(4, file_put_contents($file, 'test'));
 
         try {
-            $result = $method->invoke($callback, [
+            $result = $validator->findOversizedLabel([
                 'children' => [[
                     'properties' => [
                         'type' => 'element',
@@ -151,6 +148,30 @@ final class CallbackExportUploadPermissionTest extends TestCase
             ], $file, 'attachment');
 
             self::assertNull($result);
+        } finally {
+            @unlink($file);
+        }
+    }
+
+    public function testFlashUploadValidationReturnsNestedOversizedLabel(): void
+    {
+        $validator = new FlashUploadSizeValidator();
+        $file = tempnam(sys_get_temp_dir(), 'bfng-upload-test-');
+        self::assertNotFalse($file);
+        self::assertSame(5, file_put_contents($file, 'large'));
+
+        try {
+            self::assertSame('Attachment', $validator->findOversizedLabel([
+                'children' => [[
+                    'properties' => [
+                        'type' => 'element',
+                        'bfType' => 'bfFile',
+                        'flashUploaderBytes' => 4,
+                        'bfName' => 'attachment',
+                        'label' => 'Attachment',
+                    ],
+                ]],
+            ], $file, ' attachment '));
         } finally {
             @unlink($file);
         }

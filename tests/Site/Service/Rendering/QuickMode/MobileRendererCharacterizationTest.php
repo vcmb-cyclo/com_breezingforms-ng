@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Rendering\QuickMode;
 
 use HTML_facileFormsProcessor;
+use Joomla\CMS\Application\CMSApplication;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\MobileRenderer;
@@ -20,6 +21,7 @@ if (!class_exists(HTML_facileFormsProcessor::class)) {
 require_once __DIR__ . '/joomla-htmlhelper-stub.php';
 require_once __DIR__ . '/joomla-text-stub.php';
 require_once __DIR__ . '/joomla-uri-stub.php';
+require_once __DIR__ . '/joomla-cmsapplication-stub.php';
 
 /**
  * Characterization coverage for the mobile QuickMode renderer.
@@ -165,6 +167,42 @@ final class MobileRendererCharacterizationTest extends TestCase
         self::assertStringContainsString('Envoyer</span>', $html);
     }
 
+    public function testFileElementPlain(): void
+    {
+        $html = $this->renderElement('bfFile', [
+            'dbId' => 61,
+            'bfName' => 'attachment',
+            'hideLabel' => true,
+            'flashUploader' => false,
+            'html5' => false,
+            'attachToAdminMail' => false,
+            'attachToUserMail' => false,
+        ]);
+
+        self::assertStringContainsString('type="file"', $html);
+        self::assertStringContainsString('name="ff_nm_attachment[]"', $html);
+    }
+
+    public function testFileElementFlashUploader(): void
+    {
+        $html = $this->renderElement('bfFile', [
+            'dbId' => 62,
+            'bfName' => 'photo',
+            'hideLabel' => true,
+            'flashUploader' => true,
+            'html5' => true,
+            'flashUploaderMulti' => false,
+            'flashUploaderBytes' => 2097152,
+            'allowedFileExtensions' => 'jpg,png',
+            'attachToAdminMail' => true,
+            'attachToUserMail' => false,
+        ]);
+
+        self::assertStringContainsString('flashUploadphoto', $html);
+        self::assertStringContainsString('plupload.Uploader', $html);
+        self::assertStringContainsString('name="attachToAdminMail[photo]"', $html);
+    }
+
     /**
      * @param array<string, mixed> $overrides
      */
@@ -214,6 +252,8 @@ final class MobileRendererCharacterizationTest extends TestCase
         $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();
         $processor->rowcount = 0;
         $processor->rows = [];
+        $processor->app = new CMSApplication();
+        $processor->form = 27;
 
         $renderer = (new ReflectionClass(MobileRenderer::class))->newInstanceWithoutConstructor();
         $this->setPrivate($renderer, 'p', $processor);

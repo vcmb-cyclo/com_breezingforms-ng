@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Rendering\QuickMode;
 
 use HTML_facileFormsProcessor;
+use Joomla\CMS\Application\CMSApplication;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\OnePageRenderer;
@@ -20,6 +21,7 @@ if (!class_exists(HTML_facileFormsProcessor::class)) {
 require_once __DIR__ . '/joomla-htmlhelper-stub.php';
 require_once __DIR__ . '/joomla-text-stub.php';
 require_once __DIR__ . '/joomla-uri-stub.php';
+require_once __DIR__ . '/joomla-cmsapplication-stub.php';
 
 /**
  * Characterization coverage for the one-page QuickMode renderer.
@@ -169,6 +171,35 @@ final class OnePageRendererCharacterizationTest extends TestCase
     }
 
     /**
+     * OnePageRenderer's bfFile case has its flashUploader/html5 condition
+     * fully commented out in production - the flash/HTML5 upload widget
+     * always renders regardless of those mdata flags, and the plain
+     * <input type="file"> fallback branch is unreachable dead code. This
+     * test documents that actual (if surprising) behavior, not a guess at
+     * what it "should" do.
+     */
+    public function testFileElementAlwaysRendersFlashUploader(): void
+    {
+        $html = $this->renderElement('bfFile', [
+            'dbId' => 62,
+            'bfName' => 'photo',
+            'hideLabel' => true,
+            'flashUploader' => false,
+            'html5' => false,
+            'flashUploaderMulti' => false,
+            'flashUploaderBytes' => 2097152,
+            'allowedFileExtensions' => 'jpg,png',
+            'attachToAdminMail' => true,
+            'attachToUserMail' => false,
+        ]);
+
+        self::assertStringContainsString('flashUploadphoto', $html);
+        self::assertStringContainsString('plupload.Uploader', $html);
+        self::assertStringContainsString('name="attachToAdminMail[photo]"', $html);
+        self::assertStringNotContainsString('type="file"', $html);
+    }
+
+    /**
      * @param array<string, mixed> $overrides
      */
     private function renderElement(string $bfType, array $overrides): string
@@ -219,6 +250,8 @@ final class OnePageRendererCharacterizationTest extends TestCase
         $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();
         $processor->rowcount = 0;
         $processor->rows = [];
+        $processor->app = new CMSApplication();
+        $processor->form = 27;
 
         $renderer = (new ReflectionClass(OnePageRenderer::class))->newInstanceWithoutConstructor();
         $this->setPrivate($renderer, 'p', $processor);
@@ -247,6 +280,8 @@ final class OnePageRendererCharacterizationTest extends TestCase
             'other-form-group' => 'other-form-group',
             'btn' => 'btn',
             'btn-primary' => 'btn-primary',
+            'icon-upload' => 'fas fa-upload',
+            'row' => 'row',
         ]]);
 
         return $renderer;

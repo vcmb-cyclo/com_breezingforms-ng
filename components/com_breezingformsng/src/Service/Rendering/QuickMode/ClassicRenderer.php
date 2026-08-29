@@ -30,6 +30,8 @@ use Joomla\CMS\Editor\Editor;
 
 class ClassicRenderer {
 
+	use HiddenFieldTrait;
+
 	/**
 	 * @var HTML_facileFormsProcessor
 	 */
@@ -920,10 +922,6 @@ float:left;
 			}
 			echo '</select>' . "\n";
 		}
-	}
-
-	private function renderHiddenField(array $mdata): void {
-		echo '<input class="ff_elem" type="hidden" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
 	}
 
 	private function renderSubmitButtonField(array $mdata, string $tabIndex, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void {

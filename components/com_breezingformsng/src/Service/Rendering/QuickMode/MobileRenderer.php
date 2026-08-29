@@ -27,6 +27,7 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RuntimeAssetLoader;
 
 class MobileRenderer
 {
+	use HiddenFieldTrait;
 
 	public $forceMobileUrl = '';
 	/**
@@ -1068,8 +1069,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 						break;
 
 					case 'bfHidden':
-
-						echo '<input class="ff_elem" type="hidden" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+						$this->renderHiddenField($mdata);
 						break;
 
 					case 'bfSummarize':

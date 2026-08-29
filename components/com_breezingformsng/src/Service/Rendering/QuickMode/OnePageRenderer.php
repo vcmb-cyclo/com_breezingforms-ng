@@ -26,6 +26,8 @@ use Joomla\CMS\Component\ComponentHelper;
 
 class OnePageRenderer
 {
+    use HiddenFieldTrait;
+
 
     /**
      * @var HTML_facileFormsProcessor
@@ -1364,8 +1366,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                         break;
 
                     case 'bfHidden':
-
-                        echo '<input class="ff_elem" type="hidden" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+                        $this->renderHiddenField($mdata);
                         break;
 
                     case 'bfSummarize':

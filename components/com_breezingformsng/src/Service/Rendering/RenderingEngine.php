@@ -252,6 +252,7 @@ final class RenderingEngine
         }
 
         $is_mobile_type = '';
+        $rootMdata = [];
 
         if (trim($this->processor->formrow->template_code_processed) == 'QuickMode') {
 

@@ -1260,49 +1260,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                         break;
 
                     case 'bfNumberInput':
-                        $type = 'number';
-
-			if ($mdata['range']) {
-				$type = 'range';
-			}
-			
-                        $maxlength = '';
-                        if (is_numeric($mdata['maxLength'])) {
-                            $maxlength = 'max="' . intval($mdata['maxLength']) . '" ';
-                        }
-                        $icon = '';
-                        if ($this->rootMdata['themebootstrapThemeEngine'] == 'bootstrap' && $this->rootMdata['themebootstrap'] == 'Azure') {
-                            if (!isset($mdata['icon']) || $mdata['icon'] == '') {
-                                $icon = '<i class="fas fa-pencil iconf--fumi" aria-hidden="true"></i>';
-                            } else {
-                                $icon = '<i class="fas ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8') . ' iconf--fumi" aria-hidden="true"></i>';
-                            }
-                        }
-                        /* translatables */
-
-                        if (isset($mdata['placeholder_translation' . $this->language_tag]) && $mdata['placeholder_translation' . $this->language_tag] != '') {
-                            $mdata['placeholder'] = '000';
-                        }
-                        /* translatables end */
-
-                        echo '<div class="' . $this->bsClass('controls') . ' ' . $this->bsClass('form-inline') . '">';
-                        echo '<div class="' . $this->bsClass('form-group') . '">';
-                        echo $label;
-                        echo $icon;
-                        echo '<input ' . (isset($mdata['placeholder']) && $mdata['placeholder'] ? 'placeholder="' . htmlentities($mdata['placeholder'], ENT_QUOTES, 'UTF-8') . '" ' : '') . 'class="' . $this->bsClass('form-control') . ' ff_elem inputbox" ' . $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '" step="' . $mdata['step'] . '" max="' . $mdata['max'] . '" min="' . $mdata['min'] . '"/>' . "\n";
-                        echo '</div>';
-                        echo '</div>';
-
-                        // set size of element, number input doesn't allow size attr
-                        if ($mdata['size'] != '') {
-                            RuntimeAssetLoader::script($this->p->app,
-                                Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-number-input.js'
-                            );
-                            echo '<script type="text/javascript">bfSetNumberInputWidth('
-                                . json_encode((int) $mdata['dbId']) . ', ' . json_encode($mdata['size']) . ');</script>';
-                        }
-
-
+                        $this->renderBootstrapStyleNumberInputField($mdata, $label, $tabIndex, $onclick, $onblur, $onchange, $onfocus, $onselect, $readonly);
                         break;
 
                     case 'bfCaptcha':

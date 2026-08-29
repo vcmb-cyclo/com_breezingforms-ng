@@ -261,18 +261,7 @@ final class RenderingEngine
 
             $dataObject = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
             $rootMdata = $dataObject['properties'];
-            $is_device = false;
-
-            if ($this->processor->app->getInput()->getString('ff_applic', '') != 'mod_facileforms' && $this->processor->app->getInput()->getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
-                $is_device = true;
-                $this->processor->isMobile = isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile'] ? true : (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $this->processor->app->getSession()->get('com_breezingformsng.mobile', false) ? true : false);
-            } else {
-                $this->processor->isMobile = false;
-
-                if (isset($rootMdata['themebootstrapThemeEngine']) && $rootMdata['themebootstrapThemeEngine'] == 'bootstrap') {
-                    $this->processor->legacy_wrap = false;
-                }
-            }
+            $is_device = $this->applyMobileMode($rootMdata);
 
             if ($is_device && isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && !$rootMdata['forceMobile']) {
                 $is_mobile_type = 'choose';
@@ -2381,6 +2370,28 @@ final class RenderingEngine
         } elseif ($this->processor->app->getInput()->getBool('mobile', false)) {
             $this->processor->app->getSession()->set('com_breezingformsng.mobile', true);
         }
+    }
+
+    /**
+     * Apply the mobile mode selected by the request and template settings.
+     *
+     * @param array<string, mixed> $rootMdata
+     */
+    private function applyMobileMode(array $rootMdata): bool
+    {
+        if ($this->processor->app->getInput()->getString('ff_applic', '') != 'mod_facileforms' && $this->processor->app->getInput()->getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
+            $this->processor->isMobile = isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile'] ? true : (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $this->processor->app->getSession()->get('com_breezingformsng.mobile', false) ? true : false);
+
+            return true;
+        }
+
+        $this->processor->isMobile = false;
+
+        if (isset($rootMdata['themebootstrapThemeEngine']) && $rootMdata['themebootstrapThemeEngine'] == 'bootstrap') {
+            $this->processor->legacy_wrap = false;
+        }
+
+        return false;
     }
 
     // view

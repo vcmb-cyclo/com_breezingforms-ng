@@ -44,4 +44,20 @@ final class PdfDocumentTest extends TestCase
     {
         self::assertSame('myfontb', PdfDocument::importTtfFont('/fonts/MyFont-Bold.ttf'));
     }
+
+    public function testTypedStateSettersAndSuffixHelper(): void
+    {
+        $pdf = (new \ReflectionClass(PdfDocument::class))->newInstanceWithoutConstructor();
+
+        $pdf->setFormName('registration');
+        $pdf->setMailback(true);
+        $pdf->setWhich('export');
+
+        self::assertSame('registration', $pdf->form_name);
+        self::assertTrue($pdf->mailback);
+        self::assertSame('export', $pdf->which);
+        self::assertTrue($pdf->endsWith('report.pdf', '.pdf'));
+        self::assertTrue($pdf->endsWith('report.pdf', ''));
+        self::assertFalse($pdf->endsWith('report.pdf', '.xml'));
+    }
 }

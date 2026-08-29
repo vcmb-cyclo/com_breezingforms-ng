@@ -50,6 +50,22 @@ final class CoreServicesTest extends TestCase
         self::assertSame('', $whitespace);
     }
 
+    #[DataProvider('whitespaceProvider')]
+    public function testDetectsNonWhitespaceCode(string $code, bool $expected): void
+    {
+        self::assertSame($expected, (new CodeStringTools())->containsNonWhitespace($code));
+    }
+
+    public static function whitespaceProvider(): array
+    {
+        return [
+            'empty' => ['', false],
+            'spaces and line breaks' => [" \t\r\n", false],
+            'zero' => ['0', true],
+            'comment' => ['// comment', true],
+        ];
+    }
+
     public function testFindsNestedElement(): void
     {
         $element = [
@@ -102,6 +118,19 @@ final class CoreServicesTest extends TestCase
         self::assertStringStartsWith("items = [\r\n", $exporter->exportVariable('items', ['first']));
     }
 
+    public function testExportsNestedArraysAndObjectsWithIndentation(): void
+    {
+        $value = (object) [
+            'enabled' => true,
+            'items' => ['one', 2],
+        ];
+
+        $javascript = (new JavascriptValueExporter())->exportValue($value);
+
+        self::assertStringContainsString("enabled:\r\n\ttrue", $javascript);
+        self::assertStringContainsString("items:\r\n\t[\r\n\t\t'one',\r\n\t\t2\r\n\t]", $javascript);
+    }
+
     public function testRendersProcessorHeaderUncompressedAndCompressed(): void
     {
         $renderer = new ProcessorHeaderRenderer(new JavascriptValueExporter());
@@ -140,6 +169,15 @@ final class CoreServicesTest extends TestCase
             "var value=1;var text='a b';\n",
             (new JavascriptCompressor())->compress($javascript, 80, "\n")
         );
+    }
+
+    public function testCompressorPreservesCommentMarkersInsideStrings(): void
+    {
+        $javascript = "var url = 'https://example.test/a//b'; /* removed */ var value = 2;";
+
+        $compressed = (new JavascriptCompressor())->compress($javascript, 80, "\n");
+
+        self::assertSame("var url='https://example.test/a//b';var value=2;\n", $compressed);
     }
 
     public function testBuildsSuccessfulAndFailedUploadResults(): void
@@ -203,9 +241,17 @@ final class CoreServicesTest extends TestCase
                 1, true, 2, true, 0, false, 1,
                 [0, 1, 'ff_form12', 'https://example.test/administrator/index.php?tmpl=component', false, true],
             ],
+            'backend non iframe uses component homepage' => [
+                1, false, 1, true, 0, false, 1,
+                [0, 1, 'ff_form12', 'index.php?tmpl=component', false, false],
+            ],
             'preview enables grid and inline form' => [
                 2, false, 0, false, 1, true, 2,
                 [1, 1, 'adminForm', 'index.php?tmpl=component', true, false],
+            ],
+            'preview keeps grid hidden when disabled' => [
+                2, false, 0, true, 1, false, 4,
+                [1, 1, 'adminForm', 'index.php?tmpl=component', false, true],
             ],
         ];
     }

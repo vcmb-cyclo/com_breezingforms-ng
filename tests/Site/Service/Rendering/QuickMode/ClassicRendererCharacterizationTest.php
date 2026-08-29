@@ -408,6 +408,45 @@ final class ClassicRendererCharacterizationTest extends TestCase
         $this->assertMatchesSnapshot('classic_bfCalendar.html', $html);
     }
 
+    public function testFileElementPlain(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfFile', [
+            'dbId' => 61,
+            'bfName' => 'attachment',
+            'hideLabel' => true,
+            'flashUploader' => false,
+            'html5' => false,
+            'attachToAdminMail' => false,
+            'attachToUserMail' => false,
+        ]));
+
+        $this->assertMatchesSnapshot('classic_bfFile_plain.html', $html);
+    }
+
+    public function testFileElementFlashUploader(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfFile', [
+            'dbId' => 62,
+            'bfName' => 'photo',
+            'hideLabel' => true,
+            'flashUploader' => true,
+            'html5' => true,
+            'flashUploaderMulti' => false,
+            'flashUploaderBytes' => 2097152,
+            'flashUploaderWidth' => '',
+            'flashUploaderHeight' => '',
+            'allowedFileExtensions' => 'jpg,png',
+            'attachToAdminMail' => true,
+            'attachToUserMail' => false,
+        ]));
+
+        $this->assertMatchesSnapshot('classic_bfFile_flashUploader.html', $html);
+    }
+
     /**
      * @param array<string, mixed> $overrides
      * @return array<string, mixed>
@@ -450,6 +489,7 @@ final class ClassicRendererCharacterizationTest extends TestCase
         $processor->rowcount = 0;
         $processor->rows = [];
         $processor->app = new CMSApplication();
+        $processor->form = 27;
 
         $renderer = (new ReflectionClass(ClassicRenderer::class))->newInstanceWithoutConstructor();
 
@@ -460,6 +500,9 @@ final class ClassicRendererCharacterizationTest extends TestCase
         ]);
         $this->setPrivate($renderer, 'fadingClass', '');
         $this->setPrivate($renderer, 'language_tag', 'zz-ZZ');
+        $this->setPrivate($renderer, 'flashUploadTicket', 'test-ticket-fixed');
+        $this->setPrivate($renderer, 'uploadImagePath', '/media/breezingforms/themes/upload.png');
+        $this->setPrivate($renderer, 'cancelImagePath', '/media/breezingforms/themes/cancel.png');
 
         return $renderer;
     }

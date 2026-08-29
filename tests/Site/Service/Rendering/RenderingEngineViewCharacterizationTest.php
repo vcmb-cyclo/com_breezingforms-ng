@@ -624,6 +624,32 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertStringContainsString('ff_library_submitted(2,"saved");', $processor->linkedCallbacks[0]['code']);
     }
 
+    public function testSubmittedOnloadLinksPresentationHooksWithoutCallback(): void
+    {
+        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
+        $processor->status = 1;
+        $processor->message = '';
+        $processor->showgrid = true;
+        $processor->formrow = (object) [
+            'name' => 'contact',
+            'script2cond' => 0,
+            'script2id' => 0,
+            'heightmode' => 3,
+            'height' => 420,
+        ];
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+        $library = [];
+        $linked = [];
+
+        (new ReflectionClass($engine))->getMethod('linkSubmittedOnload')->invokeArgs($engine, [&$library, &$linked]);
+
+        self::assertCount(1, $processor->linkedCallbacks);
+        self::assertStringContainsString('ff_resizepage(3, 420);', $processor->linkedCallbacks[0]['code']);
+        self::assertStringContainsString('ff_showgrid();', $processor->linkedCallbacks[0]['code']);
+        self::assertStringNotContainsString('_submitted(', $processor->linkedCallbacks[0]['code']);
+    }
+
     public function testHeaderRendersProcessorVariablesThroughSharedHeaderRenderer(): void
     {
         $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();

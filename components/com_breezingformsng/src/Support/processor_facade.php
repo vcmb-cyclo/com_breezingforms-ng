@@ -582,9 +582,9 @@ class HTML_facileFormsProcessor
         return $this->renderingEngine()->cbCheckPermissions();
     }
 
-    public function view()
+    public function view(): void
     {
-        return $this->renderingEngine()->view();
+        $this->renderingEngine()->view();
     }
 
     private function renderingEngine(): RenderingEngine

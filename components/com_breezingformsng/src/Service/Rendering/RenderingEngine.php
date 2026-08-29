@@ -593,13 +593,7 @@ final class RenderingEngine
             $fileExtensionsCheck .
             $capFunc;
 
-        // create library list
-        $library = array();
-        $this->processor->loadBuiltins($library);
-        $this->processor->loadScripts($library);
-
-        // start linking
-        $linked = array();
+        [$library, $linked] = $this->createScriptLibraryState();
 
         if ($this->processor->status == '') {
             $code = "onload = function()" . nl() .
@@ -2415,6 +2409,20 @@ final class RenderingEngine
         }
 
         return '';
+    }
+
+    /**
+     * Build the script library and the registry used while linking callbacks.
+     *
+     * @return array{0: array<int|string, mixed>, 1: array<int|string, mixed>}
+     */
+    private function createScriptLibraryState(): array
+    {
+        $library = [];
+        $this->processor->loadBuiltins($library);
+        $this->processor->loadScripts($library);
+
+        return [$library, []];
     }
 
     // view

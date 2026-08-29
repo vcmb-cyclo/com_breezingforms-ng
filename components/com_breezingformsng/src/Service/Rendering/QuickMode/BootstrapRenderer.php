@@ -688,49 +688,7 @@ class BootstrapRenderer
                         break;
 
                     case 'bfTextfield':
-                        $type = 'text';
-
-                        if ($mdata['password']) {
-                            $type = 'password';
-                        }
-                        $maxlength = '';
-                        if (is_numeric($mdata['maxLength'])) {
-                            $maxlength = 'maxlength="' . intval($mdata['maxLength']) . '" ';
-                        }
-                        $size = '';
-
-                        if ($mdata['size'] != '') {
-                            $size = 'style="width:' . htmlentities(strip_tags($mdata['size'])) . ' !important; min-width:' . htmlentities(strip_tags($mdata['size'])) . ' !important;" ';
-                        }
-                        $icon = '';
-                        if ($this->rootMdata['themebootstrapThemeEngine'] == 'bootstrap' && $this->rootMdata['themebootstrap'] == 'Azure') {
-                            if (!isset($mdata['icon']) || $mdata['icon'] == '') {
-                                $icon = '<i class="fas fa-pencil iconf--fumi" aria-hidden="true"></i>';
-                            } else {
-                                $icon = '<i class="fas ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8') . ' iconf--fumi" aria-hidden="true"></i>';
-                            }
-                        }
-                        /* translatables */
-                        if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
-                            $mdata['value'] = $mdata['value_translation' . $this->language_tag];
-                        }
-
-                        if (isset($mdata['placeholder_translation' . $this->language_tag]) && $mdata['placeholder_translation' . $this->language_tag] != '') {
-                            $mdata['placeholder'] = $mdata['placeholder_translation' . $this->language_tag];
-                        }
-                        /* translatables end */
-
-                        echo '<div class="' . $this->bsClass('controls') . ' ' . $this->bsClass('form-inline') . '">';
-                        echo '<div class="' . $this->bsClass('form-group') . '">';
-                        echo $label;
-                        echo $icon;
-                        echo '<input ' . (isset($mdata['placeholder']) && $mdata['placeholder'] ? 'placeholder="' . htmlentities($mdata['placeholder'], ENT_QUOTES, 'UTF-8') . '" ' : '') . 'class="' . $this->bsClass('form-control') . ' ff_elem inputbox" ' . $size . $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
-                        echo '</div>';
-                        echo '</div>';
-                        if ($mdata['mailbackAsSender']) {
-                            echo '<input type="hidden" name="mailbackSender[' . $mdata['bfName'] . ']" value="true"/>' . "\n";
-                        }
-
+                        $this->renderBootstrapStyleTextfieldField($mdata, $label, $tabIndex, $onclick, $onblur, $onchange, $onfocus, $onselect, $readonly);
                         break;
 
                     case 'bfTextarea':

@@ -34,6 +34,16 @@ final class RenderingEngineProcessorDouble extends HTML_facileFormsProcessor
 {
     public int $permissionChecks = 0;
 
+    public function loadBuiltins(&$library)
+    {
+        $library['builtin'] = 'loaded';
+    }
+
+    public function loadScripts(&$library)
+    {
+        $library['script'] = 'loaded';
+    }
+
     public function cbCheckPermissions(): array
     {
         $this->permissionChecks++;
@@ -183,6 +193,19 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertStringContainsString('lastIndexOf(".jpg")', $script);
         self::assertStringContainsString('return true;', $script);
         self::assertStringNotContainsString('ff_elem22Exts', $script);
+    }
+
+    public function testScriptLibraryStateLoadsBuiltinsAndScripts(): void
+    {
+        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+
+        $method = (new ReflectionClass($engine))->getMethod('createScriptLibraryState');
+        [$library, $linked] = $method->invoke($engine);
+
+        self::assertSame(['builtin' => 'loaded', 'script' => 'loaded'], $library);
+        self::assertSame([], $linked);
     }
 
     public function testHeaderRendersProcessorVariablesThroughSharedHeaderRenderer(): void

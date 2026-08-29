@@ -389,6 +389,63 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertSame(['ff_contact_init'], $processor->callbackNames);
     }
 
+    public function testMobileSessionPreferenceClearsDesktopOverrideBeforeSettingMobile(): void
+    {
+        $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();
+        $input = new class {
+            /** @var array<string, bool> */
+            public array $values = [];
+
+            public function getBool(string $name, bool $default = false): bool
+            {
+                return $this->values[$name] ?? $default;
+            }
+        };
+        $session = new class {
+            /** @var list<string> */
+            public array $actions = [];
+
+            public function clear(string $name): void
+            {
+                $this->actions[] = 'clear:' . $name;
+            }
+
+            public function set(string $name, mixed $value): void
+            {
+                $this->actions[] = 'set:' . $name . ':' . (int) $value;
+            }
+        };
+        $processor->app = new class($input, $session) {
+            public function __construct(private object $input, private object $session)
+            {
+            }
+
+            public function getInput(): object
+            {
+                return $this->input;
+            }
+
+            public function getSession(): object
+            {
+                return $this->session;
+            }
+        };
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+        $method = (new ReflectionClass($engine))->getMethod('syncMobileSessionPreference');
+
+        $input->values = ['non_mobile' => true, 'mobile' => true];
+        $method->invoke($engine);
+        self::assertSame(['clear:com_breezingformsng.mobile'], $session->actions);
+
+        $input->values = ['mobile' => true];
+        $method->invoke($engine);
+        self::assertSame([
+            'clear:com_breezingformsng.mobile',
+            'set:com_breezingformsng.mobile:1',
+        ], $session->actions);
+    }
+
     public function testHeaderRendersProcessorVariablesThroughSharedHeaderRenderer(): void
     {
         $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();

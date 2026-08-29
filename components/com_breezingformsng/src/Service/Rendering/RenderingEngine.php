@@ -291,29 +291,7 @@ final class RenderingEngine
         echo $this->processor->header();
         $this->initializeFormRendering();
 
-        // handle Before Form piece
-        $code = '';
-        switch ($this->processor->formrow->piece1cond) {
-            case 1: // library
-                $piece1id = (int) $this->processor->formrow->piece1id;
-                $query = $this->processor->database->getQuery(true)
-                    ->select(['name', 'code'])
-                    ->from($this->processor->database->quoteName('#__facileforms_pieces'))
-                    ->where($this->processor->database->quoteName('id') . ' = :piece1id')
-                    ->where($this->processor->database->quoteName('published') . ' = 1')
-                    ->bind(':piece1id', $piece1id, ParameterType::INTEGER);
-                $this->processor->database->setQuery($query);
-                $rows = $this->processor->database->loadObjectList();
-                if (count($rows))
-                    echo $this->processor->execPiece($rows[0]->code, Text::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECE') . " " . $rows[0]->name, 'p', $this->processor->formrow->piece1id, null);
-                break;
-            case 2: // custom code
-                echo $this->processor->execPiece($this->processor->formrow->piece1code, Text::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECEC'), 'f', $this->processor->form, 2);
-                break;
-            default:
-                break;
-        } // switch
-        if ($this->processor->bury())
+        if ($this->executeBeforeFormPiece())
             return;
 
         [$fileExtensionsCheck, $cntFiles] = $this->buildFileExtensionsCheck();
@@ -2339,6 +2317,33 @@ final class RenderingEngine
 
         $this->processor->status = $this->processor->app->getInput()->getCmd('ff_status', '');
         $this->processor->message = $this->processor->app->getInput()->getString('ff_message', '');
+    }
+
+    private function executeBeforeFormPiece(): bool
+    {
+        switch ($this->processor->formrow->piece1cond) {
+            case 1:
+                $piece1id = (int) $this->processor->formrow->piece1id;
+                $query = $this->processor->database->getQuery(true)
+                    ->select(['name', 'code'])
+                    ->from($this->processor->database->quoteName('#__facileforms_pieces'))
+                    ->where($this->processor->database->quoteName('id') . ' = :piece1id')
+                    ->where($this->processor->database->quoteName('published') . ' = 1')
+                    ->bind(':piece1id', $piece1id, ParameterType::INTEGER);
+                $this->processor->database->setQuery($query);
+                $rows = $this->processor->database->loadObjectList();
+                if (count($rows)) {
+                    echo $this->processor->execPiece($rows[0]->code, Text::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECE') . ' ' . $rows[0]->name, 'p', $this->processor->formrow->piece1id, null);
+                }
+                break;
+            case 2:
+                echo $this->processor->execPiece($this->processor->formrow->piece1code, Text::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECEC'), 'f', $this->processor->form, 2);
+                break;
+            default:
+                break;
+        }
+
+        return $this->processor->bury();
     }
 
     /**

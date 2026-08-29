@@ -51,6 +51,11 @@ final class RenderingEngineProcessorDouble extends HTML_facileFormsProcessor
 
     public bool $buryAfterFirstCallback = false;
 
+    public bool $buryImmediately = false;
+
+    /** @var list<array{code: string, name: string, type: string, id: int, pane: int|null}> */
+    public array $executedPieces = [];
+
     public function loadBuiltins(&$library)
     {
         $library['builtin'] = 'loaded';
@@ -73,12 +78,25 @@ final class RenderingEngineProcessorDouble extends HTML_facileFormsProcessor
 
     public function bury()
     {
-        return $this->buryAfterFirstCallback && count($this->callbackNames) >= 1;
+        return $this->buryImmediately || ($this->buryAfterFirstCallback && count($this->callbackNames) >= 1);
     }
 
     public function getClassName($className)
     {
         return 'resolved-' . $className;
+    }
+
+    public function execPiece($code, $name, $type, $id, $pane)
+    {
+        $this->executedPieces[] = [
+            'code' => $code,
+            'name' => $name,
+            'type' => $type,
+            'id' => $id,
+            'pane' => $pane,
+        ];
+
+        return '<piece>' . $code . '</piece>';
     }
 
     public function cbCheckPermissions(): array
@@ -701,6 +719,41 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertStringContainsString('id="ff_formdiv12"', $html);
         self::assertStringContainsString('bfFormDiv resolved-form-class', $html);
         self::assertStringContainsString('bfPage-m bfClearfix', $html);
+    }
+
+    public function testBeforeFormCustomPieceRendersAndPropagatesBuryState(): void
+    {
+        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
+        $processor->form = 9;
+        $processor->formrow = (object) [
+            'piece1cond' => 2,
+            'piece1code' => 'echo "before";',
+        ];
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+        $method = (new ReflectionClass($engine))->getMethod('executeBeforeFormPiece');
+
+        ob_start();
+        try {
+            $buried = $method->invoke($engine);
+            $html = ob_get_contents();
+        } finally {
+            ob_end_clean();
+        }
+
+        self::assertFalse($buried);
+        self::assertSame('<piece>echo "before";</piece>', $html);
+        self::assertSame('f', $processor->executedPieces[0]['type']);
+        self::assertSame(9, $processor->executedPieces[0]['id']);
+        self::assertSame(2, $processor->executedPieces[0]['pane']);
+
+        $processor->buryImmediately = true;
+        ob_start();
+        try {
+            self::assertTrue($method->invoke($engine));
+        } finally {
+            ob_end_clean();
+        }
     }
 
     public function testHeaderRendersProcessorVariablesThroughSharedHeaderRenderer(): void

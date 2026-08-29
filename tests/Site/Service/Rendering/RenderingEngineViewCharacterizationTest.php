@@ -241,6 +241,25 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertSame('function bfCheckCaptcha(){if(checkFileExtensions())ff_submitForm2();}', $callback);
     }
 
+    public function testMobileChoiceTypeOnlyAppliesToOptionalMobileMode(): void
+    {
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        $method = (new ReflectionClass($engine))->getMethod('mobileChoiceType');
+
+        self::assertSame('choose', $method->invoke($engine, true, [
+            'mobileEnabled' => true,
+            'forceMobile' => false,
+        ]));
+        self::assertSame('', $method->invoke($engine, false, [
+            'mobileEnabled' => true,
+            'forceMobile' => false,
+        ]));
+        self::assertSame('', $method->invoke($engine, true, [
+            'mobileEnabled' => true,
+            'forceMobile' => true,
+        ]));
+    }
+
     public function testHeaderRendersProcessorVariablesThroughSharedHeaderRenderer(): void
     {
         $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();

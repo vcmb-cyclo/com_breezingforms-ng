@@ -17,6 +17,18 @@ namespace Joomla\CMS\Uri;
 if (!class_exists(Uri::class, false)) {
     final class Uri
     {
+        public static string $currentUrl = 'http://example.test/form';
+
+        public static function getInstance(): self
+        {
+            return new self();
+        }
+
+        public function toString(): string
+        {
+            return self::$currentUrl;
+        }
+
         public static function root(bool $pathOnly = false): string
         {
             return $pathOnly ? '' : 'http://example.test/';

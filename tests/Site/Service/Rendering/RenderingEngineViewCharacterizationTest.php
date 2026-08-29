@@ -6,6 +6,7 @@ namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Rendering;
 
 use HTML_facileFormsProcessor;
 use Joomla\CMS\Application\CMSApplication;
+use Joomla\CMS\Uri\Uri;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\RenderingEngine;
@@ -206,6 +207,28 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
 
         self::assertSame(['builtin' => 'loaded', 'script' => 'loaded'], $library);
         self::assertSame([], $linked);
+    }
+
+    public function testMobileChoiceRemovesDesktopOverrideAndAddsMobileFlag(): void
+    {
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        Uri::$currentUrl = 'https://example.test/form?foo=bar&non_mobile=1';
+
+        ob_start();
+        try {
+            (new ReflectionClass($engine))->getMethod('renderMobileChoice')->invoke($engine);
+            $html = ob_get_contents();
+        } finally {
+            ob_end_clean();
+            Uri::$currentUrl = 'http://example.test/form';
+        }
+
+        self::assertStringContainsString(
+            (string) json_encode('https://example.test/form?foo=bar&mobile=1'),
+            $html
+        );
+        self::assertStringNotContainsString('non_mobile=1', $html);
+        self::assertStringContainsString('COM_BREEZINGFORMSNG_MOBILE_VERSION', $html);
     }
 
     public function testHeaderRendersProcessorVariablesThroughSharedHeaderRenderer(): void

@@ -508,241 +508,31 @@ float:left;
 				switch ($mdata['bfType']) {
 
 					case 'bfNumberInput':
-						$type = 'number';
-
-						if ($mdata['range']) {
-							$type = 'range';
-						}
-						$maxlength = '';
-						if(is_numeric($mdata['maxLength'])){
-							$maxlength = 'max="'.intval($mdata['maxLength']).'" ';
-						}
-
-						/* translatables */
-
-						if (isset($mdata['placeholder_translation' . $this->language_tag]) && $mdata['placeholder_translation' . $this->language_tag] != '') {
-							$mdata['placeholder'] = $mdata['placeholder_translation' . $this->language_tag];
-						}
-						/* translatables end */
-
-						//echo $label;
-
-						echo '<input '.(isset($mdata['placeholder']) && $mdata['placeholder'] ? 'placeholder="'.htmlentities($mdata['placeholder'], ENT_QUOTES, 'UTF-8').'" ' : '').'class="ff_elem inputbox" '.$tabIndex.$maxlength.$onclick.$onblur.$onchange.$onfocus.$onselect.$readonly.'type="'.$type.'" name="ff_nm_'.$mdata['bfName'].'[]" value="'.htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8').'" id="ff_elem'.$mdata['dbId'].'" step="' . $mdata['step'] . '" max="' . $mdata['max'] . '" min="' . $mdata['min'] . '"/>'."\n";
-
-						// set size of element, number input doesn't allow size attr
-						
-						if ($mdata['size'] != '') {
-							RuntimeAssetLoader::script($this->p->app,
-								Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-number-input.js'
-							);
-							echo '<script type="text/javascript">bfSetNumberInputWidth('
-								. json_encode((int) $mdata['dbId']) . ', ' . json_encode($mdata['size']) . ');</script>';
-						}
+						$this->renderNumberInputField($mdata, $tabIndex, $onclick, $onblur, $onchange, $onfocus, $onselect, $readonly);
 						break;
 
 					case 'bfTextfield':
-						$type = 'text';
-
-						if ($mdata['password']) {
-							$type = 'password';
-						}
-						$maxlength = '';
-						if (is_numeric($mdata['maxLength'])) {
-							$maxlength = 'maxlength="' . intval($mdata['maxLength']) . '" ';
-						}
-						$size = '';
-						if ($mdata['size'] != '') {
-							$size = 'style="width:' . htmlentities(strip_tags($mdata['size'])) . '" ';
-						}
-
-						/* translatables */
-						if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
-							$mdata['value'] = $mdata['value_translation' . $this->language_tag];
-						}
-
-						if (isset($mdata['placeholder_translation' . $this->language_tag]) && $mdata['placeholder_translation' . $this->language_tag] != '') {
-							$mdata['placeholder'] = $mdata['placeholder_translation' . $this->language_tag];
-						}
-						/* translatables end */
-
-						echo '<input ' . (isset($mdata['placeholder']) && $mdata['placeholder'] ? 'placeholder="' . htmlentities($mdata['placeholder'], ENT_QUOTES, 'UTF-8') . '" ' : '') . 'class="ff_elem" ' . $size . $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
-						if ($mdata['mailbackAsSender']) {
-							echo '<input type="hidden" name="mailbackSender[' . $mdata['bfName'] . ']" value="true"/>' . "\n";
-						}
-
+						$this->renderTextfieldField($mdata, $tabIndex, $onclick, $onblur, $onchange, $onfocus, $onselect, $readonly);
 						break;
 
 					case 'bfTextarea':
-
-						$width = '';
-						if ($mdata['width'] != '') {
-							$width = 'width:' . htmlentities(strip_tags($mdata['width'])) . ';';
-						}
-						$height = '';
-						if ($mdata['height'] != '') {
-							$height = 'height:' . htmlentities(strip_tags($mdata['height'])) . ';';
-						}
-						$size = '';
-						if ($height != '' || $width != '') {
-							$size = 'style="' . $width . $height . '" ';
-						}
-						$onkeyup = '';
-						if (isset($mdata['maxlength']) && $mdata['maxlength'] > 0) {
-							$onkeyup = 'onkeyup="bfCheckMaxlength(' . intval($mdata['dbId']) . ', ' . intval($mdata['maxlength']) . ', ' . (isset($mdata['showMaxlengthCounter']) && $mdata['showMaxlengthCounter'] ? 'true' : 'false') . ')" ';
-						}
-
-						/* translatables */
-						if (isset($mdata['placeholder_translation' . $this->language_tag]) && $mdata['placeholder_translation' . $this->language_tag] != '') {
-							$mdata['placeholder'] = $mdata['placeholder_translation' . $this->language_tag];
-						}
-						if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
-							$mdata['value'] = $mdata['value_translation' . $this->language_tag];
-						}
-						/* translatables end */
-
-						if (isset($mdata['is_html']) && $mdata['is_html']) {
-							echo '<div style="display: inline-block; vertical-align: top; width: ' . strip_tags($mdata['width']) . ';">';
-							$editor = Editor::getInstance($this->p->app->get('editor'));
-							$this->htmltextareas[] = 'ff_nm_' . $mdata['bfName'] . '[]';
-							echo $editor->display('ff_nm_' . $mdata['bfName'] . '[]', htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8'), strip_tags($mdata['width']), strip_tags($mdata['height']), '75', '20', true, 'ff_elem' . $mdata['dbId']);
-							echo '<style type="text/css">.toggle-editor{display: none;}</style>';
-							echo '</div>';
-						} else {
-							echo '<textarea ' . (isset($mdata['placeholder']) && $mdata['placeholder'] ? 'placeholder="' . htmlentities($mdata['placeholder'], ENT_QUOTES, 'UTF-8') . '" ' : '') . 'cols="20" rows="5" class="ff_elem" ' . $onkeyup . $size . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '">' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '</textarea>' . "\n";
-						}
+						$this->renderTextareaField($mdata, $tabIndex, $onclick, $onblur, $onchange, $onfocus, $onselect, $readonly);
 						break;
 
 					case 'bfRadioGroup':
-						/* translatables */
-						if (isset($mdata['group_translation' . $this->language_tag]) && $mdata['group_translation' . $this->language_tag] != '') {
-							$mdata['group'] = $mdata['group_translation' . $this->language_tag];
-						}
-						/* translatables end */
-						if ($mdata['group'] != '') {
-							$wrapOpen = '';
-							$wrapClose = '';
-							if (!$mdata['wrap']) {
-								$wrapOpen = '<span class="bfElementGroupNoWrap" id="bfElementGroupNoWrap' . $mdata['dbId'] . '">' . "\n";
-								$wrapClose = '</span>' . "\n";
-							} else {
-								$wrapOpen = '<span class="bfElementGroup" id="bfElementGroup' . $mdata['dbId'] . '">' . "\n";
-								$wrapClose = '</span>' . "\n";
-							}
-							$mdata['group'] = str_replace("\r", '', $mdata['group']);
-							$gEx = explode("\n", $mdata['group']);
-							$lines = count($gEx);
-							echo $wrapOpen;
-							for ($i = 0; $i < $lines; $i++) {
-								
-								$idExt = $i != 0 ? '_' . $i : '';
-								$iEx = explode(";", $gEx[$i]);
-								$iCnt = count($iEx);
-								if ($iCnt == 3) {
-									$lblRight = '<label class="bfGroupLabel" id="bfGroupLabel' . $mdata['dbId'] . $idExt . '" for="ff_elem' . $mdata['dbId'] . $idExt . '">' . trim($iEx[1]) . '</label>';
-									$lblLeft = '';
-									if ($mdata['labelPosition'] == 'right') {
-										$lblLeft = $lblRight;
-										$lblRight = '';
-									}
-									echo $lblLeft . '<input ' . ($iEx[0] == 1 ? 'checked="checked" ' : '') . ' class="ff_elem" ' . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . ($readonly ? ' disabled="disabled" ' : '') . 'type="radio" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($iEx[2]), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . $idExt . '"/>' . $lblRight . "\n";
-									if ($mdata['wrap']) {
-										echo '<br/>' . "\n";
-									}
-								}
-								
-							}
-							echo $wrapClose;
-						}
-
+						$this->renderRadioGroupField($mdata, $tabIndex, $onclick, $onblur, $onchange, $onfocus, $onselect, $readonly);
 						break;
 
-
 					case 'bfCheckboxGroup':
-						/* translatables */
-						if (isset($mdata['group_translation' . $this->language_tag]) && $mdata['group_translation' . $this->language_tag] != '') {
-							$mdata['group'] = $mdata['group_translation' . $this->language_tag];
-						}
-						/* translatables end */
-						if ($mdata['group'] != '') {
-							$wrapOpen = '';
-							$wrapClose = '';
-							if (!$mdata['wrap']) {
-								$wrapOpen = '<span class="bfElementGroupNoWrap" id="bfElementGroupNoWrap' . $mdata['dbId'] . '">' . "\n";
-								$wrapClose = '</span>' . "\n";
-							} else {
-								$wrapOpen = '<span class="bfElementGroup" id="bfElementGroup' . $mdata['dbId'] . '">' . "\n";
-								$wrapClose = '</span>' . "\n";
-							}
-							$mdata['group'] = str_replace("\r", '', $mdata['group']);
-							$gEx = explode("\n", $mdata['group']);
-							$lines = count($gEx);
-							echo $wrapOpen;
-							for ($i = 0; $i < $lines; $i++) {
-								$idExt = $i != 0 ? '_' . $i : '';
-								$iEx = explode(";", $gEx[$i]);
-								$iCnt = count($iEx);
-								if ($iCnt == 3) {
-									$lblRight = '<label class="bfGroupLabel" id="bfGroupLabel' . $mdata['dbId'] . $idExt . '" for="ff_elem' . $mdata['dbId'] . $idExt . '">' . trim($iEx[1]) . '</label>';
-									$lblLeft = '';
-									if ($mdata['labelPosition'] == 'right') {
-										$lblLeft = $lblRight;
-										$lblRight = '';
-									}
-									echo $lblLeft . '<input ' . ($iEx[0] == 1 ? 'checked="checked" ' : '') . ' class="ff_elem" ' . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . ($readonly ? ' disabled="disabled" ' : '') . 'type="checkbox" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($iEx[2]), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . $idExt . '"/>' . $lblRight . "\n";
-									if ($mdata['wrap']) {
-										echo '<br/>' . "\n";
-									}
-								}
-							}
-							echo $wrapClose;
-						}
-
+						$this->renderCheckboxGroupField($mdata, $tabIndex, $onclick, $onblur, $onchange, $onfocus, $onselect, $readonly);
 						break;
 
 					case 'bfCheckbox':
-
-						echo '<input class="ff_elem" ' . ($mdata['checked'] ? 'checked="checked" ' : '') . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . ($readonly ? ' disabled="disabled" ' : '') . 'type="checkbox" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
-						if ($mdata['mailbackAccept']) {
-							echo '<input type="hidden" class="ff_elem" name="mailbackConnectWith[' . $mdata['mailbackConnectWith'] . ']" value="true_' . $mdata['bfName'] . '"/>' . "\n";
-						}
-
+						$this->renderCheckboxField($mdata, $tabIndex, $onclick, $onblur, $onchange, $onfocus, $onselect, $readonly);
 						break;
 
 					case 'bfSelect':
-						/* translatables */
-						if (isset($mdata['list_translation' . $this->language_tag]) && $mdata['list_translation' . $this->language_tag] != '') {
-							$mdata['list'] = $mdata['list_translation' . $this->language_tag];
-						}
-						/* translatables end */
-						if ($mdata['list'] != '') {
-
-							$width = '';
-							if (isset($mdata['width']) && $mdata['width'] != '') {
-								$width = 'width:' . htmlentities(strip_tags($mdata['width'])) . ';';
-							}
-							$height = '';
-							if (isset($mdata['height']) && $mdata['height'] != '') {
-								$height = 'height:' . htmlentities(strip_tags($mdata['height'])) . ';';
-							}
-							$size = '';
-							if ($height != '' || $width != '') {
-								$size = 'style="' . $width . $height . '" ';
-							}
-
-							$mdata['list'] = str_replace("\r", '', $mdata['list']);
-							$gEx = explode("\n", $mdata['list']);
-							$lines = count($gEx);
-							echo '<select data-chosen="no-chzn" class="ff_elem chzn-done" ' . $size . ($mdata['multiple'] ? 'multiple="multiple" ' : '') . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '">' . "\n";
-							for ($i = 0; $i < $lines; $i++) {
-								$iEx = explode(";", $gEx[$i]);
-								$iCnt = count($iEx);
-								if ($iCnt == 3) {
-									echo '<option ' . ($iEx[0] == 1 ? 'selected="selected" ' : '') . 'value="' . htmlentities(trim($iEx[2]), ENT_QUOTES, 'UTF-8') . '">' . htmlentities(trim($iEx[1]), ENT_QUOTES, 'UTF-8') . '</option>' . "\n";
-								}
-							}
-							echo '</select>' . "\n";
-						}
-
+						$this->renderSelectField($mdata, $tabIndex, $onclick, $onblur, $onchange, $onfocus, $onselect, $readonly);
 						break;
 
 					case 'bfFile':
@@ -1021,8 +811,7 @@ float:left;
 						break;
 
 					case 'bfHidden':
-
-						echo '<input class="ff_elem" type="hidden" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+						$this->renderHiddenField($mdata);
 						break;
 
 					case 'bfSummarize':
@@ -1432,6 +1221,246 @@ float:left;
                 }
 			}
 		}
+	}
+
+	/**
+	 * Field renderers extracted from process()'s bfType switch, one field
+	 * type at a time, each covered by a characterization test (see
+	 * tests/Site/Service/Rendering/QuickMode/ClassicRendererCharacterizationTest.php)
+	 * before being extracted, so any accidental behavior change shows up as
+	 * a snapshot diff. Purely mechanical moves - no logic changed.
+	 */
+
+	private function renderTextfieldField(array $mdata, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void {
+		$type = 'text';
+
+		if ($mdata['password']) {
+			$type = 'password';
+		}
+		$maxlength = '';
+		if (is_numeric($mdata['maxLength'])) {
+			$maxlength = 'maxlength="' . intval($mdata['maxLength']) . '" ';
+		}
+		$size = '';
+		if ($mdata['size'] != '') {
+			$size = 'style="width:' . htmlentities(strip_tags($mdata['size'])) . '" ';
+		}
+
+		/* translatables */
+		if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
+			$mdata['value'] = $mdata['value_translation' . $this->language_tag];
+		}
+
+		if (isset($mdata['placeholder_translation' . $this->language_tag]) && $mdata['placeholder_translation' . $this->language_tag] != '') {
+			$mdata['placeholder'] = $mdata['placeholder_translation' . $this->language_tag];
+		}
+		/* translatables end */
+
+		echo '<input ' . (isset($mdata['placeholder']) && $mdata['placeholder'] ? 'placeholder="' . htmlentities($mdata['placeholder'], ENT_QUOTES, 'UTF-8') . '" ' : '') . 'class="ff_elem" ' . $size . $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+		if ($mdata['mailbackAsSender']) {
+			echo '<input type="hidden" name="mailbackSender[' . $mdata['bfName'] . ']" value="true"/>' . "\n";
+		}
+	}
+
+	private function renderNumberInputField(array $mdata, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void {
+		$type = 'number';
+
+		if ($mdata['range']) {
+			$type = 'range';
+		}
+		$maxlength = '';
+		if(is_numeric($mdata['maxLength'])){
+			$maxlength = 'max="'.intval($mdata['maxLength']).'" ';
+		}
+
+		/* translatables */
+
+		if (isset($mdata['placeholder_translation' . $this->language_tag]) && $mdata['placeholder_translation' . $this->language_tag] != '') {
+			$mdata['placeholder'] = $mdata['placeholder_translation' . $this->language_tag];
+		}
+		/* translatables end */
+
+		echo '<input '.(isset($mdata['placeholder']) && $mdata['placeholder'] ? 'placeholder="'.htmlentities($mdata['placeholder'], ENT_QUOTES, 'UTF-8').'" ' : '').'class="ff_elem inputbox" '.$tabIndex.$maxlength.$onclick.$onblur.$onchange.$onfocus.$onselect.$readonly.'type="'.$type.'" name="ff_nm_'.$mdata['bfName'].'[]" value="'.htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8').'" id="ff_elem'.$mdata['dbId'].'" step="' . $mdata['step'] . '" max="' . $mdata['max'] . '" min="' . $mdata['min'] . '"/>'."\n";
+
+		// set size of element, number input doesn't allow size attr
+
+		if ($mdata['size'] != '') {
+			RuntimeAssetLoader::script($this->p->app,
+				Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-number-input.js'
+			);
+			echo '<script type="text/javascript">bfSetNumberInputWidth('
+				. json_encode((int) $mdata['dbId']) . ', ' . json_encode($mdata['size']) . ');</script>';
+		}
+	}
+
+	private function renderTextareaField(array $mdata, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void {
+		$width = '';
+		if ($mdata['width'] != '') {
+			$width = 'width:' . htmlentities(strip_tags($mdata['width'])) . ';';
+		}
+		$height = '';
+		if ($mdata['height'] != '') {
+			$height = 'height:' . htmlentities(strip_tags($mdata['height'])) . ';';
+		}
+		$size = '';
+		if ($height != '' || $width != '') {
+			$size = 'style="' . $width . $height . '" ';
+		}
+		$onkeyup = '';
+		if (isset($mdata['maxlength']) && $mdata['maxlength'] > 0) {
+			$onkeyup = 'onkeyup="bfCheckMaxlength(' . intval($mdata['dbId']) . ', ' . intval($mdata['maxlength']) . ', ' . (isset($mdata['showMaxlengthCounter']) && $mdata['showMaxlengthCounter'] ? 'true' : 'false') . ')" ';
+		}
+
+		/* translatables */
+		if (isset($mdata['placeholder_translation' . $this->language_tag]) && $mdata['placeholder_translation' . $this->language_tag] != '') {
+			$mdata['placeholder'] = $mdata['placeholder_translation' . $this->language_tag];
+		}
+		if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
+			$mdata['value'] = $mdata['value_translation' . $this->language_tag];
+		}
+		/* translatables end */
+
+		if (isset($mdata['is_html']) && $mdata['is_html']) {
+			echo '<div style="display: inline-block; vertical-align: top; width: ' . strip_tags($mdata['width']) . ';">';
+			$editor = Editor::getInstance($this->p->app->get('editor'));
+			$this->htmltextareas[] = 'ff_nm_' . $mdata['bfName'] . '[]';
+			echo $editor->display('ff_nm_' . $mdata['bfName'] . '[]', htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8'), strip_tags($mdata['width']), strip_tags($mdata['height']), '75', '20', true, 'ff_elem' . $mdata['dbId']);
+			echo '<style type="text/css">.toggle-editor{display: none;}</style>';
+			echo '</div>';
+		} else {
+			echo '<textarea ' . (isset($mdata['placeholder']) && $mdata['placeholder'] ? 'placeholder="' . htmlentities($mdata['placeholder'], ENT_QUOTES, 'UTF-8') . '" ' : '') . 'cols="20" rows="5" class="ff_elem" ' . $onkeyup . $size . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '">' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '</textarea>' . "\n";
+		}
+	}
+
+	private function renderRadioGroupField(array $mdata, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void {
+		/* translatables */
+		if (isset($mdata['group_translation' . $this->language_tag]) && $mdata['group_translation' . $this->language_tag] != '') {
+			$mdata['group'] = $mdata['group_translation' . $this->language_tag];
+		}
+		/* translatables end */
+		if ($mdata['group'] != '') {
+			$wrapOpen = '';
+			$wrapClose = '';
+			if (!$mdata['wrap']) {
+				$wrapOpen = '<span class="bfElementGroupNoWrap" id="bfElementGroupNoWrap' . $mdata['dbId'] . '">' . "\n";
+				$wrapClose = '</span>' . "\n";
+			} else {
+				$wrapOpen = '<span class="bfElementGroup" id="bfElementGroup' . $mdata['dbId'] . '">' . "\n";
+				$wrapClose = '</span>' . "\n";
+			}
+			$mdata['group'] = str_replace("\r", '', $mdata['group']);
+			$gEx = explode("\n", $mdata['group']);
+			$lines = count($gEx);
+			echo $wrapOpen;
+			for ($i = 0; $i < $lines; $i++) {
+
+				$idExt = $i != 0 ? '_' . $i : '';
+				$iEx = explode(";", $gEx[$i]);
+				$iCnt = count($iEx);
+				if ($iCnt == 3) {
+					$lblRight = '<label class="bfGroupLabel" id="bfGroupLabel' . $mdata['dbId'] . $idExt . '" for="ff_elem' . $mdata['dbId'] . $idExt . '">' . trim($iEx[1]) . '</label>';
+					$lblLeft = '';
+					if ($mdata['labelPosition'] == 'right') {
+						$lblLeft = $lblRight;
+						$lblRight = '';
+					}
+					echo $lblLeft . '<input ' . ($iEx[0] == 1 ? 'checked="checked" ' : '') . ' class="ff_elem" ' . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . ($readonly ? ' disabled="disabled" ' : '') . 'type="radio" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($iEx[2]), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . $idExt . '"/>' . $lblRight . "\n";
+					if ($mdata['wrap']) {
+						echo '<br/>' . "\n";
+					}
+				}
+
+			}
+			echo $wrapClose;
+		}
+	}
+
+	private function renderCheckboxGroupField(array $mdata, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void {
+		/* translatables */
+		if (isset($mdata['group_translation' . $this->language_tag]) && $mdata['group_translation' . $this->language_tag] != '') {
+			$mdata['group'] = $mdata['group_translation' . $this->language_tag];
+		}
+		/* translatables end */
+		if ($mdata['group'] != '') {
+			$wrapOpen = '';
+			$wrapClose = '';
+			if (!$mdata['wrap']) {
+				$wrapOpen = '<span class="bfElementGroupNoWrap" id="bfElementGroupNoWrap' . $mdata['dbId'] . '">' . "\n";
+				$wrapClose = '</span>' . "\n";
+			} else {
+				$wrapOpen = '<span class="bfElementGroup" id="bfElementGroup' . $mdata['dbId'] . '">' . "\n";
+				$wrapClose = '</span>' . "\n";
+			}
+			$mdata['group'] = str_replace("\r", '', $mdata['group']);
+			$gEx = explode("\n", $mdata['group']);
+			$lines = count($gEx);
+			echo $wrapOpen;
+			for ($i = 0; $i < $lines; $i++) {
+				$idExt = $i != 0 ? '_' . $i : '';
+				$iEx = explode(";", $gEx[$i]);
+				$iCnt = count($iEx);
+				if ($iCnt == 3) {
+					$lblRight = '<label class="bfGroupLabel" id="bfGroupLabel' . $mdata['dbId'] . $idExt . '" for="ff_elem' . $mdata['dbId'] . $idExt . '">' . trim($iEx[1]) . '</label>';
+					$lblLeft = '';
+					if ($mdata['labelPosition'] == 'right') {
+						$lblLeft = $lblRight;
+						$lblRight = '';
+					}
+					echo $lblLeft . '<input ' . ($iEx[0] == 1 ? 'checked="checked" ' : '') . ' class="ff_elem" ' . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . ($readonly ? ' disabled="disabled" ' : '') . 'type="checkbox" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($iEx[2]), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . $idExt . '"/>' . $lblRight . "\n";
+					if ($mdata['wrap']) {
+						echo '<br/>' . "\n";
+					}
+				}
+			}
+			echo $wrapClose;
+		}
+	}
+
+	private function renderCheckboxField(array $mdata, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void {
+		echo '<input class="ff_elem" ' . ($mdata['checked'] ? 'checked="checked" ' : '') . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . ($readonly ? ' disabled="disabled" ' : '') . 'type="checkbox" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+		if ($mdata['mailbackAccept']) {
+			echo '<input type="hidden" class="ff_elem" name="mailbackConnectWith[' . $mdata['mailbackConnectWith'] . ']" value="true_' . $mdata['bfName'] . '"/>' . "\n";
+		}
+	}
+
+	private function renderSelectField(array $mdata, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void {
+		/* translatables */
+		if (isset($mdata['list_translation' . $this->language_tag]) && $mdata['list_translation' . $this->language_tag] != '') {
+			$mdata['list'] = $mdata['list_translation' . $this->language_tag];
+		}
+		/* translatables end */
+		if ($mdata['list'] != '') {
+
+			$width = '';
+			if (isset($mdata['width']) && $mdata['width'] != '') {
+				$width = 'width:' . htmlentities(strip_tags($mdata['width'])) . ';';
+			}
+			$height = '';
+			if (isset($mdata['height']) && $mdata['height'] != '') {
+				$height = 'height:' . htmlentities(strip_tags($mdata['height'])) . ';';
+			}
+			$size = '';
+			if ($height != '' || $width != '') {
+				$size = 'style="' . $width . $height . '" ';
+			}
+
+			$mdata['list'] = str_replace("\r", '', $mdata['list']);
+			$gEx = explode("\n", $mdata['list']);
+			$lines = count($gEx);
+			echo '<select data-chosen="no-chzn" class="ff_elem chzn-done" ' . $size . ($mdata['multiple'] ? 'multiple="multiple" ' : '') . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '">' . "\n";
+			for ($i = 0; $i < $lines; $i++) {
+				$iEx = explode(";", $gEx[$i]);
+				$iCnt = count($iEx);
+				if ($iCnt == 3) {
+					echo '<option ' . ($iEx[0] == 1 ? 'selected="selected" ' : '') . 'value="' . htmlentities(trim($iEx[2]), ENT_QUOTES, 'UTF-8') . '">' . htmlentities(trim($iEx[1]), ENT_QUOTES, 'UTF-8') . '</option>' . "\n";
+				}
+			}
+			echo '</select>' . "\n";
+		}
+	}
+
+	private function renderHiddenField(array $mdata): void {
+		echo '<input class="ff_elem" type="hidden" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
 	}
 
 	public function render() {

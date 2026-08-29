@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<ruleset name="BreezingFormsNG">
+    <description>PSR-12 coding standard for BreezingForms NG (Joomla 6 / PHP 8.3).</description>
+
+    <file>administrator/components/com_breezingformsng/src/Service/AjaxStateService.php</file>
+    <file>administrator/components/com_breezingformsng/src/Service/DatabaseAuditService.php</file>
+    <file>components/com_breezingformsng/src/Service/Runtime</file>
+    <file>components/com_breezingformsng/src/Service/Upload</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/JavascriptCompressor.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/JavascriptValueExporter.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ProcessorHeaderRenderer.php</file>
+    <file>components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php</file>
+
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/node_modules/*</exclude-pattern>
+    <exclude-pattern>*/build/*</exclude-pattern>
+    <exclude-pattern>*/coverage/*</exclude-pattern>
+
+    <!--
+        Legacy runtime surfaces are intentionally excluded until they are
+        decomposed. Removing an entry is part of the corresponding refactor.
+    -->
+    <exclude-pattern>components/com_breezingformsng/src/Service/Runtime/CodeToolsRuntime.php</exclude-pattern>
+
+    <arg name="extensions" value="php"/>
+    <arg name="colors"/>
+    <arg value="sp"/>
+
+    <rule ref="PSR12"/>
+
+    <!-- Joomla task names are part of the public controller routing contract. -->
+    <rule ref="PSR1.Methods.CamelCapsMethodName">
+        <exclude-pattern>*/Controller/*</exclude-pattern>
+    </rule>
+
+    <!-- Joomla installer discovers this global class by its fixed name. -->
+    <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
+        <exclude-pattern>script.php</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.Classes.ValidClassName">
+        <exclude-pattern>script.php</exclude-pattern>
+    </rule>
+</ruleset>

@@ -212,7 +212,7 @@ final class ExportEngine
                             if ($_arr == 1) {
                                 $_values = explode("\n", $_rec->recValue);
                                 if (isset($_values[$_key])) {
-                                    if (strpos(strtolower($_values[$_key]), '{cbsite}') === 0) {
+                                    if (str_starts_with(strtolower($_values[$_key]), '{cbsite}')) {
                                         $_values[$_key] = str_replace(array('{cbsite}', '{CBSite}'), array(JPATH_SITE, JPATH_SITE), $_values[$_key]);
                                     }
                                     if (file_exists($_values[$_key])) {
@@ -277,7 +277,7 @@ final class ExportEngine
             foreach ($this->processor->savedata as $data) {
                 // CONTENTBUILDER WILL TAKE OVER SAVING/UPDATE IF EXISTS
                 if (!is_object($cbResult['form'])) {
-                    $subrecord->id = NULL;
+        $subrecord->id = null;
                     $subrecord->element = $data[_FF_DATA_ID];
                     $subrecord->name = $data[_FF_DATA_NAME];
                     $subrecord->title = strip_tags($data[_FF_DATA_TITLE]);
@@ -787,7 +787,7 @@ final class ExportEngine
 
             $fm = $matches_array[2][0];
 
-            if (substr(trim($fm), 0, strlen('{mospath}')) === '{mospath}') {
+            if (str_starts_with(trim($fm), '{mospath}')) {
                 $fm = str_replace('{mospath}', $this->processor->mospath, $fm);
             }
 
@@ -812,7 +812,8 @@ final class ExportEngine
 
             $uploads = $this->processor->uploads . '/';
 
-            if (substr(trim($fm), 0, 1) === '/' || substr(trim($fm), 1, 1) === ':') {
+            $trimmedFilename = trim($fm);
+            if (str_starts_with($trimmedFilename, '/') || (($trimmedFilename[1] ?? '') === ':')) {
                 $uploads = '';
             }
 
@@ -893,7 +894,7 @@ final class ExportEngine
         }
 
         if ($inverted == false) {
-            $head = substr($head, 0, strlen($head) - 1) . nl();
+            $head = substr($head, 0, -1) . nl();
         }
 
         $out = '';
@@ -911,7 +912,7 @@ final class ExportEngine
             }
 
             if ($inverted == false) {
-                $out = substr($out, 0, strlen($out) - 1);
+                $out = substr($out, 0, -1);
                 $out .= nl();
             }
         }

@@ -10,6 +10,7 @@ use Joomla\CMS\Uri\Uri;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\RenderingEngine;
+use Vcmb\Component\BreezingformsNG\Site\Service\Upload\TokenizedDirectoryResolver;
 
 if (!defined('JPATH_ADMINISTRATOR')) {
     define('JPATH_ADMINISTRATOR', __DIR__ . '/../../../../administrator');
@@ -955,6 +956,18 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertSame("</div><!-- form end -->\n", $modernHtml);
         self::assertStringContainsString('bfPage-bl', $legacyHtml);
         self::assertStringContainsString('<!-- form end -->', $legacyHtml);
+    }
+
+    public function testMakeSafeFolderDelegatesToTokenizedDirectoryResolver(): void
+    {
+        $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        $engineReflection = new ReflectionClass($engine);
+        $engineReflection->getProperty('processor')->setValue($engine, $processor);
+        $resolver = (new ReflectionClass(TokenizedDirectoryResolver::class))->newInstanceWithoutConstructor();
+        $engineReflection->getProperty('tokenizedDirectoryResolverService')->setValue($engine, $resolver);
+
+        self::assertSame('uploads/user_name/{field}/file_.txt', $engine->makeSafeFolder('uploads/user name/{field}/file?.txt'));
     }
 
     public function testHeaderRendersProcessorVariablesThroughSharedHeaderRenderer(): void

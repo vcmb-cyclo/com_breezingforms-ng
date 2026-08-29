@@ -262,9 +262,7 @@ final class RenderingEngine
             $rootMdata = $this->loadQuickModeMetadata();
             $is_device = $this->applyMobileMode($rootMdata);
 
-            if ($is_device && isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && !$rootMdata['forceMobile']) {
-                $is_mobile_type = 'choose';
-            }
+            $is_mobile_type = $this->mobileChoiceType($is_device, $rootMdata);
 
             if (!$this->processor->isMobile || ($this->processor->isMobile && $this->processor->app->getInput()->getString('ff_task', '') == 'submit')) {
 
@@ -2403,6 +2401,20 @@ final class RenderingEngine
         $dataObject = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
 
         return $dataObject['properties'];
+    }
+
+    /**
+     * Determine whether the visitor should be offered the mobile version.
+     *
+     * @param array<string, mixed> $rootMdata
+     */
+    private function mobileChoiceType(bool $isDevice, array $rootMdata): string
+    {
+        if ($isDevice && isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && !$rootMdata['forceMobile']) {
+            return 'choose';
+        }
+
+        return '';
     }
 
     // view

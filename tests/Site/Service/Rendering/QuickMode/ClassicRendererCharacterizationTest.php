@@ -92,6 +92,94 @@ final class ClassicRendererCharacterizationTest extends TestCase
         $this->assertMatchesSnapshot('classic_bfTextfield_prefilled.html', $html);
     }
 
+    public function testLegacyTooltipStyleMarkerIsNotRendered(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfTextfield', [
+            'dbId' => 44,
+            'bfName' => 'email',
+            'label' => 'Adresse e-mail',
+            'hint' => 'background: #ffc; color: #000;<<<styleSaisissez une adresse valide.',
+        ]));
+
+        self::assertStringContainsString('Saisissez une adresse valide.', $html);
+        self::assertStringNotContainsString('<<<style', $html);
+        self::assertStringNotContainsString('background: #ffc; color: #000;', $html);
+        self::assertStringContainsString('class="editlinktip hasTooltip"', $html);
+    }
+
+    public function testTextareaElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfTextarea', [
+            'dbId' => 44,
+            'bfName' => 'message',
+            'label' => 'Message',
+            'hint' => '',
+            'required' => true,
+            'width' => '',
+            'height' => '',
+            'placeholder' => '',
+            'value' => "Ligne 1\nLigne 2",
+            'is_html' => false,
+        ]));
+
+        $this->assertMatchesSnapshot('classic_bfTextarea.html', $html);
+    }
+
+    public function testHiddenElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfHidden', [
+            'dbId' => 45,
+            'bfName' => 'source',
+            'hideLabel' => true,
+            'value' => 'newsletter-2026',
+        ]));
+
+        $this->assertMatchesSnapshot('classic_bfHidden.html', $html);
+    }
+
+    public function testCheckboxElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfCheckbox', [
+            'dbId' => 46,
+            'bfName' => 'accept',
+            'label' => "J'accepte les conditions",
+            'hint' => '',
+            'required' => true,
+            'checked' => false,
+            'value' => '1',
+            'mailbackAccept' => false,
+        ]));
+
+        $this->assertMatchesSnapshot('classic_bfCheckbox.html', $html);
+    }
+
+    public function testSelectElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfSelect', [
+            'dbId' => 47,
+            'bfName' => 'country',
+            'label' => 'Pays',
+            'hint' => '',
+            'required' => false,
+            'multiple' => false,
+            'width' => '',
+            'height' => '',
+            'list' => "1;France;fr\n0;Belgique;be\n0;Suisse;ch",
+        ]));
+
+        $this->assertMatchesSnapshot('classic_bfSelect.html', $html);
+    }
+
     /**
      * @param array<string, mixed> $overrides
      * @return array<string, mixed>

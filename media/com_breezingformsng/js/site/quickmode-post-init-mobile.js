@@ -23,12 +23,6 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
         bfSectionFieldsDeactivated = true;
     }
-    if (JQuery.bfvalidationEngine) {
-        JQuery.bfvalidationEngineLanguage.newLang();
-        JQuery(".ff_elem").change(function() {
-            JQuery.bfvalidationEngine.closePrompt(this);
-        });
-    }
     JQuery(".bfQuickMode .hasTip").css("color", "inherit");
     JQuery(".bfQuickMode .bfTooltip").css("color", "inherit");
     JQuery("input[type=text]").bind("keypress", function(evt) {

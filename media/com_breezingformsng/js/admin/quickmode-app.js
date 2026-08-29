@@ -744,10 +744,9 @@
                     }
                 );
 
-                JQuery('#menutab').tabs({
-                    select: function (e, ui) {
-                    }
-                });
+                // #menutab is now a native Bootstrap 5 nav-tabs/tab-content
+                // pair (see QuickmodeHtml::render()) - no JS init call
+                // needed, data-bs-toggle="tab" wires it up on its own.
             }
 
             window.onload = function () {

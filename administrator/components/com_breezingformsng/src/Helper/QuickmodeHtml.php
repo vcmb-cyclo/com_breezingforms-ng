@@ -148,7 +148,7 @@ final class QuickmodeHtml
         $wa->useStyle('com_breezingformsng.custom-style');
         $wa->useScript('com_breezingformsng.jquery-alias');
         $wa->useScript('com_breezingformsng.jtree');
-        $wa->useScript('com_breezingformsng.jq-ui');
+        $wa->useScript('bootstrap.tab');
         $wa->useScript('com_breezingformsng.base64');
         $wa->useScript('com_breezingformsng.json-plugin');
         $wa->useScript('com_breezingformsng.md5');
@@ -277,34 +277,31 @@ final class QuickmodeHtml
 
                 <form name="bfForm" onsubmit="return false">
 
-                    <div id="menutab" class="flora">
+                    <div id="menutab">
                         <input id="triggerScrollable" type="checkbox"><label class="triggerScrollableLabel"
                             for="triggerScrollable">Keep panel docked</label>
-                        <ul>
-                            <li><a onclick="JQuery('.bfFadingMessage').css('display', 'none')" href="#fragment-1"><span>
-                                        <div class="tab-items">
-                                            <?php echo Text::_('COM_BREEZINGFORMSNG_PROPERTIES') ?>
-                                        </div>
-                                    </span></a>
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button type="button" class="nav-link active tab-items" id="fragment-1-tab"
+                                    data-bs-toggle="tab" data-bs-target="#fragment-1" role="tab"
+                                    aria-controls="fragment-1" aria-selected="true"
+                                    onclick="JQuery('.bfFadingMessage').css('display', 'none')">
+                                    <?php echo Text::_('COM_BREEZINGFORMSNG_PROPERTIES') ?>
+                                </button>
                             </li>
-                            <li><a onclick="JQuery('.bfFadingMessage').css('display', 'none')" href="#fragment-2"><span>
-                                        <div class="tab-element">
-                                            <?php echo Text::_('COM_BREEZINGFORMSNG_ADVANCED') ?>
-                                        </div>
-                                    </span></a>
+                            <li class="nav-item" role="presentation">
+                                <button type="button" class="nav-link tab-element" id="fragment-2-tab"
+                                    data-bs-toggle="tab" data-bs-target="#fragment-2" role="tab"
+                                    aria-controls="fragment-2" aria-selected="false"
+                                    onclick="JQuery('.bfFadingMessage').css('display', 'none')">
+                                    <?php echo Text::_('COM_BREEZINGFORMSNG_ADVANCED') ?>
+                                </button>
                             </li>
                         </ul>
 
-                        <div class="t">
+                        <div class="tab-content">
 
-                            <div class="t">
-                                <div class="t"></div>
-                            </div>
-                        </div>
-
-                        <div class="m">
-
-                            <div id="fragment-1">
+                            <div id="fragment-1" class="tab-pane fade show active" role="tabpanel" aria-labelledby="fragment-1-tab">
                                 <div>
                                     <br />
                                     <div class="bfFadingMessage" style="display:none"></div>
@@ -326,7 +323,7 @@ final class QuickmodeHtml
                                 </div>
                             </div>
 
-                            <div id="fragment-2">
+                            <div id="fragment-2" class="tab-pane fade" role="tabpanel" aria-labelledby="fragment-2-tab">
                                 <div>
                                     <br />
 
@@ -345,13 +342,6 @@ final class QuickmodeHtml
                                     <br />
 
                                 </div>
-                            </div>
-                        </div>
-
-
-                        <div class="b">
-                            <div class="b">
-                                <div class="b"></div>
                             </div>
                         </div>
                     </div>

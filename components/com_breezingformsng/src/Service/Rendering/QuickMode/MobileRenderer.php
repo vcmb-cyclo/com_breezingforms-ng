@@ -222,12 +222,6 @@ class MobileRenderer
 			$this->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-flash-upload-mobile.js');
 		}
 
-		if ($this->useBalloonErrors) {
-			$this->addStyleSheet(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/validationEngine.jquery.css');
-			$this->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jquery.validationEngine-en.js');
-			$this->addScript(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jquery.validationEngine.js');
-		}
-
 		$this->addStyleDeclaration('.tooltip { margin-left: 2%; margin-top: 5px; }');
 
 		$toggleCode = '';

@@ -96,7 +96,7 @@ class HtmlView extends BaseHtmlView
         $wa->useStyle('com_breezingformsng.custom-style');
         $wa->useScript('com_breezingformsng.jquery-alias');
         $wa->useScript('com_breezingformsng.jtree');
-        $wa->useScript('com_breezingformsng.jq-ui');
+        $wa->useScript('bootstrap.tab');
         $wa->useScript('com_breezingformsng.base64');
         $wa->useScript('com_breezingformsng.json-plugin');
         $wa->useScript('com_breezingformsng.md5');

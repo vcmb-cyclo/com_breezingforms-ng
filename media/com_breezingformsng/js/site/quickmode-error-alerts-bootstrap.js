@@ -5,7 +5,18 @@
    Bootstrap variant doesn't have the bfSignature-specific validation
    prompt branch. Depends on two globals declared inline right before this
    file is loaded: bfShowDefaultErrors, bfErrorPageScoped and
-   ff_processor.form_id. */
+   ff_processor.form_id.
+
+   The per-field "balloon" error prompt branch that used to run here
+   (JQuery(...).bfvalidationEngine(...), buildPrompt()/closePrompt())
+   was removed: it called a method that was never actually defined
+   anywhere in this codebase (the vendored plugin only exposes itself
+   as $.fn.validationEngine, not $.fn.bfvalidationEngine), guarded by
+   a check on a property that was equally never set - so the branch
+   had been dead code, unreachable, since whenever this "bf" renaming
+   happened. The vendored jquery.validationEngine.js/-en.js library
+   and its CSS have been removed along with it (see
+   docs/maintenance/js-libraries-migration-plan.md). */
 				function bfShowErrors(error){
                                         if (bfShowDefaultErrors) {
                                             JQuery(".bfErrorMessage").html("");
@@ -24,69 +35,5 @@
                                             if (!bfErrorPageScoped) {
                                                 JQuery(".bfErrorMessage").css("display","");
                                             }
-                                        }
-
-                                        if(JQuery.bfvalidationEngine)
-                                        {
-                                            JQuery("#" + ff_processor.form_id).bfvalidationEngine({
-                                              promptPosition: "bottomLeft",
-                                              success :  false,
-                                              failure : function() {}
-                                            });
-
-                                            for(var i = 0; i < inlineErrorElements.length; i++)
-                                            {
-                                                if(inlineErrorElements[i][1] != "")
-                                                {
-                                                    var prompt = null;
-
-                                                    if(inlineErrorElements[i][0] == "bfCaptchaEntry"){
-                                                        prompt = JQuery.bfvalidationEngine.buildPrompt("#bfCaptchaEntry",inlineErrorElements[i][1],"error");
-                                                    }
-                                                    else if(inlineErrorElements[i][0] == "bfReCaptchaEntry"){
-                                                        // nothing here yet for recaptcha, alert is default
-                                                        alert(inlineErrorElements[i][1]);
-                                                    }
-                                                    else if(typeof JQuery("#bfUploader"+inlineErrorElements[i][0]).get(0) != "undefined")
-                                                    {
-                                                        alert(inlineErrorElements[i][1]);
-                                                        //prompt = JQuery.bfvalidationEngine.buildPrompt("#"+JQuery("#bfUploader"+inlineErrorElements[i][0]).val(),inlineErrorElements[i][1],"error");
-                                                    }
-                                                    else
-                                                    {
-                                                        if(ff_getElementByName(inlineErrorElements[i][0])){
-                                                            prompt = JQuery.bfvalidationEngine.buildPrompt("#"+ff_getElementByName(inlineErrorElements[i][0]).id,inlineErrorElements[i][1],"error");
-                                                        }else{
-                                                            alert(inlineErrorElements[i][1]);
-                                                        }
-                                                    }
-
-                                                    JQuery(prompt).mouseover(
-                                                        function(){
-                                                            var inlineError = JQuery(this).attr("class").split(" ");
-                                                            if(inlineError && inlineError.length && inlineError.length == 2){
-                                                                var result = inlineError[1].split("formError");
-                                                                if(result && result.length && result.length >= 1){
-                                                                    JQuery.bfvalidationEngine.closePrompt("#"+result[0]);
-                                                                }
-                                                            }
-                                                        }
-                                                    );
-                                                }
-                                                else
-                                                {
-                                                    if(typeof JQuery("#bfUploader"+inlineErrorElements[i][0]).get(0) != "undefined")
-                                                    {
-                                                        //JQuery.bfvalidationEngine.closePrompt("#"+JQuery("#bfUploader"+inlineErrorElements[i][0]).val());
-                                                    }
-                                                    else
-                                                    {
-                                                        if(ff_getElementByName(inlineErrorElements[i][0])){
-                                                            JQuery.bfvalidationEngine.closePrompt("#"+ff_getElementByName(inlineErrorElements[i][0]).id);
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            inlineErrorElements = new Array();
                                         }
 				}

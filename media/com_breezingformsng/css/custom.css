@@ -966,45 +966,31 @@ quick mode
     background: #FCFCFC;
 }
 
-.ui-tabs-nav {
-    list-style: outside none none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    height: inherit;
-}
-
-.ui-tabs-nav li.ui-corner-top {
-    background: #f5f5f5;
-    border: 1px solid #eaeaea;
+#menutab .nav-item {
     margin: 0 7px 0 0 !important;
 }
 
-.ui-tabs-nav li.ui-state-active {
-    background: transparent;
-    border-top: 1px solid #3F51B5 !important;
-    border-bottom: 1px solid #fff !important;
-}
-
-.ui-tabs-nav li.ui-corner-top a,
-.ui-tabs-nav li.ui-corner-top a span {
-    background: transparent !important;
+#menutab .nav-link {
+    background: #f5f5f5;
+    border: 1px solid #eaeaea;
     height: 30px;
     padding: 3px;
     margin: 0 !important;
     color: #333333;
 }
 
-.ui-tabs-nav li.ui-corner-top a:hover,
-.ui-tabs-nav li.ui-corner-top a span:hover {
-    background: #fff !important;
-}
-
-.ui-tabs-nav li.ui-state-active a,
-.ui-tabs-nav li.ui-state-active a span {
+#menutab .nav-link.active {
+    background: transparent;
+    border-top: 1px solid #3F51B5 !important;
+    border-bottom: 1px solid #fff !important;
     color: #555 !important;
 }
 
-#menutab div.m {
+#menutab .nav-link:hover {
+    background: #fff !important;
+}
+
+#menutab .tab-content {
     border: 1px solid #eaeaea !important;
     padding: 15px !important;
 	overflow: hidden;
@@ -1587,7 +1573,7 @@ CONFIGURATION Joomla.submitbutton('step4');
         border: 1px solid #d5d5d5;
         text-decoration: none !important;
     }
-	.ui-tabs-panel.ui-widget-content.ui-corner-bottom {
+	#menutab .tab-pane {
 		overflow:hidden;
 	}
 	

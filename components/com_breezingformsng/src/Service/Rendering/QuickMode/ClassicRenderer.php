@@ -93,11 +93,6 @@ float:left;
 		if($this->useErrorAlerts) {
 			RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/js/sweetalert2.min.js');
 		}
-		if ($this->useBalloonErrors) {
-			RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/validationEngine.jquery.css');
-			RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jquery.validationEngine-en.js');
-			RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/jquery.validationEngine.js');
-		}
 		$toggleCode = '';
 		if ($this->toggleFields != '[]') {
 			RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-toggle-fields.js');

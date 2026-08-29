@@ -24,16 +24,9 @@
     font-weight: normal !important;
 }
 
-.ui-tabs-panel {
-    background: none; /* declare background color for container to avoid distorted fonts in IE while fading */
-}
-
-#menutab div.m {
+#menutab .tab-content {
     border: none;
     border-top: 1px solid #0088CC !important;
-    border-radius: 0 !important;
-    -moz-border-radius: 0 !important;
-    -webkit-border-radius: 0 !important;
     padding: 0 8px !important;
     min-width: 90% !important;
 }
@@ -148,30 +141,39 @@ overflow:hidden;width: 100%;
 }
 
 /* option tabs */
-.ui-tabs-nav{
+#menutab .nav-tabs {
     height: 37px;
+    border-bottom: none;
 }
 
 @media (max-width: 767px) {
-    #menutab div.m{
+    #menutab .tab-content {
         border-top: none !important;
     }
 }
 
-.ui-tabs-nav a, .ui-tabs-nav a span {
-    float: left !important;
+#menutab .nav-link {
     padding: 3px 12px !important;
     background: #0088CC !important;
+    color: #fff !important;
     font-size: 16px;
+    border: none;
+    border-radius: 0;
 }
 
-.tab-items {
+#menutab .nav-link.active {
+    background: #fff !important;
+    color: #0088CC !important;
+    border: 1px solid #0088CC;
+    border-bottom-color: #fff;
+}
+
+.tab-items,
+.tab-element,
+.tab-form {
     padding-right: 0 !important;
     background: none !important;
 }
-
-.tab-element { padding-right: 0 !important; background: none !important;}
-.tab-form { padding-right: 25px !important; background: none !important;}
 
 .bfFadingMessage{
     margin-bottom: 10px;

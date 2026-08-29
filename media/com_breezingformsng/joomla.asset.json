@@ -15,14 +15,6 @@
     },
 
     {
-      "name": "com_breezingformsng.jq-ui",
-      "type": "script",
-      "uri": "administrator/components/com_breezingformsng/libraries/jquery/jq-ui.min.js",
-      "dependencies": ["com_breezingformsng.jquery-alias"],
-      "version": "auto"
-    },
-
-    {
       "name": "com_breezingformsng.base64",
       "type": "script",
       "uri": "administrator/components/com_breezingformsng/libraries/jquery/plugins/base64.js",
@@ -95,7 +87,7 @@
         "com_breezingformsng.quickmode-compat",
         "com_breezingformsng.quickmode-app-properties",
         "com_breezingformsng.jtree",
-        "com_breezingformsng.jq-ui",
+        "bootstrap.tab",
         "com_breezingformsng.base64",
         "com_breezingformsng.json-plugin",
         "com_breezingformsng.md5",

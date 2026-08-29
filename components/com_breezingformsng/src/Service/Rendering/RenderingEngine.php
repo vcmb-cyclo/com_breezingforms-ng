@@ -551,42 +551,7 @@ final class RenderingEngine
         if ($this->processor->status == '') {
             $this->linkInitialOnload($library, $linked);
         } else {
-            $funcname = "";
-            switch ($this->processor->formrow->script2cond) {
-                case 1:
-                    $script2id = (int) $this->processor->formrow->script2id;
-                    $query = $this->processor->database->getQuery(true)
-                        ->select('name')
-                        ->from($this->processor->database->quoteName('#__facileforms_scripts'))
-                        ->where($this->processor->database->quoteName('id') . ' = :script2id')
-                        ->where($this->processor->database->quoteName('published') . ' = 1')
-                        ->bind(':script2id', $script2id, ParameterType::INTEGER);
-                    $this->processor->database->setQuery($query);
-                    $funcname = $this->processor->database->loadResult();
-                    break;
-                case 2:
-                    $funcname = "ff_" . $this->processor->formrow->name . "_submitted";
-                    break;
-                default:
-                    break;
-            } // switch
-            if ($funcname != '' || $this->processor->formrow->heightmode || $this->processor->showgrid) {
-                $code = "onload = function()" . nl() .
-                    "{" . nl();
-                if ($this->processor->formrow->heightmode)
-                    $code .= "    ff_resizepage(" . $this->processor->formrow->heightmode . ", " . $this->processor->formrow->height . ");" . nl();
-                if ($this->processor->showgrid)
-                    $code .= "    ff_showgrid();" . nl();
-                if ($funcname != '') {
-                    $json_return = json_encode($this->processor->message, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS);
-                    if (trim($json_return) == '') {
-                        $json_return = '""';
-                    }
-                    $code .= "    " . $funcname . "(" . $this->processor->status . "," . $json_return . ");" . nl();
-                }
-                $code .= "} // onload";
-                $this->processor->linkcode('onload', $library, $linked, $code);
-            } // if
+            $this->linkSubmittedOnload($library, $linked);
         } // if
         if ($this->processor->bury())
             return;
@@ -2364,6 +2329,58 @@ final class RenderingEngine
         }
         $code .= "    if (ff_processor && ff_processor.traceBuffer) ff_traceWindow();" . nl() .
             "} // onload";
+        $this->processor->linkcode('onload', $library, $linked, $code);
+    }
+
+    /**
+     * Link the onload callback used after a form submission.
+     *
+     * @param array<int|string, mixed> $library
+     * @param array<int|string, mixed> $linked
+     */
+    private function linkSubmittedOnload(array &$library, array &$linked): void
+    {
+        $functionName = '';
+
+        switch ($this->processor->formrow->script2cond) {
+            case 1:
+                $script2id = (int) $this->processor->formrow->script2id;
+                $query = $this->processor->database->getQuery(true)
+                    ->select('name')
+                    ->from($this->processor->database->quoteName('#__facileforms_scripts'))
+                    ->where($this->processor->database->quoteName('id') . ' = :script2id')
+                    ->where($this->processor->database->quoteName('published') . ' = 1')
+                    ->bind(':script2id', $script2id, ParameterType::INTEGER);
+                $this->processor->database->setQuery($query);
+                $functionName = $this->processor->database->loadResult();
+                break;
+            case 2:
+                $functionName = 'ff_' . $this->processor->formrow->name . '_submitted';
+                break;
+            default:
+                break;
+        }
+
+        if ($functionName == '' && !$this->processor->formrow->heightmode && !$this->processor->showgrid) {
+            return;
+        }
+
+        $code = "onload = function()" . nl() .
+            "{" . nl();
+        if ($this->processor->formrow->heightmode) {
+            $code .= "    ff_resizepage(" . $this->processor->formrow->heightmode . ", " . $this->processor->formrow->height . ");" . nl();
+        }
+        if ($this->processor->showgrid) {
+            $code .= "    ff_showgrid();" . nl();
+        }
+        if ($functionName != '') {
+            $jsonReturn = json_encode($this->processor->message, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS);
+            if (trim($jsonReturn) === '') {
+                $jsonReturn = '""';
+            }
+            $code .= "    " . $functionName . "(" . $this->processor->status . "," . $jsonReturn . ");" . nl();
+        }
+        $code .= '} // onload';
         $this->processor->linkcode('onload', $library, $linked, $code);
     }
 

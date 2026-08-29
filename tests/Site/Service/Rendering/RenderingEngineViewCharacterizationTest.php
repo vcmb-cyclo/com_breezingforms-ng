@@ -134,4 +134,22 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertSame('', $html);
     }
 
+    public function testPermissionsReturnNeutralContextWhenContentBuilderIsUnavailable(): void
+    {
+        $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+
+        self::assertSame(
+            [
+                'form' => null,
+                'record' => null,
+                'frontend' => true,
+                'data' => null,
+                'full' => false,
+            ],
+            $engine->cbCheckPermissions()
+        );
+    }
+
 }

@@ -6,6 +6,8 @@ namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service;
 
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use ReflectionMethod;
+use Vcmb\Component\BreezingformsNG\Site\Service\Callback\FlashUploadCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Export\ExportEngine;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\ImageResizer;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\TokenizedDirectoryResolver;
@@ -75,6 +77,34 @@ final class CallbackExportUploadPermissionTest extends TestCase
         }
     }
 
+    public function testUploadStoragePreservesExistingFileWithUniqueDestination(): void
+    {
+        $directory = sys_get_temp_dir() . '/bfng-upload-' . bin2hex(random_bytes(4));
+        self::assertTrue(mkdir($directory));
+        self::assertSame(3, file_put_contents($directory . '/submission.txt', 'old'));
+
+        try {
+            $storage = new UploadStorage(
+                new ImageResizer(),
+                static function (string $source, string $destination): bool {
+                    return file_put_contents($destination, 'new') !== false;
+                }
+            );
+
+            $result = $storage->store('/tmp/upload.tmp', $directory, 'submission.txt', true, null, false);
+
+            self::assertTrue($result->isSuccessful());
+            self::assertNotSame($directory . '/submission.txt', $result->path);
+            self::assertSame('old', file_get_contents($directory . '/submission.txt'));
+            self::assertSame('new', file_get_contents($result->serverPath));
+        } finally {
+            foreach (glob($directory . '/*') ?: [] as $file) {
+                @unlink($file);
+            }
+            @rmdir($directory);
+        }
+    }
+
     public function testTokenizedUploadPathsSanitizeUnsafeFolderCharacters(): void
     {
         $resolver = (new ReflectionClass(TokenizedDirectoryResolver::class))->newInstanceWithoutConstructor();
@@ -83,6 +113,33 @@ final class CallbackExportUploadPermissionTest extends TestCase
             'uploads/user_name/{field}/file_.txt',
             $resolver->makeSafeFolder('uploads/user name/{field}/file?.txt')
         );
+    }
+
+    public function testFlashUploadValidationTraversesNestedElements(): void
+    {
+        $callback = (new ReflectionClass(FlashUploadCallback::class))->newInstanceWithoutConstructor();
+        $method = new ReflectionMethod($callback, 'validateUploadSize');
+        $method->setAccessible(true);
+        $file = tempnam(sys_get_temp_dir(), 'bfng-upload-test-');
+        self::assertNotFalse($file);
+        self::assertSame(4, file_put_contents($file, 'test'));
+
+        try {
+            $result = $method->invoke($callback, [
+                'children' => [[
+                    'properties' => [
+                        'type' => 'element',
+                        'bfType' => 'bfFile',
+                        'flashUploaderBytes' => 4,
+                        'bfName' => 'attachment',
+                    ],
+                ]],
+            ], $file, 'attachment');
+
+            self::assertNull($result);
+        } finally {
+            @unlink($file);
+        }
     }
 
     public function testCallbacksKeepBoundDatabaseQueriesAndInputAuthorizationChecks(): void

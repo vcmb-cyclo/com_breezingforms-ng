@@ -22,6 +22,12 @@ restent inchangées afin de conserver la traçabilité des migrations précéden
   Classic, Bootstrap, Mobile et OnePage.
 - [x] Premier filet sur `RenderingEngine::view()` : branche non-QuickMode,
   avertissement et arrêt avant initialisation du runtime.
+- [x] `ClassicRenderer` : les 21 types de champs couverts par filet de
+  caractérisation et extraits de `process()` en méthodes privées dédiées
+  (`renderTextfieldField`, `renderFileField`, etc. — `bfFile`, dernier type,
+  terminé le 2026-08-29). `process()` : ~1250 → ~510 lignes. Lot B ci-dessous
+  clos ; le fichier n'est plus « en cours local », il peut être touché par
+  d'autres lots (D, mutualisation Strategy) sans conflit particulier.
 - [ ] Compléter `RenderingEngine::view()` avant toute extraction : header,
   toolbar, arbre de nœuds, aperçu, permissions, sélection mobile et sorties
   anticipées.
@@ -38,7 +44,7 @@ distincts :
 | Lot | Périmètre | Dépendance | Conflit probable |
 |---|---|---|---|
 | A | Filets Bootstrap, Mobile et OnePage supplémentaires | `bfTextfield` couvert | Faible |
-| B | Filets Classic supplémentaires | Travail Classic local | Élevé — mainteneur actif |
+| B | ~~Filets Classic supplémentaires~~ — **clos le 2026-08-29** : 21/21 types couverts et extraits | — | — |
 | C | Tests purs callbacks, uploads, exports et parsers | Aucun runtime Joomla réel | Faible |
 | D | Branches simples de `RenderingEngine::view()` | Harness/stubs existants | Moyen |
 | E | Nettoyage PHPCS par petits groupes de services | PHPCS installé | Faible si un fichier par lot |

@@ -328,50 +328,7 @@ final class RenderingEngine
         if ($this->processor->bury())
             return;
 
-        $cntFiles = 0;
-        $fileExtensionError = json_encode(
-            Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED'),
-            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE
-        );
-        $fileExtensionsCheck = 'function checkFileExtensions(){';
-        for ($i = 0; $i < $this->processor->rowcount; $i++) {
-            $row = $this->processor->rows[$i];
-            if ($row->type == 'File Upload' && trim($this->processor->formrow->template_code) != '') {
-                if (trim($row->data2) != '') {
-                    $exts = explode(',', $row->data2);
-                    $extsCount = count($exts);
-                    $fileExtensionsCheck .= 'var ff_elem' . $row->id . 'Exts = false;';
-                    for ($x = 0; $x < $extsCount; $x++) {
-                        $fileExtensionsCheck .= '
-							if(!ff_elem' . $row->id . 'Exts && document.getElementById("ff_elem' . $row->id . '").value.toLowerCase().lastIndexOf(".' . strtolower(trim($exts[$x])) . '") != -1){
-								ff_elem' . $row->id . 'Exts = true;
-							}else if(!ff_elem' . $row->id . 'Exts && document.getElementById("ff_elem' . $row->id . '").value == ""){
-								ff_elem' . $row->id . 'Exts = true;
-							}';
-                    }
-                    $fileExtensionsCheck .= '
-					if(!ff_elem' . $row->id . 'Exts){
-						if(typeof bfUseErrorAlerts == "undefined"){
-							alert(' . $fileExtensionError . ');
-						} else {
-							bfShowErrors(' . $fileExtensionError . ');
-						}
-						if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
-                                                if(document.getElementById("bfSubmitButton")){
-                                                    document.getElementById("bfSubmitButton").disabled = false;
-                                                }
-                                                if(typeof JQuery != "undefined"){JQuery(".bfCustomSubmitButton").prop("disabled", false);}
-						return false;
-					}
-					';
-                    $cntFiles++;
-                }
-            }
-        }
-        $fileExtensionsCheck .= '
-			return true;
-		}
-		';
+        [$fileExtensionsCheck, $cntFiles] = $this->buildFileExtensionsCheck();
 
         $captchaError = json_encode(
             Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG'),
@@ -2399,6 +2356,61 @@ final class RenderingEngine
         $this->processor->loadScripts($library);
 
         return [$library, []];
+    }
+
+    /**
+     * Build the client-side file extension validator.
+     *
+     * @return array{0: string, 1: int}
+     */
+    private function buildFileExtensionsCheck(): array
+    {
+        $cntFiles = 0;
+        $fileExtensionError = json_encode(
+            Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED'),
+            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE
+        );
+        $fileExtensionsCheck = 'function checkFileExtensions(){';
+        for ($i = 0; $i < $this->processor->rowcount; $i++) {
+            $row = $this->processor->rows[$i];
+            if ($row->type == 'File Upload' && trim($this->processor->formrow->template_code) != '') {
+                if (trim($row->data2) != '') {
+                    $exts = explode(',', $row->data2);
+                    $extsCount = count($exts);
+                    $fileExtensionsCheck .= 'var ff_elem' . $row->id . 'Exts = false;';
+                    for ($x = 0; $x < $extsCount; $x++) {
+                        $fileExtensionsCheck .= '
+							if(!ff_elem' . $row->id . 'Exts && document.getElementById("ff_elem' . $row->id . '").value.toLowerCase().lastIndexOf(".' . strtolower(trim($exts[$x])) . '") != -1){
+								ff_elem' . $row->id . 'Exts = true;
+							}else if(!ff_elem' . $row->id . 'Exts && document.getElementById("ff_elem' . $row->id . '").value == ""){
+								ff_elem' . $row->id . 'Exts = true;
+							}';
+                    }
+                    $fileExtensionsCheck .= '
+					if(!ff_elem' . $row->id . 'Exts){
+						if(typeof bfUseErrorAlerts == "undefined"){
+							alert(' . $fileExtensionError . ');
+						} else {
+							bfShowErrors(' . $fileExtensionError . ');
+						}
+						if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
+                                                if(document.getElementById("bfSubmitButton")){
+                                                    document.getElementById("bfSubmitButton").disabled = false;
+                                                }
+                                                if(typeof JQuery != "undefined"){JQuery(".bfCustomSubmitButton").prop("disabled", false);}
+						return false;
+					}
+					';
+                    $cntFiles++;
+                }
+            }
+        }
+        $fileExtensionsCheck .= '
+			return true;
+		}
+		';
+
+        return [$fileExtensionsCheck, $cntFiles];
     }
 
     /**

@@ -824,6 +824,41 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertStringContainsString('COM_BREEZINGFORMSNG_PROCESS_BFPIECE Library piece', $processor->executedPieces[0]['name']);
     }
 
+    public function testAfterFormCustomPieceRendersAndPropagatesBuryState(): void
+    {
+        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
+        $processor->form = 9;
+        $processor->formrow = (object) [
+            'piece2cond' => 2,
+            'piece2code' => 'echo "after";',
+        ];
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+        $method = (new ReflectionClass($engine))->getMethod('executeAfterFormPiece');
+
+        ob_start();
+        try {
+            $buried = $method->invoke($engine);
+            $html = ob_get_contents();
+        } finally {
+            ob_end_clean();
+        }
+
+        self::assertFalse($buried);
+        self::assertSame('<piece>echo "after";</piece>', $html);
+        self::assertSame('f', $processor->executedPieces[0]['type']);
+        self::assertSame(9, $processor->executedPieces[0]['id']);
+        self::assertSame(2, $processor->executedPieces[0]['pane']);
+
+        $processor->buryImmediately = true;
+        ob_start();
+        try {
+            self::assertTrue($method->invoke($engine));
+        } finally {
+            ob_end_clean();
+        }
+    }
+
     public function testHeaderRendersProcessorVariablesThroughSharedHeaderRenderer(): void
     {
         $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();

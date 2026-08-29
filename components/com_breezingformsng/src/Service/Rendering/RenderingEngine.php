@@ -2101,42 +2101,7 @@ final class RenderingEngine
                     echo '</form>' . nl();
                 } // if
         } // if
-        // handle After Form piece
-        $code = '';
-
-        switch ($this->processor->formrow->piece2cond) {
-            case 1: // library
-                $piece2id = (int) $this->processor->formrow->piece2id;
-                $query = $this->processor->database->getQuery(true)
-                    ->select(['name', 'code'])
-                    ->from($this->processor->database->quoteName('#__facileforms_pieces'))
-                    ->where($this->processor->database->quoteName('id') . ' = :piece2id')
-                    ->where($this->processor->database->quoteName('published') . ' = 1')
-                    ->bind(':piece2id', $piece2id, ParameterType::INTEGER);
-                $this->processor->database->setQuery($query);
-                $rows = $this->processor->database->loadObjectList();
-                if (count($rows))
-                    echo $this->processor->execPiece(
-                        $rows[0]->code,
-                        Text::_('COM_BREEZINGFORMSNG_PROCESS_AFPIECE') . " " . $rows[0]->name,
-                        'p',
-                        $this->processor->formrow->piece2id,
-                        null
-                    );
-                break;
-            case 2: // custom code
-                echo $this->processor->execPiece(
-                    $this->processor->formrow->piece2code,
-                    Text::_('COM_BREEZINGFORMSNG_PROCESS_AFPIECEC'),
-                    'f',
-                    $this->processor->form,
-                    2
-                );
-                break;
-            default:
-                break;
-        } // switch
-        if ($this->processor->bury())
+        if ($this->executeAfterFormPiece())
             return;
 
         if ($this->processor->legacy_wrap) {
@@ -2338,6 +2303,45 @@ final class RenderingEngine
                 break;
             case 2:
                 echo $this->processor->execPiece($this->processor->formrow->piece1code, Text::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECEC'), 'f', $this->processor->form, 2);
+                break;
+            default:
+                break;
+        }
+
+        return $this->processor->bury();
+    }
+
+    private function executeAfterFormPiece(): bool
+    {
+        switch ($this->processor->formrow->piece2cond) {
+            case 1:
+                $piece2id = (int) $this->processor->formrow->piece2id;
+                $query = $this->processor->database->getQuery(true)
+                    ->select(['name', 'code'])
+                    ->from($this->processor->database->quoteName('#__facileforms_pieces'))
+                    ->where($this->processor->database->quoteName('id') . ' = :piece2id')
+                    ->where($this->processor->database->quoteName('published') . ' = 1')
+                    ->bind(':piece2id', $piece2id, ParameterType::INTEGER);
+                $this->processor->database->setQuery($query);
+                $rows = $this->processor->database->loadObjectList();
+                if (count($rows)) {
+                    echo $this->processor->execPiece(
+                        $rows[0]->code,
+                        Text::_('COM_BREEZINGFORMSNG_PROCESS_AFPIECE') . ' ' . $rows[0]->name,
+                        'p',
+                        $this->processor->formrow->piece2id,
+                        null
+                    );
+                }
+                break;
+            case 2:
+                echo $this->processor->execPiece(
+                    $this->processor->formrow->piece2code,
+                    Text::_('COM_BREEZINGFORMSNG_PROCESS_AFPIECEC'),
+                    'f',
+                    $this->processor->form,
+                    2
+                );
                 break;
             default:
                 break;

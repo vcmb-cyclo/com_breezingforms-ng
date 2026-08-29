@@ -317,6 +317,114 @@ final class BootstrapRendererCharacterizationTest extends TestCase
         $this->assertMatchesSnapshot('bootstrap_bfCalendarResponsive.html', $html);
     }
 
+    public function testHiddenElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfHidden', [
+            'dbId' => 45,
+            'bfName' => 'source',
+            'hideLabel' => true,
+            'value' => 'newsletter-2026',
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfHidden.html', $html);
+    }
+
+    public function testNumberInputElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfNumberInput', [
+            'dbId' => 50,
+            'bfName' => 'age',
+            'label' => 'Âge',
+            'range' => false,
+            'value' => '',
+            'step' => 1,
+            'max' => 120,
+            'min' => 0,
+            'size' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfNumberInput.html', $html);
+    }
+
+    public function testSummarizeElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfSummarize', [
+            'dbId' => 51,
+            'hideLabel' => true,
+            'connectWith' => ['price', 'qty'],
+            'connectType' => 'multiply',
+            'emptyMessage' => '0',
+            'hideIfEmpty' => false,
+            'fieldCalc' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfSummarize.html', $html);
+    }
+
+    public function testSignatureElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfSignature', [
+            'dbId' => 57,
+            'bfName' => 'signature',
+            'hideLabel' => true,
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfSignature.html', $html);
+    }
+
+    public function testStripeElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfStripe', [
+            'dbId' => 53,
+            'hideLabel' => true,
+            'image' => '',
+            'actionClick' => 0,
+            'actionFunctionName' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfStripe.html', $html);
+    }
+
+    public function testPayPalElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfPayPal', [
+            'dbId' => 54,
+            'hideLabel' => true,
+            'image' => '',
+            'actionClick' => 0,
+            'actionFunctionName' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfPayPal.html', $html);
+    }
+
+    public function testSofortueberweisungElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfSofortueberweisung', [
+            'dbId' => 55,
+            'hideLabel' => true,
+            'image' => '',
+            'actionClick' => 0,
+            'actionFunctionName' => '',
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfSofortueberweisung.html', $html);
+    }
+
     /**
      * @param array<string, mixed> $overrides
      * @return array<string, mixed>

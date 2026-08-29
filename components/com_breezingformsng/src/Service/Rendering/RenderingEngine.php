@@ -549,17 +549,7 @@ final class RenderingEngine
         [$library, $linked] = $this->createScriptLibraryState();
 
         if ($this->processor->status == '') {
-            $code = "onload = function()" . nl() .
-                "{" . nl() .
-                "    ff_initialize('formentry');" . nl() .
-                "    ff_initialize('pageentry');" . nl();
-            if ($this->processor->formrow->heightmode)
-                $code .= "    ff_resizepage(" . $this->processor->formrow->heightmode . ", " . $this->processor->formrow->height . ");" . nl();
-            if ($this->processor->showgrid)
-                $code .= "    ff_showgrid();" . nl();
-            $code .= "    if (ff_processor && ff_processor.traceBuffer) ff_traceWindow();" . nl() .
-                "} // onload";
-            $this->processor->linkcode('onload', $library, $linked, $code);
+            $this->linkInitialOnload($library, $linked);
         } else {
             $funcname = "";
             switch ($this->processor->formrow->script2cond) {
@@ -2352,6 +2342,29 @@ final class RenderingEngine
         $this->processor->loadScripts($library);
 
         return [$library, []];
+    }
+
+    /**
+     * Link the onload callback used when a form is displayed for the first time.
+     *
+     * @param array<int|string, mixed> $library
+     * @param array<int|string, mixed> $linked
+     */
+    private function linkInitialOnload(array &$library, array &$linked): void
+    {
+        $code = "onload = function()" . nl() .
+            "{" . nl() .
+            "    ff_initialize('formentry');" . nl() .
+            "    ff_initialize('pageentry');" . nl();
+        if ($this->processor->formrow->heightmode) {
+            $code .= "    ff_resizepage(" . $this->processor->formrow->heightmode . ", " . $this->processor->formrow->height . ");" . nl();
+        }
+        if ($this->processor->showgrid) {
+            $code .= "    ff_showgrid();" . nl();
+        }
+        $code .= "    if (ff_processor && ff_processor.traceBuffer) ff_traceWindow();" . nl() .
+            "} // onload";
+        $this->processor->linkcode('onload', $library, $linked, $code);
     }
 
     /**

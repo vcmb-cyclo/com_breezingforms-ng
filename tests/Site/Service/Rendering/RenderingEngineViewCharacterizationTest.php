@@ -31,12 +31,19 @@ if (!function_exists('Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering
     eval('namespace Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering; function bf_b64dec(string $value): string { return (string) base64_decode($value, true); }');
 }
 
+if (!function_exists('Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering\\nl')) {
+    eval('namespace Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering; function nl(): string { return "\\n"; }');
+}
+
 final class RenderingEngineProcessorDouble extends HTML_facileFormsProcessor
 {
     public int $permissionChecks = 0;
 
     /** @var list<string> */
     public array $callbackNames = [];
+
+    /** @var list<array{function: string, code: string}> */
+    public array $linkedCallbacks = [];
 
     public bool $buryAfterFirstCallback = false;
 
@@ -53,6 +60,11 @@ final class RenderingEngineProcessorDouble extends HTML_facileFormsProcessor
     public function addFunction($cond, $id, $name, $code, &$library, &$linked, $type, $rowid, $pane)
     {
         $this->callbackNames[] = $name;
+    }
+
+    public function linkcode($func, &$library, &$linked, $code, $type = null, $id = null, $pane = null)
+    {
+        $this->linkedCallbacks[] = ['function' => $func, 'code' => $code];
     }
 
     public function bury()
@@ -472,6 +484,26 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
             'clear:com_breezingformsng.mobile',
             'set:com_breezingformsng.mobile:1',
         ], $session->actions);
+    }
+
+    public function testInitialOnloadInitializesFormPageGridAndHeight(): void
+    {
+        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
+        $processor->formrow = (object) ['heightmode' => 2, 'height' => 480];
+        $processor->showgrid = true;
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+        $library = [];
+        $linked = [];
+
+        (new ReflectionClass($engine))->getMethod('linkInitialOnload')->invokeArgs($engine, [&$library, &$linked]);
+
+        self::assertCount(1, $processor->linkedCallbacks);
+        self::assertSame('onload', $processor->linkedCallbacks[0]['function']);
+        self::assertStringContainsString("ff_initialize('formentry');", $processor->linkedCallbacks[0]['code']);
+        self::assertStringContainsString("ff_initialize('pageentry');", $processor->linkedCallbacks[0]['code']);
+        self::assertStringContainsString('ff_resizepage(2, 480);', $processor->linkedCallbacks[0]['code']);
+        self::assertStringContainsString('ff_showgrid();', $processor->linkedCallbacks[0]['code']);
     }
 
     public function testHeaderRendersProcessorVariablesThroughSharedHeaderRenderer(): void

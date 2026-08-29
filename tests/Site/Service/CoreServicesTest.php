@@ -9,10 +9,14 @@ use PHPUnit\Framework\TestCase;
 use Vcmb\Component\BreezingformsNG\Site\Service\QuickMode\ElementFinder;
 use Vcmb\Component\BreezingformsNG\Site\Service\QuickMode\TranslationResolver;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\JavascriptValueExporter;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\JavascriptCompressor;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ProcessorHeaderRenderer;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\CodeStringTools;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\FormDisplayContextResolver;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RequestParameterParser;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\ImageResizer;
+use Vcmb\Component\BreezingformsNG\Site\Service\Upload\UploadError;
+use Vcmb\Component\BreezingformsNG\Site\Service\Upload\UploadResult;
 
 final class CoreServicesTest extends TestCase
 {
@@ -125,6 +129,84 @@ final class CoreServicesTest extends TestCase
             'gigabytes' => ['1g', 1024.0 * 1048576],
             'empty value uses safe default' => ['', 8 * 1048576],
             'unsupported unit uses safe default' => ['100b', 8 * 1048576],
+        ];
+    }
+
+    public function testCompressesJavascriptWhilePreservingStrings(): void
+    {
+        $javascript = "var value = 1; // ignored\nvar text = 'a b'; /* ignored */";
+
+        self::assertSame(
+            "var value=1;var text='a b';\n",
+            (new JavascriptCompressor())->compress($javascript, 80, "\n")
+        );
+    }
+
+    public function testBuildsSuccessfulAndFailedUploadResults(): void
+    {
+        $success = UploadResult::success('/files/example.pdf', '/var/www/files/example.pdf');
+        self::assertTrue($success->isSuccessful());
+        self::assertSame('/files/example.pdf', $success->path);
+        self::assertNull($success->error);
+
+        $failure = UploadResult::failure(UploadError::MoveFailed);
+        self::assertFalse($failure->isSuccessful());
+        self::assertSame(UploadError::MoveFailed, $failure->error);
+        self::assertSame('', $failure->path);
+    }
+
+    #[DataProvider('displayContextProvider')]
+    public function testResolvesFormDisplayContext(
+        int $runMode,
+        bool $inFrame,
+        int $formRunMode,
+        bool $published,
+        int $previewMode,
+        bool $gridEnabled,
+        int $gridSize,
+        array $expected
+    ): void {
+        $context = (new FormDisplayContextResolver())->resolve(
+            $runMode,
+            $inFrame,
+            12,
+            $formRunMode,
+            $published,
+            $previewMode,
+            $gridEnabled,
+            $gridSize,
+            'https://example.test'
+        );
+
+        self::assertSame($expected, [
+            $context->inline,
+            $context->template,
+            $context->formId,
+            $context->homepage,
+            $context->showGrid,
+            $context->canRun,
+        ]);
+    }
+
+    public static function displayContextProvider(): array
+    {
+        return [
+            'frontend form allowed' => [
+                0, false, 1, true, 0, false, 1,
+                [0, 0, 'ff_form12', 'https://example.test', false, true],
+            ],
+            'frontend form rejected when unpublished' => [
+                0, false, 0, false, 0, false, 1,
+                [0, 0, 'ff_form12', 'https://example.test', false, false],
+            ],
+            'backend iframe uses administrator homepage' => [
+                1, true, 2, true, 0, false, 1,
+                [0, 1, 'ff_form12', 'https://example.test/administrator/index.php?tmpl=component', false, true],
+            ],
+            'preview enables grid and inline form' => [
+                2, false, 0, false, 1, true, 2,
+                [1, 1, 'adminForm', 'index.php?tmpl=component', true, false],
+            ],
         ];
     }
 }

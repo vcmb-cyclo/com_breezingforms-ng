@@ -77,8 +77,11 @@ distincts :
 
 ### Ne pas paralléliser pour l'instant
 
-- La couche Strategy commune : elle dépend des quatre filets complets et serait
-  prématurée avant la caractérisation de `RenderingEngine::view()`.
+- ~~La couche Strategy commune~~ — **garde levée explicitement le 2026-08-29** :
+  les 4 filets complets sont en place, décision prise de démarrer sans
+  attendre la caractérisation de `RenderingEngine::view()`. À surveiller :
+  ce chantier touche les 4 renderers en même temps, coordination requise
+  avec tout travail parallèle sur ces fichiers.
 - Les modifications simultanées de `ClassicRenderer.php`, de son harness et de
   ses snapshots : ce périmètre contient déjà du travail local non commité.
 - La suppression des façades/classes legacy appelables depuis du PHP stocké en

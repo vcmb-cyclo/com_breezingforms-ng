@@ -99,8 +99,9 @@ ContentBuilder.
 État : `EditableRecord` et `EditableRecordLoader` sont extraits et branchés
 dans `RenderingEngine::view()` par `89165de7`. Le loader est couvert pour
 l'absence de résultat, le chargement des sous-enregistrements et les filtres
-SQL critiques via `dc68404bb` ; le contrat SQL est désormais isolé derrière
-un service. La génération du JavaScript `bfLoadEditable()` est maintenant
+SQL critiques via `dc68404bb` et `fd27c67dc` ; le contrat SQL est désormais
+isolé derrière un service, y compris la liaison du sous-enregistrement et le
+cas utilisateur invité. La génération du JavaScript `bfLoadEditable()` est maintenant
 extraite dans `EditableRecordHydrationScriptBuilder` (`a8325a7c`) et couverte
 pour les champs simples, checkbox/radio, listes, valeurs vides et types
 inconnus ; le nettoyage `InputFilter` reste explicitement dans `view()`.

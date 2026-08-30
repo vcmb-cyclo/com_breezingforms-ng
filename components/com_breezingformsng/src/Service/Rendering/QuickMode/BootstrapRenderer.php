@@ -778,7 +778,7 @@ class BootstrapRenderer
                                 (string) $mdata['bfName'],
                                 (string) $mdata['value'],
                                 (int) $mdata['dbId'],
-                            $onkeyup . $size . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+                                $onkeyup . $size . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
                                 (string) ($mdata['placeholder'] ?? '')
                             );
                         }

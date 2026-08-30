@@ -52,6 +52,7 @@
 | `RenderingEngine::view()` — première boucle classique | Intégration callbacks, scan statique et identifiants draggable couverte | Commit `a254e895` |
 | ContentBuilder — valeurs éditables | Générateur indépendant créé, couvert et branché dans `view()` | Commits `f685ff5e`, `c2ae9a76` |
 | ContentBuilder — champs non éditables | Générateur indépendant créé, couvert et branché dans `view()` | Commits `8bfd520e`, `21a0a812` |
+| ContentBuilder — résolution des signatures | Résolution des chemins vide/absent/présent isolée et testée ; lecture/encodage encore dans `view()` | Commit `b31b5c47` |
 | PHPCS | Actif sur les services modernes, les builders ContentBuilder et `HiddenFieldTrait` | `phpcs.xml.dist`, commit `2e58c4bb` |
 | PHPStan | Niveau 2 sur le composant, avec baseline | `phpstan.neon.dist`, 251 entrées dans la baseline |
 
@@ -248,10 +249,15 @@ trois providers couverts. Les champs de contexte ContentBuilder
 `ContentBuilderTechnicalFieldsBuilder`, branché dans les trois modes par
 `c53a457e`.
 
-- Extraire la détection PayPal, Sofort et Stripe.
-- Extraire le champ caché `ff_payment_method`.
-- Extraire les paramètres ContentBuilder transmis au formulaire.
-- Extraire les paramètres additionnels et le jeton CSRF Joomla.
+- Détection PayPal, Sofort et Stripe extraite dans `PaymentProviderDetector`
+  (`b5d1a55e`).
+- Champ caché `ff_payment_method` extrait dans `PaymentMethodFieldBuilder`
+  (`3d45e1e2`).
+- Paramètres ContentBuilder transmis au formulaire extraits dans
+  `ContentBuilderTechnicalFieldsBuilder` (`c53a457e`).
+- Paramètres additionnels et jeton CSRF Joomla extraits respectivement dans
+  `AdditionalHiddenFieldsBuilder` (`bb469b88`) et `FormTokenFieldBuilder`
+  (`462b2984`).
 
 ### 4.3 Variantes frontend, backend et preview
 
@@ -262,10 +268,14 @@ trois providers couverts. Les champs de contexte ContentBuilder
 
 ### 4.4 Fermeture et traçage
 
-- Garantir la fermeture des tampons de sortie sur chaque chemin de retour.
-- Garantir la restauration du gestionnaire d'erreurs.
-- Extraire le vidage du trace buffer.
-- Ajouter des tests qui échouent si un tampon ou un gestionnaire reste actif.
+État : les sorties anticipées nettoient désormais les tampons et restaurent le
+gestionnaire d'erreurs via `abortViewRendering()` (`2d4f75ef`). La finalisation
+normale et le vidage du trace buffer sont regroupés dans
+`finishViewRendering()` (`ced03d7a`), avec tests de caractérisation des deux
+ordres de traçage.
+
+- Compléter les tests avec les chemins ContentBuilder et Query List.
+- Vérifier les variantes où Joomla interrompt le rendu pendant un callback.
 
 Critère de sortie de la phase : `RenderingEngine::view()` devient une méthode
 d'orchestration courte, composée d'étapes nommées et testées.

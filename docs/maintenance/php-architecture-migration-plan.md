@@ -371,8 +371,8 @@ Règles de coordination :
 
 1. Harnais ContentBuilder pour le parcours complet des fichiers et des
    signatures, puis validation de la lecture SQL de l'enregistrement.
-2. Premier lot Strategy QuickMode : `bfTextfield` et `bfNumberInput`, après
-   comparaison des quatre variantes déjà couvertes par snapshots.
+2. Étendre la stratégie `QuickModeInputBuilder` aux wrappers Bootstrap et
+   OnePage, après le premier branchement Classic/Mobile (`065cef94`).
 3. Harnais ContentBuilder pour les parcours runtime fichiers/signatures.
 4. Rendu HTML classique par famille de nœuds.
 5. Réduction progressive des avertissements PHPCS et PHPStan après chaque
@@ -404,6 +404,10 @@ longueur restant à traiter séparément. Le trait partagé
 `BootstrapStyleFieldTrait` est désormais inclus dans le périmètre PHPCS par
 `212b6450` et ne présente plus d'erreur, avec ses avertissements de longueur
 documentés.
+
+Le premier contrôle partagé `bfTextfield`/`bfNumberInput` est commité dans
+`065cef94` et testé par les snapshots Classic/Mobile ; les wrappers Bootstrap
+et OnePage restent à intégrer sans perdre leurs classes et icônes de thème.
 
 Les lots 3 à 5 peuvent être préparés en parallèle du lot 6, à condition que le
 branchement dans `RenderingEngine.php` soit coordonné.

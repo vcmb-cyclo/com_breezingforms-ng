@@ -57,6 +57,7 @@ final class RenderingEngine
     private ?TokenizedDirectoryResolver $tokenizedDirectoryResolverService = null;
     private ?ProcessorHeaderRenderer $processorHeaderRendererService = null;
     private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
+    private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -148,6 +149,11 @@ final class RenderingEngine
     private function contentBuilderValueScriptBuilder(): ContentBuilderValueScriptBuilder
     {
         return $this->contentBuilderValueScriptBuilderService ??= new ContentBuilderValueScriptBuilder();
+    }
+
+    private function contentBuilderReadonlyScriptBuilder(): ContentBuilderReadonlyScriptBuilder
+    {
+        return $this->contentBuilderReadonlyScriptBuilderService ??= new ContentBuilderReadonlyScriptBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -834,40 +840,7 @@ final class RenderingEngine
                 $this->processor->app->getDocument()->getWebAssetManager()->addInlineScript('<!--' . nl() . 'var bfDeactivateField = new Array();' . nl() . '//-->');
                 echo '<script type="text/javascript">' . nl();
                 echo '<!--' . nl();
-                echo 'function bfContentBuilderFieldHasVisibleControl(fieldId){' . nl();
-                echo 'var wrap = JQuery("#bfElemWrap" + fieldId);' . nl();
-                echo 'if(!wrap.length){ return false; }' . nl();
-                echo 'var hasVisibleControl = false;' . nl();
-                echo 'wrap.find(".ff_elem").each(function(){' . nl();
-                echo 'if(typeof this.type != "undefined" && this.type != "hidden"){ hasVisibleControl = true; return false; }' . nl();
-                echo '});' . nl();
-                echo 'return hasVisibleControl;' . nl();
-                echo '}' . nl();
-                echo 'function bfDisableContentBuilderFields(){' . nl();
-            }
-            foreach ($cbNonEditableFields as $cbNonEditableField) {
-                echo 'if(typeof document.getElementById("ff_elem' . $cbNonEditableField . '").disabled != "undefined"){' . nl();
-                echo 'bfCbMainElement = document.getElementById("ff_elem' . $cbNonEditableField . '");' . nl();
-                echo 'bfCbRespectReadonly = (bfCbMainElement && typeof bfCbMainElement.readOnly != "undefined" && bfCbMainElement.readOnly);' . nl();
-                echo 'bfCbName = document.getElementById("ff_elem' . $cbNonEditableField . '").name;' . nl();
-                echo 'if(typeof document.getElementsByName != "undefined"){' . nl();
-                echo 'bfCbElements = document.getElementsByName(bfCbName);' . nl();
-                echo 'for(var i = 0; i < bfCbElements.length; i++){' . nl();
-                echo 'if(typeof bfCbElements[i].disabled != "undefined" && !bfCbRespectReadonly){' . nl();
-                echo 'bfCbElements[i].disabled = true;' . nl();
-                echo '}' . nl();
-                echo 'bfDeactivateField[bfCbName]=true;' . nl();
-                echo 'if(typeof JQuery != "undefined" && !bfContentBuilderFieldHasVisibleControl("' . $cbNonEditableField . '")){ JQuery("#bfElemWrap' . $cbNonEditableField . '").css("display", "none"); }' . nl();
-                echo '}' . nl();
-                echo '}else{' . nl();
-                echo 'if(!bfCbRespectReadonly){ document.getElementById("ff_elem' . $cbNonEditableField . '").disabled = true; }' . nl();
-                echo 'bfDeactivateField[bfCbName]=true;' . nl();
-                echo 'if(typeof JQuery != "undefined" && !bfContentBuilderFieldHasVisibleControl("' . $cbNonEditableField . '")){ JQuery("#bfElemWrap' . $cbNonEditableField . '").css("display", "none"); }' . nl();
-                echo '}' . nl();
-                echo '}' . nl();
-            }
-            if (count($cbNonEditableFields)) {
-                echo '}' . nl();
+                echo $this->contentBuilderReadonlyScriptBuilder()->build($cbNonEditableFields);
                 echo '//-->' . nl();
                 echo '</script>' . nl();
             }

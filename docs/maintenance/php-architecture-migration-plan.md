@@ -321,7 +321,9 @@ propres à chaque thème.
 6. Boutons et champs cachés restants — `bfHidden` était déjà partagé par
    `HiddenFieldTrait`; le bouton de champ `bfSubmitButton` est désormais
    partagé via `QuickModeSubmitButtonBuilder` (`92b4af6f`). Les boutons de
-   navigation générale restent à caractériser séparément.
+   navigation générale utilisent désormais les actions partagées de
+   `QuickModePagingActionBuilder` (`10d7dc6a`); les enveloppes et variantes
+   de thème restent à caractériser séparément.
 7. Calendriers et calendriers responsives — le bouton de déclenchement est
    partagé via `QuickModeCalendarButtonBuilder` (`7911701f`), et l'input texte
    est partagé via `QuickModeCalendarInputBuilder` (`1d623384`). Les

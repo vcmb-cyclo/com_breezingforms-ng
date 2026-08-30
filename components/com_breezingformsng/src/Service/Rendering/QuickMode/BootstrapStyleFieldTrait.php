@@ -600,7 +600,15 @@ trait BootstrapStyleFieldTrait
                 if ($iCnt == 3) {
                     $inlineClass = $mdata['wrap'] ? '' : ' ' . $this->bsClass('inline');
                     echo '<div class="form-check' . $inlineClass . '">';
-                    echo '<input ' . ($iEx[0] == 1 ? 'checked="checked" ' : '') . ' class="ff_elem form-check-input" ' . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . ($readonly ? ' disabled="disabled" ' : '') . 'type="radio" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($iEx[2]), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . $idExt . '"/>' . "\n";
+                    echo $this->quickModeGroupOptionBuilder()->build(
+                        'radio',
+                        'ff_elem form-check-input',
+                        (string) $mdata['bfName'],
+                        (string) $iEx[2],
+                        (string) $mdata['dbId'] . $idExt,
+                        $iEx[0] == 1,
+                        $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . ($readonly ? ' disabled="disabled" ' : '')
+                    ) . "\n";
                     echo '<label class="' . $this->bsClass('radio') . '" id="bfGroupLabel' . $mdata['dbId'] . $idExt . '" for="ff_elem' . $mdata['dbId'] . $idExt . '">' . trim($iEx[1]) . '</label>';
                     echo '</div>';
                 }
@@ -643,7 +651,15 @@ trait BootstrapStyleFieldTrait
                 if ($iCnt == 3) {
                     $inlineClass = $mdata['wrap'] ? '' : ' ' . $this->bsClass('inline');
                     echo '<div class="form-check' . $inlineClass . '">';
-                    echo '<input ' . ($iEx[0] == 1 ? 'checked="checked" ' : '') . ' class="ff_elem form-check-input" ' . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . ($readonly ? ' disabled="disabled" ' : '') . 'type="checkbox" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($iEx[2]), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . $idExt . '"/>' . "\n";
+                    echo $this->quickModeGroupOptionBuilder()->build(
+                        'checkbox',
+                        'ff_elem form-check-input',
+                        (string) $mdata['bfName'],
+                        (string) $iEx[2],
+                        (string) $mdata['dbId'] . $idExt,
+                        $iEx[0] == 1,
+                        $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . ($readonly ? ' disabled="disabled" ' : '')
+                    ) . "\n";
                     echo '<label class="' . $this->bsClass('checkbox') . '" id="bfGroupLabel' . $mdata['dbId'] . $idExt . '" for="ff_elem' . $mdata['dbId'] . $idExt . '">' . trim($iEx[1]) . '</label>';
                     echo '</div>';
                 }

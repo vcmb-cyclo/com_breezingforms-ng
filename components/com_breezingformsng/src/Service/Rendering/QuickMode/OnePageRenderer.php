@@ -60,6 +60,7 @@ class OnePageRenderer
     private ?QuickModeCheckboxBuilder $quickModeCheckboxBuilderService = null;
     private ?QuickModeSelectBuilder $quickModeSelectBuilderService = null;
     private ?QuickModeMaxLengthCounterBuilder $quickModeMaxLengthCounterBuilderService = null;
+    private ?QuickModeGroupOptionBuilder $quickModeGroupOptionBuilderService = null;
 
     public function bsClass($key)
     {
@@ -90,6 +91,11 @@ class OnePageRenderer
     private function quickModeMaxLengthCounterBuilder(): QuickModeMaxLengthCounterBuilder
     {
         return $this->quickModeMaxLengthCounterBuilderService ??= new QuickModeMaxLengthCounterBuilder();
+    }
+
+    private function quickModeGroupOptionBuilder(): QuickModeGroupOptionBuilder
+    {
+        return $this->quickModeGroupOptionBuilderService ??= new QuickModeGroupOptionBuilder();
     }
 
     public static function getEditorContent($editor)

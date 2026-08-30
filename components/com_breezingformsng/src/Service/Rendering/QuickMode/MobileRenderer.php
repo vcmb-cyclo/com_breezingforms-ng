@@ -54,6 +54,7 @@ class MobileRenderer
     private ?QuickModeCheckboxBuilder $quickModeCheckboxBuilderService = null;
     private ?QuickModeSelectBuilder $quickModeSelectBuilderService = null;
     private ?QuickModeMaxLengthCounterBuilder $quickModeMaxLengthCounterBuilderService = null;
+    private ?QuickModeGroupOptionBuilder $quickModeGroupOptionBuilderService = null;
 
     public function __construct(HTML_facileFormsProcessor $p)
     {
@@ -112,6 +113,11 @@ class MobileRenderer
     private function quickModeMaxLengthCounterBuilder(): QuickModeMaxLengthCounterBuilder
     {
         return $this->quickModeMaxLengthCounterBuilderService ??= new QuickModeMaxLengthCounterBuilder();
+    }
+
+    private function quickModeGroupOptionBuilder(): QuickModeGroupOptionBuilder
+    {
+        return $this->quickModeGroupOptionBuilderService ??= new QuickModeGroupOptionBuilder();
     }
 
     public function parseToggleFields($code)
@@ -743,7 +749,15 @@ HTML;
                                 $iCnt = count($iEx);
                                 if ($iCnt == 3) {
                                     $lblRight = '<label class="bfGroupLabel" id="bfGroupLabel' . $mdata['dbId'] . $idExt . '" for="ff_elem' . $mdata['dbId'] . $idExt . '">' . trim($iEx[1]) . '</label>';
-                                    echo '<input ' . ($iEx[0] == 1 ? 'checked="checked" ' : '') . ' class="ff_elem" ' . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="radio" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($iEx[2]), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . $idExt . '"/>' . $lblRight . "\n";
+                                    echo $this->quickModeGroupOptionBuilder()->build(
+                                        'radio',
+                                        'ff_elem',
+                                        (string) $mdata['bfName'],
+                                        (string) $iEx[2],
+                                        (string) $mdata['dbId'] . $idExt,
+                                        $iEx[0] == 1,
+                                        $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly
+                                    ) . $lblRight . "\n";
                                 }
                             }
                             echo $wrapClose;
@@ -772,7 +786,15 @@ HTML;
                                 $iCnt = count($iEx);
                                 if ($iCnt == 3) {
                                     $lbl = '<label class="bfGroupLabel" id="bfGroupLabel' . $mdata['dbId'] . $idExt . '" for="ff_elem' . $mdata['dbId'] . $idExt . '">' . trim($iEx[1]) . '</label>';
-                                    echo '<input ' . ($iEx[0] == 1 ? 'checked="checked" ' : '') . ' class="ff_elem" ' . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="checkbox" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($iEx[2]), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . $idExt . '"/>' . $lbl . "\n";
+                                    echo $this->quickModeGroupOptionBuilder()->build(
+                                        'checkbox',
+                                        'ff_elem',
+                                        (string) $mdata['bfName'],
+                                        (string) $iEx[2],
+                                        (string) $mdata['dbId'] . $idExt,
+                                        $iEx[0] == 1,
+                                        $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly
+                                    ) . $lbl . "\n";
                                 }
                             }
                             echo $wrapClose;

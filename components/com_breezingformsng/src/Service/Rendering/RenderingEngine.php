@@ -85,6 +85,7 @@ final class RenderingEngine
     private ?ContentBuilderValueHydrationScriptBuilder $contentBuilderValueHydrationScriptBuilderService = null;
     private ?ContentBuilderChoiceHydrationScriptBuilder $contentBuilderChoiceHydrationScriptBuilderService = null;
     private ?ContentBuilderSelectHydrationScriptBuilder $contentBuilderSelectHydrationScriptBuilderService = null;
+    private ?ContentBuilderEditableScriptWrapperBuilder $contentBuilderEditableScriptWrapperBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -316,6 +317,11 @@ final class RenderingEngine
     private function contentBuilderSelectHydrationScriptBuilder(): ContentBuilderSelectHydrationScriptBuilder
     {
         return $this->contentBuilderSelectHydrationScriptBuilderService ??= new ContentBuilderSelectHydrationScriptBuilder();
+    }
+
+    private function contentBuilderEditableScriptWrapperBuilder(): ContentBuilderEditableScriptWrapperBuilder
+    {
+        return $this->contentBuilderEditableScriptWrapperBuilderService ??= new ContentBuilderEditableScriptWrapperBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -926,35 +932,11 @@ final class RenderingEngine
                 }
             }
 
-            echo '
-                    <script type="text/javascript">
-                    <!--' . nl() . '
-                    var cbFlashElemCnt = new Array();
-                    function bfCheckUploadValidation(id, obj, deactivatable){
-                        if(obj.checked){
-                            cbFlashElemCnt[id]--;
-                        }else{
-                            cbFlashElemCnt[id]++;
-                        }
-                        if(cbFlashElemCnt[id] == 0){
-                            bfDeactivateField[deactivatable]=false;
-                        }else{
-                            bfDeactivateField[deactivatable]=true;
-                        }
-                    }
-                    ' . $cbJs . '
-                    function bfLoadContentBuilderEditable(){
-                        ' . $js . '
-                        // legacy seccode removal
-                        for(var i = 0;i < document.ff_form' . $this->processor->form . '.elements.length;i++){
-                                if(document.ff_form' . $this->processor->form . '.elements[i].name == "ff_nm_seccode[]"){
-                                        document.ff_form' . $this->processor->form . '.elements[i].value = "";
-                                }
-                        }
-                    }
-                    ' . nl() . '//-->
-                    </script>
-                    ' . nl();
+            echo $this->contentBuilderEditableScriptWrapperBuilder()->build(
+                (int) $this->processor->form,
+                $cbJs,
+                $js
+            );
         }
 
         $cbNonEditableFields = array();

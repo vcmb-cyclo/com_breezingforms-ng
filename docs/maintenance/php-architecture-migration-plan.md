@@ -50,7 +50,7 @@
 | `RenderingEngine::view()` — callbacks d'éléments | Extraction committée ; ordre `init` / `action` / `validate` et trois arrêts `bury()` couverts | Commit `413cb1cb` |
 | `RenderingEngine::view()` — métadonnées classiques | Comptage icônes/infobulles et scan `Static Text/HTML` extraits et couverts | Commit `51e86824` |
 | `RenderingEngine::view()` — première boucle classique | Intégration callbacks, scan statique et identifiants draggable couverte | Commit `a254e895` |
-| ContentBuilder — valeurs éditables | Générateur indépendant créé, couvert et branché dans `view()` | Commits `f685ff5e`, `c2ae9a76` |
+| ContentBuilder — valeurs éditables | Générateurs d’hydratation par famille créés, couverts et branchés dans `view()` | Commits `f685ff5e`, `c2ae9a76`, `084fc749`, `e8d531cd`, `152def4c` |
 | ContentBuilder — champs non éditables | Générateur indépendant créé, couvert et branché dans `view()` | Commits `8bfd520e`, `21a0a812` |
 | ContentBuilder — résolution des signatures | Résolution, lecture et encodage des fichiers isolés et testés | Commits `b31b5c47`, `e9386794` |
 | PHPCS | Actif sur les services modernes, les builders ContentBuilder et `HiddenFieldTrait` | `phpcs.xml.dist`, commit `2e58c4bb` |
@@ -97,8 +97,9 @@ ContentBuilder.
 
 État : `EditableRecord` et `EditableRecordLoader` sont extraits et branchés
 dans `RenderingEngine::view()` par `89165de7`. Le loader est couvert pour
-l'absence de résultat et le chargement des sous-enregistrements ; le contrat
-SQL est désormais isolé derrière un service.
+l'absence de résultat, le chargement des sous-enregistrements et les filtres
+SQL critiques via `dc68404bb` ; le contrat SQL est désormais isolé derrière
+un service.
 
 - Extraire la recherche du dernier enregistrement de l'utilisateur.
 - Isoler les requêtes `#__facileforms_records` et
@@ -200,10 +201,6 @@ JavaScript sont désormais extraits dans `CaptchaLegacyValidationScriptBuilder`
 et `CaptchaReCaptchaValidationScriptBuilder` (`75c0ca2b`, `1cea0c84`) ; les
 variantes et leurs interpolations sont couvertes par les tests unitaires et le
 test de caractérisation de `RenderingEngineViewCharacterizationTest`.
-Les valeurs par défaut du message et du callback sont désormais produites par
-`CaptchaValidationDefaultsBuilder` (`41612fa2`), avec couverture de l'encodage
-JSON et de l'ordre de soumission.
-
 La phase 2.3 est donc couverte pour les scripts de signature et de contrôles
 de fichiers ; l'intégration complète ContentBuilder reste conditionnée à un
 harnais Joomla/ContentBuilder permettant de tester les dépendances runtime.

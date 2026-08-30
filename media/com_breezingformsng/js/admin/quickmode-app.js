@@ -964,6 +964,16 @@
 
             JQuery(document).ready(function () {
 
+                // After a redirect from the "Options" tab's own save (bfOptionsForm ->
+                // forms.save -> back here with #fragment-3), reopen that tab instead of
+                // the default one.
+                if (location.hash === '#fragment-3') {
+                    var optionsTabEl = document.getElementById('fragment-3-tab');
+                    if (optionsTabEl && window.bootstrap && window.bootstrap.Tab) {
+                        new bootstrap.Tab(optionsTabEl).show();
+                    }
+                }
+
                 JQuery('#adminForm').get(0).onsubmit = function () {
                     return false;
                 };

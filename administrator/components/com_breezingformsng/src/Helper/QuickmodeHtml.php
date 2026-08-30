@@ -405,6 +405,7 @@ final class QuickmodeHtml
                                         ?>
                                         <input type="hidden" name="id" value="<?php echo (int) $formId; ?>">
                                         <input type="hidden" name="task" value="forms.save">
+                                        <input type="hidden" name="return_tab" value="options">
                                         <?php echo HTMLHelper::_('form.token'); ?>
                                         <input type="submit" class="btn btn-secondary"
                                             value="<?php echo Text::_('COM_BREEZINGFORMSNG_PROPERTIES_SAVE'); ?>" />

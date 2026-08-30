@@ -156,10 +156,14 @@ class FormsController extends BaseController
         try {
             $id  = $this->getFormModel()->saveForm($data);
             $pkg = (string) ($data['package'] ?? '');
+            // Set by the QuickMode "Options" tab's own form (bfOptionsForm) so
+            // the redirect lands back on that tab instead of the default one.
+            $returnTab = $input->post->getCmd('return_tab', '');
             $app->enqueueMessage(Text::_('JLIB_APPLICATION_SAVE_SUCCESS'), 'message');
             $app->redirect(Route::_(
                 'index.php?option=com_breezingformsng&task=quickmode.display&form=' . $id
-                . ($pkg !== '' ? '&pkg=' . rawurlencode($pkg) : ''),
+                . ($pkg !== '' ? '&pkg=' . rawurlencode($pkg) : '')
+                . ($returnTab === 'options' ? '#fragment-3' : ''),
                 false
             ));
         } catch (\Throwable $e) {

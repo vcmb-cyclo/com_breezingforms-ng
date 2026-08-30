@@ -50,6 +50,7 @@
 | Rendu HTML classique — texte statique, rectangle, image, infobulle et icône | Markup `Static Text/HTML`, `Rectangle`, `Image`, `Tooltip` et `Icon` extrait et couvert sans modifier le HTML produit | Commits `43bc8b9d`, `ec310eabb`, `08f6bc4ee`, `1e23287f8`, `3acfe4d66` |
 | Rendu HTML classique — champ caché | Markup `Hidden Input` extrait et couvert avec conservation du nom et de la valeur historiques | Commit `0bacb6fc7` |
 | Rendu HTML classique — champ texte | Markup `Text` extrait et couvert pour texte/mot de passe, dimensions, maxlength, événements et états readonly/disabled | Commit `24776d379` |
+| Rendu HTML classique — textarea | Markup `Textarea` extrait et couvert pour états, dimensions, événements et ajustement Mozilla des lignes | Commit `593e018b5` |
 | `RenderingEngine::view()` — scripts d'icônes | Extraction committée et trois chemins `bury()` couverts | Commit `0a908143` |
 | `RenderingEngine::view()` — callbacks d'éléments | Extraction committée ; ordre `init` / `action` / `validate` et trois arrêts `bury()` couverts | Commit `413cb1cb` |
 | `RenderingEngine::view()` — métadonnées classiques | Comptage icônes/infobulles et scan `Static Text/HTML` extraits et couverts | Commit `51e86824` |
@@ -250,8 +251,8 @@ Ordre conseillé, du plus simple au plus risqué :
    `08f6bc4ee`, `1e23287f8` et `3acfe4d66`) ; le champ caché est isolé par
    `ClassicHiddenInputBuilder` (`0bacb6fc7`). Les champs techniques viennent
    ensuite.
-2. Champ texte (`ClassicTextInputBuilder`, `24776d379`), puis textarea, nombre
-   et champ caché.
+2. Champ texte (`ClassicTextInputBuilder`, `24776d379`) et textarea
+   (`ClassicTextareaBuilder`, `593e018b5`), puis nombre et champ caché.
 3. Checkbox, radio et listes de sélection.
 4. Boutons et navigation entre pages.
 5. Uploads, CAPTCHA et signatures.

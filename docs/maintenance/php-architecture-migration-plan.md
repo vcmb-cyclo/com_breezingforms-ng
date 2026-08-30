@@ -403,9 +403,11 @@ fichiers ContentBuilder (`2c72231e`) et loader d'enregistrement éditable
 extraits et testés (`ad9dd75f`, `3d45e1e2`, `c53a457e`). Les champs de routage
 `return` et `tmpl` sont désormais construits par
 `FormRoutingFieldsBuilder` dans les trois branches de finalisation via
-`f183a4ce`, avec échappement et absence de paramètres couverts. Il reste à
-couvrir la finalisation complète par mode d'exécution et le token CSRF, sans
-modifier leurs différences de routage.
+`f183a4ce`, avec échappement et absence de paramètres couverts. Le formatage
+du token CSRF Joomla est désormais isolé dans `FormTokenFieldBuilder` et
+réutilisé dans ces trois branches via `462b2984`, avec sa sortie indentée et
+ses retours historiques testés. Il reste à couvrir la finalisation complète
+par mode d'exécution, sans modifier leurs différences de routage.
 
 Les quatre renderers QuickMode ont encore une baseline PHPCS distincte ; le
 contrôle direct fait apparaître des violations de formatage héritées. Ce lot

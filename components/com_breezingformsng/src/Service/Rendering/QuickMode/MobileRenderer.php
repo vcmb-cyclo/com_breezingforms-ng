@@ -57,6 +57,7 @@ class MobileRenderer
     private ?QuickModeGroupOptionBuilder $quickModeGroupOptionBuilderService = null;
     private ?QuickModeSubmitButtonBuilder $quickModeSubmitButtonBuilderService = null;
     private ?QuickModeCalendarButtonBuilder $quickModeCalendarButtonBuilderService = null;
+    private ?QuickModeCalendarInputBuilder $quickModeCalendarInputBuilderService = null;
 
     public function __construct(HTML_facileFormsProcessor $p)
     {
@@ -130,6 +131,11 @@ class MobileRenderer
     private function quickModeCalendarButtonBuilder(): QuickModeCalendarButtonBuilder
     {
         return $this->quickModeCalendarButtonBuilderService ??= new QuickModeCalendarButtonBuilder();
+    }
+
+    private function quickModeCalendarInputBuilder(): QuickModeCalendarInputBuilder
+    {
+        return $this->quickModeCalendarInputBuilderService ??= new QuickModeCalendarInputBuilder();
     }
 
     public function parseToggleFields($code)
@@ -1341,7 +1347,12 @@ HTML;
                             $right = '...';
                         }
 
-                        echo '<input autocomplete="off" class="ff_elem" type="text" name="ff_nm_' . $mdata['bfName'] . '[]"  id="ff_elem' . $mdata['dbId'] . '" value="' . htmlentities($left, ENT_QUOTES, 'UTF-8') . '"/>' . "\n";
+                        echo $this->quickModeCalendarInputBuilder()->build(
+                            'ff_elem',
+                            (string) $mdata['bfName'],
+                            (int) $mdata['dbId'],
+                            (string) $left
+                        );
                         echo '<label for="ff_elem' . $mdata['dbId'] . '_calendarButton"></label>';
                         echo $this->quickModeCalendarButtonBuilder()->build(
                             'type="button"',

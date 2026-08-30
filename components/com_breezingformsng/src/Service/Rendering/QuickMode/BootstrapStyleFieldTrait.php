@@ -183,7 +183,13 @@ trait BootstrapStyleFieldTrait
         }
 
         echo '<div class="' . $this->bsClass('input-append') . '">';
-        echo '<input autocomplete="off" class="' . $this->bsClass('form-control') . ' ' . $this->bsClass('custom-form-control') . ' ff_elem" ' . $size . 'type="text" name="ff_nm_' . $mdata['bfName'] . '[]"  id="ff_elem' . $mdata['dbId'] . '" value="' . htmlentities($left, ENT_QUOTES, 'UTF-8') . '"/>' . "\n";
+        echo $this->quickModeCalendarInputBuilder()->build(
+            $this->bsClass('form-control') . ' ' . $this->bsClass('custom-form-control') . ' ff_elem',
+            (string) $mdata['bfName'],
+            (int) $mdata['dbId'],
+            (string) $left,
+            $size
+        );
         echo $this->quickModeCalendarButtonBuilder()->build(
             'style="cursor:pointer !important;" type="button"',
             'ff_elem' . $mdata['dbId'] . '_calendarButton',

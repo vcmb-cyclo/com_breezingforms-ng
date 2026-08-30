@@ -304,8 +304,9 @@ propres à chaque thème.
    `QuickModeCalendarInitScriptBuilder` (`1de4b129`).
 8. Uploads, CAPTCHA, signatures et paiements — l'URL de l'image CAPTCHA est
    désormais partagée via `QuickModeCaptchaUrlBuilder` (`21afa208`) et le
-   markup image/réponse via `QuickModeCaptchaMarkupBuilder` (`176af451`); les
-   scripts de validation et le rechargement restent à traiter.
+   markup image/réponse via `QuickModeCaptchaMarkupBuilder` (`176af451`) et le
+   script de rechargement via `QuickModeCaptchaReloadScriptBuilder`
+   (`4d706e95`); les scripts de validation restent à traiter.
 
 Pour chaque type :
 
@@ -495,6 +496,12 @@ renderers par `176af451`. Les attributs de dimensions, classes de thème,
 valeurs échappées et espacements historiques sont couverts par les snapshots
 et les tests unitaires ; les contrôles de rechargement restent spécifiques à
 chaque renderer.
+
+Le corps JavaScript de rechargement CAPTCHA est désormais centralisé dans
+`QuickModeCaptchaReloadScriptBuilder` et branché dans les quatre renderers par
+`4d706e95`. Le nettoyage du champ, le focus et l'ajout de
+`bfMathRandom` sont couverts par un test unitaire ; les balises et icônes
+visuelles restent propres à chaque renderer.
 
 La baseline PHPCS est maintenant sans erreur sur les services modernes, les
 quatre renderers QuickMode et leurs traits (`e25d501f`, `14985d4d`, `288b42a4`,

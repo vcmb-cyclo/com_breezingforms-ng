@@ -47,7 +47,7 @@
 | `RenderingEngine::view()` — CAPTCHA | Sélection `Captcha` / `ReCaptcha`, endpoints site/admin et générateurs JavaScript isolés, ordre historique préservé | Commits `4a070774`, `8e3e9a7a`, `4563ae11`, `d328c4f8`, `75c0ca2b`, `1cea0c84` |
 | `RenderingEngine::view()` — Query List | Préparation extraite et variantes par défaut/checkbox/résultat vide couvertes | Commits `4070ec0f`, `b358e7e9` |
 | `RenderingEngine::view()` — hydratation d'un enregistrement éditable | Nettoyage conservé dans l'orchestrateur, génération JavaScript extraite et couverte par famille de contrôle | Commit `a8325a7c` |
-| Rendu HTML classique — texte statique et rectangle | Markup `Static Text/HTML` et `Rectangle` extrait et couvert sans modifier le HTML produit | Commits `43bc8b9d`, `ec310eabb` |
+| Rendu HTML classique — texte statique, rectangle et image | Markup `Static Text/HTML`, `Rectangle` et `Image` extrait et couvert sans modifier le HTML produit | Commits `43bc8b9d`, `ec310eabb`, `08f6bc4ee` |
 | `RenderingEngine::view()` — scripts d'icônes | Extraction committée et trois chemins `bury()` couverts | Commit `0a908143` |
 | `RenderingEngine::view()` — callbacks d'éléments | Extraction committée ; ordre `init` / `action` / `validate` et trois arrêts `bury()` couverts | Commit `413cb1cb` |
 | `RenderingEngine::view()` — métadonnées classiques | Comptage icônes/infobulles et scan `Static Text/HTML` extraits et couverts | Commit `51e86824` |
@@ -243,8 +243,8 @@ la quantité d'état implicite traversant la grande boucle actuelle.
 
 Ordre conseillé, du plus simple au plus risqué :
 
-1. Texte statique et rectangle (`ClassicStaticTextBuilder` extraits par
-   `43bc8b9d` et `ec310eabb`), puis image, icône et infobulle.
+1. Texte statique, rectangle et image (`ClassicStaticTextBuilder` extraits par
+   `43bc8b9d`, `ec310eabb` et `08f6bc4ee`), puis icône et infobulle.
 2. Champs texte, textarea, nombre et champ caché.
 3. Checkbox, radio et listes de sélection.
 4. Boutons et navigation entre pages.

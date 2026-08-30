@@ -302,7 +302,9 @@ propres à chaque thème.
    est partagé via `QuickModeCalendarInputBuilder` (`1d623384`). Les
    initialisations Pickadate et responsive sont désormais centralisées via
    `QuickModeCalendarInitScriptBuilder` (`1de4b129`).
-8. Uploads, CAPTCHA, signatures et paiements.
+8. Uploads, CAPTCHA, signatures et paiements — l'URL de l'image CAPTCHA est
+   désormais partagée via `QuickModeCaptchaUrlBuilder` (`21afa208`); le
+   markup et les scripts de validation restent à traiter.
 
 Pour chaque type :
 
@@ -479,6 +481,12 @@ partagés via `QuickModeCalendarInitScriptBuilder` et branchés par `1de4b129`.
 Les paramètres JSON, le drapeau `hasYearScroller` et le libellé traduit sont
 couverts ; le chargement des assets reste dans les renderers car il dépend du
 cycle d'asset Joomla et de l'état local du renderer.
+
+La construction de l'URL du CAPTCHA image est désormais partagée via
+`QuickModeCaptchaUrlBuilder` et branchée dans les quatre renderers par
+`21afa208`. Les variantes frontend et administrateur sont couvertes ; le
+markup d'image, de saisie et de rechargement ainsi que les scripts CAPTCHA
+restent séparés en raison de leurs différences de thème et de comportement.
 
 La baseline PHPCS est maintenant sans erreur sur les services modernes, les
 quatre renderers QuickMode et leurs traits (`e25d501f`, `14985d4d`, `288b42a4`,

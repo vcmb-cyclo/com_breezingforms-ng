@@ -27,4 +27,9 @@ final class QuickModePagingActionBuilder
             . ";bf_validate_nextpage(" . $nextPage . ");"
             . "populateSummarizers();if(typeof bfRefreshAll != 'undefined'){bfRefreshAll();}";
     }
+
+    public function cancel(): string
+    {
+        return "ff_resetForm(this, 'click');";
+    }
 }

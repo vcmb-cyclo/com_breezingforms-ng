@@ -32,4 +32,12 @@ final class QuickModePagingActionBuilderTest extends TestCase
             (new QuickModePagingActionBuilder())->onePageNext(2, 3)
         );
     }
+
+    public function testCancelActionPreservesHistoricalResetCall(): void
+    {
+        self::assertSame(
+            "ff_resetForm(this, 'click');",
+            (new QuickModePagingActionBuilder())->cancel()
+        );
+    }
 }

@@ -63,6 +63,7 @@ final class RenderingEngine
     private ?ClassicChoiceBuilder $classicChoiceBuilderService = null;
     private ?ClassicSelectBuilder $classicSelectBuilderService = null;
     private ?ClassicRegularButtonBuilder $classicRegularButtonBuilderService = null;
+    private ?ClassicGraphicButtonBuilder $classicGraphicButtonBuilderService = null;
     private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
     private ?EditableRecordHydrationScriptBuilder $editableRecordHydrationScriptBuilderService = null;
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
@@ -216,6 +217,11 @@ final class RenderingEngine
     private function classicRegularButtonBuilder(): ClassicRegularButtonBuilder
     {
         return $this->classicRegularButtonBuilderService ??= new ClassicRegularButtonBuilder();
+    }
+
+    private function classicGraphicButtonBuilder(): ClassicGraphicButtonBuilder
+    {
+        return $this->classicGraphicButtonBuilderService ??= new ClassicGraphicButtonBuilder();
     }
 
     private function contentBuilderValueScriptBuilder(): ContentBuilderValueScriptBuilder
@@ -1155,60 +1161,22 @@ final class RenderingEngine
                         );
                         break;
                     case 'Graphic Button':
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
-                        $attribs = '';
-                        if ($row->flag2)
-                            $attribs .= ' disabled="disabled"';
-                        $attribs .= $this->processor->script2clause($row);
-                        echo indentc(2) . '<button id="ff_elem' . $row->id . '" type="button" name="ff_nm_' . $row->name . '" value="' . $data2 . '"' . $attribs . $class2 . '>' . nlc();
-                        $attribs = '';
-                        if ($row->width > 0)
-                            $attribs .= 'width="' . $row->width . '" ';
-                        if ($row->height > 0)
-                            $attribs .= 'height="' . $row->height . '" ';
-                        switch ($row->flag1) {
-                            case 0: // none
-                                echo indentc(3) . '<table cellpadding="0" cellspacing="6" border="0">' . nlc();
-                                echo indentc(4) . '<tr><td>' . nlc();
-                                echo indentc(5) . '<img id="ff_img' . $row->id . '" src="' . $data1 . '"  alt="' . $data2 . '" border="0" ' . $attribs . '/>' . nlc();
-                                echo indentc(4) . '</td></tr>' . nlc();
-                                echo indentc(3) . '</table>' . nlc();
-                                break;
-                            case 1: // below
-                                echo indentc(3) . '<table cellpadding="0" cellspacing="6" border="0">' . nlc();
-                                echo indentc(4) . '<tr><td nowrap style="text-align:center">' . nlc();
-                                echo indentc(5) . '<img id="ff_img' . $row->id . '" src="' . $data1 . '" alt="" border="0" ' . $attribs . '/><br/>' . nlc();
-                                echo indentc(5) . $data2 . nlc();
-                                echo indentc(4) . '</td></tr>' . nlc();
-                                echo indentc(3) . '</table>' . nlc();
-                                break;
-                            case 2: // above
-                                echo indentc(3) . '<table cellpadding="0" cellspacing="6" border="0">' . nlc();
-                                echo indentc(4) . '<tr><td nowrap style="text-align:center">' . nlc();
-                                echo indentc(5) . $data2 . '<br/>' . nlc();
-                                echo indentc(5) . '<img id="ff_img' . $row->id . '" src="' . $data1 . '" alt="" border="0" ' . $attribs . '/>' . nlc();
-                                echo indentc(4) . '</td></tr>' . nlc();
-                                echo indentc(3) . '</table>.nlc()';
-                                break;
-                            case 3: // left
-                                echo indentc(3) . '<table cellpadding="0" cellspacing="6" border="0">' . nlc();
-                                echo indentc(4) . '<tr>' . nlc();
-                                echo indentc(5) . '<td>' . $data2 . '</td>' . nlc();
-                                echo indentc(5) . '<td><img id="ff_img' . $row->id . '" src="' . $data1 . '" alt="" border="0" ' . $attribs . '/></td>' . nlc();
-                                echo indentc(4) . '</tr>' . nlc();
-                                echo indentc(3) . '</table>' . nlc();
-                                break;
-                            default: // assume right
-                                echo indentc(3) . '<table cellpadding="0" cellspacing="6" border="0">' . nlc();
-                                echo indentc(4) . '<tr>' . nlc();
-                                echo indentc(5) . '<td><img id="ff_img' . $row->id . '" src="' . $data1 . '" alt="" border="0" ' . $attribs . '/></td>' . nlc();
-                                echo indentc(5) . '<td>' . $data2 . '</td>' . nlc();
-                                echo indentc(4) . '</tr>' . nlc();
-                                echo indentc(3) . '</table>' . nlc();
-                                break;
-                        } // switch
-                        echo indentc(2) . '</button>' . nlc();
-                        echo indentc(1) . '</div>' . nl();
+                        echo $this->classicGraphicButtonBuilder()->build(
+                            (int) $row->id,
+                            (string) $row->name,
+                            $data1,
+                            $data2,
+                            $attribs,
+                            $class1,
+                            $class2,
+                            (int) $row->width,
+                            (int) $row->height,
+                            (bool) $row->flag2,
+                            $this->processor->script2clause($row),
+                            (int) $row->flag1,
+                            indentc(1),
+                            nlc() ?? ''
+                        );
                         break;
                     case 'Icon':
                         echo $this->classicStaticTextBuilder()->buildIcon(

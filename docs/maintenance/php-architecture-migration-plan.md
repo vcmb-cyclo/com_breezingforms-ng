@@ -418,7 +418,10 @@ wrappers moderne et legacy est désormais construite par
 `FormClosingMarkupBuilder`, branché dans `closeFormRendering()` via
 `301ba9f1`. Les deux sorties restent couvertes par le test de caractérisation
 de `RenderingEngine` et par des tests unitaires dédiés ; le cycle complet de
-finalisation par mode reste à éprouver de bout en bout.
+finalisation par mode reste à éprouver de bout en bout. Le markup d'ouverture
+du formulaire (wrapper moderne/legacy, identifiant et classe personnalisée)
+est désormais construit par `FormOpeningMarkupBuilder` via `e77be68a`, avec
+ses deux variantes couvertes par des tests unitaires.
 
 Les quatre renderers QuickMode ont encore une baseline PHPCS distincte ; le
 contrôle direct fait apparaître des violations de formatage héritées. Ce lot

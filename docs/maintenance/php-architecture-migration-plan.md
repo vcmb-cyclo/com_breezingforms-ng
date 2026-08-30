@@ -408,9 +408,13 @@ du token CSRF Joomla est désormais isolé dans `FormTokenFieldBuilder` et
 réutilisé dans ces trois branches via `462b2984`, avec sa sortie indentée et
 ses retours historiques testés. Il reste à couvrir la finalisation complète
 par mode d'exécution, sans modifier leurs différences de routage. La
-finalisation des paramètres de routage et du token est désormais isolée ; les
-champs de contexte propres à chaque mode et l'appel de fermeture du formulaire
-restent à caractériser.
+finalisation des paramètres de routage et du token est désormais isolée. Les
+champs de contexte (`ff_contentid`, `ff_applic`, `ff_record_id`,
+`ff_module_id` et `ff_runmode`) sont désormais générés par
+`FormContextFieldsBuilder` dans les trois branches via `f7d06454`. Le
+séparateur de lignes reste fourni par le renderer afin de préserver les
+sorties de test et le comportement historique (`0261acd4`). L'appel de
+fermeture du formulaire reste à caractériser.
 
 Les quatre renderers QuickMode ont encore une baseline PHPCS distincte ; le
 contrôle direct fait apparaître des violations de formatage héritées. Ce lot

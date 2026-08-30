@@ -15,7 +15,11 @@ use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Editor\Editor;
 use Vcmb\Component\BreezingformsNG\Administrator\Helper\BreadcrumbHelper;
+use Vcmb\Component\BreezingformsNG\Administrator\Helper\FormsAdvancedOptionsHtml;
+use Vcmb\Component\BreezingformsNG\Administrator\Model\FormModel;
+use Vcmb\Component\BreezingformsNG\Administrator\Model\FormsModel;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\QuickmodeModel;
 
 class HtmlView extends BaseHtmlView
@@ -32,6 +36,23 @@ class HtmlView extends BaseHtmlView
     public array  $elementScripts = [];
     public array  $themes         = [];
     public array  $themesBootstrap  = [];
+
+    /**
+     * Backing data for the "Options" tab (fragment-3), which reuses the
+     * classic forms.edit&advanced=1 settings block. Null when the form has
+     * not been saved yet (formId === 0): that screen has no
+     * #__facileforms_forms row to read or write until the first QuickMode
+     * save creates one.
+     */
+    public ?\stdClass $advancedOptionsForm = null;
+    public $advancedOptionsEditor = null;
+    public array $advancedOptionsTabEntryCounts = [];
+    public array $advancedOptionsInitScripts = [];
+    public array $advancedOptionsSubmittedScripts = [];
+    public array $advancedOptionsPieceBefore = [];
+    public array $advancedOptionsPieceAfter = [];
+    public array $advancedOptionsPieceBeginSubmit = [];
+    public array $advancedOptionsPieceEndSubmit = [];
 
     public function display($tpl = null): void
     {
@@ -72,6 +93,22 @@ class HtmlView extends BaseHtmlView
         $this->elementScripts  = $model->getElementScripts();
         $this->themes          = $model->getThemes();
         $this->themesBootstrap = $model->getThemesBootstrap();
+
+        if ($formId > 0) {
+            $listModel = $this->getFormsModel();
+            $this->advancedOptionsForm = $this->getFormModel()->getForm($formId);
+
+            if ($this->advancedOptionsForm !== null) {
+                $this->advancedOptionsEditor           = Editor::getInstance('codemirror');
+                $this->advancedOptionsTabEntryCounts    = FormsAdvancedOptionsHtml::countEntries($this->advancedOptionsForm);
+                $this->advancedOptionsInitScripts       = $listModel->getScripts('Form Init');
+                $this->advancedOptionsSubmittedScripts  = $listModel->getScripts('Form Submitted');
+                $this->advancedOptionsPieceBefore       = $listModel->getPieces('Before Form');
+                $this->advancedOptionsPieceAfter        = $listModel->getPieces('After Form');
+                $this->advancedOptionsPieceBeginSubmit  = $listModel->getPieces('Begin Submit');
+                $this->advancedOptionsPieceEndSubmit    = $listModel->getPieces('End Submit');
+            }
+        }
 
         // Toolbar
         $pageTitle = BreadcrumbHelper::render([
@@ -132,6 +169,38 @@ class HtmlView extends BaseHtmlView
             ->createModel('Quickmode', 'Administrator', ['ignore_request' => true]);
 
         if (!$model instanceof QuickmodeModel) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        return $model;
+    }
+
+    /**
+     * Loads the "Options" tab's backing row - same model the classic
+     * forms.edit&advanced=1 screen uses (View\Forms\HtmlView::display()).
+     */
+    private function getFormModel(): FormModel
+    {
+        $model = Factory::getApplication()
+            ->bootComponent('com_breezingformsng')
+            ->getMVCFactory()
+            ->createModel('Form', 'Administrator', ['ignore_request' => true]);
+
+        if (!$model instanceof FormModel) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        return $model;
+    }
+
+    private function getFormsModel(): FormsModel
+    {
+        $model = Factory::getApplication()
+            ->bootComponent('com_breezingformsng')
+            ->getMVCFactory()
+            ->createModel('Forms', 'Administrator', ['ignore_request' => true]);
+
+        if (!$model instanceof FormsModel) {
             throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
         }
 

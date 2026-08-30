@@ -567,7 +567,7 @@ parameters:
 		-
 			message: '#^Call to an undefined method Joomla\\CMS\\Extension\\ComponentInterface\:\:getMVCFactory\(\)\.$#'
 			identifier: method.notFound
-			count: 1
+			count: 3
 			path: /home/xavier/workspaces/vcmb/com_breezingformsng/administrator/components/com_breezingformsng/src/View/Quickmode/HtmlView.php
 
 		-
@@ -687,7 +687,7 @@ parameters:
 		-
 			message: '#^Variable \$this might not be defined\.$#'
 			identifier: variable.undefined
-			count: 17
+			count: 26
 			path: /home/xavier/workspaces/vcmb/com_breezingformsng/administrator/components/com_breezingformsng/tmpl/quickmode/default.php
 
 		-
@@ -1040,12 +1040,6 @@ parameters:
 
 		-
 			message: '#^Function bf_b64dec not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: /home/xavier/workspaces/vcmb/com_breezingformsng/components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
-
-		-
-			message: '#^Function bf_b64enc not found\.$#'
 			identifier: function.notFound
 			count: 1
 			path: /home/xavier/workspaces/vcmb/com_breezingformsng/components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php

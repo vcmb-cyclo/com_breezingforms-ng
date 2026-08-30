@@ -123,8 +123,26 @@ final class QuickmodeHtml
             . '; window.BFQMConfig.dataObject = ' . $dataObjectJson . ';';
     }
 
-    public static function showApplication($formId, $formName, $formTitle, $formDesc, $formEmailntf, $formEmailadr, $published, $debugMode, $dataObjectString, $elementScripts, $themes, $themesbootstrap)
+    /**
+     * @param array<string, mixed> $advancedOptions Backing data for the
+     *     "Options" tab (fragment-3): form, editor, tabEntryCounts,
+     *     initScripts, submittedScripts, pieceBefore, pieceAfter,
+     *     pieceBeginSubmit, pieceEndSubmit. Empty when the form has not been
+     *     saved yet (formId === 0) - the tab then shows a placeholder
+     *     instead of the settings block.
+     */
+    public static function showApplication($formId, $formName, $formTitle, $formDesc, $formEmailntf, $formEmailadr, $published, $debugMode, $dataObjectString, $elementScripts, $themes, $themesbootstrap, array $advancedOptions = [])
     {
+        $optionsForm = $advancedOptions['form'] ?? null;
+        $optionsEditor = $advancedOptions['editor'] ?? null;
+        $optionsTabEntryCounts = $advancedOptions['tabEntryCounts'] ?? [];
+        $optionsInitScripts = $advancedOptions['initScripts'] ?? [];
+        $optionsSubmittedScripts = $advancedOptions['submittedScripts'] ?? [];
+        $optionsPieceBefore = $advancedOptions['pieceBefore'] ?? [];
+        $optionsPieceAfter = $advancedOptions['pieceAfter'] ?? [];
+        $optionsPieceBeginSubmit = $advancedOptions['pieceBeginSubmit'] ?? [];
+        $optionsPieceEndSubmit = $advancedOptions['pieceEndSubmit'] ?? [];
+
         $active_language_code = htmlentities(
             Factory::getApplication()->getInput()->getString('active_language_code', ''),
             ENT_QUOTES,
@@ -293,6 +311,14 @@ final class QuickmodeHtml
                                 <?php echo Text::_('COM_BREEZINGFORMSNG_ADVANCED') ?>
                             </button>
                         </li>
+                        <li class="nav-item" role="presentation">
+                            <button type="button" class="nav-link" id="fragment-3-tab"
+                                data-bs-toggle="tab" data-bs-target="#fragment-3" role="tab"
+                                aria-controls="fragment-3" aria-selected="false"
+                                onclick="JQuery('.bfFadingMessage').css('display', 'none')">
+                                <?php echo Text::_('COM_BREEZINGFORMSNG_OPTIONS') ?>
+                            </button>
+                        </li>
                     </ul>
 
                     <div class="tab-content">
@@ -352,6 +378,41 @@ final class QuickmodeHtml
                             </div>
 
                         </form>
+
+                        <div id="fragment-3" class="tab-pane fade" role="tabpanel" aria-labelledby="fragment-3-tab">
+                            <div>
+                                <br />
+                                <?php if ($optionsForm === null): ?>
+                                    <div class="alert alert-info">
+                                        <?php echo Text::_('COM_BREEZINGFORMSNG_QM_OPTIONS_SAVE_FIRST'); ?>
+                                    </div>
+                                <?php else: ?>
+                                    <form id="bfOptionsForm" method="post" action="index.php?option=com_breezingformsng">
+                                        <?php
+                                        FormsAdvancedOptionsHtml::render([
+                                            'f' => $optionsForm,
+                                            'pkg' => (string) ($optionsForm->package ?? ''),
+                                            'editor' => $optionsEditor,
+                                            'tabId' => 'bfOptionsFormTabs',
+                                            'tabEntryCounts' => $optionsTabEntryCounts,
+                                            'initScripts' => $optionsInitScripts,
+                                            'submittedScripts' => $optionsSubmittedScripts,
+                                            'pieceBefore' => $optionsPieceBefore,
+                                            'pieceAfter' => $optionsPieceAfter,
+                                            'pieceBeginSubmit' => $optionsPieceBeginSubmit,
+                                            'pieceEndSubmit' => $optionsPieceEndSubmit,
+                                        ]);
+                                        ?>
+                                        <input type="hidden" name="id" value="<?php echo (int) $formId; ?>">
+                                        <input type="hidden" name="task" value="forms.save">
+                                        <?php echo HTMLHelper::_('form.token'); ?>
+                                        <input type="submit" class="btn btn-secondary"
+                                            value="<?php echo Text::_('COM_BREEZINGFORMSNG_PROPERTIES_SAVE'); ?>" />
+                                    </form>
+                                <?php endif; ?>
+                                <br />
+                            </div>
+                        </div>
 
                     </div>
                 </div>

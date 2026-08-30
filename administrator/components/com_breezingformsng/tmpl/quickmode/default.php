@@ -80,5 +80,16 @@ echo QuickmodeHtml::showApplication(
     $o,
     $this->elementScripts,
     $this->themes,
-    $this->themesBootstrap
+    $this->themesBootstrap,
+    [
+        'form' => $this->advancedOptionsForm,
+        'editor' => $this->advancedOptionsEditor,
+        'tabEntryCounts' => $this->advancedOptionsTabEntryCounts,
+        'initScripts' => $this->advancedOptionsInitScripts,
+        'submittedScripts' => $this->advancedOptionsSubmittedScripts,
+        'pieceBefore' => $this->advancedOptionsPieceBefore,
+        'pieceAfter' => $this->advancedOptionsPieceAfter,
+        'pieceBeginSubmit' => $this->advancedOptionsPieceBeginSubmit,
+        'pieceEndSubmit' => $this->advancedOptionsPieceEndSubmit,
+    ]
 );

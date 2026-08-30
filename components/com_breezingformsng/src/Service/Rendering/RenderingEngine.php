@@ -68,6 +68,7 @@ final class RenderingEngine
     private ?FormTokenFieldBuilder $formTokenFieldBuilderService = null;
     private ?FormContextFieldsBuilder $formContextFieldsBuilderService = null;
     private ?FormClosingMarkupBuilder $formClosingMarkupBuilderService = null;
+    private ?FormOpeningMarkupBuilder $formOpeningMarkupBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -214,6 +215,11 @@ final class RenderingEngine
     private function formClosingMarkupBuilder(): FormClosingMarkupBuilder
     {
         return $this->formClosingMarkupBuilderService ??= new FormClosingMarkupBuilder();
+    }
+
+    private function formOpeningMarkupBuilder(): FormOpeningMarkupBuilder
+    {
+        return $this->formOpeningMarkupBuilderService ??= new FormOpeningMarkupBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -1921,13 +1927,14 @@ final class RenderingEngine
             echo '<table style="display:none;width:100%;" id="bfReCaptchaWrap"><tr><td><div id="bfReCaptchaDiv"></div></td></tr></table>';
         }
 
-        echo '<div id="ff_formdiv' . $this->processor->form . '"';
-        echo ' class="bfFormDiv' . ($this->processor->formrow->class1 != '' ? ' ' . $this->processor->getClassName($this->processor->formrow->class1) : '') . '"';
-        if ($this->processor->legacy_wrap) {
-            echo '><div class="bfPage-tl"><div class="bfPage-tr"><div class="bfPage-t"></div></div></div><div class="bfPage-l"><div class="bfPage-r"><div class="bfPage-m bfClearfix">' . nl();
-        } else {
-            echo '>';
-        }
+        echo $this->formOpeningMarkupBuilder()->build(
+            (string) $this->processor->form,
+            $this->processor->formrow->class1 != ''
+                ? $this->processor->getClassName($this->processor->formrow->class1)
+                : '',
+            (bool) $this->processor->legacy_wrap,
+            nl()
+        );
 
         $this->processor->status = $this->processor->app->getInput()->getCmd('ff_status', '');
         $this->processor->message = $this->processor->app->getInput()->getString('ff_message', '');

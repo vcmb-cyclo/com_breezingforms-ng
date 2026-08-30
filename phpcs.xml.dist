@@ -18,6 +18,12 @@
     <file>components/com_breezingformsng/src/Service/Rendering/PostRenderScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/PaymentMethodFieldBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderTechnicalFieldsBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/AdditionalHiddenFieldsBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/CaptchaEndpointBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderFileDisplayNameBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderFileValueParser.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderFlashUploadValidationBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderSignatureFileResolver.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/HiddenFieldTrait.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/BootstrapStyleFieldTrait.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeInputBuilder.php</file>
@@ -34,6 +40,8 @@
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeCaptchaMarkupBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeCaptchaReloadScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeUploadOptionsBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModePagingActionBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeSubmitActionBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php</file>
 
     <exclude-pattern>*/vendor/*</exclude-pattern>

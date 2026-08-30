@@ -380,6 +380,14 @@ Ordre conseillé :
 Chaque ajout au périmètre PHPCS doit être accompagné des corrections du seul
 groupe concerné, sans reformatage transversal.
 
+Le périmètre PHPCS couvre désormais aussi les services extraits de CAPTCHA,
+ContentBuilder et les actions QuickMode (`CaptchaEndpointBuilder`, builders de
+fichiers/champs cachés, `ContentBuilderSignatureFileResolver`,
+`QuickModePagingActionBuilder` et `QuickModeSubmitActionBuilder`). Ces huit
+fichiers passent PHPCS sans erreur ni warning. Le ruleset complet conserve des
+warnings hérités dans certains traits/builders QuickMode déjà inclus ; ils
+seront traités avec la migration de leurs renderers, sans reformatage global.
+
 ### 6.2 Réduire la baseline PHPStan
 
 - Classer les 251 entrées actuelles par fichier et par catégorie.

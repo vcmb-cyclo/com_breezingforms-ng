@@ -60,6 +60,7 @@ final class RenderingEngine
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
     private ?ContentBuilderSignatureScriptBuilder $contentBuilderSignatureScriptBuilderService = null;
     private ?ContentBuilderFileUploadScriptBuilder $contentBuilderFileUploadScriptBuilderService = null;
+    private ?EditableRecordLoader $editableRecordLoaderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -166,6 +167,11 @@ final class RenderingEngine
     private function contentBuilderFileUploadScriptBuilder(): ContentBuilderFileUploadScriptBuilder
     {
         return $this->contentBuilderFileUploadScriptBuilderService ??= new ContentBuilderFileUploadScriptBuilder();
+    }
+
+    private function editableRecordLoader(): EditableRecordLoader
+    {
+        return $this->editableRecordLoaderService ??= new EditableRecordLoader($this->processor->database);
     }
 
     public function cbCheckPermissions(): array
@@ -538,31 +544,11 @@ final class RenderingEngine
         $cbJs = '';
 
         if ($this->processor->editable && $cbRecord === null) {
-            $db = $this->processor->database;
-            $formValue = $this->processor->form;
             $userId = $this->processor->app->getIdentity()->get('id', -1);
-            $query = $db->getQuery(true)
-                ->select(['id', 'form'])
-                ->from($db->quoteName('#__facileforms_records'))
-                ->where($db->quoteName('form') . ' = :formValue')
-                ->where($db->quoteName('user_id') . ' = :userId')
-                ->where($db->quoteName('user_id') . ' <> 0')
-                ->where($db->quoteName('archived') . ' = 0')
-                ->order($db->quoteName('id') . ' DESC')
-                ->bind(':formValue', $formValue, ParameterType::STRING)
-                ->bind(':userId', $userId, ParameterType::INTEGER);
-            $db->setQuery($query, 0, 1);
-            $recordsResult = $db->loadObjectList();
-            if (count($recordsResult) != 0) {
-                $this->processor->record_id = $recordsResult[0]->id;
-                $recordId = (int) $recordsResult[0]->id;
-                $subrecordsQuery = $db->getQuery(true)
-                    ->select('*')
-                    ->from($db->quoteName('#__facileforms_subrecords'))
-                    ->where($db->quoteName('record') . ' = :recordId')
-                    ->bind(':recordId', $recordId, ParameterType::INTEGER);
-                $db->setQuery($subrecordsQuery);
-                $recordEntries = $db->loadObjectList();
+            $editableRecord = $this->editableRecordLoader()->load((int) $this->processor->form, (int) $userId);
+            if ($editableRecord !== null) {
+                $this->processor->record_id = $editableRecord->id;
+                $recordEntries = $editableRecord->entries;
                 $js = '';
                 foreach ($recordEntries as $recordEntry) {
 

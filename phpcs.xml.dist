@@ -13,6 +13,8 @@
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderReadonlyScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderSignatureScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderFileUploadScriptBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/EditableRecord.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/EditableRecordLoader.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/HiddenFieldTrait.php</file>
     <file>components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php</file>
 

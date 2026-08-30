@@ -61,6 +61,7 @@ final class RenderingEngine
     private ?ClassicTextInputBuilder $classicTextInputBuilderService = null;
     private ?ClassicTextareaBuilder $classicTextareaBuilderService = null;
     private ?ClassicChoiceBuilder $classicChoiceBuilderService = null;
+    private ?ClassicSelectBuilder $classicSelectBuilderService = null;
     private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
     private ?EditableRecordHydrationScriptBuilder $editableRecordHydrationScriptBuilderService = null;
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
@@ -204,6 +205,11 @@ final class RenderingEngine
     private function classicChoiceBuilder(): ClassicChoiceBuilder
     {
         return $this->classicChoiceBuilderService ??= new ClassicChoiceBuilder();
+    }
+
+    private function classicSelectBuilder(): ClassicSelectBuilder
+    {
+        return $this->classicSelectBuilderService ??= new ClassicSelectBuilder();
     }
 
     private function contentBuilderValueScriptBuilder(): ContentBuilderValueScriptBuilder
@@ -1212,60 +1218,22 @@ final class RenderingEngine
                         );
                         break;
                     case 'Select List':
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
-                        $attribs = '';
-                        $styles = '';
-                        if ($row->width > 0)
-                            $styles .= 'width:' . $row->width . 'px;';
-                        if ($row->height > 0)
-                            $styles .= 'height:' . $row->height . 'px;';
-                        if ($row->flag1)
-                            $attribs .= ' multiple="multiple"';
-                        if ($row->flag2)
-                            $attribs .= ' disabled="disabled"';
-                        $attribs .= $this->processor->script2clause($row);
-                        if ($data1 != '')
-                            $attribs .= ' size="' . $data1 . '"';
-                        if ($styles != '')
-                            $attribs .= ' style="' . $styles . '"';
-                        echo indentc(2) . '<select id="ff_elem' . $row->id . '" name="ff_nm_' . $row->name . '[]" ' . $attribs . $class2 . '>' . nlc();
-                        $options = explode('\n', preg_replace('/([\\r\\n])/s', '\n', $data2));
-                        $cnt = count($options);
-                        for ($o = 0; $o < $cnt; $o++) {
-                            $opt = explode(";", $options[$o]);
-                            $selected = '';
-                            switch (count($opt)) {
-                                case 0:
-                                    break;
-                                case 1:
-                                    if ($this->processor->trim($opt[0])) {
-                                        $selected = '0';
-                                        $value = $text = $opt[0];
-                                    } // if
-                                    break;
-                                case 2:
-                                    $selected = $opt[0];
-                                    $value = $text = $opt[1];
-                                    break;
-                                default:
-                                    $selected = $opt[0];
-                                    $text = $opt[1];
-                                    $value = $opt[2];
-                            } // switch
-                            if ($this->processor->trim($selected)) {
-                                $attribs = '';
-                                if ($this->processor->trim($value) != '') {
-                                    if ($value == '""' || $value == "''")
-                                        $value = '';
-                                    $attribs .= ' value="' . htmlspecialchars($value, ENT_QUOTES) . '"';
-                                } // if
-                                if ($selected == 1)
-                                    $attribs .= ' selected="selected"';
-                                echo indentc(3) . '<option' . $attribs . '>' . htmlspecialchars(trim($text), ENT_QUOTES) . '</option>' . nlc();
-                            } // if
-                        } // for
-                        echo indentc(2) . '</select>' . nlc();
-                        echo indentc(1) . '</div>' . nl();
+                        echo $this->classicSelectBuilder()->build(
+                            (int) $row->id,
+                            (string) $row->name,
+                            $attribs,
+                            $class1,
+                            $class2,
+                            (string) $data1,
+                            $data2,
+                            (int) $row->width,
+                            (int) $row->height,
+                            (bool) $row->flag1,
+                            (bool) $row->flag2,
+                            $this->processor->script2clause($row),
+                            indentc(1),
+                            nlc() ?? ''
+                        );
                         break;
                     case 'Text':
                         echo $this->classicTextInputBuilder()->build(

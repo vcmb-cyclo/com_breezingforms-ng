@@ -475,6 +475,9 @@ avertissements de longueur conservés pour un lot ultérieur.
 `ClassNameResolver` et l'appel multi-ligne restant de `BootstrapRenderer` ne
 présentent désormais plus d'erreur PHPCS via `0fc70f33`; les avertissements de
 longueur de Bootstrap restent documentés comme hérités.
+Les builders de finalisation et de validation ContentBuilder ajoutés dans ces
+lots ne présentent plus d'avertissement de longueur via `4d64cc7c`; les
+chaînes produites restent inchangées et couvertes par les tests.
 `BootstrapRenderer` a été traité dans `288b42a4`; ses snapshots et PHPStan
 sont également verts. `OnePageRenderer` a reçu le même traitement dans
 `72204865`; ses snapshots et PHPStan sont verts également. Les quatre

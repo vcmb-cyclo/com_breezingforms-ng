@@ -68,6 +68,7 @@ class BootstrapRenderer
     private ?QuickModeCalendarInputBuilder $quickModeCalendarInputBuilderService = null;
     private ?QuickModeCalendarInitScriptBuilder $quickModeCalendarInitScriptBuilderService = null;
     private ?QuickModeCaptchaUrlBuilder $quickModeCaptchaUrlBuilderService = null;
+    private ?QuickModeCaptchaMarkupBuilder $quickModeCaptchaMarkupBuilderService = null;
 
     public function bsClass($key)
     {
@@ -128,6 +129,11 @@ class BootstrapRenderer
     private function quickModeCaptchaUrlBuilder(): QuickModeCaptchaUrlBuilder
     {
         return $this->quickModeCaptchaUrlBuilderService ??= new QuickModeCaptchaUrlBuilder();
+    }
+
+    private function quickModeCaptchaMarkupBuilder(): QuickModeCaptchaMarkupBuilder
+    {
+        return $this->quickModeCaptchaMarkupBuilderService ??= new QuickModeCaptchaMarkupBuilder();
     }
 
     public static function getEditorContent($editor)
@@ -1139,10 +1145,20 @@ class BootstrapRenderer
 
                         echo '<div style="display: inline-block;">';
 
-                        echo '<img alt="" ' . (isset($mdata['width']) && intval($mdata['width']) > 0 ? ' style="width: ' . intval($mdata['width']) . 'px !important;min-width: ' . intval($mdata['width']) . 'px !important;max-width: ' . intval($mdata['width']) . 'px !important;"' : 'style="width: 230px !important;min-width: 230px !important;max-width: 230px !important;"') . ' id="ff_capimgValue" class="ff_capimg ' . $this->bsClass('img-thumbnail') . '" src="' . $captcha_url . '"/>' . "\n";
+                        echo $this->quickModeCaptchaMarkupBuilder()->buildImage(
+                            isset($mdata['width']) && intval($mdata['width']) > 0 ? ' style="width: ' . intval($mdata['width']) . 'px !important;min-width: ' . intval($mdata['width']) . 'px !important;max-width: ' . intval($mdata['width']) . 'px !important;"' : 'style="width: 230px !important;min-width: 230px !important;max-width: 230px !important;"',
+                            'ff_capimgValue',
+                            'ff_capimg ' . $this->bsClass('img-thumbnail'),
+                            $captcha_url
+                        );
                         echo '<div style="height: 10px;"></div>';
                         echo '<div class="' . $this->bsClass('input-append') . '">';
-                        echo '<input ' . (isset($mdata['width']) && intval($mdata['width']) > 0 ? ' style="width:' . (intval($mdata['width']) - 45) . 'px !important;min-width:' . (intval($mdata['width']) - 45) . 'px !important;max-width:' . (intval($mdata['width']) - 45) . 'px !important;"' : '') . ' autocomplete="off" class="' . $this->bsClass('form-control') . ' ' . $this->bsClass('custom-form-control') . ' ff_elem bfCaptchaField" type="text" name="bfCaptchaEntry" id="bfCaptchaEntry" />' . "\n";
+                        echo $this->quickModeCaptchaMarkupBuilder()->buildResponseInput(
+                            isset($mdata['width']) && intval($mdata['width']) > 0 ? ' style="width:' . (intval($mdata['width']) - 45) . 'px !important;min-width:' . (intval($mdata['width']) - 45) . 'px !important;max-width:' . (intval($mdata['width']) - 45) . 'px !important;"' : '',
+                            $this->bsClass('form-control') . ' ' . $this->bsClass('custom-form-control') . ' ff_elem bfCaptchaField',
+                            '',
+                            true
+                        );
                         echo '<span type="button" class="ff_elem ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' button" onclick="document.getElementById(\'bfCaptchaEntry\').value=\'\';document.getElementById(\'bfCaptchaEntry\').focus();document.getElementById(\'ff_capimgValue\').src = \'' . $captcha_url . '&bfMathRandom=\' + Math.random(); return false"><i class="' . $this->bsClass('icon-refresh') . '"></i></button>' . "\n";
                         echo '</div>';
                         echo '</div>';

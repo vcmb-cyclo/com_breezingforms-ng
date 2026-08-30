@@ -65,6 +65,7 @@ class ClassicRenderer
     private ?QuickModeCalendarInputBuilder $quickModeCalendarInputBuilderService = null;
     private ?QuickModeCalendarInitScriptBuilder $quickModeCalendarInitScriptBuilderService = null;
     private ?QuickModeCaptchaUrlBuilder $quickModeCaptchaUrlBuilderService = null;
+    private ?QuickModeCaptchaMarkupBuilder $quickModeCaptchaMarkupBuilderService = null;
 
     public function headers()
     {
@@ -212,6 +213,11 @@ float:left;
     private function quickModeCaptchaUrlBuilder(): QuickModeCaptchaUrlBuilder
     {
         return $this->quickModeCaptchaUrlBuilderService ??= new QuickModeCaptchaUrlBuilder();
+    }
+
+    private function quickModeCaptchaMarkupBuilder(): QuickModeCaptchaMarkupBuilder
+    {
+        return $this->quickModeCaptchaMarkupBuilderService ??= new QuickModeCaptchaMarkupBuilder();
     }
 
     public function __construct(HTML_facileFormsProcessor $p)
@@ -1186,10 +1192,20 @@ float:left;
 
         echo '<span class="bfCaptcha">' . "\n";
 
-        echo '<img alt="" ' . (isset($mdata['width']) && intval($mdata['width']) > 0 ? ' width="' . intval($mdata['width']) . '"' : 'width="230"' ) . ' id="ff_capimgValue" class="ff_capimg" src="' . $captcha_url . '"/>' . "\n";
+        echo $this->quickModeCaptchaMarkupBuilder()->buildImage(
+            isset($mdata['width']) && intval($mdata['width']) > 0 ? ' width="' . intval($mdata['width']) . '"' : 'width="230"',
+            'ff_capimgValue',
+            'ff_capimg',
+            $captcha_url
+        );
 
         echo '<br/>';
-        echo '<input ' . (isset($mdata['width']) && intval($mdata['width']) > 0 && (intval($mdata['width']) - 45 >= 230) ? ' style="width:' . (intval($mdata['width']) - 45) . 'px;"' : '' ) . ' autocomplete="off" class="ff_elem" type="text" name="bfCaptchaEntry" id="bfCaptchaEntry" />' . "\n";
+        echo $this->quickModeCaptchaMarkupBuilder()->buildResponseInput(
+            isset($mdata['width']) && intval($mdata['width']) > 0 && (intval($mdata['width']) - 45 >= 230) ? ' style="width:' . (intval($mdata['width']) - 45) . 'px;"' : '',
+            'ff_elem',
+            '',
+            true
+        );
         echo '<a href="#" class="ff_elem" onclick="document.getElementById(\'bfCaptchaEntry\').value=\'\';document.getElementById(\'bfCaptchaEntry\').focus();document.getElementById(\'ff_capimgValue\').src = \'' . $captcha_url . '&bfMathRandom=\' + Math.random(); return false"><img alt="captcha" src="' . Uri::root(true) . '/media/com_breezingformsng/images/site/captcha/refresh-captcha.png" /></a>' . "\n";
         echo '</span>' . "\n";
     }

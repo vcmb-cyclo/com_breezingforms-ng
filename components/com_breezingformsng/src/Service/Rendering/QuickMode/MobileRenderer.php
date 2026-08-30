@@ -60,6 +60,7 @@ class MobileRenderer
     private ?QuickModeCalendarInputBuilder $quickModeCalendarInputBuilderService = null;
     private ?QuickModeCalendarInitScriptBuilder $quickModeCalendarInitScriptBuilderService = null;
     private ?QuickModeCaptchaUrlBuilder $quickModeCaptchaUrlBuilderService = null;
+    private ?QuickModeCaptchaMarkupBuilder $quickModeCaptchaMarkupBuilderService = null;
 
     public function __construct(HTML_facileFormsProcessor $p)
     {
@@ -148,6 +149,11 @@ class MobileRenderer
     private function quickModeCaptchaUrlBuilder(): QuickModeCaptchaUrlBuilder
     {
         return $this->quickModeCaptchaUrlBuilderService ??= new QuickModeCaptchaUrlBuilder();
+    }
+
+    private function quickModeCaptchaMarkupBuilder(): QuickModeCaptchaMarkupBuilder
+    {
+        return $this->quickModeCaptchaMarkupBuilderService ??= new QuickModeCaptchaMarkupBuilder();
     }
 
     public function parseToggleFields($code)
@@ -1258,10 +1264,16 @@ HTML;
                         );
 
                         echo '<div class="d-flex flex-wrap align-items-center gap-2">';
-                        echo '<img alt="" border="0" width="230" id="ff_capimgValue" class="ff_capimg" src="' . $captcha_url . '"/><br/><br/>' . "\n";
+                        echo $this->quickModeCaptchaMarkupBuilder()->buildImage(
+                            'border="0" width="230" ',
+                            'ff_capimgValue',
+                            'ff_capimg',
+                            $captcha_url,
+                            '<br/><br/>'
+                        );
 
 
-                        echo '<input autocomplete="off" class="ff_elem" type="text" name="bfCaptchaEntry" id="bfCaptchaEntry" />' . "\n";
+                        echo $this->quickModeCaptchaMarkupBuilder()->buildResponseInput('', 'ff_elem');
                         echo '<button type="button" class="btn btn-secondary btn-sm" id="bfCaptchaReload" onclick="document.getElementById(\'bfCaptchaEntry\').value=\'\';document.getElementById(\'bfCaptchaEntry\').focus();document.getElementById(\'ff_capimgValue\').src = \'' . $captcha_url . '&bfMathRandom=\' + Math.random(); return false"><span class="icon-refresh" aria-hidden="true"></span><span>Reload Captcha</span></button>';
                         echo '</div>';
                         break;

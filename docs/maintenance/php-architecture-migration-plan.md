@@ -47,7 +47,7 @@
 | `RenderingEngine::view()` — CAPTCHA | Sélection `Captcha` / `ReCaptcha`, endpoints site/admin et générateurs JavaScript isolés, ordre historique préservé | Commits `4a070774`, `8e3e9a7a`, `4563ae11`, `d328c4f8`, `75c0ca2b`, `1cea0c84` |
 | `RenderingEngine::view()` — Query List | Préparation extraite et variantes par défaut/checkbox/résultat vide couvertes | Commits `4070ec0f`, `b358e7e9` |
 | `RenderingEngine::view()` — hydratation d'un enregistrement éditable | Nettoyage conservé dans l'orchestrateur, génération JavaScript extraite et couverte par famille de contrôle | Commit `a8325a7c` |
-| Rendu HTML classique — texte statique, rectangle, image et infobulle | Markup `Static Text/HTML`, `Rectangle`, `Image` et `Tooltip` extrait et couvert sans modifier le HTML produit | Commits `43bc8b9d`, `ec310eabb`, `08f6bc4ee`, `1e23287f8` |
+| Rendu HTML classique — texte statique, rectangle, image, infobulle et icône | Markup `Static Text/HTML`, `Rectangle`, `Image`, `Tooltip` et `Icon` extrait et couvert sans modifier le HTML produit | Commits `43bc8b9d`, `ec310eabb`, `08f6bc4ee`, `1e23287f8`, `3acfe4d66` |
 | `RenderingEngine::view()` — scripts d'icônes | Extraction committée et trois chemins `bury()` couverts | Commit `0a908143` |
 | `RenderingEngine::view()` — callbacks d'éléments | Extraction committée ; ordre `init` / `action` / `validate` et trois arrêts `bury()` couverts | Commit `413cb1cb` |
 | `RenderingEngine::view()` — métadonnées classiques | Comptage icônes/infobulles et scan `Static Text/HTML` extraits et couverts | Commit `51e86824` |
@@ -243,9 +243,10 @@ la quantité d'état implicite traversant la grande boucle actuelle.
 
 Ordre conseillé, du plus simple au plus risqué :
 
-1. Texte statique, rectangle, image et infobulle (`ClassicStaticTextBuilder`
-   extraits par `43bc8b9d`, `ec310eabb`, `08f6bc4ee` et `1e23287f8`), puis
-   icône.
+1. Texte statique, rectangle, image, infobulle et icône
+   (`ClassicStaticTextBuilder` extraits par `43bc8b9d`, `ec310eabb`,
+   `08f6bc4ee`, `1e23287f8` et `3acfe4d66`) ; les champs techniques viennent
+   ensuite.
 2. Champs texte, textarea, nombre et champ caché.
 3. Checkbox, radio et listes de sélection.
 4. Boutons et navigation entre pages.

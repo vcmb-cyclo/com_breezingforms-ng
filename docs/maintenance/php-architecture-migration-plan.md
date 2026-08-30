@@ -45,9 +45,10 @@
 | `RenderingEngine::view()` — scripts | Bibliothèques, callbacks formulaire et `onload` extraits et couverts | `RenderingEngine` |
 | `RenderingEngine::view()` — validation | Extensions de fichiers et valeurs CAPTCHA par défaut extraites et couvertes | `RenderingEngine` |
 | `RenderingEngine::view()` — CAPTCHA | Sélection `Captcha` / `ReCaptcha` extraite, ordre historique préservé | Commit `4a070774` |
-| `RenderingEngine::view()` — Query List | Préparation extraite et premier test committé ; variantes à compléter | Commit `4070ec0f` |
+| `RenderingEngine::view()` — Query List | Préparation extraite et variantes par défaut/checkbox/résultat vide couvertes | Commits `4070ec0f`, `b358e7e9` |
 | `RenderingEngine::view()` — scripts d'icônes | Extraction committée et trois chemins `bury()` couverts | Commit `0a908143` |
 | `RenderingEngine::view()` — callbacks d'éléments | Extraction committée ; ordre `init` / `action` / `validate` et trois arrêts `bury()` couverts | Commit `413cb1cb` |
+| `RenderingEngine::view()` — métadonnées classiques | Comptage icônes/infobulles et scan `Static Text/HTML` extraits et couverts | Commit `51e86824` |
 | ContentBuilder — valeurs éditables | Générateur indépendant créé et couvert ; branchement dans `view()` restant | Commit `f685ff5e` |
 | ContentBuilder — champs non éditables | Générateur indépendant créé et couvert ; branchement dans `view()` restant | En attente de coordination avec `RenderingEngine` |
 | PHPCS | Actif sur un premier groupe de services modernes | `phpcs.xml.dist` |
@@ -57,7 +58,7 @@
 
 ### 1.1 Stabiliser l'extraction Query List
 
-État : socle committé dans `4070ec0f`, couverture complémentaire à ajouter.
+État : extraction et couverture committées dans `4070ec0f` et `b358e7e9`.
 
 Déjà couvert :
 
@@ -65,29 +66,21 @@ Déjà couvert :
 - pagination personnalisée et taille de page ;
 - export de lignes non vides.
 
-Reste à couvrir :
-
-- Vérifier les modes sans checkbox, checkbox simple et checkbox multiple.
-- Vérifier les valeurs de pagination par défaut.
-- Vérifier l'export d'un résultat vide.
-- Conserver l'appel à `bury()` au même endroit dans le flux de `view()`.
-- Ajouter ces variantes dans un commit de tests sans refactorisation
-  supplémentaire.
+La couverture vérifie les modes avec et sans checkbox, la pagination par
+défaut ou personnalisée et les résultats vides ou non vides. L'appel à
+`bury()` reste dans le flux de `view()` au même endroit qu'avant l'extraction.
 
 Critère de sortie : `view()` délègue toute la préparation d'une ligne
 `Query List`, et le JavaScript produit reste identique.
 
 ### 1.2 Extraire la préparation des scripts des éléments
 
-État : extraction des scripts d'icônes committée dans `0a908143` et extraction
-des callbacks committée dans `413cb1cb`. Les trois chemins `bury()` sont
-couverts ; le comptage et le traitement `Static Text/HTML` restent à extraire.
+État : extraction des scripts d'icônes committée dans `0a908143`, des callbacks
+dans `413cb1cb` et des métadonnées/du scan statique dans `51e86824`. Les trois
+chemins `bury()` des callbacks et du registre d'icônes sont couverts.
 
-- Isoler le comptage des icônes et infobulles.
-- Isoler l'enregistrement des callbacks `init`, `action` et `validate`.
-- Préserver chaque sortie anticipée `bury()` et le nettoyage du tampon associé.
-- Isoler le traitement `Static Text/HTML` utilisé pour le scan de code.
-- Ajouter un test sur l'ordre exact des callbacks et sur chaque arrêt anticipé.
+- Ajouter les tests d'intégration de la première boucle sur plusieurs types
+  d'éléments.
 
 Critère de sortie : la première boucle sur les éléments ne contient plus de
 construction de script directement dans `view()`.
@@ -344,11 +337,11 @@ Règles de coordination :
 
 ## Ordre recommandé des prochains lots
 
-1. Compléter les variantes de caractérisation Query List.
-2. Extraire le comptage et le traitement `Static Text/HTML`.
-3. Service de chargement d'un enregistrement éditable.
-4. Générateur des valeurs éditables BreezingForms.
-5. Générateurs ContentBuilder par famille de champs.
+1. Ajouter les tests d'intégration de la première boucle classique.
+2. Brancher le générateur des valeurs éditables ContentBuilder.
+3. Brancher le générateur des champs ContentBuilder non éditables.
+4. Service de chargement d'un enregistrement éditable.
+5. Générateurs ContentBuilder pour fichiers et signatures.
 6. Premier lot Strategy QuickMode : `bfTextfield` et `bfNumberInput`.
 7. Extraction des scripts post-rendu et des champs techniques.
 8. Rendu HTML classique par famille de nœuds.

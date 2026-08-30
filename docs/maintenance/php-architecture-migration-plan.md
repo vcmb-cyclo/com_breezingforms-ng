@@ -392,6 +392,8 @@ erreurs structurelles manuelles dans `e25d501f`; les avertissements de
 longueur restent explicitement hors de ce lot. `MobileRenderer` a reçu le même
 traitement dans `14985d4d`; ses snapshots et PHPStan sont verts, avec les
 avertissements de longueur conservés pour un lot ultérieur.
+`BootstrapRenderer` a été traité dans `288b42a4`; ses snapshots et PHPStan
+sont également verts.
 
 Les lots 3 à 5 peuvent être préparés en parallèle du lot 6, à condition que le
 branchement dans `RenderingEngine.php` soit coordonné.

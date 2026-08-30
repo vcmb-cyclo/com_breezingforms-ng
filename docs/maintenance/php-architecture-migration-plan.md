@@ -46,6 +46,7 @@
 | `RenderingEngine::view()` — validation | Extensions de fichiers, valeurs par défaut et scripts CAPTCHA extraits et couverts | Builders de validation dédiés |
 | `RenderingEngine::view()` — CAPTCHA | Sélection `Captcha` / `ReCaptcha`, endpoints site/admin et générateurs JavaScript isolés, ordre historique préservé | Commits `4a070774`, `8e3e9a7a`, `4563ae11`, `d328c4f8`, `75c0ca2b`, `1cea0c84` |
 | `RenderingEngine::view()` — Query List | Préparation extraite et variantes par défaut/checkbox/résultat vide couvertes | Commits `4070ec0f`, `b358e7e9` |
+| `RenderingEngine::view()` — hydratation d'un enregistrement éditable | Nettoyage conservé dans l'orchestrateur, génération JavaScript extraite et couverte par famille de contrôle | Commit `a8325a7c` |
 | `RenderingEngine::view()` — scripts d'icônes | Extraction committée et trois chemins `bury()` couverts | Commit `0a908143` |
 | `RenderingEngine::view()` — callbacks d'éléments | Extraction committée ; ordre `init` / `action` / `validate` et trois arrêts `bury()` couverts | Commit `413cb1cb` |
 | `RenderingEngine::view()` — métadonnées classiques | Comptage icônes/infobulles et scan `Static Text/HTML` extraits et couverts | Commit `51e86824` |
@@ -99,15 +100,16 @@ ContentBuilder.
 dans `RenderingEngine::view()` par `89165de7`. Le loader est couvert pour
 l'absence de résultat, le chargement des sous-enregistrements et les filtres
 SQL critiques via `dc68404bb` ; le contrat SQL est désormais isolé derrière
-un service.
+un service. La génération du JavaScript `bfLoadEditable()` est maintenant
+extraite dans `EditableRecordHydrationScriptBuilder` (`a8325a7c`) et couverte
+pour les champs simples, checkbox/radio, listes, valeurs vides et types
+inconnus ; le nettoyage `InputFilter` reste explicitement dans `view()`.
 
-- Extraire la recherche du dernier enregistrement de l'utilisateur.
-- Isoler les requêtes `#__facileforms_records` et
-  `#__facileforms_subrecords` derrière un service dédié.
-- Retourner un objet de résultat explicite plutôt que modifier plusieurs
-  propriétés de `RenderingEngine` implicitement.
-- Caractériser l'absence d'enregistrement, l'enregistrement archivé,
-  l'utilisateur invité et l'enregistrement valide.
+- La recherche du dernier enregistrement, les requêtes
+  `#__facileforms_records`/`#__facileforms_subrecords` et le résultat typé sont
+  désormais portés par `EditableRecordLoader`.
+- Caractériser encore l'enregistrement archivé, l'utilisateur invité et le
+  parcours complet dans `view()` lorsque le runtime Joomla est disponible.
 
 Critère de sortie : `RenderingEngine` ne construit plus directement les
 requêtes de chargement d'un enregistrement éditable.

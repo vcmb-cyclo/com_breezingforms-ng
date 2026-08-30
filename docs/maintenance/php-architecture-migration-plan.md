@@ -405,9 +405,11 @@ longueur restant à traiter séparément. Le trait partagé
 `212b6450` et ne présente plus d'erreur, avec ses avertissements de longueur
 documentés.
 
-Le premier contrôle partagé `bfTextfield`/`bfNumberInput` est commité dans
-`065cef94` et testé par les snapshots Classic/Mobile ; les wrappers Bootstrap
-et OnePage restent à intégrer sans perdre leurs classes et icônes de thème.
+Le contrôle partagé `bfTextfield`/`bfNumberInput` est commité dans
+`065cef94` et branché dans les wrappers Classic/Mobile. Le trait Bootstrap
+commun aux wrappers Bootstrap/OnePage l'utilise désormais aussi via
+`f3d04e55`, sans perte de classes, icônes ni attributs de thème. Les autres
+familles de champs restent à migrer par ordre de risque.
 
 Les lots 3 à 5 peuvent être préparés en parallèle du lot 6, à condition que le
 branchement dans `RenderingEngine.php` soit coordonné.

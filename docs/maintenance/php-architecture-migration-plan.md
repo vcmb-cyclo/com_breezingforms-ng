@@ -387,6 +387,10 @@ contrôle direct fait apparaître des violations de formatage héritées. Ce lot
 reste séparé de la mutualisation fonctionnelle pour conserver des commits
 réversibles.
 
+`ClassicRenderer` a reçu les corrections automatiques PHPCBF et ses trois
+erreurs structurelles manuelles dans `e25d501f`; les avertissements de
+longueur restent explicitement hors de ce lot.
+
 Les lots 3 à 5 peuvent être préparés en parallèle du lot 6, à condition que le
 branchement dans `RenderingEngine.php` soit coordonné.
 

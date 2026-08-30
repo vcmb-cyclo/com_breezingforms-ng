@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * BreezingForms NG - A Joomla Forms Application
  *
@@ -18,6 +16,8 @@ declare(strict_types=1);
  * restructuring their constructors or instantiation.
  */
 
+declare(strict_types=1);
+
 namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode;
 
 \defined('_JEXEC') or die;
@@ -29,6 +29,9 @@ trait HiddenFieldTrait
      */
     private function renderHiddenField(array $mdata): void
     {
-        echo '<input class="ff_elem" type="hidden" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+        $html = '<input class="ff_elem" type="hidden" name="ff_nm_' . $mdata['bfName'] . '[]" ';
+        $html .= 'value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" ';
+        $html .= 'id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+        echo $html;
     }
 }

@@ -552,12 +552,16 @@ trait BootstrapStyleFieldTrait
             $value = 'value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" ';
         }
         if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
-            $onclick = 'onclick="if(typeof bf_htmltextareainit != \'undefined\'){ bf_htmltextareainit() }populateSummarizers();'
-                . 'if(document.getElementById(\'bfPaymentMethod\')){document.getElementById(\'bfPaymentMethod\').value=\'\';};'
+            $onclick = 'onclick="if(typeof bf_htmltextareainit != \'undefined\'){ bf_htmltextareainit() }'
+                . 'populateSummarizers();'
+                . 'if(document.getElementById(\'bfPaymentMethod\')){'
+                . 'document.getElementById(\'bfPaymentMethod\').value=\'\';};'
                 . $mdata['actionFunctionName'] . '(this,\'click\');return false;" ';
         } else {
-            $onclick = 'onclick="if(typeof bf_htmltextareainit != \'undefined\'){ bf_htmltextareainit() }populateSummarizers();'
-                . 'if(document.getElementById(\'bfPaymentMethod\')){document.getElementById(\'bfPaymentMethod\').value=\'\';};'
+            $onclick = 'onclick="if(typeof bf_htmltextareainit != \'undefined\'){ bf_htmltextareainit() }'
+                . 'populateSummarizers();'
+                . 'if(document.getElementById(\'bfPaymentMethod\')){'
+                . 'document.getElementById(\'bfPaymentMethod\').value=\'\';};'
                 . 'return false;" ';
         }
         if ($src == '') {
@@ -740,8 +744,14 @@ trait BootstrapStyleFieldTrait
      */
     private function renderBootstrapStyleSignatureField(array $mdata, string $label): void
     {
-        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/js/signature.js');
-        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-signature.js');
+        RuntimeAssetLoader::script(
+            $this->p->app,
+            Uri::root(true) . '/components/com_breezingformsng/libraries/js/signature.js'
+        );
+        RuntimeAssetLoader::script(
+            $this->p->app,
+            Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-signature.js'
+        );
         $this->p->app->getDocument()->getWebAssetManager()->addInlineScript(
             'bfSignatureInit(' . json_encode((int) $mdata['dbId']) . ');'
         );
@@ -751,13 +761,18 @@ trait BootstrapStyleFieldTrait
         echo $label;
         echo '<span class="' . $this->bsClass('nonform-control') . '">';
 
-        echo '<div class="bfSignature" id="bfSignature' . $mdata['dbId'] . '"><div class="bfSignatureCanvasBorder"><canvas></canvas></div>' . "\n";
-        echo '<button onclick="bfSignatureReset(' . json_encode((int) $mdata['dbId']) . ');" class="bfSignatureResetButton button ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . '"><span>' . Text::_('COM_BREEZINGFORMSNG_SIGNATURE_RESET_BUTTON') . '</span></button>' . "\n";
+        echo '<div class="bfSignature" id="bfSignature' . $mdata['dbId']
+            . '"><div class="bfSignatureCanvasBorder"><canvas></canvas></div>' . "\n";
+        echo '<button onclick="bfSignatureReset(' . json_encode((int) $mdata['dbId'])
+            . ');" class="bfSignatureResetButton button ' . $this->bsClass('btn') . ' '
+            . $this->bsClass('btn-primary') . '"><span>'
+            . Text::_('COM_BREEZINGFORMSNG_SIGNATURE_RESET_BUTTON') . '</span></button>' . "\n";
         echo '</div>';
         echo '</span>';
         echo '</div>';
         echo '</div>';
-        echo '<input class="ff_elem" type="hidden" name="ff_nm_' . $mdata['bfName'] . '[]" value="" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+        echo '<input class="ff_elem" type="hidden" name="ff_nm_' . $mdata['bfName']
+            . '[]" value="" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
     }
 
     /**
@@ -770,10 +785,23 @@ trait BootstrapStyleFieldTrait
      *
      * @param array<string, mixed> $mdata
      */
-    private function renderBootstrapStyleRadioGroupField(array $mdata, string $label, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly, string $wrapClass = ''): void
-    {
+    private function renderBootstrapStyleRadioGroupField(
+        array $mdata,
+        string $label,
+        string $tabIndex,
+        string $onclick,
+        string $onblur,
+        string $onchange,
+        string $onfocus,
+        string $onselect,
+        string $readonly,
+        string $wrapClass = ''
+    ): void {
         /* translatables */
-        if (isset($mdata['group_translation' . $this->language_tag]) && $mdata['group_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['group_translation' . $this->language_tag])
+            && $mdata['group_translation' . $this->language_tag] != ''
+        ) {
             $mdata['group'] = $mdata['group_translation' . $this->language_tag];
         }
         /* translatables end */
@@ -784,7 +812,8 @@ trait BootstrapStyleFieldTrait
             echo $label;
             echo '<span class="' . $this->bsClass('nonform-control') . '">';
             if ($mdata['wrap']) {
-                echo '<div' . ($wrapClass !== '' ? ' class="' . $wrapClass . '"' : '') . ' style="display: inline-block; vertical-align: top;">';
+                echo '<div' . ($wrapClass !== '' ? ' class="' . $wrapClass . '"' : '')
+                    . ' style="display: inline-block; vertical-align: top;">';
             }
             $mdata['group'] = str_replace("\r", '', $mdata['group']);
             $gEx = explode("\n", $mdata['group']);
@@ -803,9 +832,11 @@ trait BootstrapStyleFieldTrait
                         (string) $iEx[2],
                         (string) $mdata['dbId'] . $idExt,
                         $iEx[0] == 1,
-                        $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . ($readonly ? ' disabled="disabled" ' : '')
+                        $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect
+                            . ($readonly ? ' disabled="disabled" ' : '')
                     ) . "\n";
-                    echo '<label class="' . $this->bsClass('radio') . '" id="bfGroupLabel' . $mdata['dbId'] . $idExt . '" for="ff_elem' . $mdata['dbId'] . $idExt . '">' . trim($iEx[1]) . '</label>';
+                    echo '<label class="' . $this->bsClass('radio') . '" id="bfGroupLabel' . $mdata['dbId']
+                        . $idExt . '" for="ff_elem' . $mdata['dbId'] . $idExt . '">' . trim($iEx[1]) . '</label>';
                     echo '</div>';
                 }
             }
@@ -821,10 +852,23 @@ trait BootstrapStyleFieldTrait
     /**
      * @param array<string, mixed> $mdata
      */
-    private function renderBootstrapStyleCheckboxGroupField(array $mdata, string $label, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly, string $wrapClass = ''): void
-    {
+    private function renderBootstrapStyleCheckboxGroupField(
+        array $mdata,
+        string $label,
+        string $tabIndex,
+        string $onclick,
+        string $onblur,
+        string $onchange,
+        string $onfocus,
+        string $onselect,
+        string $readonly,
+        string $wrapClass = ''
+    ): void {
         /* translatables */
-        if (isset($mdata['group_translation' . $this->language_tag]) && $mdata['group_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['group_translation' . $this->language_tag])
+            && $mdata['group_translation' . $this->language_tag] != ''
+        ) {
             $mdata['group'] = $mdata['group_translation' . $this->language_tag];
         }
         /* translatables end */
@@ -834,7 +878,8 @@ trait BootstrapStyleFieldTrait
             echo $label;
             echo '<span class="' . $this->bsClass('nonform-control') . '">';
             if ($mdata['wrap']) {
-                echo '<div' . ($wrapClass !== '' ? ' class="' . $wrapClass . '"' : '') . ' style="display: inline-block; vertical-align: top;">';
+                echo '<div' . ($wrapClass !== '' ? ' class="' . $wrapClass . '"' : '')
+                    . ' style="display: inline-block; vertical-align: top;">';
             }
             $mdata['group'] = str_replace("\r", '', $mdata['group']);
             $gEx = explode("\n", $mdata['group']);
@@ -854,9 +899,11 @@ trait BootstrapStyleFieldTrait
                         (string) $iEx[2],
                         (string) $mdata['dbId'] . $idExt,
                         $iEx[0] == 1,
-                        $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . ($readonly ? ' disabled="disabled" ' : '')
+                        $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect
+                            . ($readonly ? ' disabled="disabled" ' : '')
                     ) . "\n";
-                    echo '<label class="' . $this->bsClass('checkbox') . '" id="bfGroupLabel' . $mdata['dbId'] . $idExt . '" for="ff_elem' . $mdata['dbId'] . $idExt . '">' . trim($iEx[1]) . '</label>';
+                    echo '<label class="' . $this->bsClass('checkbox') . '" id="bfGroupLabel' . $mdata['dbId']
+                        . $idExt . '" for="ff_elem' . $mdata['dbId'] . $idExt . '">' . trim($iEx[1]) . '</label>';
                     echo '</div>';
                 }
             }

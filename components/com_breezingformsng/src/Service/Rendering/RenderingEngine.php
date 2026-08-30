@@ -86,6 +86,7 @@ final class RenderingEngine
     private ?ContentBuilderChoiceHydrationScriptBuilder $contentBuilderChoiceHydrationScriptBuilderService = null;
     private ?ContentBuilderSelectHydrationScriptBuilder $contentBuilderSelectHydrationScriptBuilderService = null;
     private ?ContentBuilderEditableScriptWrapperBuilder $contentBuilderEditableScriptWrapperBuilderService = null;
+    private ?ContentBuilderFileHydrationScriptBuilder $contentBuilderFileHydrationScriptBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -322,6 +323,11 @@ final class RenderingEngine
     private function contentBuilderEditableScriptWrapperBuilder(): ContentBuilderEditableScriptWrapperBuilder
     {
         return $this->contentBuilderEditableScriptWrapperBuilderService ??= new ContentBuilderEditableScriptWrapperBuilder();
+    }
+
+    private function contentBuilderFileHydrationScriptBuilder(): ContentBuilderFileHydrationScriptBuilder
+    {
+        return $this->contentBuilderFileHydrationScriptBuilderService ??= new ContentBuilderFileHydrationScriptBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -844,19 +850,10 @@ final class RenderingEngine
                                 );
                                 $cbOut = $uploadControls['html'];
                                 $js .= $uploadControls['deactivation'];
-                                $js .= '
-                                                    if (document.createTextNode){
-                                                        if(!document.getElementById("bfFlashFileQueue' . $cbEntry->recElementId . '")){
-                                                           var mydiv = document.createElement("div");
-                                                           mydiv.innerHTML = "<br/>' . $cbOut . '";
-                                                           JQuery("#ff_elem' . $cbEntry->recElementId . '_files").append(mydiv);
-                                                        } else {
-                                                           var mydiv = document.createElement("div");
-                                                           mydiv.innerHTML = "' . $cbOut . '";
-                                                           mydiv.innerHTML = "<br/>" + mydiv.innerHTML;
-                                                           JQuery("#bfFlashFileQueue' . $cbEntry->recElementId . '").after(mydiv);
-                                                        }
-                                                    }' . nl();
+                                $js .= $this->contentBuilderFileHydrationScriptBuilder()->build(
+                                    (int) $cbEntry->recElementId,
+                                    $cbOut
+                                );
                             }
                             break;
                         case 'Signature':

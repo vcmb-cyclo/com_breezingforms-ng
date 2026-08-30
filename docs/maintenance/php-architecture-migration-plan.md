@@ -472,6 +472,9 @@ erreurs structurelles manuelles dans `e25d501f`; les avertissements de
 longueur restent explicitement hors de ce lot. `MobileRenderer` a reçu le même
 traitement dans `14985d4d`; ses snapshots et PHPStan sont verts, avec les
 avertissements de longueur conservés pour un lot ultérieur.
+`ClassNameResolver` et l'appel multi-ligne restant de `BootstrapRenderer` ne
+présentent désormais plus d'erreur PHPCS via `0fc70f33`; les avertissements de
+longueur de Bootstrap restent documentés comme hérités.
 `BootstrapRenderer` a été traité dans `288b42a4`; ses snapshots et PHPStan
 sont également verts. `OnePageRenderer` a reçu le même traitement dans
 `72204865`; ses snapshots et PHPStan sont verts également. Les quatre

@@ -101,4 +101,45 @@ final class RenderingEngineQueryListPreparationTest extends TestCase
             $queryCode
         );
     }
+
+    public function testQueryListPreparationUsesDefaultsWithoutCheckboxOrRows(): void
+    {
+        $processor = new QueryListProcessorDouble();
+        $processor->queryCols = [];
+        $processor->queryRows = [];
+
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+
+        $row = (object) [
+            'id' => 42,
+            'flag1' => 0,
+            'flag2' => 0,
+            'height' => 10,
+            'data1' => '',
+            'data3' => '',
+        ];
+        $checkboxCount = 0;
+        $queryCode = '';
+
+        (new ReflectionClass($engine))->getMethod('prepareQueryListRow')->invokeArgs(
+            $engine,
+            [$row, &$checkboxCount, &$queryCode]
+        );
+
+        self::assertSame(0, $checkboxCount);
+        self::assertSame([], $processor->queryCols['ff_42']);
+        self::assertSame([], $processor->queryRows['ff_42']);
+        self::assertSame(
+            "\n" .
+            "ff_queryCurrPage[42] = 1;\n" .
+            "ff_queryPageSize[42] = 10;\n" .
+            "ff_queryCheckbox[42] = 0;\n" .
+            "ff_queryHeader[42] = 0;\n" .
+            "ff_queryPagenav[42] = 1;\n" .
+            "ff_queryCols[42] = [];\n" .
+            "ff_queryRows[42] = [];\n",
+            $queryCode
+        );
+    }
 }

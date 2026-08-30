@@ -70,6 +70,7 @@ final class RenderingEngine
     private ?FormClosingMarkupBuilder $formClosingMarkupBuilderService = null;
     private ?FormOpeningMarkupBuilder $formOpeningMarkupBuilderService = null;
     private ?FormOptionalContextFieldsBuilder $formOptionalContextFieldsBuilderService = null;
+    private ?AdditionalHiddenFieldsBuilder $additionalHiddenFieldsBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -226,6 +227,11 @@ final class RenderingEngine
     private function formOptionalContextFieldsBuilder(): FormOptionalContextFieldsBuilder
     {
         return $this->formOptionalContextFieldsBuilderService ??= new FormOptionalContextFieldsBuilder();
+    }
+
+    private function additionalHiddenFieldsBuilder(): AdditionalHiddenFieldsBuilder
+    {
+        return $this->additionalHiddenFieldsBuilderService ??= new AdditionalHiddenFieldsBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -1688,11 +1694,7 @@ final class RenderingEngine
                     true,
                     nl()
                 );
-                reset($ff_otherparams);
-                // while (list($prop, $val) = each($ff_otherparams))
-                foreach ($ff_otherparams as $prop => $val) {
-                    echo indentc(1) . '<input type="hidden" name="' . htmlentities((string) $prop, ENT_QUOTES, 'UTF-8') . '" value="' . htmlentities(urlencode((string) $val), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                }
+                echo $this->additionalHiddenFieldsBuilder()->build($ff_otherparams, indentc(1), nl());
                 if ($this->processor->app->getInput()->getInt('cb_form_id', 0)) {
                     echo $this->contentBuilderTechnicalFieldsBuilder()->build(
                         '',

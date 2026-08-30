@@ -49,6 +49,7 @@ class MobileRenderer
     private $language_tag = '';
 
     private $hasResponsiveDatePicker = false;
+    private ?QuickModeInputBuilder $quickModeInputBuilderService = null;
 
     public function __construct(HTML_facileFormsProcessor $p)
     {
@@ -82,6 +83,11 @@ class MobileRenderer
 
         mt_srand();
         $this->flashUploadTicket = md5(strtotime('now') . mt_rand(0, mt_getrandmax()));
+    }
+
+    private function quickModeInputBuilder(): QuickModeInputBuilder
+    {
+        return $this->quickModeInputBuilderService ??= new QuickModeInputBuilder();
     }
 
     public function parseToggleFields($code)
@@ -613,7 +619,15 @@ HTML;
                         }
                         /* translatables end */
 
-                        echo '<input ' . (isset($mdata['placeholder']) && $mdata['placeholder'] ? 'placeholder="' . htmlentities($mdata['placeholder'], ENT_QUOTES, 'UTF-8') . '" ' : '') . 'class="ff_elem" ' . $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+                        echo $this->quickModeInputBuilder()->build(
+                            'ff_elem',
+                            $type,
+                            (string) $mdata['bfName'],
+                            (string) $mdata['value'],
+                            (int) $mdata['dbId'],
+                            $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+                            (string) ($mdata['placeholder'] ?? '')
+                        );
                         if ($mdata['mailbackAsSender']) {
                             echo '<input type="hidden" name="mailbackSender[' . $mdata['bfName'] . ']" value="true"/>' . "\n";
                         }
@@ -637,7 +651,15 @@ HTML;
                         }
                         /* translatables end */
 
-                        echo '<input ' . (isset($mdata['placeholder']) && $mdata['placeholder'] ? 'placeholder="' . htmlentities($mdata['placeholder'], ENT_QUOTES, 'UTF-8') . '" ' : '') . 'class="ff_elem" ' . $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+                        echo $this->quickModeInputBuilder()->build(
+                            'ff_elem',
+                            $type,
+                            (string) $mdata['bfName'],
+                            (string) $mdata['value'],
+                            (int) $mdata['dbId'],
+                            $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+                            (string) ($mdata['placeholder'] ?? '')
+                        );
                         break;
 
                     case 'bfTextarea':

@@ -54,6 +54,7 @@ class ClassicRenderer
     private $htmltextareas = array();
     private $language_tag = '';
     private $hasResponsiveDatePicker = false;
+    private ?QuickModeInputBuilder $quickModeInputBuilderService = null;
 
     public function headers()
     {
@@ -146,6 +147,11 @@ float:left;
         if ($this->rootMdata['theme'] != 'none' && @file_exists(JPATH_SITE . '/media/breezingforms/themes/' . $this->rootMdata['theme'] . '/theme.css')) {
             RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/media/breezingforms/themes/' . $this->rootMdata['theme'] . '/theme.css');
         }
+    }
+
+    private function quickModeInputBuilder(): QuickModeInputBuilder
+    {
+        return $this->quickModeInputBuilderService ??= new QuickModeInputBuilder();
     }
 
     public function __construct(HTML_facileFormsProcessor $p)
@@ -710,7 +716,15 @@ float:left;
         }
         /* translatables end */
 
-        echo '<input ' . (isset($mdata['placeholder']) && $mdata['placeholder'] ? 'placeholder="' . htmlentities($mdata['placeholder'], ENT_QUOTES, 'UTF-8') . '" ' : '') . 'class="ff_elem" ' . $size . $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+        echo $this->quickModeInputBuilder()->build(
+            'ff_elem',
+            $type,
+            (string) $mdata['bfName'],
+            (string) $mdata['value'],
+            (int) $mdata['dbId'],
+            $size . $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+            (string) ($mdata['placeholder'] ?? '')
+        );
         if ($mdata['mailbackAsSender']) {
             echo '<input type="hidden" name="mailbackSender[' . $mdata['bfName'] . ']" value="true"/>' . "\n";
         }
@@ -735,7 +749,16 @@ float:left;
         }
         /* translatables end */
 
-        echo '<input ' . (isset($mdata['placeholder']) && $mdata['placeholder'] ? 'placeholder="' . htmlentities($mdata['placeholder'], ENT_QUOTES, 'UTF-8') . '" ' : '') . 'class="ff_elem inputbox" ' . $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '" step="' . $mdata['step'] . '" max="' . $mdata['max'] . '" min="' . $mdata['min'] . '"/>' . "\n";
+        echo $this->quickModeInputBuilder()->build(
+            'ff_elem inputbox',
+            $type,
+            (string) $mdata['bfName'],
+            (string) $mdata['value'],
+            (int) $mdata['dbId'],
+            $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+            (string) ($mdata['placeholder'] ?? ''),
+            ' step="' . $mdata['step'] . '" max="' . $mdata['max'] . '" min="' . $mdata['min'] . '"'
+        );
 
         // set size of element, number input doesn't allow size attr
 

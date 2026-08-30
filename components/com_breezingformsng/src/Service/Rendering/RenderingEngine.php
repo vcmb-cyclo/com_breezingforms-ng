@@ -62,6 +62,7 @@ final class RenderingEngine
     private ?ClassicTextareaBuilder $classicTextareaBuilderService = null;
     private ?ClassicChoiceBuilder $classicChoiceBuilderService = null;
     private ?ClassicSelectBuilder $classicSelectBuilderService = null;
+    private ?ClassicRegularButtonBuilder $classicRegularButtonBuilderService = null;
     private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
     private ?EditableRecordHydrationScriptBuilder $editableRecordHydrationScriptBuilderService = null;
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
@@ -210,6 +211,11 @@ final class RenderingEngine
     private function classicSelectBuilder(): ClassicSelectBuilder
     {
         return $this->classicSelectBuilderService ??= new ClassicSelectBuilder();
+    }
+
+    private function classicRegularButtonBuilder(): ClassicRegularButtonBuilder
+    {
+        return $this->classicRegularButtonBuilderService ??= new ClassicRegularButtonBuilder();
     }
 
     private function contentBuilderValueScriptBuilder(): ContentBuilderValueScriptBuilder
@@ -1135,13 +1141,18 @@ final class RenderingEngine
                         );
                         break;
                     case 'Regular Button':
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
-                        $attribs = '';
-                        if ($row->flag2)
-                            $attribs .= ' disabled="disabled"';
-                        $attribs .= $this->processor->script2clause($row);
-                        echo indentc(2) . '<input id="ff_elem' . $row->id . '" type="button" name="ff_nm_' . $row->name . '" value="' . $data2 . '"' . $attribs . $class2 . '/>' . nlc();
-                        echo indentc(1) . '</div>' . nl();
+                        echo $this->classicRegularButtonBuilder()->build(
+                            (int) $row->id,
+                            (string) $row->name,
+                            $data2,
+                            $attribs,
+                            $class1,
+                            $class2,
+                            (bool) $row->flag2,
+                            $this->processor->script2clause($row),
+                            indentc(1),
+                            nlc() ?? ''
+                        );
                         break;
                     case 'Graphic Button':
                         echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();

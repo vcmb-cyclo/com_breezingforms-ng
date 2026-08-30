@@ -69,6 +69,7 @@ final class RenderingEngine
     private ?ClassicQueryListSettingsBuilder $classicQueryListSettingsBuilderService = null;
     private ?ClassicQueryListHeaderBuilder $classicQueryListHeaderBuilderService = null;
     private ?ClassicQueryListCellBuilder $classicQueryListCellBuilderService = null;
+    private ?ClassicQueryListRowBuilder $classicQueryListRowBuilderService = null;
     private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
     private ?EditableRecordHydrationScriptBuilder $editableRecordHydrationScriptBuilderService = null;
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
@@ -252,6 +253,12 @@ final class RenderingEngine
     private function classicQueryListCellBuilder(): ClassicQueryListCellBuilder
     {
         return $this->classicQueryListCellBuilderService ??= new ClassicQueryListCellBuilder();
+    }
+
+    private function classicQueryListRowBuilder(): ClassicQueryListRowBuilder
+    {
+        return $this->classicQueryListRowBuilderService ??=
+            new ClassicQueryListRowBuilder($this->classicQueryListCellBuilder());
     }
 
     private function contentBuilderValueScriptBuilder(): ContentBuilderValueScriptBuilder
@@ -1366,33 +1373,23 @@ final class RenderingEngine
                             $qcnt = $row->height;
                         for ($q = 0; $q < $qcnt; $q++) {
                             $qrow = &$qrows[$q];
-                            if ($k == 1)
-                                $cl = $tr1class;
-                            else
-                                $cl = $tr2class;
-                            echo indentc(3) . '<tr' . $cl . '>' . nlc();
-                            $skip = 0;
-                            for ($c = 0; $c < $colcnt; $c++) {
-                                $col = &$cols[$c];
-                                echo $this->classicQueryListCellBuilder()->build(
-                                    $col,
-                                    $qrow[$c],
-                                    $c,
-                                    $q,
-                                    (int) $row->id,
-                                    (string) $row->name,
-                                    (int) $row->flag2,
-                                    $k == 1,
-                                    $skip,
-                                    fn (string $class): string => $this->processor->getClassName($class),
-                                    indentc(4),
-                                    nlc() ?? ''
-                                );
-                                unset($col);
-                                if ($this->processor->dying)
-                                    break;
-                            } // for
-                            echo indentc(3) . '</tr>' . nl();
+                            $cl = $k == 1 ? $tr1class : $tr2class;
+                            echo $this->classicQueryListRowBuilder()->build(
+                                $cols,
+                                $qrow,
+                                (int) $row->id,
+                                $q,
+                                (string) $row->name,
+                                $cl,
+                                (int) $row->flag2,
+                                $k == 1,
+                                fn (string $class): string => $this->processor->getClassName($class),
+                                fn (): bool => $this->processor->dying,
+                                indentc(3),
+                                indentc(4),
+                                nlc() ?? '',
+                                nl()
+                            );
                             $k = 3 - $k;
                             unset($qrow);
                             if ($this->processor->dying)

@@ -97,7 +97,10 @@ trait BootstrapStyleFieldTrait
             $mdata['format'] = $mdata['format_translation' . $this->language_tag];
         }
         $icon = '';
-        if ($this->rootMdata['themebootstrapThemeEngine'] == 'bootstrap' && $this->rootMdata['themebootstrap'] == 'Azure') {
+        if (
+            $this->rootMdata['themebootstrapThemeEngine'] == 'bootstrap'
+            && $this->rootMdata['themebootstrap'] == 'Azure'
+        ) {
             if (!isset($mdata['icon']) || $mdata['icon'] == '') {
                 $icon = '<i class="fas fa-calendar iconf--fumi" aria-hidden="true"></i>';
             } else {
@@ -140,7 +143,14 @@ trait BootstrapStyleFieldTrait
                 ? $mdata['firstDay'] : '7',
         ];
 
-        echo HTMLHelper::_('calendar', $left, "ff_nm_" . $mdata['bfName'] . "[]", "ff_elem" . $mdata['dbId'], $mdata['format'], $calAttr);
+        echo HTMLHelper::_(
+            'calendar',
+            $left,
+            "ff_nm_" . $mdata['bfName'] . "[]",
+            "ff_elem" . $mdata['dbId'],
+            $mdata['format'],
+            $calAttr
+        );
 
         echo '</span>';
         echo '</div>';
@@ -226,8 +236,12 @@ trait BootstrapStyleFieldTrait
 
         if (!$this->hasResponsiveDatePicker) {
             $this->p->app->getDocument()->getWebAssetManager()->addInlineScript(
-                'var bfPickerMinusYearIcon = ' . json_encode(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/minusyear.png') . ';'
-                . "\n" . 'var bfPickerPlusYearIcon = ' . json_encode(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/plusyear.png') . ';'
+                'var bfPickerMinusYearIcon = ' . json_encode(
+                    Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/minusyear.png'
+                ) . ';'
+                . "\n" . 'var bfPickerPlusYearIcon = ' . json_encode(
+                    Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/plusyear.png'
+                ) . ';'
             );
             RuntimeAssetLoader::script(
                 $this->p->app,

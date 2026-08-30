@@ -52,6 +52,9 @@ final class RenderingEngineProcessorDouble extends HTML_facileFormsProcessor
     /** @var list<array{function: string, code: string}> */
     public array $linkedCallbacks = [];
 
+    /** @var list<string> */
+    public array $traceEvents = [];
+
     /** @var list<array<int, scalar>> */
     public array $queryResultRows = [];
 
@@ -104,6 +107,12 @@ final class RenderingEngineProcessorDouble extends HTML_facileFormsProcessor
     public function expJsValue($mixed, $indent = '')
     {
         return json_encode($mixed, JSON_THROW_ON_ERROR);
+    }
+
+    public function dumpTrace()
+    {
+        $this->traceEvents[] = 'dumpTrace';
+        echo 'trace';
     }
 
     public function bury()
@@ -1032,6 +1041,35 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertSame("</div><!-- form end -->\n", $modernHtml);
         self::assertStringContainsString('bfPage-bl', $legacyHtml);
         self::assertStringContainsString('<!-- form end -->', $legacyHtml);
+    }
+
+    public function testViewFinalizationPreservesTraceOrdering(): void
+    {
+        $method = (new ReflectionClass(RenderingEngine::class))->getMethod('finishViewRendering');
+        $initialBufferLevel = ob_get_level();
+
+        foreach ([false, true] as $directTrace) {
+            $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
+            $processor->traceMode = $directTrace ? _FF_TRACEMODE_DIRECT : 0;
+            $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+            (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+            set_error_handler(static function (): bool {
+                return false;
+            });
+            ob_start();
+            ob_start();
+
+            try {
+                $method->invoke($engine);
+                self::assertSame($initialBufferLevel + 1, ob_get_level());
+                self::assertSame($directTrace ? 'trace</pre>' : 'trace', ob_get_contents());
+                self::assertSame(['dumpTrace'], $processor->traceEvents);
+            } finally {
+                while (ob_get_level() > $initialBufferLevel) {
+                    ob_end_clean();
+                }
+            }
+        }
     }
 
     public function testMakeSafeFolderDelegatesToTokenizedDirectoryResolver(): void

@@ -1810,15 +1810,7 @@ final class RenderingEngine
         }
 
         $this->closeFormRendering();
-        if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT) {
-            $this->processor->dumpTrace();
-            ob_end_flush();
-            echo '</pre>';
-        } else {
-            ob_end_flush();
-            $this->processor->dumpTrace();
-        } // if
-        restore_error_handler();
+        $this->finishViewRendering();
 
     }
 
@@ -1994,6 +1986,20 @@ final class RenderingEngine
     private function abortViewRendering(): void
     {
         ob_end_flush();
+        restore_error_handler();
+    }
+
+    private function finishViewRendering(): void
+    {
+        if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT) {
+            $this->processor->dumpTrace();
+            ob_end_flush();
+            echo '</pre>';
+        } else {
+            ob_end_flush();
+            $this->processor->dumpTrace();
+        }
+
         restore_error_handler();
     }
 

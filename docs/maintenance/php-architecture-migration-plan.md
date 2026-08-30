@@ -44,7 +44,7 @@
 | `RenderingEngine::view()` — pièces | Pièces Before/After, code personnalisé et sorties `bury()` couverts | `RenderingEngine` |
 | `RenderingEngine::view()` — scripts | Bibliothèques, callbacks formulaire et `onload` extraits et couverts | `RenderingEngine` |
 | `RenderingEngine::view()` — validation | Extensions de fichiers et valeurs CAPTCHA par défaut extraites et couvertes | `RenderingEngine` |
-| `RenderingEngine::view()` — CAPTCHA | Sélection `Captcha` / `ReCaptcha` extraite, endpoints site/admin isolés, ordre historique préservé | Commits `4a070774`, `8e3e9a7a` |
+| `RenderingEngine::view()` — CAPTCHA | Sélection `Captcha` / `ReCaptcha` extraite, endpoints site/admin isolés et réutilisés par le champ, ordre historique préservé | Commits `4a070774`, `8e3e9a7a`, `4563ae11` |
 | `RenderingEngine::view()` — Query List | Préparation extraite et variantes par défaut/checkbox/résultat vide couvertes | Commits `4070ec0f`, `b358e7e9` |
 | `RenderingEngine::view()` — scripts d'icônes | Extraction committée et trois chemins `bury()` couverts | Commit `0a908143` |
 | `RenderingEngine::view()` — callbacks d'éléments | Extraction committée ; ordre `init` / `action` / `validate` et trois arrêts `bury()` couverts | Commit `413cb1cb` |
@@ -170,6 +170,9 @@ complète des signatures reste à éprouver avec un harnais ContentBuilder/Jooml
 
 Pour le CAPTCHA, la construction des endpoints image, validation legacy et
 ReCaptcha est désormais isolée dans `CaptchaEndpointBuilder` via `8e3e9a7a`.
+L’URL de base du champ CAPTCHA réutilise également ce service via `4563ae11`,
+ce qui supprime la dernière construction directe de cet endpoint dans
+`RenderingEngine`.
 La génération du JavaScript de validation reste à extraire séparément ; ses
 variantes et son ordre historique sont déjà couverts par
 `RenderingEngineViewCharacterizationTest`.

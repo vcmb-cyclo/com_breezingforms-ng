@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * BreezingForms NG - A Joomla Forms Application
  * @version   5.0
@@ -10,6 +8,9 @@ declare(strict_types=1);
  * @copyright Copyright (C) 2024-2026 by XDA+GIL- EVH
  * @license   Released under the terms of the GNU General Public License
  * */
+
+declare(strict_types=1);
+
 namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode;
 
 \defined('_JEXEC') or die;
@@ -57,7 +58,7 @@ class BootstrapRenderer
     private $hasResponsiveDatePicker = false;
     private $bsClasses = array();
 
-    function bsClass($key)
+    public function bsClass($key)
     {
 
         return $this->bsClasses[5][$key];
@@ -68,7 +69,7 @@ class BootstrapRenderer
         return 'Joomla.editors.instances[' . json_encode($editor) . '].getValue()';
     }
 
-    function __construct(HTML_facileFormsProcessor $p)
+    public function __construct(HTML_facileFormsProcessor $p)
     {
         $this->p = $p;
         $default = ComponentHelper::getParams('com_languages')->get('site');
@@ -195,10 +196,11 @@ class BootstrapRenderer
                 $state = '';
                 // rebuilding the state as it could be a value containing blanks
                 for ($j = 7; $j < $tokensCnt; $j++) {
-                    if ($j + 1 < $tokensCnt)
+                    if ($j + 1 < $tokensCnt) {
                         $state .= $tokens[$j] . ' ';
-                    else
+                    } else {
                         $state .= $tokens[$j];
+                    }
                 }
                 $parsed .= json_encode([
                     'action' => $tokens[0],
@@ -264,7 +266,8 @@ class BootstrapRenderer
         $area_count = count($this->htmltextareas);
         if ($area_count) {
             $editor = Editor::getInstance('tinymce');
-            RuntimeAssetLoader::script($this->p->app,
+            RuntimeAssetLoader::script(
+                $this->p->app,
                 Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-html-textareas.js'
             );
             for ($i = 0; $i < $area_count; $i++) {
@@ -293,7 +296,6 @@ class BootstrapRenderer
     public function process(&$dataObject, $parent = null, $parentPage = null, $index = 0, $childrenLength = 0, $parentFull = null)
     {
         if (isset($dataObject['attributes']) && isset($dataObject['properties'])) {
-
             HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
 
             $options = array('type' => 'normal', 'displayType' => 'breaks');
@@ -348,7 +350,6 @@ class BootstrapRenderer
             $mdata = $dataObject['properties'];
 
             if ($mdata['type'] == 'page') {
-
                 $parentPage = $mdata;
                 if ($parentPage['pageNumber'] > 1) {
                     echo '</div><!-- bfPage end -->' . "\n"; // closing previous pages
@@ -357,9 +358,9 @@ class BootstrapRenderer
                 $display = ' style="display:none;"';
                 if ($this->p->app->getInput()->getInt('ff_form_submitted', 0) == 0 && $this->p->app->getInput()->getInt('ff_page', 1) == $parentPage['pageNumber']) {
                     $display = '';
-                } else if ($this->p->app->getInput()->getInt('ff_form_submitted', 0) == 1 && $this->rootMdata['lastPageThankYou'] && $parentPage['pageNumber'] == count($this->dataObject['children'])) {
+                } elseif ($this->p->app->getInput()->getInt('ff_form_submitted', 0) == 1 && $this->rootMdata['lastPageThankYou'] && $parentPage['pageNumber'] == count($this->dataObject['children'])) {
                     $display = '';
-                } else if ($this->p->app->getInput()->getInt('ff_form_submitted', 0) == 1 && false == $this->rootMdata['lastPageThankYou'] && $parentPage['pageNumber'] == 1) {
+                } elseif ($this->p->app->getInput()->getInt('ff_form_submitted', 0) == 1 && false == $this->rootMdata['lastPageThankYou'] && $parentPage['pageNumber'] == 1) {
                     $display = '';
                 }
 
@@ -372,7 +373,6 @@ class BootstrapRenderer
                 /* translatables end */
 
                 if (trim($mdata['pageIntro']) != '') {
-
                     echo '<div class="' . (isset($this->rootMdata['themebootstrapUseHeroUnit']) && $this->rootMdata['themebootstrapUseHeroUnit'] ? $this->bsClass('hero-unit') : '') . $this->fadingClass . '">' . "\n";
 
                     $regex = '/{loadposition\s+(.*?)}/i';
@@ -385,7 +385,6 @@ class BootstrapRenderer
                     $options = array('style' => 'xhtml');
 
                     foreach ($matches as $match) {
-
                         $matcheslist = explode(',', $match[1]);
                         $position = trim($matcheslist[0]);
                         $output = $renderer->render($position, $options, null);
@@ -400,8 +399,7 @@ class BootstrapRenderer
                 if (!$this->useErrorAlerts) {
                     echo '<div class="bfErrorMessage ' . $this->bsClass('alert') . ' ' . $this->bsClass('alert-error') . '" style="display:none"></div>' . "\n";
                 }
-            } else if ($mdata['type'] == 'section') {
-
+            } elseif ($mdata['type'] == 'section') {
                 if (isset($dataObject['properties']['name']) && isset($mdata['off']) && $mdata['off']) {
                     echo '<script type="text/javascript">bfRegisterDeactivatedSection(' . json_encode($dataObject['properties']['name']) . ');</script>' . "\n";
                 }
@@ -421,8 +419,7 @@ class BootstrapRenderer
                     }
 
                     echo '<div>';
-                } else if ($mdata['bfType'] == 'normal') {
-
+                } elseif ($mdata['bfType'] == 'normal') {
                     $normal = true;
 
                     if (isset($dataObject['properties']['name']) && $dataObject['properties']['name'] != '') {
@@ -446,13 +443,11 @@ class BootstrapRenderer
                     preg_match_all($regex, $introtext, $matches, PREG_SET_ORDER);
 
                     if ($matches) {
-
                         $document = $this->p->app->getDocument();
                         $renderer = $document->loadRenderer('modules');
                         $options = array('style' => 'xhtml');
 
                         foreach ($matches as $match) {
-
                             $matcheslist = explode(',', $match[1]);
                             $position = trim($matcheslist[0]);
                             $output = $renderer->render($position, $options, null);
@@ -463,8 +458,7 @@ class BootstrapRenderer
                     echo $introtext . "\n";
                     echo '</div>' . "\n";
                 }
-            } else if ($mdata['type'] == 'element') {
-
+            } elseif ($mdata['type'] == 'element') {
                 $onclick = '';
                 if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
                     $onclick = 'onclick="' . $mdata['actionFunctionName'] . '(this,\'click\');" ';
@@ -496,16 +490,13 @@ class BootstrapRenderer
 
                 $label = '';
                 if (!$mdata['hideLabel']) {
-
                     $badge = '';
 
                     if (isset($mdata['theme'])) {
-
                         $badge = str_replace('invisible_', '', trim($mdata['theme']));
                     }
 
                     if (!($mdata['bfType'] == 'bfReCaptcha' && isset($mdata['invisibleCaptcha']) && $mdata['invisibleCaptcha'] && $badge != 'inline')) {
-
                         $maxlengthCounter = '';
                         if ($mdata['bfType'] == 'bfTextarea' && isset($mdata['maxlength']) && $mdata['maxlength'] > 0 && isset($mdata['showMaxlengthCounter']) && $mdata['showMaxlengthCounter']) {
                             $maxlengthCounter = ' <span class=***bfMaxLengthCounter*** id=***bfMaxLengthCounter' . $mdata['dbId'] . '***>(' . $mdata['maxlength'] . ' ' . Text::_('COM_BREEZINGFORMSNG_CHARS_LEFT') . ')</span>';
@@ -573,7 +564,7 @@ class BootstrapRenderer
 
                         if ($mdata['bfType'] == 'bfCaptcha') {
                             $for = 'for="bfCaptchaEntry"';
-                        } else if ($mdata['bfType'] == 'bfReCaptcha') {
+                        } elseif ($mdata['bfType'] == 'bfReCaptcha') {
                             $for = 'for="recaptcha_response_field"';
                         }
                         $required = '';
@@ -597,7 +588,6 @@ class BootstrapRenderer
                 for ($i = 0; $i < $this->p->rowcount; $i++) {
                     $row = $this->p->rows[$i];
                     if ($mdata['bfName'] == $row->name) {
-
                         if (
                             (isset($mdata['value']) || isset($mdata['list']) || isset($mdata['group'])) &&
                             (
@@ -614,7 +604,6 @@ class BootstrapRenderer
                                 $mdata['bfType'] == 'bfRadioGroup'
                             )
                         ) {
-
                             if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
                                 $mdata['value_translation' . $this->language_tag] = $this->p->replaceCode($mdata['value_translation' . $this->language_tag], "data1 of " . $mdata['bfName'], 'e', $mdata['dbId'], 0);
                             }
@@ -629,7 +618,7 @@ class BootstrapRenderer
 
                             if ($mdata['bfType'] == 'bfSelect') {
                                 $mdata['list'] = $this->p->replaceCode($row->data2, "data2 of " . $mdata['bfName'], 'e', $mdata['dbId'], 0);
-                            } else if ($mdata['bfType'] == 'bfCheckboxGroup' || $mdata['bfType'] == 'bfRadioGroup') {
+                            } elseif ($mdata['bfType'] == 'bfCheckboxGroup' || $mdata['bfType'] == 'bfRadioGroup') {
                                 $mdata['group'] = $this->p->replaceCode($row->data2, "data2 of " . $mdata['bfName'], 'e', $mdata['dbId'], 0);
                             } else {
                                 $mdata['value'] = $this->p->replaceCode($row->data1, "data1 of " . $mdata['bfName'], 'e', $mdata['dbId'], 0);
@@ -643,7 +632,6 @@ class BootstrapRenderer
                 }
 
                 switch ($mdata['bfType']) {
-
                     case 'bfNumberInput':
                         $this->renderBootstrapStyleNumberInputField($mdata, $label, $tabIndex, $onclick, $onblur, $onchange, $onfocus, $onselect, $readonly);
                         break;
@@ -653,7 +641,6 @@ class BootstrapRenderer
                         break;
 
                     case 'bfTextarea':
-
                         $width = '';
                         if ($mdata['width'] != '') {
                             $width = 'width:' . htmlentities(strip_tags($mdata['width'])) . ' !important; min-width:' . htmlentities(strip_tags($mdata['width'])) . ' !important;';
@@ -730,7 +717,6 @@ class BootstrapRenderer
                         echo $label;
                         echo '<span class="' . $this->bsClass('nonform-control') . '">';
                         if ((isset($mdata['flashUploader']) && $mdata['flashUploader']) || (isset($mdata['html5']) && $mdata['html5'])) {
-
                             $base = explode('/', Uri::base());
                             if (isset($base[count($base) - 2]) && $base[count($base) - 2] == 'administrator') {
                                 unset($base[count($base) - 2]);
@@ -983,15 +969,12 @@ class BootstrapRenderer
                         break;
 
                     case 'bfReCaptcha':
-
                         echo '<div class="' . $this->bsClass('controls') . ' ' . $this->bsClass('form-inline') . '' . (isset($mdata['pubkey']) && $mdata['pubkey'] ? '' : ' ' . $this->bsClass('well') . ' ' . $this->bsClass('well-small') . '') . '">';
                         echo '<div class="' . $this->bsClass('form-group') . ' ' . $this->bsClass('other-form-group') . '">';
                         echo $label;
                         echo '<span class="' . $this->bsClass('nonform-control') . '">';
                         if (isset($mdata['pubkey']) && $mdata['pubkey'] != '') {
-
                             if (!isset($mdata['invisibleCaptcha']) || !$mdata['invisibleCaptcha']) {
-
                                 $http = 'https';
 
                                 $getLangTag = $this->p->app->getLanguage()->getTag();
@@ -1021,15 +1004,13 @@ class BootstrapRenderer
                                     'size' => $size,
                                     'resetOnRerender' => false,
                                 ]) . ');</script>';
-                            } else
-                                if (isset($mdata['invisibleCaptcha']) && $mdata['invisibleCaptcha']) {
+                            } elseif (isset($mdata['invisibleCaptcha']) && $mdata['invisibleCaptcha']) {
+                                $http = 'https';
 
-                                    $http = 'https';
+                                $badge = str_replace('invisible_', '', trim($mdata['theme']));
 
-                                    $badge = str_replace('invisible_', '', trim($mdata['theme']));
-
-                                    if ($badge == 'inline') {
-                                        ?>
+                                if ($badge == 'inline') {
+                                    ?>
                                                 <div style="display: inline-block !important; vertical-align: middle;">
                                                     <div class="<?php echo $this->bsClass('control-group'); ?>">
                                                         <div class="<?php echo $this->bsClass('controls') ?>">
@@ -1039,27 +1020,27 @@ class BootstrapRenderer
                                                     </div>
                                                 </div>
                                         <?php
-                                    } else {
-                                        ?>
+                                } else {
+                                    ?>
                                                 <div id="bfInvisibleReCaptchaContainer"></div>
                                                 <div id="bfInvisibleReCaptcha"></div>
-                                        <?php
-                                    }
+                                    <?php
+                                }
 
-                                    RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-invisible.js');
-                                    ?>
+                                RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-invisible.js');
+                                ?>
 
                                             <script data-usercentrics="reCAPTCHA" type="text/javascript">bfInitInvisibleReCaptcha(<?php echo json_encode([
-												'sitekey' => $mdata['pubkey'],
-												'badge' => $badge == 'red' ? '' : $badge,
-												'hasFlashUpload' => $this->hasFlashUpload,
-												'resetFlagOnCallback' => true,
-											]); ?>);</script>
+                                            'sitekey' => $mdata['pubkey'],
+                                            'badge' => $badge == 'red' ? '' : $badge,
+                                            'hasFlashUpload' => $this->hasFlashUpload,
+                                            'resetFlagOnCallback' => true,
+                                        ]); ?>);</script>
                                             <script data-usercentrics="reCAPTCHA"
                                                 src="https://www.google.com/recaptcha/api.js?onload=onloadBFNewRecaptchaCallback&render=explicit" async
                                                 defer></script>
                                     <?php
-                                }
+                            }
                         } else {
                             echo '<span class="bfCaptcha">' . "\n";
                             echo 'WARNING: No public key given for ReCaptcha element!';
@@ -1073,7 +1054,6 @@ class BootstrapRenderer
                         break;
 
                     case 'bfCaptcha':
-
                         echo '<div class="' . $this->bsClass('controls') . ' ' . $this->bsClass('form-inline') . '">';
                         echo '<div class="' . $this->bsClass('form-group') . ' ' . $this->bsClass('other-form-group') . '">';
                         echo $label;
@@ -1159,20 +1139,18 @@ class BootstrapRenderer
         if (isset($dataObject['properties']) && $dataObject['properties']['type'] == 'section' && $dataObject['properties']['bfType'] == 'section') {
             echo '</div><!-- section section -->'; // row-fluid
             echo '</div>' . "\n";
-        } else if (isset($dataObject['properties']) && $dataObject['properties']['type'] == 'section' && $dataObject['properties']['bfType'] == 'normal') {
+        } elseif (isset($dataObject['properties']) && $dataObject['properties']['type'] == 'section' && $dataObject['properties']['bfType'] == 'normal') {
             if (isset($dataObject['properties']['name']) && $dataObject['properties']['name'] != '') {
                 echo '</div><!-- section normal -->'; // row-fluid
                 echo '</section>' . "\n";
             }
-        } else if (isset($dataObject['properties']) && $dataObject['properties']['type'] == 'page') {
-
+        } elseif (isset($dataObject['properties']) && $dataObject['properties']['type'] == 'page') {
             $isLastPage = false;
             if ($this->rootMdata['lastPageThankYou'] && $dataObject['properties']['pageNumber'] == count($this->dataObject['children']) && count($this->dataObject['children']) > 1) {
                 $isLastPage = true;
             }
 
             if (!$isLastPage) {
-
                 $last = 0;
                 if ($this->rootMdata['lastPageThankYou']) {
                     $last = 1;
@@ -1214,7 +1192,6 @@ class BootstrapRenderer
                 }
 
                 if ($this->rootMdata['cancelInclude'] && $dataObject['properties']['pageNumber'] + 1 > count($this->dataObject['children']) - $last) {
-
                     /* translatables */
                     if (isset($this->rootMdata['cancelLabel_translation' . $this->language_tag]) && $this->rootMdata['cancelLabel_translation' . $this->language_tag] != '') {
                         $this->rootMdata['cancelLabel'] = $this->rootMdata['cancelLabel_translation' . $this->language_tag];
@@ -1229,7 +1206,7 @@ class BootstrapRenderer
         }
     }
 
-    function headers()
+    public function headers()
     {
 
         if ($this->hasFlashUpload) {
@@ -1298,52 +1275,49 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
             // loading theme
             RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/themes/quickmode-bootstrap' . '5' . '/system.css');
 
-            if (isset($this->rootMdata['themebootstrap'])) {
+        if (isset($this->rootMdata['themebootstrap'])) {
+            $vars = '';
+            $themecss = '';
+            $scriptjs = '';
+            $scriptphp = '';
 
-                $vars = '';
-                $themecss = '';
-                $scriptjs = '';
-                $scriptphp = '';
+            $themecss_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/theme.css';
+            $vars_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/vars.txt';
+            $scriptjs_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/script.js';
+            $scriptphp_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/script.php';
 
-                $themecss_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/theme.css';
-                $vars_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/vars.txt';
-                $scriptjs_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/script.js';
-                $scriptphp_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/script.php';
+            if ($this->rootMdata['themebootstrap'] != '' && $this->rootMdata['themebootstrap'] != 'none' && file_exists($themecss_path)) {
+                if (file_exists($vars_path)) {
+                    $vars = file_get_contents($vars_path);
+                }
+                if (file_exists($themecss_path)) {
+                    $themecss = file_get_contents($themecss_path);
+                }
+                if (file_exists($scriptphp_path)) {
+                    require_once($scriptphp_path);
+                }
+                if (file_exists($scriptjs_path)) {
+                    $scriptjs = file_get_contents($scriptjs_path);
+                }
 
-                if ($this->rootMdata['themebootstrap'] != '' && $this->rootMdata['themebootstrap'] != 'none' && file_exists($themecss_path)) {
-
-
-                    if (file_exists($vars_path)) {
-                        $vars = file_get_contents($vars_path);
-                    }
-                    if (file_exists($themecss_path)) {
-                        $themecss = file_get_contents($themecss_path);
-                    }
-                    if (file_exists($scriptphp_path)) {
-                        require_once($scriptphp_path);
-                    }
-                    if (file_exists($scriptjs_path)) {
-                        $scriptjs = file_get_contents($scriptjs_path);
-                    }
-
-                    $vars = str_replace("\r", '', $vars);
-                    $vars = explode("\n", $vars);
-                    foreach ($vars as $var) {
-                        if (trim($var)) {
-                            $keyvalue = explode('=', $var);
-                            if (count($keyvalue) == 2) {
-                                $themecss = str_replace('{' . trim($keyvalue[0]) . '}', trim($keyvalue[1]), $themecss);
-                            }
+                $vars = str_replace("\r", '', $vars);
+                $vars = explode("\n", $vars);
+                foreach ($vars as $var) {
+                    if (trim($var)) {
+                        $keyvalue = explode('=', $var);
+                        if (count($keyvalue) == 2) {
+                            $themecss = str_replace('{' . trim($keyvalue[0]) . '}', trim($keyvalue[1]), $themecss);
                         }
                     }
+                }
 
-                    $manager = $this->p->app->getDocument()->getWebAssetManager();
-                    $manager->addInlineStyle($themecss);
-                    if ($scriptjs) {
-                        $manager->addInlineScript($scriptjs);
-                    }
+                $manager = $this->p->app->getDocument()->getWebAssetManager();
+                $manager->addInlineStyle($themecss);
+                if ($scriptjs) {
+                    $manager->addInlineScript($scriptjs);
                 }
             }
+        }
     }
 
     private function bfCalendarIsTruthy($mdata, $key)
@@ -1394,5 +1368,4 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
         return $range > 0 ? max(10, $range + 1) : 60;
     }
-
 }

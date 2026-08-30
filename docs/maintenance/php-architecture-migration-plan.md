@@ -148,6 +148,11 @@ dans `view()` par `4f475561` et `2c72231e`, avec couverture dédiée.
   désormais isolée dans `ContentBuilderValueHydrationScriptBuilder` via
   `084fc749`, avec conservation du fallback JQuery/native et du délai des
   calendriers.
+- L'hydratation des checkbox/radio est isolée dans
+  `ContentBuilderChoiceHydrationScriptBuilder` via `e8d531cd`, et celle des
+  listes dans `ContentBuilderSelectHydrationScriptBuilder` via `152def4c` ;
+  les valeurs multiples, l'échappement JSON et les déclenchements historiques
+  sont couverts par des tests unitaires.
 - Isoler la présentation des fichiers existants et les cases de suppression.
 - Vérifier explicitement les chemins, noms de fichiers et valeurs absentes.
 - Caractériser `bfLoadContentBuilderEditable()` avant toute normalisation du

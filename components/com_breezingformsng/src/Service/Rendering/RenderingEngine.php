@@ -75,6 +75,7 @@ final class RenderingEngine
     private ?ContentBuilderFileValueParser $contentBuilderFileValueParserService = null;
     private ?ContentBuilderFileDisplayNameBuilder $contentBuilderFileDisplayNameBuilderService = null;
     private ?ContentBuilderFlashUploadValidationBuilder $contentBuilderFlashUploadValidationBuilderService = null;
+    private ?ContentBuilderSignatureFileResolver $contentBuilderSignatureFileResolverService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -256,6 +257,11 @@ final class RenderingEngine
     private function contentBuilderFlashUploadValidationBuilder(): ContentBuilderFlashUploadValidationBuilder
     {
         return $this->contentBuilderFlashUploadValidationBuilderService ??= new ContentBuilderFlashUploadValidationBuilder();
+    }
+
+    private function contentBuilderSignatureFileResolver(): ContentBuilderSignatureFileResolver
+    {
+        return $this->contentBuilderSignatureFileResolverService ??= new ContentBuilderSignatureFileResolver();
     }
 
     public function cbCheckPermissions(): array
@@ -797,9 +803,14 @@ final class RenderingEngine
 
                             $sig_path = JPATH_SITE . '/media/breezingforms/signatures/';
 
-                            if (strlen($cbEntry->recValue) > 0 && file_exists($sig_path . $cbEntry->recValue)) {
+                            $signaturePath = $this->contentBuilderSignatureFileResolver()->resolve(
+                                $sig_path,
+                                (string) $cbEntry->recValue
+                            );
 
-                                $sig_encoded = bf_b64enc(file_get_contents($sig_path . $cbEntry->recValue));
+                            if ($signaturePath !== null) {
+
+                                $sig_encoded = bf_b64enc(file_get_contents($signaturePath));
 
                                 $js .= $this->contentBuilderSignatureScriptBuilder()->build(
                                     (string) $cbEntry->recName,

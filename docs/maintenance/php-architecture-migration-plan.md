@@ -281,8 +281,11 @@ propres à chaque thème.
 
 ### Ordre de migration
 
-1. `bfTextfield` et `bfNumberInput`.
-2. `bfTextarea` et compteur de longueur.
+1. `bfTextfield` et `bfNumberInput` — partagé et branché via
+   `QuickModeInputBuilder` (`065cef94`, `f3d04e55`).
+2. `bfTextarea` et compteur de longueur — le contrôle textarea est partagé et
+   branché via `QuickModeTextareaBuilder` (`620b7efe`); le compteur reste à
+   caractériser séparément.
 3. `bfCheckbox`.
 4. `bfSelect`.
 5. Groupes checkbox et radio.
@@ -410,6 +413,14 @@ Le contrôle partagé `bfTextfield`/`bfNumberInput` est commité dans
 commun aux wrappers Bootstrap/OnePage l'utilise désormais aussi via
 `f3d04e55`, sans perte de classes, icônes ni attributs de thème. Les autres
 familles de champs restent à migrer par ordre de risque.
+
+Le contrôle `bfTextarea` est désormais extrait dans
+`QuickModeTextareaBuilder` et branché dans les quatre renderers par
+`620b7efe`. Les snapshots QuickMode restent verts (`84 tests, 230
+assertions`) et le service est couvert par des tests d'échappement, de
+placeholder et d'attributs structurels. Le compteur de longueur et ses
+événements restent volontairement dans les renderers jusqu'à caractérisation
+complète.
 
 Les lots 3 à 5 peuvent être préparés en parallèle du lot 6, à condition que le
 branchement dans `RenderingEngine.php` soit coordonné.

@@ -20,8 +20,6 @@ jQuery(document).ready(function () {
 
     jQuery('main').append('<a href="#" class="scrollToTop"><i class="fa fa-angle-up fa-3x" aria-hidden="true"></i></a>');
 
-    jQuery('#bfFormAdvanced fieldset a').addClass('btn-more-options');
-
     /*
     breezingforms logo
     */

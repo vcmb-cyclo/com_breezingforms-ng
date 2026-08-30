@@ -13,17 +13,12 @@ use Joomla\CMS\Language\Text;
                                     </div>
                                     <div class="bfAdvanced" id="bfFormAdvanced" style="display:none">
                                         <br />
-                                        <fieldset>
-                                            <legend>
-                                                <?php echo Text::_('COM_BREEZINGFORMSNG_ADVANCED_FORM_OPTIONS'); ?>
-                                            </legend>
-                                            <?php if ($formId != 0) { ?>
-                                                <a href="index.php?option=com_breezingformsng&task=forms.edit&id=<?php echo $formId ?>&pkg=QuickModeForms&advanced=1"
-                                                    title="<?php echo Text::_('COM_BREEZINGFORMSNG_MORE_OPTIONS'); ?>">
-                                                    <?php echo htmlentities(Text::_('COM_BREEZINGFORMSNG_MORE_OPTIONS'), ENT_QUOTES, 'UTF-8') ?>
-                                                </a>
-                                            <?php } ?>
-                                        </fieldset>
+                                        <!--
+                                            The "Plus d'options" link that used to live here
+                                            (navigating to forms.edit&advanced=1) was repatriated
+                                            as the "Options" tab (fragment-3) in QuickmodeHtml -
+                                            see docs/maintenance/quickmode-options-tab-plan.md.
+                                        -->
                                         <fieldset>
                                             <legend>
                                                 <?php echo Text::_('COM_BREEZINGFORMSNG_ADVANCED_FORM_THEMES'); ?>

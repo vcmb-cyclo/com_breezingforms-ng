@@ -103,12 +103,6 @@ parameters:
 			path: /home/xavier/workspaces/vcmb/com_breezingformsng/administrator/components/com_breezingformsng/layouts/quickmode/advanced_form.php
 
 		-
-			message: '#^Variable \$formId might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: /home/xavier/workspaces/vcmb/com_breezingformsng/administrator/components/com_breezingformsng/layouts/quickmode/advanced_form.php
-
-		-
 			message: '#^Variable \$themes might not be defined\.$#'
 			identifier: variable.undefined
 			count: 3

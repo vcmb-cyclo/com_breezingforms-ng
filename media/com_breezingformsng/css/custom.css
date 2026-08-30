@@ -1144,23 +1144,6 @@ More options
     padding: 40px 15px 15px 15px;
 }
 
-.btn-more-options {
-    background: #eaeaea none repeat scroll 0 0 !important;
-    border: 1px solid #eaeaea;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    color: #333 !important;
-    padding: 7px 15px;
-    text-shadow: none !important;
-    text-decoration: none !important;
-}
-
-.btn-more-options:hover,
-.btn-more-options:focus {
-    background: #d5d5d5 !important;
-    border: 1px solid #d5d5d5;
-}
-
 main joomla-tab[view="tabs"] ul li{
     border: 1px solid #eaeaea;
     border-bottom: 0 !important;

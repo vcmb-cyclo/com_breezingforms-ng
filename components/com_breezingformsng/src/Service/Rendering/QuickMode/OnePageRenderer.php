@@ -62,6 +62,7 @@ class OnePageRenderer
     private ?QuickModeMaxLengthCounterBuilder $quickModeMaxLengthCounterBuilderService = null;
     private ?QuickModeGroupOptionBuilder $quickModeGroupOptionBuilderService = null;
     private ?QuickModeSubmitButtonBuilder $quickModeSubmitButtonBuilderService = null;
+    private ?QuickModeCalendarButtonBuilder $quickModeCalendarButtonBuilderService = null;
 
     public function bsClass($key)
     {
@@ -102,6 +103,11 @@ class OnePageRenderer
     private function quickModeSubmitButtonBuilder(): QuickModeSubmitButtonBuilder
     {
         return $this->quickModeSubmitButtonBuilderService ??= new QuickModeSubmitButtonBuilder();
+    }
+
+    private function quickModeCalendarButtonBuilder(): QuickModeCalendarButtonBuilder
+    {
+        return $this->quickModeCalendarButtonBuilderService ??= new QuickModeCalendarButtonBuilder();
     }
 
     public static function getEditorContent($editor)

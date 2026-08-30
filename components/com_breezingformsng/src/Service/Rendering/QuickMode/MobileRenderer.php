@@ -56,6 +56,7 @@ class MobileRenderer
     private ?QuickModeMaxLengthCounterBuilder $quickModeMaxLengthCounterBuilderService = null;
     private ?QuickModeGroupOptionBuilder $quickModeGroupOptionBuilderService = null;
     private ?QuickModeSubmitButtonBuilder $quickModeSubmitButtonBuilderService = null;
+    private ?QuickModeCalendarButtonBuilder $quickModeCalendarButtonBuilderService = null;
 
     public function __construct(HTML_facileFormsProcessor $p)
     {
@@ -124,6 +125,11 @@ class MobileRenderer
     private function quickModeSubmitButtonBuilder(): QuickModeSubmitButtonBuilder
     {
         return $this->quickModeSubmitButtonBuilderService ??= new QuickModeSubmitButtonBuilder();
+    }
+
+    private function quickModeCalendarButtonBuilder(): QuickModeCalendarButtonBuilder
+    {
+        return $this->quickModeCalendarButtonBuilderService ??= new QuickModeCalendarButtonBuilder();
     }
 
     public function parseToggleFields($code)
@@ -1337,7 +1343,14 @@ HTML;
 
                         echo '<input autocomplete="off" class="ff_elem" type="text" name="ff_nm_' . $mdata['bfName'] . '[]"  id="ff_elem' . $mdata['dbId'] . '" value="' . htmlentities($left, ENT_QUOTES, 'UTF-8') . '"/>' . "\n";
                         echo '<label for="ff_elem' . $mdata['dbId'] . '_calendarButton"></label>';
-                        echo '<button id="ff_elem' . $mdata['dbId'] . '_calendarButton" type="button" class="bfCalendar btn btn-secondary btn-sm" value="' . htmlentities($right, ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities($right, ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
+                        echo $this->quickModeCalendarButtonBuilder()->build(
+                            'type="button"',
+                            'ff_elem' . $mdata['dbId'] . '_calendarButton',
+                            'bfCalendar btn btn-secondary btn-sm',
+                            (string) $right,
+                            '<span>' . htmlentities($right, ENT_QUOTES, 'UTF-8') . '</span>',
+                            true
+                        );
 
                         if (!$this->hasResponsiveDatePicker) {
                             RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js');

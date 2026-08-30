@@ -61,6 +61,7 @@ class ClassicRenderer
     private ?QuickModeMaxLengthCounterBuilder $quickModeMaxLengthCounterBuilderService = null;
     private ?QuickModeGroupOptionBuilder $quickModeGroupOptionBuilderService = null;
     private ?QuickModeSubmitButtonBuilder $quickModeSubmitButtonBuilderService = null;
+    private ?QuickModeCalendarButtonBuilder $quickModeCalendarButtonBuilderService = null;
 
     public function headers()
     {
@@ -188,6 +189,11 @@ float:left;
     private function quickModeSubmitButtonBuilder(): QuickModeSubmitButtonBuilder
     {
         return $this->quickModeSubmitButtonBuilderService ??= new QuickModeSubmitButtonBuilder();
+    }
+
+    private function quickModeCalendarButtonBuilder(): QuickModeCalendarButtonBuilder
+    {
+        return $this->quickModeCalendarButtonBuilderService ??= new QuickModeCalendarButtonBuilder();
     }
 
     public function __construct(HTML_facileFormsProcessor $p)
@@ -1243,7 +1249,13 @@ float:left;
 
         echo '<span class="bfElementGroupNoWrap" id="bfElementGroupNoWrap' . $mdata['dbId'] . '">' . "\n";
         echo '<input autocomplete="off" class="ff_elem bfCalendarInput" ' . $size . 'type="text" name="ff_nm_' . $mdata['bfName'] . '[]"  id="ff_elem' . $mdata['dbId'] . '" value="' . htmlentities($left, ENT_QUOTES, 'UTF-8') . '"/>' . "\n";
-        echo '<button type="button" id="ff_elem' . $mdata['dbId'] . '_calendarButton" class="bfCalendar btn btn-secondary" value="' . htmlentities($right, ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities($right, ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
+        echo $this->quickModeCalendarButtonBuilder()->build(
+            'type="button"',
+            'ff_elem' . $mdata['dbId'] . '_calendarButton',
+            'bfCalendar btn btn-secondary',
+            (string) $right,
+            '<span>' . htmlentities($right, ENT_QUOTES, 'UTF-8') . '</span>'
+        );
         echo '</span>' . "\n";
 
         if (!$this->hasResponsiveDatePicker) {

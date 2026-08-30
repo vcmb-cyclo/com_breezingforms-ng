@@ -184,7 +184,13 @@ trait BootstrapStyleFieldTrait
 
         echo '<div class="' . $this->bsClass('input-append') . '">';
         echo '<input autocomplete="off" class="' . $this->bsClass('form-control') . ' ' . $this->bsClass('custom-form-control') . ' ff_elem" ' . $size . 'type="text" name="ff_nm_' . $mdata['bfName'] . '[]"  id="ff_elem' . $mdata['dbId'] . '" value="' . htmlentities($left, ENT_QUOTES, 'UTF-8') . '"/>' . "\n";
-        echo '<button style="cursor:pointer !important;" type="button" id="ff_elem' . $mdata['dbId'] . '_calendarButton" class="bfCalendar ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' button" value="' . htmlentities($right, ENT_QUOTES, 'UTF-8') . '"><i class="' . $this->bsClass('icon-calendar') . '"></i>' . htmlentities($right == '...' ? '' : $right, ENT_QUOTES, 'UTF-8') . '</button>' . "\n";
+        echo $this->quickModeCalendarButtonBuilder()->build(
+            'style="cursor:pointer !important;" type="button"',
+            'ff_elem' . $mdata['dbId'] . '_calendarButton',
+            'bfCalendar ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' button',
+            (string) $right,
+            '<i class="' . $this->bsClass('icon-calendar') . '"></i>' . htmlentities($right == '...' ? '' : $right, ENT_QUOTES, 'UTF-8')
+        );
         echo '</div>' . "\n";
 
         if (!$this->hasResponsiveDatePicker) {

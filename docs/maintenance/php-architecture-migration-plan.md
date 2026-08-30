@@ -52,6 +52,7 @@
 | Rendu HTML classique — champ texte | Markup `Text` extrait et couvert pour texte/mot de passe, dimensions, maxlength, événements et états readonly/disabled | Commit `24776d379` |
 | Rendu HTML classique — textarea | Markup `Textarea` extrait et couvert pour états, dimensions, événements et ajustement Mozilla des lignes | Commit `593e018b5` |
 | Rendu HTML classique — choix élémentaire | Contrôle commun `Checkbox`/`Radio Button` extrait et couvert pour états, classes, labels et événements | Commit `fcc72f2aa` |
+| Rendu HTML classique — liste de sélection | Parsing et markup `Select List` extraits et couverts pour options, échappement, sélection, taille et états | Commit `771f3d014` |
 | `RenderingEngine::view()` — scripts d'icônes | Extraction committée et trois chemins `bury()` couverts | Commit `0a908143` |
 | `RenderingEngine::view()` — callbacks d'éléments | Extraction committée ; ordre `init` / `action` / `validate` et trois arrêts `bury()` couverts | Commit `413cb1cb` |
 | `RenderingEngine::view()` — métadonnées classiques | Comptage icônes/infobulles et scan `Static Text/HTML` extraits et couverts | Commit `51e86824` |
@@ -255,7 +256,8 @@ Ordre conseillé, du plus simple au plus risqué :
 2. Champ texte (`ClassicTextInputBuilder`, `24776d379`) et textarea
    (`ClassicTextareaBuilder`, `593e018b5`), puis nombre et champ caché.
 3. Contrôle commun checkbox/radio (`ClassicChoiceBuilder`, `fcc72f2aa`), puis
-   groupes et listes de sélection.
+   liste de sélection (`ClassicSelectBuilder`, `771f3d014`). Les groupes
+   restent représentés par les contrôles d’options élémentaires.
 4. Boutons et navigation entre pages.
 5. Uploads, CAPTCHA et signatures.
 6. Query List et ses tableaux paginés.

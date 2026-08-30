@@ -82,6 +82,7 @@ final class RenderingEngine
     private ?CaptchaValidationDefaultsBuilder $captchaValidationDefaultsBuilderService = null;
     private ?CaptchaLegacyValidationScriptBuilder $captchaLegacyValidationScriptBuilderService = null;
     private ?CaptchaReCaptchaValidationScriptBuilder $captchaReCaptchaValidationScriptBuilderService = null;
+    private ?ContentBuilderValueHydrationScriptBuilder $contentBuilderValueHydrationScriptBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -298,6 +299,11 @@ final class RenderingEngine
     private function captchaReCaptchaValidationScriptBuilder(): CaptchaReCaptchaValidationScriptBuilder
     {
         return $this->captchaReCaptchaValidationScriptBuilderService ??= new CaptchaReCaptchaValidationScriptBuilder();
+    }
+
+    private function contentBuilderValueHydrationScriptBuilder(): ContentBuilderValueHydrationScriptBuilder
+    {
+        return $this->contentBuilderValueHydrationScriptBuilderService ??= new ContentBuilderValueHydrationScriptBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -873,15 +879,12 @@ final class RenderingEngine
                               }
                               } */
 
-                            if ($cbEntry->recType == 'Calendar') {
-                                $js .= "setTimeout(function(){";
-                            }
-                            $js .= 'if(typeof JQuery != "undefined"){';
-                            $js .= 'JQuery("[name=\"ff_nm_' . $cbEntry->recName . '[]\"]").val(' . json_encode($cbEntry->recValue) . ');if(typeof JQuery != "undefined")JQuery("[name=\"ff_nm_' . $cbEntry->recName . '[]\"]").trigger("change");';
-                            $js .= '}else{if(document.getElementById("ff_elem' . $cbEntry->recElementId . '"))document.getElementById("ff_elem' . $cbEntry->recElementId . '").value=' . json_encode($cbEntry->recValue) . ';if(typeof JQuery != "undefined")JQuery(document.getElementById("ff_elem' . $cbEntry->recElementId . '")).trigger("change");}' . nl();
-                            if ($cbEntry->recType == 'Calendar') {
-                                $js .= "}, 100);";
-                            }
+                            $js .= $this->contentBuilderValueHydrationScriptBuilder()->build(
+                                (string) $cbEntry->recType,
+                                (string) $cbEntry->recName,
+                                (int) $cbEntry->recElementId,
+                                $cbEntry->recValue
+                            );
                             break;
                         case 'Checkbox':
                         case 'Checkbox Group':

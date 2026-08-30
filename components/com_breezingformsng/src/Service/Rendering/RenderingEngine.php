@@ -333,10 +333,7 @@ final class RenderingEngine
 
             $this->processor->draggableDivIds[] = 'ff_div' . $row->id;
 
-            if ($row->type == "Icon")
-                $icons++;
-            if ($row->type == "Tooltip")
-                $tooltips++;
+            $this->collectElementMetadata($row, $icons, $tooltips);
             if ($row->type == "Query List") {
                 $this->prepareQueryListRow($row, $qcheckboxes, $qcode);
                 if ($this->processor->bury())
@@ -346,8 +343,7 @@ final class RenderingEngine
                 unset($row);
                 return;
             }
-            if ($row->type == 'Static Text/HTML')
-                $this->processor->linkcode('#scanonly', $library, $linked, $row->data1);
+            $this->registerStaticTextScanCallback($row, $library, $linked);
             unset($row);
             if ($this->processor->bury())
                 return;
@@ -2302,6 +2298,33 @@ final class RenderingEngine
         }
 
         return false;
+    }
+
+    /**
+     * Count the element types that require post-render assets or behavior.
+     */
+    private function collectElementMetadata(object $row, int &$icons, int &$tooltips): void
+    {
+        if ($row->type == "Icon") {
+            $icons++;
+        }
+
+        if ($row->type == "Tooltip") {
+            $tooltips++;
+        }
+    }
+
+    /**
+     * Register the scan-only callback used by static HTML elements.
+     *
+     * @param array<int|string, mixed> $library
+     * @param array<int|string, mixed> $linked
+     */
+    private function registerStaticTextScanCallback(object $row, array &$library, array &$linked): void
+    {
+        if ($row->type == 'Static Text/HTML') {
+            $this->processor->linkcode('#scanonly', $library, $linked, $row->data1);
+        }
     }
 
     /**

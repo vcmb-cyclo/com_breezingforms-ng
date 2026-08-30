@@ -1351,4 +1351,36 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         ];
     }
 
+    public function testCollectElementMetadataCountsOnlyIconsAndTooltips(): void
+    {
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        $icons = 0;
+        $tooltips = 0;
+        $method = (new ReflectionClass($engine))->getMethod('collectElementMetadata');
+
+        $method->invokeArgs($engine, [(object) ['type' => 'Icon'], &$icons, &$tooltips]);
+        $method->invokeArgs($engine, [(object) ['type' => 'Tooltip'], &$icons, &$tooltips]);
+        $method->invokeArgs($engine, [(object) ['type' => 'Text'], &$icons, &$tooltips]);
+
+        self::assertSame(1, $icons);
+        self::assertSame(1, $tooltips);
+    }
+
+    public function testRegisterStaticTextScanCallbackOnlyHandlesStaticHtml(): void
+    {
+        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+        $library = [];
+        $linked = [];
+        $method = (new ReflectionClass($engine))->getMethod('registerStaticTextScanCallback');
+
+        $method->invokeArgs($engine, [(object) ['type' => 'Static Text/HTML', 'data1' => '<p>content</p>'], &$library, &$linked]);
+        $method->invokeArgs($engine, [(object) ['type' => 'Text', 'data1' => 'ignored'], &$library, &$linked]);
+
+        self::assertCount(1, $processor->linkedCallbacks);
+        self::assertSame('#scanonly', $processor->linkedCallbacks[0]['function']);
+        self::assertSame('<p>content</p>', $processor->linkedCallbacks[0]['code']);
+    }
+
 }

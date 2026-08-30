@@ -182,6 +182,9 @@ variantes et son ordre historique sont déjà couverts par
 est désormais isolée dans `CaptchaValidationRowSelector` (`d328c4f8`) : le
 premier `Captcha` est prioritaire et le dernier `ReCaptcha` est conservé,
 comme dans le flux historique ; ces règles sont couvertes par un test unitaire.
+Les valeurs par défaut du message et du callback sont désormais produites par
+`CaptchaValidationDefaultsBuilder` (`41612fa2`), avec couverture de l'encodage
+JSON et de l'ordre de soumission.
 
 La phase 2.3 est donc couverte pour les scripts de signature et de contrôles
 de fichiers ; l'intégration complète ContentBuilder reste conditionnée à un

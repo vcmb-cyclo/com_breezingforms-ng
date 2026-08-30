@@ -375,7 +375,8 @@ Règles de coordination :
    comparaison des quatre variantes déjà couvertes par snapshots.
 3. Harnais ContentBuilder pour les parcours runtime fichiers/signatures.
 4. Rendu HTML classique par famille de nœuds.
-5. Extension PHPCS et réduction PHPStan après chaque service stabilisé.
+5. Réduction progressive des avertissements PHPCS et PHPStan après chaque
+   extraction fonctionnelle.
 
 Lots récemment terminés : tests d'intégration des variantes Query List et du
 point d'arrêt `bury()` dans la première boucle (`7a19ffeb`), contrôles de
@@ -406,6 +407,12 @@ documentés.
 
 Les lots 3 à 5 peuvent être préparés en parallèle du lot 6, à condition que le
 branchement dans `RenderingEngine.php` soit coordonné.
+
+La baseline PHPCS est maintenant sans erreur sur les services modernes, les
+quatre renderers QuickMode et leurs traits (`e25d501f`, `14985d4d`, `288b42a4`,
+`72204865`, `212b6450`). Les avertissements restants concernent surtout les
+longues chaînes HTML/JavaScript ; leur réduction est volontairement séparée
+des extractions de comportement.
 
 ## Vérification obligatoire par lot
 

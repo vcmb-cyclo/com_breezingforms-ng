@@ -433,7 +433,10 @@ Les sorties anticipées de `RenderingEngine::view()` après activation du buffer
 et du gestionnaire d'erreurs nettoient désormais leur propre état via
 `abortViewRendering()` (`2d4f75ef`). Les chemins `bury()` et callbacks sont
 couverts par les tests de caractérisation, qui vérifient le niveau de buffer
-restitué au code appelant et ne produisent plus de tests PHPUnit risqués.
+restitué au code appelant et ne produisent plus de tests PHPUnit risqués. La
+finalisation normale est regroupée dans `finishViewRendering()` (`ced03d7a`) :
+les ordres `dumpTrace()`/`ob_end_flush()` des modes direct et non direct sont
+caractérisés et testés, ainsi que la fermeture `</pre>` du mode direct.
 
 Les champs de contexte et le cycle d'enveloppe de `view()` sont désormais
 isolés en builders testés : `FormContextFieldsBuilder` (`f7d06454`),

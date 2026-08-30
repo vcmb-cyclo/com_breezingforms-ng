@@ -59,6 +59,7 @@ final class RenderingEngine
     private ?ClassicStaticTextBuilder $classicStaticTextBuilderService = null;
     private ?ClassicHiddenInputBuilder $classicHiddenInputBuilderService = null;
     private ?ClassicTextInputBuilder $classicTextInputBuilderService = null;
+    private ?ClassicTextareaBuilder $classicTextareaBuilderService = null;
     private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
     private ?EditableRecordHydrationScriptBuilder $editableRecordHydrationScriptBuilderService = null;
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
@@ -192,6 +193,11 @@ final class RenderingEngine
     private function classicTextInputBuilder(): ClassicTextInputBuilder
     {
         return $this->classicTextInputBuilderService ??= new ClassicTextInputBuilder();
+    }
+
+    private function classicTextareaBuilder(): ClassicTextareaBuilder
+    {
+        return $this->classicTextareaBuilderService ??= new ClassicTextareaBuilder();
     }
 
     private function contentBuilderValueScriptBuilder(): ContentBuilderValueScriptBuilder
@@ -1262,40 +1268,23 @@ final class RenderingEngine
                         );
                         break;
                     case 'Textarea':
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
-                        $attribs = '';
-                        $styles = '';
-                        switch ($row->flag2) {
-                            case 1:
-                                $attribs .= ' disabled="disabled"';
-                                break;
-                            case 2:
-                                $attribs .= ' readonly="readonly"';
-                                break;
-                            default:
-                                break;
-                        } // switch
-                        if ($row->width > 0) {
-                            if ($row->widthmode > 0)
-                                $styles .= 'width:' . $row->width . 'px;';
-                            else
-                                $attribs .= ' cols="' . $row->width . '"';
-                        } // if
-                        if ($row->height > 0) {
-                            if ($row->heightmode > 0)
-                                $styles .= 'height:' . $row->height . 'px;';
-                            else {
-                                $height = $row->height;
-                                if ($height > 1 && stristr($this->processor->browser, 'mozilla'))
-                                    $height--;
-                                $attribs .= ' rows="' . $height . '"';
-                            } // if
-                        } // if
-                        if ($styles != '')
-                            $attribs .= ' style="' . $styles . '"';
-                        $attribs .= $this->processor->script2clause($row);
-                        echo indentc(2) . '<textarea id="ff_elem' . $row->id . '" name="ff_nm_' . $row->name . '[]"' . $attribs . $class2 . '>' . $data1 . '</textarea>' . nlc();
-                        echo indentc(1) . '</div>' . nl();
+                        echo $this->classicTextareaBuilder()->build(
+                            (int) $row->id,
+                            (string) $row->name,
+                            $data1,
+                            $attribs,
+                            $class1,
+                            $class2,
+                            (int) $row->width,
+                            (int) $row->widthmode,
+                            (int) $row->height,
+                            (int) $row->heightmode,
+                            stristr($this->processor->browser, 'mozilla') !== false,
+                            (int) $row->flag2,
+                            $this->processor->script2clause($row),
+                            indentc(1),
+                            nlc() ?? ''
+                        );
                         break;
                     case 'File Upload':
                         echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();

@@ -94,6 +94,11 @@ ContentBuilder.
 
 ### 2.1 Chargement d'un enregistrement BreezingForms éditable
 
+État : `EditableRecord` et `EditableRecordLoader` sont extraits et branchés
+dans `RenderingEngine::view()` par `89165de7`. Le loader est couvert pour
+l'absence de résultat et le chargement des sous-enregistrements ; le contrat
+SQL est désormais isolé derrière un service.
+
 - Extraire la recherche du dernier enregistrement de l'utilisateur.
 - Isoler les requêtes `#__facileforms_records` et
   `#__facileforms_subrecords` derrière un service dédié.
@@ -362,8 +367,10 @@ Règles de coordination :
 5. Rendu HTML classique par famille de nœuds.
 6. Extension PHPCS et réduction PHPStan après chaque service stabilisé.
 
-Lot récemment terminé : tests d'intégration des variantes Query List et du
-point d'arrêt `bury()` dans la première boucle (`7a19ffeb`).
+Lots récemment terminés : tests d'intégration des variantes Query List et du
+point d'arrêt `bury()` dans la première boucle (`7a19ffeb`), contrôles de
+fichiers ContentBuilder (`2c72231e`) et loader d'enregistrement éditable
+(`89165de7`).
 
 Les lots 3 à 5 peuvent être préparés en parallèle du lot 6, à condition que le
 branchement dans `RenderingEngine.php` soit coordonné.

@@ -49,8 +49,8 @@
 | `RenderingEngine::view()` — scripts d'icônes | Extraction committée et trois chemins `bury()` couverts | Commit `0a908143` |
 | `RenderingEngine::view()` — callbacks d'éléments | Extraction committée ; ordre `init` / `action` / `validate` et trois arrêts `bury()` couverts | Commit `413cb1cb` |
 | `RenderingEngine::view()` — métadonnées classiques | Comptage icônes/infobulles et scan `Static Text/HTML` extraits et couverts | Commit `51e86824` |
-| ContentBuilder — valeurs éditables | Générateur indépendant créé et couvert ; branchement dans `view()` restant | Commit `f685ff5e` |
-| ContentBuilder — champs non éditables | Générateur indépendant créé et couvert ; branchement dans `view()` restant | En attente de coordination avec `RenderingEngine` |
+| ContentBuilder — valeurs éditables | Générateur indépendant créé, couvert et branché dans `view()` | Commits `f685ff5e`, `c2ae9a76` |
+| ContentBuilder — champs non éditables | Générateur indépendant créé, couvert et branché dans `view()` | Commits `8bfd520e`, `21a0a812` |
 | PHPCS | Actif sur un premier groupe de services modernes | `phpcs.xml.dist` |
 | PHPStan | Niveau 2 sur le composant, avec baseline | `phpstan.neon.dist`, 251 entrées dans la baseline |
 
@@ -106,8 +106,8 @@ requêtes de chargement d'un enregistrement éditable.
 
 ### 2.2 Génération des valeurs éditables BreezingForms
 
-État : générateur indépendant committé dans `f685ff5e`. Le branchement dans
-`RenderingEngine::view()` reste à faire dans un lot coordonné.
+État : générateur indépendant committé dans `f685ff5e` et branché dans
+`RenderingEngine::view()` par `c2ae9a76`.
 
 - Extraire le JavaScript de remplissage des champs simples : texte, textarea,
   nombre, champ caché et calendrier.
@@ -139,8 +139,9 @@ Critère de sortie : l'hydratation ContentBuilder n'est plus implémentée dans
 
 ### 2.4 Champs ContentBuilder non éditables
 
-État : générateur indépendant couvert ; son branchement dans `view()` reste à
-faire en respectant le cycle de création de `bfDeactivateField`.
+État : générateur indépendant committé dans `8bfd520e` et branché dans
+`RenderingEngine::view()` par `21a0a812`, en respectant le cycle de création de
+`bfDeactivateField`.
 
 - Extraire la récupération des identifiants non éditables.
 - Extraire le script de désactivation et de masquage des contrôles.

@@ -57,6 +57,7 @@ final class RenderingEngine
     private ?TokenizedDirectoryResolver $tokenizedDirectoryResolverService = null;
     private ?ProcessorHeaderRenderer $processorHeaderRendererService = null;
     private ?ClassicStaticTextBuilder $classicStaticTextBuilderService = null;
+    private ?ClassicHiddenInputBuilder $classicHiddenInputBuilderService = null;
     private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
     private ?EditableRecordHydrationScriptBuilder $editableRecordHydrationScriptBuilderService = null;
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
@@ -180,6 +181,11 @@ final class RenderingEngine
     private function classicStaticTextBuilder(): ClassicStaticTextBuilder
     {
         return $this->classicStaticTextBuilderService ??= new ClassicStaticTextBuilder();
+    }
+
+    private function classicHiddenInputBuilder(): ClassicHiddenInputBuilder
+    {
+        return $this->classicHiddenInputBuilderService ??= new ClassicHiddenInputBuilder();
     }
 
     private function contentBuilderValueScriptBuilder(): ContentBuilderValueScriptBuilder
@@ -1062,7 +1068,13 @@ final class RenderingEngine
                         );
                         break;
                     case 'Hidden Input':
-                        echo indentc(1) . '<input id="ff_elem' . $row->id . '" type="hidden" name="ff_nm_' . $row->name . '[]" value="' . $data1 . '" />' . nl();
+                        echo $this->classicHiddenInputBuilder()->build(
+                            (int) $row->id,
+                            (string) $row->name,
+                            $data1,
+                            indentc(1),
+                            nl()
+                        );
                         break;
                     case 'Checkbox':
                         echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();

@@ -70,6 +70,7 @@ final class RenderingEngine
     private ?ClassicQueryListHeaderBuilder $classicQueryListHeaderBuilderService = null;
     private ?ClassicQueryListCellBuilder $classicQueryListCellBuilderService = null;
     private ?ClassicQueryListRowBuilder $classicQueryListRowBuilderService = null;
+    private ?ClassicQueryListFooterBuilder $classicQueryListFooterBuilderService = null;
     private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
     private ?EditableRecordHydrationScriptBuilder $editableRecordHydrationScriptBuilderService = null;
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
@@ -259,6 +260,11 @@ final class RenderingEngine
     {
         return $this->classicQueryListRowBuilderService ??=
             new ClassicQueryListRowBuilder($this->classicQueryListCellBuilder());
+    }
+
+    private function classicQueryListFooterBuilder(): ClassicQueryListFooterBuilder
+    {
+        return $this->classicQueryListFooterBuilderService ??= new ClassicQueryListFooterBuilder();
     }
 
     private function contentBuilderValueScriptBuilder(): ContentBuilderValueScriptBuilder
@@ -1407,39 +1413,23 @@ final class RenderingEngine
                                 if ($cols[$c]->thspan > 0)
                                     $span++;
                             $pages = intval((count($qrows) + $row->height - 1) / $row->height);
-                            echo indentc(3) . '<tr' . $trfclass . '>' . nlc();
-                            echo indentc(4) . '<td colspan="' . $span . '"' . $tdfclass . '>' . nlc();
-                            if ($pages > 1) {
-                                echo indentc(5);
-                                if ($pagenav <= 4)
-                                    echo '&lt;&lt; ';
-                                if ($pagenav <= 2)
-                                    echo Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGESTART') . ' ';
-                                if ($pagenav <= 4)
-                                    echo '&lt; ';
-                                if ($pagenav <= 2)
-                                    echo Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV') . ' ';
-                                echo nlc();
-                                if ($pagenav % 2) {
-                                    echo indentc(5);
-                                    echo '1 ';
-                                    for ($p = 2; $p <= $pages; $p++)
-                                        echo indentc(5) . '<a href="javascript:ff_dispQueryPage(' . $row->id . ',' . $p . ');">' . $p . '</a> ' . nlc();
-                                    echo nlc();
-                                } // if
-                                if ($pagenav <= 4) {
-                                    echo indentc(5) . '<a href="javascript:ff_dispQueryPage(' . $row->id . ',2);">';
-                                    if ($pagenav <= 2)
-                                        echo Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT') . ' ';
-                                    echo '&gt;</a> ' . nlc();
-                                    echo indentc(5) . '<a href="javascript:ff_dispQueryPage(' . $row->id . ',' . $pages . ');">';
-                                    if ($pagenav <= 2)
-                                        echo Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEEND') . ' ';
-                                    echo '&gt;&gt;</a>' . nlc();
-                                } // if
-                            } // if
-                            echo indentc(4) . '</td>' . nlc();
-                            echo indentc(3) . '</tr>' . nl();
+                            echo $this->classicQueryListFooterBuilder()->build(
+                                (int) $row->id,
+                                $span,
+                                $pages,
+                                (int) $pagenav,
+                                $trfclass,
+                                $tdfclass,
+                                Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGESTART'),
+                                Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV'),
+                                Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT'),
+                                Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEEND'),
+                                indentc(3),
+                                indentc(4),
+                                indentc(5),
+                                nlc() ?? '',
+                                nl()
+                            );
                         } // if
                         // table end
                         echo indentc(2) . '</table>' . nlc();

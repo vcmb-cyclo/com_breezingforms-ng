@@ -290,7 +290,9 @@ propres à chaque thème.
    (`18a3e7ea`).
 4. `bfSelect` — partagé et branché via `QuickModeSelectBuilder`
    (`8a891fb5`).
-5. Groupes checkbox et radio.
+5. Groupes checkbox et radio — contrôle d'option partagé via
+   `QuickModeGroupOptionBuilder` (`a85bed34`); les enveloppes, labels et règles
+   `wrap` restent propres aux renderers.
 6. Boutons et champs cachés restants.
 7. Calendriers et calendriers responsives.
 8. Uploads, CAPTCHA, signatures et paiements.
@@ -440,6 +442,12 @@ options sélectionnées, l'échappement des libellés et valeurs, `multiple`, le
 attributs d'événements et les styles de dimensions. La différence historique
 de `data-chosen` entre Mobile et les autres renderers est conservée par une
 option explicite du builder.
+
+Les contrôles élémentaires des groupes radio et checkbox sont désormais
+partagés via `QuickModeGroupOptionBuilder` et branchés dans les quatre
+renderers par `a85bed34`. Les différences d'enveloppe, de label, de saut de
+ligne et de classe Bootstrap restent dans les renderers ; les valeurs et
+attributs des options sont testés avec leurs variantes checked/unchecked.
 
 La baseline PHPCS est maintenant sans erreur sur les services modernes, les
 quatre renderers QuickMode et leurs traits (`e25d501f`, `14985d4d`, `288b42a4`,

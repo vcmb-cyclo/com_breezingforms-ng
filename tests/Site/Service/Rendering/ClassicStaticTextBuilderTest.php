@@ -9,6 +9,44 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ClassicStaticTextBuild
 
 final class ClassicStaticTextBuilderTest extends TestCase
 {
+    public function testBuildsIconLayoutsAndHoverEvents(): void
+    {
+        $builder = new ClassicStaticTextBuilder();
+        $html = $builder->buildIcon(
+            20,
+            'position:absolute;',
+            ' class="icon-wrapper"',
+            ' class="icon-image"',
+            '/icon.png',
+            'Label',
+            '/hover.png',
+            'onclick="runIcon();"',
+            3,
+            true,
+            24,
+            18
+        );
+
+        self::assertStringContainsString('padding:3px;position:absolute;', $html);
+        self::assertStringContainsString('MM_swapImage(\'ff_img20\',\'\',\'/hover.png\',1);', $html);
+        self::assertStringContainsString('onclick="runIcon();"', $html);
+        self::assertStringContainsString('Label &nbsp;<img id="ff_img20"', $html);
+        self::assertStringContainsString('width="24" height="18"', $html);
+    }
+
+    public function testBuildsIconAboveAndDefaultRightLayouts(): void
+    {
+        $builder = new ClassicStaticTextBuilder();
+        $above = $builder->buildIcon(21, '', '', '', 'icon.png', 'Above', '', '', 2, false, 0, 0);
+        $right = $builder->buildIcon(22, '', '', '', 'icon.png', 'Right', '', '', 9, false, 0, 0);
+
+        self::assertStringContainsString('<table id="ff_elem21" cellpadding="2"', $above);
+        self::assertStringContainsString('<tr><td style="text-align:center;">Above</td></tr>', $above);
+        self::assertStringContainsString('<span id="ff_elem22"  style="vertical-align:middle;">', $right);
+        self::assertStringContainsString('icon.png', $right);
+        self::assertStringContainsString('&nbsp; Right', $right);
+    }
+
     public function testBuildsTooltipWithDefaultImageAndEscapedTitle(): void
     {
         $html = (new ClassicStaticTextBuilder())->buildTooltip(

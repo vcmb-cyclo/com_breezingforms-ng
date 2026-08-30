@@ -1043,7 +1043,7 @@ final class RenderingEngine
                             (int) $row->width,
                             (int) $row->height,
                             indentc(1),
-                            nlc()
+                            nlc() ?? ''
                         );
                         break;
                     case 'Tooltip':
@@ -1058,7 +1058,7 @@ final class RenderingEngine
                             (int) $row->flag1,
                             $ff_mossite,
                             indentc(1),
-                            nlc()
+                            nlc() ?? ''
                         );
                         break;
                     case 'Hidden Input':
@@ -1152,50 +1152,22 @@ final class RenderingEngine
                         echo indentc(1) . '</div>' . nl();
                         break;
                     case 'Icon':
-                        if ($row->flag2)
-                            echo indentc(1) . '<div id="ff_div' . $row->id . '" onmouseout="ff_hideIconBorder(this);" onmouseover="ff_dispIconBorder(this);" style="padding:3px;' . $attribs . '"' . $class1 . '>' . nlc();
-                        else
-                            echo indentc(1) . '<div id="ff_div' . $row->id . '"  style="' . $attribs . '"' . $class1 . '>' . nlc();
-                        $swap = '';
-                        if ($data3 != '')
-                            $swap = 'onmouseout="MM_swapImgRestore();" onmouseover="MM_swapImage(\'ff_img' . $row->id . '\',\'\',\'' . $data3 . '\',1);" ';
-
-                        $swap .= $this->processor->script2clause($row);
-                        $attribs = '';
-                        if ($row->width > 0)
-                            $attribs .= 'width="' . $row->width . '" ';
-                        if ($row->height > 0)
-                            $attribs .= 'height="' . $row->height . '" ';
-                        switch ($row->flag1) {
-                            case 0: // none
-                                echo indentc(2) . '<span id="ff_elem' . $row->id . '" ' . $swap . '>' . nlc();
-                                echo indentc(3) . '<img id="ff_img' . $row->id . '" src="' . $data1 . '" alt="" border="0" align="middle" ' . $attribs . $class2 . '/>' . nlc();
-                                echo indentc(2) . '</span>' . nlc();
-                                break;
-                            case 1: // below
-                                echo indentc(2) . '<table id="ff_elem' . $row->id . '" cellpadding="1" cellspacing="0" border="0" ' . $swap . '>' . nlc();
-                                echo indentc(3) . '<tr><td style="text-align:center;"><img id="ff_img' . $row->id . '" src="' . $data1 . '" alt="" border="0" align="middle" ' . $attribs . $class2 . '/></td></tr>' . nlc();
-                                echo indentc(3) . '<tr><td style="text-align:center;">' . $data2 . '</td></tr>' . nlc();
-                                echo indentc(2) . '</table>' . nlc();
-                                break;
-                            case 2: // above
-                                echo indentc(2) . '<table id="ff_elem' . $row->id . '" cellpadding="2" cellspacing="0" border="0" ' . $swap . '>' . nlc();
-                                echo indentc(3) . '<tr><td style="text-align:center;">' . $data2 . '</td></tr>' . nlc();
-                                echo indentc(3) . '<tr><td style="text-align:center;"><img id="ff_img' . $row->id . '" src="' . $data1 . '" alt="" border="0" align="middle" ' . $attribs . $class2 . '/></td></tr>' . nlc();
-                                echo indentc(2) . '</table>' . nlc();
-                                break;
-                            case 3: // left
-                                echo indentc(2) . '<span id="ff_elem' . $row->id . '" ' . $swap . ' style="vertical-align:middle;">' . nlc();
-                                echo indentc(3) . $data2 . ' &nbsp;<img id="ff_img' . $row->id . '" src="' . $data1 . '" alt="" border="0" align="middle" ' . $attribs . $class2 . '/>' . nlc();
-                                echo indentc(2) . '</span>' . nlc();
-                                break;
-                            default: // assume right
-                                echo indentc(2) . '<span id="ff_elem' . $row->id . '" ' . $swap . ' style="vertical-align:middle;">' . nlc();
-                                echo indentc(3) . '<img id="ff_img' . $row->id . '" src="' . $data1 . '" alt="" border="0" align="middle" ' . $attribs . $class2 . '/>&nbsp; ' . $data2 . nlc();
-                                echo indentc(2) . '</span>' . nlc();
-                                break;
-                        } // switch
-                        echo indentc(1) . '</div>' . nl();
+                        echo $this->classicStaticTextBuilder()->buildIcon(
+                            (int) $row->id,
+                            $attribs,
+                            $class1,
+                            $class2,
+                            $data1,
+                            $data2,
+                            $data3,
+                            $this->processor->script2clause($row),
+                            (int) $row->flag1,
+                            (bool) $row->flag2,
+                            (int) $row->width,
+                            (int) $row->height,
+                            indentc(1),
+                            nlc() ?? ''
+                        );
                         break;
                     case 'Select List':
                         echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();

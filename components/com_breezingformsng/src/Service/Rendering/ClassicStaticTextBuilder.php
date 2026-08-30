@@ -9,6 +9,66 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering;
  */
 final class ClassicStaticTextBuilder
 {
+    public function buildIcon(
+        int $elementId,
+        string $style,
+        string $classAttribute,
+        string $imageClassAttribute,
+        string $source,
+        string $label,
+        string $hoverSource,
+        string $eventAttributes,
+        int $layout,
+        bool $showBorder,
+        int $width,
+        int $height,
+        string $indent = "\t",
+        string $newline = "\n"
+    ): string {
+        $wrapperAttributes = $showBorder
+            ? ' onmouseout="ff_hideIconBorder(this);" onmouseover="ff_dispIconBorder(this);" style="padding:3px;' . $style . '"'
+            : '  style="' . $style . '"';
+        $swap = $hoverSource !== ''
+            ? 'onmouseout="MM_swapImgRestore();" onmouseover="MM_swapImage(\'ff_img' . $elementId . '\',\'\',\'' . $hoverSource . '\',1);" '
+            : '';
+        $swap .= $eventAttributes;
+        $dimensions = '';
+        if ($width > 0) {
+            $dimensions .= 'width="' . $width . '" ';
+        }
+        if ($height > 0) {
+            $dimensions .= 'height="' . $height . '" ';
+        }
+        $image = '<img id="ff_img' . $elementId . '" src="' . $source . '" alt="" border="0" align="middle" '
+            . $dimensions . $imageClassAttribute . '/>';
+
+        $content = match ($layout) {
+            1 => $indent . $indent . '<table id="ff_elem' . $elementId . '" cellpadding="1" cellspacing="0" border="0" ' . $swap . '>' . $newline
+                . $indent . $indent . $indent . '<tr><td style="text-align:center;">' . $image . '</td></tr>' . $newline
+                . $indent . $indent . $indent . '<tr><td style="text-align:center;">' . $label . '</td></tr>' . $newline
+                . $indent . $indent . '</table>' . $newline,
+            2 => $indent . $indent . '<table id="ff_elem' . $elementId . '" cellpadding="2" cellspacing="0" border="0" ' . $swap . '>' . $newline
+                . $indent . $indent . $indent . '<tr><td style="text-align:center;">' . $label . '</td></tr>' . $newline
+                . $indent . $indent . $indent . '<tr><td style="text-align:center;">' . $image . '</td></tr>' . $newline
+                . $indent . $indent . '</table>' . $newline,
+            3 => $indent . $indent . '<span id="ff_elem' . $elementId . '" ' . $swap . ' style="vertical-align:middle;">' . $newline
+                . $indent . $indent . $indent . $label . ' &nbsp;' . $image . $newline
+                . $indent . $indent . '</span>' . $newline,
+            4 => $indent . $indent . '<span id="ff_elem' . $elementId . '" ' . $swap . ' style="vertical-align:middle;">' . $newline
+                . $indent . $indent . $indent . $image . '&nbsp; ' . $label . $newline
+                . $indent . $indent . '</span>' . $newline,
+            0 => $indent . $indent . '<span id="ff_elem' . $elementId . '" ' . $swap . '>' . $newline
+                . $indent . $indent . $indent . $image . $newline
+                . $indent . $indent . '</span>' . $newline,
+            default => $indent . $indent . '<span id="ff_elem' . $elementId . '" ' . $swap . ' style="vertical-align:middle;">' . $newline
+                . $indent . $indent . $indent . $image . '&nbsp; ' . $label . $newline
+                . $indent . $indent . '</span>' . $newline,
+        };
+
+        return $indent . '<div id="ff_div' . $elementId . '"' . $wrapperAttributes . $classAttribute . '>' . $newline
+            . $content . $indent . '</div>' . $newline;
+    }
+
     public function buildTooltip(
         int $elementId,
         string $style,

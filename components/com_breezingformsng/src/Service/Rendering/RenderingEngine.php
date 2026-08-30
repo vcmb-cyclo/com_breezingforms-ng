@@ -65,6 +65,7 @@ final class RenderingEngine
     private ?ClassicRegularButtonBuilder $classicRegularButtonBuilderService = null;
     private ?ClassicGraphicButtonBuilder $classicGraphicButtonBuilderService = null;
     private ?ClassicFileUploadBuilder $classicFileUploadBuilderService = null;
+    private ?ClassicCaptchaBuilder $classicCaptchaBuilderService = null;
     private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
     private ?EditableRecordHydrationScriptBuilder $editableRecordHydrationScriptBuilderService = null;
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
@@ -228,6 +229,11 @@ final class RenderingEngine
     private function classicFileUploadBuilder(): ClassicFileUploadBuilder
     {
         return $this->classicFileUploadBuilderService ??= new ClassicFileUploadBuilder();
+    }
+
+    private function classicCaptchaBuilder(): ClassicCaptchaBuilder
+    {
+        return $this->classicCaptchaBuilderService ??= new ClassicCaptchaBuilder();
     }
 
     private function contentBuilderValueScriptBuilder(): ContentBuilderValueScriptBuilder
@@ -1279,18 +1285,18 @@ final class RenderingEngine
                             $this->processor->app->isClient('administrator'),
                             (int) $this->processor->form
                         )['captcha'];
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
-                        $attribs = '';
-                        if ($row->width > 0)
-                            $attribs .= 'width:' . $row->width . 'px;';
-                        if ($row->height > 0)
-                            $attribs .= 'height:' . $row->height . 'px;';
-                        echo '<img id="ff_capimgValue" class="ff_capimg" src="' . $captcha_url . '"/>';
-                        echo '<br/>';
-                        echo '<input type="text" style="' . $attribs . '" name="bfCaptchaEntry" id="bfCaptchaEntry" />';
-                        //echo '<br/>';
-                        echo '<a href="#" onclick="document.getElementById(\'bfCaptchaEntry\').value=\'\';document.getElementById(\'bfCaptchaEntry\').focus();document.getElementById(\'ff_capimgValue\').src = \'' . $captcha_url . '&bfMathRandom=\' + Math.random(); return false"><img src="' . Uri::root() . 'media/com_breezingformsng/images/site/captcha/refresh-captcha.png" border="0" /></a>';
-                        echo indentc(1) . '</div>' . nl();
+                        echo $this->classicCaptchaBuilder()->build(
+                            (int) $row->id,
+                            $attribs,
+                            $class1,
+                            $captcha_url,
+                            Uri::root(),
+                            (int) $row->width,
+                            (int) $row->height,
+                            indentc(1),
+                            nlc() ?? '',
+                            nl()
+                        );
                         break;
                     case 'Query List':
                         echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();

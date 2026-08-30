@@ -64,6 +64,7 @@ final class RenderingEngine
     private ?ClassicSelectBuilder $classicSelectBuilderService = null;
     private ?ClassicRegularButtonBuilder $classicRegularButtonBuilderService = null;
     private ?ClassicGraphicButtonBuilder $classicGraphicButtonBuilderService = null;
+    private ?ClassicFileUploadBuilder $classicFileUploadBuilderService = null;
     private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
     private ?EditableRecordHydrationScriptBuilder $editableRecordHydrationScriptBuilderService = null;
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
@@ -222,6 +223,11 @@ final class RenderingEngine
     private function classicGraphicButtonBuilder(): ClassicGraphicButtonBuilder
     {
         return $this->classicGraphicButtonBuilderService ??= new ClassicGraphicButtonBuilder();
+    }
+
+    private function classicFileUploadBuilder(): ClassicFileUploadBuilder
+    {
+        return $this->classicFileUploadBuilderService ??= new ClassicFileUploadBuilder();
     }
 
     private function contentBuilderValueScriptBuilder(): ContentBuilderValueScriptBuilder
@@ -1252,19 +1258,20 @@ final class RenderingEngine
                         );
                         break;
                     case 'File Upload':
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
-                        $attribs = '';
-                        if ($row->width > 0)
-                            $attribs .= ' size="' . $row->width . '"';
-                        if ($row->height > 0)
-                            $attribs .= ' maxlength="' . $row->height . '"';
-                        if ($row->flag2)
-                            $attribs .= ' disabled="disabled"';
-                        if ($row->data2 != '')
-                            $attribs .= ' accept="' . $data2 . '"';
-                        $attribs .= $this->processor->script2clause($row);
-                        echo indentc(2) . '<input id="ff_elem' . $row->id . '"' . $attribs . ' type="file" name="ff_nm_' . $row->name . '[]"' . $class2 . '/>' . nlc();
-                        echo indentc(1) . '</div>' . nl();
+                        echo $this->classicFileUploadBuilder()->build(
+                            (int) $row->id,
+                            (string) $row->name,
+                            $attribs,
+                            $class1,
+                            $class2,
+                            (int) $row->width,
+                            (int) $row->height,
+                            (bool) $row->flag2,
+                            $row->data2 !== '' ? $data2 : '',
+                            $this->processor->script2clause($row),
+                            indentc(1),
+                            nlc() ?? ''
+                        );
                         break;
                     case 'Captcha':
                         $captcha_url = $this->captchaEndpointBuilder()->build(

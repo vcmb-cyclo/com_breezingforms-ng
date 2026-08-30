@@ -506,9 +506,13 @@ visuelles restent propres à chaque renderer.
 La normalisation des options d'upload est désormais centralisée dans
 `QuickModeUploadOptionsBuilder` et branchée dans les quatre renderers par
 `94a1345d`. Les extensions autorisées et la taille maximale sont couvertes
-par des tests unitaires et alimentent toujours le même JavaScript historique ;
-la génération du markup et de la configuration complète de l'uploader reste
-à extraire par sous-lots.
+par des tests unitaires et alimentent toujours le même JavaScript historique.
+Les options `multi_selection` et `runtimes` sont ensuite partagées par
+`eaa777e8`, avec couverture des combinaisons HTML5/Flash/HTML4 et de la
+sélection multiple. Les dimensions positives et les valeurs par défaut du
+bouton d'upload sont partagées par `ddea69f8` dans les renderers Classic et
+Mobile. Le markup et les callbacks de configuration complète de l'uploader
+restent à extraire par sous-lots.
 
 La baseline PHPCS est maintenant sans erreur sur les services modernes, les
 quatre renderers QuickMode et leurs traits (`e25d501f`, `14985d4d`, `288b42a4`,

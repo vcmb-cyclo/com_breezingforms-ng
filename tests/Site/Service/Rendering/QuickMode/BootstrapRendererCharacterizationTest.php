@@ -37,6 +37,38 @@ require_once __DIR__ . '/joomla-cmsapplication-stub.php';
  */
 final class BootstrapRendererCharacterizationTest extends TestCase
 {
+    public function testPageNavigationRendersSharedPreviousAndNextActions(): void
+    {
+        $renderer = $this->makeRenderer();
+        $this->setPrivate($renderer, 'rootMdata', [
+            'useErrorAlerts' => true,
+            'lastPageThankYou' => false,
+            'pagingInclude' => true,
+            'pagingPrevLabel' => 'Previous',
+            'pagingNextLabel' => 'Next',
+            'submitInclude' => false,
+            'cancelInclude' => false,
+        ]);
+        $this->setPrivate($renderer, 'dataObject', ['children' => [[], [], []]]);
+
+        ob_start();
+        try {
+            $node = [
+                'attributes' => ['id' => 'page2'],
+                'properties' => ['type' => 'page', 'pageNumber' => 2, 'pageIntro' => ''],
+            ];
+            $renderer->process($node);
+            $html = ob_get_contents();
+        } finally {
+            ob_end_clean();
+        }
+
+        self::assertStringContainsString('bfPrevButton', (string) $html);
+        self::assertStringContainsString("ff_validate_prevpage(this, 'click');", (string) $html);
+        self::assertStringContainsString('bfNextButton', (string) $html);
+        self::assertStringContainsString("ff_validate_nextpage(this, 'click');", (string) $html);
+    }
+
     private const SNAPSHOT_DIR = __DIR__ . '/__snapshots__';
 
     /** @var array<string, string> */

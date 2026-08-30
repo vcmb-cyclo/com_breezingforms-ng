@@ -29,6 +29,37 @@ require_once __DIR__ . '/joomla-cmsapplication-stub.php';
  */
 final class OnePageRendererCharacterizationTest extends TestCase
 {
+    public function testPageNavigationRendersSharedOnePageNextAction(): void
+    {
+        $renderer = $this->makeRenderer();
+        $this->setPrivate($renderer, 'rootMdata', [
+            'themebootstrapThemeEngine' => 'bootstrap',
+            'themebootstrap' => '',
+            'useErrorAlerts' => true,
+            'lastPageThankYou' => false,
+            'pagingInclude' => true,
+            'pagingNextLabel' => 'Next',
+            'submitInclude' => false,
+            'cancelInclude' => false,
+        ]);
+        $this->setPrivate($renderer, 'dataObject', ['children' => [[], [], []]]);
+
+        ob_start();
+        try {
+            $node = [
+                'attributes' => ['id' => 'page2'],
+                'properties' => ['type' => 'page', 'pageNumber' => 2, 'pageIntro' => ''],
+            ];
+            $renderer->process($node);
+            $html = ob_get_contents();
+        } finally {
+            ob_end_clean();
+        }
+
+        self::assertStringContainsString('bfNextButton', (string) $html);
+        self::assertStringContainsString('ff_currentpage = 2;bf_validate_nextpage(3);', (string) $html);
+    }
+
     private const SNAPSHOT_DIR = __DIR__ . '/__snapshots__';
 
     public function testTextfieldElement(): void

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * BreezingForms NG - A Joomla Forms Application
  *
@@ -23,6 +21,8 @@ declare(strict_types=1);
  * has access to $this and its properties, not to the including method's
  * locals.
  */
+
+declare(strict_types=1);
 
 namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode;
 
@@ -298,7 +298,8 @@ trait BootstrapStyleFieldTrait
 
         // set size of element, number input doesn't allow size attr
         if ($mdata['size'] != '') {
-            RuntimeAssetLoader::script($this->p->app,
+            RuntimeAssetLoader::script(
+                $this->p->app,
                 Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-number-input.js'
             );
             echo '<script type="text/javascript">bfSetNumberInputWidth('

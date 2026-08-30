@@ -49,6 +49,7 @@
 | `RenderingEngine::view()` — scripts d'icônes | Extraction committée et trois chemins `bury()` couverts | Commit `0a908143` |
 | `RenderingEngine::view()` — callbacks d'éléments | Extraction committée ; ordre `init` / `action` / `validate` et trois arrêts `bury()` couverts | Commit `413cb1cb` |
 | `RenderingEngine::view()` — métadonnées classiques | Comptage icônes/infobulles et scan `Static Text/HTML` extraits et couverts | Commit `51e86824` |
+| `RenderingEngine::view()` — première boucle classique | Intégration callbacks, scan statique et identifiants draggable couverte | Commit `a254e895` |
 | ContentBuilder — valeurs éditables | Générateur indépendant créé, couvert et branché dans `view()` | Commits `f685ff5e`, `c2ae9a76` |
 | ContentBuilder — champs non éditables | Générateur indépendant créé, couvert et branché dans `view()` | Commits `8bfd520e`, `21a0a812` |
 | PHPCS | Actif sur les services modernes, les builders ContentBuilder et `HiddenFieldTrait` | `phpcs.xml.dist`, commit `2e58c4bb` |
@@ -79,8 +80,8 @@ Critère de sortie : `view()` délègue toute la préparation d'une ligne
 dans `413cb1cb` et des métadonnées/du scan statique dans `51e86824`. Les trois
 chemins `bury()` des callbacks et du registre d'icônes sont couverts.
 
-- Ajouter les tests d'intégration de la première boucle sur plusieurs types
-  d'éléments.
+- Ajouter les tests d'intégration des variantes Query List et `bury()` de la
+  première boucle.
 
 Critère de sortie : la première boucle sur les éléments ne contient plus de
 construction de script directement dans `view()`.
@@ -338,15 +339,14 @@ Règles de coordination :
 
 ## Ordre recommandé des prochains lots
 
-1. Ajouter les tests d'intégration de la première boucle classique.
-2. Brancher le générateur des valeurs éditables ContentBuilder.
-3. Brancher le générateur des champs ContentBuilder non éditables.
-4. Service de chargement d'un enregistrement éditable.
-5. Générateurs ContentBuilder pour fichiers et signatures.
-6. Premier lot Strategy QuickMode : `bfTextfield` et `bfNumberInput`.
-7. Extraction des scripts post-rendu et des champs techniques.
-8. Rendu HTML classique par famille de nœuds.
-9. Extension PHPCS et réduction PHPStan après chaque service stabilisé.
+1. Ajouter les tests d'intégration des variantes Query List et `bury()` de la
+   première boucle.
+2. Service de chargement d'un enregistrement éditable.
+3. Générateurs ContentBuilder pour fichiers et signatures.
+4. Premier lot Strategy QuickMode : `bfTextfield` et `bfNumberInput`.
+5. Extraction des scripts post-rendu et des champs techniques.
+6. Rendu HTML classique par famille de nœuds.
+7. Extension PHPCS et réduction PHPStan après chaque service stabilisé.
 
 Les lots 3 à 5 peuvent être préparés en parallèle du lot 6, à condition que le
 branchement dans `RenderingEngine.php` soit coordonné.

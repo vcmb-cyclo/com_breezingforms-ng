@@ -64,6 +64,7 @@ final class RenderingEngine
     private ?PostRenderScriptBuilder $postRenderScriptBuilderService = null;
     private ?PaymentMethodFieldBuilder $paymentMethodFieldBuilderService = null;
     private ?ContentBuilderTechnicalFieldsBuilder $contentBuilderTechnicalFieldsBuilderService = null;
+    private ?FormRoutingFieldsBuilder $formRoutingFieldsBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -190,6 +191,11 @@ final class RenderingEngine
     private function contentBuilderTechnicalFieldsBuilder(): ContentBuilderTechnicalFieldsBuilder
     {
         return $this->contentBuilderTechnicalFieldsBuilderService ??= new ContentBuilderTechnicalFieldsBuilder();
+    }
+
+    private function formRoutingFieldsBuilder(): FormRoutingFieldsBuilder
+    {
+        return $this->formRoutingFieldsBuilderService ??= new FormRoutingFieldsBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -1635,12 +1641,10 @@ final class RenderingEngine
                         $this->processor->app->getInput()->getBool('cbIsNew', false)
                     );
                 }
-                if ($this->processor->app->getInput()->getString('return', '') !== '') {
-                    echo '<input type="hidden" name="return" value="' . htmlentities($this->processor->app->getInput()->getString('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                }
-                if ($this->processor->app->getInput()->getString('tmpl', '') == 'component') {
-                    echo '<input type="hidden" name="tmpl" value="component"/>' . nl();
-                }
+                echo $this->formRoutingFieldsBuilder()->build(
+                    $this->processor->app->getInput()->getString('return', ''),
+                    $this->processor->app->getInput()->getString('tmpl', '')
+                );
                 echo '</form>' . nl();
                 break;
 
@@ -1675,13 +1679,10 @@ final class RenderingEngine
                         $this->processor->app->getInput()->getBool('cbIsNew', false)
                     );
                 }
-                if ($this->processor->app->getInput()->getString('return', '') !== '') {
-                    echo '<input type="hidden" name="return" value="' . htmlentities($this->processor->app->getInput()->getString('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                }
-                //echo '<input type="hidden" name="tmpl" value="' . $this->processor->app->getInput()->getCmd('tmpl', '') . '"/>' . nl();
-                if ($this->processor->app->getInput()->getString('tmpl', '') == 'component') {
-                    echo '<input type="hidden" name="tmpl" value="component"/>' . nl();
-                }
+                echo $this->formRoutingFieldsBuilder()->build(
+                    $this->processor->app->getInput()->getString('return', ''),
+                    $this->processor->app->getInput()->getString('tmpl', '')
+                );
                 echo '</form>' . nl();
                 break;
 
@@ -1707,12 +1708,10 @@ final class RenderingEngine
                             $this->processor->app->getInput()->getBool('cbIsNew', false)
                         );
                     }
-                    if ($this->processor->app->getInput()->getString('return', '') !== '') {
-                        echo '<input type="hidden" name="return" value="' . htmlentities($this->processor->app->getInput()->getString('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                    }
-                    if ($this->processor->app->getInput()->getString('tmpl', '') == 'component') {
-                        echo '<input type="hidden" name="tmpl" value="component"/>' . nl();
-                    }
+                    echo $this->formRoutingFieldsBuilder()->build(
+                        $this->processor->app->getInput()->getString('return', ''),
+                        $this->processor->app->getInput()->getString('tmpl', '')
+                    );
                     echo '</form>' . nl();
                 } // if
         } // if

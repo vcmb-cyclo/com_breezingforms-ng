@@ -6,7 +6,7 @@ final class QuickModeUploadOptionsBuilder
 {
     /**
      * @param array<string, mixed> $data
-     * @return array{extensions: string, maxFileSize: string, multiSelection: string, runtimes: string}
+     * @return array{extensions: string, maxFileSize: string, multiSelection: string, runtimes: string, buttonWidth: string, buttonHeight: string}
      */
     public function build(array $data): array
     {
@@ -18,12 +18,20 @@ final class QuickModeUploadOptionsBuilder
         $multiSelection = !empty($data['flashUploaderMulti']) ? 'true' : 'false';
         $runtimes = (!empty($data['html5']) ? 'html5,' : '')
             . (!empty($data['flashUploader']) ? 'flash,' : '') . 'html4';
+        $buttonWidth = is_numeric($data['flashUploaderWidth'] ?? null) && $data['flashUploaderWidth'] > 0
+            ? (string) (int) $data['flashUploaderWidth']
+            : '64';
+        $buttonHeight = is_numeric($data['flashUploaderHeight'] ?? null) && $data['flashUploaderHeight'] > 0
+            ? (string) (int) $data['flashUploaderHeight']
+            : '64';
 
         return [
             'extensions' => $extensions,
             'maxFileSize' => $maxFileSize,
             'multiSelection' => $multiSelection,
             'runtimes' => $runtimes,
+            'buttonWidth' => $buttonWidth,
+            'buttonHeight' => $buttonHeight,
         ];
     }
 }

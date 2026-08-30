@@ -15,12 +15,16 @@ final class QuickModeUploadOptionsBuilderTest extends TestCase
                 'maxFileSize' => "max_file_size : '2048',",
                 'multiSelection' => 'false',
                 'runtimes' => 'html5,flash,html4',
+                'buttonWidth' => '96',
+                'buttonHeight' => '48',
             ],
             (new QuickModeUploadOptionsBuilder())->build([
                 'allowedFileExtensions' => 'jpg,png',
                 'flashUploaderBytes' => '2048',
                 'html5' => true,
                 'flashUploader' => true,
+                'flashUploaderWidth' => '96.7',
+                'flashUploaderHeight' => 48,
             ])
         );
     }
@@ -30,16 +34,45 @@ final class QuickModeUploadOptionsBuilderTest extends TestCase
         $builder = new QuickModeUploadOptionsBuilder();
 
         self::assertSame(
-            ['extensions' => '', 'maxFileSize' => '', 'multiSelection' => 'false', 'runtimes' => 'html4'],
+            [
+                'extensions' => '',
+                'maxFileSize' => '',
+                'multiSelection' => 'false',
+                'runtimes' => 'html4',
+                'buttonWidth' => '64',
+                'buttonHeight' => '64',
+            ],
             $builder->build([])
         );
         self::assertSame(
-            ['extensions' => 'pdf', 'maxFileSize' => '', 'multiSelection' => 'true', 'runtimes' => 'flash,html4'],
+            [
+                'extensions' => 'pdf',
+                'maxFileSize' => '',
+                'multiSelection' => 'true',
+                'runtimes' => 'flash,html4',
+                'buttonWidth' => '64',
+                'buttonHeight' => '64',
+            ],
             $builder->build([
                 'allowedFileExtensions' => 'pdf',
                 'flashUploaderBytes' => 0,
                 'flashUploaderMulti' => true,
                 'flashUploader' => true,
+            ])
+        );
+
+        self::assertSame(
+            [
+                'extensions' => '',
+                'maxFileSize' => '',
+                'multiSelection' => 'false',
+                'runtimes' => 'html4',
+                'buttonWidth' => '72',
+                'buttonHeight' => '80',
+            ],
+            $builder->build([
+                'flashUploaderWidth' => 72,
+                'flashUploaderHeight' => 80,
             ])
         );
     }

@@ -1441,7 +1441,7 @@ float:left;
             $runtimes = $uploadOptions['runtimes'];
             $flashUploader = "
                                                         <label id=\"bfUploadContainer" . $mdata['dbId'] . "\">
-							<img alt=\"\" style=\"cursor: pointer;\" id=\"bfPickFiles" . $mdata['dbId'] . "\" src=\"" . $this->uploadImagePath . "\" width=\"" . (isset($mdata['flashUploaderWidth']) && is_numeric($mdata['flashUploaderWidth']) && $mdata['flashUploaderWidth'] > 0 ? intval($mdata['flashUploaderWidth']) : '64') . "\" height=\"" . (isset($mdata['flashUploaderHeight']) && is_numeric($mdata['flashUploaderHeight']) && $mdata['flashUploaderHeight'] > 0 ? intval($mdata['flashUploaderHeight']) : '64') . "\"/>
+							<img alt=\"\" style=\"cursor: pointer;\" id=\"bfPickFiles" . $mdata['dbId'] . "\" src=\"" . $this->uploadImagePath . "\" width=\"" . $uploadOptions['buttonWidth'] . "\" height=\"" . $uploadOptions['buttonHeight'] . "\"/>
                                                         <div id=\"bfPickFiles" . $mdata['dbId'] . "holder\" style=\"display:none;\">&nbsp;</div>
                                                         </label>
                                                         <span id=\"bfUploader" . $mdata['bfName'] . "\"></span>

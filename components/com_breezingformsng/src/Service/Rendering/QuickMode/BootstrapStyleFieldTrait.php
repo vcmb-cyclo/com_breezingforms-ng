@@ -251,7 +251,15 @@ trait BootstrapStyleFieldTrait
         echo '<div class="' . $this->bsClass('form-group') . '">';
         echo $label;
         echo $icon;
-        echo '<input ' . (isset($mdata['placeholder']) && $mdata['placeholder'] ? 'placeholder="' . htmlentities($mdata['placeholder'], ENT_QUOTES, 'UTF-8') . '" ' : '') . 'class="' . $this->bsClass('form-control') . ' ff_elem inputbox" ' . $size . $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+        echo $this->quickModeInputBuilder()->build(
+            $this->bsClass('form-control') . ' ff_elem inputbox',
+            $type,
+            (string) $mdata['bfName'],
+            (string) $mdata['value'],
+            (int) $mdata['dbId'],
+            $size . $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+            (string) ($mdata['placeholder'] ?? '')
+        );
         echo '</div>';
         echo '</div>';
         if ($mdata['mailbackAsSender']) {
@@ -292,7 +300,16 @@ trait BootstrapStyleFieldTrait
         echo '<div class="' . $this->bsClass('form-group') . '">';
         echo $label;
         echo $icon;
-        echo '<input ' . (isset($mdata['placeholder']) && $mdata['placeholder'] ? 'placeholder="' . htmlentities($mdata['placeholder'], ENT_QUOTES, 'UTF-8') . '" ' : '') . 'class="' . $this->bsClass('form-control') . ' ff_elem inputbox" ' . $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '" step="' . $mdata['step'] . '" max="' . $mdata['max'] . '" min="' . $mdata['min'] . '"/>' . "\n";
+        echo $this->quickModeInputBuilder()->build(
+            $this->bsClass('form-control') . ' ff_elem inputbox',
+            $type,
+            (string) $mdata['bfName'],
+            (string) $mdata['value'],
+            (int) $mdata['dbId'],
+            $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+            (string) ($mdata['placeholder'] ?? ''),
+            ' step="' . $mdata['step'] . '" max="' . $mdata['max'] . '" min="' . $mdata['min'] . '"'
+        );
         echo '</div>';
         echo '</div>';
 

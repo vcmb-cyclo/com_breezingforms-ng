@@ -57,11 +57,17 @@ class BootstrapRenderer
     private $language_tag = '';
     private $hasResponsiveDatePicker = false;
     private $bsClasses = array();
+    private ?QuickModeInputBuilder $quickModeInputBuilderService = null;
 
     public function bsClass($key)
     {
 
         return $this->bsClasses[5][$key];
+    }
+
+    private function quickModeInputBuilder(): QuickModeInputBuilder
+    {
+        return $this->quickModeInputBuilderService ??= new QuickModeInputBuilder();
     }
 
     public static function getEditorContent($editor)

@@ -59,6 +59,7 @@ class MobileRenderer
     private ?QuickModeCalendarButtonBuilder $quickModeCalendarButtonBuilderService = null;
     private ?QuickModeCalendarInputBuilder $quickModeCalendarInputBuilderService = null;
     private ?QuickModeCalendarInitScriptBuilder $quickModeCalendarInitScriptBuilderService = null;
+    private ?QuickModeCaptchaUrlBuilder $quickModeCaptchaUrlBuilderService = null;
 
     public function __construct(HTML_facileFormsProcessor $p)
     {
@@ -142,6 +143,11 @@ class MobileRenderer
     private function quickModeCalendarInitScriptBuilder(): QuickModeCalendarInitScriptBuilder
     {
         return $this->quickModeCalendarInitScriptBuilderService ??= new QuickModeCalendarInitScriptBuilder();
+    }
+
+    private function quickModeCaptchaUrlBuilder(): QuickModeCaptchaUrlBuilder
+    {
+        return $this->quickModeCaptchaUrlBuilderService ??= new QuickModeCaptchaUrlBuilder();
     }
 
     public function parseToggleFields($code)
@@ -1246,9 +1252,10 @@ HTML;
                         }
                         break;
                     case 'bfCaptcha':
-                        $captcha_url = Uri::root(true)
-                            . ($this->p->app->isClient('administrator') ? '/administrator' : '')
-                            . '/index.php?option=com_breezingformsng&bfCaptcha=1';
+                        $captcha_url = $this->quickModeCaptchaUrlBuilder()->build(
+                            Uri::root(true),
+                            $this->p->app->isClient('administrator')
+                        );
 
                         echo '<div class="d-flex flex-wrap align-items-center gap-2">';
                         echo '<img alt="" border="0" width="230" id="ff_capimgValue" class="ff_capimg" src="' . $captcha_url . '"/><br/><br/>' . "\n";

@@ -65,6 +65,7 @@ class OnePageRenderer
     private ?QuickModeCalendarButtonBuilder $quickModeCalendarButtonBuilderService = null;
     private ?QuickModeCalendarInputBuilder $quickModeCalendarInputBuilderService = null;
     private ?QuickModeCalendarInitScriptBuilder $quickModeCalendarInitScriptBuilderService = null;
+    private ?QuickModeCaptchaUrlBuilder $quickModeCaptchaUrlBuilderService = null;
 
     public function bsClass($key)
     {
@@ -120,6 +121,11 @@ class OnePageRenderer
     private function quickModeCalendarInitScriptBuilder(): QuickModeCalendarInitScriptBuilder
     {
         return $this->quickModeCalendarInitScriptBuilderService ??= new QuickModeCalendarInitScriptBuilder();
+    }
+
+    private function quickModeCaptchaUrlBuilder(): QuickModeCaptchaUrlBuilder
+    {
+        return $this->quickModeCaptchaUrlBuilderService ??= new QuickModeCaptchaUrlBuilder();
     }
 
     public static function getEditorContent($editor)
@@ -1317,9 +1323,10 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                         echo $label;
                         echo '<span class="' . $this->bsClass('nonform-control') . '">';
 
-                        $captcha_url = Uri::root(true)
-                            . ($this->p->app->isClient('administrator') ? '/administrator' : '')
-                            . '/index.php?option=com_breezingformsng&bfCaptcha=1';
+                        $captcha_url = $this->quickModeCaptchaUrlBuilder()->build(
+                            Uri::root(true),
+                            $this->p->app->isClient('administrator')
+                        );
 
                         echo '<div style="display: inline-block;">';
 

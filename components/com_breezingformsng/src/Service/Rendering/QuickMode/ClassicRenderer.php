@@ -64,6 +64,7 @@ class ClassicRenderer
     private ?QuickModeCalendarButtonBuilder $quickModeCalendarButtonBuilderService = null;
     private ?QuickModeCalendarInputBuilder $quickModeCalendarInputBuilderService = null;
     private ?QuickModeCalendarInitScriptBuilder $quickModeCalendarInitScriptBuilderService = null;
+    private ?QuickModeCaptchaUrlBuilder $quickModeCaptchaUrlBuilderService = null;
 
     public function headers()
     {
@@ -206,6 +207,11 @@ float:left;
     private function quickModeCalendarInitScriptBuilder(): QuickModeCalendarInitScriptBuilder
     {
         return $this->quickModeCalendarInitScriptBuilderService ??= new QuickModeCalendarInitScriptBuilder();
+    }
+
+    private function quickModeCaptchaUrlBuilder(): QuickModeCaptchaUrlBuilder
+    {
+        return $this->quickModeCaptchaUrlBuilderService ??= new QuickModeCaptchaUrlBuilder();
     }
 
     public function __construct(HTML_facileFormsProcessor $p)
@@ -1173,9 +1179,10 @@ float:left;
 
     private function renderCaptchaField(array $mdata): void
     {
-        $captcha_url = Uri::root(true)
-            . ($this->p->app->isClient('administrator') ? '/administrator' : '')
-            . '/index.php?option=com_breezingformsng&bfCaptcha=1';
+        $captcha_url = $this->quickModeCaptchaUrlBuilder()->build(
+            Uri::root(true),
+            $this->p->app->isClient('administrator')
+        );
 
         echo '<span class="bfCaptcha">' . "\n";
 

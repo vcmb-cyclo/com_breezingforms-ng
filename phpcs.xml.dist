@@ -16,6 +16,7 @@
     <file>components/com_breezingformsng/src/Service/Rendering/EditableRecord.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/EditableRecordLoader.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/PostRenderScriptBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/PaymentMethodFieldBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/HiddenFieldTrait.php</file>
     <file>components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php</file>
 

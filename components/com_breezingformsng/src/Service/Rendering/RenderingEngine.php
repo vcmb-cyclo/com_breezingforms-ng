@@ -62,6 +62,7 @@ final class RenderingEngine
     private ?ContentBuilderFileUploadScriptBuilder $contentBuilderFileUploadScriptBuilderService = null;
     private ?EditableRecordLoader $editableRecordLoaderService = null;
     private ?PostRenderScriptBuilder $postRenderScriptBuilderService = null;
+    private ?PaymentMethodFieldBuilder $paymentMethodFieldBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -178,6 +179,11 @@ final class RenderingEngine
     private function postRenderScriptBuilder(): PostRenderScriptBuilder
     {
         return $this->postRenderScriptBuilderService ??= new PostRenderScriptBuilder();
+    }
+
+    private function paymentMethodFieldBuilder(): PaymentMethodFieldBuilder
+    {
+        return $this->paymentMethodFieldBuilderService ??= new PaymentMethodFieldBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -1584,7 +1590,7 @@ final class RenderingEngine
         for ($i = 0; $i < $this->processor->rowcount; $i++) {
             $row = $this->processor->rows[$i];
             if ($row->type == "PayPal" || $row->type == "Sofortueberweisung" || $row->type == "Stripe") {
-                echo indentc(1) . '<input type="hidden" name="ff_payment_method" id="bfPaymentMethod" value=""/>' . nl();
+                echo $this->paymentMethodFieldBuilder()->build(indentc(1));
                 break;
             }
         }

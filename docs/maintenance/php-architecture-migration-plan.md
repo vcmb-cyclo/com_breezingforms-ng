@@ -373,14 +373,17 @@ Règles de coordination :
    signatures, puis validation de la lecture SQL de l'enregistrement.
 2. Premier lot Strategy QuickMode : `bfTextfield` et `bfNumberInput`, après
    comparaison des quatre variantes déjà couvertes par snapshots.
-3. Extraction des scripts post-rendu et des champs techniques.
+3. Harnais ContentBuilder pour les parcours runtime fichiers/signatures.
 4. Rendu HTML classique par famille de nœuds.
 5. Extension PHPCS et réduction PHPStan après chaque service stabilisé.
 
 Lots récemment terminés : tests d'intégration des variantes Query List et du
 point d'arrêt `bury()` dans la première boucle (`7a19ffeb`), contrôles de
 fichiers ContentBuilder (`2c72231e`) et loader d'enregistrement éditable
-(`89165de7`).
+(`89165de7`). Les scripts post-rendu et les champs techniques sont également
+extraits et testés (`ad9dd75f`, `3d45e1e2`, `c53a457e`). Il reste à couvrir la
+finalisation complète par mode d'exécution et les champs additionnels
+(`return`, `tmpl`, token CSRF), sans modifier leurs différences de routage.
 
 Les quatre renderers QuickMode ont encore une baseline PHPCS distincte ; le
 contrôle direct fait apparaître des violations de formatage héritées. Ce lot

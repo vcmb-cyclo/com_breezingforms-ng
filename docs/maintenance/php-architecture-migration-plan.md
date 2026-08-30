@@ -511,8 +511,11 @@ Les options `multi_selection` et `runtimes` sont ensuite partagées par
 `eaa777e8`, avec couverture des combinaisons HTML5/Flash/HTML4 et de la
 sélection multiple. Les dimensions positives et les valeurs par défaut du
 bouton d'upload sont partagées par `ddea69f8` dans les renderers Classic et
-Mobile. Le markup et les callbacks de configuration complète de l'uploader
-restent à extraire par sous-lots.
+Mobile. La valeur numérique utilisée par le contrôle client de taille est
+également fournie par le builder et consommée par les quatre renderers via
+`9535e3a`, supprimant le dernier recalcul PHP de cette limite. Le markup et
+les callbacks de configuration complète de l'uploader restent à extraire par
+sous-lots.
 
 La baseline PHPCS est maintenant sans erreur sur les services modernes, les
 quatre renderers QuickMode et leurs traits (`e25d501f`, `14985d4d`, `288b42a4`,

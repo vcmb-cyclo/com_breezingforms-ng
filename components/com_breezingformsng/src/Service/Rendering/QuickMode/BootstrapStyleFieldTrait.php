@@ -41,7 +41,10 @@ trait BootstrapStyleFieldTrait
     private function renderBootstrapStyleSummarizeField(array $mdata, string $label): void
     {
         /* translatables */
-        if (isset($mdata['emptyMessage_translation' . $this->language_tag]) && $mdata['emptyMessage_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['emptyMessage_translation' . $this->language_tag])
+            && $mdata['emptyMessage_translation' . $this->language_tag] != ''
+        ) {
             $mdata['emptyMessage'] = $mdata['emptyMessage_translation' . $this->language_tag];
         }
         /* translatables end */
@@ -49,7 +52,8 @@ trait BootstrapStyleFieldTrait
         echo '<div class="' . $this->bsClass('form-group') . ' ' . $this->bsClass('other-form-group') . '">';
         echo $label;
         echo '<span class="' . $this->bsClass('nonform-control') . '">';
-        echo '<div style="display: inline-block; vertical-align: top;" class="ff_elem bfSummarize" id="ff_elem' . $mdata['dbId'] . '"></div>' . "\n";
+        echo '<div style="display: inline-block; vertical-align: top;" class="ff_elem bfSummarize" id="ff_elem'
+            . $mdata['dbId'] . '"></div>' . "\n";
         echo '<script type="text/javascript">bfRegisterSummarize('
             . json_encode('ff_elem' . $mdata['dbId']) . ', '
             . json_encode($mdata['connectWith']) . ', '
@@ -80,10 +84,16 @@ trait BootstrapStyleFieldTrait
     private function renderBootstrapStyleCalendarField(array $mdata, string $label): void
     {
         /* translatables */
-        if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['value_translation' . $this->language_tag])
+            && $mdata['value_translation' . $this->language_tag] != ''
+        ) {
             $mdata['value'] = $mdata['value_translation' . $this->language_tag];
         }
-        if (isset($mdata['format_translation' . $this->language_tag]) && $mdata['format_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['format_translation' . $this->language_tag])
+            && $mdata['format_translation' . $this->language_tag] != ''
+        ) {
             $mdata['format'] = $mdata['format_translation' . $this->language_tag];
         }
         $icon = '';
@@ -91,7 +101,8 @@ trait BootstrapStyleFieldTrait
             if (!isset($mdata['icon']) || $mdata['icon'] == '') {
                 $icon = '<i class="fas fa-calendar iconf--fumi" aria-hidden="true"></i>';
             } else {
-                $icon = '<i class="fas ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8') . ' iconf--fumi" aria-hidden="true"></i>';
+                $icon = '<i class="fas ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8')
+                    . ' iconf--fumi" aria-hidden="true"></i>';
             }
         }
         /* translatables end */

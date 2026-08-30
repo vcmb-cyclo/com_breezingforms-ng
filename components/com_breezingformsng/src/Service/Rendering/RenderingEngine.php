@@ -56,6 +56,7 @@ final class RenderingEngine
 {
     private ?TokenizedDirectoryResolver $tokenizedDirectoryResolverService = null;
     private ?ProcessorHeaderRenderer $processorHeaderRendererService = null;
+    private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -142,6 +143,11 @@ final class RenderingEngine
     {
         return $this->processorHeaderRendererService ??=
             new ProcessorHeaderRenderer(new JavascriptValueExporter());
+    }
+
+    private function contentBuilderValueScriptBuilder(): ContentBuilderValueScriptBuilder
+    {
+        return $this->contentBuilderValueScriptBuilderService ??= new ContentBuilderValueScriptBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -557,22 +563,12 @@ final class RenderingEngine
                         case 'Hidden Input':
                         case 'Number Input':
                         case 'Calendar':
-
-                            /*
-                              if($recordEntry->type == 'Textarea'){
-
-                              $dataObject = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
-                              $qmelement = $this->processor->findQuickModeElement($dataObject, $recordEntry->name);
-
-                              if(isset($recordEntry->value) && $qmelement !== null && isset($qmelement['properties']['is_html']) && $qmelement['properties']['is_html']) {
-
-                              $recordEntry->value = $this->processor->removeDangerousHtml($recordEntry->value);
-                              }
-                              } */
-
-                            $js .= 'if(typeof JQuery != "undefined"){JQuery("[name=\"ff_nm_' . $recordEntry->name . '[]\"]").val(' . json_encode($recordEntry->value) . ');if(typeof JQuery != "undefined")JQuery("[name=\"ff_nm_' . $recordEntry->name . '[]\"]").trigger("change");}else{';
-                            $js .= 'if(document.getElementById("ff_elem' . $recordEntry->element . '"))document.getElementById("ff_elem' . $recordEntry->element . '").value=' . json_encode($recordEntry->value) . ';if(typeof JQuery != "undefined")JQuery(document.getElementById("ff_elem' . $recordEntry->element . '")).trigger("change");' . "\n";
-                            $js .= '}';
+                            $js .= $this->contentBuilderValueScriptBuilder()->build((object) [
+                                'recType' => $recordEntry->type,
+                                'recName' => $recordEntry->name,
+                                'recElementId' => $recordEntry->element,
+                                'recValue' => $recordEntry->value,
+                            ], $this->processor->form);
                             break;
                         case 'Checkbox':
                             if (!empty($recordEntry->value)) {

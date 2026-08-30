@@ -153,6 +153,10 @@ dans `view()` par `4f475561` et `2c72231e`, avec couverture dédiée.
   listes dans `ContentBuilderSelectHydrationScriptBuilder` via `152def4c` ;
   les valeurs multiples, l'échappement JSON et les déclenchements historiques
   sont couverts par des tests unitaires.
+- L'enveloppe `bfLoadContentBuilderEditable`, le compteur Flash et le nettoyage
+  legacy du champ seccode sont désormais assemblés par
+  `ContentBuilderEditableScriptWrapperBuilder` via `ec113799`, avec les scripts
+  de validation et d'hydratation injectés sans changement de contrat.
 - Isoler la présentation des fichiers existants et les cases de suppression.
 - Vérifier explicitement les chemins, noms de fichiers et valeurs absentes.
 - Caractériser `bfLoadContentBuilderEditable()` avant toute normalisation du

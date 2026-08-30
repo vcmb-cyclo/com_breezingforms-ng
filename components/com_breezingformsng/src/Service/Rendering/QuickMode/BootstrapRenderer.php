@@ -73,6 +73,12 @@ class BootstrapRenderer
     private ?QuickModeUploadOptionsBuilder $quickModeUploadOptionsBuilderService = null;
     private ?QuickModePagingActionBuilder $quickModePagingActionBuilderService = null;
     private ?QuickModeSubmitActionBuilder $quickModeSubmitActionBuilderService = null;
+    private ?QuickModeCalendarOptionsBuilder $quickModeCalendarOptionsBuilderService = null;
+
+    private function quickModeCalendarOptionsBuilder(): QuickModeCalendarOptionsBuilder
+    {
+        return $this->quickModeCalendarOptionsBuilderService ??= new QuickModeCalendarOptionsBuilder();
+    }
 
     public function bsClass($key)
     {
@@ -1396,50 +1402,26 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
     private function bfCalendarIsTruthy($mdata, $key)
     {
-        return isset($mdata[$key]) && $mdata[$key] !== '' && $mdata[$key] !== '0' && $mdata[$key] !== 0 && $mdata[$key] !== false;
+        return $this->quickModeCalendarOptionsBuilder()->isTruthy($mdata, $key);
     }
 
     private function bfCalendarShowTimeEnabled($mdata)
     {
-        return $this->bfCalendarIsTruthy($mdata, 'showTime');
+        return $this->quickModeCalendarOptionsBuilder()->showTimeEnabled($mdata);
     }
 
     private function bfCalendarToPickadateFormat($format)
     {
-        $format = trim((string) $format);
-
-        if ($format === '') {
-            return 'yyyy-mm-dd';
-        }
-
-        $format = str_replace(
-            array('%Y', '%y', '%m', '%d', '%e', '%B', '%b'),
-            array('yyyy', 'yy', 'mm', 'dd', 'd', 'mmmm', 'mmm'),
-            $format
-        );
-        $format = preg_replace('/\s*(%H|%I|%k|%l|%M|%S|%p).*/', '', $format);
-        $format = trim($format);
-
-        return $format !== '' ? $format : 'yyyy-mm-dd';
+        return $this->quickModeCalendarOptionsBuilder()->toPickadateFormat($format);
     }
 
     private function bfCalendarToPickadateFirstDay($firstDay)
     {
-        $firstDay = (int) $firstDay;
-
-        if ($firstDay < 1 || $firstDay > 7) {
-            $firstDay = 1;
-        }
-
-        return $firstDay === 7 ? 0 : $firstDay;
+        return $this->quickModeCalendarOptionsBuilder()->toPickadateFirstDay($firstDay);
     }
 
     private function bfCalendarSelectYears($mdata)
     {
-        $minYear = (isset($mdata['minYear']) && is_numeric($mdata['minYear'])) ? max(0, (int) $mdata['minYear']) : 0;
-        $maxYear = (isset($mdata['maxYear']) && is_numeric($mdata['maxYear'])) ? max(0, (int) $mdata['maxYear']) : 0;
-        $range = $minYear + $maxYear;
-
-        return $range > 0 ? max(10, $range + 1) : 60;
+        return $this->quickModeCalendarOptionsBuilder()->selectYears($mdata);
     }
 }

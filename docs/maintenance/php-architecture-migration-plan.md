@@ -298,7 +298,8 @@ propres à chaque thème.
    partagé via `QuickModeSubmitButtonBuilder` (`92b4af6f`). Les boutons de
    navigation générale restent à caractériser séparément.
 7. Calendriers et calendriers responsives — le bouton de déclenchement est
-   partagé via `QuickModeCalendarButtonBuilder` (`7911701f`); les inputs,
+   partagé via `QuickModeCalendarButtonBuilder` (`7911701f`), et l'input texte
+   est partagé via `QuickModeCalendarInputBuilder` (`1d623384`). Les
    initialisations Pickadate et responsive restent à traiter séparément.
 8. Uploads, CAPTCHA, signatures et paiements.
 
@@ -465,6 +466,12 @@ Le bouton de déclenchement des calendriers est désormais partagé via
 Bootstrap commun à Bootstrap/OnePage par `7911701f`. Les ordres d'attributs,
 classes, valeurs et contenus d'icône/label propres aux renderers sont
 préservés par les paramètres du builder.
+
+L'input texte des calendriers est désormais partagé via
+`QuickModeCalendarInputBuilder` et branché dans Classic, Mobile et le trait
+Bootstrap commun à Bootstrap/OnePage par `1d623384`. Les classes de thème,
+styles de largeur, valeur échappée et espacement historique de l'attribut
+`id` sont couverts par les snapshots et le test unitaire du builder.
 
 La baseline PHPCS est maintenant sans erreur sur les services modernes, les
 quatre renderers QuickMode et leurs traits (`e25d501f`, `14985d4d`, `288b42a4`,

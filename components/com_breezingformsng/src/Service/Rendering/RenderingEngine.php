@@ -81,6 +81,7 @@ final class RenderingEngine
     private ?CaptchaValidationRowSelector $captchaValidationRowSelectorService = null;
     private ?CaptchaValidationDefaultsBuilder $captchaValidationDefaultsBuilderService = null;
     private ?CaptchaLegacyValidationScriptBuilder $captchaLegacyValidationScriptBuilderService = null;
+    private ?CaptchaReCaptchaValidationScriptBuilder $captchaReCaptchaValidationScriptBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -292,6 +293,11 @@ final class RenderingEngine
     private function captchaLegacyValidationScriptBuilder(): CaptchaLegacyValidationScriptBuilder
     {
         return $this->captchaLegacyValidationScriptBuilderService ??= new CaptchaLegacyValidationScriptBuilder();
+    }
+
+    private function captchaReCaptchaValidationScriptBuilder(): CaptchaReCaptchaValidationScriptBuilder
+    {
+        return $this->captchaReCaptchaValidationScriptBuilderService ??= new CaptchaReCaptchaValidationScriptBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -2460,113 +2466,11 @@ final class RenderingEngine
                 );
             } elseif ($row->type == "ReCaptcha") {
 
-                $capFunc = 'var bfReCaptchaLoaded = true;
-                                    function bfCheckCaptcha(){
-					if(checkFileExtensions()){
-                                                function bfValidateCaptcha()
-                                                {
-                                                    if(typeof bfInvisibleRecaptcha != "undefined" && bfInvisibleRecaptcha === false){
-														if(typeof bfDoFlashUpload != \'undefined\'){
-															bfDoFlashUpload();
-														} else {
-															ff_submitForm2();
-														}
-														return;
-                                                    }
-                                                    
-                                                    if(typeof onloadBFNewRecaptchaCallback == "undefined"){
-                                                        challengeField = JQuery("input#recaptcha_challenge_field").val();
-                                                        responseField = JQuery("input#recaptcha_response_field").val();
-                                                        var html = JQuery.ajax({
-                                                        type: "POST",
-                                                        url: "' . Route::_($endpoints['recaptcha']) . '",
-                                                        data: "recaptcha_challenge_field=" + challengeField + "&recaptcha_response_field=" + responseField,
-                                                        async: false
-                                                        }).responseText;
-
-                                                        if (html.replace(/^\s+|\s+$/, "") == "success")
-                                                        {
-                                                            if(typeof bfDoFlashUpload != \'undefined\'){
-                                                                bfDoFlashUpload();
-                                                            } else {
-                                                                ff_submitForm2();
-                                                            }
-                                                        }
-                                                        else
-                                                        {
-                                                                if(typeof bfUseErrorAlerts == "undefined"){
-                                                                        alert(' . $captchaError . ');
-                                                                } else {
-                                                                    if(typeof inlineErrorElements != "undefined"){
-                                                                        inlineErrorElements.push(["bfReCaptchaEntry",' . $captchaError . ']);
-                                                                    }
-                                                                    bfShowErrors(' . $captchaError . ');
-                                                                }
-
-                                                                if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
-                                                                Recaptcha.focus_response_field();
-
-                                                                Recaptcha.reload();
-
-                                                                if(document.getElementById("bfSubmitButton")){
-                                                                    document.getElementById("bfSubmitButton").disabled = false;
-                                                                }
-                                                                if(typeof JQuery != "undefined"){JQuery(".bfCustomSubmitButton").prop("disabled", false);}
-                                                                if(typeof ladda_button != "undefined"){
-                                                                    bf_restore_submitbutton();
-                                                                }
-                                                                
-                                                        }
-                                                    }
-                                                    else{
-                                                        
-                                                        if(typeof bfInvisibleRecaptcha != "undefined"){
-                                                        
-                                                            grecaptcha.execute();
-                                                        }
-                                                        
-                                                        var gresponse = grecaptcha.getResponse();
-                                                        
-                                                        if(gresponse == ""){
-                                                            
-                                                            if(typeof bfInvisibleRecaptcha == "undefined"){
-                                                            
-	                                                            if(typeof bfUseErrorAlerts == "undefined"){
-	                                                                    alert(' . $captchaError . ');
-	                                                            } else {
-	                                                                if(typeof inlineErrorElements != "undefined"){
-	                                                                    inlineErrorElements.push(["bfReCaptchaEntry",' . $captchaError . ']);
-	                                                                }
-	                                                                bfShowErrors(' . $captchaError . ');
-	                                                            }
-                                                            
-                                                            
-                                                                if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
-                                                            }
-                                                            if(document.getElementById("bfSubmitButton")){
-                                                                document.getElementById("bfSubmitButton").disabled = false;
-                                                            }
-                                                            if(typeof JQuery != "undefined"){JQuery(".bfCustomSubmitButton").prop("disabled", false);}
-                                                            if(typeof ladda_button != "undefined"){
-                                                                bf_restore_submitbutton();
-                                                            }
-                                                            
-                                                            
-                                                        }else{
-               
-                                                            if(typeof bfDoFlashUpload != \'undefined\'){
-                                                                bfDoFlashUpload();
-                                                            } else {
-                                                                ff_submitForm2();
-                                                            }
-                                                        }
-                                                    }
-                                                }
-
-                                                bfValidateCaptcha();
-
-					}
-					}';
+                return $this->captchaReCaptchaValidationScriptBuilder()->build(
+                    $captchaError,
+                    $endpoints['recaptcha'],
+                    (int) $row->page
+                );
         }
         }
 

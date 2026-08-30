@@ -12,6 +12,10 @@ if (!interface_exists(DatabaseInterface::class)) {
     eval('namespace Joomla\\Database; interface DatabaseInterface {}');
 }
 
+if (!class_exists('Joomla\\Database\\ParameterType')) {
+    eval('namespace Joomla\\Database; final class ParameterType { public const INTEGER = 1; }');
+}
+
 final class EditableRecordLoaderTest extends TestCase
 {
     public function testLoadReturnsNullWhenNoEditableRecordExists(): void
@@ -20,6 +24,22 @@ final class EditableRecordLoaderTest extends TestCase
 
         self::assertNull((new EditableRecordLoader($database))->load(7, 12));
         self::assertCount(1, $database->queries);
+        self::assertSame(
+            [
+                'form = :formValue',
+                'user_id = :userId',
+                'user_id <> 0',
+                'archived = 0',
+            ],
+            $database->queryObjects[0]->where
+        );
+        self::assertSame(
+            [
+                [':formValue', 7, 1],
+                [':userId', 12, 1],
+            ],
+            $database->queryObjects[0]->bindings
+        );
     }
 
     public function testLoadReturnsLatestRecordAndItsSubrecords(): void
@@ -44,6 +64,9 @@ final class EditableRecordDatabaseDouble implements DatabaseInterface
     /** @var list<object> */
     public array $queries = [];
 
+    /** @var list<EditableRecordQueryDouble> */
+    public array $queryObjects = [];
+
     /** @param list<object> $records */
     public function __construct(private array $records, private array $entries = [])
     {
@@ -51,13 +74,7 @@ final class EditableRecordDatabaseDouble implements DatabaseInterface
 
     public function getQuery(bool $new = false): object
     {
-        return new class {
-            public function select(mixed $columns): self { return $this; }
-            public function from(string $table): self { return $this; }
-            public function where(string $condition): self { return $this; }
-            public function order(string $ordering): self { return $this; }
-            public function bind(string $key, mixed $value, mixed $type): self { return $this; }
-        };
+        return $this->queryObjects[] = new EditableRecordQueryDouble();
     }
 
     public function quoteName(string|array $name): string|array
@@ -74,5 +91,43 @@ final class EditableRecordDatabaseDouble implements DatabaseInterface
     public function loadObjectList(): array
     {
         return count($this->queries) === 1 ? $this->records : $this->entries;
+    }
+}
+
+final class EditableRecordQueryDouble
+{
+    /** @var list<string> */
+    public array $where = [];
+
+    /** @var list<array{string, mixed, mixed}> */
+    public array $bindings = [];
+
+    public function select(mixed $columns): self
+    {
+        return $this;
+    }
+
+    public function from(string $table): self
+    {
+        return $this;
+    }
+
+    public function where(string $condition): self
+    {
+        $this->where[] = $condition;
+
+        return $this;
+    }
+
+    public function order(string $ordering): self
+    {
+        return $this;
+    }
+
+    public function bind(string $key, mixed $value, mixed $type): self
+    {
+        $this->bindings[] = [$key, $value, $type];
+
+        return $this;
     }
 }

@@ -44,6 +44,7 @@
 | `RenderingEngine::view()` — pièces | Pièces Before/After, code personnalisé et sorties `bury()` couverts | `RenderingEngine` |
 | `RenderingEngine::view()` — scripts | Bibliothèques, callbacks formulaire et `onload` extraits et couverts | `RenderingEngine` |
 | QuickMode — règles de bascule | Parsing `toggleFields` mutualisé entre les quatre renderers, avec API publique conservée et valeurs multi-mots couvertes | Commit `37c554755` |
+| QuickMode — options calendrier | Normalisation des booléens, formats Pickadate, premier jour et années mutualisée entre les quatre renderers | Commit `a2e025609` |
 | `RenderingEngine::view()` — validation | Extensions de fichiers, valeurs par défaut et scripts CAPTCHA extraits et couverts | Builders de validation dédiés |
 | `RenderingEngine::view()` — CAPTCHA | Sélection `Captcha` / `ReCaptcha`, endpoints site/admin et générateurs JavaScript isolés, ordre historique préservé | Commits `4a070774`, `8e3e9a7a`, `4563ae11`, `d328c4f8`, `75c0ca2b`, `1cea0c84` |
 | `RenderingEngine::view()` — Query List | Préparation extraite et variantes par défaut/checkbox/résultat vide couvertes | Commits `4070ec0f`, `b358e7e9` |
@@ -624,6 +625,12 @@ est désormais confié à `QuickModeToggleFieldsParser` (`37c554755`). Les
 méthodes publiques historiques des renderers délèguent au parser afin de
 préserver le contrat appelé par la façade ; les règles invalides, les retours
 CRLF et les valeurs contenant des espaces sont couverts.
+
+La normalisation des options de calendrier est désormais confiée à
+`QuickModeCalendarOptionsBuilder` (`a2e025609`). Les quatre renderers
+réutilisent ce service pour les valeurs booléennes, les formats Pickadate, le
+premier jour de la semaine et le nombre d'années sélectionnables ; les
+snapshots de calendrier restent inchangés.
 
 Le contrôle `bfCheckbox` est désormais extrait dans
 `QuickModeCheckboxBuilder` et branché dans les quatre renderers par

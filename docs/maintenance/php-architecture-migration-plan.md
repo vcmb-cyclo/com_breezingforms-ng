@@ -335,7 +335,10 @@ propres à chaque thème.
    désormais partagée via `QuickModeCaptchaUrlBuilder` (`21afa208`) et le
    markup image/réponse via `QuickModeCaptchaMarkupBuilder` (`176af451`) et le
    script de rechargement via `QuickModeCaptchaReloadScriptBuilder`
-   (`4d706e95`); les scripts de validation restent à traiter.
+   (`4d706e95`). Les actions de navigation et de soumission sont maintenant
+   mutualisées via `QuickModePagingActionBuilder` (`10d7dc6a`, `04e09cf6`) et
+   `QuickModeSubmitActionBuilder` (`4dd3e3dd`). Les scripts de validation
+   complets restent à traiter.
 
 Pour chaque type :
 

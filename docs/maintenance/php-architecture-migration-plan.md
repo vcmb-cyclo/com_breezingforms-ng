@@ -323,8 +323,9 @@ propres à chaque thème.
    partagé via `QuickModeSubmitButtonBuilder` (`92b4af6f`). Les boutons de
    navigation générale utilisent désormais les actions partagées de
    `QuickModePagingActionBuilder` (`10d7dc6a`, `04e09cf6`), y compris
-   l’annulation ; les enveloppes et variantes de thème restent à caractériser
-   séparément.
+   l’annulation. Les variantes de pages intermédiaires et finales des quatre
+   renderers sont maintenant caractérisées par `063c39e7`; les enveloppes de
+   thème restent propres à chaque renderer.
 7. Calendriers et calendriers responsives — le bouton de déclenchement est
    partagé via `QuickModeCalendarButtonBuilder` (`7911701f`), et l'input texte
    est partagé via `QuickModeCalendarInputBuilder` (`1d623384`). Les

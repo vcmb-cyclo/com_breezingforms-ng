@@ -299,212 +299,7 @@ final class RenderingEngine
 
         [$captchaError, $capFunc] = $this->createCaptchaDefaults();
 
-        for ($i = 0; $i < $this->processor->rowcount; $i++) {
-            $row = $this->processor->rows[$i];
-            if ($row->type == "Captcha") {
-                $capFunc = '
-
-				function bfAjaxObject101() {
-					this.createRequestObject = function() {
-						try {
-							var ro = new XMLHttpRequest();
-						}
-						catch (e) {
-							var ro = new ActiveXObject("Microsoft.XMLHTTP");
-						}
-						return ro;
-					}
-					this.sndReq = function(action, url, data) {
-					
-						if (action.toUpperCase() == "POST") {
-							this.http.open(action,url,true);
-							this.http.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-							this.http.onreadystatechange = this.handleResponse;
-							this.http.send(data);
-						}
-						else {
-							this.http.open(action,url + "?" + data,true);
-							this.http.onreadystatechange = this.handleResponse;
-							this.http.send(null);
-						}
-					}
-					this.handleResponse = function() {
-						if ( me.http.readyState == 4) {
-							if (typeof me.funcDone == "function") { me.funcDone();}
-							var rawdata = me.http.responseText.split("|");
-							for ( var i = 0; i < rawdata.length; i++ ) {
-								var item = (rawdata[i]).split("=>");
-								if (item[0] != "") {
-									if (item[1].substr(0,3) == "%V%" ) {
-										document.getElementById(item[0]).value = item[1].substring(3);
-									}
-									else {
-										if(item[1] == "true"){
-                                                                                    if(typeof bfDoFlashUpload != \'undefined\'){
-                                                                                        bfDoFlashUpload();
-                                                                                    } else {
-									   		ff_submitForm2();
-                                                                                    }
-									   } else {
-                                                                                if(typeof JQuery != "undefined" && JQuery("#bfSubmitMessage"))
-									        {
-                                                                                    JQuery("#bfSubmitMessage").css("visibility","hidden");
-                                                                                    JQuery("#bfSubmitMessage").css("display","none");
-									        }
-                                                                                if(typeof bfUseErrorAlerts == "undefined"){
-                                                                                    alert(' . $captchaError . ');
-									        } else {
-                                                                                   if(typeof inlineErrorElements != "undefined"){
-                                                                                     inlineErrorElements.push(["bfCaptchaEntry",' . $captchaError . ']);
-                                                                                   }
-									           bfShowErrors(' . $captchaError . ');
-									        }
-                                                                                if(typeof ladda_button != "undefined"){
-                                                                                    
-                                                                                    bf_restore_submitbutton();
-                                                                                }
-                                                                                
-                                                                                        document.getElementById(\'ff_capimgValue\').src = \'' . Uri::root(true) . ($this->processor->app->isClient('administrator') ? '/administrator' : '') . '/index.php?option=com_breezingformsng&bfCaptcha=1&bfMathRandom=\' + Math.random();
-                                                                                        document.getElementById(\'bfCaptchaEntry\').value = "";
-                                                                                        if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
-                                                                                        document.getElementById(\'bfCaptchaEntry\').focus();
-                                                                                        if(document.getElementById("bfSubmitButton")){
-                                                                                            document.getElementById("bfSubmitButton").disabled = false;
-                                                                                        }
-                                                                                        if(typeof JQuery != "undefined"){JQuery(".bfCustomSubmitButton").prop("disabled", false);}
-										}
-                                                                                
-									}
-								}
-							}
-						}
-						if ((me.http.readyState == 1) && (typeof me.funcWait == "function")) { me.funcWait(); }
-					}
-					var me = this;
-					this.http = this.createRequestObject();
-
-					var funcWait = null;
-					var funcDone = null;
-				}
-
-                                function bfCheckCaptcha(){
-                                        if(checkFileExtensions()){
-                                               var ao = new bfAjaxObject101();
-                                               ao.sndReq("get","' . Uri::root(true) . ($this->processor->app->isClient('administrator') ? '/administrator' : '') . '/index.php?raw=true&option=com_breezingformsng&checkCaptcha=true&Itemid=0&tmpl=component&value="+document.getElementById("bfCaptchaEntry").value,"");
-                                        }
-                                }';
-                break;
-            } else if ($row->type == "ReCaptcha") {
-
-                $capFunc = 'var bfReCaptchaLoaded = true;
-                                    function bfCheckCaptcha(){
-					if(checkFileExtensions()){
-                                                function bfValidateCaptcha()
-                                                {
-                                                    if(typeof bfInvisibleRecaptcha != "undefined" && bfInvisibleRecaptcha === false){
-														if(typeof bfDoFlashUpload != \'undefined\'){
-															bfDoFlashUpload();
-														} else {
-															ff_submitForm2();
-														}
-														return;
-                                                    }
-                                                    
-                                                    if(typeof onloadBFNewRecaptchaCallback == "undefined"){
-                                                        challengeField = JQuery("input#recaptcha_challenge_field").val();
-                                                        responseField = JQuery("input#recaptcha_response_field").val();
-                                                        var html = JQuery.ajax({
-                                                        type: "POST",
-                                                        url: "' . Route::_("index.php?raw=true&option=com_breezingformsng&bfReCaptcha=true&form=" . $this->processor->form . "&Itemid=0&tmpl=component") . '",
-                                                        data: "recaptcha_challenge_field=" + challengeField + "&recaptcha_response_field=" + responseField,
-                                                        async: false
-                                                        }).responseText;
-
-                                                        if (html.replace(/^\s+|\s+$/, "") == "success")
-                                                        {
-                                                            if(typeof bfDoFlashUpload != \'undefined\'){
-                                                                bfDoFlashUpload();
-                                                            } else {
-                                                                ff_submitForm2();
-                                                            }
-                                                        }
-                                                        else
-                                                        {
-                                                                if(typeof bfUseErrorAlerts == "undefined"){
-                                                                        alert(' . $captchaError . ');
-                                                                } else {
-                                                                    if(typeof inlineErrorElements != "undefined"){
-                                                                        inlineErrorElements.push(["bfReCaptchaEntry",' . $captchaError . ']);
-                                                                    }
-                                                                    bfShowErrors(' . $captchaError . ');
-                                                                }
-
-                                                                if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
-                                                                Recaptcha.focus_response_field();
-
-                                                                Recaptcha.reload();
-
-                                                                if(document.getElementById("bfSubmitButton")){
-                                                                    document.getElementById("bfSubmitButton").disabled = false;
-                                                                }
-                                                                if(typeof JQuery != "undefined"){JQuery(".bfCustomSubmitButton").prop("disabled", false);}
-                                                                if(typeof ladda_button != "undefined"){
-                                                                    bf_restore_submitbutton();
-                                                                }
-                                                                
-                                                        }
-                                                    }
-                                                    else{
-                                                        
-                                                        if(typeof bfInvisibleRecaptcha != "undefined"){
-                                                        
-                                                            grecaptcha.execute();
-                                                        }
-                                                        
-                                                        var gresponse = grecaptcha.getResponse();
-                                                        
-                                                        if(gresponse == ""){
-                                                            
-                                                            if(typeof bfInvisibleRecaptcha == "undefined"){
-                                                            
-	                                                            if(typeof bfUseErrorAlerts == "undefined"){
-	                                                                    alert(' . $captchaError . ');
-	                                                            } else {
-	                                                                if(typeof inlineErrorElements != "undefined"){
-	                                                                    inlineErrorElements.push(["bfReCaptchaEntry",' . $captchaError . ']);
-	                                                                }
-	                                                                bfShowErrors(' . $captchaError . ');
-	                                                            }
-                                                            
-                                                            
-                                                                if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
-                                                            }
-                                                            if(document.getElementById("bfSubmitButton")){
-                                                                document.getElementById("bfSubmitButton").disabled = false;
-                                                            }
-                                                            if(typeof JQuery != "undefined"){JQuery(".bfCustomSubmitButton").prop("disabled", false);}
-                                                            if(typeof ladda_button != "undefined"){
-                                                                bf_restore_submitbutton();
-                                                            }
-                                                            
-                                                            
-                                                        }else{
-               
-                                                            if(typeof bfDoFlashUpload != \'undefined\'){
-                                                                bfDoFlashUpload();
-                                                            } else {
-                                                                ff_submitForm2();
-                                                            }
-                                                        }
-                                                    }
-                                                }
-
-                                                bfValidateCaptcha();
-
-					}
-				}';
-            }
-        }
+        $capFunc = $this->buildCaptchaScript($captchaError, $capFunc);
 
         echo
             '<script type="text/javascript">' . nl() .
@@ -2478,6 +2273,227 @@ final class RenderingEngine
         );
 
         return [$captchaError, 'function bfCheckCaptcha(){if(checkFileExtensions())ff_submitForm2();}'];
+    }
+
+    /**
+     * Build the legacy CAPTCHA/ReCaptcha submit-validation script for the
+     * first Captcha or ReCaptcha row found on the form. Preserves the
+     * original control flow verbatim: a "Captcha" row breaks out of the
+     * loop immediately, while a "ReCaptcha" row does not - if a form has
+     * multiple ReCaptcha rows, the last one silently wins. Returns
+     * $capFunc unchanged (createCaptchaDefaults()'s default) when neither
+     * row type is present.
+     */
+    private function buildCaptchaScript(string $captchaError, string $capFunc): string
+    {
+        for ($i = 0; $i < $this->processor->rowcount; $i++) {
+            $row = $this->processor->rows[$i];
+            if ($row->type == "Captcha") {
+                $capFunc = '
+
+				function bfAjaxObject101() {
+					this.createRequestObject = function() {
+						try {
+							var ro = new XMLHttpRequest();
+						}
+						catch (e) {
+							var ro = new ActiveXObject("Microsoft.XMLHTTP");
+						}
+						return ro;
+					}
+					this.sndReq = function(action, url, data) {
+					
+						if (action.toUpperCase() == "POST") {
+							this.http.open(action,url,true);
+							this.http.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
+							this.http.onreadystatechange = this.handleResponse;
+							this.http.send(data);
+						}
+						else {
+							this.http.open(action,url + "?" + data,true);
+							this.http.onreadystatechange = this.handleResponse;
+							this.http.send(null);
+						}
+					}
+					this.handleResponse = function() {
+						if ( me.http.readyState == 4) {
+							if (typeof me.funcDone == "function") { me.funcDone();}
+							var rawdata = me.http.responseText.split("|");
+							for ( var i = 0; i < rawdata.length; i++ ) {
+								var item = (rawdata[i]).split("=>");
+								if (item[0] != "") {
+									if (item[1].substr(0,3) == "%V%" ) {
+										document.getElementById(item[0]).value = item[1].substring(3);
+									}
+									else {
+										if(item[1] == "true"){
+                                                                                    if(typeof bfDoFlashUpload != \'undefined\'){
+                                                                                        bfDoFlashUpload();
+                                                                                    } else {
+									   		ff_submitForm2();
+                                                                                    }
+									   } else {
+                                                                                if(typeof JQuery != "undefined" && JQuery("#bfSubmitMessage"))
+									        {
+                                                                                    JQuery("#bfSubmitMessage").css("visibility","hidden");
+                                                                                    JQuery("#bfSubmitMessage").css("display","none");
+									        }
+                                                                                if(typeof bfUseErrorAlerts == "undefined"){
+                                                                                    alert(' . $captchaError . ');
+									        } else {
+                                                                                   if(typeof inlineErrorElements != "undefined"){
+                                                                                     inlineErrorElements.push(["bfCaptchaEntry",' . $captchaError . ']);
+                                                                                   }
+									           bfShowErrors(' . $captchaError . ');
+									        }
+                                                                                if(typeof ladda_button != "undefined"){
+                                                                                    
+                                                                                    bf_restore_submitbutton();
+                                                                                }
+                                                                                
+                                                                                        document.getElementById(\'ff_capimgValue\').src = \'' . Uri::root(true) . ($this->processor->app->isClient('administrator') ? '/administrator' : '') . '/index.php?option=com_breezingformsng&bfCaptcha=1&bfMathRandom=\' + Math.random();
+                                                                                        document.getElementById(\'bfCaptchaEntry\').value = "";
+                                                                                        if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
+                                                                                        document.getElementById(\'bfCaptchaEntry\').focus();
+                                                                                        if(document.getElementById("bfSubmitButton")){
+                                                                                            document.getElementById("bfSubmitButton").disabled = false;
+                                                                                        }
+                                                                                        if(typeof JQuery != "undefined"){JQuery(".bfCustomSubmitButton").prop("disabled", false);}
+										}
+                                                                                
+									}
+								}
+							}
+						}
+						if ((me.http.readyState == 1) && (typeof me.funcWait == "function")) { me.funcWait(); }
+					}
+					var me = this;
+					this.http = this.createRequestObject();
+
+					var funcWait = null;
+					var funcDone = null;
+				}
+
+                                function bfCheckCaptcha(){
+                                        if(checkFileExtensions()){
+                                               var ao = new bfAjaxObject101();
+                                               ao.sndReq("get","' . Uri::root(true) . ($this->processor->app->isClient('administrator') ? '/administrator' : '') . '/index.php?raw=true&option=com_breezingformsng&checkCaptcha=true&Itemid=0&tmpl=component&value="+document.getElementById("bfCaptchaEntry").value,"");
+                                        }
+                                }';
+                break;
+            } else if ($row->type == "ReCaptcha") {
+
+                $capFunc = 'var bfReCaptchaLoaded = true;
+                                    function bfCheckCaptcha(){
+					if(checkFileExtensions()){
+                                                function bfValidateCaptcha()
+                                                {
+                                                    if(typeof bfInvisibleRecaptcha != "undefined" && bfInvisibleRecaptcha === false){
+														if(typeof bfDoFlashUpload != \'undefined\'){
+															bfDoFlashUpload();
+														} else {
+															ff_submitForm2();
+														}
+														return;
+                                                    }
+                                                    
+                                                    if(typeof onloadBFNewRecaptchaCallback == "undefined"){
+                                                        challengeField = JQuery("input#recaptcha_challenge_field").val();
+                                                        responseField = JQuery("input#recaptcha_response_field").val();
+                                                        var html = JQuery.ajax({
+                                                        type: "POST",
+                                                        url: "' . Route::_("index.php?raw=true&option=com_breezingformsng&bfReCaptcha=true&form=" . $this->processor->form . "&Itemid=0&tmpl=component") . '",
+                                                        data: "recaptcha_challenge_field=" + challengeField + "&recaptcha_response_field=" + responseField,
+                                                        async: false
+                                                        }).responseText;
+
+                                                        if (html.replace(/^\s+|\s+$/, "") == "success")
+                                                        {
+                                                            if(typeof bfDoFlashUpload != \'undefined\'){
+                                                                bfDoFlashUpload();
+                                                            } else {
+                                                                ff_submitForm2();
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                                if(typeof bfUseErrorAlerts == "undefined"){
+                                                                        alert(' . $captchaError . ');
+                                                                } else {
+                                                                    if(typeof inlineErrorElements != "undefined"){
+                                                                        inlineErrorElements.push(["bfReCaptchaEntry",' . $captchaError . ']);
+                                                                    }
+                                                                    bfShowErrors(' . $captchaError . ');
+                                                                }
+
+                                                                if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
+                                                                Recaptcha.focus_response_field();
+
+                                                                Recaptcha.reload();
+
+                                                                if(document.getElementById("bfSubmitButton")){
+                                                                    document.getElementById("bfSubmitButton").disabled = false;
+                                                                }
+                                                                if(typeof JQuery != "undefined"){JQuery(".bfCustomSubmitButton").prop("disabled", false);}
+                                                                if(typeof ladda_button != "undefined"){
+                                                                    bf_restore_submitbutton();
+                                                                }
+                                                                
+                                                        }
+                                                    }
+                                                    else{
+                                                        
+                                                        if(typeof bfInvisibleRecaptcha != "undefined"){
+                                                        
+                                                            grecaptcha.execute();
+                                                        }
+                                                        
+                                                        var gresponse = grecaptcha.getResponse();
+                                                        
+                                                        if(gresponse == ""){
+                                                            
+                                                            if(typeof bfInvisibleRecaptcha == "undefined"){
+                                                            
+	                                                            if(typeof bfUseErrorAlerts == "undefined"){
+	                                                                    alert(' . $captchaError . ');
+	                                                            } else {
+	                                                                if(typeof inlineErrorElements != "undefined"){
+	                                                                    inlineErrorElements.push(["bfReCaptchaEntry",' . $captchaError . ']);
+	                                                                }
+	                                                                bfShowErrors(' . $captchaError . ');
+	                                                            }
+                                                            
+                                                            
+                                                                if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
+                                                            }
+                                                            if(document.getElementById("bfSubmitButton")){
+                                                                document.getElementById("bfSubmitButton").disabled = false;
+                                                            }
+                                                            if(typeof JQuery != "undefined"){JQuery(".bfCustomSubmitButton").prop("disabled", false);}
+                                                            if(typeof ladda_button != "undefined"){
+                                                                bf_restore_submitbutton();
+                                                            }
+                                                            
+                                                            
+                                                        }else{
+               
+                                                            if(typeof bfDoFlashUpload != \'undefined\'){
+                                                                bfDoFlashUpload();
+                                                            } else {
+                                                                ff_submitForm2();
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                                bfValidateCaptcha();
+
+					}
+				}';
+            }
+        }
+
+        return $capFunc;
     }
 
     /**

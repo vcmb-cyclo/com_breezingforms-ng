@@ -26,6 +26,7 @@ if (!class_exists(HTML_facileFormsProcessor::class)) {
 
 require_once __DIR__ . '/QuickMode/joomla-text-stub.php';
 require_once __DIR__ . '/QuickMode/joomla-uri-stub.php';
+require_once __DIR__ . '/QuickMode/joomla-route-stub.php';
 require_once __DIR__ . '/QuickMode/joomla-cmsapplication-stub.php';
 
 if (!function_exists('Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering\\bf_b64dec')) {
@@ -54,6 +55,16 @@ final class RenderingEngineProcessorDouble extends HTML_facileFormsProcessor
 
     public bool $buryImmediately = false;
 
+    /**
+     * When set, bury() ignores the flags above and instead returns true
+     * starting from this call number (1-indexed) - lets a test stop view()
+     * at a precise point without needing a callback/flag it doesn't have
+     * yet at that point in the flow.
+     */
+    public ?int $buryOnCallNumber = null;
+
+    private int $buryCallCount = 0;
+
     /** @var list<array{code: string, name: string, type: string, id: int, pane: int|null}> */
     public array $executedPieces = [];
 
@@ -79,6 +90,12 @@ final class RenderingEngineProcessorDouble extends HTML_facileFormsProcessor
 
     public function bury()
     {
+        $this->buryCallCount++;
+
+        if ($this->buryOnCallNumber !== null) {
+            return $this->buryCallCount >= $this->buryOnCallNumber;
+        }
+
         return $this->buryImmediately || ($this->buryAfterFirstCallback && count($this->callbackNames) >= 1);
     }
 
@@ -1055,6 +1072,152 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertStringContainsString('= 12;', $script);
         self::assertStringContainsString("ff_processor.ip", $script);
         self::assertStringContainsString("'127.0.0.1';", $script);
+    }
+
+    /**
+     * Drives view() end-to-end through the QuickMode preamble, header,
+     * before-form piece and file-extension/CAPTCHA script emission, then
+     * stops right after that script tag is echoed - before the (unrelated,
+     * much larger) per-element rendering loop - via a bury() call counted
+     * to fire on its second invocation (the first, inside
+     * executeBeforeFormPiece(), must return false to let rendering
+     * continue).
+     *
+     * @param list<object> $rows
+     */
+    private function makeProcessorReadyForCaptchaScript(array $rows): RenderingEngineProcessorDouble
+    {
+        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
+        $processor->app = new CMSApplication();
+        // Short-circuits applyMobileMode()'s device check (ff_applic ===
+        // 'mod_facileforms') so it never has to call the real bf_is_mobile().
+        $processor->app->getInput()->values['ff_applic'] = 'mod_facileforms';
+        $processor->formrow = (object) [
+            'template_code_processed' => 'QuickMode',
+            'template_code' => base64_encode(json_encode([
+                'properties' => [
+                    'mobileEnabled' => false,
+                    'forceMobile' => false,
+                    'themebootstrapThemeEngine' => 'bootstrap',
+                ],
+            ], JSON_THROW_ON_ERROR)),
+            'class1' => '',
+            'piece1cond' => 0,
+            'heightmode' => 0,
+            'height' => 0,
+        ];
+        $processor->okrun = true;
+        $processor->form = 7;
+        $processor->status = '';
+        $processor->message = '';
+        $processor->showgrid = false;
+        $processor->ip = '127.0.0.1';
+        $processor->agent = 'Test Agent';
+        $processor->browser = 'Test Browser';
+        $processor->opsys = 'Test OS';
+        $processor->provider = 'Test Provider';
+        $processor->submitted = 0;
+        $processor->form_id = 7;
+        $processor->page = 1;
+        $processor->target = '';
+        $processor->runmode = 0;
+        $processor->inframe = 0;
+        $processor->inline = 0;
+        $processor->template = 0;
+        $processor->homepage = 'https://example.test';
+        $processor->mossite = 'https://example.test';
+        $processor->images = 0;
+        $processor->border = 0;
+        $processor->align = '';
+        $processor->top = 0;
+        $processor->suffix = '';
+        $processor->record_id = 0;
+        $processor->traceBuffer = '';
+        $processor->rows = $rows;
+        $processor->rowcount = count($rows);
+        $processor->buryOnCallNumber = 2;
+
+        $GLOBALS['ff_config'] = (object) ['compress' => false];
+
+        return $processor;
+    }
+
+    private function captureCaptchaScript(RenderingEngineProcessorDouble $processor): string
+    {
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+
+        $outputBufferLevel = ob_get_level();
+        ob_start();
+        try {
+            $engine->view();
+
+            return (string) ob_get_contents();
+        } finally {
+            while (ob_get_level() > $outputBufferLevel) {
+                ob_end_clean();
+            }
+
+            restore_error_handler();
+        }
+    }
+
+    public function testCaptchaScriptUsesDefaultCallbackWithoutACaptchaRow(): void
+    {
+        $html = $this->captureCaptchaScript($this->makeProcessorReadyForCaptchaScript([]));
+
+        self::assertStringContainsString(
+            'function bfCheckCaptcha(){if(checkFileExtensions())ff_submitForm2();}',
+            $html
+        );
+        self::assertStringNotContainsString('bfAjaxObject101', $html);
+        self::assertStringNotContainsString('bfReCaptchaLoaded', $html);
+    }
+
+    public function testCaptchaScriptBuildsLegacyAjaxCallbackForCaptchaRow(): void
+    {
+        $html = $this->captureCaptchaScript($this->makeProcessorReadyForCaptchaScript([
+            (object) ['type' => 'Captcha', 'page' => 3],
+        ]));
+
+        self::assertStringContainsString('function bfAjaxObject101()', $html);
+        self::assertStringContainsString('function bfCheckCaptcha(){', $html);
+        self::assertStringContainsString('if(ff_currentpage != 3)ff_switchpage(3);', $html);
+        self::assertStringContainsString(
+            'alert("COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG");',
+            $html
+        );
+        self::assertStringNotContainsString('bfReCaptchaLoaded', $html);
+    }
+
+    public function testCaptchaScriptBuildsReCaptchaCallbackForReCaptchaRow(): void
+    {
+        $html = $this->captureCaptchaScript($this->makeProcessorReadyForCaptchaScript([
+            (object) ['type' => 'ReCaptcha', 'page' => 5],
+        ]));
+
+        self::assertStringContainsString('var bfReCaptchaLoaded = true;', $html);
+        self::assertStringContainsString('function bfValidateCaptcha()', $html);
+        self::assertStringContainsString('if(ff_currentpage != 5)ff_switchpage(5);', $html);
+        self::assertStringContainsString(
+            'inlineErrorElements.push(["bfReCaptchaEntry","COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG"]);',
+            $html
+        );
+        self::assertStringNotContainsString('bfAjaxObject101', $html);
+    }
+
+    public function testCaptchaScriptStopsAtFirstCaptchaRowButLastReCaptchaRowWins(): void
+    {
+        $html = $this->captureCaptchaScript($this->makeProcessorReadyForCaptchaScript([
+            (object) ['type' => 'ReCaptcha', 'page' => 1],
+            (object) ['type' => 'ReCaptcha', 'page' => 9],
+        ]));
+
+        // The loop has no break on ReCaptcha, so with two such rows the last
+        // one silently overwrites $capFunc - preserved verbatim from the
+        // pre-extraction behavior, not "fixed".
+        self::assertStringContainsString('if(ff_currentpage != 9)ff_switchpage(9);', $html);
+        self::assertStringNotContainsString('if(ff_currentpage != 1)ff_switchpage(1);', $html);
     }
 
 }

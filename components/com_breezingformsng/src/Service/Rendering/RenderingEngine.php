@@ -59,6 +59,7 @@ final class RenderingEngine
     private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
     private ?ContentBuilderSignatureScriptBuilder $contentBuilderSignatureScriptBuilderService = null;
+    private ?ContentBuilderFileUploadScriptBuilder $contentBuilderFileUploadScriptBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -160,6 +161,11 @@ final class RenderingEngine
     private function contentBuilderSignatureScriptBuilder(): ContentBuilderSignatureScriptBuilder
     {
         return $this->contentBuilderSignatureScriptBuilderService ??= new ContentBuilderSignatureScriptBuilder();
+    }
+
+    private function contentBuilderFileUploadScriptBuilder(): ContentBuilderFileUploadScriptBuilder
+    {
+        return $this->contentBuilderFileUploadScriptBuilderService ??= new ContentBuilderFileUploadScriptBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -673,30 +679,31 @@ final class RenderingEngine
                                             ';
                                 }
 
-                                $cbOut = '';
                                 $cbFiles = explode("\n", str_replace("\r", "", $cbEntry->recValue));
-                                $i = 0;
                                 $cnt = count($cbFiles);
                                 $cbJs .= '
                                     cbFlashElemCnt["ff_elem' . $cbEntry->recElementId . '"] = ' . $cnt . ';
                                 ';
-                                $cbDeac = '';
+                                $displayNames = [];
                                 foreach ($cbFiles as $cbFile) {
                                     if (trim($cbFile)) {
                                         $displayName = htmlspecialchars(
-                                            basename(ContentbuilderngHelper::contentbuilderng_wordwrap($cbFile->recValue, 150, '<br>', true)),
+                                            basename(ContentbuilderngHelper::contentbuilderng_wordwrap($cbFile, 150, '<br>', true)),
                                             ENT_QUOTES,
                                             'UTF-8'
                                         );
                                         $displayName = str_replace('&lt;br&gt;', '<br>', $displayName);
-                                        $cbOut .= '<div><input type=\"checkbox\" onchange=\"bfCheckUploadValidation(\'ff_elem' . $cbEntry->recElementId . '\', this, \'ff_nm_' . $cbEntry->recName . '[]\')\" value=\"1\" name=\"cb_delete_' . $cbEntry->recElementId . '[' . $i . ']\" id=\"cb_delete_' . $cbEntry->recElementId . '_' . $i . '\"/> <label style=\"margin-left: 5px; float: none !important; display: inline !important;\" for=\"cb_delete_' . $cbEntry->recElementId . '_' . $i . '\">' . $displayName . '</label></div>';
-                                        if ($cbDeac == '') {
-                                            $cbDeac = 'bfDeactivateField["ff_nm_' . $cbEntry->recName . '[]"]=true;' . nl();
-                                        }
-                                        $i++;
+                                        $displayNames[] = $displayName;
                                     }
                                 }
-                                $js .= $cbDeac;
+                                $uploadControls = $this->contentBuilderFileUploadScriptBuilder()->build(
+                                    (int) $cbEntry->recElementId,
+                                    (string) $cbEntry->recName,
+                                    $cnt,
+                                    $displayNames
+                                );
+                                $cbOut = $uploadControls['html'];
+                                $js .= $uploadControls['deactivation'];
                                 $js .= '
                                                     if (document.createTextNode){
                                                         if(!document.getElementById("bfFlashFileQueue' . $cbEntry->recElementId . '")){

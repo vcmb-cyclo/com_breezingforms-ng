@@ -58,6 +58,7 @@ final class RenderingEngine
     private ?ProcessorHeaderRenderer $processorHeaderRendererService = null;
     private ?ClassicStaticTextBuilder $classicStaticTextBuilderService = null;
     private ?ClassicHiddenInputBuilder $classicHiddenInputBuilderService = null;
+    private ?ClassicTextInputBuilder $classicTextInputBuilderService = null;
     private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
     private ?EditableRecordHydrationScriptBuilder $editableRecordHydrationScriptBuilderService = null;
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
@@ -186,6 +187,11 @@ final class RenderingEngine
     private function classicHiddenInputBuilder(): ClassicHiddenInputBuilder
     {
         return $this->classicHiddenInputBuilderService ??= new ClassicHiddenInputBuilder();
+    }
+
+    private function classicTextInputBuilder(): ClassicTextInputBuilder
+    {
+        return $this->classicTextInputBuilderService ??= new ClassicTextInputBuilder();
     }
 
     private function contentBuilderValueScriptBuilder(): ContentBuilderValueScriptBuilder
@@ -1238,33 +1244,22 @@ final class RenderingEngine
                         echo indentc(1) . '</div>' . nl();
                         break;
                     case 'Text':
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
-                        $attribs = '';
-                        if ($row->width > 0) {
-                            if ($row->widthmode > 0)
-                                $attribs .= ' style="width:' . $row->width . 'px;"';
-                            else
-                                $attribs .= ' size="' . $row->width . '"';
-                        } // if
-                        if ($row->height > 0)
-                            $attribs .= ' maxlength="' . $row->height . '"';
-                        if ($row->flag1)
-                            $attribs .= ' type="password"';
-                        else
-                            $attribs .= ' type="text"';
-                        switch ($row->flag2) {
-                            case 1:
-                                $attribs .= ' disabled="disabled"';
-                                break;
-                            case 2:
-                                $attribs .= ' readonly="readonly"';
-                                break;
-                            default:
-                                break;
-                        } // switch
-                        $attribs .= $this->processor->script2clause($row);
-                        echo indentc(2) . '<input id="ff_elem' . $row->id . '"' . $attribs . ' name="ff_nm_' . $row->name . '[]" value="' . $data1 . '"' . $class2 . '/>' . nlc();
-                        echo indentc(1) . '</div>' . nl();
+                        echo $this->classicTextInputBuilder()->build(
+                            (int) $row->id,
+                            (string) $row->name,
+                            $data1,
+                            $attribs,
+                            $class1,
+                            $class2,
+                            (int) $row->width,
+                            (int) $row->widthmode,
+                            (int) $row->height,
+                            (bool) $row->flag1,
+                            (int) $row->flag2,
+                            $this->processor->script2clause($row),
+                            indentc(1),
+                            nlc() ?? ''
+                        );
                         break;
                     case 'Textarea':
                         echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();

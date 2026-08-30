@@ -503,6 +503,13 @@ Le corps JavaScript de rechargement CAPTCHA est désormais centralisé dans
 `bfMathRandom` sont couverts par un test unitaire ; les balises et icônes
 visuelles restent propres à chaque renderer.
 
+La normalisation des options d'upload est désormais centralisée dans
+`QuickModeUploadOptionsBuilder` et branchée dans les quatre renderers par
+`94a1345d`. Les extensions autorisées et la taille maximale sont couvertes
+par des tests unitaires et alimentent toujours le même JavaScript historique ;
+la génération du markup et de la configuration complète de l'uploader reste
+à extraire par sous-lots.
+
 La baseline PHPCS est maintenant sans erreur sur les services modernes, les
 quatre renderers QuickMode et leurs traits (`e25d501f`, `14985d4d`, `288b42a4`,
 `72204865`, `212b6450`). Les avertissements restants concernent surtout les

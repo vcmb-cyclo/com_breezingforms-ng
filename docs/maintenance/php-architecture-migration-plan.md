@@ -51,7 +51,7 @@
 | `RenderingEngine::view()` — métadonnées classiques | Comptage icônes/infobulles et scan `Static Text/HTML` extraits et couverts | Commit `51e86824` |
 | ContentBuilder — valeurs éditables | Générateur indépendant créé, couvert et branché dans `view()` | Commits `f685ff5e`, `c2ae9a76` |
 | ContentBuilder — champs non éditables | Générateur indépendant créé, couvert et branché dans `view()` | Commits `8bfd520e`, `21a0a812` |
-| PHPCS | Actif sur un premier groupe de services modernes | `phpcs.xml.dist` |
+| PHPCS | Actif sur les services modernes, les builders ContentBuilder et `HiddenFieldTrait` | `phpcs.xml.dist`, commit `2e58c4bb` |
 | PHPStan | Niveau 2 sur le composant, avec baseline | `phpstan.neon.dist`, 251 entrées dans la baseline |
 
 ## Phase 1 — Terminer la préparation des éléments classiques
@@ -283,7 +283,7 @@ Ordre conseillé :
 1. Nouveaux services extraits de `RenderingEngine`.
 2. Services ContentBuilder extraits.
 3. Stratégies de champs QuickMode.
-4. Traits QuickMode déjà mutualisés.
+4. Traits QuickMode déjà mutualisés, en commençant par `HiddenFieldTrait`.
 5. Renderers, un par un après réduction de leur taille.
 6. `RenderingEngine` lorsque les blocs historiques principaux ont disparu.
 

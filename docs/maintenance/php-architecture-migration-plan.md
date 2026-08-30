@@ -384,15 +384,16 @@ Le périmètre PHPCS couvre désormais aussi les services extraits de CAPTCHA,
 ContentBuilder et les actions QuickMode (`CaptchaEndpointBuilder`, builders de
 fichiers/champs cachés, `ContentBuilderSignatureFileResolver`,
 `QuickModePagingActionBuilder` et `QuickModeSubmitActionBuilder`). Ces huit
-fichiers passent PHPCS sans erreur ni warning. Le ruleset complet conserve des
-warnings hérités dans certains traits/builders QuickMode déjà inclus ; ils
-seront traités avec la migration de leurs renderers, sans reformatage global.
+fichiers passent PHPCS sans erreur ni warning. Le ruleset complet passe
+désormais également sans erreur ni warning (`61/61`), après le nettoyage ciblé
+des traits et builders QuickMode ; aucun reformatage global n'a été appliqué.
 
 Le premier nettoyage ciblé de cette baseline PHPCS est réalisé dans
 `QuickModeSelectBuilder`, `QuickModeCaptchaMarkupBuilder` et
 `QuickModeUploadOptionsBuilder` (`eaf8b2d1`) : leurs sorties sont inchangées et
-leurs warnings de longueur sont supprimés. Le prochain groupe reste
-`BootstrapStyleFieldTrait`, qui nécessite un lot séparé du fait de son volume.
+leurs warnings de longueur sont supprimés. Le nettoyage de
+`BootstrapStyleFieldTrait` est désormais terminé dans les lots
+`d1638610`, `9a93d10c` et `aaabc40c`.
 
 Le nettoyage du trait Bootstrap a couvert les méthodes de résumé, calendrier,
 champs, confirmation, paiement, signature et groupes (`750dd432`, `6b0a8532`,
@@ -637,9 +638,9 @@ sous-lots.
 
 La baseline PHPCS est maintenant sans erreur sur les services modernes, les
 quatre renderers QuickMode et leurs traits (`e25d501f`, `14985d4d`, `288b42a4`,
-`72204865`, `212b6450`). Les avertissements restants concernent surtout les
-longues chaînes HTML/JavaScript ; leur réduction est volontairement séparée
-des extractions de comportement.
+`72204865`, `212b6450`, `aaabc40c`). Le ruleset complet est vert ; la qualité
+de formatage n'est donc plus un prérequis bloquant pour les extractions de
+comportement suivantes.
 
 ## Vérification obligatoire par lot
 

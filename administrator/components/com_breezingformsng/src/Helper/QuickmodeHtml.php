@@ -273,31 +273,40 @@ final class QuickmodeHtml
 
             <div id="bfQuickModeRight" class="bfClearfix">
 
-                <form name="bfForm" onsubmit="return false">
+                <div id="menutab">
+                    <input id="triggerScrollable" type="checkbox"><label class="triggerScrollableLabel"
+                        for="triggerScrollable">Keep panel docked</label>
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button type="button" class="nav-link active tab-items" id="fragment-1-tab"
+                                data-bs-toggle="tab" data-bs-target="#fragment-1" role="tab"
+                                aria-controls="fragment-1" aria-selected="true"
+                                onclick="JQuery('.bfFadingMessage').css('display', 'none')">
+                                <?php echo Text::_('COM_BREEZINGFORMSNG_PROPERTIES') ?>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button type="button" class="nav-link tab-element" id="fragment-2-tab"
+                                data-bs-toggle="tab" data-bs-target="#fragment-2" role="tab"
+                                aria-controls="fragment-2" aria-selected="false"
+                                onclick="JQuery('.bfFadingMessage').css('display', 'none')">
+                                <?php echo Text::_('COM_BREEZINGFORMSNG_ADVANCED') ?>
+                            </button>
+                        </li>
+                    </ul>
 
-                    <div id="menutab">
-                        <input id="triggerScrollable" type="checkbox"><label class="triggerScrollableLabel"
-                            for="triggerScrollable">Keep panel docked</label>
-                        <ul class="nav nav-tabs" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button type="button" class="nav-link active tab-items" id="fragment-1-tab"
-                                    data-bs-toggle="tab" data-bs-target="#fragment-1" role="tab"
-                                    aria-controls="fragment-1" aria-selected="true"
-                                    onclick="JQuery('.bfFadingMessage').css('display', 'none')">
-                                    <?php echo Text::_('COM_BREEZINGFORMSNG_PROPERTIES') ?>
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button type="button" class="nav-link tab-element" id="fragment-2-tab"
-                                    data-bs-toggle="tab" data-bs-target="#fragment-2" role="tab"
-                                    aria-controls="fragment-2" aria-selected="false"
-                                    onclick="JQuery('.bfFadingMessage').css('display', 'none')">
-                                    <?php echo Text::_('COM_BREEZINGFORMSNG_ADVANCED') ?>
-                                </button>
-                            </li>
-                        </ul>
+                    <div class="tab-content">
 
-                        <div class="tab-content">
+                        <!--
+                            bfForm wraps only fragment-1/fragment-2 (not the whole
+                            #menutab): the "Options" tab (fragment-3) needs its own
+                            <form> posting to forms.save, and nesting <form> elements
+                            is invalid HTML. Native submission is blocked either way
+                            (onsubmit="return false") - the Enregistrer buttons are
+                            intercepted by id via quickmode-app.js, unaffected by
+                            exactly which ancestor this <form> wraps.
+                        -->
+                        <form name="bfForm" onsubmit="return false">
 
                             <div id="fragment-1" class="tab-pane fade show active" role="tabpanel" aria-labelledby="fragment-1-tab">
                                 <div>
@@ -341,10 +350,11 @@ final class QuickmodeHtml
 
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                </form>
+                        </form>
+
+                    </div>
+                </div>
 
             </div> <!-- ##### bfQuickModeRight end ##### -->
 

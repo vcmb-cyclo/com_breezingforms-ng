@@ -1357,9 +1357,11 @@ final class RenderingEngine
                         echo indentc(1) . '</div>' . nl();
                         break;
                     case 'Captcha':
-                        $captcha_url = Uri::root(true)
-                            . ($this->processor->app->isClient('administrator') ? '/administrator' : '')
-                            . '/index.php?option=com_breezingformsng&bfCaptcha=1';
+                        $captcha_url = $this->captchaEndpointBuilder()->build(
+                            Uri::root(true),
+                            $this->processor->app->isClient('administrator'),
+                            (int) $this->processor->form
+                        )['captcha'];
                         echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
                         $attribs = '';
                         if ($row->width > 0)

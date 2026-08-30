@@ -13,6 +13,7 @@ final class CaptchaEndpointBuilderTest extends TestCase
     {
         self::assertSame(
             [
+                'captcha' => 'https://example.test/index.php?option=com_breezingformsng&bfCaptcha=1',
                 'image' => 'https://example.test/index.php?option=com_breezingformsng&bfCaptcha=1&bfMathRandom=',
                 'check' => 'https://example.test/index.php?raw=true&option=com_breezingformsng&checkCaptcha=true&Itemid=0&tmpl=component&value=',
                 'recaptcha' => 'index.php?raw=true&option=com_breezingformsng&bfReCaptcha=true&form=27&Itemid=0&tmpl=component',
@@ -28,6 +29,10 @@ final class CaptchaEndpointBuilderTest extends TestCase
         self::assertSame(
             'https://example.test/administrator/index.php?option=com_breezingformsng&bfCaptcha=1&bfMathRandom=',
             $endpoints['image']
+        );
+        self::assertSame(
+            'https://example.test/administrator/index.php?option=com_breezingformsng&bfCaptcha=1',
+            $endpoints['captcha']
         );
         self::assertStringStartsWith(
             'https://example.test/administrator/index.php?raw=true&option=com_breezingformsng&checkCaptcha=true',

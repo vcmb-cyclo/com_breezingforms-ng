@@ -9,17 +9,17 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering;
  */
 final class FormRoutingFieldsBuilder
 {
-    public function build(string $return, string $template): string
+    public function build(string $return, string $template, string $newline = "\r\n"): string
     {
         $fields = '';
 
         if ($return !== '') {
             $fields .= '<input type="hidden" name="return" value="'
-                . htmlentities($return, ENT_QUOTES, 'UTF-8') . '"/>' . "\r\n";
+                . htmlentities($return, ENT_QUOTES, 'UTF-8') . '"/>' . $newline;
         }
 
         if ($template === 'component') {
-            $fields .= '<input type="hidden" name="tmpl" value="component"/>' . "\r\n";
+            $fields .= '<input type="hidden" name="tmpl" value="component"/>' . $newline;
         }
 
         return $fields;

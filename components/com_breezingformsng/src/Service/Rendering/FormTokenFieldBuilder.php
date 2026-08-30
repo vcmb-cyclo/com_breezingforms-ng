@@ -9,8 +9,8 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering;
  */
 final class FormTokenFieldBuilder
 {
-    public function build(string $token, string $indentation): string
+    public function build(string $token, string $indentation, string $newline = "\r\n"): string
     {
-        return $indentation . $token . "\r\n";
+        return $indentation . $token . $newline;
     }
 }

@@ -178,7 +178,10 @@ ce qui supprime la dernière construction directe de cet endpoint dans
 `RenderingEngine`.
 La génération du JavaScript de validation reste à extraire séparément ; ses
 variantes et son ordre historique sont déjà couverts par
-`RenderingEngineViewCharacterizationTest`.
+`RenderingEngineViewCharacterizationTest`. La sélection du nœud de validation
+est désormais isolée dans `CaptchaValidationRowSelector` (`d328c4f8`) : le
+premier `Captcha` est prioritaire et le dernier `ReCaptcha` est conservé,
+comme dans le flux historique ; ces règles sont couvertes par un test unitaire.
 
 La phase 2.3 est donc couverte pour les scripts de signature et de contrôles
 de fichiers ; l'intégration complète ContentBuilder reste conditionnée à un

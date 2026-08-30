@@ -24,4 +24,23 @@ final class ContentBuilderFileValueParserTest extends TestCase
             (new ContentBuilderFileValueParser())->parse('')
         );
     }
+
+    public function testPreservesBlankLinesAndUnicodeFileNames(): void
+    {
+        self::assertSame(
+            [
+                'count' => 4,
+                'files' => ['rapport été.pdf', '', 'second.txt', ''],
+            ],
+            (new ContentBuilderFileValueParser())->parse("rapport été.pdf\r\n\nsecond.txt\n")
+        );
+    }
+
+    public function testRemovesCarriageReturnsEvenWithoutLineFeeds(): void
+    {
+        self::assertSame(
+            ['count' => 1, 'files' => ['first.pdfsecond.pdf']],
+            (new ContentBuilderFileValueParser())->parse("first.pdf\rsecond.pdf")
+        );
+    }
 }

@@ -227,8 +227,9 @@ JQuery/`bfToggleFieldsLoaded`.
 ### 4.2 Champs techniques et paiement
 
 État : le builder pur du champ `ff_payment_method` est extrait et branché par
-`3d45e1e2`. La détection des types de paiement reste dans `view()` et demeure
-à caractériser avec les trois providers. Les champs de contexte ContentBuilder
+`3d45e1e2`. La détection des types de paiement est désormais isolée dans
+`PaymentProviderDetector` et branchée dans `view()` par `b5d1a55e`, avec les
+trois providers couverts. Les champs de contexte ContentBuilder
 (`cb_form_id`, `cb_record_id`, `cbIsNew`) sont maintenant produits par
 `ContentBuilderTechnicalFieldsBuilder`, branché dans les trois modes par
 `c53a457e`.

@@ -358,19 +358,23 @@ Règles de coordination :
 
 ## Ordre recommandé des prochains lots
 
-1. Service de chargement d'un enregistrement éditable.
-2. Harnais ContentBuilder pour le parcours complet des fichiers et des
-   signatures, puis extraction de la lecture SQL de l'enregistrement.
-3. Premier lot Strategy QuickMode : `bfTextfield` et `bfNumberInput`, après
+1. Harnais ContentBuilder pour le parcours complet des fichiers et des
+   signatures, puis validation de la lecture SQL de l'enregistrement.
+2. Premier lot Strategy QuickMode : `bfTextfield` et `bfNumberInput`, après
    comparaison des quatre variantes déjà couvertes par snapshots.
-4. Extraction des scripts post-rendu et des champs techniques.
-5. Rendu HTML classique par famille de nœuds.
-6. Extension PHPCS et réduction PHPStan après chaque service stabilisé.
+3. Extraction des scripts post-rendu et des champs techniques.
+4. Rendu HTML classique par famille de nœuds.
+5. Extension PHPCS et réduction PHPStan après chaque service stabilisé.
 
 Lots récemment terminés : tests d'intégration des variantes Query List et du
 point d'arrêt `bury()` dans la première boucle (`7a19ffeb`), contrôles de
 fichiers ContentBuilder (`2c72231e`) et loader d'enregistrement éditable
 (`89165de7`).
+
+Les quatre renderers QuickMode ont encore une baseline PHPCS distincte ; le
+contrôle direct fait apparaître des violations de formatage héritées. Ce lot
+reste séparé de la mutualisation fonctionnelle pour conserver des commits
+réversibles.
 
 Les lots 3 à 5 peuvent être préparés en parallèle du lot 6, à condition que le
 branchement dans `RenderingEngine.php` soit coordonné.

@@ -65,6 +65,7 @@ final class RenderingEngine
     private ?PaymentMethodFieldBuilder $paymentMethodFieldBuilderService = null;
     private ?ContentBuilderTechnicalFieldsBuilder $contentBuilderTechnicalFieldsBuilderService = null;
     private ?FormRoutingFieldsBuilder $formRoutingFieldsBuilderService = null;
+    private ?FormTokenFieldBuilder $formTokenFieldBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -196,6 +197,11 @@ final class RenderingEngine
     private function formRoutingFieldsBuilder(): FormRoutingFieldsBuilder
     {
         return $this->formRoutingFieldsBuilderService ??= new FormRoutingFieldsBuilder();
+    }
+
+    private function formTokenFieldBuilder(): FormTokenFieldBuilder
+    {
+        return $this->formTokenFieldBuilderService ??= new FormTokenFieldBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -1615,7 +1621,10 @@ final class RenderingEngine
                     indentc(1) . '<input type="hidden" name="ff_module_id" value="' . $this->processor->app->getInput()->getInt('ff_module_id', 0) . '"/>' . nl();
                 echo indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities((string) $this->processor->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
-                    indentc(1) . \Joomla\CMS\HTML\HTMLHelper::_('form.token') . nl();
+                    $this->formTokenFieldBuilder()->build(
+                        \Joomla\CMS\HTML\HTMLHelper::_('form.token'),
+                        indentc(1)
+                    );
                 if ($this->processor->target > 1)
                     echo indentc(1) . '<input type="hidden" name="ff_target" value="' . htmlentities((string) $this->processor->target, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                 if ($this->processor->inframe)
@@ -1653,7 +1662,10 @@ final class RenderingEngine
                     indentc(1) . '<input type="hidden" name="act" value="run"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities((string) $this->processor->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
-                    indentc(1) . \Joomla\CMS\HTML\HTMLHelper::_('form.token') . nl() .
+                    $this->formTokenFieldBuilder()->build(
+                        \Joomla\CMS\HTML\HTMLHelper::_('form.token'),
+                        indentc(1)
+                    ) .
                     indentc(1) . '<input type="hidden" name="ff_contentid" value="' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_applic" value="' . $this->processor->app->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->processor->record_id . '"/>' . nl() .
@@ -1692,7 +1704,10 @@ final class RenderingEngine
                         indentc(1) . '<input type="hidden" name="ff_frame" value="1"/>' . nl() .
                         indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities((string) $this->processor->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
                         indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
-                    indentc(1) . \Joomla\CMS\HTML\HTMLHelper::_('form.token') . nl() .
+                    $this->formTokenFieldBuilder()->build(
+                        \Joomla\CMS\HTML\HTMLHelper::_('form.token'),
+                        indentc(1)
+                    ) .
                         indentc(1) . '<input type="hidden" name="ff_contentid" value="' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
                         indentc(1) . '<input type="hidden" name="ff_applic" value="' . $this->processor->app->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
                         indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->processor->record_id . '"/>' . nl() .

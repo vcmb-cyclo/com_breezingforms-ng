@@ -300,7 +300,8 @@ propres à chaque thème.
 7. Calendriers et calendriers responsives — le bouton de déclenchement est
    partagé via `QuickModeCalendarButtonBuilder` (`7911701f`), et l'input texte
    est partagé via `QuickModeCalendarInputBuilder` (`1d623384`). Les
-   initialisations Pickadate et responsive restent à traiter séparément.
+   initialisations Pickadate et responsive sont désormais centralisées via
+   `QuickModeCalendarInitScriptBuilder` (`1de4b129`).
 8. Uploads, CAPTCHA, signatures et paiements.
 
 Pour chaque type :
@@ -472,6 +473,12 @@ L'input texte des calendriers est désormais partagé via
 Bootstrap commun à Bootstrap/OnePage par `1d623384`. Les classes de thème,
 styles de largeur, valeur échappée et espacement historique de l'attribut
 `id` sont couverts par les snapshots et le test unitaire du builder.
+
+Les appels d'initialisation des calendriers responsive et Mobile sont désormais
+partagés via `QuickModeCalendarInitScriptBuilder` et branchés par `1de4b129`.
+Les paramètres JSON, le drapeau `hasYearScroller` et le libellé traduit sont
+couverts ; le chargement des assets reste dans les renderers car il dépend du
+cycle d'asset Joomla et de l'état local du renderer.
 
 La baseline PHPCS est maintenant sans erreur sur les services modernes, les
 quatre renderers QuickMode et leurs traits (`e25d501f`, `14985d4d`, `288b42a4`,

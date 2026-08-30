@@ -73,6 +73,7 @@ final class RenderingEngine
     private ?AdditionalHiddenFieldsBuilder $additionalHiddenFieldsBuilderService = null;
     private ?PaymentProviderDetector $paymentProviderDetectorService = null;
     private ?ContentBuilderFileValueParser $contentBuilderFileValueParserService = null;
+    private ?ContentBuilderFileDisplayNameBuilder $contentBuilderFileDisplayNameBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -244,6 +245,11 @@ final class RenderingEngine
     private function contentBuilderFileValueParser(): ContentBuilderFileValueParser
     {
         return $this->contentBuilderFileValueParserService ??= new ContentBuilderFileValueParser();
+    }
+
+    private function contentBuilderFileDisplayNameBuilder(): ContentBuilderFileDisplayNameBuilder
+    {
+        return $this->contentBuilderFileDisplayNameBuilderService ??= new ContentBuilderFileDisplayNameBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -760,12 +766,9 @@ final class RenderingEngine
                                 $displayNames = [];
                                 foreach ($cbFiles as $cbFile) {
                                     if (trim($cbFile)) {
-                                        $displayName = htmlspecialchars(
-                                            basename(ContentbuilderngHelper::contentbuilderng_wordwrap($cbFile, 150, '<br>', true)),
-                                            ENT_QUOTES,
-                                            'UTF-8'
+                                        $displayName = $this->contentBuilderFileDisplayNameBuilder()->build(
+                                            ContentbuilderngHelper::contentbuilderng_wordwrap($cbFile, 150, '<br>', true)
                                         );
-                                        $displayName = str_replace('&lt;br&gt;', '<br>', $displayName);
                                         $displayNames[] = $displayName;
                                     }
                                 }

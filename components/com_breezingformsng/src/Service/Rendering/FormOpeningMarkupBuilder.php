@@ -15,7 +15,9 @@ final class FormOpeningMarkupBuilder
             . ($className !== '' ? ' ' . $className : '') . '"';
 
         if ($legacyWrap) {
-            return $markup . '><div class="bfPage-tl"><div class="bfPage-tr"><div class="bfPage-t"></div></div></div><div class="bfPage-l"><div class="bfPage-r"><div class="bfPage-m bfClearfix">' . $newline;
+            return $markup . '><div class="bfPage-tl"><div class="bfPage-tr">'
+                . '<div class="bfPage-t"></div></div></div><div class="bfPage-l">'
+                . '<div class="bfPage-r"><div class="bfPage-m bfClearfix">' . $newline;
         }
 
         return $markup . '>';

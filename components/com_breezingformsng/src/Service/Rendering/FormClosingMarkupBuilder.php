@@ -12,7 +12,8 @@ final class FormClosingMarkupBuilder
     public function build(bool $legacyWrap, string $newline = "\r\n"): string
     {
         if ($legacyWrap) {
-            return '</div></div></div><div class="bfPage-bl"><div class="bfPage-br"><div class="bfPage-b"></div></div></div></div><!-- form end -->' . $newline;
+            return '</div></div></div><div class="bfPage-bl"><div class="bfPage-br">'
+                . '<div class="bfPage-b"></div></div></div></div><!-- form end -->' . $newline;
         }
 
         return '</div><!-- form end -->' . $newline;

@@ -60,6 +60,7 @@ final class RenderingEngine
     private ?ClassicHiddenInputBuilder $classicHiddenInputBuilderService = null;
     private ?ClassicTextInputBuilder $classicTextInputBuilderService = null;
     private ?ClassicTextareaBuilder $classicTextareaBuilderService = null;
+    private ?ClassicChoiceBuilder $classicChoiceBuilderService = null;
     private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
     private ?EditableRecordHydrationScriptBuilder $editableRecordHydrationScriptBuilderService = null;
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
@@ -198,6 +199,11 @@ final class RenderingEngine
     private function classicTextareaBuilder(): ClassicTextareaBuilder
     {
         return $this->classicTextareaBuilderService ??= new ClassicTextareaBuilder();
+    }
+
+    private function classicChoiceBuilder(): ClassicChoiceBuilder
+    {
+        return $this->classicChoiceBuilderService ??= new ClassicChoiceBuilder();
     }
 
     private function contentBuilderValueScriptBuilder(): ContentBuilderValueScriptBuilder
@@ -1089,26 +1095,38 @@ final class RenderingEngine
                         );
                         break;
                     case 'Checkbox':
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
-                        $attribs = '';
-                        if ($row->flag1)
-                            $attribs .= ' checked="checked"';
-                        if ($row->flag2)
-                            $attribs .= ' disabled="disabled"';
-                        $attribs .= $this->processor->script2clause($row);
-                        echo indentc(2) . '<input id="ff_elem' . $row->id . '" type="checkbox" name="ff_nm_' . $row->name . '[]" value="' . $data1 . '"' . $attribs . $class2 . '/><label id="ff_lbl' . $row->id . '" for="ff_elem' . $row->id . '"> ' . $data2 . '</label>' . nlc();
-                        echo indentc(1) . '</div>' . nl();
+                        echo $this->classicChoiceBuilder()->build(
+                            'checkbox',
+                            (int) $row->id,
+                            (string) $row->name,
+                            $data1,
+                            $data2,
+                            $attribs,
+                            $class1,
+                            $class2,
+                            (bool) $row->flag1,
+                            (bool) $row->flag2,
+                            $this->processor->script2clause($row),
+                            indentc(1),
+                            nlc() ?? ''
+                        );
                         break;
                     case 'Radio Button':
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
-                        $attribs = '';
-                        if ($row->flag1)
-                            $attribs .= ' checked="checked"';
-                        if ($row->flag2)
-                            $attribs .= ' disabled="disabled"';
-                        $attribs .= $this->processor->script2clause($row);
-                        echo indentc(2) . '<input id="ff_elem' . $row->id . '" type="radio" name="ff_nm_' . $row->name . '[]" value="' . $data1 . '"' . $attribs . $class2 . '/><label id="ff_lbl' . $row->id . '" for="ff_elem' . $row->id . '"> ' . $data2 . '</label>' . nlc();
-                        echo indentc(1) . '</div>' . nl();
+                        echo $this->classicChoiceBuilder()->build(
+                            'radio',
+                            (int) $row->id,
+                            (string) $row->name,
+                            $data1,
+                            $data2,
+                            $attribs,
+                            $class1,
+                            $class2,
+                            (bool) $row->flag1,
+                            (bool) $row->flag2,
+                            $this->processor->script2clause($row),
+                            indentc(1),
+                            nlc() ?? ''
+                        );
                         break;
                     case 'Regular Button':
                         echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();

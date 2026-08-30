@@ -74,6 +74,7 @@ final class RenderingEngine
     private ?PaymentProviderDetector $paymentProviderDetectorService = null;
     private ?ContentBuilderFileValueParser $contentBuilderFileValueParserService = null;
     private ?ContentBuilderFileDisplayNameBuilder $contentBuilderFileDisplayNameBuilderService = null;
+    private ?ContentBuilderFlashUploadValidationBuilder $contentBuilderFlashUploadValidationBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -250,6 +251,11 @@ final class RenderingEngine
     private function contentBuilderFileDisplayNameBuilder(): ContentBuilderFileDisplayNameBuilder
     {
         return $this->contentBuilderFileDisplayNameBuilderService ??= new ContentBuilderFileDisplayNameBuilder();
+    }
+
+    private function contentBuilderFlashUploadValidationBuilder(): ContentBuilderFlashUploadValidationBuilder
+    {
+        return $this->contentBuilderFlashUploadValidationBuilderService ??= new ContentBuilderFlashUploadValidationBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -745,16 +751,8 @@ final class RenderingEngine
                             if (trim($this->processor->formrow->template_code_processed) == 'QuickMode') {
 
                                 if ($cbFlashUploadValidationOverride == '') {
-                                    $cbJs .= '
-                                            function ff_flashupload_not_empty(element, message)
-                                            {
-                                                if(typeof bfSummarizers == "undefined") { alert("Flash upload validation only available in QuickMode!"); return ""}
-                                                if(JQuery("#bfFlashFileQueue"+element.id.split("ff_elem")[1]).html() != "" || cbFlashElemCnt[element.id] != 0 ) return "";
-                                                if (message=="") message = "Please enter "+element.name+".\n";
-                                                ff_validationFocus(element.name);
-                                                return message;
-                                            }
-                                            ';
+                                    $cbJs .= $this->contentBuilderFlashUploadValidationBuilder()->build();
+                                    $cbFlashUploadValidationOverride = '1';
                                 }
 
                                 $fileValue = $this->contentBuilderFileValueParser()->parse((string) $cbEntry->recValue);

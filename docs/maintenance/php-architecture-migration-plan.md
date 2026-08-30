@@ -423,6 +423,14 @@ du formulaire (wrapper moderne/legacy, identifiant et classe personnalisée)
 est désormais construit par `FormOpeningMarkupBuilder` via `e77be68a`, avec
 ses deux variantes couvertes par des tests unitaires.
 
+Les champs de contexte et le cycle d'enveloppe de `view()` sont désormais
+isolés en builders testés : `FormContextFieldsBuilder` (`f7d06454`),
+`FormOpeningMarkupBuilder` (`e77be68a`) et `FormClosingMarkupBuilder`
+(`301ba9f1`). La génération du token et des paramètres de routage reste
+également partagée (`462b2984`, `f183a4ce`), avec conservation explicite du
+séparateur de lignes (`0261acd4`). Les champs conditionnels propres à chaque
+mode restent à caractériser avant une éventuelle extraction.
+
 Les quatre renderers QuickMode ont encore une baseline PHPCS distincte ; le
 contrôle direct fait apparaître des violations de formatage héritées. Ce lot
 reste séparé de la mutualisation fonctionnelle pour conserver des commits

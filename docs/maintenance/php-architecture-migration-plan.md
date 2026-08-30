@@ -155,7 +155,10 @@ dans `ContentBuilderFileValueParser` via `b426525c`, avec conservation du
 comptage historique testé. La résolution du nom affiché est désormais isolée
 dans `ContentBuilderFileDisplayNameBuilder` via `40c7fd89`; l'échappement des
 balises inattendues et la restauration des `<br>` sont couverts. La
-validation QuickMode reste à caractériser avant une extraction supplémentaire.
+validation QuickMode est désormais centralisée dans
+`ContentBuilderFlashUploadValidationBuilder` via `6d4afd92`, avec émission
+unique du callback `ff_flashupload_not_empty`. Les parcours runtime complets
+des fichiers restent à éprouver avec un harnais ContentBuilder/Joomla.
 
 La phase 2.3 est donc couverte pour les scripts de signature et de contrôles
 de fichiers ; l'intégration complète ContentBuilder reste conditionnée à un

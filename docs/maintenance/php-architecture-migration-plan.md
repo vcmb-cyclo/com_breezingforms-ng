@@ -426,8 +426,10 @@ ses deux variantes couvertes par des tests unitaires.
 Les paramètres additionnels `ff_otherparams` du mode frontend sont désormais
 générés par `AdditionalHiddenFieldsBuilder` via `bb469b88`, avec ordre,
 encodage URL et échappement HTML couverts. La détection des providers de
-paiement et les champs conditionnels de finalisation restent les prochains
-points à caractériser.
+paiement est désormais isolée dans `PaymentProviderDetector` via `b5d1a55e`;
+les trois providers historiques et l'absence de provider sont couverts par
+des tests unitaires. Les champs conditionnels de finalisation restent les
+prochains points à caractériser.
 
 Les champs conditionnels `target`, `frame`, `border`, `page`, `align` et `top`
 sont désormais générés par `FormOptionalContextFieldsBuilder` via

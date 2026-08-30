@@ -44,7 +44,7 @@
 | `RenderingEngine::view()` — pièces | Pièces Before/After, code personnalisé et sorties `bury()` couverts | `RenderingEngine` |
 | `RenderingEngine::view()` — scripts | Bibliothèques, callbacks formulaire et `onload` extraits et couverts | `RenderingEngine` |
 | `RenderingEngine::view()` — validation | Extensions de fichiers et valeurs CAPTCHA par défaut extraites et couvertes | `RenderingEngine` |
-| `RenderingEngine::view()` — CAPTCHA | Sélection `Captcha` / `ReCaptcha` extraite, ordre historique préservé | Commit `4a070774` |
+| `RenderingEngine::view()` — CAPTCHA | Sélection `Captcha` / `ReCaptcha` extraite, endpoints site/admin isolés, ordre historique préservé | Commits `4a070774`, `8e3e9a7a` |
 | `RenderingEngine::view()` — Query List | Préparation extraite et variantes par défaut/checkbox/résultat vide couvertes | Commits `4070ec0f`, `b358e7e9` |
 | `RenderingEngine::view()` — scripts d'icônes | Extraction committée et trois chemins `bury()` couverts | Commit `0a908143` |
 | `RenderingEngine::view()` — callbacks d'éléments | Extraction committée ; ordre `init` / `action` / `validate` et trois arrêts `bury()` couverts | Commit `413cb1cb` |
@@ -167,6 +167,12 @@ La résolution des fichiers de signature couvre maintenant explicitement les
 valeurs vides, les fichiers absents et les fichiers présents ; la lecture et
 l'encodage restent volontairement dans `RenderingEngine`. L'intégration runtime
 complète des signatures reste à éprouver avec un harnais ContentBuilder/Joomla.
+
+Pour le CAPTCHA, la construction des endpoints image, validation legacy et
+ReCaptcha est désormais isolée dans `CaptchaEndpointBuilder` via `8e3e9a7a`.
+La génération du JavaScript de validation reste à extraire séparément ; ses
+variantes et son ordre historique sont déjà couverts par
+`RenderingEngineViewCharacterizationTest`.
 
 La phase 2.3 est donc couverte pour les scripts de signature et de contrôles
 de fichiers ; l'intégration complète ContentBuilder reste conditionnée à un

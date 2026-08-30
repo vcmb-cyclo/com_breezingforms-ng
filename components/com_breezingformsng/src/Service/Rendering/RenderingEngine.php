@@ -61,6 +61,7 @@ final class RenderingEngine
     private ?ContentBuilderSignatureScriptBuilder $contentBuilderSignatureScriptBuilderService = null;
     private ?ContentBuilderFileUploadScriptBuilder $contentBuilderFileUploadScriptBuilderService = null;
     private ?EditableRecordLoader $editableRecordLoaderService = null;
+    private ?PostRenderScriptBuilder $postRenderScriptBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -172,6 +173,11 @@ final class RenderingEngine
     private function editableRecordLoader(): EditableRecordLoader
     {
         return $this->editableRecordLoaderService ??= new EditableRecordLoader($this->processor->database);
+    }
+
+    private function postRenderScriptBuilder(): PostRenderScriptBuilder
+    {
+        return $this->postRenderScriptBuilderService ??= new PostRenderScriptBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -1544,54 +1550,15 @@ final class RenderingEngine
         }
 
         if ($this->processor->editable) {
-            echo '<script type="text/javascript"><!--' . nl() . 'if(typeof bfLoadEditable != "undefined") { 
-			    if(typeof JQuery != "undefined" && typeof bfToggleFieldsLoaded != "undefined" && typeof bfToggleFieldsLoaded != "undefined"){
-			        JQuery(document).ready(function(){
-			            let waitForToggleFields = setInterval(function(){
-			                if(bfToggleFieldsLoaded && bfToggleFieldsLoaded){
-			                    clearInterval(waitForToggleFields);
-			                    bfLoadEditable();
-			                }
-			            }, 100); 
-			        });
-			    }else{
-			        bfLoadEditable();
-			    }
-			}' . nl() . '//--></script>' . nl();
+            echo $this->postRenderScriptBuilder()->build('bfLoadEditable');
         }
 
         if ($cbRecord !== null) {
-            echo '<script type="text/javascript"><!--' . nl() . '
-			    if(typeof JQuery != "undefined" && typeof bfToggleFieldsLoaded != "undefined" && typeof bfToggleFieldsLoaded != "undefined"){
-			        JQuery(document).ready(function(){
-			            let waitForToggleFields = setInterval(function(){
-			                if(bfToggleFieldsLoaded && bfToggleFieldsLoaded){
-			                    clearInterval(waitForToggleFields);
-			                    bfLoadContentBuilderEditable();
-			                }
-			            }, 100); 
-			        });
-			    }else{
-			        bfLoadContentBuilderEditable();
-			    }
-			' . nl() . '//--></script>' . nl();
+            echo $this->postRenderScriptBuilder()->build('bfLoadContentBuilderEditable');
         }
 
         if ($cbForm !== null && count($cbNonEditableFields)) {
-            echo '<script type="text/javascript"><!--' . nl() . '
-			    if(typeof JQuery != "undefined" && typeof bfToggleFieldsLoaded != "undefined" && typeof bfToggleFieldsLoaded != "undefined"){
-			        JQuery(document).ready(function(){
-			            let waitForToggleFields = setInterval(function(){
-			                if(bfToggleFieldsLoaded && bfToggleFieldsLoaded){
-			                    clearInterval(waitForToggleFields);
-			                    bfDisableContentBuilderFields();
-			                }
-			            }, 100); 
-			        });
-			    }else{
-			        bfDisableContentBuilderFields();
-			    }
-			' . nl() . '//--></script>' . nl();
+            echo $this->postRenderScriptBuilder()->build('bfDisableContentBuilderFields');
         }
 
         // CONTENTBUILDER

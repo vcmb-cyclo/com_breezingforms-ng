@@ -423,6 +423,12 @@ du formulaire (wrapper moderne/legacy, identifiant et classe personnalisée)
 est désormais construit par `FormOpeningMarkupBuilder` via `e77be68a`, avec
 ses deux variantes couvertes par des tests unitaires.
 
+Les champs conditionnels `target`, `frame`, `border`, `page`, `align` et `top`
+sont désormais générés par `FormOptionalContextFieldsBuilder` via
+`fdbf8960`. Les paramètres frontend/backend complets et la variante preview
+(page/frame uniquement) sont couverts par des tests unitaires, tandis que les
+différences de mode restent exprimées explicitement à l'appel.
+
 Les champs de contexte et le cycle d'enveloppe de `view()` sont désormais
 isolés en builders testés : `FormContextFieldsBuilder` (`f7d06454`),
 `FormOpeningMarkupBuilder` (`e77be68a`) et `FormClosingMarkupBuilder`

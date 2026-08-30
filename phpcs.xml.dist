@@ -11,6 +11,7 @@
     <file>components/com_breezingformsng/src/Service/Rendering/ProcessorHeaderRenderer.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderValueScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderReadonlyScriptBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderSignatureScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/HiddenFieldTrait.php</file>
     <file>components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php</file>
 

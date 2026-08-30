@@ -58,6 +58,7 @@ final class RenderingEngine
     private ?ProcessorHeaderRenderer $processorHeaderRendererService = null;
     private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
+    private ?ContentBuilderSignatureScriptBuilder $contentBuilderSignatureScriptBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -154,6 +155,11 @@ final class RenderingEngine
     private function contentBuilderReadonlyScriptBuilder(): ContentBuilderReadonlyScriptBuilder
     {
         return $this->contentBuilderReadonlyScriptBuilderService ??= new ContentBuilderReadonlyScriptBuilder();
+    }
+
+    private function contentBuilderSignatureScriptBuilder(): ContentBuilderSignatureScriptBuilder
+    {
+        return $this->contentBuilderSignatureScriptBuilderService ??= new ContentBuilderSignatureScriptBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -714,17 +720,11 @@ final class RenderingEngine
 
                                 $sig_encoded = bf_b64enc(file_get_contents($sig_path . $cbEntry->recValue));
 
-                                $base = 'ba' . 'se' . '64';
-
-                                $js .= '
-										JQuery(document).ready(function(){
-											if(typeof bf_signaturePad' . $cbEntry->recElementId . ' != "undefined"){
-												if(' . (strlen($sig_encoded) > 0 ? 'true' : 'false') . '){
-													JQuery("[name=\"ff_nm_' . $cbEntry->recName . '[]\"]").val(' . json_encode('data:image/png;' . $base . ',' . $sig_encoded) . ')
-													bf_signaturePad' . $cbEntry->recElementId . '.fromDataURL(' . json_encode('data:image/png;' . $base . ',' . $sig_encoded) . ');
-												}
-											}
-										});';
+                                $js .= $this->contentBuilderSignatureScriptBuilder()->build(
+                                    (string) $cbEntry->recName,
+                                    (int) $cbEntry->recElementId,
+                                    (string) $sig_encoded
+                                );
                             }
                             break;
                         case 'Textarea':

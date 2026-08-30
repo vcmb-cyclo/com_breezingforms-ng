@@ -58,6 +58,7 @@ class MobileRenderer
     private ?QuickModeSubmitButtonBuilder $quickModeSubmitButtonBuilderService = null;
     private ?QuickModeCalendarButtonBuilder $quickModeCalendarButtonBuilderService = null;
     private ?QuickModeCalendarInputBuilder $quickModeCalendarInputBuilderService = null;
+    private ?QuickModeCalendarInitScriptBuilder $quickModeCalendarInitScriptBuilderService = null;
 
     public function __construct(HTML_facileFormsProcessor $p)
     {
@@ -136,6 +137,11 @@ class MobileRenderer
     private function quickModeCalendarInputBuilder(): QuickModeCalendarInputBuilder
     {
         return $this->quickModeCalendarInputBuilderService ??= new QuickModeCalendarInputBuilder();
+    }
+
+    private function quickModeCalendarInitScriptBuilder(): QuickModeCalendarInitScriptBuilder
+    {
+        return $this->quickModeCalendarInitScriptBuilderService ??= new QuickModeCalendarInitScriptBuilder();
     }
 
     public function parseToggleFields($code)
@@ -1312,8 +1318,10 @@ HTML;
 
                         $this->addScript(Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-mobile.js');
                         $this->addScriptDeclaration(
-                            'bfInitMobileCalendar(' . json_encode((int) $mdata['dbId']) . ', '
-                            . json_encode(Text::_('COM_BREEZINGFORMSNG_CALENDAR_OPEN')) . ');'
+                            $this->quickModeCalendarInitScriptBuilder()->buildMobile(
+                                (int) $mdata['dbId'],
+                                Text::_('COM_BREEZINGFORMSNG_CALENDAR_OPEN')
+                            )
                         );
                         echo '</span>';
                         echo '</div>';
@@ -1367,12 +1375,13 @@ HTML;
                             RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js');
                         }
 
-                        echo '<script type="text/javascript">bfInitCalendarResponsive(' . json_encode((int) $mdata['dbId']) . ', ' . json_encode([
-                        'format' => $mdata['format'],
-                        'selectYears' => $pickerSelectYears,
-                        'firstDay' => $pickerFirstDay,
-                        'hasYearScroller' => false,
-                        ]) . ');</script>' . "\n";
+                        echo $this->quickModeCalendarInitScriptBuilder()->buildResponsive(
+                            (int) $mdata['dbId'],
+                            (string) $mdata['format'],
+                            (int) $pickerSelectYears,
+                            (int) $pickerFirstDay,
+                            false
+                        );
 
                         $this->hasResponsiveDatePicker = true;
 

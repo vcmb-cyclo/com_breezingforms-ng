@@ -66,6 +66,7 @@ class BootstrapRenderer
     private ?QuickModeSubmitButtonBuilder $quickModeSubmitButtonBuilderService = null;
     private ?QuickModeCalendarButtonBuilder $quickModeCalendarButtonBuilderService = null;
     private ?QuickModeCalendarInputBuilder $quickModeCalendarInputBuilderService = null;
+    private ?QuickModeCalendarInitScriptBuilder $quickModeCalendarInitScriptBuilderService = null;
 
     public function bsClass($key)
     {
@@ -116,6 +117,11 @@ class BootstrapRenderer
     private function quickModeCalendarInputBuilder(): QuickModeCalendarInputBuilder
     {
         return $this->quickModeCalendarInputBuilderService ??= new QuickModeCalendarInputBuilder();
+    }
+
+    private function quickModeCalendarInitScriptBuilder(): QuickModeCalendarInitScriptBuilder
+    {
+        return $this->quickModeCalendarInitScriptBuilderService ??= new QuickModeCalendarInitScriptBuilder();
     }
 
     public static function getEditorContent($editor)

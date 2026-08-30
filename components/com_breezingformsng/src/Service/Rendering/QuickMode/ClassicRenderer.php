@@ -63,6 +63,7 @@ class ClassicRenderer
     private ?QuickModeSubmitButtonBuilder $quickModeSubmitButtonBuilderService = null;
     private ?QuickModeCalendarButtonBuilder $quickModeCalendarButtonBuilderService = null;
     private ?QuickModeCalendarInputBuilder $quickModeCalendarInputBuilderService = null;
+    private ?QuickModeCalendarInitScriptBuilder $quickModeCalendarInitScriptBuilderService = null;
 
     public function headers()
     {
@@ -200,6 +201,11 @@ float:left;
     private function quickModeCalendarInputBuilder(): QuickModeCalendarInputBuilder
     {
         return $this->quickModeCalendarInputBuilderService ??= new QuickModeCalendarInputBuilder();
+    }
+
+    private function quickModeCalendarInitScriptBuilder(): QuickModeCalendarInitScriptBuilder
+    {
+        return $this->quickModeCalendarInitScriptBuilderService ??= new QuickModeCalendarInitScriptBuilder();
     }
 
     public function __construct(HTML_facileFormsProcessor $p)
@@ -1279,12 +1285,13 @@ float:left;
             RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js');
         }
 
-        echo '<script type="text/javascript">bfInitCalendarResponsive(' . json_encode((int) $mdata['dbId']) . ', ' . json_encode([
-            'format' => $mdata['format'],
-            'selectYears' => $pickerSelectYears,
-            'firstDay' => $pickerFirstDay,
-            'hasYearScroller' => true,
-        ]) . ');</script>' . "\n";
+        echo $this->quickModeCalendarInitScriptBuilder()->buildResponsive(
+            (int) $mdata['dbId'],
+            (string) $mdata['format'],
+            (int) $pickerSelectYears,
+            (int) $pickerFirstDay,
+            true
+        );
 
         $this->hasResponsiveDatePicker = true;
     }

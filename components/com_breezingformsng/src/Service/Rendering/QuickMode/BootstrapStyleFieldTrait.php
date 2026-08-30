@@ -208,12 +208,13 @@ trait BootstrapStyleFieldTrait
             RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js');
         }
 
-        echo '<script type="text/javascript">bfInitCalendarResponsive(' . json_encode((int) $mdata['dbId']) . ', ' . json_encode([
-            'format' => $mdata['format'],
-            'selectYears' => $pickerSelectYears,
-            'firstDay' => $pickerFirstDay,
-            'hasYearScroller' => true,
-        ]) . ');</script>' . "\n";
+        echo $this->quickModeCalendarInitScriptBuilder()->buildResponsive(
+            (int) $mdata['dbId'],
+            (string) $mdata['format'],
+            (int) $pickerSelectYears,
+            (int) $pickerFirstDay,
+            true
+        );
 
         $this->hasResponsiveDatePicker = true;
 

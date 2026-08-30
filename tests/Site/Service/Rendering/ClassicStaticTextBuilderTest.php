@@ -9,6 +9,31 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ClassicStaticTextBuild
 
 final class ClassicStaticTextBuilderTest extends TestCase
 {
+    public function testBuildsImageWithDimensionsAndClasses(): void
+    {
+        self::assertSame(
+            "\t<div id=\"ff_div10\" style=\"position:absolute;\" class=\"wrapper\">\n\t\t<img id=\"ff_elem10\" src=\"/image.png\"  alt=\"An image\" border=\"0\" width=\"120\" height=\"40\"  class=\"image\"/>\n\t</div>\n",
+            (new ClassicStaticTextBuilder())->buildImage(
+                10,
+                'position:absolute;',
+                ' class="wrapper"',
+                ' class="image"',
+                '/image.png',
+                'An image',
+                120,
+                40
+            )
+        );
+    }
+
+    public function testBuildsImageWithoutOptionalDimensions(): void
+    {
+        self::assertSame(
+            "  <div id=\"ff_div11\" style=\"\">\r\n    <img id=\"ff_elem11\" src=\"x\"  alt=\"\" border=\"0\"  class=\"img\"/>\r\n  </div>\r\n",
+            (new ClassicStaticTextBuilder())->buildImage(11, '', '', ' class="img"', 'x', '', 0, 0, '  ', "\r\n")
+        );
+    }
+
     public function testBuildsRectangleWithOptionalBorderAndBackground(): void
     {
         self::assertSame(

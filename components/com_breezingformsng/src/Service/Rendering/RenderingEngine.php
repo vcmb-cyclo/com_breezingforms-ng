@@ -1033,14 +1033,18 @@ final class RenderingEngine
                         );
                         break;
                     case 'Image':
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
-                        $attribs = '';
-                        if ($row->width > 0)
-                            $attribs .= 'width="' . $row->width . '" ';
-                        if ($row->height > 0)
-                            $attribs .= 'height="' . $row->height . '" ';
-                        echo indentc(2) . '<img id="ff_elem' . $row->id . '" src="' . $data1 . '"  alt="' . $data2 . '" border="0" ' . $attribs . $class2 . '/>' . nlc();
-                        echo indentc(1) . '</div>' . nl();
+                        echo $this->classicStaticTextBuilder()->buildImage(
+                            (int) $row->id,
+                            $attribs,
+                            $class1,
+                            $class2,
+                            $data1,
+                            $data2,
+                            (int) $row->width,
+                            (int) $row->height,
+                            indentc(1),
+                            nlc()
+                        );
                         break;
                     case 'Tooltip':
                         $tooltipTitle = '<strong>' . htmlspecialchars(strip_tags(trim((string) $row->title)), ENT_QUOTES, 'UTF-8') . '</strong><br />' . str_replace(

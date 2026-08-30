@@ -9,6 +9,32 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering;
  */
 final class ClassicStaticTextBuilder
 {
+    public function buildImage(
+        int $elementId,
+        string $style,
+        string $classAttribute,
+        string $imageClassAttribute,
+        string $source,
+        string $alternative,
+        int $width,
+        int $height,
+        string $indent = "\t",
+        string $newline = "\n"
+    ): string {
+        $dimensions = '';
+        if ($width > 0) {
+            $dimensions .= 'width="' . $width . '" ';
+        }
+        if ($height > 0) {
+            $dimensions .= 'height="' . $height . '" ';
+        }
+
+        return $indent . '<div id="ff_div' . $elementId . '" style="' . $style . '"' . $classAttribute . '>' . $newline
+            . $indent . $indent . '<img id="ff_elem' . $elementId . '" src="' . $source . '"  alt="' . $alternative
+            . '" border="0" ' . $dimensions . $imageClassAttribute . '/>' . $newline
+            . $indent . '</div>' . $newline;
+    }
+
     public function buildRectangle(
         int $elementId,
         string $style,

@@ -132,9 +132,12 @@ trait BootstrapStyleFieldTrait
             'singleHeader' => $this->bfCalendarIsTruthy($mdata, 'singleHeader'),
             'todayBtn' => $this->bfCalendarIsTruthy($mdata, 'todayButton'),
             'weekNumbers' => $this->bfCalendarIsTruthy($mdata, 'weekNumbers'),
-            'minYear' => (isset($mdata['minYear']) && $mdata['minYear'] != '') ? '-' . $mdata['minYear'] : '',
-            'maxYear' => (isset($mdata['maxYear']) && $mdata['maxYear'] != '') ? '+' . $mdata['maxYear'] : '',
-            'firstDay' => (isset($mdata['firstDay']) && $mdata['firstDay'] != '') ? $mdata['firstDay'] : '7',
+            'minYear' => (isset($mdata['minYear']) && $mdata['minYear'] != '')
+                ? '-' . $mdata['minYear'] : '',
+            'maxYear' => (isset($mdata['maxYear']) && $mdata['maxYear'] != '')
+                ? '+' . $mdata['maxYear'] : '',
+            'firstDay' => (isset($mdata['firstDay']) && $mdata['firstDay'] != '')
+                ? $mdata['firstDay'] : '7',
         ];
 
         echo HTMLHelper::_('calendar', $left, "ff_nm_" . $mdata['bfName'] . "[]", "ff_elem" . $mdata['dbId'], $mdata['format'], $calAttr);
@@ -150,18 +153,28 @@ trait BootstrapStyleFieldTrait
     private function renderBootstrapStyleCalendarResponsiveField(array $mdata, string $label): void
     {
         /* translatables */
-        if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['value_translation' . $this->language_tag])
+            && $mdata['value_translation' . $this->language_tag] != ''
+        ) {
             $mdata['value'] = $mdata['value_translation' . $this->language_tag];
         }
-        if (isset($mdata['format_translation' . $this->language_tag]) && $mdata['format_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['format_translation' . $this->language_tag])
+            && $mdata['format_translation' . $this->language_tag] != ''
+        ) {
             $mdata['format'] = $mdata['format_translation' . $this->language_tag];
         }
         $icon = '';
-        if ($this->rootMdata['themebootstrapThemeEngine'] == 'bootstrap' && $this->rootMdata['themebootstrap'] == 'Azure') {
+        if (
+            $this->rootMdata['themebootstrapThemeEngine'] == 'bootstrap'
+            && $this->rootMdata['themebootstrap'] == 'Azure'
+        ) {
             if (!isset($mdata['icon']) || $mdata['icon'] == '') {
                 $icon = '<i class="fas fa-calendar iconf--fumi" aria-hidden="true"></i>';
             } else {
-                $icon = '<i class="fas ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8') . ' iconf--fumi" aria-hidden="true"></i>';
+                $icon = '<i class="fas ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8')
+                    . ' iconf--fumi" aria-hidden="true"></i>';
             }
         }
         /* translatables end */
@@ -206,7 +219,8 @@ trait BootstrapStyleFieldTrait
             'ff_elem' . $mdata['dbId'] . '_calendarButton',
             'bfCalendar ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' button',
             (string) $right,
-            '<i class="' . $this->bsClass('icon-calendar') . '"></i>' . htmlentities($right == '...' ? '' : $right, ENT_QUOTES, 'UTF-8')
+            '<i class="' . $this->bsClass('icon-calendar') . '"></i>'
+                . htmlentities($right == '...' ? '' : $right, ENT_QUOTES, 'UTF-8')
         );
         echo '</div>' . "\n";
 
@@ -215,8 +229,14 @@ trait BootstrapStyleFieldTrait
                 'var bfPickerMinusYearIcon = ' . json_encode(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/minusyear.png') . ';'
                 . "\n" . 'var bfPickerPlusYearIcon = ' . json_encode(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/plusyear.png') . ';'
             );
-            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-legacy-style.js');
-            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js');
+            RuntimeAssetLoader::script(
+                $this->p->app,
+                Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-legacy-style.js'
+            );
+            RuntimeAssetLoader::script(
+                $this->p->app,
+                Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js'
+            );
         }
 
         echo $this->quickModeCalendarInitScriptBuilder()->buildResponsive(
@@ -237,8 +257,17 @@ trait BootstrapStyleFieldTrait
     /**
      * @param array<string, mixed> $mdata
      */
-    private function renderBootstrapStyleTextfieldField(array $mdata, string $label, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
-    {
+    private function renderBootstrapStyleTextfieldField(
+        array $mdata,
+        string $label,
+        string $tabIndex,
+        string $onclick,
+        string $onblur,
+        string $onchange,
+        string $onfocus,
+        string $onselect,
+        string $readonly
+    ): void {
         $type = 'text';
 
         if ($mdata['password']) {
@@ -251,22 +280,33 @@ trait BootstrapStyleFieldTrait
         $size = '';
 
         if ($mdata['size'] != '') {
-            $size = 'style="width:' . htmlentities(strip_tags($mdata['size'])) . ' !important; min-width:' . htmlentities(strip_tags($mdata['size'])) . ' !important;" ';
+            $size = 'style="width:' . htmlentities(strip_tags($mdata['size']))
+                . ' !important; min-width:' . htmlentities(strip_tags($mdata['size'])) . ' !important;" ';
         }
         $icon = '';
-        if ($this->rootMdata['themebootstrapThemeEngine'] == 'bootstrap' && $this->rootMdata['themebootstrap'] == 'Azure') {
+        if (
+            $this->rootMdata['themebootstrapThemeEngine'] == 'bootstrap'
+            && $this->rootMdata['themebootstrap'] == 'Azure'
+        ) {
             if (!isset($mdata['icon']) || $mdata['icon'] == '') {
                 $icon = '<i class="fas fa-pencil iconf--fumi" aria-hidden="true"></i>';
             } else {
-                $icon = '<i class="fas ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8') . ' iconf--fumi" aria-hidden="true"></i>';
+                $icon = '<i class="fas ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8')
+                    . ' iconf--fumi" aria-hidden="true"></i>';
             }
         }
         /* translatables */
-        if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['value_translation' . $this->language_tag])
+            && $mdata['value_translation' . $this->language_tag] != ''
+        ) {
             $mdata['value'] = $mdata['value_translation' . $this->language_tag];
         }
 
-        if (isset($mdata['placeholder_translation' . $this->language_tag]) && $mdata['placeholder_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['placeholder_translation' . $this->language_tag])
+            && $mdata['placeholder_translation' . $this->language_tag] != ''
+        ) {
             $mdata['placeholder'] = $mdata['placeholder_translation' . $this->language_tag];
         }
         /* translatables end */

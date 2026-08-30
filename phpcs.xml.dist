@@ -24,6 +24,7 @@
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeTextareaBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeCheckboxBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeSelectBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeMaxLengthCounterBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php</file>
 
     <exclude-pattern>*/vendor/*</exclude-pattern>

@@ -53,6 +53,7 @@ class MobileRenderer
     private ?QuickModeTextareaBuilder $quickModeTextareaBuilderService = null;
     private ?QuickModeCheckboxBuilder $quickModeCheckboxBuilderService = null;
     private ?QuickModeSelectBuilder $quickModeSelectBuilderService = null;
+    private ?QuickModeMaxLengthCounterBuilder $quickModeMaxLengthCounterBuilderService = null;
 
     public function __construct(HTML_facileFormsProcessor $p)
     {
@@ -106,6 +107,11 @@ class MobileRenderer
     private function quickModeSelectBuilder(): QuickModeSelectBuilder
     {
         return $this->quickModeSelectBuilderService ??= new QuickModeSelectBuilder();
+    }
+
+    private function quickModeMaxLengthCounterBuilder(): QuickModeMaxLengthCounterBuilder
+    {
+        return $this->quickModeMaxLengthCounterBuilderService ??= new QuickModeMaxLengthCounterBuilder();
     }
 
     public function parseToggleFields($code)
@@ -509,7 +515,7 @@ HTML;
                     if (!($mdata['bfType'] == 'bfReCaptcha' && isset($mdata['invisibleCaptcha']) && $mdata['invisibleCaptcha'])) {
                         $maxlengthCounter = '';
                         if ($mdata['bfType'] == 'bfTextarea' && isset($mdata['maxlength']) && $mdata['maxlength'] > 0 && isset($mdata['showMaxlengthCounter']) && $mdata['showMaxlengthCounter']) {
-                            $maxlengthCounter = ' <span class=***bfMaxLengthCounter*** id=***bfMaxLengthCounter' . $mdata['dbId'] . '***>(' . $mdata['maxlength'] . ' ' . Text::_('COM_BREEZINGFORMSNG_CHARS_LEFT') . ')</span>';
+                            $maxlengthCounter = $this->quickModeMaxLengthCounterBuilder()->build((int) $mdata['dbId'], (int) $mdata['maxlength'], Text::_('COM_BREEZINGFORMSNG_CHARS_LEFT'));
                         }
 
                         $for = '';

@@ -25,16 +25,16 @@
 | `RenderingEngine::view()` — pièces | Pièces Before/After, code personnalisé et bibliothèque, avec sorties `bury()` couvertes | `RenderingEngine` |
 | `RenderingEngine::view()` — scripts | Bibliothèques, callbacks formulaire et `onload` initial/post-soumission extraits et couverts | `RenderingEngine` |
 | `RenderingEngine::view()` — validation | Générateur des extensions et valeurs CAPTCHA par défaut extraits et couverts | `RenderingEngine` |
+| `RenderingEngine::view()` — CAPTCHA | Sélection des scripts `Captcha` / `ReCaptcha` extraite et couverte, ordre historique préservé | `RenderingEngineViewCharacterizationTest` |
+| `RenderingEngine::view()` — Query List | Préparation des colonnes, pagination et lignes JavaScript extraite et couverte | `RenderingEngineQueryListPreparationTest` |
 
 ## Prochaines étapes
 
-1. Caractériser puis extraire la sélection complète du script CAPTCHA
-   (`Captcha` / `ReCaptcha`) sans modifier le JavaScript émis.
-2. Découper le rendu des éléments classiques par responsabilités : préparation
-   des requêtes, valeurs ContentBuilder, puis HTML de nœud.
-3. Après les filets de sécurité, mutualiser les comportements de champs
+1. Poursuivre le découpage du rendu classique avec les valeurs ContentBuilder,
+   puis le HTML de nœud.
+2. Après les filets de sécurité, mutualiser les comportements de champs
    QuickMode déjà rendus par les quatre renderers.
-4. Traiter PHPCS et PHPStan par groupes de services, sans reformatage massif.
+3. Traiter PHPCS et PHPStan par groupes de services, sans reformatage massif.
 
 ## Vérification minimale par lot
 

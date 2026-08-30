@@ -338,62 +338,7 @@ final class RenderingEngine
             if ($row->type == "Tooltip")
                 $tooltips++;
             if ($row->type == "Query List") {
-                if ($row->flag2)
-                    $qcheckboxes++;
-
-                // load column definitions
-                $this->processor->queryCols['ff_' . $row->id] = array();
-                $cols = &$this->processor->queryCols['ff_' . $row->id];
-                if ($this->processor->trim($row->data3)) {
-                    $cls = explode("\n", $row->data3);
-                    for ($c = 0; $c < count($cls); $c++) {
-                        if ($cls[$c] != '') {
-                            $col = ''; // instead of unset
-                            $col = new QueryColumn;
-                            $col->unpack($cls[$c]);
-                            $this->processor->compileQueryCol($row, $col);
-                            $cols[] = $col;
-                        } // if
-                    } // for
-                } // if
-                $colcnt = count($cols);
-                $checkbox = 0;
-                if ($row->flag2)
-                    $checkbox = $row->flag2;
-                $header = 0;
-                if ($row->flag1)
-                    $header = 1;
-
-                // get pagenav
-                $pagenav = 1;
-                $settings = explode("\n", $row->data1);
-                if (count($settings) > 8 && $this->processor->trim($settings[8]))
-                    $pagenav = $settings[8];
-
-                // export the javascript parameters
-                $qcode .= nl() .
-                    'ff_queryCurrPage[' . $row->id . '] = 1;' . nl() .
-                    'ff_queryPageSize[' . $row->id . '] = ' . $row->height . ';' . nl() .
-                    'ff_queryCheckbox[' . $row->id . '] = ' . $checkbox . ';' . nl() .
-                    'ff_queryHeader[' . $row->id . '] = ' . $header . ';' . nl() .
-                    'ff_queryPagenav[' . $row->id . '] = ' . $pagenav . ';' . nl() .
-                    'ff_queryCols[' . $row->id . '] = [';
-                for ($c = 0; $c < $colcnt; $c++) {
-                    if ($cols[$c]->thspan > 0)
-                        $qcode .= '1';
-                    else
-                        $qcode .= '0';
-                    if ($c < $colcnt - 1)
-                        $qcode .= ',';
-                } // for
-                $qcode .= '];' . nl();
-
-                // execute the query and export it to javascript
-                $this->processor->queryRows['ff_' . $row->id] = array();
-                $this->processor->execQuery($row, $this->processor->queryRows['ff_' . $row->id], $cols);
-                $qcode .= 'ff_queryRows[' . $row->id . '] = ' . $this->processor->expJsValue($this->processor->queryRows['ff_' . $row->id]) . ';' . nl();
-
-                unset($cols);
+                $this->prepareQueryListRow($row, $qcheckboxes, $qcode);
                 if ($this->processor->bury())
                     return;
             } // if
@@ -2258,6 +2203,65 @@ final class RenderingEngine
 		';
 
         return [$fileExtensionsCheck, $cntFiles];
+    }
+
+    /**
+     * Prepare the client-side state for one classic Query List element.
+     */
+    private function prepareQueryListRow(object $row, int &$queryCheckboxCount, string &$queryCode): void
+    {
+        if ($row->flag2) {
+            $queryCheckboxCount++;
+        }
+
+        $key = 'ff_' . $row->id;
+        $this->processor->queryCols[$key] = [];
+        $columns = &$this->processor->queryCols[$key];
+
+        if ($this->processor->trim($row->data3)) {
+            foreach (explode("\n", $row->data3) as $definition) {
+                if ($definition === '') {
+                    continue;
+                }
+
+                $column = new QueryColumn();
+                $column->unpack($definition);
+                $this->processor->compileQueryCol($row, $column);
+                $columns[] = $column;
+            }
+        }
+
+        $checkbox = $row->flag2 ?: 0;
+        $header = $row->flag1 ? 1 : 0;
+        $pageNavigation = 1;
+        $settings = explode("\n", $row->data1);
+
+        if (count($settings) > 8 && $this->processor->trim($settings[8])) {
+            $pageNavigation = $settings[8];
+        }
+
+        $queryCode .= nl() .
+            'ff_queryCurrPage[' . $row->id . '] = 1;' . nl() .
+            'ff_queryPageSize[' . $row->id . '] = ' . $row->height . ';' . nl() .
+            'ff_queryCheckbox[' . $row->id . '] = ' . $checkbox . ';' . nl() .
+            'ff_queryHeader[' . $row->id . '] = ' . $header . ';' . nl() .
+            'ff_queryPagenav[' . $row->id . '] = ' . $pageNavigation . ';' . nl() .
+            'ff_queryCols[' . $row->id . '] = [';
+
+        foreach ($columns as $index => $column) {
+            $queryCode .= $column->thspan > 0 ? '1' : '0';
+            if ($index < count($columns) - 1) {
+                $queryCode .= ',';
+            }
+        }
+
+        $queryCode .= '];' . nl();
+        $this->processor->queryRows[$key] = [];
+        $this->processor->execQuery($row, $this->processor->queryRows[$key], $columns);
+        $queryCode .= 'ff_queryRows[' . $row->id . '] = ' .
+            $this->processor->expJsValue($this->processor->queryRows[$key]) . ';' . nl();
+
+        unset($columns);
     }
 
     /**

@@ -56,6 +56,34 @@ final class EditableRecordLoaderTest extends TestCase
         self::assertSame(42, $record->id);
         self::assertSame($entries, $record->entries);
         self::assertCount(2, $database->queries);
+        self::assertSame(
+            ['record = :recordId'],
+            $database->queryObjects[1]->where
+        );
+        self::assertSame(
+            [[':recordId', 42, 1]],
+            $database->queryObjects[1]->bindings
+        );
+    }
+
+    public function testLoadKeepsGuestUsersOutOfTheEditableRecordQuery(): void
+    {
+        $database = new EditableRecordDatabaseDouble([]);
+
+        self::assertNull((new EditableRecordLoader($database))->load(7, 0));
+        self::assertSame(
+            [
+                'form = :formValue',
+                'user_id = :userId',
+                'user_id <> 0',
+                'archived = 0',
+            ],
+            $database->queryObjects[0]->where
+        );
+        self::assertSame(
+            [[':formValue', 7, 1], [':userId', 0, 1]],
+            $database->queryObjects[0]->bindings
+        );
     }
 }
 

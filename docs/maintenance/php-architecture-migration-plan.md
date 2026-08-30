@@ -123,9 +123,9 @@ partir d'une collection d'entrées.
 ### 2.3 Génération des valeurs ContentBuilder
 
 État : générateurs indépendants pour valeurs simples/non éditables, committés
-dans `f685ff5e`, `8bfd520e`, `c2ae9a76` et `21a0a812`. Le générateur de
-signatures est maintenant extrait et branché dans `view()` par `4f475561`,
-avec couverture dédiée.
+dans `f685ff5e`, `8bfd520e`, `c2ae9a76` et `21a0a812`. Les générateurs de
+signatures et de contrôles de fichiers sont maintenant extraits et branchés
+dans `view()` par `4f475561` et `2c72231e`, avec couverture dédiée.
 
 - Séparer les stratégies par type de champ :
   - valeurs simples et calendriers ;
@@ -143,6 +143,10 @@ avec couverture dédiée.
 
 Critère de sortie : l'hydratation ContentBuilder n'est plus implémentée dans
 `view()` et chaque famille de champs possède un test ciblé.
+
+Le générateur de contrôles de fichiers est traité par `2c72231e`. La lecture
+du contenu `recValue`, la résolution du nom affiché et la validation QuickMode
+restent à caractériser avant une extraction supplémentaire.
 
 ### 2.4 Champs ContentBuilder non éditables
 

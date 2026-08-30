@@ -1022,11 +1022,15 @@ final class RenderingEngine
                         );
                         break;
                     case 'Rectangle':
-                        if ($data1 != '')
-                            $attribs .= 'border:' . $data1 . ';';
-                        if ($data2 != '')
-                            $attribs .= 'background-color:' . $data2 . ';';
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="font-size:0px;' . $attribs . '"' . $class1 . '></div>' . nl();
+                        echo $this->classicStaticTextBuilder()->buildRectangle(
+                            (int) $row->id,
+                            $attribs,
+                            $class1,
+                            $data1,
+                            $data2,
+                            indentc(1),
+                            nl()
+                        );
                         break;
                     case 'Image':
                         echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();

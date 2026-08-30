@@ -511,13 +511,27 @@ trait BootstrapStyleFieldTrait
     /**
      * @param array<string, mixed> $mdata
      */
-    private function renderBootstrapStyleSubmitButtonField(array $mdata, string $label, string $tabIndex, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
-    {
+    private function renderBootstrapStyleSubmitButtonField(
+        array $mdata,
+        string $label,
+        string $tabIndex,
+        string $onblur,
+        string $onchange,
+        string $onfocus,
+        string $onselect,
+        string $readonly
+    ): void {
         /* translatables */
-        if (isset($mdata['src_translation' . $this->language_tag]) && $mdata['src_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['src_translation' . $this->language_tag])
+            && $mdata['src_translation' . $this->language_tag] != ''
+        ) {
             $mdata['src'] = $mdata['src_translation' . $this->language_tag];
         }
-        if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['value_translation' . $this->language_tag])
+            && $mdata['value_translation' . $this->language_tag] != ''
+        ) {
             $mdata['value'] = $mdata['value_translation' . $this->language_tag];
         }
         /* translatables end */
@@ -538,14 +552,19 @@ trait BootstrapStyleFieldTrait
             $value = 'value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" ';
         }
         if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
-            $onclick = 'onclick="if(typeof bf_htmltextareainit != \'undefined\'){ bf_htmltextareainit() }populateSummarizers();if(document.getElementById(\'bfPaymentMethod\')){document.getElementById(\'bfPaymentMethod\').value=\'\';};' . $mdata['actionFunctionName'] . '(this,\'click\');return false;" ';
+            $onclick = 'onclick="if(typeof bf_htmltextareainit != \'undefined\'){ bf_htmltextareainit() }populateSummarizers();'
+                . 'if(document.getElementById(\'bfPaymentMethod\')){document.getElementById(\'bfPaymentMethod\').value=\'\';};'
+                . $mdata['actionFunctionName'] . '(this,\'click\');return false;" ';
         } else {
-            $onclick = 'onclick="if(typeof bf_htmltextareainit != \'undefined\'){ bf_htmltextareainit() }populateSummarizers();if(document.getElementById(\'bfPaymentMethod\')){document.getElementById(\'bfPaymentMethod\').value=\'\';};return false;" ';
+            $onclick = 'onclick="if(typeof bf_htmltextareainit != \'undefined\'){ bf_htmltextareainit() }populateSummarizers();'
+                . 'if(document.getElementById(\'bfPaymentMethod\')){document.getElementById(\'bfPaymentMethod\').value=\'\';};'
+                . 'return false;" ';
         }
         if ($src == '') {
             echo $this->quickModeSubmitButtonBuilder()->build(
                 'button',
-                'type="button" class="ff_elem ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' button bfCustomSubmitButton"',
+                'type="button" class="ff_elem ' . $this->bsClass('btn') . ' '
+                    . $this->bsClass('btn-primary') . ' button bfCustomSubmitButton"',
                 $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
                 $type,
                 (string) $mdata['bfName'],
@@ -573,10 +592,21 @@ trait BootstrapStyleFieldTrait
     /**
      * @param array<string, mixed> $mdata
      */
-    private function renderBootstrapStyleStripeField(array $mdata, string $label, string $tabIndex, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
-    {
+    private function renderBootstrapStyleStripeField(
+        array $mdata,
+        string $label,
+        string $tabIndex,
+        string $onblur,
+        string $onchange,
+        string $onfocus,
+        string $onselect,
+        string $readonly
+    ): void {
         /* translatables */
-        if (isset($mdata['image_translation' . $this->language_tag]) && $mdata['image_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['image_translation' . $this->language_tag])
+            && $mdata['image_translation' . $this->language_tag] != ''
+        ) {
             $mdata['image'] = $mdata['image_translation' . $this->language_tag];
         }
         /* translatables end */
@@ -595,11 +625,14 @@ trait BootstrapStyleFieldTrait
             $value = 'value="Stripe" ';
         }
         if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
-            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Stripe\';' . $mdata['actionFunctionName'] . '(this,\'click\');" ';
+            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Stripe\';'
+                . $mdata['actionFunctionName'] . '(this,\'click\');" ';
         } else {
             $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Stripe\';" ';
         }
-        echo '<input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+        echo '<input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange
+            . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName']
+            . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
         echo '</span>';
         echo '</div>';
         echo '</div>';
@@ -608,10 +641,21 @@ trait BootstrapStyleFieldTrait
     /**
      * @param array<string, mixed> $mdata
      */
-    private function renderBootstrapStylePayPalField(array $mdata, string $label, string $tabIndex, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
-    {
+    private function renderBootstrapStylePayPalField(
+        array $mdata,
+        string $label,
+        string $tabIndex,
+        string $onblur,
+        string $onchange,
+        string $onfocus,
+        string $onselect,
+        string $readonly
+    ): void {
         /* translatables */
-        if (isset($mdata['image_translation' . $this->language_tag]) && $mdata['image_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['image_translation' . $this->language_tag])
+            && $mdata['image_translation' . $this->language_tag] != ''
+        ) {
             $mdata['image'] = $mdata['image_translation' . $this->language_tag];
         }
         /* translatables end */
@@ -630,11 +674,14 @@ trait BootstrapStyleFieldTrait
             $value = 'value="PayPal" ';
         }
         if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
-            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'PayPal\';' . $mdata['actionFunctionName'] . '(this,\'click\');" ';
+            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'PayPal\';'
+                . $mdata['actionFunctionName'] . '(this,\'click\');" ';
         } else {
             $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'PayPal\';" ';
         }
-        echo '<input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+        echo '<input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange
+            . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName']
+            . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
         echo '</span>';
         echo '</div>';
         echo '</div>';
@@ -643,10 +690,21 @@ trait BootstrapStyleFieldTrait
     /**
      * @param array<string, mixed> $mdata
      */
-    private function renderBootstrapStyleSofortueberweisungField(array $mdata, string $label, string $tabIndex, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
-    {
+    private function renderBootstrapStyleSofortueberweisungField(
+        array $mdata,
+        string $label,
+        string $tabIndex,
+        string $onblur,
+        string $onchange,
+        string $onfocus,
+        string $onselect,
+        string $readonly
+    ): void {
         /* translatables */
-        if (isset($mdata['image_translation' . $this->language_tag]) && $mdata['image_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['image_translation' . $this->language_tag])
+            && $mdata['image_translation' . $this->language_tag] != ''
+        ) {
             $mdata['image'] = $mdata['image_translation' . $this->language_tag];
         }
         /* translatables end */
@@ -664,11 +722,14 @@ trait BootstrapStyleFieldTrait
             $value = 'value="Sofortueberweisung" ';
         }
         if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
-            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Sofortueberweisung\';' . $mdata['actionFunctionName'] . '(this,\'click\');" ';
+            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Sofortueberweisung\';'
+                . $mdata['actionFunctionName'] . '(this,\'click\');" ';
         } else {
             $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Sofortueberweisung\';" ';
         }
-        echo '<input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+        echo '<input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange
+            . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName']
+            . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
         echo '</span>';
         echo '</div>';
         echo '</div>';

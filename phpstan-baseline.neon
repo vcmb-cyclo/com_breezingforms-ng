@@ -1,6 +1,66 @@
 parameters:
 	ignoreErrors:
 		-
+			message: '#^Variable \$editor might not be defined\.$#'
+			identifier: variable.undefined
+			count: 3
+			path: /home/xavier/workspaces/vcmb/com_breezingformsng/administrator/components/com_breezingformsng/layouts/forms/advanced_options.php
+
+		-
+			message: '#^Variable \$initScripts might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: /home/xavier/workspaces/vcmb/com_breezingformsng/administrator/components/com_breezingformsng/layouts/forms/advanced_options.php
+
+		-
+			message: '#^Variable \$pieceAfter might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: /home/xavier/workspaces/vcmb/com_breezingformsng/administrator/components/com_breezingformsng/layouts/forms/advanced_options.php
+
+		-
+			message: '#^Variable \$pieceBefore might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: /home/xavier/workspaces/vcmb/com_breezingformsng/administrator/components/com_breezingformsng/layouts/forms/advanced_options.php
+
+		-
+			message: '#^Variable \$pieceBeginSubmit might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: /home/xavier/workspaces/vcmb/com_breezingformsng/administrator/components/com_breezingformsng/layouts/forms/advanced_options.php
+
+		-
+			message: '#^Variable \$pieceEndSubmit might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: /home/xavier/workspaces/vcmb/com_breezingformsng/administrator/components/com_breezingformsng/layouts/forms/advanced_options.php
+
+		-
+			message: '#^Variable \$pkg might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: /home/xavier/workspaces/vcmb/com_breezingformsng/administrator/components/com_breezingformsng/layouts/forms/advanced_options.php
+
+		-
+			message: '#^Variable \$submittedScripts might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: /home/xavier/workspaces/vcmb/com_breezingformsng/administrator/components/com_breezingformsng/layouts/forms/advanced_options.php
+
+		-
+			message: '#^Variable \$tabEntryCounts might not be defined\.$#'
+			identifier: variable.undefined
+			count: 7
+			path: /home/xavier/workspaces/vcmb/com_breezingformsng/administrator/components/com_breezingformsng/layouts/forms/advanced_options.php
+
+		-
+			message: '#^Variable \$tabId might not be defined\.$#'
+			identifier: variable.undefined
+			count: 1
+			path: /home/xavier/workspaces/vcmb/com_breezingformsng/administrator/components/com_breezingformsng/layouts/forms/advanced_options.php
+
+		-
 			message: '#^Calling self\:\:renderCodeMirror\(\) outside of class scope\.$#'
 			identifier: outOfClass.self
 			count: 2

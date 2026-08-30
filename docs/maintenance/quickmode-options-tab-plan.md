@@ -152,3 +152,37 @@ donnant accès à l'intégralité des réglages actuellement uniquement
 disponibles via `task=forms.edit&advanced=1`, sans quitter l'écran QuickMode
 et sans dupliquer la logique de sauvegarde de `FormsController::save()`. Le
 lien « Plus d'options » a disparu de l'onglet Avancé.
+
+## État — clos le 2026-08-30
+
+Les 7 étapes sont terminées et vérifiées (`php -l`, suite PHPUnit complète,
+PHPStan sans erreur, vérification navigateur en direct à chaque étape,
+build + validation du package) :
+
+1. Contenu extrait dans `layouts/forms/advanced_options.php` et
+   `FormsAdvancedOptionsHtml` (`bfSel()`, `countEntries()`), branché dans
+   `forms/edit.php` sans changement de comportement.
+2. `<form name="bfForm">` resserré autour de `fragment-1`/`fragment-2`
+   uniquement dans `QuickmodeHtml`.
+3. `View\Quickmode\HtmlView` charge la ligne complète du formulaire via
+   `FormModel::getForm()` plus scripts/pièces via `FormsModel`, uniquement
+   quand `formId > 0`.
+4. Onglet `fragment-3` « Options » ajouté, avec son propre `<form
+   id="bfOptionsForm">` soumis à `forms.save` ; message de substitution
+   traduit (`COM_BREEZINGFORMSNG_QM_OPTIONS_SAVE_FIRST`, 8 langues) quand le
+   formulaire n'est pas encore enregistré.
+5. Lien « Plus d'options » retiré (`advanced_form.php`, `custom.js`,
+   `custom.css`) — la route `forms.edit&advanced=1` reste active pour la
+   création de formulaire.
+6. Traductions : seule `COM_BREEZINGFORMSNG_QM_OPTIONS_SAVE_FIRST` était
+   nouvelle, ajoutée aux 8 langues.
+7. Risque « redirection post-sauvegarde » également résolu : `bfOptionsForm`
+   porte `return_tab=options`, `FormsController::save()` ajoute `#fragment-3`
+   à la redirection dans ce cas, et `quickmode-app.js` réactive l'onglet
+   Options au chargement via l'API Bootstrap Tab. Vérifié de bout en bout
+   (soumission sans modification, `afterUrl` se termine par `#fragment-3`,
+   onglet actif après rechargement, valeur du titre inchangée).
+
+Commits : extraction du layout, resserrement de `bfForm`, ajout de
+`fragment-3`, retrait du lien, redirection post-sauvegarde — tous sur
+`rendering-engine-captcha-script-extraction`.

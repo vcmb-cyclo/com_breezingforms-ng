@@ -66,6 +66,7 @@ final class RenderingEngine
     private ?ClassicGraphicButtonBuilder $classicGraphicButtonBuilderService = null;
     private ?ClassicFileUploadBuilder $classicFileUploadBuilderService = null;
     private ?ClassicCaptchaBuilder $classicCaptchaBuilderService = null;
+    private ?ClassicQueryListSettingsBuilder $classicQueryListSettingsBuilderService = null;
     private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
     private ?EditableRecordHydrationScriptBuilder $editableRecordHydrationScriptBuilderService = null;
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
@@ -234,6 +235,11 @@ final class RenderingEngine
     private function classicCaptchaBuilder(): ClassicCaptchaBuilder
     {
         return $this->classicCaptchaBuilderService ??= new ClassicCaptchaBuilder();
+    }
+
+    private function classicQueryListSettingsBuilder(): ClassicQueryListSettingsBuilder
+    {
+        return $this->classicQueryListSettingsBuilderService ??= new ClassicQueryListSettingsBuilder();
     }
 
     private function contentBuilderValueScriptBuilder(): ContentBuilderValueScriptBuilder
@@ -1301,39 +1307,18 @@ final class RenderingEngine
                     case 'Query List':
                         echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
 
-                        // unpack settings
-                        $settings = explode("\n", $row->data1);
-                        $scnt = count($settings);
-                        for ($s = 0; $s < $scnt; $s++)
-                            $this->processor->trim($settings[$s]);
-                        $trhclass = '';
-                        $tr1class = '';
-                        $tr2class = '';
-                        $trfclass = '';
-                        $tdfclass = '';
-                        $pagenav = 1;
-                        $attribs = '';
-                        if ($scnt > 0 && $settings[0] != '')
-                            $attribs .= ' border="' . $settings[0] . '"';
-                        if ($scnt > 1 && $settings[1] != '')
-                            $attribs .= ' cellspacing="' . $settings[1] . '"';
-                        if ($scnt > 2 && $settings[2] != '')
-                            $attribs .= ' cellpadding="' . $settings[2] . '"';
-                        if ($scnt > 3 && $settings[3] != '')
-                            $trhclass = ' class="' . $this->processor->getClassName($settings[3]) . '"';
-                        if ($scnt > 4 && $settings[4] != '')
-                            $tr1class = ' class="' . $this->processor->getClassName($settings[4]) . '"';
-                        if ($scnt > 5 && $settings[5] != '')
-                            $tr2class = ' class="' . $this->processor->getClassName($settings[5]) . '"';
-                        if ($scnt > 6 && $settings[6] != '')
-                            $trfclass = ' class="' . $this->processor->getClassName($settings[6]) . '"';
-                        if ($scnt > 7 && $settings[7] != '')
-                            $tdfclass = ' class="' . $this->processor->getClassName($settings[7]) . '"';
-                        if ($scnt > 8 && $settings[8] != '')
-                            $pagenav = $settings[8];
-
-                        if ($row->width > 0)
-                            $attribs .= ' width="100%"';
+                        $queryListSettings = $this->classicQueryListSettingsBuilder()->build(
+                            (string) $row->data1,
+                            (int) $row->width,
+                            fn (string $class): string => $this->processor->getClassName($class)
+                        );
+                        $trhclass = $queryListSettings['headerClass'];
+                        $tr1class = $queryListSettings['oddClass'];
+                        $tr2class = $queryListSettings['evenClass'];
+                        $trfclass = $queryListSettings['footerClass'];
+                        $tdfclass = $queryListSettings['footerCellClass'];
+                        $pagenav = $queryListSettings['pageNavigation'];
+                        $attribs = $queryListSettings['tableAttributes'];
 
                         // display 1st page of table
                         echo indentc(2) . '<table id="ff_elem' . $row->id . '"' . $attribs . $class2 . '>' . nl();

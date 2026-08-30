@@ -52,6 +52,9 @@ final class RenderingEngineProcessorDouble extends HTML_facileFormsProcessor
     /** @var list<array{function: string, code: string}> */
     public array $linkedCallbacks = [];
 
+    /** @var list<array<int, scalar>> */
+    public array $queryResultRows = [];
+
     public bool $buryAfterFirstCallback = false;
 
     public bool $buryImmediately = false;
@@ -87,6 +90,20 @@ final class RenderingEngineProcessorDouble extends HTML_facileFormsProcessor
     public function linkcode($func, &$library, &$linked, $code, $type = null, $id = null, $pane = null)
     {
         $this->linkedCallbacks[] = ['function' => $func, 'code' => $code];
+    }
+
+    public function compileQueryCol(&$elem, &$coldef)
+    {
+    }
+
+    public function execQuery(&$elem, &$valrows, &$coldefs)
+    {
+        $valrows = $this->queryResultRows;
+    }
+
+    public function expJsValue($mixed, $indent = '')
+    {
+        return json_encode($mixed, JSON_THROW_ON_ERROR);
     }
 
     public function bury()
@@ -1419,6 +1436,47 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertSame('#scanonly', $processor->linkedCallbacks[1]['function']);
         self::assertSame('<p>content</p>', $processor->linkedCallbacks[1]['code']);
         self::assertSame(['ff_div31'], $processor->draggableDivIds);
+    }
+
+    public function testViewPreparesQueryListAndPreservesItsBuryPoint(): void
+    {
+        $processor = $this->makeProcessorReadyForCaptchaScript([
+            (object) [
+                'id' => 32,
+                'type' => 'Query List',
+                'flag1' => 1,
+                'flag2' => 1,
+                'height' => 15,
+                'data1' => '',
+                'data3' => '',
+                'page' => 1,
+                'name' => 'results',
+                'script1cond' => 0,
+                'script1id' => 0,
+                'script1code' => '',
+                'script2cond' => 0,
+                'script2id' => 0,
+                'script2code' => '',
+                'script3cond' => 0,
+                'script3id' => 0,
+                'script3code' => '',
+            ],
+        ]);
+        $processor->formrow->name = 'query';
+        $processor->formrow->script1cond = 0;
+        $processor->formrow->script1id = 0;
+        $processor->formrow->script1code = '';
+        $processor->formrow->script2cond = 0;
+        $processor->formrow->script2id = 0;
+        $processor->formrow->script2code = '';
+        $processor->queryResultRows = [['result', 1]];
+        $processor->buryOnCallNumber = 5;
+
+        $this->captureCaptchaScript($processor);
+
+        self::assertSame([['result', 1]], $processor->queryRows['ff_32']);
+        self::assertSame([], $processor->queryCols['ff_32']);
+        self::assertSame(['ff_div32'], $processor->draggableDivIds);
     }
 
 }

@@ -37,8 +37,12 @@ final class ContentBuilderValueScriptBuilder
     private function buildSimpleValue(object $entry, string $name, int $elementId, string $value): string
     {
         $encodedValue = $this->encode($value);
-        $script = 'if(typeof JQuery != "undefined"){JQuery("[name=\"ff_nm_' . $name . '[]\"]").val(' . $encodedValue . ');if(typeof JQuery != "undefined")JQuery("[name=\"ff_nm_' . $name . '[]\"]").trigger("change");}else{';
-        $script .= 'if(document.getElementById("ff_elem' . $elementId . '"))document.getElementById("ff_elem' . $elementId . '").value=' . $encodedValue . ';if(typeof JQuery != "undefined")JQuery(document.getElementById("ff_elem' . $elementId . '")).trigger("change");' . "\n";
+        $selector = '[name=\"ff_nm_' . $name . '[]\"]';
+        $element = 'document.getElementById("ff_elem' . $elementId . '")';
+        $script = 'if(typeof JQuery != "undefined"){JQuery("' . $selector . '").val(' . $encodedValue . ');';
+        $script .= 'if(typeof JQuery != "undefined")JQuery("' . $selector . '").trigger("change");}else{';
+        $script .= 'if(' . $element . ')' . $element . '.value=' . $encodedValue . ';';
+        $script .= 'if(typeof JQuery != "undefined")JQuery(' . $element . ').trigger("change");' . "\n";
         $script .= '}';
 
         if ($entry->recType === 'Calendar') {
@@ -51,11 +55,16 @@ final class ContentBuilderValueScriptBuilder
     private function buildCheckboxValues(string $name, int $formId, string $value): string
     {
         $script = '';
+        $elements = 'document.ff_form' . $formId . '.elements';
         foreach (explode(',', $value) as $selectedValue) {
             $selectedValue = trim($selectedValue);
-            $script .= 'for(var i = 0;i < document.ff_form' . $formId . '.elements.length;i++){' . "\n";
-            $script .= 'if(document.ff_form' . $formId . '.elements[i].type == "checkbox" && document.ff_form' . $formId . '.elements[i].name == "ff_nm_' . $name . '[]" && document.ff_form' . $formId . '.elements[i].value == ' . $this->encode($selectedValue) . '){' . "\n";
-            $script .= 'if(typeof JQuery != "undefined" && !JQuery(document.ff_form' . $formId . '.elements[i]).attr("checked")){JQuery(document.ff_form' . $formId . '.elements[i]).click();}' . "\n";
+            $selectedValueJson = $this->encode($selectedValue);
+            $script .= 'for(var i = 0;i < ' . $elements . '.length;i++){' . "\n";
+            $script .= 'if(' . $elements . '[i].type == "checkbox" && ';
+            $script .= $elements . '[i].name == "ff_nm_' . $name . '[]" && ';
+            $script .= $elements . '[i].value == ' . $selectedValueJson . '){' . "\n";
+            $script .= 'if(typeof JQuery != "undefined" && !JQuery(' . $elements . '[i]).attr("checked")){';
+            $script .= 'JQuery(' . $elements . '[i]).click();}' . "\n";
             $script .= '}' . "\n";
             $script .= '}' . "\n";
         }
@@ -66,11 +75,16 @@ final class ContentBuilderValueScriptBuilder
     private function buildRadioValues(string $name, int $formId, string $value): string
     {
         $script = '';
+        $elements = 'document.ff_form' . $formId . '.elements';
         foreach (explode(',', $value) as $selectedValue) {
             $selectedValue = trim($selectedValue);
-            $script .= 'for(var i = 0;i < document.ff_form' . $formId . '.elements.length;i++){' . "\n";
-            $script .= 'if(document.ff_form' . $formId . '.elements[i].type == "radio" && document.ff_form' . $formId . '.elements[i].name == "ff_nm_' . $name . '[]" && document.ff_form' . $formId . '.elements[i].value == ' . $this->encode($selectedValue) . '){' . "\n";
-            $script .= 'if(typeof JQuery != "undefined" && !JQuery(document.ff_form' . $formId . '.elements[i]).attr("checked")){JQuery(document.ff_form' . $formId . '.elements[i]).click();}' . "\n";
+            $selectedValueJson = $this->encode($selectedValue);
+            $script .= 'for(var i = 0;i < ' . $elements . '.length;i++){' . "\n";
+            $script .= 'if(' . $elements . '[i].type == "radio" && ';
+            $script .= $elements . '[i].name == "ff_nm_' . $name . '[]" && ';
+            $script .= $elements . '[i].value == ' . $selectedValueJson . '){' . "\n";
+            $script .= 'if(typeof JQuery != "undefined" && !JQuery(' . $elements . '[i]).attr("checked")){';
+            $script .= 'JQuery(' . $elements . '[i]).click();}' . "\n";
             $script .= '}' . "\n";
             $script .= '}' . "\n";
         }
@@ -81,12 +95,15 @@ final class ContentBuilderValueScriptBuilder
     private function buildSelectValues(int $elementId, string $value): string
     {
         $script = '';
+        $element = 'document.getElementById("ff_elem' . $elementId . '")';
         foreach (explode(',', $value) as $selectedValue) {
             $selectedValue = trim($selectedValue);
             $encodedValue = $this->encode($selectedValue);
-            $script .= 'for(var i = 0; i < document.getElementById("ff_elem' . $elementId . '").options.length; i++){' . "\n";
-            $script .= 'if(document.getElementById("ff_elem' . $elementId . '").options[i].value == ' . $encodedValue . '){' . "\n";
-            $script .= 'if(typeof JQuery != "undefined" && !JQuery(document.getElementById("ff_elem' . $elementId . '").options[i]).attr("selected")){JQuery(document.getElementById("ff_elem' . $elementId . '").options[i]).attr("selected", true).trigger("change");}' . "\n";
+            $option = $element . '.options[i]';
+            $script .= 'for(var i = 0; i < ' . $element . '.options.length; i++){' . "\n";
+            $script .= 'if(' . $option . '.value == ' . $encodedValue . '){' . "\n";
+            $script .= 'if(typeof JQuery != "undefined" && !JQuery(' . $option . ').attr("selected")){';
+            $script .= 'JQuery(' . $option . ').attr("selected", true).trigger("change");}' . "\n";
             $script .= '}' . "\n";
             $script .= '}' . "\n";
         }

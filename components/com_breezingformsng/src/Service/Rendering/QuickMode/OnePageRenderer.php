@@ -69,6 +69,7 @@ class OnePageRenderer
     private ?QuickModeCaptchaMarkupBuilder $quickModeCaptchaMarkupBuilderService = null;
     private ?QuickModeCaptchaReloadScriptBuilder $quickModeCaptchaReloadScriptBuilderService = null;
     private ?QuickModeUploadOptionsBuilder $quickModeUploadOptionsBuilderService = null;
+    private ?QuickModePagingActionBuilder $quickModePagingActionBuilderService = null;
 
     public function bsClass($key)
     {
@@ -144,6 +145,11 @@ class OnePageRenderer
     private function quickModeUploadOptionsBuilder(): QuickModeUploadOptionsBuilder
     {
         return $this->quickModeUploadOptionsBuilderService ??= new QuickModeUploadOptionsBuilder();
+    }
+
+    private function quickModePagingActionBuilder(): QuickModePagingActionBuilder
+    {
+        return $this->quickModePagingActionBuilderService ??= new QuickModePagingActionBuilder();
     }
 
     public static function getEditorContent($editor)
@@ -1464,7 +1470,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                         $this->rootMdata['pagingNextLabel'] = $this->rootMdata['pagingNextLabel_translation' . $this->language_tag];
                     }
                     /* translatables end */
-                    echo '<button type="button" class="bfNextButton ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' ' . $this->bsClass('float-end') . ' button' . $this->fadingClass . '" type="submit" onclick="ff_currentpage = ' . json_encode($dataObject['properties']['pageNumber']) . ';bf_validate_nextpage(' . ($dataObject['properties']['pageNumber'] + 1) . ');populateSummarizers();if(typeof bfRefreshAll != \'undefined\'){bfRefreshAll();}" value="' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
+                    echo '<button type="button" class="bfNextButton ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' ' . $this->bsClass('float-end') . ' button' . $this->fadingClass . '" type="submit" onclick="' . $this->quickModePagingActionBuilder()->onePageNext((int) $dataObject['properties']['pageNumber'], (int) $dataObject['properties']['pageNumber'] + 1) . '" value="' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
                 }
 
                 $callSubmit = 'bf_validate_submit(this, \'click\')';

@@ -63,6 +63,7 @@ class MobileRenderer
     private ?QuickModeCaptchaMarkupBuilder $quickModeCaptchaMarkupBuilderService = null;
     private ?QuickModeCaptchaReloadScriptBuilder $quickModeCaptchaReloadScriptBuilderService = null;
     private ?QuickModeUploadOptionsBuilder $quickModeUploadOptionsBuilderService = null;
+    private ?QuickModePagingActionBuilder $quickModePagingActionBuilderService = null;
 
     public function __construct(HTML_facileFormsProcessor $p)
     {
@@ -166,6 +167,11 @@ class MobileRenderer
     private function quickModeUploadOptionsBuilder(): QuickModeUploadOptionsBuilder
     {
         return $this->quickModeUploadOptionsBuilderService ??= new QuickModeUploadOptionsBuilder();
+    }
+
+    private function quickModePagingActionBuilder(): QuickModePagingActionBuilder
+    {
+        return $this->quickModePagingActionBuilderService ??= new QuickModePagingActionBuilder();
     }
 
     public function parseToggleFields($code)
@@ -1565,7 +1571,7 @@ HTML;
                         $this->rootMdata['pagingPrevLabel'] = $this->rootMdata['pagingPrevLabel_translation' . $this->language_tag];
                     }
                     /* translatables end */
-                    echo '<button class="bfPrevButton btn btn-secondary" type="submit" onclick="ff_validate_prevpage(this, \'click\');populateSummarizers();if(typeof bfRefreshAll != \'undefined\'){bfRefreshAll();}" value="' . htmlentities(trim($this->rootMdata['pagingPrevLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingPrevLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
+                    echo '<button class="bfPrevButton btn btn-secondary" type="submit" onclick="' . $this->quickModePagingActionBuilder()->previous() . '" value="' . htmlentities(trim($this->rootMdata['pagingPrevLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingPrevLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
                 }
 
                 if ($this->rootMdata['pagingInclude'] && $dataObject['properties']['pageNumber'] < count($this->dataObject['children']) - $last) {
@@ -1574,7 +1580,7 @@ HTML;
                         $this->rootMdata['pagingNextLabel'] = $this->rootMdata['pagingNextLabel_translation' . $this->language_tag];
                     }
                     /* translatables end */
-                    echo '<button class="bfNextButton btn btn-secondary" type="submit" onclick="ff_validate_nextpage(this, \'click\');populateSummarizers();if(typeof bfRefreshAll != \'undefined\'){bfRefreshAll();}" value="' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
+                    echo '<button class="bfNextButton btn btn-secondary" type="submit" onclick="' . $this->quickModePagingActionBuilder()->next() . '" value="' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
                 }
 
                 if ($this->rootMdata['cancelInclude'] && $dataObject['properties']['pageNumber'] + 1 > count($this->dataObject['children']) - $last) {

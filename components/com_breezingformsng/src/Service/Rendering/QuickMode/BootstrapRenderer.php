@@ -71,6 +71,7 @@ class BootstrapRenderer
     private ?QuickModeCaptchaMarkupBuilder $quickModeCaptchaMarkupBuilderService = null;
     private ?QuickModeCaptchaReloadScriptBuilder $quickModeCaptchaReloadScriptBuilderService = null;
     private ?QuickModeUploadOptionsBuilder $quickModeUploadOptionsBuilderService = null;
+    private ?QuickModePagingActionBuilder $quickModePagingActionBuilderService = null;
 
     public function bsClass($key)
     {
@@ -146,6 +147,11 @@ class BootstrapRenderer
     private function quickModeUploadOptionsBuilder(): QuickModeUploadOptionsBuilder
     {
         return $this->quickModeUploadOptionsBuilderService ??= new QuickModeUploadOptionsBuilder();
+    }
+
+    private function quickModePagingActionBuilder(): QuickModePagingActionBuilder
+    {
+        return $this->quickModePagingActionBuilderService ??= new QuickModePagingActionBuilder();
     }
 
     public static function getEditorContent($editor)
@@ -1262,7 +1268,7 @@ class BootstrapRenderer
                         $this->rootMdata['pagingPrevLabel'] = $this->rootMdata['pagingPrevLabel_translation' . $this->language_tag];
                     }
                     /* translatables end */
-                    echo '<button type="button" class="bfPrevButton ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' ' . $this->bsClass('float-start') . ' button' . $this->fadingClass . '" type="submit" onclick="ff_validate_prevpage(this, \'click\');populateSummarizers();if(typeof bfRefreshAll != \'undefined\'){bfRefreshAll();}" value="' . htmlentities(trim($this->rootMdata['pagingPrevLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingPrevLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
+                    echo '<button type="button" class="bfPrevButton ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' ' . $this->bsClass('float-start') . ' button' . $this->fadingClass . '" type="submit" onclick="' . $this->quickModePagingActionBuilder()->previous() . '" value="' . htmlentities(trim($this->rootMdata['pagingPrevLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingPrevLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
                 }
 
                 if ($this->rootMdata['pagingInclude'] && $dataObject['properties']['pageNumber'] < count($this->dataObject['children']) - $last) {
@@ -1271,7 +1277,7 @@ class BootstrapRenderer
                         $this->rootMdata['pagingNextLabel'] = $this->rootMdata['pagingNextLabel_translation' . $this->language_tag];
                     }
                     /* translatables end */
-                    echo '<button type="button" class="bfNextButton ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' ' . $this->bsClass('float-end') . ' button' . $this->fadingClass . '" type="submit" onclick="ff_validate_nextpage(this, \'click\');populateSummarizers();if(typeof bfRefreshAll != \'undefined\'){bfRefreshAll();}" value="' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
+                    echo '<button type="button" class="bfNextButton ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' ' . $this->bsClass('float-end') . ' button' . $this->fadingClass . '" type="submit" onclick="' . $this->quickModePagingActionBuilder()->next() . '" value="' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
                 }
 
                 $callSubmit = 'ff_validate_submit(this, \'click\')';

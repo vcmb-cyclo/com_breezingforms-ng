@@ -76,6 +76,7 @@ final class RenderingEngine
     private ?ContentBuilderFileDisplayNameBuilder $contentBuilderFileDisplayNameBuilderService = null;
     private ?ContentBuilderFlashUploadValidationBuilder $contentBuilderFlashUploadValidationBuilderService = null;
     private ?ContentBuilderSignatureFileResolver $contentBuilderSignatureFileResolverService = null;
+    private ?CaptchaEndpointBuilder $captchaEndpointBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -262,6 +263,11 @@ final class RenderingEngine
     private function contentBuilderSignatureFileResolver(): ContentBuilderSignatureFileResolver
     {
         return $this->contentBuilderSignatureFileResolverService ??= new ContentBuilderSignatureFileResolver();
+    }
+
+    private function captchaEndpointBuilder(): CaptchaEndpointBuilder
+    {
+        return $this->captchaEndpointBuilderService ??= new CaptchaEndpointBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -2410,6 +2416,12 @@ final class RenderingEngine
      */
     private function buildCaptchaScript(string $captchaError, string $capFunc): string
     {
+        $endpoints = $this->captchaEndpointBuilder()->build(
+            Uri::root(true),
+            $this->processor->app->isClient('administrator'),
+            (int) $this->processor->form
+        );
+
         for ($i = 0; $i < $this->processor->rowcount; $i++) {
             $row = $this->processor->rows[$i];
             if ($row->type == "Captcha") {
@@ -2475,7 +2487,7 @@ final class RenderingEngine
                                                                                     bf_restore_submitbutton();
                                                                                 }
                                                                                 
-                                                                                        document.getElementById(\'ff_capimgValue\').src = \'' . Uri::root(true) . ($this->processor->app->isClient('administrator') ? '/administrator' : '') . '/index.php?option=com_breezingformsng&bfCaptcha=1&bfMathRandom=\' + Math.random();
+                                                                                        document.getElementById(\'ff_capimgValue\').src = \'' . $endpoints['image'] . '\' + Math.random();
                                                                                         document.getElementById(\'bfCaptchaEntry\').value = "";
                                                                                         if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
                                                                                         document.getElementById(\'bfCaptchaEntry\').focus();
@@ -2501,7 +2513,7 @@ final class RenderingEngine
                                 function bfCheckCaptcha(){
                                         if(checkFileExtensions()){
                                                var ao = new bfAjaxObject101();
-                                               ao.sndReq("get","' . Uri::root(true) . ($this->processor->app->isClient('administrator') ? '/administrator' : '') . '/index.php?raw=true&option=com_breezingformsng&checkCaptcha=true&Itemid=0&tmpl=component&value="+document.getElementById("bfCaptchaEntry").value,"");
+                                               ao.sndReq("get","' . $endpoints['check'] . '"+document.getElementById("bfCaptchaEntry").value,"");
                                         }
                                 }';
                 break;
@@ -2526,7 +2538,7 @@ final class RenderingEngine
                                                         responseField = JQuery("input#recaptcha_response_field").val();
                                                         var html = JQuery.ajax({
                                                         type: "POST",
-                                                        url: "' . Route::_("index.php?raw=true&option=com_breezingformsng&bfReCaptcha=true&form=" . $this->processor->form . "&Itemid=0&tmpl=component") . '",
+                                                        url: "' . Route::_($endpoints['recaptcha']) . '",
                                                         data: "recaptcha_challenge_field=" + challengeField + "&recaptcha_response_field=" + responseField,
                                                         async: false
                                                         }).responseText;

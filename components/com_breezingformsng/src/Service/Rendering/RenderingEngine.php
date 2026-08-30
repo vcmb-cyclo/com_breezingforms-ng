@@ -84,6 +84,7 @@ final class RenderingEngine
     private ?CaptchaReCaptchaValidationScriptBuilder $captchaReCaptchaValidationScriptBuilderService = null;
     private ?ContentBuilderValueHydrationScriptBuilder $contentBuilderValueHydrationScriptBuilderService = null;
     private ?ContentBuilderChoiceHydrationScriptBuilder $contentBuilderChoiceHydrationScriptBuilderService = null;
+    private ?ContentBuilderSelectHydrationScriptBuilder $contentBuilderSelectHydrationScriptBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -310,6 +311,11 @@ final class RenderingEngine
     private function contentBuilderChoiceHydrationScriptBuilder(): ContentBuilderChoiceHydrationScriptBuilder
     {
         return $this->contentBuilderChoiceHydrationScriptBuilderService ??= new ContentBuilderChoiceHydrationScriptBuilder();
+    }
+
+    private function contentBuilderSelectHydrationScriptBuilder(): ContentBuilderSelectHydrationScriptBuilder
+    {
+        return $this->contentBuilderSelectHydrationScriptBuilderService ??= new ContentBuilderSelectHydrationScriptBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -894,21 +900,6 @@ final class RenderingEngine
                             break;
                         case 'Checkbox':
                         case 'Checkbox Group':
-                            $cbValues = explode(',', $cbEntry->recValue);
-                            foreach ($cbValues as $cbValue) {
-                                $cbValue = trim($cbValue);
-                                $js .= '
-                                                for(var i = 0;i < document.ff_form' . $this->processor->form . '.elements.length;i++){
-                                                        if(document.ff_form' . $this->processor->form . '.elements[i].type == "checkbox" && document.ff_form' . $this->processor->form . '.elements[i].name == "ff_nm_' . $cbEntry->recName . '[]" && document.ff_form' . $this->processor->form . '.elements[i].value == ' . json_encode($cbValue) . '){
-                                                                if(typeof JQuery != "undefined" && !JQuery(document.ff_form' . $this->processor->form . '.elements[i]).attr("checked")){
-                                                                    JQuery(document.ff_form' . $this->processor->form . '.elements[i]).click();
-                                                                }
-                                                        }
-                                                }' . nl();
-                            }
-                            break;
-                        case 'Radio Button':
-                        case 'Radio Group':
                             $js .= $this->contentBuilderChoiceHydrationScriptBuilder()->build(
                                 'checkbox',
                                 (string) $cbEntry->recName,
@@ -916,11 +907,18 @@ final class RenderingEngine
                                 (string) $cbEntry->recValue
                             );
                             break;
-                        case 'Select List':
+                        case 'Radio Button':
+                        case 'Radio Group':
                             $js .= $this->contentBuilderChoiceHydrationScriptBuilder()->build(
                                 'radio',
                                 (string) $cbEntry->recName,
                                 (int) $this->processor->form,
+                                (string) $cbEntry->recValue
+                            );
+                            break;
+                        case 'Select List':
+                            $js .= $this->contentBuilderSelectHydrationScriptBuilder()->build(
+                                (int) $cbEntry->recElementId,
                                 (string) $cbEntry->recValue
                             );
                             break;

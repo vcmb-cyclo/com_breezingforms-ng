@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * BreezingForms NG - A Joomla Forms Application
  * @version       5.0
@@ -10,6 +8,9 @@ declare(strict_types=1);
  * @copyright Copyright (C) 2024-2026 by XDA+GIL- EVH
  * @license       Released under the terms of the GNU General Public License
  * */
+
+declare(strict_types=1);
+
 namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode;
 
 \defined('_JEXEC') or die;
@@ -55,7 +56,7 @@ class OnePageRenderer
     private $hasResponsiveDatePicker = false;
     private $bsClasses = array();
 
-    function bsClass($key)
+    public function bsClass($key)
     {
 
         return $this->bsClasses[5][$key];
@@ -66,7 +67,7 @@ class OnePageRenderer
         return 'Joomla.editors.instances[' . json_encode($editor) . '].getValue()';
     }
 
-    function __construct(HTML_facileFormsProcessor $p)
+    public function __construct(HTML_facileFormsProcessor $p)
     {
         $this->p = $p;
         $default = ComponentHelper::getParams('com_languages')->get('site');
@@ -165,7 +166,7 @@ class OnePageRenderer
         }
     }
 
-    function headers()
+    public function headers()
     {
 
         if ($this->hasFlashUpload) {
@@ -430,57 +431,54 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
             RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/themes/quickmode-bootstrap' . '5' . '/system.css');
 
             // loading theme
-            if (isset($this->rootMdata['themebootstrap'])) {
+        if (isset($this->rootMdata['themebootstrap'])) {
+            $vars = '';
+            $themecss = '';
+            $scriptjs = '';
+            $scriptphp = '';
 
-                $vars = '';
-                $themecss = '';
-                $scriptjs = '';
-                $scriptphp = '';
+            $themecss_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/theme.css';
+            $vars_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/vars.txt';
+            $scriptjs_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/script.js';
+            $scriptphp_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/script.php';
 
-                $themecss_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/theme.css';
-                $vars_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/vars.txt';
-                $scriptjs_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/script.js';
-                $scriptphp_path = JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/script.php';
+            if ($this->rootMdata['themebootstrap'] != '' && $this->rootMdata['themebootstrap'] != 'none' && file_exists($themecss_path)) {
+                if (file_exists($vars_path)) {
+                    $vars = file_get_contents($vars_path);
+                }
+                if (file_exists($themecss_path)) {
+                    $themecss = file_get_contents($themecss_path);
+                }
+                if (file_exists($scriptphp_path)) {
+                    require_once($scriptphp_path);
+                }
+                if (file_exists($scriptjs_path)) {
+                    $scriptjs = file_get_contents($scriptjs_path);
+                }
 
-                if ($this->rootMdata['themebootstrap'] != '' && $this->rootMdata['themebootstrap'] != 'none' && file_exists($themecss_path)) {
-
-                    if (file_exists($vars_path)) {
-                        $vars = file_get_contents($vars_path);
-                    }
-                    if (file_exists($themecss_path)) {
-                        $themecss = file_get_contents($themecss_path);
-                    }
-                    if (file_exists($scriptphp_path)) {
-                        require_once($scriptphp_path);
-                    }
-                    if (file_exists($scriptjs_path)) {
-                        $scriptjs = file_get_contents($scriptjs_path);
-                    }
-
-                    $vars = str_replace("\r", '', $vars);
-                    $vars = explode("\n", $vars);
-                    foreach ($vars as $var) {
-                        if (trim($var)) {
-                            $keyvalue = explode('=', $var);
-                            if (count($keyvalue) == 2) {
-                                $themecss = str_replace('{' . trim($keyvalue[0]) . '}', trim($keyvalue[1]), $themecss);
-                            }
+                $vars = str_replace("\r", '', $vars);
+                $vars = explode("\n", $vars);
+                foreach ($vars as $var) {
+                    if (trim($var)) {
+                        $keyvalue = explode('=', $var);
+                        if (count($keyvalue) == 2) {
+                            $themecss = str_replace('{' . trim($keyvalue[0]) . '}', trim($keyvalue[1]), $themecss);
                         }
                     }
+                }
 
-                    $manager = $this->p->app->getDocument()->getWebAssetManager();
-                    $manager->addInlineStyle($themecss);
-                    if ($scriptjs) {
-                        $manager->addInlineScript($scriptjs);
-                    }
+                $manager = $this->p->app->getDocument()->getWebAssetManager();
+                $manager->addInlineStyle($themecss);
+                if ($scriptjs) {
+                    $manager->addInlineScript($scriptjs);
                 }
             }
+        }
     }
 
     public function process(&$dataObject, $parent = null, $parentPage = null, $index = 0, $childrenLength = 0, $parentFull = null)
     {
         if (isset($dataObject['attributes']) && isset($dataObject['properties'])) {
-
             HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
 
             $options = array('type' => 'normal', 'displayType' => 'breaks');
@@ -535,7 +533,6 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
             $mdata = $dataObject['properties'];
 
             if ($mdata['type'] == 'page') {
-
                 $parentPage = $mdata;
                 if ($parentPage['pageNumber'] > 1) {
                     echo '</div><!-- bfPage end -->' . "\n"; // closing previous pages
@@ -549,9 +546,9 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
                 if ($this->p->app->getInput()->getInt('ff_page', 1) >= $parentPage['pageNumber'] && !($this->rootMdata['lastPageThankYou'] && $parentPage['pageNumber'] == count($this->dataObject['children']))) {
                     $display = ' style="pointer-events:auto;opacity:1.0"';
-                } else if ($this->p->app->getInput()->getInt('ff_page', 1) < $parentPage['pageNumber'] && !($this->rootMdata['lastPageThankYou'] && $parentPage['pageNumber'] == count($this->dataObject['children']))) {
+                } elseif ($this->p->app->getInput()->getInt('ff_page', 1) < $parentPage['pageNumber'] && !($this->rootMdata['lastPageThankYou'] && $parentPage['pageNumber'] == count($this->dataObject['children']))) {
                     $display = ' style="pointer-events:none;opacity:0.4"';
-                } else if ($this->rootMdata['lastPageThankYou'] && $parentPage['pageNumber'] == count($this->dataObject['children'])) {
+                } elseif ($this->rootMdata['lastPageThankYou'] && $parentPage['pageNumber'] == count($this->dataObject['children'])) {
                     $display = ' style="display:none;"';
                 }
 
@@ -564,7 +561,6 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                 /* translatables end */
 
                 if (trim($mdata['pageIntro']) != '') {
-
                     echo '<div class="' . (isset($this->rootMdata['themebootstrapUseHeroUnit']) && $this->rootMdata['themebootstrapUseHeroUnit'] ? $this->bsClass('hero-unit') : '') . $this->fadingClass . '">' . "\n";
 
                     $regex = '/{loadposition\s+(.*?)}/i';
@@ -577,7 +573,6 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                     $options = array('style' => 'xhtml');
 
                     foreach ($matches as $match) {
-
                         $matcheslist = explode(',', $match[1]);
                         $position = trim($matcheslist[0]);
                         $output = $renderer->render($position, $options, null);
@@ -592,8 +587,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                 if (!$this->useErrorAlerts) {
                     echo '<div class="bfErrorMessage ' . $this->bsClass('alert') . ' ' . $this->bsClass('alert-error') . '" style="display:none"></div>' . "\n";
                 }
-            } else if ($mdata['type'] == 'section') {
-
+            } elseif ($mdata['type'] == 'section') {
                 if (isset($dataObject['properties']['name']) && isset($mdata['off']) && $mdata['off']) {
                     echo '<script type="text/javascript">bfRegisterDeactivatedSection(' . json_encode($dataObject['properties']['name']) . ');</script>' . "\n";
                 }
@@ -614,7 +608,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                     }
 
                     echo '<div>';
-                } else if ($mdata['bfType'] == 'normal') {
+                } elseif ($mdata['bfType'] == 'normal') {
                     if (isset($dataObject['properties']['name']) && $dataObject['properties']['name'] != '') {
                         $normal = true;
 
@@ -638,13 +632,11 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                     preg_match_all($regex, $introtext, $matches, PREG_SET_ORDER);
 
                     if ($matches) {
-
                         $document = $this->p->app->getDocument();
                         $renderer = $document->loadRenderer('modules');
                         $options = array('style' => 'xhtml');
 
                         foreach ($matches as $match) {
-
                             $matcheslist = explode(',', $match[1]);
                             $position = trim($matcheslist[0]);
                             $output = $renderer->render($position, $options, null);
@@ -655,8 +647,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                     echo $introtext . "\n";
                     echo '</div>' . "\n";
                 }
-            } else if ($mdata['type'] == 'element') {
-
+            } elseif ($mdata['type'] == 'element') {
                 $onclick = '';
                 if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
                     $onclick = 'onclick="' . $mdata['actionFunctionName'] . '(this,\'click\');" ';
@@ -691,12 +682,10 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                     $badge = '';
 
                     if (isset($mdata['theme'])) {
-
                         $badge = str_replace('invisible_', '', trim($mdata['theme']));
                     }
 
                     if (!($mdata['bfType'] == 'bfReCaptcha' && isset($mdata['invisibleCaptcha']) && $mdata['invisibleCaptcha'] && $badge != 'inline')) {
-
                         $maxlengthCounter = '';
                         if ($mdata['bfType'] == 'bfTextarea' && isset($mdata['maxlength']) && $mdata['maxlength'] > 0 && isset($mdata['showMaxlengthCounter']) && $mdata['showMaxlengthCounter']) {
                             $maxlengthCounter = ' <span class=***bfMaxLengthCounter*** id=***bfMaxLengthCounter' . $mdata['dbId'] . '***>(' . $mdata['maxlength'] . ' ' . Text::_('COM_BREEZINGFORMSNG_CHARS_LEFT') . ')</span>';
@@ -764,7 +753,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
                         if ($mdata['bfType'] == 'bfCaptcha') {
                             $for = 'for="bfCaptchaEntry"';
-                        } else if ($mdata['bfType'] == 'bfReCaptcha') {
+                        } elseif ($mdata['bfType'] == 'bfReCaptcha') {
                             $for = 'for="recaptcha_response_field"';
                         }
                         $required = '';
@@ -793,7 +782,6 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                 for ($i = 0; $i < $this->p->rowcount; $i++) {
                     $row = $this->p->rows[$i];
                     if ($mdata['bfName'] == $row->name) {
-
                         if (
                             (isset($mdata['value']) || isset($mdata['list']) || isset($mdata['group'])) &&
                             (
@@ -810,7 +798,6 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                                 $mdata['bfType'] == 'bfRadioGroup'
                             )
                         ) {
-
                             if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
                                 $mdata['value_translation' . $this->language_tag] = $this->p->replaceCode($mdata['value_translation' . $this->language_tag], "data1 of " . $mdata['bfName'], 'e', $mdata['dbId'], 0);
                             }
@@ -825,7 +812,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
                             if ($mdata['bfType'] == 'bfSelect') {
                                 $mdata['list'] = $this->p->replaceCode($row->data2, "data2 of " . $mdata['bfName'], 'e', $mdata['dbId'], 0);
-                            } else if ($mdata['bfType'] == 'bfCheckboxGroup' || $mdata['bfType'] == 'bfRadioGroup') {
+                            } elseif ($mdata['bfType'] == 'bfCheckboxGroup' || $mdata['bfType'] == 'bfRadioGroup') {
                                 $mdata['group'] = $this->p->replaceCode($row->data2, "data2 of " . $mdata['bfName'], 'e', $mdata['dbId'], 0);
                             } else {
                                 $mdata['value'] = $this->p->replaceCode($row->data1, "data1 of " . $mdata['bfName'], 'e', $mdata['dbId'], 0);
@@ -839,13 +826,11 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                 }
 
                 switch ($mdata['bfType']) {
-
                     case 'bfTextfield':
                         $this->renderBootstrapStyleTextfieldField($mdata, $label, $tabIndex, $onclick, $onblur, $onchange, $onfocus, $onselect, $readonly);
                         break;
 
                     case 'bfTextarea':
-
                         $width = '';
                         if ($mdata['width'] != '') {
                             $width = 'width:' . htmlentities(strip_tags($mdata['width'])) . ' !important; min-width:' . htmlentities(strip_tags($mdata['width'])) . ' !important;';
@@ -1174,15 +1159,12 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                         break;
 
                     case 'bfReCaptcha':
-
                         echo '<div class="' . $this->bsClass('controls') . ' ' . $this->bsClass('form-inline') . '' . (isset($mdata['pubkey']) && $mdata['pubkey'] ? '' : ' ' . $this->bsClass('well') . ' ' . $this->bsClass('well-small') . '') . '">';
                         echo '<div class="' . $this->bsClass('form-group') . ' ' . $this->bsClass('other-form-group') . '">';
                         echo $label;
                         echo '<span class="' . $this->bsClass('nonform-control') . '">';
                         if (isset($mdata['pubkey']) && $mdata['pubkey'] != '') {
-
                             if (!isset($mdata['invisibleCaptcha']) || !$mdata['invisibleCaptcha']) {
-
                                 $http = 'https';
 
                                 $getLangTag = $this->p->app->getLanguage()->getTag();
@@ -1213,13 +1195,11 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                                     'size' => $size,
                                     'resetOnRerender' => false,
                                 ]) . ');</script>';
-                            } else
-                                if (isset($mdata['invisibleCaptcha']) && $mdata['invisibleCaptcha']) {
+                            } elseif (isset($mdata['invisibleCaptcha']) && $mdata['invisibleCaptcha']) {
+                                $badge = str_replace('invisible_', '', trim($mdata['theme']));
 
-                                    $badge = str_replace('invisible_', '', trim($mdata['theme']));
-
-                                    if ($badge == 'inline') {
-                                        echo '
+                                if ($badge == 'inline') {
+                                    echo '
                                         <div style="display: inline-block !important; vertical-align: middle;">
                                             <div class="' . $this->bsClass('control-group') . '">
                                                 <div class="' . $this->bsClass('controls') . '">
@@ -1229,24 +1209,24 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                                             </div>
                                         </div>
                                         ';
-                                    } else {
-                                        echo '
+                                } else {
+                                    echo '
                                         <div id="bfInvisibleReCaptchaContainer"></div>
                                         <div id="bfInvisibleReCaptcha"></div>
                                         ';
-                                    }
+                                }
 
-                                    RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-invisible.js');
+                                RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-invisible.js');
 
-                                    echo '<script data-usercentrics="reCAPTCHA" type="text/javascript">bfInitInvisibleReCaptcha(' . json_encode([
-                                        'sitekey' => $mdata['pubkey'],
-                                        'badge' => $badge == 'red' ? '' : $badge,
-                                        'hasFlashUpload' => $this->hasFlashUpload,
-                                        'resetFlagOnCallback' => false,
-                                    ]) . ');</script>
+                                echo '<script data-usercentrics="reCAPTCHA" type="text/javascript">bfInitInvisibleReCaptcha(' . json_encode([
+                                    'sitekey' => $mdata['pubkey'],
+                                    'badge' => $badge == 'red' ? '' : $badge,
+                                    'hasFlashUpload' => $this->hasFlashUpload,
+                                    'resetFlagOnCallback' => false,
+                                ]) . ');</script>
                                                   <script data-usercentrics="reCAPTCHA" src="https://www.google.com/recaptcha/api.js?onload=onloadBFNewRecaptchaCallback&render=explicit" async defer></script>
                                                   ';
-                                }
+                            }
                         } else {
                             echo '<span class="bfCaptcha">' . "\n";
                             echo 'WARNING: No public key given for ReCaptcha element!';
@@ -1264,7 +1244,6 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                         break;
 
                     case 'bfCaptcha':
-
                         echo '<div class="' . $this->bsClass('controls') . ' ' . $this->bsClass('form-inline') . '">';
                         echo '<div class="' . $this->bsClass('form-group') . ' ' . $this->bsClass('other-form-group') . '">';
                         echo $label;
@@ -1350,20 +1329,18 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
         if (isset($dataObject['properties']) && $dataObject['properties']['type'] == 'section' && $dataObject['properties']['bfType'] == 'section') {
             echo '</div>'; // row-fluid
             echo '</div>' . "\n";
-        } else if (isset($dataObject['properties']) && $dataObject['properties']['type'] == 'section' && $dataObject['properties']['bfType'] == 'normal') {
+        } elseif (isset($dataObject['properties']) && $dataObject['properties']['type'] == 'section' && $dataObject['properties']['bfType'] == 'normal') {
             if (isset($dataObject['properties']['name']) && $dataObject['properties']['name'] != '') {
                 echo '</div>'; // row-fluid
                 echo '</section>' . "\n";
             }
-        } else if (isset($dataObject['properties']) && $dataObject['properties']['type'] == 'page') {
-
+        } elseif (isset($dataObject['properties']) && $dataObject['properties']['type'] == 'page') {
             $isLastPage = false;
             if ($this->rootMdata['lastPageThankYou'] && $dataObject['properties']['pageNumber'] == count($this->dataObject['children']) && count($this->dataObject['children']) > 1) {
                 $isLastPage = true;
             }
 
             if (!$isLastPage) {
-
                 $last = 0;
                 if ($this->rootMdata['lastPageThankYou']) {
                     $last = 1;
@@ -1469,7 +1446,8 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
         $area_count = count($this->htmltextareas);
         if ($area_count) {
             $editor = Editor::getInstance('tinymce');
-            RuntimeAssetLoader::script($this->p->app,
+            RuntimeAssetLoader::script(
+                $this->p->app,
                 Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-html-textareas.js'
             );
             for ($i = 0; $i < $area_count; $i++) {
@@ -1484,7 +1462,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
         if ($this->hasFlashUpload) {
             $tickets = $this->p->app->getSession()->get('bfFlashUploadTickets', array());
             $tickets[$this->flashUploadTicket] = array(); // stores file info for later processing
-	    $this->p->app->getSession()->set('bfFlashUploadTickets', $tickets);
+            $this->p->app->getSession()->set('bfFlashUploadTickets', $tickets);
             echo '<input type="hidden" name="bfFlashUploadTicket" value="' . $this->flashUploadTicket . '"/>' . "\n";
             RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/center.js');
             RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-flash-upload-onepage.js');
@@ -1613,5 +1591,4 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
         return "[" . rtrim($parsed, ",") . "]";
     }
-
 }

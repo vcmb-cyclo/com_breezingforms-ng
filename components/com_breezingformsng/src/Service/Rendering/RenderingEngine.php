@@ -67,6 +67,7 @@ final class RenderingEngine
     private ?ClassicFileUploadBuilder $classicFileUploadBuilderService = null;
     private ?ClassicCaptchaBuilder $classicCaptchaBuilderService = null;
     private ?ClassicQueryListSettingsBuilder $classicQueryListSettingsBuilderService = null;
+    private ?ClassicQueryListHeaderBuilder $classicQueryListHeaderBuilderService = null;
     private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
     private ?EditableRecordHydrationScriptBuilder $editableRecordHydrationScriptBuilderService = null;
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
@@ -240,6 +241,11 @@ final class RenderingEngine
     private function classicQueryListSettingsBuilder(): ClassicQueryListSettingsBuilder
     {
         return $this->classicQueryListSettingsBuilderService ??= new ClassicQueryListSettingsBuilder();
+    }
+
+    private function classicQueryListHeaderBuilder(): ClassicQueryListHeaderBuilder
+    {
+        return $this->classicQueryListHeaderBuilderService ??= new ClassicQueryListHeaderBuilder();
     }
 
     private function contentBuilderValueScriptBuilder(): ContentBuilderValueScriptBuilder
@@ -1328,77 +1334,24 @@ final class RenderingEngine
 
                         // display header
                         if ($row->flag1) {
-                            echo indentc(3) . '<tr' . $trhclass . '>' . nlc();
-                            $skip = 0;
-                            for ($c = 0; $c < $colcnt; $c++)
-                                if ($skip > 0)
-                                    $skip--;
-                                else {
-                                    $col = &$cols[$c];
-                                    if ($col->thspan > 0) {
-                                        $attribs = '';
-                                        $style = '';
-                                        switch ($col->thalign) {
-                                            case 1:
-                                                $style .= 'text-align:left;';
-                                                break;
-                                            case 2:
-                                                $style .= 'text-align:center;';
-                                                break;
-                                            case 3:
-                                                $style .= 'text-align:right;';
-                                                break;
-                                            case 4:
-                                                $style .= 'text-align:justify;';
-                                                break;
-                                            default:
-                                                ;
-                                        } // switch
-                                        switch ($col->thvalign) {
-                                            case 1:
-                                                $attribs .= ' valign="top"';
-                                                break;
-                                            case 2:
-                                                $attribs .= ' valign="middle"';
-                                                break;
-                                            case 3:
-                                                $attribs .= ' valign="bottom"';
-                                                break;
-                                            case 4:
-                                                $attribs .= ' valign="baseline"';
-                                                break;
-                                            default:
-                                                ;
-                                        } // switch
-                                        if ($col->thwrap == 1)
-                                            $attribs .= ' nowrap="nowrap"';
-                                        if ($col->thspan > 1) {
-                                            $attribs .= ' colspan="' . $col->thspan . '"';
-                                            $skip = $col->thspan - 1;
-                                        } // if
-                                        if ($col->class1 != '')
-                                            $attribs .= ' class="' . $this->processor->getClassName($col->class1) . '"';
-                                        if (intval($col->width) > 0 && !$skip) {
-                                            $style .= 'width:' . $col->width;
-                                            if ($col->widthmd)
-                                                $style .= '%;';
-                                            else
-                                                $style .= 'px;';
-                                        } // if
-                                        if ($style != '')
-                                            $attribs .= ' style="' . $style . '"';
-                                        if ($c == 0 && $row->flag2 > 0) {
-                                            if ($row->flag2 == 1)
-                                                echo indentc(4) . '<th' . $attribs . '><input type="checkbox" id="ff_cb' . $row->id . '" onclick="ff_selectAllQueryRows(' . $row->id . ',this.checked);" /></th>' . nlc();
-                                            else
-                                                echo indentc(4) . '<th' . $attribs . '></th>' . nlc();
-                                        } else
-                                            echo indentc(4) . '<th' . $attribs . '>' . $this->processor->replaceCode($col->title, Text::_('COM_BREEZINGFORMSNG_PROCESS_QTITLEOF') . " $row->name::$col->name", 'e', $row->id, 2) . '</th>' . nlc();
-                                    } // if
-                                    unset($col);
-                                } // if
-                            echo indentc(3) . '</tr>' . nl();
-                        } // if
+                            echo $this->classicQueryListHeaderBuilder()->build(
+                                $cols,
+                                (int) $row->id,
+                                (int) $row->flag2,
+                                $trhclass,
+                                fn (string $class): string => $this->processor->getClassName($class),
+                                fn (object $column): string => $this->processor->replaceCode(
+                                    $column->title,
+                                    Text::_('COM_BREEZINGFORMSNG_PROCESS_QTITLEOF') . " $row->name::$column->name",
+                                    'e',
+                                    $row->id,
+                                    2
+                                ),
+                                indentc(3),
+                                indentc(4),
+                                nlc() ?? ''
+                            );
+                        }
                         // display data rows
                         $qrows = &$this->processor->queryRows['ff_' . $row->id];
                         $qcnt = count($qrows);

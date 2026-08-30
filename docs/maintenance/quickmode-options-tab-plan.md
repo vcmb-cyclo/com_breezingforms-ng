@@ -186,3 +186,30 @@ build + validation du package) :
 Commits : extraction du layout, resserrement de `bfForm`, ajout de
 `fragment-3`, retrait du lien, redirection post-sauvegarde — tous sur
 `rendering-engine-captcha-script-extraction`.
+
+### Correctif du 2026-08-30 — onglet Avancé vide en production
+
+Retour utilisateur en direct : l'onglet « Avancé » apparaissait vide après
+mise en ligne. Cause réelle, non anticipée par ce plan : Bootstrap 5 masque
+les onglets inactifs via le sélecteur CSS `.tab-content > .tab-pane`
+(enfant direct). L'étape 2 (resserrement de `bfForm`) avait imbriqué
+`fragment-1`/`fragment-2` un niveau plus profond (dans `<form>`, lui-même
+dans `.tab-content`) — ce sélecteur ne les ciblait plus, les deux onglets
+s'affichaient donc simultanément l'un sous l'autre, poussant le contenu
+réel de « Avancé » à ~900px plus bas dans la page.
+
+Correctif : `bfForm` reprend l'intégralité de `#menutab` (les trois
+`.tab-pane` restent enfants directs de `.tab-content`, ce que Bootstrap
+exige). `fragment-3` perd son `<form>` imbriqué (qui aurait recréé le même
+problème) au profit d'un simple `div#bfOptionsFieldsWrap` ; un gestionnaire
+de clic déplace ces champs (jamais un clone — `cloneNode()` perdrait les
+modifications en cours) vers un `<form>` créé via `document.createElement()`
+et ajouté à `document.body`, avant de le soumettre nativement. Un second
+bug trouvé au passage : `jQuery('<form>', {method: 'post', ...})` n'appliquait
+pas silencieusement `method`, transformant la sauvegarde en GET 404 — corrigé
+en fixant `tempForm.method` comme propriété DOM directe après
+`createElement()`.
+
+Vérifié par capture réseau (méthode POST confirmée, redirection vers
+`#fragment-3`) et par l'état `display`/`active` calculé de chaque
+`.tab-pane` (un seul visible à la fois, positions normales).

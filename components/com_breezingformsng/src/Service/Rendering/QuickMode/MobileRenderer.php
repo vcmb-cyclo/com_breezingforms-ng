@@ -51,6 +51,7 @@ class MobileRenderer
     private $hasResponsiveDatePicker = false;
     private ?QuickModeInputBuilder $quickModeInputBuilderService = null;
     private ?QuickModeTextareaBuilder $quickModeTextareaBuilderService = null;
+    private ?QuickModeCheckboxBuilder $quickModeCheckboxBuilderService = null;
 
     public function __construct(HTML_facileFormsProcessor $p)
     {
@@ -94,6 +95,11 @@ class MobileRenderer
     private function quickModeTextareaBuilder(): QuickModeTextareaBuilder
     {
         return $this->quickModeTextareaBuilderService ??= new QuickModeTextareaBuilder();
+    }
+
+    private function quickModeCheckboxBuilder(): QuickModeCheckboxBuilder
+    {
+        return $this->quickModeCheckboxBuilderService ??= new QuickModeCheckboxBuilder();
     }
 
     public function parseToggleFields($code)
@@ -763,7 +769,14 @@ HTML;
                         break;
 
                     case 'bfCheckbox':
-                        echo '<input class="ff_elem" ' . ($mdata['checked'] ? 'checked="checked" ' : '') . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="checkbox" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+                        echo $this->quickModeCheckboxBuilder()->build(
+                            'ff_elem',
+                            (string) $mdata['bfName'],
+                            (string) $mdata['value'],
+                            (int) $mdata['dbId'],
+                            (bool) $mdata['checked'],
+                            $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly
+                        );
                         if ($mdata['mailbackAccept']) {
                             echo '<input type="hidden" class="ff_elem" name="mailbackConnectWith[' . $mdata['mailbackConnectWith'] . ']" value="true_' . $mdata['bfName'] . '"/>' . "\n";
                         }

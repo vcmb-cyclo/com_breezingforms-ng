@@ -59,6 +59,7 @@ class BootstrapRenderer
     private $bsClasses = array();
     private ?QuickModeInputBuilder $quickModeInputBuilderService = null;
     private ?QuickModeTextareaBuilder $quickModeTextareaBuilderService = null;
+    private ?QuickModeCheckboxBuilder $quickModeCheckboxBuilderService = null;
 
     public function bsClass($key)
     {
@@ -74,6 +75,11 @@ class BootstrapRenderer
     private function quickModeTextareaBuilder(): QuickModeTextareaBuilder
     {
         return $this->quickModeTextareaBuilderService ??= new QuickModeTextareaBuilder();
+    }
+
+    private function quickModeCheckboxBuilder(): QuickModeCheckboxBuilder
+    {
+        return $this->quickModeCheckboxBuilderService ??= new QuickModeCheckboxBuilder();
     }
 
     public static function getEditorContent($editor)

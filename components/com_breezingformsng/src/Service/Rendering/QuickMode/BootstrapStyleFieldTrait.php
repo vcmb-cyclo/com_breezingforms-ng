@@ -333,7 +333,15 @@ trait BootstrapStyleFieldTrait
         echo '<div class="' . $this->bsClass('form-group') . '">';
         echo $label;
         echo '<span class="' . $this->bsClass('nonform-control') . '">';
-        echo '<input class="ff_elem form-check-input" ' . ($mdata['checked'] ? 'checked="checked" ' : '') . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . ($readonly ? ' disabled="disabled" ' : '') . 'type="checkbox" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+        echo $this->quickModeCheckboxBuilder()->build(
+            'ff_elem form-check-input',
+            (string) $mdata['bfName'],
+            (string) $mdata['value'],
+            (int) $mdata['dbId'],
+            (bool) $mdata['checked'],
+            $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect
+            . ($readonly ? ' disabled="disabled" ' : '')
+        );
         echo '</span>';
         echo '</div>';
         echo '</div>';

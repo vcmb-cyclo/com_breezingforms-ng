@@ -7,6 +7,7 @@ namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Rendering;
 use HTML_facileFormsProcessor;
 use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Uri\Uri;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\RenderingEngine;
@@ -1267,6 +1268,87 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
 
         self::assertTrue($shouldReturn);
         self::assertSame(['ff_hideIconBorder', 'ff_dispIconBorder'], array_column($processor->linkedCallbacks, 'function'));
+    }
+
+    public function testRegisterElementCallbacksPreservesCallbackOrder(): void
+    {
+        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+        $library = [];
+        $linked = [];
+
+        $shouldReturn = (new ReflectionClass($engine))->getMethod('registerElementCallbacks')->invokeArgs(
+            $engine,
+            [$this->elementCallbackRow(), &$library, &$linked]
+        );
+
+        self::assertFalse($shouldReturn);
+        self::assertSame(
+            ['ff_contact_init', 'ff_contact_action', 'ff_contact_validate'],
+            $processor->callbackNames
+        );
+    }
+
+    /** @param list<string> $expectedCallbacks */
+    #[DataProvider('elementCallbackBuryProvider')]
+    public function testRegisterElementCallbacksStopsAtEachBuryPoint(
+        int $buryCall,
+        array $expectedCallbacks,
+        bool $needsOutputBuffer
+    ): void {
+        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
+        $processor->buryOnCallNumber = $buryCall;
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+        $library = [];
+        $linked = [];
+        $initialBufferLevel = ob_get_level();
+
+        if ($needsOutputBuffer) {
+            ob_start();
+        }
+
+        try {
+            $shouldReturn = (new ReflectionClass($engine))->getMethod('registerElementCallbacks')->invokeArgs(
+                $engine,
+                [$this->elementCallbackRow(), &$library, &$linked]
+            );
+        } finally {
+            while (ob_get_level() > $initialBufferLevel) {
+                ob_end_clean();
+            }
+        }
+
+        self::assertTrue($shouldReturn);
+        self::assertSame($expectedCallbacks, $processor->callbackNames);
+    }
+
+    /**
+     * @return iterable<string, array{int, list<string>, bool}>
+     */
+    public static function elementCallbackBuryProvider(): iterable
+    {
+        yield 'after init' => [1, ['ff_contact_init'], false];
+        yield 'after action' => [2, ['ff_contact_init', 'ff_contact_action'], false];
+        yield 'after validation' => [3, ['ff_contact_init', 'ff_contact_action', 'ff_contact_validate'], true];
+    }
+
+    private function elementCallbackRow(): object
+    {
+        return (object) [
+            'id' => 17,
+            'name' => 'contact',
+            'script1cond' => 0,
+            'script1id' => 101,
+            'script1code' => 'init',
+            'script2cond' => 0,
+            'script2id' => 102,
+            'script2code' => 'action',
+            'script3cond' => 0,
+            'script3id' => 103,
+            'script3code' => 'validate',
+        ];
     }
 
 }

@@ -342,49 +342,8 @@ final class RenderingEngine
                 if ($this->processor->bury())
                     return;
             } // if
-            $this->processor->addFunction(
-                $row->script1cond,
-                $row->script1id,
-                'ff_' . $row->name . '_init',
-                $row->script1code,
-                $library,
-                $linked,
-                'e',
-                $row->id,
-                1
-            );
-            if ($this->processor->bury()) {
+            if ($this->registerElementCallbacks($row, $library, $linked)) {
                 unset($row);
-                return;
-            }
-            $this->processor->addFunction(
-                $row->script2cond,
-                $row->script2id,
-                'ff_' . $row->name . '_action',
-                $row->script2code,
-                $library,
-                $linked,
-                'e',
-                $row->id,
-                1
-            );
-            if ($this->processor->bury()) {
-                unset($row);
-                return;
-            }
-            $this->processor->addFunction(
-                $row->script3cond,
-                $row->script3id,
-                'ff_' . $row->name . '_validate',
-                $row->script3code,
-                $library,
-                $linked,
-                'e',
-                $row->id,
-                1
-            );
-            if ($this->processor->bury()) {
-                ob_end_clean();
                 return;
             }
             if ($row->type == 'Static Text/HTML')
@@ -2281,6 +2240,68 @@ final class RenderingEngine
         );
 
         return $this->processor->bury();
+    }
+
+    /**
+     * Register the three callbacks associated with one classic element.
+     *
+     * The callback order and early-return behavior are part of the historical
+     * rendering contract. The validation callback also closes the active
+     * output buffer when it triggers bury().
+     *
+     * @param object $row Classic element row.
+     * @param array<int|string, mixed> $library
+     * @param array<int|string, mixed> $linked
+     */
+    private function registerElementCallbacks(object $row, array &$library, array &$linked): bool
+    {
+        $this->processor->addFunction(
+            $row->script1cond,
+            $row->script1id,
+            'ff_' . $row->name . '_init',
+            $row->script1code,
+            $library,
+            $linked,
+            'e',
+            $row->id,
+            1
+        );
+        if ($this->processor->bury()) {
+            return true;
+        }
+
+        $this->processor->addFunction(
+            $row->script2cond,
+            $row->script2id,
+            'ff_' . $row->name . '_action',
+            $row->script2code,
+            $library,
+            $linked,
+            'e',
+            $row->id,
+            1
+        );
+        if ($this->processor->bury()) {
+            return true;
+        }
+
+        $this->processor->addFunction(
+            $row->script3cond,
+            $row->script3id,
+            'ff_' . $row->name . '_validate',
+            $row->script3code,
+            $library,
+            $linked,
+            'e',
+            $row->id,
+            1
+        );
+        if ($this->processor->bury()) {
+            ob_end_clean();
+            return true;
+        }
+
+        return false;
     }
 
     /**

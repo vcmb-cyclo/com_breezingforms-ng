@@ -411,7 +411,7 @@ par mode d'exécution, sans modifier leurs différences de routage. La
 finalisation des paramètres de routage et du token est désormais isolée. Les
 champs de contexte (`ff_contentid`, `ff_applic`, `ff_record_id`,
 `ff_module_id` et `ff_runmode`) sont désormais générés par
-`FormContextFieldsBuilder` dans les trois branches via `f7d06454`. Le
+`FormContextFieldsBuilder` dans les trois branches via `f7d06454`. Les
 séparateur de lignes reste fourni par le renderer afin de préserver les
 sorties de test et le comportement historique (`0261acd4`). La fermeture des
 wrappers moderne et legacy est désormais construite par
@@ -422,6 +422,12 @@ finalisation par mode reste à éprouver de bout en bout. Le markup d'ouverture
 du formulaire (wrapper moderne/legacy, identifiant et classe personnalisée)
 est désormais construit par `FormOpeningMarkupBuilder` via `e77be68a`, avec
 ses deux variantes couvertes par des tests unitaires.
+
+Les paramètres additionnels `ff_otherparams` du mode frontend sont désormais
+générés par `AdditionalHiddenFieldsBuilder` via `bb469b88`, avec ordre,
+encodage URL et échappement HTML couverts. La détection des providers de
+paiement et les champs conditionnels de finalisation restent les prochains
+points à caractériser.
 
 Les champs conditionnels `target`, `frame`, `border`, `page`, `align` et `top`
 sont désormais générés par `FormOptionalContextFieldsBuilder` via

@@ -388,6 +388,12 @@ fichiers passent PHPCS sans erreur ni warning. Le ruleset complet conserve des
 warnings hérités dans certains traits/builders QuickMode déjà inclus ; ils
 seront traités avec la migration de leurs renderers, sans reformatage global.
 
+Le premier nettoyage ciblé de cette baseline PHPCS est réalisé dans
+`QuickModeSelectBuilder`, `QuickModeCaptchaMarkupBuilder` et
+`QuickModeUploadOptionsBuilder` (`eaf8b2d1`) : leurs sorties sont inchangées et
+leurs warnings de longueur sont supprimés. Le prochain groupe reste
+`BootstrapStyleFieldTrait`, qui nécessite un lot séparé du fait de son volume.
+
 ### 6.2 Réduire la baseline PHPStan
 
 - Classer les 251 entrées actuelles par fichier et par catégorie.

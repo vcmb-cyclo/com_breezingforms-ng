@@ -413,8 +413,12 @@ champs de contexte (`ff_contentid`, `ff_applic`, `ff_record_id`,
 `ff_module_id` et `ff_runmode`) sont désormais générés par
 `FormContextFieldsBuilder` dans les trois branches via `f7d06454`. Le
 séparateur de lignes reste fourni par le renderer afin de préserver les
-sorties de test et le comportement historique (`0261acd4`). L'appel de
-fermeture du formulaire reste à caractériser.
+sorties de test et le comportement historique (`0261acd4`). La fermeture des
+wrappers moderne et legacy est désormais construite par
+`FormClosingMarkupBuilder`, branché dans `closeFormRendering()` via
+`301ba9f1`. Les deux sorties restent couvertes par le test de caractérisation
+de `RenderingEngine` et par des tests unitaires dédiés ; le cycle complet de
+finalisation par mode reste à éprouver de bout en bout.
 
 Les quatre renderers QuickMode ont encore une baseline PHPCS distincte ; le
 contrôle direct fait apparaître des violations de formatage héritées. Ce lot

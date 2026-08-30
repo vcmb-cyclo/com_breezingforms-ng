@@ -166,7 +166,7 @@ class OnePageRenderer
 
     public static function getEditorContent($editor)
     {
-        return 'Joomla.editors.instances[' . json_encode($editor) . '].getValue()';
+        return QuickModeEditorValueBuilder::build($editor);
     }
 
     public function __construct(HTML_facileFormsProcessor $p)

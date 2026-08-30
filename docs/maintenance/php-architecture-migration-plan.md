@@ -139,8 +139,10 @@ dans `view()` par `4f475561` et `2c72231e`, avec couverture dédiée.
   - listes de sélection ;
   - fichiers ;
   - signatures.
-- La lecture et l'encodage des signatures restent dans `view()` ; le service
-  de génération JavaScript reçoit une image déjà encodée.
+- La lecture et l'encodage des signatures restent dans `view()` ; la
+  résolution du fichier existant est désormais isolée dans
+  `ContentBuilderSignatureFileResolver` via `b31b5c47`. Le service de
+  génération JavaScript reçoit une image déjà encodée.
 - Isoler la présentation des fichiers existants et les cases de suppression.
 - Vérifier explicitement les chemins, noms de fichiers et valeurs absentes.
 - Caractériser `bfLoadContentBuilderEditable()` avant toute normalisation du
@@ -159,6 +161,11 @@ validation QuickMode est désormais centralisée dans
 `ContentBuilderFlashUploadValidationBuilder` via `6d4afd92`, avec émission
 unique du callback `ff_flashupload_not_empty`. Les parcours runtime complets
 des fichiers restent à éprouver avec un harnais ContentBuilder/Joomla.
+
+La résolution des fichiers de signature couvre maintenant explicitement les
+valeurs vides, les fichiers absents et les fichiers présents ; la lecture et
+l'encodage restent volontairement dans `RenderingEngine`. L'intégration runtime
+complète des signatures reste à éprouver avec un harnais ContentBuilder/Joomla.
 
 La phase 2.3 est donc couverte pour les scripts de signature et de contrôles
 de fichiers ; l'intégration complète ContentBuilder reste conditionnée à un

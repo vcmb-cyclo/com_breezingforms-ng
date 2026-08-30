@@ -286,7 +286,8 @@ propres à chaque thème.
 2. `bfTextarea` et compteur de longueur — le contrôle textarea est partagé et
    branché via `QuickModeTextareaBuilder` (`620b7efe`); le compteur reste à
    caractériser séparément.
-3. `bfCheckbox`.
+3. `bfCheckbox` — partagé et branché via `QuickModeCheckboxBuilder`
+   (`18a3e7ea`).
 4. `bfSelect`.
 5. Groupes checkbox et radio.
 6. Boutons et champs cachés restants.
@@ -424,6 +425,13 @@ complète.
 
 Les lots 3 à 5 peuvent être préparés en parallèle du lot 6, à condition que le
 branchement dans `RenderingEngine.php` soit coordonné.
+
+Le contrôle `bfCheckbox` est désormais extrait dans
+`QuickModeCheckboxBuilder` et branché dans les quatre renderers par
+`18a3e7ea`. Les variantes checked/unchecked, valeur échappée, attributs
+d'événements et états de lecture seule sont couvertes ; les champs cachés
+associés à `mailbackAccept` restent dans chaque renderer car ils appartiennent
+au comportement d'enveloppe du champ.
 
 La baseline PHPCS est maintenant sans erreur sur les services modernes, les
 quatre renderers QuickMode et leurs traits (`e25d501f`, `14985d4d`, `288b42a4`,

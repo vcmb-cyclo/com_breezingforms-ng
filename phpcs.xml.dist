@@ -33,6 +33,7 @@
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeCaptchaUrlBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeCaptchaMarkupBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeCaptchaReloadScriptBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeUploadOptionsBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php</file>
 
     <exclude-pattern>*/vendor/*</exclude-pattern>

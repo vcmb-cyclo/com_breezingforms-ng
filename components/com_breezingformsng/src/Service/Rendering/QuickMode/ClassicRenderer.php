@@ -67,6 +67,7 @@ class ClassicRenderer
     private ?QuickModeCaptchaUrlBuilder $quickModeCaptchaUrlBuilderService = null;
     private ?QuickModeCaptchaMarkupBuilder $quickModeCaptchaMarkupBuilderService = null;
     private ?QuickModeCaptchaReloadScriptBuilder $quickModeCaptchaReloadScriptBuilderService = null;
+    private ?QuickModeUploadOptionsBuilder $quickModeUploadOptionsBuilderService = null;
 
     public function headers()
     {
@@ -224,6 +225,11 @@ float:left;
     private function quickModeCaptchaReloadScriptBuilder(): QuickModeCaptchaReloadScriptBuilder
     {
         return $this->quickModeCaptchaReloadScriptBuilderService ??= new QuickModeCaptchaReloadScriptBuilder();
+    }
+
+    private function quickModeUploadOptionsBuilder(): QuickModeUploadOptionsBuilder
+    {
+        return $this->quickModeUploadOptionsBuilderService ??= new QuickModeUploadOptionsBuilder();
     }
 
     public function __construct(HTML_facileFormsProcessor $p)
@@ -1428,17 +1434,9 @@ float:left;
 
             echo '<input type="hidden" id="flashUpload' . $mdata['bfName'] . '" name="flashUpload' . $mdata['bfName'] . '" value="bfFlashFileQueue' . $mdata['dbId'] . '"/>' . "\n";
             $this->hasFlashUpload = true;
-            //allowedFileExtensions
-            $allowedExts = explode(',', $mdata['allowedFileExtensions']);
-            $allowedExtsCnt = count($allowedExts);
-            for ($i = 0; $i < $allowedExtsCnt; $i++) {
-                $allowedExts[$i] = $allowedExts[$i];
-            }
-            $exts = '';
-            if ($allowedExtsCnt != 0) {
-                $exts = implode(',', $allowedExts);
-            }
-            $bytes = (isset($mdata['flashUploaderBytes']) && is_numeric($mdata['flashUploaderBytes']) && $mdata['flashUploaderBytes'] > 0 ? "max_file_size : '" . intval($mdata['flashUploaderBytes']) . "'," : '');
+            $uploadOptions = $this->quickModeUploadOptionsBuilder()->build($mdata);
+            $exts = $uploadOptions['extensions'];
+            $bytes = $uploadOptions['maxFileSize'];
             $flashUploader = "
                                                         <label id=\"bfUploadContainer" . $mdata['dbId'] . "\">
 							<img alt=\"\" style=\"cursor: pointer;\" id=\"bfPickFiles" . $mdata['dbId'] . "\" src=\"" . $this->uploadImagePath . "\" width=\"" . (isset($mdata['flashUploaderWidth']) && is_numeric($mdata['flashUploaderWidth']) && $mdata['flashUploaderWidth'] > 0 ? intval($mdata['flashUploaderWidth']) : '64') . "\" height=\"" . (isset($mdata['flashUploaderHeight']) && is_numeric($mdata['flashUploaderHeight']) && $mdata['flashUploaderHeight'] > 0 ? intval($mdata['flashUploaderHeight']) : '64') . "\"/>

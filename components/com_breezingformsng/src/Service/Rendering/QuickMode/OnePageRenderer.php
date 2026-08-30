@@ -68,6 +68,7 @@ class OnePageRenderer
     private ?QuickModeCaptchaUrlBuilder $quickModeCaptchaUrlBuilderService = null;
     private ?QuickModeCaptchaMarkupBuilder $quickModeCaptchaMarkupBuilderService = null;
     private ?QuickModeCaptchaReloadScriptBuilder $quickModeCaptchaReloadScriptBuilderService = null;
+    private ?QuickModeUploadOptionsBuilder $quickModeUploadOptionsBuilderService = null;
 
     public function bsClass($key)
     {
@@ -138,6 +139,11 @@ class OnePageRenderer
     private function quickModeCaptchaReloadScriptBuilder(): QuickModeCaptchaReloadScriptBuilder
     {
         return $this->quickModeCaptchaReloadScriptBuilderService ??= new QuickModeCaptchaReloadScriptBuilder();
+    }
+
+    private function quickModeUploadOptionsBuilder(): QuickModeUploadOptionsBuilder
+    {
+        return $this->quickModeUploadOptionsBuilderService ??= new QuickModeUploadOptionsBuilder();
     }
 
     public static function getEditorContent($editor)
@@ -1003,17 +1009,9 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
                         echo '<input type="hidden" id="flashUpload' . $mdata['bfName'] . '" name="flashUpload' . $mdata['bfName'] . '" value="bfFlashFileQueue' . $mdata['dbId'] . '"/>' . "\n";
                         $this->hasFlashUpload = true;
-                        //allowedFileExtensions
-                        $allowedExts = explode(',', $mdata['allowedFileExtensions']);
-                        $allowedExtsCnt = count($allowedExts);
-                        for ($i = 0; $i < $allowedExtsCnt; $i++) {
-                            $allowedExts[$i] = $allowedExts[$i];
-                        }
-                        $exts = '';
-                        if ($allowedExtsCnt != 0) {
-                            $exts = implode(',', $allowedExts);
-                        }
-                        $bytes = (isset($mdata['flashUploaderBytes']) && is_numeric($mdata['flashUploaderBytes']) && $mdata['flashUploaderBytes'] > 0 ? "max_file_size : '" . intval($mdata['flashUploaderBytes']) . "'," : '');
+                        $uploadOptions = $this->quickModeUploadOptionsBuilder()->build($mdata);
+                        $exts = $uploadOptions['extensions'];
+                        $bytes = $uploadOptions['maxFileSize'];
                         echo "
                                                         <span id=\"bfUploadContainer" . $mdata['dbId'] . "\">
                                                             <button type=\"button\" class=\"" . $this->bsClass('btn') . " " . $this->bsClass('btn-primary') . " bfUploadButton button\" id=\"bfPickFiles" . $mdata['dbId'] . "\"><i class=\"" . $this->bsClass('icon-upload') . "\"></i></button>

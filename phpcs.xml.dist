@@ -21,6 +21,7 @@
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/HiddenFieldTrait.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/BootstrapStyleFieldTrait.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeInputBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeTextareaBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php</file>
 
     <exclude-pattern>*/vendor/*</exclude-pattern>

@@ -58,6 +58,7 @@ class BootstrapRenderer
     private $hasResponsiveDatePicker = false;
     private $bsClasses = array();
     private ?QuickModeInputBuilder $quickModeInputBuilderService = null;
+    private ?QuickModeTextareaBuilder $quickModeTextareaBuilderService = null;
 
     public function bsClass($key)
     {
@@ -68,6 +69,11 @@ class BootstrapRenderer
     private function quickModeInputBuilder(): QuickModeInputBuilder
     {
         return $this->quickModeInputBuilderService ??= new QuickModeInputBuilder();
+    }
+
+    private function quickModeTextareaBuilder(): QuickModeTextareaBuilder
+    {
+        return $this->quickModeTextareaBuilderService ??= new QuickModeTextareaBuilder();
     }
 
     public static function getEditorContent($editor)
@@ -695,7 +701,14 @@ class BootstrapRenderer
                             echo '</div>';
                             echo '<style type="text/css">.toggle-editor{display: none;}</style>';
                         } else {
-                            echo '<textarea ' . (isset($mdata['placeholder']) && $mdata['placeholder'] ? 'placeholder="' . htmlentities($mdata['placeholder'], ENT_QUOTES, 'UTF-8') . '" ' : '') . 'class="' . $this->bsClass('form-control') . ' ff_elem inputbox" ' . $onkeyup . $size . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '">' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '</textarea>' . "\n";
+                            echo $this->quickModeTextareaBuilder()->build(
+                                $this->bsClass('form-control') . ' ff_elem inputbox',
+                                (string) $mdata['bfName'],
+                                (string) $mdata['value'],
+                                (int) $mdata['dbId'],
+                            $onkeyup . $size . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+                                (string) ($mdata['placeholder'] ?? '')
+                            );
                         }
                         echo '</div>';
                         echo '</div>';

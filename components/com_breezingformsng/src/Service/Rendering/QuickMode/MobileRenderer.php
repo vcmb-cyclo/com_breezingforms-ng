@@ -50,6 +50,7 @@ class MobileRenderer
 
     private $hasResponsiveDatePicker = false;
     private ?QuickModeInputBuilder $quickModeInputBuilderService = null;
+    private ?QuickModeTextareaBuilder $quickModeTextareaBuilderService = null;
 
     public function __construct(HTML_facileFormsProcessor $p)
     {
@@ -88,6 +89,11 @@ class MobileRenderer
     private function quickModeInputBuilder(): QuickModeInputBuilder
     {
         return $this->quickModeInputBuilderService ??= new QuickModeInputBuilder();
+    }
+
+    private function quickModeTextareaBuilder(): QuickModeTextareaBuilder
+    {
+        return $this->quickModeTextareaBuilderService ??= new QuickModeTextareaBuilder();
     }
 
     public function parseToggleFields($code)
@@ -658,7 +664,7 @@ HTML;
                             (string) $mdata['value'],
                             (int) $mdata['dbId'],
                             $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
-                            (string) ($mdata['placeholder'] ?? '')
+                            (string) ($mdata['placeholder'] ?? ''),
                         );
                         break;
 
@@ -687,7 +693,15 @@ HTML;
                             $mdata['value'] = $mdata['value_translation' . $this->language_tag];
                         }
                         /* translatables end */
-                        echo '<textarea ' . (isset($mdata['placeholder']) && $mdata['placeholder'] ? 'placeholder="' . htmlentities($mdata['placeholder'], ENT_QUOTES, 'UTF-8') . '" ' : '') . ' class="ff_elem" ' . $onkeyup . $size . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '">' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '</textarea>' . "\n";
+                        echo $this->quickModeTextareaBuilder()->build(
+                            'ff_elem',
+                            (string) $mdata['bfName'],
+                            (string) $mdata['value'],
+                            (int) $mdata['dbId'],
+                            $onkeyup . $size . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+                            (string) ($mdata['placeholder'] ?? ''),
+                            ' '
+                        );
                         break;
 
                     case 'bfRadioGroup':

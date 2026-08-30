@@ -43,8 +43,8 @@
 | `RenderingEngine::view()` — enveloppe | Initialisation, fermeture et wrappers extraits et couverts | `RenderingEngine` |
 | `RenderingEngine::view()` — pièces | Pièces Before/After, code personnalisé et sorties `bury()` couverts | `RenderingEngine` |
 | `RenderingEngine::view()` — scripts | Bibliothèques, callbacks formulaire et `onload` extraits et couverts | `RenderingEngine` |
-| `RenderingEngine::view()` — validation | Extensions de fichiers et valeurs CAPTCHA par défaut extraites et couvertes | `RenderingEngine` |
-| `RenderingEngine::view()` — CAPTCHA | Sélection `Captcha` / `ReCaptcha` extraite, endpoints site/admin isolés et réutilisés par le champ, ordre historique préservé | Commits `4a070774`, `8e3e9a7a`, `4563ae11` |
+| `RenderingEngine::view()` — validation | Extensions de fichiers, valeurs par défaut et scripts CAPTCHA extraits et couverts | Builders de validation dédiés |
+| `RenderingEngine::view()` — CAPTCHA | Sélection `Captcha` / `ReCaptcha`, endpoints site/admin et générateurs JavaScript isolés, ordre historique préservé | Commits `4a070774`, `8e3e9a7a`, `4563ae11`, `d328c4f8`, `75c0ca2b`, `1cea0c84` |
 | `RenderingEngine::view()` — Query List | Préparation extraite et variantes par défaut/checkbox/résultat vide couvertes | Commits `4070ec0f`, `b358e7e9` |
 | `RenderingEngine::view()` — scripts d'icônes | Extraction committée et trois chemins `bury()` couverts | Commit `0a908143` |
 | `RenderingEngine::view()` — callbacks d'éléments | Extraction committée ; ordre `init` / `action` / `validate` et trois arrêts `bury()` couverts | Commit `413cb1cb` |
@@ -176,12 +176,15 @@ ReCaptcha est désormais isolée dans `CaptchaEndpointBuilder` via `8e3e9a7a`.
 L’URL de base du champ CAPTCHA réutilise également ce service via `4563ae11`,
 ce qui supprime la dernière construction directe de cet endpoint dans
 `RenderingEngine`.
-La génération du JavaScript de validation reste à extraire séparément ; ses
-variantes et son ordre historique sont déjà couverts par
-`RenderingEngineViewCharacterizationTest`. La sélection du nœud de validation
-est désormais isolée dans `CaptchaValidationRowSelector` (`d328c4f8`) : le
-premier `Captcha` est prioritaire et le dernier `ReCaptcha` est conservé,
-comme dans le flux historique ; ces règles sont couvertes par un test unitaire.
+La sélection du nœud de validation est isolée dans
+`CaptchaValidationRowSelector` (`d328c4f8`) : le premier `Captcha` est
+prioritaire et le dernier `ReCaptcha` est conservé, comme dans le flux
+historique. Les valeurs par défaut sont produites par
+`CaptchaValidationDefaultsBuilder` (`41612fa2`). Les deux générateurs de
+JavaScript sont désormais extraits dans `CaptchaLegacyValidationScriptBuilder`
+et `CaptchaReCaptchaValidationScriptBuilder` (`75c0ca2b`, `1cea0c84`) ; les
+variantes et leurs interpolations sont couvertes par les tests unitaires et le
+test de caractérisation de `RenderingEngineViewCharacterizationTest`.
 Les valeurs par défaut du message et du callback sont désormais produites par
 `CaptchaValidationDefaultsBuilder` (`41612fa2`), avec couverture de l'encodage
 JSON et de l'ordre de soumission.

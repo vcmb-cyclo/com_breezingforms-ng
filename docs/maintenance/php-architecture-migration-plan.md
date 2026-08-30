@@ -54,6 +54,7 @@
 | Rendu HTML classique — choix élémentaire | Contrôle commun `Checkbox`/`Radio Button` extrait et couvert pour états, classes, labels et événements | Commit `fcc72f2aa` |
 | Rendu HTML classique — liste de sélection | Parsing et markup `Select List` extraits et couverts pour options, échappement, sélection, taille et états | Commit `771f3d014` |
 | Rendu HTML classique — bouton régulier | Markup `Regular Button` extrait et couvert pour états et événements | Commit `974fcf0db` |
+| Rendu HTML classique — bouton graphique | Markup `Graphic Button` extrait et couvert pour les dispositions d’image, états, dimensions et événements | Commit `cf09129e0` |
 | `RenderingEngine::view()` — scripts d'icônes | Extraction committée et trois chemins `bury()` couverts | Commit `0a908143` |
 | `RenderingEngine::view()` — callbacks d'éléments | Extraction committée ; ordre `init` / `action` / `validate` et trois arrêts `bury()` couverts | Commit `413cb1cb` |
 | `RenderingEngine::view()` — métadonnées classiques | Comptage icônes/infobulles et scan `Static Text/HTML` extraits et couverts | Commit `51e86824` |
@@ -259,8 +260,9 @@ Ordre conseillé, du plus simple au plus risqué :
 3. Contrôle commun checkbox/radio (`ClassicChoiceBuilder`, `fcc72f2aa`), puis
    liste de sélection (`ClassicSelectBuilder`, `771f3d014`). Les groupes
    restent représentés par les contrôles d’options élémentaires.
-4. Bouton régulier (`ClassicRegularButtonBuilder`, `974fcf0db`), puis bouton
-   graphique et navigation entre pages.
+4. Bouton régulier (`ClassicRegularButtonBuilder`, `974fcf0db`) et bouton
+   graphique (`ClassicGraphicButtonBuilder`, `cf09129e0`), puis navigation
+   entre pages.
 5. Uploads, CAPTCHA et signatures.
 6. Query List et ses tableaux paginés.
 

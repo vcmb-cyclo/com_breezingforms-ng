@@ -973,7 +973,7 @@ class BootstrapRenderer
                                                                                         }
                                                                                     }
                                                                                 );
-                                                                                var thebytes = " . (isset($mdata['flashUploaderBytes']) && is_numeric($mdata['flashUploaderBytes']) && $mdata['flashUploaderBytes'] > 0 ? intval($mdata['flashUploaderBytes']) : '0') . ";
+                                                                                var thebytes = " . $uploadOptions['maxBytes'] . ";
                                                                                 if(thebytes > 0 && typeof files[i].size != 'undefined' && files[i].size > thebytes){
                                                                                      alert(" . json_encode(' ' . Text::_('COM_BREEZINGFORMSNG_FLASH_UPLOADER_TOO_LARGE')) . ");
                                                                                      error = true;

@@ -13,6 +13,7 @@ final class QuickModeUploadOptionsBuilderTest extends TestCase
             [
                 'extensions' => 'jpg,png',
                 'maxFileSize' => "max_file_size : '2048',",
+                'maxBytes' => '2048',
                 'multiSelection' => 'false',
                 'runtimes' => 'html5,flash,html4',
                 'buttonWidth' => '96',
@@ -37,6 +38,7 @@ final class QuickModeUploadOptionsBuilderTest extends TestCase
             [
                 'extensions' => '',
                 'maxFileSize' => '',
+                'maxBytes' => '0',
                 'multiSelection' => 'false',
                 'runtimes' => 'html4',
                 'buttonWidth' => '64',
@@ -48,6 +50,7 @@ final class QuickModeUploadOptionsBuilderTest extends TestCase
             [
                 'extensions' => 'pdf',
                 'maxFileSize' => '',
+                'maxBytes' => '0',
                 'multiSelection' => 'true',
                 'runtimes' => 'flash,html4',
                 'buttonWidth' => '64',
@@ -65,6 +68,7 @@ final class QuickModeUploadOptionsBuilderTest extends TestCase
             [
                 'extensions' => '',
                 'maxFileSize' => '',
+                'maxBytes' => '0',
                 'multiSelection' => 'false',
                 'runtimes' => 'html4',
                 'buttonWidth' => '72',

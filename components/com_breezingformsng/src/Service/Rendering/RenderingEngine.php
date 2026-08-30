@@ -395,28 +395,9 @@ final class RenderingEngine
         } // for
 
         if ($icons > 0) {
-            $this->processor->linkcode(
-                'ff_hideIconBorder',
-                $library,
-                $linked,
-                'function ff_hideIconBorder(element)' . nl() .
-                '{' . nl() .
-                '    element.style.border = "none";' . nl() .
-                '} // ff_hideIconBorder'
-            );
-            if ($this->processor->bury())
+            if ($this->registerIconBorderScripts($library, $linked)) {
                 return;
-            $this->processor->linkcode(
-                'ff_dispIconBorder',
-                $library,
-                $linked,
-                'function ff_dispIconBorder(element)' . nl() .
-                '{' . nl() .
-                '    element.style.border = "1px outset";' . nl() .
-                '} // ff_dispIconBorder'
-            );
-            if ($this->processor->bury())
-                return;
+            }
         } // if
 
         if ($qcode != '') {
@@ -2262,6 +2243,44 @@ final class RenderingEngine
             $this->processor->expJsValue($this->processor->queryRows[$key]) . ';' . nl();
 
         unset($columns);
+    }
+
+    /**
+     * Link the icon border hover callbacks used when the form has at least
+     * one "Icon" row. Returns whether view() should bury/return - mirrors
+     * the original inline control flow exactly: the second linkcode() call
+     * never runs if bury() is already true after the first.
+     *
+     * @param array<int|string, mixed> $library
+     * @param array<int|string, mixed> $linked
+     */
+    private function registerIconBorderScripts(array &$library, array &$linked): bool
+    {
+        $this->processor->linkcode(
+            'ff_hideIconBorder',
+            $library,
+            $linked,
+            'function ff_hideIconBorder(element)' . nl() .
+            '{' . nl() .
+            '    element.style.border = "none";' . nl() .
+            '} // ff_hideIconBorder'
+        );
+
+        if ($this->processor->bury()) {
+            return true;
+        }
+
+        $this->processor->linkcode(
+            'ff_dispIconBorder',
+            $library,
+            $linked,
+            'function ff_dispIconBorder(element)' . nl() .
+            '{' . nl() .
+            '    element.style.border = "1px outset";' . nl() .
+            '} // ff_dispIconBorder'
+        );
+
+        return $this->processor->bury();
     }
 
     /**

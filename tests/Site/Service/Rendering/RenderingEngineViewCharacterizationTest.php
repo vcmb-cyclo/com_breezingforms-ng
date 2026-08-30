@@ -1220,4 +1220,53 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertStringNotContainsString('if(ff_currentpage != 1)ff_switchpage(1);', $html);
     }
 
+    public function testRegisterIconBorderScriptsLinksBothCallbacksWhenNotBuried(): void
+    {
+        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+        $library = [];
+        $linked = [];
+
+        $shouldReturn = (new ReflectionClass($engine))->getMethod('registerIconBorderScripts')
+            ->invokeArgs($engine, [&$library, &$linked]);
+
+        self::assertFalse($shouldReturn);
+        self::assertSame(['ff_hideIconBorder', 'ff_dispIconBorder'], array_column($processor->linkedCallbacks, 'function'));
+        self::assertStringContainsString('element.style.border = "none";', $processor->linkedCallbacks[0]['code']);
+        self::assertStringContainsString('element.style.border = "1px outset";', $processor->linkedCallbacks[1]['code']);
+    }
+
+    public function testRegisterIconBorderScriptsStopsAfterFirstCallbackWhenBuried(): void
+    {
+        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
+        $processor->buryOnCallNumber = 1;
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+        $library = [];
+        $linked = [];
+
+        $shouldReturn = (new ReflectionClass($engine))->getMethod('registerIconBorderScripts')
+            ->invokeArgs($engine, [&$library, &$linked]);
+
+        self::assertTrue($shouldReturn);
+        self::assertSame(['ff_hideIconBorder'], array_column($processor->linkedCallbacks, 'function'));
+    }
+
+    public function testRegisterIconBorderScriptsBuriesAfterSecondCallback(): void
+    {
+        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
+        $processor->buryOnCallNumber = 2;
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+        $library = [];
+        $linked = [];
+
+        $shouldReturn = (new ReflectionClass($engine))->getMethod('registerIconBorderScripts')
+            ->invokeArgs($engine, [&$library, &$linked]);
+
+        self::assertTrue($shouldReturn);
+        self::assertSame(['ff_hideIconBorder', 'ff_dispIconBorder'], array_column($processor->linkedCallbacks, 'function'));
+    }
+
 }

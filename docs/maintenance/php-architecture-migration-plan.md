@@ -284,8 +284,8 @@ propres à chaque thème.
 1. `bfTextfield` et `bfNumberInput` — partagé et branché via
    `QuickModeInputBuilder` (`065cef94`, `f3d04e55`).
 2. `bfTextarea` et compteur de longueur — le contrôle textarea est partagé et
-   branché via `QuickModeTextareaBuilder` (`620b7efe`); le compteur reste à
-   caractériser séparément.
+   branché via `QuickModeTextareaBuilder` (`620b7efe`); le compteur est
+   désormais partagé via `QuickModeMaxLengthCounterBuilder` (`bdb7d910`).
 3. `bfCheckbox` — partagé et branché via `QuickModeCheckboxBuilder`
    (`18a3e7ea`).
 4. `bfSelect` — partagé et branché via `QuickModeSelectBuilder`
@@ -420,9 +420,9 @@ Le contrôle `bfTextarea` est désormais extrait dans
 `QuickModeTextareaBuilder` et branché dans les quatre renderers par
 `620b7efe`. Les snapshots QuickMode restent verts (`84 tests, 230
 assertions`) et le service est couvert par des tests d'échappement, de
-placeholder et d'attributs structurels. Le compteur de longueur et ses
-événements restent volontairement dans les renderers jusqu'à caractérisation
-complète.
+placeholder et d'attributs structurels. Le compteur de longueur est désormais
+couvert par `QuickModeMaxLengthCounterBuilder` (`bdb7d910`) ; ses événements
+restent volontairement dans les renderers jusqu'à caractérisation complète.
 
 Les lots 3 à 5 peuvent être préparés en parallèle du lot 6, à condition que le
 branchement dans `RenderingEngine.php` soit coordonné.

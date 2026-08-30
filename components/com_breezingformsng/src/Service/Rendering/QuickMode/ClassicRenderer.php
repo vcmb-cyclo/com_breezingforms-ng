@@ -69,6 +69,7 @@ class ClassicRenderer
     private ?QuickModeCaptchaReloadScriptBuilder $quickModeCaptchaReloadScriptBuilderService = null;
     private ?QuickModeUploadOptionsBuilder $quickModeUploadOptionsBuilderService = null;
     private ?QuickModePagingActionBuilder $quickModePagingActionBuilderService = null;
+    private ?QuickModeSubmitActionBuilder $quickModeSubmitActionBuilderService = null;
 
     public function headers()
     {
@@ -236,6 +237,11 @@ float:left;
     private function quickModePagingActionBuilder(): QuickModePagingActionBuilder
     {
         return $this->quickModePagingActionBuilderService ??= new QuickModePagingActionBuilder();
+    }
+
+    private function quickModeSubmitActionBuilder(): QuickModeSubmitActionBuilder
+    {
+        return $this->quickModeSubmitActionBuilderService ??= new QuickModeSubmitActionBuilder();
     }
 
     public function __construct(HTML_facileFormsProcessor $p)
@@ -741,10 +747,7 @@ float:left;
                     echo '<button type="button" class="btn btn-primary bfNextButton button' . $this->fadingClass . '" type="submit" onclick="' . $this->quickModePagingActionBuilder()->next() . '" value="' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
                 }
 
-                $callSubmit = 'ff_validate_submit(this, \'click\')';
-                if ($this->hasFlashUpload) {
-                    $callSubmit = 'if(typeof bfAjaxObject101 == \'undefined\' && typeof bfReCaptchaLoaded == \'undefined\'){bfDoFlashUpload()}else{ff_validate_submit(this, \'click\')}';
-                }
+                $callSubmit = $this->quickModeSubmitActionBuilder()->build(false, $this->hasFlashUpload);
                 if ($this->rootMdata['submitInclude'] && $dataObject['properties']['pageNumber'] + 1 > count($this->dataObject['children']) - $last) {
                     /* translatables */
                     if (isset($this->rootMdata['submitLabel_translation' . $this->language_tag]) && $this->rootMdata['submitLabel_translation' . $this->language_tag] != '') {

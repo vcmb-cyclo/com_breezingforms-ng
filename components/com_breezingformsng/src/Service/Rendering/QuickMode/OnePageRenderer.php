@@ -70,6 +70,7 @@ class OnePageRenderer
     private ?QuickModeCaptchaReloadScriptBuilder $quickModeCaptchaReloadScriptBuilderService = null;
     private ?QuickModeUploadOptionsBuilder $quickModeUploadOptionsBuilderService = null;
     private ?QuickModePagingActionBuilder $quickModePagingActionBuilderService = null;
+    private ?QuickModeSubmitActionBuilder $quickModeSubmitActionBuilderService = null;
 
     public function bsClass($key)
     {
@@ -150,6 +151,11 @@ class OnePageRenderer
     private function quickModePagingActionBuilder(): QuickModePagingActionBuilder
     {
         return $this->quickModePagingActionBuilderService ??= new QuickModePagingActionBuilder();
+    }
+
+    private function quickModeSubmitActionBuilder(): QuickModeSubmitActionBuilder
+    {
+        return $this->quickModeSubmitActionBuilderService ??= new QuickModeSubmitActionBuilder();
     }
 
     public static function getEditorContent($editor)
@@ -1473,10 +1479,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                     echo '<button type="button" class="bfNextButton ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' ' . $this->bsClass('float-end') . ' button' . $this->fadingClass . '" type="submit" onclick="' . $this->quickModePagingActionBuilder()->onePageNext((int) $dataObject['properties']['pageNumber'], (int) $dataObject['properties']['pageNumber'] + 1) . '" value="' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '"><span>' . htmlentities(trim($this->rootMdata['pagingNextLabel']), ENT_QUOTES, 'UTF-8') . '</span></button>' . "\n";
                 }
 
-                $callSubmit = 'bf_validate_submit(this, \'click\')';
-                if ($this->hasFlashUpload) {
-                    $callSubmit = 'if(typeof bfAjaxObject101 == \'undefined\' && typeof bfReCaptchaLoaded == \'undefined\'){bfDoFlashUpload()}else{bf_validate_submit(this, \'click\')}';
-                }
+                $callSubmit = $this->quickModeSubmitActionBuilder()->build(true, $this->hasFlashUpload);
                 if ($this->rootMdata['submitInclude'] && $dataObject['properties']['pageNumber'] + 1 > count($this->dataObject['children']) - $last) {
                     /* translatables */
                     if (isset($this->rootMdata['submitLabel_translation' . $this->language_tag]) && $this->rootMdata['submitLabel_translation' . $this->language_tag] != '') {

@@ -79,6 +79,7 @@ final class RenderingEngine
     private ?ContentBuilderSignatureImageEncoder $contentBuilderSignatureImageEncoderService = null;
     private ?CaptchaEndpointBuilder $captchaEndpointBuilderService = null;
     private ?CaptchaValidationRowSelector $captchaValidationRowSelectorService = null;
+    private ?CaptchaValidationDefaultsBuilder $captchaValidationDefaultsBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -280,6 +281,11 @@ final class RenderingEngine
     private function captchaValidationRowSelector(): CaptchaValidationRowSelector
     {
         return $this->captchaValidationRowSelectorService ??= new CaptchaValidationRowSelector();
+    }
+
+    private function captchaValidationDefaultsBuilder(): CaptchaValidationDefaultsBuilder
+    {
+        return $this->captchaValidationDefaultsBuilderService ??= new CaptchaValidationDefaultsBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -2411,12 +2417,9 @@ final class RenderingEngine
      */
     private function createCaptchaDefaults(): array
     {
-        $captchaError = json_encode(
-            Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG'),
-            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE
+        return $this->captchaValidationDefaultsBuilder()->build(
+            Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')
         );
-
-        return [$captchaError, 'function bfCheckCaptcha(){if(checkFileExtensions())ff_submitForm2();}'];
     }
 
     /**

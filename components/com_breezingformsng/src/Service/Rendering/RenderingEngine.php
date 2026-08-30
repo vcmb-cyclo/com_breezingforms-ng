@@ -56,6 +56,7 @@ final class RenderingEngine
 {
     private ?TokenizedDirectoryResolver $tokenizedDirectoryResolverService = null;
     private ?ProcessorHeaderRenderer $processorHeaderRendererService = null;
+    private ?ClassicStaticTextBuilder $classicStaticTextBuilderService = null;
     private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
     private ?EditableRecordHydrationScriptBuilder $editableRecordHydrationScriptBuilderService = null;
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
@@ -174,6 +175,11 @@ final class RenderingEngine
     {
         return $this->processorHeaderRendererService ??=
             new ProcessorHeaderRenderer(new JavascriptValueExporter());
+    }
+
+    private function classicStaticTextBuilder(): ClassicStaticTextBuilder
+    {
+        return $this->classicStaticTextBuilderService ??= new ClassicStaticTextBuilder();
     }
 
     private function contentBuilderValueScriptBuilder(): ContentBuilderValueScriptBuilder
@@ -1006,7 +1012,14 @@ final class RenderingEngine
                     $attribs .= 'visibility:hidden;';
                 switch ($row->type) {
                     case 'Static Text/HTML':
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . $data1 . '</div>' . nl();
+                        echo $this->classicStaticTextBuilder()->build(
+                            (int) $row->id,
+                            $attribs,
+                            $class1,
+                            $data1,
+                            indentc(1),
+                            nl()
+                        );
                         break;
                     case 'Rectangle':
                         if ($data1 != '')

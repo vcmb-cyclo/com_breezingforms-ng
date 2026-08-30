@@ -52,7 +52,7 @@
 | `RenderingEngine::view()` — première boucle classique | Intégration callbacks, scan statique et identifiants draggable couverte | Commit `a254e895` |
 | ContentBuilder — valeurs éditables | Générateur indépendant créé, couvert et branché dans `view()` | Commits `f685ff5e`, `c2ae9a76` |
 | ContentBuilder — champs non éditables | Générateur indépendant créé, couvert et branché dans `view()` | Commits `8bfd520e`, `21a0a812` |
-| ContentBuilder — résolution des signatures | Résolution des chemins vide/absent/présent isolée et testée ; lecture/encodage encore dans `view()` | Commit `b31b5c47` |
+| ContentBuilder — résolution des signatures | Résolution, lecture et encodage des fichiers isolés et testés | Commits `b31b5c47`, `e9386794` |
 | PHPCS | Actif sur les services modernes, les builders ContentBuilder et `HiddenFieldTrait` | `phpcs.xml.dist`, commit `2e58c4bb` |
 | PHPStan | Niveau 2 sur le composant, avec baseline | `phpstan.neon.dist`, 251 entrées dans la baseline |
 
@@ -174,7 +174,9 @@ balises inattendues et la restauration des `<br>` sont couverts. La
 validation QuickMode est désormais centralisée dans
 `ContentBuilderFlashUploadValidationBuilder` via `6d4afd92`, avec émission
 unique du callback `ff_flashupload_not_empty`. Les parcours runtime complets
-des fichiers restent à éprouver avec un harnais ContentBuilder/Joomla.
+des fichiers restent à éprouver avec un harnais ContentBuilder/Joomla. La
+phase de restauration JavaScript des contrôles de fichiers est désormais
+isolée dans `ContentBuilderFileHydrationScriptBuilder` via `757f27446`.
 
 La résolution et l'encodage des fichiers de signature couvrent explicitement
 les valeurs vides, les fichiers absents et les fichiers présents ; la lecture

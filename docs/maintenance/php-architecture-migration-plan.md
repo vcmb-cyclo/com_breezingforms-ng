@@ -395,9 +395,9 @@ leurs warnings de longueur sont supprimés. Le prochain groupe reste
 `BootstrapStyleFieldTrait`, qui nécessite un lot séparé du fait de son volume.
 
 Le nettoyage du trait Bootstrap a commencé par les méthodes de résumé et de
-calendrier (`750dd432`) ; leurs sorties restent couvertes par les snapshots.
-Les 59 warnings de longueur restants sont conservés pour les sous-lots
-suivants du même trait.
+calendrier (`750dd432`, `6b0a8532`) ; leurs sorties restent couvertes par les
+snapshots. Le compteur est passé de 64 à 46 warnings de longueur ; les
+warnings restants sont conservés pour les sous-lots suivants du même trait.
 
 ### 6.2 Réduire la baseline PHPStan
 

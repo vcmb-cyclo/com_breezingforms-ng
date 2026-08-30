@@ -61,6 +61,7 @@
 | Rendu HTML classique — Query List header | Markup des en-têtes, spans, styles et sélecteur de lignes extrait et couvert | Commit `a940525b7` |
 | Rendu HTML classique — Query List cellules | Construction d’une cellule extraite et couverte pour alignements, spans, styles et contrôles de sélection | Commit `c047a0779` |
 | Rendu HTML classique — Query List lignes | Boucle de ligne extraite, réutilisant le builder de cellule et conservant l’arrêt `dying` | Commit `58dec7178` |
+| Rendu HTML classique — Query List pied et pagination | Markup du pied de tableau et liens de pagination extrait, avec variantes de navigation et mode compact couverts | Commit `76351beae` |
 | `RenderingEngine::view()` — scripts d'icônes | Extraction committée et trois chemins `bury()` couverts | Commit `0a908143` |
 | `RenderingEngine::view()` — callbacks d'éléments | Extraction committée ; ordre `init` / `action` / `validate` et trois arrêts `bury()` couverts | Commit `413cb1cb` |
 | `RenderingEngine::view()` — métadonnées classiques | Comptage icônes/infobulles et scan `Static Text/HTML` extraits et couverts | Commit `51e86824` |
@@ -274,7 +275,8 @@ Ordre conseillé, du plus simple au plus risqué :
    (`ClassicQueryListSettingsBuilder`, `ff720c4dc`), en-tête
    (`ClassicQueryListHeaderBuilder`, `a940525b7`), cellules
    (`ClassicQueryListCellBuilder`, `c047a0779`), puis boucle des lignes
-   (`ClassicQueryListRowBuilder`, `58dec7178`).
+   (`ClassicQueryListRowBuilder`, `58dec7178`) et pied/pagination
+   (`ClassicQueryListFooterBuilder`, `76351beae`).
 6. Query List et ses tableaux paginés.
 
 Chaque famille doit disposer d'un snapshot ou d'assertions structurelles avant

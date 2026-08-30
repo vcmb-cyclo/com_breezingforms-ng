@@ -67,6 +67,7 @@ class OnePageRenderer
     private ?QuickModeCalendarInitScriptBuilder $quickModeCalendarInitScriptBuilderService = null;
     private ?QuickModeCaptchaUrlBuilder $quickModeCaptchaUrlBuilderService = null;
     private ?QuickModeCaptchaMarkupBuilder $quickModeCaptchaMarkupBuilderService = null;
+    private ?QuickModeCaptchaReloadScriptBuilder $quickModeCaptchaReloadScriptBuilderService = null;
 
     public function bsClass($key)
     {
@@ -132,6 +133,11 @@ class OnePageRenderer
     private function quickModeCaptchaMarkupBuilder(): QuickModeCaptchaMarkupBuilder
     {
         return $this->quickModeCaptchaMarkupBuilderService ??= new QuickModeCaptchaMarkupBuilder();
+    }
+
+    private function quickModeCaptchaReloadScriptBuilder(): QuickModeCaptchaReloadScriptBuilder
+    {
+        return $this->quickModeCaptchaReloadScriptBuilderService ??= new QuickModeCaptchaReloadScriptBuilder();
     }
 
     public static function getEditorContent($editor)
@@ -1350,7 +1356,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                             '',
                             true
                         );
-                        echo '<button type="button" class="ff_elem ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' button" onclick="document.getElementById(\'bfCaptchaEntry\').value=\'\';document.getElementById(\'bfCaptchaEntry\').focus();document.getElementById(\'ff_capimgValue\').src = \'' . $captcha_url . '&bfMathRandom=\' + Math.random(); return false"><i class="' . $this->bsClass('icon-refresh') . '"></i></button>' . "\n";
+                        echo '<button type="button" class="ff_elem ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' button" onclick="' . $this->quickModeCaptchaReloadScriptBuilder()->build($captcha_url) . '"><i class="' . $this->bsClass('icon-refresh') . '"></i></button>' . "\n";
                         echo '</div>';
                         echo '</div>';
 

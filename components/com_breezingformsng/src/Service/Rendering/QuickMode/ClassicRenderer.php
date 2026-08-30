@@ -66,6 +66,7 @@ class ClassicRenderer
     private ?QuickModeCalendarInitScriptBuilder $quickModeCalendarInitScriptBuilderService = null;
     private ?QuickModeCaptchaUrlBuilder $quickModeCaptchaUrlBuilderService = null;
     private ?QuickModeCaptchaMarkupBuilder $quickModeCaptchaMarkupBuilderService = null;
+    private ?QuickModeCaptchaReloadScriptBuilder $quickModeCaptchaReloadScriptBuilderService = null;
 
     public function headers()
     {
@@ -218,6 +219,11 @@ float:left;
     private function quickModeCaptchaMarkupBuilder(): QuickModeCaptchaMarkupBuilder
     {
         return $this->quickModeCaptchaMarkupBuilderService ??= new QuickModeCaptchaMarkupBuilder();
+    }
+
+    private function quickModeCaptchaReloadScriptBuilder(): QuickModeCaptchaReloadScriptBuilder
+    {
+        return $this->quickModeCaptchaReloadScriptBuilderService ??= new QuickModeCaptchaReloadScriptBuilder();
     }
 
     public function __construct(HTML_facileFormsProcessor $p)
@@ -1206,7 +1212,7 @@ float:left;
             '',
             true
         );
-        echo '<a href="#" class="ff_elem" onclick="document.getElementById(\'bfCaptchaEntry\').value=\'\';document.getElementById(\'bfCaptchaEntry\').focus();document.getElementById(\'ff_capimgValue\').src = \'' . $captcha_url . '&bfMathRandom=\' + Math.random(); return false"><img alt="captcha" src="' . Uri::root(true) . '/media/com_breezingformsng/images/site/captcha/refresh-captcha.png" /></a>' . "\n";
+        echo '<a href="#" class="ff_elem" onclick="' . $this->quickModeCaptchaReloadScriptBuilder()->build($captcha_url) . '"><img alt="captcha" src="' . Uri::root(true) . '/media/com_breezingformsng/images/site/captcha/refresh-captcha.png" /></a>' . "\n";
         echo '</span>' . "\n";
     }
 

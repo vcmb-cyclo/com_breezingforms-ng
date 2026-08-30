@@ -61,6 +61,7 @@ class MobileRenderer
     private ?QuickModeCalendarInitScriptBuilder $quickModeCalendarInitScriptBuilderService = null;
     private ?QuickModeCaptchaUrlBuilder $quickModeCaptchaUrlBuilderService = null;
     private ?QuickModeCaptchaMarkupBuilder $quickModeCaptchaMarkupBuilderService = null;
+    private ?QuickModeCaptchaReloadScriptBuilder $quickModeCaptchaReloadScriptBuilderService = null;
 
     public function __construct(HTML_facileFormsProcessor $p)
     {
@@ -154,6 +155,11 @@ class MobileRenderer
     private function quickModeCaptchaMarkupBuilder(): QuickModeCaptchaMarkupBuilder
     {
         return $this->quickModeCaptchaMarkupBuilderService ??= new QuickModeCaptchaMarkupBuilder();
+    }
+
+    private function quickModeCaptchaReloadScriptBuilder(): QuickModeCaptchaReloadScriptBuilder
+    {
+        return $this->quickModeCaptchaReloadScriptBuilderService ??= new QuickModeCaptchaReloadScriptBuilder();
     }
 
     public function parseToggleFields($code)
@@ -1274,7 +1280,7 @@ HTML;
 
 
                         echo $this->quickModeCaptchaMarkupBuilder()->buildResponseInput('', 'ff_elem');
-                        echo '<button type="button" class="btn btn-secondary btn-sm" id="bfCaptchaReload" onclick="document.getElementById(\'bfCaptchaEntry\').value=\'\';document.getElementById(\'bfCaptchaEntry\').focus();document.getElementById(\'ff_capimgValue\').src = \'' . $captcha_url . '&bfMathRandom=\' + Math.random(); return false"><span class="icon-refresh" aria-hidden="true"></span><span>Reload Captcha</span></button>';
+                        echo '<button type="button" class="btn btn-secondary btn-sm" id="bfCaptchaReload" onclick="' . $this->quickModeCaptchaReloadScriptBuilder()->build($captcha_url) . '"><span class="icon-refresh" aria-hidden="true"></span><span>Reload Captcha</span></button>';
                         echo '</div>';
                         break;
 

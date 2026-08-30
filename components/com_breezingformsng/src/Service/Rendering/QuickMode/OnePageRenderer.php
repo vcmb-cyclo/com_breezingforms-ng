@@ -61,6 +61,7 @@ class OnePageRenderer
     private ?QuickModeSelectBuilder $quickModeSelectBuilderService = null;
     private ?QuickModeMaxLengthCounterBuilder $quickModeMaxLengthCounterBuilderService = null;
     private ?QuickModeGroupOptionBuilder $quickModeGroupOptionBuilderService = null;
+    private ?QuickModeSubmitButtonBuilder $quickModeSubmitButtonBuilderService = null;
 
     public function bsClass($key)
     {
@@ -96,6 +97,11 @@ class OnePageRenderer
     private function quickModeGroupOptionBuilder(): QuickModeGroupOptionBuilder
     {
         return $this->quickModeGroupOptionBuilderService ??= new QuickModeGroupOptionBuilder();
+    }
+
+    private function quickModeSubmitButtonBuilder(): QuickModeSubmitButtonBuilder
+    {
+        return $this->quickModeSubmitButtonBuilderService ??= new QuickModeSubmitButtonBuilder();
     }
 
     public static function getEditorContent($editor)

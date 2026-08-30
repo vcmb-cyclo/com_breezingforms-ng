@@ -426,9 +426,27 @@ trait BootstrapStyleFieldTrait
             $onclick = 'onclick="if(typeof bf_htmltextareainit != \'undefined\'){ bf_htmltextareainit() }populateSummarizers();if(document.getElementById(\'bfPaymentMethod\')){document.getElementById(\'bfPaymentMethod\').value=\'\';};return false;" ';
         }
         if ($src == '') {
-            echo '<button type="button" class="ff_elem ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' button bfCustomSubmitButton" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '">' . $mdata['value'] . '</button>' . "\n";
+            echo $this->quickModeSubmitButtonBuilder()->build(
+                'button',
+                'type="button" class="ff_elem ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' button bfCustomSubmitButton"',
+                $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+                $type,
+                (string) $mdata['bfName'],
+                (int) $mdata['dbId'],
+                (string) $mdata['value']
+            );
         } else {
-            echo '<input type="button" class="ff_elem bfCustomSubmitButton" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" alt="" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '" value="' . $mdata['value'] . '"/>' . "\n";
+            echo $this->quickModeSubmitButtonBuilder()->build(
+                'input',
+                'type="button" class="ff_elem bfCustomSubmitButton"',
+                $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+                $type,
+                (string) $mdata['bfName'],
+                (int) $mdata['dbId'],
+                '',
+                ' alt=""',
+                ' value="' . $mdata['value'] . '"'
+            );
         }
         echo '</span>';
         echo '</div>';

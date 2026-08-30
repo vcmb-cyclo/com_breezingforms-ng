@@ -60,6 +60,7 @@ class ClassicRenderer
     private ?QuickModeSelectBuilder $quickModeSelectBuilderService = null;
     private ?QuickModeMaxLengthCounterBuilder $quickModeMaxLengthCounterBuilderService = null;
     private ?QuickModeGroupOptionBuilder $quickModeGroupOptionBuilderService = null;
+    private ?QuickModeSubmitButtonBuilder $quickModeSubmitButtonBuilderService = null;
 
     public function headers()
     {
@@ -182,6 +183,11 @@ float:left;
     private function quickModeGroupOptionBuilder(): QuickModeGroupOptionBuilder
     {
         return $this->quickModeGroupOptionBuilderService ??= new QuickModeGroupOptionBuilder();
+    }
+
+    private function quickModeSubmitButtonBuilder(): QuickModeSubmitButtonBuilder
+    {
+        return $this->quickModeSubmitButtonBuilderService ??= new QuickModeSubmitButtonBuilder();
     }
 
     public function __construct(HTML_facileFormsProcessor $p)
@@ -1027,9 +1033,27 @@ float:left;
             $onclick = 'onclick="if(typeof bf_htmltextareainit != \'undefined\'){ bf_htmltextareainit() }populateSummarizers();if(document.getElementById(\'bfPaymentMethod\')){document.getElementById(\'bfPaymentMethod\').value=\'\';};return false;" ';
         }
         if ($src == '') {
-            echo '<button type="button" class="ff_elem btn btn-primary bfCustomSubmitButton" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"><span>' . $mdata['value'] . '</span></button>' . "\n";
+            echo $this->quickModeSubmitButtonBuilder()->build(
+                'button',
+                'type="button" class="ff_elem btn btn-primary bfCustomSubmitButton"',
+                $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+                $type,
+                (string) $mdata['bfName'],
+                (int) $mdata['dbId'],
+                '<span>' . $mdata['value'] . '</span>'
+            );
         } else {
-            echo '<input type="image" class="ff_elem btn btn-primary bfCustomSubmitButton" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '" value="' . $mdata['value'] . '"/>' . "\n";
+            echo $this->quickModeSubmitButtonBuilder()->build(
+                'input',
+                'type="image" class="ff_elem btn btn-primary bfCustomSubmitButton"',
+                $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+                $type,
+                (string) $mdata['bfName'],
+                (int) $mdata['dbId'],
+                '',
+                '',
+                ' value="' . $mdata['value'] . '"'
+            );
         }
     }
 

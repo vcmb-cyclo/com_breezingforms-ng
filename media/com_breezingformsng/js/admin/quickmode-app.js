@@ -540,6 +540,26 @@
                     appScope.saveButton
                 );
 
+                // The Options tab's fields live inside bfForm (needed for its
+                // .tab-pane to stay a direct child of .tab-content - see the
+                // comment in QuickmodeHtml::showApplication()) but aren't
+                // themselves in a <form>: a second nested <form> there would be
+                // invalid HTML. Move them (not clone - clone would lose live
+                // edits, since cloneNode() copies the original attributes, not
+                // the current DOM properties) into a detached <form> and submit
+                // that instead.
+                JQuery('#bfOptionsSaveButton').click(function (e) {
+                    e.preventDefault();
+                    var $fields = JQuery('#bfOptionsFieldsWrap').children();
+                    var tempForm = document.createElement('form');
+                    tempForm.method = 'post';
+                    tempForm.action = 'index.php?option=com_breezingformsng';
+                    tempForm.style.display = 'none';
+                    document.body.appendChild(tempForm);
+                    JQuery(tempForm).append($fields);
+                    tempForm.submit();
+                });
+
                 JQuery('#bfNewSectionButton').click(
                     function () {
                         var id = "bfQuickModeSection" + (Math.floor(Math.random() * 100000));

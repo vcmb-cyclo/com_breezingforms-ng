@@ -291,48 +291,39 @@ final class QuickmodeHtml
 
             <div id="bfQuickModeRight" class="bfClearfix">
 
-                <div id="menutab">
-                    <input id="triggerScrollable" type="checkbox"><label class="triggerScrollableLabel"
-                        for="triggerScrollable">Keep panel docked</label>
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li class="nav-item" role="presentation">
-                            <button type="button" class="nav-link active tab-items" id="fragment-1-tab"
-                                data-bs-toggle="tab" data-bs-target="#fragment-1" role="tab"
-                                aria-controls="fragment-1" aria-selected="true"
-                                onclick="JQuery('.bfFadingMessage').css('display', 'none')">
-                                <?php echo Text::_('COM_BREEZINGFORMSNG_PROPERTIES') ?>
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button type="button" class="nav-link tab-element" id="fragment-2-tab"
-                                data-bs-toggle="tab" data-bs-target="#fragment-2" role="tab"
-                                aria-controls="fragment-2" aria-selected="false"
-                                onclick="JQuery('.bfFadingMessage').css('display', 'none')">
-                                <?php echo Text::_('COM_BREEZINGFORMSNG_ADVANCED') ?>
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button type="button" class="nav-link" id="fragment-3-tab"
-                                data-bs-toggle="tab" data-bs-target="#fragment-3" role="tab"
-                                aria-controls="fragment-3" aria-selected="false"
-                                onclick="JQuery('.bfFadingMessage').css('display', 'none')">
-                                <?php echo Text::_('COM_BREEZINGFORMSNG_OPTIONS') ?>
-                            </button>
-                        </li>
-                    </ul>
+                <form name="bfForm" onsubmit="return false">
 
-                    <div class="tab-content">
+                    <div id="menutab">
+                        <input id="triggerScrollable" type="checkbox"><label class="triggerScrollableLabel"
+                            for="triggerScrollable">Keep panel docked</label>
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button type="button" class="nav-link active tab-items" id="fragment-1-tab"
+                                    data-bs-toggle="tab" data-bs-target="#fragment-1" role="tab"
+                                    aria-controls="fragment-1" aria-selected="true"
+                                    onclick="JQuery('.bfFadingMessage').css('display', 'none')">
+                                    <?php echo Text::_('COM_BREEZINGFORMSNG_PROPERTIES') ?>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button type="button" class="nav-link tab-element" id="fragment-2-tab"
+                                    data-bs-toggle="tab" data-bs-target="#fragment-2" role="tab"
+                                    aria-controls="fragment-2" aria-selected="false"
+                                    onclick="JQuery('.bfFadingMessage').css('display', 'none')">
+                                    <?php echo Text::_('COM_BREEZINGFORMSNG_ADVANCED') ?>
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button type="button" class="nav-link" id="fragment-3-tab"
+                                    data-bs-toggle="tab" data-bs-target="#fragment-3" role="tab"
+                                    aria-controls="fragment-3" aria-selected="false"
+                                    onclick="JQuery('.bfFadingMessage').css('display', 'none')">
+                                    <?php echo Text::_('COM_BREEZINGFORMSNG_OPTIONS') ?>
+                                </button>
+                            </li>
+                        </ul>
 
-                        <!--
-                            bfForm wraps only fragment-1/fragment-2 (not the whole
-                            #menutab): the "Options" tab (fragment-3) needs its own
-                            <form> posting to forms.save, and nesting <form> elements
-                            is invalid HTML. Native submission is blocked either way
-                            (onsubmit="return false") - the Enregistrer buttons are
-                            intercepted by id via quickmode-app.js, unaffected by
-                            exactly which ancestor this <form> wraps.
-                        -->
-                        <form name="bfForm" onsubmit="return false">
+                        <div class="tab-content">
 
                             <div id="fragment-1" class="tab-pane fade show active" role="tabpanel" aria-labelledby="fragment-1-tab">
                                 <div>
@@ -377,46 +368,58 @@ final class QuickmodeHtml
                                 </div>
                             </div>
 
-                        </form>
-
-                        <div id="fragment-3" class="tab-pane fade" role="tabpanel" aria-labelledby="fragment-3-tab">
-                            <div>
-                                <br />
-                                <?php if ($optionsForm === null): ?>
-                                    <div class="alert alert-info">
-                                        <?php echo Text::_('COM_BREEZINGFORMSNG_QM_OPTIONS_SAVE_FIRST'); ?>
-                                    </div>
-                                <?php else: ?>
-                                    <form id="bfOptionsForm" method="post" action="index.php?option=com_breezingformsng">
-                                        <?php
-                                        FormsAdvancedOptionsHtml::render([
-                                            'f' => $optionsForm,
-                                            'pkg' => (string) ($optionsForm->package ?? ''),
-                                            'editor' => $optionsEditor,
-                                            'tabId' => 'bfOptionsFormTabs',
-                                            'tabEntryCounts' => $optionsTabEntryCounts,
-                                            'initScripts' => $optionsInitScripts,
-                                            'submittedScripts' => $optionsSubmittedScripts,
-                                            'pieceBefore' => $optionsPieceBefore,
-                                            'pieceAfter' => $optionsPieceAfter,
-                                            'pieceBeginSubmit' => $optionsPieceBeginSubmit,
-                                            'pieceEndSubmit' => $optionsPieceEndSubmit,
-                                        ]);
-                                        ?>
-                                        <input type="hidden" name="id" value="<?php echo (int) $formId; ?>">
-                                        <input type="hidden" name="task" value="forms.save">
-                                        <input type="hidden" name="return_tab" value="options">
-                                        <?php echo HTMLHelper::_('form.token'); ?>
-                                        <input type="submit" class="btn btn-secondary"
+                            <div id="fragment-3" class="tab-pane fade" role="tabpanel" aria-labelledby="fragment-3-tab">
+                                <div>
+                                    <br />
+                                    <?php if ($optionsForm === null): ?>
+                                        <div class="alert alert-info">
+                                            <?php echo Text::_('COM_BREEZINGFORMSNG_QM_OPTIONS_SAVE_FIRST'); ?>
+                                        </div>
+                                    <?php else: ?>
+                                        <!--
+                                            No <form> here on purpose: fragment-3 sits inside
+                                            bfForm (a <tab-pane> must stay a direct child of
+                                            .tab-content for Bootstrap's ".tab-content > .tab-pane"
+                                            CSS to hide/show it - see quickmode-options-tab-plan.md),
+                                            and nesting a second <form> inside bfForm is invalid
+                                            HTML. bfOptionsSaveButton below moves these fields
+                                            into a detached <form> at click time instead - see
+                                            quickmode-app.js.
+                                        -->
+                                        <div id="bfOptionsFieldsWrap">
+                                            <?php
+                                            FormsAdvancedOptionsHtml::render([
+                                                'f' => $optionsForm,
+                                                'pkg' => (string) ($optionsForm->package ?? ''),
+                                                'editor' => $optionsEditor,
+                                                'tabId' => 'bfOptionsFormTabs',
+                                                'tabEntryCounts' => $optionsTabEntryCounts,
+                                                'initScripts' => $optionsInitScripts,
+                                                'submittedScripts' => $optionsSubmittedScripts,
+                                                'pieceBefore' => $optionsPieceBefore,
+                                                'pieceAfter' => $optionsPieceAfter,
+                                                'pieceBeginSubmit' => $optionsPieceBeginSubmit,
+                                                'pieceEndSubmit' => $optionsPieceEndSubmit,
+                                            ]);
+                                            ?>
+                                            <input type="hidden" name="id" value="<?php echo (int) $formId; ?>">
+                                            <input type="hidden" name="task" value="forms.save">
+                                            <input type="hidden" name="return_tab" value="options">
+                                            <?php echo HTMLHelper::_('form.token'); ?>
+                                        </div>
+                                        <input type="submit" class="btn btn-secondary" id="bfOptionsSaveButton"
                                             value="<?php echo Text::_('COM_BREEZINGFORMSNG_PROPERTIES_SAVE'); ?>" />
-                                    </form>
-                                <?php endif; ?>
-                                <br />
+                                    <?php endif; ?>
+                                    <br />
+                                </div>
                             </div>
-                        </div>
 
+                        </div>
                     </div>
-                </div>
+
+                </form>
+
+            </div> <!-- ##### bfQuickModeRight end ##### -->
 
             </div> <!-- ##### bfQuickModeRight end ##### -->
 

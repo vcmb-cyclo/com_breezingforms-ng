@@ -376,8 +376,10 @@ final class RenderingEngine
         echo $this->processor->header();
         $this->initializeFormRendering();
 
-        if ($this->executeBeforeFormPiece())
+        if ($this->executeBeforeFormPiece()) {
+            $this->abortViewRendering();
             return;
+        }
 
         [$fileExtensionsCheck, $cntFiles] = $this->buildFileExtensionsCheck();
 
@@ -399,12 +401,16 @@ final class RenderingEngine
         } else {
             $this->linkSubmittedOnload($library, $linked);
         } // if
-        if ($this->processor->bury())
+        if ($this->processor->bury()) {
+            $this->abortViewRendering();
             return;
+        }
 
         // add form scripts
-        if ($this->addFormScripts($library, $linked))
+        if ($this->addFormScripts($library, $linked)) {
+            $this->abortViewRendering();
             return;
+        }
 
         // all element scripts & static text/HTML
         $icons = 0;
@@ -420,21 +426,27 @@ final class RenderingEngine
             $this->collectElementMetadata($row, $icons, $tooltips);
             if ($row->type == "Query List") {
                 $this->prepareQueryListRow($row, $qcheckboxes, $qcode);
-                if ($this->processor->bury())
+                if ($this->processor->bury()) {
+                    $this->abortViewRendering();
                     return;
+                }
             } // if
             if ($this->registerElementCallbacks($row, $library, $linked)) {
                 unset($row);
+                $this->abortViewRendering();
                 return;
             }
             $this->registerStaticTextScanCallback($row, $library, $linked);
             unset($row);
-            if ($this->processor->bury())
+            if ($this->processor->bury()) {
+                $this->abortViewRendering();
                 return;
+            }
         } // for
 
         if ($icons > 0) {
             if ($this->registerIconBorderScripts($library, $linked)) {
+                $this->abortViewRendering();
                 return;
             }
         } // if
@@ -563,8 +575,10 @@ final class RenderingEngine
             $code .= '    window.scrollTo(0,0);' . nl() .
                 '} // ff_dispQueryPage';
             $this->processor->linkcode('ff_dispQueryPage', $library, $linked, $code);
-            if ($this->processor->bury())
+            if ($this->processor->bury()) {
+                $this->abortViewRendering();
                 return;
+            }
         } // if
 
         echo '//-->' . nl() .
@@ -918,14 +932,20 @@ final class RenderingEngine
                     $row->height = 0;
                 if ($row->type != 'Query List') {
                     $data1 = $this->processor->replaceCode($row->data1, "data1 of $row->name", 'e', $row->id, 0);
-                    if ($this->processor->bury())
+                    if ($this->processor->bury()) {
+                        $this->abortViewRendering();
                         return;
+                    }
                     $data2 = $this->processor->replaceCode($row->data2, "data2 of $row->name", 'e', $row->id, 0);
-                    if ($this->processor->bury())
+                    if ($this->processor->bury()) {
+                        $this->abortViewRendering();
                         return;
+                    }
                     $data3 = $this->processor->replaceCode($row->data3, "data3 of $row->name", 'e', $row->id, 0);
-                    if ($this->processor->bury())
+                    if ($this->processor->bury()) {
+                        $this->abortViewRendering();
                         return;
+                    }
                 } // if
                 $attribs = 'position:absolute;z-index:' . $i . ';';
                 if ($row->posx >= 0)
@@ -1523,8 +1543,10 @@ final class RenderingEngine
                             if ($this->processor->dying)
                                 break;
                         } // for
-                        if ($this->processor->bury())
+                        if ($this->processor->bury()) {
+                            $this->abortViewRendering();
                             return;
+                        }
 
                         // display footer
                         if ($row->height > 0 && $pagenav > 0) {
@@ -1782,8 +1804,10 @@ final class RenderingEngine
                     echo '</form>' . nl();
                 } // if
         } // if
-        if ($this->executeAfterFormPiece())
+        if ($this->executeAfterFormPiece()) {
+            $this->abortViewRendering();
             return;
+        }
 
         $this->closeFormRendering();
         if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT) {
@@ -1965,6 +1989,12 @@ final class RenderingEngine
     private function closeFormRendering(): void
     {
         echo $this->formClosingMarkupBuilder()->build((bool) $this->processor->legacy_wrap, nl());
+    }
+
+    private function abortViewRendering(): void
+    {
+        ob_end_flush();
+        restore_error_handler();
     }
 
     private function executeBeforeFormPiece(): bool

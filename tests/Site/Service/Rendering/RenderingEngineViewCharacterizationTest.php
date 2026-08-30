@@ -1169,14 +1169,13 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         ob_start();
         try {
             $engine->view();
+            self::assertSame($outputBufferLevel + 1, ob_get_level());
 
             return (string) ob_get_contents();
         } finally {
             while (ob_get_level() > $outputBufferLevel) {
                 ob_end_clean();
             }
-
-            restore_error_handler();
         }
     }
 

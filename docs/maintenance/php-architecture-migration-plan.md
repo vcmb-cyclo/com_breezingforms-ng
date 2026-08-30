@@ -47,7 +47,7 @@
 | `RenderingEngine::view()` — CAPTCHA | Sélection `Captcha` / `ReCaptcha` extraite, ordre historique préservé | Commit `4a070774` |
 | `RenderingEngine::view()` — Query List | Préparation extraite et premier test committé ; variantes à compléter | Commit `4070ec0f` |
 | `RenderingEngine::view()` — scripts d'icônes | Extraction committée et trois chemins `bury()` couverts | Commit `0a908143` |
-| `RenderingEngine::view()` — callbacks d'éléments | Extraction en cours ; ordre `init` / `action` / `validate` et trois arrêts `bury()` couverts | `registerElementCallbacks()` |
+| `RenderingEngine::view()` — callbacks d'éléments | Extraction committée ; ordre `init` / `action` / `validate` et trois arrêts `bury()` couverts | Commit `413cb1cb` |
 | ContentBuilder — valeurs éditables | Générateur indépendant créé et couvert ; branchement dans `view()` restant | Commit `f685ff5e` |
 | ContentBuilder — champs non éditables | Générateur indépendant créé et couvert ; branchement dans `view()` restant | En attente de coordination avec `RenderingEngine` |
 | PHPCS | Actif sur un premier groupe de services modernes | `phpcs.xml.dist` |
@@ -79,11 +79,9 @@ Critère de sortie : `view()` délègue toute la préparation d'une ligne
 
 ### 1.2 Extraire la préparation des scripts des éléments
 
-État : premier sous-lot committé dans `0a908143`. L'enregistrement des scripts
-de bordure des icônes est extrait dans `registerIconBorderScripts()` et les
-trois chemins `bury()` sont couverts. L'extraction des callbacks propres aux
-éléments est en cours dans `registerElementCallbacks()` ; le comptage et le
-traitement `Static Text/HTML` restent à extraire.
+État : extraction des scripts d'icônes committée dans `0a908143` et extraction
+des callbacks committée dans `413cb1cb`. Les trois chemins `bury()` sont
+couverts ; le comptage et le traitement `Static Text/HTML` restent à extraire.
 
 - Isoler le comptage des icônes et infobulles.
 - Isoler l'enregistrement des callbacks `init`, `action` et `validate`.
@@ -347,8 +345,7 @@ Règles de coordination :
 ## Ordre recommandé des prochains lots
 
 1. Compléter les variantes de caractérisation Query List.
-2. Terminer le comptage et le traitement `Static Text/HTML`, puis committer les
-   callbacks d'éléments.
+2. Extraire le comptage et le traitement `Static Text/HTML`.
 3. Service de chargement d'un enregistrement éditable.
 4. Générateur des valeurs éditables BreezingForms.
 5. Générateurs ContentBuilder par famille de champs.

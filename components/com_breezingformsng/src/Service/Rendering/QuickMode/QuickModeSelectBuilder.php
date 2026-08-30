@@ -14,7 +14,8 @@ final class QuickModeSelectBuilder
         string $style = '',
         bool $includeChosenAttribute = true
     ): string {
-        $html = '<select ' . ($includeChosenAttribute ? 'data-chosen="no-chzn" ' : '') . 'class="' . $class . '" ' . $style
+        $html = '<select ' . ($includeChosenAttribute ? 'data-chosen="no-chzn" ' : '')
+            . 'class="' . $class . '" ' . $style
             . ($multiple ? 'multiple="multiple" ' : '') . $attributes
             . 'name="ff_nm_' . $fieldName . '[]" id="ff_elem' . $elementId . '">' . "\n";
 

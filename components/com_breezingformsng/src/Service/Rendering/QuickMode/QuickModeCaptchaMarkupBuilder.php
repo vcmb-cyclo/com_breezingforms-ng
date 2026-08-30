@@ -13,7 +13,8 @@ final class QuickModeCaptchaMarkupBuilder
     ): string {
         $imageAttributes = trim($attributes);
 
-        return '<img alt="" ' . ($imageAttributes !== '' ? $imageAttributes . ' ' : '') . 'id="' . $elementId . '" class="' . $class
+        return '<img alt="" ' . ($imageAttributes !== '' ? $imageAttributes . ' ' : '')
+            . 'id="' . $elementId . '" class="' . $class
             . '" src="' . $src . '"/>' . $suffix . "\n";
     }
 

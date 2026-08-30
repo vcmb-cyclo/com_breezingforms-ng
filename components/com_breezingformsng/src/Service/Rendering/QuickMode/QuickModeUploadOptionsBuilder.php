@@ -6,7 +6,15 @@ final class QuickModeUploadOptionsBuilder
 {
     /**
      * @param array<string, mixed> $data
-     * @return array{extensions: string, maxFileSize: string, maxBytes: string, multiSelection: string, runtimes: string, buttonWidth: string, buttonHeight: string}
+     * @return array{
+     *     extensions: string,
+     *     maxFileSize: string,
+     *     maxBytes: string,
+     *     multiSelection: string,
+     *     runtimes: string,
+     *     buttonWidth: string,
+     *     buttonHeight: string
+     * }
      */
     public function build(array $data): array
     {

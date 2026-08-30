@@ -71,6 +71,7 @@ final class RenderingEngine
     private ?ClassicQueryListCellBuilder $classicQueryListCellBuilderService = null;
     private ?ClassicQueryListRowBuilder $classicQueryListRowBuilderService = null;
     private ?ClassicQueryListFooterBuilder $classicQueryListFooterBuilderService = null;
+    private ?ClassicQueryListMarkupBuilder $classicQueryListMarkupBuilderService = null;
     private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
     private ?EditableRecordHydrationScriptBuilder $editableRecordHydrationScriptBuilderService = null;
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
@@ -265,6 +266,11 @@ final class RenderingEngine
     private function classicQueryListFooterBuilder(): ClassicQueryListFooterBuilder
     {
         return $this->classicQueryListFooterBuilderService ??= new ClassicQueryListFooterBuilder();
+    }
+
+    private function classicQueryListMarkupBuilder(): ClassicQueryListMarkupBuilder
+    {
+        return $this->classicQueryListMarkupBuilderService ??= new ClassicQueryListMarkupBuilder();
     }
 
     private function contentBuilderValueScriptBuilder(): ContentBuilderValueScriptBuilder
@@ -1330,8 +1336,7 @@ final class RenderingEngine
                         );
                         break;
                     case 'Query List':
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
-
+                        $wrapperStyle = $attribs;
                         $queryListSettings = $this->classicQueryListSettingsBuilder()->build(
                             (string) $row->data1,
                             (int) $row->width,
@@ -1343,10 +1348,19 @@ final class RenderingEngine
                         $trfclass = $queryListSettings['footerClass'];
                         $tdfclass = $queryListSettings['footerCellClass'];
                         $pagenav = $queryListSettings['pageNavigation'];
-                        $attribs = $queryListSettings['tableAttributes'];
 
                         // display 1st page of table
-                        echo indentc(2) . '<table id="ff_elem' . $row->id . '"' . $attribs . $class2 . '>' . nl();
+                        echo $this->classicQueryListMarkupBuilder()->open(
+                            (int) $row->id,
+                            $wrapperStyle,
+                            $class1,
+                            $queryListSettings['tableAttributes'],
+                            $class2,
+                            indentc(1),
+                            indentc(2),
+                            nlc() ?? '',
+                            nl()
+                        );
 
                         $cols = &$this->processor->queryCols['ff_' . $row->id];
                         $colcnt = count($cols);
@@ -1432,8 +1446,12 @@ final class RenderingEngine
                             );
                         } // if
                         // table end
-                        echo indentc(2) . '</table>' . nlc();
-                        echo indentc(1) . '</div>' . nl();
+                        echo $this->classicQueryListMarkupBuilder()->close(
+                            indentc(2),
+                            indentc(1),
+                            nlc() ?? '',
+                            nl()
+                        );
                         unset($qrows);
                         unset($cols);
                         break;

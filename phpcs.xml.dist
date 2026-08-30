@@ -9,6 +9,8 @@
     <file>components/com_breezingformsng/src/Service/Rendering/JavascriptCompressor.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/JavascriptValueExporter.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ProcessorHeaderRenderer.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderValueScriptBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderReadonlyScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php</file>
 
     <exclude-pattern>*/vendor/*</exclude-pattern>

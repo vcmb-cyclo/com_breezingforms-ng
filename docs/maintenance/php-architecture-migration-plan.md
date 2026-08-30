@@ -226,6 +226,10 @@ JQuery/`bfToggleFieldsLoaded`.
 
 ### 4.2 Champs techniques et paiement
 
+État : le builder pur du champ `ff_payment_method` est extrait et branché par
+`3d45e1e2`. La détection des types de paiement reste dans `view()` et demeure
+à caractériser avec les trois providers.
+
 - Extraire la détection PayPal, Sofort et Stripe.
 - Extraire le champ caché `ff_payment_method`.
 - Extraire les paramètres ContentBuilder transmis au formulaire.

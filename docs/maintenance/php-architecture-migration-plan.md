@@ -293,7 +293,10 @@ propres à chaque thème.
 5. Groupes checkbox et radio — contrôle d'option partagé via
    `QuickModeGroupOptionBuilder` (`a85bed34`); les enveloppes, labels et règles
    `wrap` restent propres aux renderers.
-6. Boutons et champs cachés restants.
+6. Boutons et champs cachés restants — `bfHidden` était déjà partagé par
+   `HiddenFieldTrait`; le bouton de champ `bfSubmitButton` est désormais
+   partagé via `QuickModeSubmitButtonBuilder` (`92b4af6f`). Les boutons de
+   navigation générale restent à caractériser séparément.
 7. Calendriers et calendriers responsives.
 8. Uploads, CAPTCHA, signatures et paiements.
 
@@ -448,6 +451,12 @@ partagés via `QuickModeGroupOptionBuilder` et branchés dans les quatre
 renderers par `a85bed34`. Les différences d'enveloppe, de label, de saut de
 ligne et de classe Bootstrap restent dans les renderers ; les valeurs et
 attributs des options sont testés avec leurs variantes checked/unchecked.
+
+Le rendu du champ `bfSubmitButton` est désormais partagé via
+`QuickModeSubmitButtonBuilder` et branché dans Classic, Mobile et le trait
+Bootstrap commun à Bootstrap/OnePage par `92b4af6f`. Les variantes bouton et
+image, les attributs de thème et l'ordre HTML historique sont couverts ; les
+callbacks JavaScript restent préparés dans chaque renderer.
 
 La baseline PHPCS est maintenant sans erreur sur les services modernes, les
 quatre renderers QuickMode et leurs traits (`e25d501f`, `14985d4d`, `288b42a4`,

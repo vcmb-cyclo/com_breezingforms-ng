@@ -67,6 +67,7 @@ final class RenderingEngine
     private ?FormRoutingFieldsBuilder $formRoutingFieldsBuilderService = null;
     private ?FormTokenFieldBuilder $formTokenFieldBuilderService = null;
     private ?FormContextFieldsBuilder $formContextFieldsBuilderService = null;
+    private ?FormClosingMarkupBuilder $formClosingMarkupBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -208,6 +209,11 @@ final class RenderingEngine
     private function formContextFieldsBuilder(): FormContextFieldsBuilder
     {
         return $this->formContextFieldsBuilderService ??= new FormContextFieldsBuilder();
+    }
+
+    private function formClosingMarkupBuilder(): FormClosingMarkupBuilder
+    {
+        return $this->formClosingMarkupBuilderService ??= new FormClosingMarkupBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -1929,13 +1935,7 @@ final class RenderingEngine
 
     private function closeFormRendering(): void
     {
-        if ($this->processor->legacy_wrap) {
-            echo '</div></div></div><div class="bfPage-bl"><div class="bfPage-br"><div class="bfPage-b"></div></div></div></div><!-- form end -->' . nl();
-
-            return;
-        }
-
-        echo '</div><!-- form end -->' . nl();
+        echo $this->formClosingMarkupBuilder()->build((bool) $this->processor->legacy_wrap, nl());
     }
 
     private function executeBeforeFormPiece(): bool

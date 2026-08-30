@@ -72,6 +72,7 @@ final class RenderingEngine
     private ?FormOptionalContextFieldsBuilder $formOptionalContextFieldsBuilderService = null;
     private ?AdditionalHiddenFieldsBuilder $additionalHiddenFieldsBuilderService = null;
     private ?PaymentProviderDetector $paymentProviderDetectorService = null;
+    private ?ContentBuilderFileValueParser $contentBuilderFileValueParserService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -238,6 +239,11 @@ final class RenderingEngine
     private function paymentProviderDetector(): PaymentProviderDetector
     {
         return $this->paymentProviderDetectorService ??= new PaymentProviderDetector();
+    }
+
+    private function contentBuilderFileValueParser(): ContentBuilderFileValueParser
+    {
+        return $this->contentBuilderFileValueParserService ??= new ContentBuilderFileValueParser();
     }
 
     public function cbCheckPermissions(): array
@@ -745,8 +751,9 @@ final class RenderingEngine
                                             ';
                                 }
 
-                                $cbFiles = explode("\n", str_replace("\r", "", $cbEntry->recValue));
-                                $cnt = count($cbFiles);
+                                $fileValue = $this->contentBuilderFileValueParser()->parse((string) $cbEntry->recValue);
+                                $cbFiles = $fileValue['files'];
+                                $cnt = $fileValue['count'];
                                 $cbJs .= '
                                     cbFlashElemCnt["ff_elem' . $cbEntry->recElementId . '"] = ' . $cnt . ';
                                 ';

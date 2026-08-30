@@ -394,12 +394,12 @@ Le premier nettoyage ciblé de cette baseline PHPCS est réalisé dans
 leurs warnings de longueur sont supprimés. Le prochain groupe reste
 `BootstrapStyleFieldTrait`, qui nécessite un lot séparé du fait de son volume.
 
-Le nettoyage du trait Bootstrap a commencé par les méthodes de résumé,
-calendrier et champs (`750dd432`, `6b0a8532`, `82b42a90`, `d1638610`) ; leurs
-sorties restent couvertes par les snapshots. Le compteur est passé de 64 à
-33 warnings de longueur ; les warnings restants sont conservés pour les
-sous-lots suivants du même trait, principalement dans les méthodes de
-confirmation et de paiement.
+Le nettoyage du trait Bootstrap a couvert les méthodes de résumé, calendrier,
+champs, confirmation, paiement, signature et groupes (`750dd432`, `6b0a8532`,
+`82b42a90`, `d1638610`, `9a93d10c`, `aaabc40c`) ; leurs sorties restent
+couvertes par les snapshots. Le compteur est passé de 64 à 0 warnings de
+longueur pour ce trait. Les quatre renderers passent toujours la
+caractérisation PHPUnit et le sous-périmètre QuickMode passe PHPStan.
 
 ### 6.2 Réduire la baseline PHPStan
 

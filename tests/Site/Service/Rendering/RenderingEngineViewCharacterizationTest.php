@@ -1383,4 +1383,42 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertSame('<p>content</p>', $processor->linkedCallbacks[0]['code']);
     }
 
+    public function testViewRegistersElementCallbacksAndStaticTextScanCallbackInOrder(): void
+    {
+        $processor = $this->makeProcessorReadyForCaptchaScript([
+            (object) [
+                'id' => 31,
+                'type' => 'Static Text/HTML',
+                'name' => 'intro',
+                'data1' => '<p>content</p>',
+                'script1cond' => 0,
+                'script1id' => 0,
+                'script1code' => 'element init',
+                'script2cond' => 0,
+                'script2id' => 0,
+                'script2code' => 'element action',
+                'script3cond' => 0,
+                'script3id' => 0,
+                'script3code' => 'element validate',
+            ],
+        ]);
+        $processor->formrow->script1cond = 0;
+        $processor->formrow->script1id = 0;
+        $processor->formrow->script1code = '';
+        $processor->formrow->script2cond = 0;
+        $processor->formrow->script2id = 0;
+        $processor->formrow->script2code = '';
+        $processor->buryOnCallNumber = 8;
+
+        $this->captureCaptchaScript($processor);
+
+        self::assertSame(
+            ['ff_intro_init', 'ff_intro_action', 'ff_intro_validate'],
+            array_slice($processor->callbackNames, -3)
+        );
+        self::assertSame('#scanonly', $processor->linkedCallbacks[1]['function']);
+        self::assertSame('<p>content</p>', $processor->linkedCallbacks[1]['code']);
+        self::assertSame(['ff_div31'], $processor->draggableDivIds);
+    }
+
 }

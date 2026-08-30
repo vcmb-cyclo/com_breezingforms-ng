@@ -57,6 +57,7 @@ class ClassicRenderer
     private ?QuickModeInputBuilder $quickModeInputBuilderService = null;
     private ?QuickModeTextareaBuilder $quickModeTextareaBuilderService = null;
     private ?QuickModeCheckboxBuilder $quickModeCheckboxBuilderService = null;
+    private ?QuickModeSelectBuilder $quickModeSelectBuilderService = null;
 
     public function headers()
     {
@@ -164,6 +165,11 @@ float:left;
     private function quickModeCheckboxBuilder(): QuickModeCheckboxBuilder
     {
         return $this->quickModeCheckboxBuilderService ??= new QuickModeCheckboxBuilder();
+    }
+
+    private function quickModeSelectBuilder(): QuickModeSelectBuilder
+    {
+        return $this->quickModeSelectBuilderService ??= new QuickModeSelectBuilder();
     }
 
     public function __construct(HTML_facileFormsProcessor $p)
@@ -953,18 +959,15 @@ float:left;
                 $size = 'style="' . $width . $height . '" ';
             }
 
-            $mdata['list'] = str_replace("\r", '', $mdata['list']);
-            $gEx = explode("\n", $mdata['list']);
-            $lines = count($gEx);
-            echo '<select data-chosen="no-chzn" class="ff_elem chzn-done" ' . $size . ($mdata['multiple'] ? 'multiple="multiple" ' : '') . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '">' . "\n";
-            for ($i = 0; $i < $lines; $i++) {
-                $iEx = explode(";", $gEx[$i]);
-                $iCnt = count($iEx);
-                if ($iCnt == 3) {
-                    echo '<option ' . ($iEx[0] == 1 ? 'selected="selected" ' : '') . 'value="' . htmlentities(trim($iEx[2]), ENT_QUOTES, 'UTF-8') . '">' . htmlentities(trim($iEx[1]), ENT_QUOTES, 'UTF-8') . '</option>' . "\n";
-                }
-            }
-            echo '</select>' . "\n";
+            echo $this->quickModeSelectBuilder()->build(
+                'ff_elem chzn-done',
+                (string) $mdata['bfName'],
+                (int) $mdata['dbId'],
+                (string) $mdata['list'],
+                (bool) $mdata['multiple'],
+                $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+                $size
+            );
         }
     }
 

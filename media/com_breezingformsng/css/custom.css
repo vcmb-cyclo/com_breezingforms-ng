@@ -23,20 +23,24 @@ main .alert {
 inputs
 */
 
-input[type="text"],
-input[type="password"],
-input[type="datetime"],
-input[type="datetime-local"],
-input[type="date"],
-input[type="month"],
-input[type="time"],
-input[type="week"],
-input[type="number"],
-input[type="email"],
-input[type="url"],
-input[type="search"],
-input[type="tel"],
-input[type="color"],
+/* :not(#bfOptionsFieldsWrap *) throughout this legacy input/select/label skin
+   exempts the QuickMode "Options" tab, which embeds forms/edit.php's own
+   Bootstrap .form-control/.form-select markup - see
+   docs/maintenance/quickmode-options-tab-plan.md. */
+input[type="text"]:not(#bfOptionsFieldsWrap *),
+input[type="password"]:not(#bfOptionsFieldsWrap *),
+input[type="datetime"]:not(#bfOptionsFieldsWrap *),
+input[type="datetime-local"]:not(#bfOptionsFieldsWrap *),
+input[type="date"]:not(#bfOptionsFieldsWrap *),
+input[type="month"]:not(#bfOptionsFieldsWrap *),
+input[type="time"]:not(#bfOptionsFieldsWrap *),
+input[type="week"]:not(#bfOptionsFieldsWrap *),
+input[type="number"]:not(#bfOptionsFieldsWrap *),
+input[type="email"]:not(#bfOptionsFieldsWrap *),
+input[type="url"]:not(#bfOptionsFieldsWrap *),
+input[type="search"]:not(#bfOptionsFieldsWrap *),
+input[type="tel"]:not(#bfOptionsFieldsWrap *),
+input[type="color"]:not(#bfOptionsFieldsWrap *),
 .custom-form-control {
     width: 206px;
     background-color: #fff !important;
@@ -55,18 +59,18 @@ input[type="color"],
     transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s !important;
 }
 
-main input:focus:not([type="checkbox"]):not([type="radio"]) {
+main input:focus:not([type="checkbox"]):not([type="radio"]):not(#bfOptionsFieldsWrap *) {
     background: #f8f8f8 none repeat scroll 0 0 !important;
     border-color: #3f51b5 !important;
     box-shadow: none !important;
     outline: 0 none !important;
 }
 
-main textarea {
+main textarea:not(#bfOptionsFieldsWrap *) {
     border-radius: 0 !important;
 }
 
-main textarea:focus {
+main textarea:focus:not(#bfOptionsFieldsWrap *) {
     background: #f8f8f8 none repeat scroll 0 0 !important;
     border-color: #3f51b5 !important;
     box-shadow: none !important;
@@ -74,7 +78,7 @@ main textarea:focus {
     border-radius: 0 !important;
 }
 
-main select {
+main select:not(#bfOptionsFieldsWrap *) {
     height: 35px !important;
     border: 0 !important;
     border: 1px solid #ccc !important;
@@ -100,8 +104,8 @@ main select {
     cursor: pointer !important;
 }
 
-.custom-select, .form-select {
-    
+.custom-select, .form-select:not(#bfOptionsFieldsWrap *) {
+
     max-width: 75px;
 }
 
@@ -120,18 +124,18 @@ main .form-control{
     margin-left: 20px;
 }
 
-main label {
+main label:not(#bfOptionsFieldsWrap *) {
 
     color: #333;
     font-size: 13px;
     line-height: 18px;
 }
 
-main label span {
+main label span:not(#bfOptionsFieldsWrap *) {
     font-size: 1rem;
 }
 
-main select:focus {
+main select:focus:not(#bfOptionsFieldsWrap *) {
     background: #f8f8f8 url('../images/select_arrow.png') no-repeat !important;
     border-color: #3f51b5 !important;
     box-shadow: none !important;
@@ -204,8 +208,8 @@ a[onclick^="addOption"]:focus {
 custom radio and checkbox style
 */
 
-main input[type="checkbox"]:not(old),
-main input[type="radio"]:not(old) {
+main input[type="checkbox"]:not(old):not(#bfOptionsFieldsWrap *),
+main input[type="radio"]:not(old):not(#bfOptionsFieldsWrap *) {
     width: 2em !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -217,7 +221,11 @@ main input[type="radio"]:not(old) {
 /* The custom skin above expects an immediate <label><span> sibling to draw the
    visible control; the QuickMode editor's own Yes/No property toggles don't
    follow that markup, so they'd otherwise render fully invisible (opacity: 0
-   with nothing drawn in its place). Exempt them. */
+   with nothing drawn in its place). Exempt them. #bfOptionsFieldsWrap (the
+   QuickMode "Options" tab, embedding forms/edit.php's own Bootstrap
+   .form-check radios/checkboxes - docs/maintenance/quickmode-options-tab-plan.md)
+   is excluded from the rule above entirely, so its normal Bootstrap sizing
+   applies too, not just visibility. */
 .bfPropertyWrap input[type="checkbox"],
 .bfPropertyWrap input[type="radio"] {
     opacity: 1 !important;

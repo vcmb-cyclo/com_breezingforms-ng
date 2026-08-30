@@ -63,6 +63,7 @@ final class RenderingEngine
     private ?EditableRecordLoader $editableRecordLoaderService = null;
     private ?PostRenderScriptBuilder $postRenderScriptBuilderService = null;
     private ?PaymentMethodFieldBuilder $paymentMethodFieldBuilderService = null;
+    private ?ContentBuilderTechnicalFieldsBuilder $contentBuilderTechnicalFieldsBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -184,6 +185,11 @@ final class RenderingEngine
     private function paymentMethodFieldBuilder(): PaymentMethodFieldBuilder
     {
         return $this->paymentMethodFieldBuilderService ??= new PaymentMethodFieldBuilder();
+    }
+
+    private function contentBuilderTechnicalFieldsBuilder(): ContentBuilderTechnicalFieldsBuilder
+    {
+        return $this->contentBuilderTechnicalFieldsBuilderService ??= new ContentBuilderTechnicalFieldsBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -1622,13 +1628,12 @@ final class RenderingEngine
                     echo indentc(1) . '<input type="hidden" name="' . htmlentities((string) $prop, ENT_QUOTES, 'UTF-8') . '" value="' . htmlentities(urlencode((string) $val), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                 }
                 if ($this->processor->app->getInput()->getInt('cb_form_id', 0)) {
-                    echo '<input type="hidden" name="cb_form_id" value="' . $this->processor->app->getInput()->getInt('cb_form_id', 0) . '"/>' . nl();
-                    if ($this->processor->app->getInput()->getInt('cb_record_id', 0)) {
-                        echo '<input type="hidden" name="cb_record_id" value="' . $this->processor->app->getInput()->getInt('cb_record_id', 0) . '"/>' . nl();
-                    }
-                    if ($this->processor->app->getInput()->getBool('cbIsNew', false)) {
-                        echo '<input type="hidden" name="cbIsNew" value="1"/>' . nl();
-                    }
+                    echo $this->contentBuilderTechnicalFieldsBuilder()->build(
+                        '',
+                        $this->processor->app->getInput()->getInt('cb_form_id', 0),
+                        $this->processor->app->getInput()->getInt('cb_record_id', 0),
+                        $this->processor->app->getInput()->getBool('cbIsNew', false)
+                    );
                 }
                 if ($this->processor->app->getInput()->getString('return', '') !== '') {
                     echo '<input type="hidden" name="return" value="' . htmlentities($this->processor->app->getInput()->getString('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
@@ -1663,13 +1668,12 @@ final class RenderingEngine
                 if ($this->processor->top != 0)
                     echo indentc(1) . '<input type="hidden" name="ff_top" value="' . htmlentities((string) $this->processor->top, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                 if ($this->processor->app->getInput()->getInt('cb_form_id', 0)) {
-                    echo '<input type="hidden" name="cb_form_id" value="' . $this->processor->app->getInput()->getInt('cb_form_id', 0) . '"/>' . nl();
-                    if ($this->processor->app->getInput()->getInt('cb_record_id', 0)) {
-                        echo '<input type="hidden" name="cb_record_id" value="' . $this->processor->app->getInput()->getInt('cb_record_id', 0) . '"/>' . nl();
-                    }
-                    if ($this->processor->app->getInput()->getBool('cbIsNew', false)) {
-                        echo '<input type="hidden" name="cbIsNew" value="1"/>' . nl();
-                    }
+                    echo $this->contentBuilderTechnicalFieldsBuilder()->build(
+                        '',
+                        $this->processor->app->getInput()->getInt('cb_form_id', 0),
+                        $this->processor->app->getInput()->getInt('cb_record_id', 0),
+                        $this->processor->app->getInput()->getBool('cbIsNew', false)
+                    );
                 }
                 if ($this->processor->app->getInput()->getString('return', '') !== '') {
                     echo '<input type="hidden" name="return" value="' . htmlentities($this->processor->app->getInput()->getString('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
@@ -1696,13 +1700,12 @@ final class RenderingEngine
                     if ($this->processor->page != 1)
                         echo indentc(1) . '<input type="hidden" name="ff_page" value="' . htmlentities((string) $this->processor->page, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                     if ($this->processor->app->getInput()->getInt('cb_form_id', 0)) {
-                        echo '<input type="hidden" name="cb_form_id" value="' . $this->processor->app->getInput()->getInt('cb_form_id', 0) . '"/>' . nl();
-                        if ($this->processor->app->getInput()->getInt('cb_record_id', 0)) {
-                            echo '<input type="hidden" name="cb_record_id" value="' . $this->processor->app->getInput()->getInt('cb_record_id', 0) . '"/>' . nl();
-                        }
-                        if ($this->processor->app->getInput()->getBool('cbIsNew', false)) {
-                            echo '<input type="hidden" name="cbIsNew" value="1"/>' . nl();
-                        }
+                        echo $this->contentBuilderTechnicalFieldsBuilder()->build(
+                            '',
+                            $this->processor->app->getInput()->getInt('cb_form_id', 0),
+                            $this->processor->app->getInput()->getInt('cb_record_id', 0),
+                            $this->processor->app->getInput()->getBool('cbIsNew', false)
+                        );
                     }
                     if ($this->processor->app->getInput()->getString('return', '') !== '') {
                         echo '<input type="hidden" name="return" value="' . htmlentities($this->processor->app->getInput()->getString('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();

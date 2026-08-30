@@ -144,6 +144,10 @@ dans `view()` par `4f475561` et `2c72231e`, avec couverture dédiée.
   `ContentBuilderSignatureFileResolver` via `b31b5c47`, et l'encodage est
   désormais confié à `ContentBuilderSignatureImageEncoder` via `e9386794`.
   Le service de génération JavaScript reçoit une image déjà encodée.
+- L'hydratation JavaScript des valeurs simples et des calendriers est
+  désormais isolée dans `ContentBuilderValueHydrationScriptBuilder` via
+  `084fc749`, avec conservation du fallback JQuery/native et du délai des
+  calendriers.
 - Isoler la présentation des fichiers existants et les cases de suppression.
 - Vérifier explicitement les chemins, noms de fichiers et valeurs absentes.
 - Caractériser `bfLoadContentBuilderEditable()` avant toute normalisation du

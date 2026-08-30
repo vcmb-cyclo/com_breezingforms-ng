@@ -396,7 +396,10 @@ avertissements de longueur conservés pour un lot ultérieur.
 sont également verts. `OnePageRenderer` a reçu le même traitement dans
 `72204865`; ses snapshots et PHPStan sont verts également. Les quatre
 renderers ont désormais une baseline sans erreurs PHPCS, les avertissements de
-longueur restant à traiter séparément.
+longueur restant à traiter séparément. Le trait partagé
+`BootstrapStyleFieldTrait` est désormais inclus dans le périmètre PHPCS par
+`212b6450` et ne présente plus d'erreur, avec ses avertissements de longueur
+documentés.
 
 Les lots 3 à 5 peuvent être préparés en parallèle du lot 6, à condition que le
 branchement dans `RenderingEngine.php` soit coordonné.

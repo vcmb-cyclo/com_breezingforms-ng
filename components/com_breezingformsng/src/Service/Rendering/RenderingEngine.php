@@ -66,6 +66,7 @@ final class RenderingEngine
     private ?ContentBuilderTechnicalFieldsBuilder $contentBuilderTechnicalFieldsBuilderService = null;
     private ?FormRoutingFieldsBuilder $formRoutingFieldsBuilderService = null;
     private ?FormTokenFieldBuilder $formTokenFieldBuilderService = null;
+    private ?FormContextFieldsBuilder $formContextFieldsBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -202,6 +203,11 @@ final class RenderingEngine
     private function formTokenFieldBuilder(): FormTokenFieldBuilder
     {
         return $this->formTokenFieldBuilderService ??= new FormTokenFieldBuilder();
+    }
+
+    private function formContextFieldsBuilder(): FormContextFieldsBuilder
+    {
+        return $this->formContextFieldsBuilderService ??= new FormContextFieldsBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -1615,15 +1621,18 @@ final class RenderingEngine
 
         switch ($this->processor->runmode) {
             case _FF_RUNMODE_FRONTEND:
-                echo indentc(1) . '<input type="hidden" name="ff_contentid" value="' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_applic" value="' . $this->processor->app->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->processor->record_id . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_module_id" value="' . $this->processor->app->getInput()->getInt('ff_module_id', 0) . '"/>' . nl();
+                echo $this->formContextFieldsBuilder()->build([
+                    'ff_contentid' => $this->processor->app->getInput()->getInt('ff_contentid', 0),
+                    'ff_applic' => $this->processor->app->getInput()->getWord('ff_applic', ''),
+                    'ff_record_id' => $this->processor->record_id,
+                    'ff_module_id' => $this->processor->app->getInput()->getInt('ff_module_id', 0),
+                ], indentc(1));
                 echo indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities((string) $this->processor->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
                     indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
                     $this->formTokenFieldBuilder()->build(
                         \Joomla\CMS\HTML\HTMLHelper::_('form.token'),
-                        indentc(1)
+                        indentc(1),
+                        nl()
                     );
                 if ($this->processor->target > 1)
                     echo indentc(1) . '<input type="hidden" name="ff_target" value="' . htmlentities((string) $this->processor->target, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
@@ -1652,7 +1661,8 @@ final class RenderingEngine
                 }
                 echo $this->formRoutingFieldsBuilder()->build(
                     $this->processor->app->getInput()->getString('return', ''),
-                    $this->processor->app->getInput()->getString('tmpl', '')
+                    $this->processor->app->getInput()->getString('tmpl', ''),
+                    nl()
                 );
                 echo '</form>' . nl();
                 break;
@@ -1664,13 +1674,16 @@ final class RenderingEngine
                     indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
                     $this->formTokenFieldBuilder()->build(
                         \Joomla\CMS\HTML\HTMLHelper::_('form.token'),
-                        indentc(1)
+                        indentc(1),
+                        nl()
                     ) .
-                    indentc(1) . '<input type="hidden" name="ff_contentid" value="' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_applic" value="' . $this->processor->app->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->processor->record_id . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_module_id" value="' . $this->processor->app->getInput()->getInt('ff_module_id', 0) . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_runmode" value="' . htmlentities((string) $this->processor->runmode, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                    $this->formContextFieldsBuilder()->build([
+                        'ff_contentid' => $this->processor->app->getInput()->getInt('ff_contentid', 0),
+                        'ff_applic' => $this->processor->app->getInput()->getWord('ff_applic', ''),
+                        'ff_record_id' => $this->processor->record_id,
+                        'ff_module_id' => $this->processor->app->getInput()->getInt('ff_module_id', 0),
+                        'ff_runmode' => $this->processor->runmode,
+                    ], indentc(1));
                 if ($this->processor->target > 1)
                     echo indentc(1) . '<input type="hidden" name="ff_target" value="' . htmlentities((string) $this->processor->target, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                 if ($this->processor->inframe)
@@ -1693,7 +1706,8 @@ final class RenderingEngine
                 }
                 echo $this->formRoutingFieldsBuilder()->build(
                     $this->processor->app->getInput()->getString('return', ''),
-                    $this->processor->app->getInput()->getString('tmpl', '')
+                    $this->processor->app->getInput()->getString('tmpl', ''),
+                    nl()
                 );
                 echo '</form>' . nl();
                 break;
@@ -1706,13 +1720,16 @@ final class RenderingEngine
                         indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
                     $this->formTokenFieldBuilder()->build(
                         \Joomla\CMS\HTML\HTMLHelper::_('form.token'),
-                        indentc(1)
+                        indentc(1),
+                        nl()
                     ) .
-                        indentc(1) . '<input type="hidden" name="ff_contentid" value="' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_applic" value="' . $this->processor->app->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->processor->record_id . '"/>' . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_module_id" value="' . $this->processor->app->getInput()->getInt('ff_module_id', 0) . '"/>' . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_runmode" value="' . htmlentities((string) $this->processor->runmode, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                    $this->formContextFieldsBuilder()->build([
+                        'ff_contentid' => $this->processor->app->getInput()->getInt('ff_contentid', 0),
+                        'ff_applic' => $this->processor->app->getInput()->getWord('ff_applic', ''),
+                        'ff_record_id' => $this->processor->record_id,
+                        'ff_module_id' => $this->processor->app->getInput()->getInt('ff_module_id', 0),
+                        'ff_runmode' => $this->processor->runmode,
+                    ], indentc(1));
                     if ($this->processor->page != 1)
                         echo indentc(1) . '<input type="hidden" name="ff_page" value="' . htmlentities((string) $this->processor->page, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
                     if ($this->processor->app->getInput()->getInt('cb_form_id', 0)) {
@@ -1725,7 +1742,8 @@ final class RenderingEngine
                     }
                     echo $this->formRoutingFieldsBuilder()->build(
                         $this->processor->app->getInput()->getString('return', ''),
-                        $this->processor->app->getInput()->getString('tmpl', '')
+                        $this->processor->app->getInput()->getString('tmpl', ''),
+                        nl()
                     );
                     echo '</form>' . nl();
                 } // if

@@ -71,6 +71,7 @@ final class RenderingEngine
     private ?FormOpeningMarkupBuilder $formOpeningMarkupBuilderService = null;
     private ?FormOptionalContextFieldsBuilder $formOptionalContextFieldsBuilderService = null;
     private ?AdditionalHiddenFieldsBuilder $additionalHiddenFieldsBuilderService = null;
+    private ?PaymentProviderDetector $paymentProviderDetectorService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -232,6 +233,11 @@ final class RenderingEngine
     private function additionalHiddenFieldsBuilder(): AdditionalHiddenFieldsBuilder
     {
         return $this->additionalHiddenFieldsBuilderService ??= new AdditionalHiddenFieldsBuilder();
+    }
+
+    private function paymentProviderDetector(): PaymentProviderDetector
+    {
+        return $this->paymentProviderDetectorService ??= new PaymentProviderDetector();
     }
 
     public function cbCheckPermissions(): array
@@ -1656,13 +1662,8 @@ final class RenderingEngine
             }
         }
 
-        $paymentMethod = '';
-        for ($i = 0; $i < $this->processor->rowcount; $i++) {
-            $row = $this->processor->rows[$i];
-            if ($row->type == "PayPal" || $row->type == "Sofortueberweisung" || $row->type == "Stripe") {
-                echo $this->paymentMethodFieldBuilder()->build(indentc(1));
-                break;
-            }
+        if ($this->paymentProviderDetector()->hasSupportedProvider($this->processor->rows)) {
+            echo $this->paymentMethodFieldBuilder()->build(indentc(1));
         }
 
         switch ($this->processor->runmode) {

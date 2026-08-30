@@ -23,7 +23,7 @@ final class ContentBuilderFileUploadScriptBuilderTest extends TestCase
         self::assertStringContainsString('cb_delete_27[0]', $result['html']);
         self::assertStringContainsString('cb_delete_27[1]', $result['html']);
         self::assertStringContainsString('first.pdf', $result['html']);
-        self::assertSame("bfDeactivateField[\"ff_nm_documents[]\"] = true;\n", $result['deactivation']);
+        self::assertSame("bfDeactivateField[\"ff_nm_documents[]\"]=true;\n", $result['deactivation']);
     }
 
     public function testBuildLeavesEmptyFileListWithoutControlsOrDeactivation(): void

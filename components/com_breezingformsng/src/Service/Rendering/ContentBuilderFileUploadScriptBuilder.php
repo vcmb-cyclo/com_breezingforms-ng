@@ -30,7 +30,7 @@ final class ContentBuilderFileUploadScriptBuilder
             'html' => $html,
             'deactivation' => $displayNames === []
                 ? ''
-                : 'bfDeactivateField["ff_nm_' . $recordName . '[]"] = true;' . "\n",
+                : 'bfDeactivateField["ff_nm_' . $recordName . '[]"]=true;' . "\n",
         ];
     }
 }

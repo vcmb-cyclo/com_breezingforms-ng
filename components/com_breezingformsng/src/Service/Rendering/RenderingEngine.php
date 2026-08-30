@@ -68,6 +68,7 @@ final class RenderingEngine
     private ?ClassicCaptchaBuilder $classicCaptchaBuilderService = null;
     private ?ClassicQueryListSettingsBuilder $classicQueryListSettingsBuilderService = null;
     private ?ClassicQueryListHeaderBuilder $classicQueryListHeaderBuilderService = null;
+    private ?ClassicQueryListCellBuilder $classicQueryListCellBuilderService = null;
     private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
     private ?EditableRecordHydrationScriptBuilder $editableRecordHydrationScriptBuilderService = null;
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
@@ -246,6 +247,11 @@ final class RenderingEngine
     private function classicQueryListHeaderBuilder(): ClassicQueryListHeaderBuilder
     {
         return $this->classicQueryListHeaderBuilderService ??= new ClassicQueryListHeaderBuilder();
+    }
+
+    private function classicQueryListCellBuilder(): ClassicQueryListCellBuilder
+    {
+        return $this->classicQueryListCellBuilderService ??= new ClassicQueryListCellBuilder();
     }
 
     private function contentBuilderValueScriptBuilder(): ContentBuilderValueScriptBuilder
@@ -1368,71 +1374,20 @@ final class RenderingEngine
                             $skip = 0;
                             for ($c = 0; $c < $colcnt; $c++) {
                                 $col = &$cols[$c];
-                                if ($col->thspan > 0) {
-                                    $attribs = '';
-                                    $style = '';
-                                    switch ($col->align) {
-                                        case 1:
-                                            $style .= 'text-align:left;';
-                                            break;
-                                        case 2:
-                                            $style .= 'text-align:center;';
-                                            break;
-                                        case 3:
-                                            $style .= 'text-align:right;';
-                                            break;
-                                        case 4:
-                                            $style .= 'text-align:justify;';
-                                            break;
-                                        default:
-                                            ;
-                                    } // switch
-                                    switch ($col->valign) {
-                                        case 1:
-                                            $attribs .= ' valign="top"';
-                                            break;
-                                        case 2:
-                                            $attribs .= ' valign="middle"';
-                                            break;
-                                        case 3:
-                                            $attribs .= ' valign="bottom"';
-                                            break;
-                                        case 4:
-                                            $attribs .= ' valign="baseline"';
-                                            break;
-                                        default:
-                                            ;
-                                    } // switch
-                                    if ($col->wrap == 1)
-                                        $attribs .= ' nowrap="nowrap"';
-                                    if ($k == 1)
-                                        $cl = $col->class2;
-                                    else
-                                        $cl = $col->class3;
-                                    if ($cl != '')
-                                        $attribs .= ' class="' . $this->processor->getClassName($cl) . '"';
-                                    if (!$skip && $col->thspan > 1)
-                                        $skip = $col->thspan;
-                                    if ($skip && $q == 0)
-                                        if (intval($col->width) > 0) {
-                                            $style .= 'width:' . $col->width;
-                                            if ($col->widthmd)
-                                                $style .= '%;';
-                                            else
-                                                $style .= 'px;';
-                                        } // if
-                                    if ($skip > 0)
-                                        $skip--;
-                                    if ($style != '')
-                                        $attribs .= ' style="' . $style . '"';
-                                    if ($c == 0 && $row->flag2 > 0) {
-                                        if ($row->flag2 == 1)
-                                            echo indentc(4) . '<td' . $attribs . '><input type="checkbox" id="ff_cb' . $row->id . '_' . $q . '" value="' . $qrow[$c] . '"  name="ff_nm_' . $row->name . '[]"/></td>' . nlc();
-                                        else
-                                            echo indentc(4) . '<td' . $attribs . '><input type="radio" id="ff_cb' . $row->id . '_' . $q . '" value="' . $qrow[$c] . '"  name="ff_nm_' . $row->name . '[]"/></td>' . nlc();
-                                    } else
-                                        echo indentc(4) . '<td' . $attribs . '>' . $qrow[$c] . '</td>' . nlc();
-                                } // if
+                                echo $this->classicQueryListCellBuilder()->build(
+                                    $col,
+                                    $qrow[$c],
+                                    $c,
+                                    $q,
+                                    (int) $row->id,
+                                    (string) $row->name,
+                                    (int) $row->flag2,
+                                    $k == 1,
+                                    $skip,
+                                    fn (string $class): string => $this->processor->getClassName($class),
+                                    indentc(4),
+                                    nlc() ?? ''
+                                );
                                 unset($col);
                                 if ($this->processor->dying)
                                     break;

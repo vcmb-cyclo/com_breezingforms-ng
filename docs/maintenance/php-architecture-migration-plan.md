@@ -215,6 +215,10 @@ d'un champ ou d'un nœud.
 
 ### 4.1 Scripts post-rendu
 
+État : `PostRenderScriptBuilder` extrait et branché dans `view()` par
+`ad9dd75f`, avec couverture des trois fonctions différées et de leur garde
+JQuery/`bfToggleFieldsLoaded`.
+
 - Extraire l'appel différé à `bfLoadEditable()`.
 - Extraire l'appel différé à `bfLoadContentBuilderEditable()`.
 - Extraire l'appel à `bfDisableContentBuilderFields()`.

@@ -303,8 +303,9 @@ propres à chaque thème.
    initialisations Pickadate et responsive sont désormais centralisées via
    `QuickModeCalendarInitScriptBuilder` (`1de4b129`).
 8. Uploads, CAPTCHA, signatures et paiements — l'URL de l'image CAPTCHA est
-   désormais partagée via `QuickModeCaptchaUrlBuilder` (`21afa208`); le
-   markup et les scripts de validation restent à traiter.
+   désormais partagée via `QuickModeCaptchaUrlBuilder` (`21afa208`) et le
+   markup image/réponse via `QuickModeCaptchaMarkupBuilder` (`176af451`); les
+   scripts de validation et le rechargement restent à traiter.
 
 Pour chaque type :
 
@@ -487,6 +488,13 @@ La construction de l'URL du CAPTCHA image est désormais partagée via
 `21afa208`. Les variantes frontend et administrateur sont couvertes ; le
 markup d'image, de saisie et de rechargement ainsi que les scripts CAPTCHA
 restent séparés en raison de leurs différences de thème et de comportement.
+
+Le markup commun de l'image CAPTCHA et du champ de réponse est désormais
+centralisé dans `QuickModeCaptchaMarkupBuilder` et branché dans les quatre
+renderers par `176af451`. Les attributs de dimensions, classes de thème,
+valeurs échappées et espacements historiques sont couverts par les snapshots
+et les tests unitaires ; les contrôles de rechargement restent spécifiques à
+chaque renderer.
 
 La baseline PHPCS est maintenant sans erreur sur les services modernes, les
 quatre renderers QuickMode et leurs traits (`e25d501f`, `14985d4d`, `288b42a4`,

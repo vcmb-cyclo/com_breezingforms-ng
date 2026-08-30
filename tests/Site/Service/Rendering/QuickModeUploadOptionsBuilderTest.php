@@ -80,4 +80,23 @@ final class QuickModeUploadOptionsBuilderTest extends TestCase
             ])
         );
     }
+
+    public function testUsesDefaultButtonDimensionsWhenValuesAreNotPositive(): void
+    {
+        self::assertSame(
+            [
+                'extensions' => '',
+                'maxFileSize' => '',
+                'maxBytes' => '0',
+                'multiSelection' => 'false',
+                'runtimes' => 'html4',
+                'buttonWidth' => '64',
+                'buttonHeight' => '64',
+            ],
+            (new QuickModeUploadOptionsBuilder())->build([
+                'flashUploaderWidth' => 0,
+                'flashUploaderHeight' => -12,
+            ])
+        );
+    }
 }

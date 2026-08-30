@@ -57,6 +57,7 @@ final class RenderingEngine
     private ?TokenizedDirectoryResolver $tokenizedDirectoryResolverService = null;
     private ?ProcessorHeaderRenderer $processorHeaderRendererService = null;
     private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
+    private ?EditableRecordHydrationScriptBuilder $editableRecordHydrationScriptBuilderService = null;
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
     private ?ContentBuilderSignatureScriptBuilder $contentBuilderSignatureScriptBuilderService = null;
     private ?ContentBuilderFileUploadScriptBuilder $contentBuilderFileUploadScriptBuilderService = null;
@@ -178,6 +179,12 @@ final class RenderingEngine
     private function contentBuilderValueScriptBuilder(): ContentBuilderValueScriptBuilder
     {
         return $this->contentBuilderValueScriptBuilderService ??= new ContentBuilderValueScriptBuilder();
+    }
+
+    private function editableRecordHydrationScriptBuilder(): EditableRecordHydrationScriptBuilder
+    {
+        return $this->editableRecordHydrationScriptBuilderService ??=
+            new EditableRecordHydrationScriptBuilder($this->contentBuilderValueScriptBuilder());
     }
 
     private function contentBuilderReadonlyScriptBuilder(): ContentBuilderReadonlyScriptBuilder
@@ -719,7 +726,6 @@ final class RenderingEngine
             if ($editableRecord !== null) {
                 $this->processor->record_id = $editableRecord->id;
                 $recordEntries = $editableRecord->entries;
-                $js = '';
                 foreach ($recordEntries as $recordEntry) {
 
                     //$recordEntry->value = $this->processor->removeDangerousHtml($recordEntry->value);
@@ -731,56 +737,9 @@ final class RenderingEngine
 
                     $recordEntry->value = InputFilter::getInstance([], [], 1, 1)->clean((string) $recordEntry->value, 'html');
 
-                    switch ($recordEntry->type) {
-                        case 'Textarea':
-                        case 'Text':
-                        case 'Hidden Input':
-                        case 'Number Input':
-                        case 'Calendar':
-                            $js .= $this->contentBuilderValueScriptBuilder()->build((object) [
-                                'recType' => $recordEntry->type,
-                                'recName' => $recordEntry->name,
-                                'recElementId' => $recordEntry->element,
-                                'recValue' => $recordEntry->value,
-                            ], $this->processor->form);
-                            break;
-                        case 'Checkbox':
-                            if (!empty($recordEntry->value)) {
-                                $js .= 'if(document.getElementById("ff_elem' . $recordEntry->element . '") && !JQuery(document.getElementById("ff_elem' . $recordEntry->element . '")).attr("checked"))JQuery(document.getElementById("ff_elem' . $recordEntry->element . '")).click();' . "\n";
-                            }
-                            break;
-                        case 'Checkbox Group':
-                            $js .= '
-							for(var i = 0;i < document.ff_form' . $this->processor->form . '.elements.length;i++){
-								if(document.ff_form' . $this->processor->form . '.elements[i].type == "checkbox" && document.ff_form' . $this->processor->form . '.elements[i].name == "ff_nm_' . $recordEntry->name . '[]" && document.ff_form' . $this->processor->form . '.elements[i].value == ' . json_encode($recordEntry->value) . '){
-									if(typeof JQuery != "undefined" && !JQuery(document.ff_form' . $this->processor->form . '.elements[i]).attr("checked")){
-									    JQuery(document.ff_form' . $this->processor->form . '.elements[i]).click();
-									}
-								}
-							}' . "\n";
-                            break;
-                        case 'Radio Button':
-                        case 'Radio Group':
-                            $js .= '
-							for(var i = 0;i < document.ff_form' . $this->processor->form . '.elements.length;i++){
-								if(document.ff_form' . $this->processor->form . '.elements[i].type == "radio" && document.ff_form' . $this->processor->form . '.elements[i].name == "ff_nm_' . $recordEntry->name . '[]" && document.ff_form' . $this->processor->form . '.elements[i].value == ' . json_encode($recordEntry->value) . '){
-									if(typeof JQuery != "undefined" && !JQuery(document.ff_form' . $this->processor->form . '.elements[i]).attr("checked")){
-									    JQuery(document.ff_form' . $this->processor->form . '.elements[i]).click();
-									}
-								}
-							}' . "\n";
-                            break;
-                        case 'Select List':
-                            $js .= 'for(var i = 0; i < document.getElementById("ff_elem' . $recordEntry->element . '").options.length; i++){
-								if(document.getElementById("ff_elem' . $recordEntry->element . '").options[i].value == ' . json_encode($recordEntry->value) . '){
-									if(typeof JQuery != "undefined" && !JQuery(document.getElementById("ff_elem' . $recordEntry->element . '").options[i]).attr("selected")){
-									    JQuery(document.getElementById("ff_elem' . $recordEntry->element . '").options[i]).attr("selected", true).trigger("change");
-									}
-								}
-							}' . "\n";
-                            break;
-                    }
                 }
+
+                $js = $this->editableRecordHydrationScriptBuilder()->build($recordEntries, (int) $this->processor->form);
 
                 echo '
 				<script type="text/javascript">

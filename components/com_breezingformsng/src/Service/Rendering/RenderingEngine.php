@@ -83,6 +83,7 @@ final class RenderingEngine
     private ?CaptchaLegacyValidationScriptBuilder $captchaLegacyValidationScriptBuilderService = null;
     private ?CaptchaReCaptchaValidationScriptBuilder $captchaReCaptchaValidationScriptBuilderService = null;
     private ?ContentBuilderValueHydrationScriptBuilder $contentBuilderValueHydrationScriptBuilderService = null;
+    private ?ContentBuilderChoiceHydrationScriptBuilder $contentBuilderChoiceHydrationScriptBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -304,6 +305,11 @@ final class RenderingEngine
     private function contentBuilderValueHydrationScriptBuilder(): ContentBuilderValueHydrationScriptBuilder
     {
         return $this->contentBuilderValueHydrationScriptBuilderService ??= new ContentBuilderValueHydrationScriptBuilder();
+    }
+
+    private function contentBuilderChoiceHydrationScriptBuilder(): ContentBuilderChoiceHydrationScriptBuilder
+    {
+        return $this->contentBuilderChoiceHydrationScriptBuilderService ??= new ContentBuilderChoiceHydrationScriptBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -903,31 +909,20 @@ final class RenderingEngine
                             break;
                         case 'Radio Button':
                         case 'Radio Group':
-                            $cbValues = explode(',', $cbEntry->recValue);
-                            foreach ($cbValues as $cbValue) {
-                                $cbValue = trim($cbValue);
-                                $js .= '
-                                                for(var i = 0;i < document.ff_form' . $this->processor->form . '.elements.length;i++){
-                                                        if(document.ff_form' . $this->processor->form . '.elements[i].type == "radio" && document.ff_form' . $this->processor->form . '.elements[i].name == "ff_nm_' . $cbEntry->recName . '[]" && document.ff_form' . $this->processor->form . '.elements[i].value == ' . json_encode($cbValue) . '){
-                                                                if(typeof JQuery != "undefined" && !JQuery(document.ff_form' . $this->processor->form . '.elements[i]).attr("checked")){
-                                                                    JQuery(document.ff_form' . $this->processor->form . '.elements[i]).click();
-                                                                }
-                                                        }
-                                                }' . nl();
-                            }
+                            $js .= $this->contentBuilderChoiceHydrationScriptBuilder()->build(
+                                'checkbox',
+                                (string) $cbEntry->recName,
+                                (int) $this->processor->form,
+                                (string) $cbEntry->recValue
+                            );
                             break;
                         case 'Select List':
-                            $cbValues = explode(',', $cbEntry->recValue);
-                            foreach ($cbValues as $cbValue) {
-                                $cbValue = trim($cbValue);
-                                $js .= 'for(var i = 0; i < document.getElementById("ff_elem' . $cbEntry->recElementId . '").options.length; i++){
-                                                        if(document.getElementById("ff_elem' . $cbEntry->recElementId . '").options[i].value == ' . json_encode($cbValue) . '){
-                                                                if(typeof JQuery != "undefined" && !JQuery(document.getElementById("ff_elem' . $cbEntry->recElementId . '").options[i]).attr("selected")){
-                                                                    JQuery(document.getElementById("ff_elem' . $cbEntry->recElementId . '").options[i]).attr("selected", true).trigger("change");
-                                                                }
-                                                        }
-                                                }' . nl();
-                            }
+                            $js .= $this->contentBuilderChoiceHydrationScriptBuilder()->build(
+                                'radio',
+                                (string) $cbEntry->recName,
+                                (int) $this->processor->form,
+                                (string) $cbEntry->recValue
+                            );
                             break;
                     }
                 }

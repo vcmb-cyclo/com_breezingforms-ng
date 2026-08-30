@@ -394,6 +394,11 @@ Le premier nettoyage ciblé de cette baseline PHPCS est réalisé dans
 leurs warnings de longueur sont supprimés. Le prochain groupe reste
 `BootstrapStyleFieldTrait`, qui nécessite un lot séparé du fait de son volume.
 
+Le nettoyage du trait Bootstrap a commencé par les méthodes de résumé et de
+calendrier (`750dd432`) ; leurs sorties restent couvertes par les snapshots.
+Les 59 warnings de longueur restants sont conservés pour les sous-lots
+suivants du même trait.
+
 ### 6.2 Réduire la baseline PHPStan
 
 - Classer les 251 entrées actuelles par fichier et par catégorie.

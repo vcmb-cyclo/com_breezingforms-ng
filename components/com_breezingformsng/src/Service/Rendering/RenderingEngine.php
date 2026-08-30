@@ -80,6 +80,7 @@ final class RenderingEngine
     private ?CaptchaEndpointBuilder $captchaEndpointBuilderService = null;
     private ?CaptchaValidationRowSelector $captchaValidationRowSelectorService = null;
     private ?CaptchaValidationDefaultsBuilder $captchaValidationDefaultsBuilderService = null;
+    private ?CaptchaLegacyValidationScriptBuilder $captchaLegacyValidationScriptBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -286,6 +287,11 @@ final class RenderingEngine
     private function captchaValidationDefaultsBuilder(): CaptchaValidationDefaultsBuilder
     {
         return $this->captchaValidationDefaultsBuilderService ??= new CaptchaValidationDefaultsBuilder();
+    }
+
+    private function captchaLegacyValidationScriptBuilder(): CaptchaLegacyValidationScriptBuilder
+    {
+        return $this->captchaLegacyValidationScriptBuilderService ??= new CaptchaLegacyValidationScriptBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -2446,97 +2452,12 @@ final class RenderingEngine
 
         if ($row !== null) {
             if ($row->type == "Captcha") {
-                $capFunc = '
-
-				function bfAjaxObject101() {
-					this.createRequestObject = function() {
-						try {
-							var ro = new XMLHttpRequest();
-						}
-						catch (e) {
-							var ro = new ActiveXObject("Microsoft.XMLHTTP");
-						}
-						return ro;
-					}
-					this.sndReq = function(action, url, data) {
-					
-						if (action.toUpperCase() == "POST") {
-							this.http.open(action,url,true);
-							this.http.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-							this.http.onreadystatechange = this.handleResponse;
-							this.http.send(data);
-						}
-						else {
-							this.http.open(action,url + "?" + data,true);
-							this.http.onreadystatechange = this.handleResponse;
-							this.http.send(null);
-						}
-					}
-					this.handleResponse = function() {
-						if ( me.http.readyState == 4) {
-							if (typeof me.funcDone == "function") { me.funcDone();}
-							var rawdata = me.http.responseText.split("|");
-							for ( var i = 0; i < rawdata.length; i++ ) {
-								var item = (rawdata[i]).split("=>");
-								if (item[0] != "") {
-									if (item[1].substr(0,3) == "%V%" ) {
-										document.getElementById(item[0]).value = item[1].substring(3);
-									}
-									else {
-										if(item[1] == "true"){
-                                                                                    if(typeof bfDoFlashUpload != \'undefined\'){
-                                                                                        bfDoFlashUpload();
-                                                                                    } else {
-									   		ff_submitForm2();
-                                                                                    }
-									   } else {
-                                                                                if(typeof JQuery != "undefined" && JQuery("#bfSubmitMessage"))
-									        {
-                                                                                    JQuery("#bfSubmitMessage").css("visibility","hidden");
-                                                                                    JQuery("#bfSubmitMessage").css("display","none");
-									        }
-                                                                                if(typeof bfUseErrorAlerts == "undefined"){
-                                                                                    alert(' . $captchaError . ');
-									        } else {
-                                                                                   if(typeof inlineErrorElements != "undefined"){
-                                                                                     inlineErrorElements.push(["bfCaptchaEntry",' . $captchaError . ']);
-                                                                                   }
-									           bfShowErrors(' . $captchaError . ');
-									        }
-                                                                                if(typeof ladda_button != "undefined"){
-                                                                                    
-                                                                                    bf_restore_submitbutton();
-                                                                                }
-                                                                                
-                                                                                        document.getElementById(\'ff_capimgValue\').src = \'' . $endpoints['image'] . '\' + Math.random();
-                                                                                        document.getElementById(\'bfCaptchaEntry\').value = "";
-                                                                                        if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
-                                                                                        document.getElementById(\'bfCaptchaEntry\').focus();
-                                                                                        if(document.getElementById("bfSubmitButton")){
-                                                                                            document.getElementById("bfSubmitButton").disabled = false;
-                                                                                        }
-                                                                                        if(typeof JQuery != "undefined"){JQuery(".bfCustomSubmitButton").prop("disabled", false);}
-										}
-                                                                                
-									}
-								}
-							}
-						}
-						if ((me.http.readyState == 1) && (typeof me.funcWait == "function")) { me.funcWait(); }
-					}
-					var me = this;
-					this.http = this.createRequestObject();
-
-					var funcWait = null;
-					var funcDone = null;
-				}
-
-                                function bfCheckCaptcha(){
-                                        if(checkFileExtensions()){
-                                               var ao = new bfAjaxObject101();
-                                               ao.sndReq("get","' . $endpoints['check'] . '"+document.getElementById("bfCaptchaEntry").value,"");
-                                        }
-                                }';
+                return $this->captchaLegacyValidationScriptBuilder()->build(
+                    $captchaError,
+                    $endpoints['image'],
+                    $endpoints['check'],
+                    (int) $row->page
+                );
             } elseif ($row->type == "ReCaptcha") {
 
                 $capFunc = 'var bfReCaptchaLoaded = true;

@@ -122,6 +122,11 @@ partir d'une collection d'entrées.
 
 ### 2.3 Génération des valeurs ContentBuilder
 
+État : générateurs indépendants pour valeurs simples/non éditables, committés
+dans `f685ff5e`, `8bfd520e`, `c2ae9a76` et `21a0a812`. Le générateur de
+signatures est maintenant extrait et branché dans `view()` par `4f475561`,
+avec couverture dédiée.
+
 - Séparer les stratégies par type de champ :
   - valeurs simples et calendriers ;
   - checkbox et groupes de checkbox ;
@@ -129,7 +134,8 @@ partir d'une collection d'entrées.
   - listes de sélection ;
   - fichiers ;
   - signatures.
-- Isoler la lecture et l'encodage des signatures du générateur JavaScript.
+- La lecture et l'encodage des signatures restent dans `view()` ; le service
+  de génération JavaScript reçoit une image déjà encodée.
 - Isoler la présentation des fichiers existants et les cases de suppression.
 - Vérifier explicitement les chemins, noms de fichiers et valeurs absentes.
 - Caractériser `bfLoadContentBuilderEditable()` avant toute normalisation du
@@ -339,14 +345,16 @@ Règles de coordination :
 
 ## Ordre recommandé des prochains lots
 
-1. Ajouter les tests d'intégration des variantes Query List et `bury()` de la
-   première boucle.
-2. Service de chargement d'un enregistrement éditable.
-3. Générateurs ContentBuilder pour fichiers et signatures.
-4. Premier lot Strategy QuickMode : `bfTextfield` et `bfNumberInput`.
-5. Extraction des scripts post-rendu et des champs techniques.
-6. Rendu HTML classique par famille de nœuds.
-7. Extension PHPCS et réduction PHPStan après chaque service stabilisé.
+1. Service de chargement d'un enregistrement éditable.
+2. Générateur ContentBuilder pour fichiers, avec caractérisation des chemins
+   et noms absents.
+3. Premier lot Strategy QuickMode : `bfTextfield` et `bfNumberInput`.
+4. Extraction des scripts post-rendu et des champs techniques.
+5. Rendu HTML classique par famille de nœuds.
+6. Extension PHPCS et réduction PHPStan après chaque service stabilisé.
+
+Lot récemment terminé : tests d'intégration des variantes Query List et du
+point d'arrêt `bury()` dans la première boucle (`7a19ffeb`).
 
 Les lots 3 à 5 peuvent être préparés en parallèle du lot 6, à condition que le
 branchement dans `RenderingEngine.php` soit coordonné.

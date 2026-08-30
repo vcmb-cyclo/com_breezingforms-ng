@@ -57,6 +57,7 @@
 | Rendu HTML classique — bouton graphique | Markup `Graphic Button` extrait et couvert pour les dispositions d’image, états, dimensions et événements | Commit `cf09129e0` |
 | Rendu HTML classique — upload | Markup `File Upload` extrait et couvert pour taille, longueur, accept, état disabled et événements | Commit `205127c81` |
 | Rendu HTML classique — CAPTCHA | Markup image/saisie/rechargement extrait et couvert pour endpoint, dimensions et mode compressé | Commit `c260c2eb9` |
+| Rendu HTML classique — Query List | Interprétation des paramètres de présentation extraite et couverte pour attributs, classes et pagination | Commit `ff720c4dc` |
 | `RenderingEngine::view()` — scripts d'icônes | Extraction committée et trois chemins `bury()` couverts | Commit `0a908143` |
 | `RenderingEngine::view()` — callbacks d'éléments | Extraction committée ; ordre `init` / `action` / `validate` et trois arrêts `bury()` couverts | Commit `413cb1cb` |
 | `RenderingEngine::view()` — métadonnées classiques | Comptage icônes/infobulles et scan `Static Text/HTML` extraits et couverts | Commit `51e86824` |
@@ -266,7 +267,8 @@ Ordre conseillé, du plus simple au plus risqué :
    graphique (`ClassicGraphicButtonBuilder`, `cf09129e0`), puis navigation
    entre pages.
 5. Upload classique (`ClassicFileUploadBuilder`, `205127c81`) et CAPTCHA
-   (`ClassicCaptchaBuilder`, `c260c2eb9`), puis signatures et Query List.
+   (`ClassicCaptchaBuilder`, `c260c2eb9`), puis paramètres Query List
+   (`ClassicQueryListSettingsBuilder`, `ff720c4dc`) et rendu des lignes.
 6. Query List et ses tableaux paginés.
 
 Chaque famille doit disposer d'un snapshot ou d'assertions structurelles avant

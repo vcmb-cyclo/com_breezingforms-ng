@@ -288,7 +288,8 @@ propres à chaque thème.
    caractériser séparément.
 3. `bfCheckbox` — partagé et branché via `QuickModeCheckboxBuilder`
    (`18a3e7ea`).
-4. `bfSelect`.
+4. `bfSelect` — partagé et branché via `QuickModeSelectBuilder`
+   (`8a891fb5`).
 5. Groupes checkbox et radio.
 6. Boutons et champs cachés restants.
 7. Calendriers et calendriers responsives.
@@ -432,6 +433,13 @@ Le contrôle `bfCheckbox` est désormais extrait dans
 d'événements et états de lecture seule sont couvertes ; les champs cachés
 associés à `mailbackAccept` restent dans chaque renderer car ils appartiennent
 au comportement d'enveloppe du champ.
+
+Le contrôle `bfSelect` est désormais extrait dans `QuickModeSelectBuilder` et
+branché dans les quatre renderers par `8a891fb5`. La stratégie couvre les
+options sélectionnées, l'échappement des libellés et valeurs, `multiple`, les
+attributs d'événements et les styles de dimensions. La différence historique
+de `data-chosen` entre Mobile et les autres renderers est conservée par une
+option explicite du builder.
 
 La baseline PHPCS est maintenant sans erreur sur les services modernes, les
 quatre renderers QuickMode et leurs traits (`e25d501f`, `14985d4d`, `288b42a4`,

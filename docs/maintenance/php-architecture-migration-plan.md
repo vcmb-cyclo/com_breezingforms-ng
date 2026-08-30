@@ -148,6 +148,10 @@ Le générateur de contrôles de fichiers est traité par `2c72231e`. La lecture
 du contenu `recValue`, la résolution du nom affiché et la validation QuickMode
 restent à caractériser avant une extraction supplémentaire.
 
+La phase 2.3 est donc couverte pour les scripts de signature et de contrôles
+de fichiers ; l'intégration complète ContentBuilder reste conditionnée à un
+harnais Joomla/ContentBuilder permettant de tester les dépendances runtime.
+
 ### 2.4 Champs ContentBuilder non éditables
 
 État : générateur indépendant committé dans `8bfd520e` et branché dans
@@ -350,9 +354,10 @@ Règles de coordination :
 ## Ordre recommandé des prochains lots
 
 1. Service de chargement d'un enregistrement éditable.
-2. Générateur ContentBuilder pour fichiers, avec caractérisation des chemins
-   et noms absents.
-3. Premier lot Strategy QuickMode : `bfTextfield` et `bfNumberInput`.
+2. Harnais ContentBuilder pour le parcours complet des fichiers et des
+   signatures, puis extraction de la lecture SQL de l'enregistrement.
+3. Premier lot Strategy QuickMode : `bfTextfield` et `bfNumberInput`, après
+   comparaison des quatre variantes déjà couvertes par snapshots.
 4. Extraction des scripts post-rendu et des champs techniques.
 5. Rendu HTML classique par famille de nœuds.
 6. Extension PHPCS et réduction PHPStan après chaque service stabilisé.

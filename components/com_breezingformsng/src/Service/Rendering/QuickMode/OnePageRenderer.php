@@ -1664,37 +1664,6 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
           ACTION STATE TARGETCATEGORY TARGETNAME if SRCNAME is VALUE
          */
 
-        $parsed = '';
-        $code = str_replace("\r", '', $code);
-        $lines = explode("\n", $code);
-        $linesCnt = count($lines);
-
-        for ($i = 0; $i < $linesCnt; $i++) {
-            $tokens = explode(' ', trim($lines[$i]));
-            $tokensCnt = count($tokens);
-            if ($tokensCnt >= 8) {
-                $state = '';
-                // rebuilding the state as it could be a value containing blanks
-                for ($j = 7; $j < $tokensCnt; $j++) {
-                    if ($j + 1 < $tokensCnt) {
-                        $state .= $tokens[$j] . ' ';
-                    } else {
-                        $state .= $tokens[$j];
-                    }
-                }
-                $parsed .= json_encode([
-                    'action' => $tokens[0],
-                    'state' => $tokens[1],
-                    'tCat' => $tokens[2],
-                    'tName' => $tokens[3],
-                    'statement' => $tokens[4],
-                    'sName' => $tokens[5],
-                    'condition' => $tokens[6],
-                    'value' => $state,
-                ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE) . ',';
-            }
-        }
-
-        return "[" . rtrim($parsed, ",") . "]";
+        return (new QuickModeToggleFieldsParser())->parse((string) $code);
     }
 }

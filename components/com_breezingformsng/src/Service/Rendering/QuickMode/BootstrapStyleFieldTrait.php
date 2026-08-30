@@ -334,8 +334,17 @@ trait BootstrapStyleFieldTrait
     /**
      * @param array<string, mixed> $mdata
      */
-    private function renderBootstrapStyleNumberInputField(array $mdata, string $label, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
-    {
+    private function renderBootstrapStyleNumberInputField(
+        array $mdata,
+        string $label,
+        string $tabIndex,
+        string $onclick,
+        string $onblur,
+        string $onchange,
+        string $onfocus,
+        string $onselect,
+        string $readonly
+    ): void {
         $type = 'number';
 
         if ($mdata['range']) {
@@ -346,16 +355,23 @@ trait BootstrapStyleFieldTrait
             $maxlength = 'max="' . intval($mdata['maxLength']) . '" ';
         }
         $icon = '';
-        if ($this->rootMdata['themebootstrapThemeEngine'] == 'bootstrap' && $this->rootMdata['themebootstrap'] == 'Azure') {
+        if (
+            $this->rootMdata['themebootstrapThemeEngine'] == 'bootstrap'
+            && $this->rootMdata['themebootstrap'] == 'Azure'
+        ) {
             if (!isset($mdata['icon']) || $mdata['icon'] == '') {
                 $icon = '<i class="fas fa-pencil iconf--fumi" aria-hidden="true"></i>';
             } else {
-                $icon = '<i class="fas ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8') . ' iconf--fumi" aria-hidden="true"></i>';
+                $icon = '<i class="fas ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8')
+                    . ' iconf--fumi" aria-hidden="true"></i>';
             }
         }
         /* translatables */
 
-        if (isset($mdata['placeholder_translation' . $this->language_tag]) && $mdata['placeholder_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['placeholder_translation' . $this->language_tag])
+            && $mdata['placeholder_translation' . $this->language_tag] != ''
+        ) {
             $mdata['placeholder'] = '000';
         }
         /* translatables end */
@@ -391,8 +407,17 @@ trait BootstrapStyleFieldTrait
     /**
      * @param array<string, mixed> $mdata
      */
-    private function renderBootstrapStyleCheckboxField(array $mdata, string $label, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
-    {
+    private function renderBootstrapStyleCheckboxField(
+        array $mdata,
+        string $label,
+        string $tabIndex,
+        string $onclick,
+        string $onblur,
+        string $onchange,
+        string $onfocus,
+        string $onselect,
+        string $readonly
+    ): void {
         echo '<div class="' . $this->bsClass('controls') . ' ' . $this->bsClass('form-inline') . '">';
         echo '<div class="' . $this->bsClass('form-group') . '">';
         echo $label;
@@ -410,24 +435,38 @@ trait BootstrapStyleFieldTrait
         echo '</div>';
         echo '</div>';
         if ($mdata['mailbackAccept']) {
-            echo '<input type="hidden" class="ff_elem" name="mailbackConnectWith[' . $mdata['mailbackConnectWith'] . ']" value="true_' . $mdata['bfName'] . '"/>' . "\n";
+            echo '<input type="hidden" class="ff_elem" name="mailbackConnectWith['
+                . $mdata['mailbackConnectWith'] . ']" value="true_' . $mdata['bfName'] . '"/>' . "\n";
         }
     }
 
     /**
      * @param array<string, mixed> $mdata
      */
-    private function renderBootstrapStyleSelectField(array $mdata, string $label, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
-    {
+    private function renderBootstrapStyleSelectField(
+        array $mdata,
+        string $label,
+        string $tabIndex,
+        string $onclick,
+        string $onblur,
+        string $onchange,
+        string $onfocus,
+        string $onselect,
+        string $readonly
+    ): void {
         /* translatables */
-        if (isset($mdata['list_translation' . $this->language_tag]) && $mdata['list_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['list_translation' . $this->language_tag])
+            && $mdata['list_translation' . $this->language_tag] != ''
+        ) {
             $mdata['list'] = $mdata['list_translation' . $this->language_tag];
         }
         /* translatables end */
         if ($mdata['list'] != '') {
             $width = '';
             if (isset($mdata['width']) && $mdata['width'] != '') {
-                $width = 'width:' . htmlentities(strip_tags($mdata['width'])) . ' !important; min-width:' . htmlentities(strip_tags($mdata['width'])) . ' !important;';
+                $width = 'width:' . htmlentities(strip_tags($mdata['width']))
+                    . ' !important; min-width:' . htmlentities(strip_tags($mdata['width'])) . ' !important;';
             }
             $height = '';
             if (isset($mdata['height']) && $mdata['height'] != '') {

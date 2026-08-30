@@ -1047,27 +1047,19 @@ final class RenderingEngine
                         );
                         break;
                     case 'Tooltip':
-                        $tooltipTitle = '<strong>' . htmlspecialchars(strip_tags(trim((string) $row->title)), ENT_QUOTES, 'UTF-8') . '</strong><br />' . str_replace(
-                            ["\n", "\r"],
-                            ["", ""],
-                            htmlentities(trim((string) $data2), ENT_QUOTES, 'UTF-8')
+                        echo $this->classicStaticTextBuilder()->buildTooltip(
+                            (int) $row->id,
+                            $attribs,
+                            $class1,
+                            $class2,
+                            (string) $row->title,
+                            $data2,
+                            $data1,
+                            (int) $row->flag1,
+                            $ff_mossite,
+                            indentc(1),
+                            nlc()
                         );
-                        $tooltipClass = $class1 !== ''
-                            ? str_replace(' class="', ' class="hasTooltip ', $class1)
-                            : ' class="hasTooltip"';
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '" title="' . $tooltipTitle . '"' . $tooltipClass . '>' . nlc();
-                        switch ($row->flag1) {
-                            case 0:
-                                $url = $ff_mossite . '/media/com_breezingformsng/images/site/tooltip.png';
-                                break;
-                            case 1:
-                                $url = $ff_mossite . '/media/com_breezingformsng/images/site/warning.png';
-                                break;
-                            default:
-                                $url = $data1;
-                        } // switch
-                        echo indentc(2) . '<img src="' . $url . '" alt="" border="0"' . $class2 . '/>' . nlc();
-                        echo indentc(1) . '</div>' . nl();
                         break;
                     case 'Hidden Input':
                         echo indentc(1) . '<input id="ff_elem' . $row->id . '" type="hidden" name="ff_nm_' . $row->name . '[]" value="' . $data1 . '" />' . nl();

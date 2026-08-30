@@ -9,6 +9,40 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ClassicStaticTextBuild
 
 final class ClassicStaticTextBuilderTest extends TestCase
 {
+    public function testBuildsTooltipWithDefaultImageAndEscapedTitle(): void
+    {
+        $html = (new ClassicStaticTextBuilder())->buildTooltip(
+            12,
+            'position:absolute;',
+            ' class="tip"',
+            ' class="icon"',
+            '<b>Title</b>',
+            "Line & details\nnext",
+            '/custom.png',
+            0,
+            '/site'
+        );
+
+        self::assertStringContainsString('title="<strong>Title</strong><br />Line &amp; detailsnext"', $html);
+        self::assertStringContainsString('class="hasTooltip tip"', $html);
+        self::assertStringContainsString('/site/media/com_breezingformsng/images/site/tooltip.png', $html);
+        self::assertStringContainsString('class="icon"', $html);
+    }
+
+    public function testBuildsTooltipWithWarningAndCustomImageVariants(): void
+    {
+        $builder = new ClassicStaticTextBuilder();
+
+        self::assertStringContainsString(
+            '/site/media/com_breezingformsng/images/site/warning.png',
+            $builder->buildTooltip(13, '', '', '', 'Warning', 'Text', '/custom.png', 1, '/site')
+        );
+        self::assertStringContainsString(
+            'src="/custom.png"',
+            $builder->buildTooltip(14, '', '', '', 'Custom', 'Text', '/custom.png', 2, '/site')
+        );
+    }
+
     public function testBuildsImageWithDimensionsAndClasses(): void
     {
         self::assertSame(

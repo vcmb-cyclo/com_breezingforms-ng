@@ -9,6 +9,39 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering;
  */
 final class ClassicStaticTextBuilder
 {
+    public function buildTooltip(
+        int $elementId,
+        string $style,
+        string $classAttribute,
+        string $imageClassAttribute,
+        string $title,
+        string $description,
+        string $imageSource,
+        int $imageType,
+        string $siteRoot,
+        string $indent = "\t",
+        string $newline = "\n"
+    ): string {
+        $tooltipTitle = '<strong>' . htmlspecialchars(strip_tags(trim($title)), ENT_QUOTES, 'UTF-8') . '</strong><br />' . str_replace(
+            ["\n", "\r"],
+            ['', ''],
+            htmlentities(trim($description), ENT_QUOTES, 'UTF-8')
+        );
+        $tooltipClass = $classAttribute !== ''
+            ? str_replace(' class="', ' class="hasTooltip ', $classAttribute)
+            : ' class="hasTooltip"';
+        $source = match ($imageType) {
+            0 => $siteRoot . '/media/com_breezingformsng/images/site/tooltip.png',
+            1 => $siteRoot . '/media/com_breezingformsng/images/site/warning.png',
+            default => $imageSource,
+        };
+
+        return $indent . '<div id="ff_div' . $elementId . '" style="' . $style . '" title="' . $tooltipTitle . '"'
+            . $tooltipClass . '>' . $newline
+            . $indent . $indent . '<img src="' . $source . '" alt="" border="0"' . $imageClassAttribute . '/>' . $newline
+            . $indent . '</div>' . $newline;
+    }
+
     public function buildImage(
         int $elementId,
         string $style,

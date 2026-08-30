@@ -76,6 +76,7 @@ final class RenderingEngine
     private ?ContentBuilderFileDisplayNameBuilder $contentBuilderFileDisplayNameBuilderService = null;
     private ?ContentBuilderFlashUploadValidationBuilder $contentBuilderFlashUploadValidationBuilderService = null;
     private ?ContentBuilderSignatureFileResolver $contentBuilderSignatureFileResolverService = null;
+    private ?ContentBuilderSignatureImageEncoder $contentBuilderSignatureImageEncoderService = null;
     private ?CaptchaEndpointBuilder $captchaEndpointBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
@@ -263,6 +264,11 @@ final class RenderingEngine
     private function contentBuilderSignatureFileResolver(): ContentBuilderSignatureFileResolver
     {
         return $this->contentBuilderSignatureFileResolverService ??= new ContentBuilderSignatureFileResolver();
+    }
+
+    private function contentBuilderSignatureImageEncoder(): ContentBuilderSignatureImageEncoder
+    {
+        return $this->contentBuilderSignatureImageEncoderService ??= new ContentBuilderSignatureImageEncoder();
     }
 
     private function captchaEndpointBuilder(): CaptchaEndpointBuilder
@@ -816,7 +822,7 @@ final class RenderingEngine
 
                             if ($signaturePath !== null) {
 
-                                $sig_encoded = bf_b64enc(file_get_contents($signaturePath));
+                                $sig_encoded = $this->contentBuilderSignatureImageEncoder()->encode($signaturePath);
 
                                 $js .= $this->contentBuilderSignatureScriptBuilder()->build(
                                     (string) $cbEntry->recName,

@@ -899,6 +899,8 @@ HTML;
                             $uploadOptions = $this->quickModeUploadOptionsBuilder()->build($mdata);
                             $exts = $uploadOptions['extensions'];
                             $bytes = $uploadOptions['maxFileSize'];
+                            $multiSelection = $uploadOptions['multiSelection'];
+                            $runtimes = $uploadOptions['runtimes'];
                             $flashUploader = "
                                                         <label id=\"bfUploadContainer" . $mdata['dbId'] . "\">
 							<img style=\"cursor: pointer;\" id=\"bfPickFiles" . $mdata['dbId'] . "\" src=\"" . $this->uploadImagePath . "\" border=\"0\" width=\"" . (isset($mdata['flashUploaderWidth']) && is_numeric($mdata['flashUploaderWidth']) && $mdata['flashUploaderWidth'] > 0 ? intval($mdata['flashUploaderWidth']) : '64') . "\" height=\"" . (isset($mdata['flashUploaderHeight']) && is_numeric($mdata['flashUploaderHeight']) && $mdata['flashUploaderHeight'] > 0 ? intval($mdata['flashUploaderHeight']) : '64') . "\"/>
@@ -989,10 +991,10 @@ HTML;
                                                                 var iOS = ( navigator.userAgent.match(/(iPad|iPhone|iPod)/i) ? true : false );
                                                                 var uploader = new plupload.Uploader({
                                                                         max_retries: 10,
-                                                                        multi_selection: " . (isset($mdata['flashUploaderMulti']) && $mdata['flashUploaderMulti'] ? 'true' : 'false') . ",
+                                                                        multi_selection: " . $multiSelection . ",
                                                                         unique_names: iOS,
                                                                         chunk_size: '10kb',
-                                                                        runtimes : '" . (isset($mdata['html5']) && $mdata['html5'] ? 'html5,' : '') . (isset($mdata['flashUploader']) && $mdata['flashUploader'] ? 'flash,' : '') . "html4',
+                                                                        runtimes : '" . $runtimes . "',
                                                                         browse_button : 'bfPickFiles" . $mdata['dbId'] . "',
                                                                         container: 'bfUploadContainer" . $mdata['dbId'] . "',
                                                                         file_data_name: 'Filedata',
@@ -1042,7 +1044,7 @@ HTML;
                                                                                             bfUploaders_[i].start();
                                                                                         }
                                                                                         // re-enable button if there is none left
-                                                                                        if( " . (isset($mdata['flashUploaderMulti']) && $mdata['flashUploaderMulti'] ? 'true' : 'false') . " == false ){
+                                                                                        if( " . $multiSelection . " == false ){
                                                                                             var the_size = JQuery('#bfFlashFileQueue" . $mdata['dbId'] . " .bfFileQueueItem').size();
                                                                                             if( the_size == 0 ){
                                                                                                 JQuery('#bfPickFiles" . $mdata['dbId'] . "').css('display','block');
@@ -1078,7 +1080,7 @@ HTML;
                                                                             }
                                                                         }
                                                                         // disable the button if no multi upload
-                                                                        if( " . (isset($mdata['flashUploaderMulti']) && $mdata['flashUploaderMulti'] ? 'true' : 'false') . " == false ){
+                                                                        if( " . $multiSelection . " == false ){
                                                                             var the_size = JQuery('#bfFlashFileQueue" . $mdata['dbId'] . " .bfFileQueueItem').size();
                                                                             if( the_size > 0 ){
                                                                                 JQuery('#bfPickFiles" . $mdata['dbId'] . "').css('display','none');

@@ -820,6 +820,8 @@ class BootstrapRenderer
                             $uploadOptions = $this->quickModeUploadOptionsBuilder()->build($mdata);
                             $exts = $uploadOptions['extensions'];
                             $bytes = $uploadOptions['maxFileSize'];
+                            $multiSelection = $uploadOptions['multiSelection'];
+                            $runtimes = $uploadOptions['runtimes'];
                             echo "
 							<label id=\"bfUploadContainer" . $mdata['dbId'] . "\">
 							<div class=\"" . $this->bsClass('btn') . " " . $this->bsClass('btn-primary') . " bfUploadButton button\" id=\"bfPickFiles" . $mdata['dbId'] . "\"><i class=\"" . $this->bsClass('icon-upload') . "\"></i></div>
@@ -909,10 +911,10 @@ class BootstrapRenderer
                                                                 var iOS = ( navigator.userAgent.match(/(iPad|iPhone|iPod)/i) ? true : false );
                                                                 var uploader = new plupload.Uploader({
                                                                         max_retries: 10,
-                                                                        multi_selection: " . (isset($mdata['flashUploaderMulti']) && $mdata['flashUploaderMulti'] ? 'true' : 'false') . ",
+                                                                        multi_selection: " . $multiSelection . ",
                                                                         unique_names: iOS,
                                                                         chunk_size: '100kb',
-                                                                        runtimes : '" . (isset($mdata['html5']) && $mdata['html5'] ? 'html5,' : '') . (isset($mdata['flashUploader']) && $mdata['flashUploader'] ? 'flash,' : '') . "html4',
+                                                                        runtimes : '" . $runtimes . "',
                                                                         browse_button : 'bfPickFiles" . $mdata['dbId'] . "',
                                                                         container: 'bfUploadContainer" . $mdata['dbId'] . "',
                                                                         file_data_name: 'Filedata',
@@ -963,7 +965,7 @@ class BootstrapRenderer
                                                                                             bfUploaders_[i].start();
                                                                                         }
                                                                                         // re-enable button if there is none left
-                                                                                        if( " . (isset($mdata['flashUploaderMulti']) && $mdata['flashUploaderMulti'] ? 'true' : 'false') . " == false ){
+                                                                                        if( " . $multiSelection . " == false ){
                                                                                             var the_size = JQuery('#bfFlashFileQueue" . $mdata['dbId'] . " .bfFileQueueItem').size();
                                                                                             if( the_size == 0 ){
                                                                                                 JQuery('#bfPickFiles" . $mdata['dbId'] . "').prop('disabled',false);
@@ -998,7 +1000,7 @@ class BootstrapRenderer
                                                                             }
                                                                         }
                                                                         // disable the button if no multi upload
-                                                                        if( " . (isset($mdata['flashUploaderMulti']) && $mdata['flashUploaderMulti'] ? 'true' : 'false') . " == false ){
+                                                                        if( " . $multiSelection . " == false ){
                                                                             var the_size = JQuery('#bfFlashFileQueue" . $mdata['dbId'] . " .bfFileQueueItem').size();
                                                                             if( the_size > 0 ){
                                                                                 JQuery('#bfPickFiles" . $mdata['dbId'] . "').prop('disabled',true);

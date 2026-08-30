@@ -78,6 +78,7 @@ final class RenderingEngine
     private ?ContentBuilderSignatureFileResolver $contentBuilderSignatureFileResolverService = null;
     private ?ContentBuilderSignatureImageEncoder $contentBuilderSignatureImageEncoderService = null;
     private ?CaptchaEndpointBuilder $captchaEndpointBuilderService = null;
+    private ?CaptchaValidationRowSelector $captchaValidationRowSelectorService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -274,6 +275,11 @@ final class RenderingEngine
     private function captchaEndpointBuilder(): CaptchaEndpointBuilder
     {
         return $this->captchaEndpointBuilderService ??= new CaptchaEndpointBuilder();
+    }
+
+    private function captchaValidationRowSelector(): CaptchaValidationRowSelector
+    {
+        return $this->captchaValidationRowSelectorService ??= new CaptchaValidationRowSelector();
     }
 
     public function cbCheckPermissions(): array
@@ -2430,8 +2436,12 @@ final class RenderingEngine
             (int) $this->processor->form
         );
 
-        for ($i = 0; $i < $this->processor->rowcount; $i++) {
-            $row = $this->processor->rows[$i];
+        $row = $this->captchaValidationRowSelector()->select(
+            $this->processor->rows,
+            $this->processor->rowcount
+        );
+
+        if ($row !== null) {
             if ($row->type == "Captcha") {
                 $capFunc = '
 
@@ -2524,8 +2534,7 @@ final class RenderingEngine
                                                ao.sndReq("get","' . $endpoints['check'] . '"+document.getElementById("bfCaptchaEntry").value,"");
                                         }
                                 }';
-                break;
-            } else if ($row->type == "ReCaptcha") {
+            } elseif ($row->type == "ReCaptcha") {
 
                 $capFunc = 'var bfReCaptchaLoaded = true;
                                     function bfCheckCaptcha(){
@@ -2633,8 +2642,8 @@ final class RenderingEngine
                                                 bfValidateCaptcha();
 
 					}
-				}';
-            }
+					}';
+        }
         }
 
         return $capFunc;

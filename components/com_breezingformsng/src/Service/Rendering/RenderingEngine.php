@@ -69,6 +69,7 @@ final class RenderingEngine
     private ?FormContextFieldsBuilder $formContextFieldsBuilderService = null;
     private ?FormClosingMarkupBuilder $formClosingMarkupBuilderService = null;
     private ?FormOpeningMarkupBuilder $formOpeningMarkupBuilderService = null;
+    private ?FormOptionalContextFieldsBuilder $formOptionalContextFieldsBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -220,6 +221,11 @@ final class RenderingEngine
     private function formOpeningMarkupBuilder(): FormOpeningMarkupBuilder
     {
         return $this->formOpeningMarkupBuilderService ??= new FormOpeningMarkupBuilder();
+    }
+
+    private function formOptionalContextFieldsBuilder(): FormOptionalContextFieldsBuilder
+    {
+        return $this->formOptionalContextFieldsBuilderService ??= new FormOptionalContextFieldsBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -1646,18 +1652,20 @@ final class RenderingEngine
                         indentc(1),
                         nl()
                     );
-                if ($this->processor->target > 1)
-                    echo indentc(1) . '<input type="hidden" name="ff_target" value="' . htmlentities((string) $this->processor->target, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if ($this->processor->inframe)
-                    echo indentc(1) . '<input type="hidden" name="ff_frame" value="1"/>' . nl();
-                if ($this->processor->border)
-                    echo indentc(1) . '<input type="hidden" name="ff_border" value="1"/>' . nl();
-                if ($this->processor->page != 1)
-                    echo indentc(1) . '<input type="hidden" name="ff_page" value="' . htmlentities((string) $this->processor->page, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if ($this->processor->align != 1)
-                    echo indentc(1) . '<input type="hidden" name="ff_align" value="' . htmlentities((string) $this->processor->align, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if ($this->processor->top != 0)
-                    echo indentc(1) . '<input type="hidden" name="ff_top" value="' . htmlentities((string) $this->processor->top, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                echo $this->formOptionalContextFieldsBuilder()->build(
+                    $this->processor->target,
+                    (bool) $this->processor->inframe,
+                    (bool) $this->processor->border,
+                    $this->processor->page,
+                    $this->processor->align,
+                    $this->processor->top,
+                    indentc(1),
+                    true,
+                    true,
+                    true,
+                    true,
+                    nl()
+                );
                 reset($ff_otherparams);
                 // while (list($prop, $val) = each($ff_otherparams))
                 foreach ($ff_otherparams as $prop => $val) {
@@ -1696,18 +1704,20 @@ final class RenderingEngine
                         'ff_module_id' => $this->processor->app->getInput()->getInt('ff_module_id', 0),
                         'ff_runmode' => $this->processor->runmode,
                     ], indentc(1));
-                if ($this->processor->target > 1)
-                    echo indentc(1) . '<input type="hidden" name="ff_target" value="' . htmlentities((string) $this->processor->target, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if ($this->processor->inframe)
-                    echo indentc(1) . '<input type="hidden" name="ff_frame" value="1"/>' . nl();
-                if ($this->processor->border)
-                    echo indentc(1) . '<input type="hidden" name="ff_border" value="1"/>' . nl();
-                if ($this->processor->page != 1)
-                    echo indentc(1) . '<input type="hidden" name="ff_page" value="' . htmlentities((string) $this->processor->page, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if ($this->processor->align != 1)
-                    echo indentc(1) . '<input type="hidden" name="ff_align" value="' . htmlentities((string) $this->processor->align, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if ($this->processor->top != 0)
-                    echo indentc(1) . '<input type="hidden" name="ff_top" value="' . htmlentities((string) $this->processor->top, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                echo $this->formOptionalContextFieldsBuilder()->build(
+                    $this->processor->target,
+                    (bool) $this->processor->inframe,
+                    (bool) $this->processor->border,
+                    $this->processor->page,
+                    $this->processor->align,
+                    $this->processor->top,
+                    indentc(1),
+                    true,
+                    true,
+                    true,
+                    true,
+                    nl()
+                );
                 if ($this->processor->app->getInput()->getInt('cb_form_id', 0)) {
                     echo $this->contentBuilderTechnicalFieldsBuilder()->build(
                         '',
@@ -1742,8 +1752,20 @@ final class RenderingEngine
                         'ff_module_id' => $this->processor->app->getInput()->getInt('ff_module_id', 0),
                         'ff_runmode' => $this->processor->runmode,
                     ], indentc(1));
-                    if ($this->processor->page != 1)
-                        echo indentc(1) . '<input type="hidden" name="ff_page" value="' . htmlentities((string) $this->processor->page, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
+                    echo $this->formOptionalContextFieldsBuilder()->build(
+                        $this->processor->target,
+                        (bool) $this->processor->inframe,
+                        (bool) $this->processor->border,
+                        $this->processor->page,
+                        $this->processor->align,
+                        $this->processor->top,
+                        indentc(1),
+                        false,
+                        true,
+                        false,
+                        false,
+                        nl()
+                    );
                     if ($this->processor->app->getInput()->getInt('cb_form_id', 0)) {
                         echo $this->contentBuilderTechnicalFieldsBuilder()->build(
                             '',

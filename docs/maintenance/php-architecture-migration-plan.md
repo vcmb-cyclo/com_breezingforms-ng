@@ -152,8 +152,10 @@ Critère de sortie : l'hydratation ContentBuilder n'est plus implémentée dans
 Le générateur de contrôles de fichiers est traité par `2c72231e`. La lecture
 et la normalisation des fins de ligne de `recValue` sont désormais isolées
 dans `ContentBuilderFileValueParser` via `b426525c`, avec conservation du
-comptage historique testé. La résolution du nom affiché et la validation
-QuickMode restent à caractériser avant une extraction supplémentaire.
+comptage historique testé. La résolution du nom affiché est désormais isolée
+dans `ContentBuilderFileDisplayNameBuilder` via `40c7fd89`; l'échappement des
+balises inattendues et la restauration des `<br>` sont couverts. La
+validation QuickMode reste à caractériser avant une extraction supplémentaire.
 
 La phase 2.3 est donc couverte pour les scripts de signature et de contrôles
 de fichiers ; l'intégration complète ContentBuilder reste conditionnée à un

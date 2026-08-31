@@ -278,6 +278,9 @@ dans `ContentBuilderFormAssociationLoader`, avec vérification des filtres
 `type`, `reference_id` et `published` ainsi que du binding entier. Les étapes
 de permission et de chargement d'enregistrement restent dépendantes du runtime
 ContentBuilder.
+Le chargement de la définition publiée sélectionnée est désormais isolé dans
+`ContentBuilderFormDataLoader`, avec son binding entier et son cas `null`
+couverts par test.
 
 ### 2.4 Champs ContentBuilder non éditables
 

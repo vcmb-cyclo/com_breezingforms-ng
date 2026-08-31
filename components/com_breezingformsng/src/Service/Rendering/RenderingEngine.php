@@ -106,6 +106,7 @@ final class RenderingEngine
     private ?ContentBuilderEditableRecordScriptBuilder $contentBuilderEditableRecordScriptBuilderService = null;
     private ?ContentBuilderNonEditableFieldsResolver $contentBuilderNonEditableFieldsResolverService = null;
     private ?ContentBuilderFormAssociationLoader $contentBuilderFormAssociationLoaderService = null;
+    private ?ContentBuilderFormDataLoader $contentBuilderFormDataLoaderService = null;
     private ?QuickModeRendererFactory $quickModeRendererFactoryService = null;
     private ?FormOnloadScriptBuilder $formOnloadScriptBuilderService = null;
     private ?QueryListRowPreparationService $queryListRowPreparationService = null;
@@ -534,6 +535,13 @@ final class RenderingEngine
         );
     }
 
+    private function contentBuilderFormDataLoader(): ContentBuilderFormDataLoader
+    {
+        return $this->contentBuilderFormDataLoaderService ??= new ContentBuilderFormDataLoader(
+            $this->processor->database
+        );
+    }
+
     private function quickModeRendererFactory(): QuickModeRendererFactory
     {
         return $this->quickModeRendererFactoryService ??= new QuickModeRendererFactory();
@@ -645,14 +653,7 @@ final class RenderingEngine
                 }
 
                 $cbFormId = $input->getInt('cb_form_id', 0);
-                $query = $db->getQuery(true)
-                    ->select('*')
-                    ->from($db->quoteName('#__contentbuilderng_forms'))
-                    ->where($db->quoteName('id') . ' = :cbFormId')
-                    ->where($db->quoteName('published') . ' = 1')
-                    ->bind(':cbFormId', $cbFormId, ParameterType::INTEGER);
-                $db->setQuery($query);
-                $cbData = $db->loadAssoc();
+                $cbData = $this->contentBuilderFormDataLoader()->load($cbFormId);
                 if (is_array($cbData)) {
                     $cbFull = $cbFrontend ? $permissionService->authorizeFe('fullarticle') : $permissionService->authorize('fullarticle');
                     $cbForm = FormSourceFactory::getForm('com_breezingformsng', $cbData['reference_id']);

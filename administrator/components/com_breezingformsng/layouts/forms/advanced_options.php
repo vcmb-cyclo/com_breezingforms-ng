@@ -138,7 +138,7 @@ HTMLHelper::_('bootstrap.tab');
       </div>
 
       <div class="row mb-3">
-        <label class="col-sm-3 col-form-label" for="jf_ordering"><?= Text::_('JORDER'); ?></label>
+        <label class="col-sm-3 col-form-label" for="jf_ordering"><?= Text::_('JFIELD_ORDERING_LABEL'); ?></label>
         <div class="col-sm-9"><input type="number" class="form-control w-auto" id="jf_ordering" name="ordering" value="<?= (int) ($f->ordering ?? 0); ?>"></div>
       </div>
 

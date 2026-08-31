@@ -107,6 +107,11 @@
   color: var(--bfng-text-2);
   font-size: var(--bfng-fs-sm);
 }
+#bfOptionsFieldsWrap .form-control,
+#bfOptionsFieldsWrap .form-select,
+#bfOptionsFieldsWrap textarea {
+  font-size: var(--bfng-fs-base);
+}
 #bfOptionsFieldsWrap .form-control:focus,
 #bfOptionsFieldsWrap .form-select:focus {
   border-color: var(--bfng-accent-500);

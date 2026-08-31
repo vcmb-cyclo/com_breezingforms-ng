@@ -864,6 +864,11 @@ entrées de pièces/fonctions, sorties de pile et avertissements de pile vide
 restent identiques ; `TraceRuntimeTest` couvre aussi le formatage des arguments
 null, booléens, numériques, chaînes, tableaux et objets.
 
+La requête de chargement du formulaire ne conserve plus dans la façade que la
+lecture de `FormTable` ; le chargement des éléments publiés est délégué à
+`FormElementLoader`, ce qui laisse une frontière SQL testable sans modifier les
+propriétés historiques `rows` et `rowcount` exposées aux callbacks.
+
 Les deux gardes locales `if (!$halt)` de `SubmissionEngine` ont ensuite été
 retirées : `$halt` était initialisé à `false` et ses seules affectations à
 `true` précédaient immédiatement `exit`. Le contrôle CAPTCHA, les pièces de

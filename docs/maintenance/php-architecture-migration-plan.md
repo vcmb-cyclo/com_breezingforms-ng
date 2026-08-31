@@ -64,6 +64,7 @@
 | `RenderingEngine::view()` — Query List navigation | Markup JavaScript des liens première/précédente/suivante/dernière page extrait et couvert avec libellés injectés | Commit `c93d06eb7` |
 | `RenderingEngine::view()` — Query List lignes | Calcul de page et rafraîchissement JavaScript des lignes visibles/masquées extrait et couvert | Commit `7ee50bccc` |
 | `RenderingEngine::view()` — Query List fin de pagination | Resynchronisation des checkbox, redimensionnement et défilement extraits et couverts par variantes | Commit `c942cfe90` |
+| `RenderingEngine::view()` — Query List état JavaScript | Initialisation ordonnée des tableaux d’état Query List extraite et injection de `qcode` couverte | Commit `70c6aa58b` |
 | `RenderingEngine::view()` — hydratation d'un enregistrement éditable | Nettoyage conservé dans l'orchestrateur, génération JavaScript extraite et couverte par famille de contrôle | Commit `a8325a7c` |
 | Rendu HTML classique — texte statique, rectangle, image, infobulle et icône | Markup `Static Text/HTML`, `Rectangle`, `Image`, `Tooltip` et `Icon` extrait et couvert sans modifier le HTML produit | Commits `43bc8b9d`, `ec310eabb`, `08f6bc4ee`, `1e23287f8`, `3acfe4d66` |
 | Rendu HTML classique — champ caché | Markup `Hidden Input` extrait et couvert avec conservation du nom et de la valeur historiques | Commit `0bacb6fc7` |
@@ -642,6 +643,12 @@ La fin de `ff_dispQueryPage` est désormais construite par
 de resynchronisation des checkbox, de redimensionnement, de défilement dans
 une iframe et de défilement général sont testés par combinaisons ; la gestion
 des variables d'état et l'appel au callback restent dans le moteur.
+
+L'initialisation des tableaux JavaScript Query List est désormais fournie par
+`QueryListStateLibraryBuilder` (`70c6aa58b`). L'ordre des sept entrées
+(`ff_queryCurrPage` à `ff_queryRows`) et l'injection du code de données restent
+explicitement couverts ; l'orchestration de la liaison des callbacks demeure
+dans `RenderingEngine`.
 
 L'enveloppe du script global de validation est désormais construite par
 `FormValidationScriptWrapperBuilder` (`9b92acb55`). Les contrôles de fichiers

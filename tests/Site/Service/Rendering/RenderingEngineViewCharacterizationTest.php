@@ -1465,6 +1465,58 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertStringContainsString('ff_queryCurrPage[id] = page;', $queryCode);
     }
 
+    public function testViewReachesFinalizationWithQueryList(): void
+    {
+        $processor = $this->makeProcessorReadyForCaptchaScript([
+            (object) [
+                'id' => 34,
+                'type' => 'Query List',
+                'flag1' => 1,
+                'flag2' => 0,
+                'height' => 15,
+                'data1' => '',
+                'data3' => '',
+                'page' => 1,
+                'name' => 'results',
+                'script1cond' => 0,
+                'script1id' => 0,
+                'script1code' => '',
+                'script2cond' => 0,
+                'script2id' => 0,
+                'script2code' => '',
+                'script3cond' => 0,
+                'script3id' => 0,
+                'script3code' => '',
+            ],
+        ]);
+        $processor->formrow->name = 'query';
+        $processor->formrow->piece2cond = 0;
+        $processor->formrow->script1cond = 0;
+        $processor->formrow->script1id = 0;
+        $processor->formrow->script1code = '';
+        $processor->formrow->script2cond = 0;
+        $processor->formrow->script2id = 0;
+        $processor->formrow->script2code = '';
+        $processor->formrow->class2 = '';
+        $processor->form_id = 7;
+        $processor->target = 0;
+        $processor->align = 0;
+        $processor->top = 0;
+        $processor->traceMode = 0;
+        $processor->buryOnCallNumber = null;
+        $processor->queryResultRows = [['result', 1]];
+        $GLOBALS['ff_otherparams'] = [];
+
+        $html = $this->captureCaptchaScript($processor);
+
+        self::assertSame([['result', 1]], $processor->queryRows['ff_34']);
+        self::assertStringContainsString(
+            'function ff_dispQueryPage(id,page)',
+            $processor->linkedCallbacks[array_key_last($processor->linkedCallbacks)]['code']
+        );
+        self::assertStringContainsString('</div><!-- form end -->', $html);
+    }
+
     public function testViewReachesFinalizationForAnEmptyQuickModeForm(): void
     {
         $processor = $this->makeProcessorReadyForCaptchaScript([]);

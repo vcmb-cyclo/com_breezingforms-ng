@@ -409,14 +409,15 @@ trois providers couverts. Les champs de contexte ContentBuilder
 État : les champs cachés communs sont mutualisés par
 `FormSubmissionFieldsBuilder` (`be602b94f`) et les sorties des trois variantes
 sont verrouillées par `dc73ec0fc`. Les différences de route, iframe, cible,
-bordure et template restent dans les branches d'orchestration ; la
-finalisation complète par mode doit encore être caractérisée avec un runtime
-Joomla réel.
+bordure et template restent dans les branches d'orchestration. Les parcours
+frontend, backend, preview et Query List sont désormais caractérisés jusqu'à
+la fermeture du formulaire dans `RenderingEngineViewCharacterizationTest`.
+La validation avec un runtime Joomla réel reste une étape d'intégration.
 
-- Ajouter une stratégie de finalisation par mode d'exécution après cette
-  caractérisation runtime.
+- Ajouter une stratégie de finalisation par mode d'exécution après la
+  caractérisation runtime Joomla.
 - Conserver les différences de route, iframe, cible, bordure et template.
-- Étendre les tests de sortie aux parcours ContentBuilder et Query List.
+- Étendre les tests de sortie au parcours ContentBuilder.
 
 ### 4.4 Fermeture et traçage
 

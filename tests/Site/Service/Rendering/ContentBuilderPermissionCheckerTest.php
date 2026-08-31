@@ -7,9 +7,56 @@ namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Rendering;
 use PHPUnit\Framework\TestCase;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderPermissionChecker;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderPermissionGateway;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderPermissionServiceAdapter;
 
 final class ContentBuilderPermissionCheckerTest extends TestCase
 {
+    public function testPermissionAdapterForwardsEveryOperation(): void
+    {
+        $service = new class {
+            /** @var list<array{string, list<mixed>}> */
+            public array $calls = [];
+
+            public function setPermissions(int $formId, int $recordId, string $suffix): void
+            {
+                $this->calls[] = ['setPermissions', [$formId, $recordId, $suffix]];
+            }
+
+            public function authorize(string $action): bool
+            {
+                $this->calls[] = ['authorize', [$action]];
+
+                return true;
+            }
+
+            public function authorizeFe(string $action): bool
+            {
+                $this->calls[] = ['authorizeFe', [$action]];
+
+                return true;
+            }
+
+            public function checkPermissions(string $action, string $message, string $suffix): void
+            {
+                $this->calls[] = ['checkPermissions', [$action, $message, $suffix]];
+            }
+        };
+
+        $adapter = new ContentBuilderPermissionServiceAdapter($service);
+
+        $adapter->setPermissions(12, 44, '_fe');
+        self::assertTrue($adapter->authorize('new'));
+        self::assertTrue($adapter->authorizeFrontend('fullarticle'));
+        $adapter->checkPermissions('edit', 'denied', '_fe');
+
+        self::assertSame([
+            ['setPermissions', [12, 44, '_fe']],
+            ['authorize', ['new']],
+            ['authorizeFe', ['fullarticle']],
+            ['checkPermissions', ['edit', 'denied', '_fe']],
+        ], $service->calls);
+    }
+
     public function testAuthorizesEveryFrontendFormForNewRecords(): void
     {
         $permission = $this->createMock(ContentBuilderPermissionGateway::class);

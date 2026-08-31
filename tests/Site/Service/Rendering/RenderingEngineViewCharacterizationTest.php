@@ -252,6 +252,21 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertSame(1, $processor->permissionChecks);
     }
 
+    public function testViewAbortsAfterBeforeFormPieceWhenPieceRequestsBury(): void
+    {
+        $processor = $this->makeProcessorReadyForCaptchaScript([]);
+        $processor->formrow->piece1cond = 2;
+        $processor->formrow->piece1code = 'before';
+        $processor->buryOnCallNumber = 1;
+
+        $html = $this->captureCaptchaScript($processor);
+
+        self::assertStringContainsString('<piece>before</piece>', $html);
+        self::assertStringNotContainsString('function ffCheckCaptcha()', $html);
+        self::assertSame('before', $processor->executedPieces[0]['code']);
+        self::assertSame('f', $processor->executedPieces[0]['type']);
+    }
+
     public function testPermissionsReturnNeutralContextWhenContentBuilderIsUnavailable(): void
     {
         $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();

@@ -1876,6 +1876,11 @@ Les primitives lexicales \`findToken\` et \`findRealToken\` sont également
 caractérisées sur l'avancement des offsets, les tokens de structure, les
 commentaires de ligne et le suivi des numéros de ligne.
 
+Les directives \`+trace\` de \`prepareEvalCode\` sont couvertes sur leurs
+parcours normal et \`disable\`. Le test verrouille aussi le comportement
+historique observé : sans \`first\`, le mot-clé \`disable\` de la directive
+n'empêche pas l'instrumentation du code.
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

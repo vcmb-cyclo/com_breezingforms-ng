@@ -77,6 +77,30 @@ final class CodeToolsRuntimeTest extends TestCase
         self::assertStringContainsString("/*'/*", $code);
     }
 
+    public function testAppliesTraceDirectiveBeforePatchingCode(): void
+    {
+        $processor = $this->processor();
+        $runtime = new CodeToolsRuntime($processor);
+        $code = "//+trace direct low global none\nreturn 1;";
+
+        self::assertTrue($runtime->prepareEvalCode($code, 'answer', 'e', 7, 1));
+        self::assertStringContainsString('_ff_tracePiece(', $code);
+        self::assertStringContainsString('_ff_traceExit(', $code);
+        self::assertSame(0, $processor->traceMode);
+    }
+
+    public function testTraceDisableDirectiveWithoutFirstStillPatchesHistorically(): void
+    {
+        $processor = $this->processor();
+        $runtime = new CodeToolsRuntime($processor);
+        $code = "//+trace disable\nreturn 1;";
+
+        self::assertTrue($runtime->prepareEvalCode($code, '', '', 0, 0));
+        self::assertStringContainsString('_ff_tracePiece(', $code);
+        self::assertStringContainsString('return 1;', $code);
+        self::assertStringContainsString('/*', $code);
+    }
+
     public function testPatchesFunctionAndReturnTracePoints(): void
     {
         $runtime = new CodeToolsRuntime($this->processor());

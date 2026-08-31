@@ -1620,18 +1620,6 @@ final class RenderingEngine
     }
 
     /**
-     * Keep the existing characterization seam for the default CAPTCHA data.
-     *
-     * @return array{0: string, 1: string}
-     */
-    private function createCaptchaDefaults(): array
-    {
-        return $this->captchaSupportBuilder()->validationDefaults(
-            Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')
-        );
-    }
-
-    /**
      * Link the form-level init and submission callbacks.
      *
      * @param array<int|string, mixed> $library

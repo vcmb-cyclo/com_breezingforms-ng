@@ -786,6 +786,12 @@ diagnostics. Dans `SubmissionEngine`, les listes de valeurs et le marqueur de
 chemin relatif sont ensuite utilisés selon leurs contrats déjà établis, sans
 tests de type ou de booléen redondants ; le niveau 4 descend à 21 diagnostics.
 
+La méthode privée `RenderingEngine::createCaptchaDefaults()` est ensuite
+supprimée : elle n'avait plus d'appelant depuis l'extraction de
+`CaptchaSupportBuilder`. Le contrat de valeurs par défaut reste couvert par
+`CaptchaSupportBuilderTest`, tandis que `RenderingEngine::view()` conserve ses
+caractérisations d'intégration ; le niveau 4 descend à 20 diagnostics.
+
 ## Phase 7 — Réduire les façades historiques
 
 Cette phase commence seulement lorsque leurs responsabilités ont été extraites

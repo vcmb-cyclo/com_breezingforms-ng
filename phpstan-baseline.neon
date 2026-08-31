@@ -475,12 +475,6 @@ parameters:
 			path: components/com_breezingformsng/src/Service/Export/ExportEngine.php
 
 		-
-			message: '#^Undefined variable\: \$created_up$#'
-			identifier: variable.undefined
-			count: 1
-			path: components/com_breezingformsng/src/Service/Export/ExportEngine.php
-
-		-
 			message: '#^Constant _FF_RUNMODE_FRONTEND not found\.$#'
 			identifier: constant.notFound
 			count: 1

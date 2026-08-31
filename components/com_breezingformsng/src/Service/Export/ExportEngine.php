@@ -418,7 +418,7 @@ final class ExportEngine
                     if (!$res) {
 
                         $is_future = 0;
-                        $created_up = $created_up->toSql();
+                        $created_up = (new \Joomla\CMS\Date\Date())->toSql();
                         if (intval($cbData->default_publish_up_days) != 0) {
                             $is_future = 1;
                             $date = new \Joomla\CMS\Date\Date(strtotime('now +' . intval($cbData->default_publish_up_days) . ' days'));

@@ -65,7 +65,8 @@ final class ClassicTextareaBuilder
         }
         $attributes .= $eventAttributes;
 
-        return $indent . '<div id="ff_div' . $elementId . '" style="' . $wrapperStyle . '"' . $wrapperClass . '>' . $newline
+        return $indent . '<div id="ff_div' . $elementId . '" style="' . $wrapperStyle
+            . '"' . $wrapperClass . '>' . $newline
             . $indent . $indent . '<textarea id="ff_elem' . $elementId . '" name="ff_nm_' . $name . '[]"' . $attributes
             . $controlClass . '>' . $value . '</textarea>' . $newline
             . $indent . '</div>' . $newline;

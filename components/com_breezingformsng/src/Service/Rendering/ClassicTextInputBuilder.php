@@ -52,7 +52,8 @@ final class ClassicTextInputBuilder
         };
         $attributes .= $eventAttributes;
 
-        return $indent . '<div id="ff_div' . $elementId . '" style="' . $wrapperStyle . '"' . $wrapperClass . '>' . $newline
+        return $indent . '<div id="ff_div' . $elementId . '" style="' . $wrapperStyle
+            . '"' . $wrapperClass . '>' . $newline
             . $indent . $indent . '<input id="ff_elem' . $elementId . '"' . $attributes . ' name="ff_nm_' . $name
             . '[]" value="' . $value . '"' . $inputClass . '/>' . $newline
             . $indent . '</div>' . $newline;

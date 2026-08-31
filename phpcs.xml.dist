@@ -21,6 +21,9 @@
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicQueryListCellBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicQueryListRowBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicQueryListFooterBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ClassicTextInputBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ClassicTextareaBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ClassicSelectBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderValueScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderReadonlyScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderSignatureScriptBuilder.php</file>

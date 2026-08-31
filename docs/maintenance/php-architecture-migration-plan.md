@@ -544,6 +544,10 @@ settings, header, cellule, ligne, footer et enveloppe passent le contrôle
 après un découpage de quatre lignes trop longues, avec leurs tests directs
 conservés comme filet de sortie.
 
+Les contrôles Classic de saisie (`TextInput`, `Textarea` et `Select`) sont
+également passés sous PHPCS après le découpage neutre d'une ligne trop longue
+dans chaque builder ; leurs tests directs couvrent toujours leurs sorties.
+
 Le premier nettoyage ciblé de cette baseline PHPCS est réalisé dans
 `QuickModeSelectBuilder`, `QuickModeCaptchaMarkupBuilder` et
 `QuickModeUploadOptionsBuilder` (`eaf8b2d1`) : leurs sorties sont inchangées et

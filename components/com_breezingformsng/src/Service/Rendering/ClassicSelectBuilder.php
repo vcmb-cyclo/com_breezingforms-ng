@@ -99,7 +99,8 @@ final class ClassicSelectBuilder
                 . htmlspecialchars(trim($text), ENT_QUOTES) . '</option>' . $newline;
         }
 
-        return $indent . '<div id="ff_div' . $elementId . '" style="' . $wrapperStyle . '"' . $wrapperClass . '>' . $newline
+        return $indent . '<div id="ff_div' . $elementId . '" style="' . $wrapperStyle
+            . '"' . $wrapperClass . '>' . $newline
             . $indent . $indent . '<select id="ff_elem' . $elementId . '" name="ff_nm_' . $name . '[]" ' . $attributes
             . $controlClass . '>' . $newline . $options . $indent . $indent . '</select>' . $newline
             . $indent . '</div>' . $newline;

@@ -107,6 +107,36 @@ final class ContentBuilderEditableRecordScriptBuilderTest extends TestCase
         self::assertStringContainsString('base64,', $result['javascript']);
     }
 
+    public function testBuildsRadioSelectAndCalendarHydration(): void
+    {
+        $radio = $this->record(51, 'gender', 'Radio Group', 'female');
+        $select = $this->record(52, 'country', 'Select List', 'France');
+        $calendar = $this->record(53, 'birthdate', 'Calendar', '2026-08-31');
+
+        $result = $this->builder()->build(
+            [$radio, $select, $calendar],
+            [],
+            true,
+            9,
+            sys_get_temp_dir()
+        );
+
+        self::assertStringContainsString('type == "radio"', $result['javascript']);
+        self::assertStringContainsString('ff_elem52', $result['javascript']);
+        self::assertStringContainsString('ff_nm_birthdate[]', $result['javascript']);
+    }
+
+    private function record(int $elementId, string $name, string $type, string $value): stdClass
+    {
+        $record = new stdClass();
+        $record->recElementId = $elementId;
+        $record->recName = $name;
+        $record->recType = $type;
+        $record->recValue = $value;
+
+        return $record;
+    }
+
     private function builder(): ContentBuilderEditableRecordScriptBuilder
     {
         return new ContentBuilderEditableRecordScriptBuilder(

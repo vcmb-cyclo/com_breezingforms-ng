@@ -1341,7 +1341,7 @@ fichiers `theme.css` après installation réelle.
 
 ### Vérification
 
-Le test de manifeste passe, la suite complète passe (633 tests, 1 962
+Le test de manifeste passe, la suite complète passe (633 tests, 1 963
 assertions), PHPCS et le XML du manifeste sont valides, le paquet est validé
 et le smoke-test Joomla 6 installation/update/frontend confirme la présence
 effective de `media/breezingforms/themes/default/theme.css` et

@@ -1168,7 +1168,7 @@ float:left;
 
                 RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-invisible.js');
                 ?>
-                    <script data-usercentrics="reCAPTCHA" type="text/javascript">bfInitInvisibleReCaptcha(<?php echo json_encode([
+                    <script data-usercentrics="reCAPTCHA" type="text/javascript">bfInitInvisibleReCaptcha(<?php echo $this->quickModeReCaptchaInitScriptBuilder()->encode([
                         'sitekey' => $mdata['pubkey'],
                         'badge' => $badge == 'red' ? '' : $badge,
                         'hasFlashUpload' => $this->hasFlashUpload,

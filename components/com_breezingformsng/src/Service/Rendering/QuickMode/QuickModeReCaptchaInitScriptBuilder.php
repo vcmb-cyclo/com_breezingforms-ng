@@ -24,4 +24,10 @@ final class QuickModeReCaptchaInitScriptBuilder
             . json_encode($configuration)
             . ');</script>';
     }
+
+    /** @param array<string, mixed> $configuration */
+    public function encode(array $configuration): string
+    {
+        return (string) json_encode($configuration);
+    }
 }

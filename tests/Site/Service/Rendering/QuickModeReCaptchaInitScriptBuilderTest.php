@@ -12,7 +12,9 @@ final class QuickModeReCaptchaInitScriptBuilderTest extends TestCase
     public function testBuildsVisibleRecaptchaInitializationScript(): void
     {
         self::assertSame(
-            '<script data-usercentrics="reCAPTCHA" type="text/javascript">bfInitVisibleReCaptcha({"sitekey":"public-key","theme":"light","size":"normal","resetOnRerender":false});</script>',
+            '<script data-usercentrics="reCAPTCHA" type="text/javascript">'
+            . 'bfInitVisibleReCaptcha({"sitekey":"public-key","theme":"light","size":"normal",'
+            . '"resetOnRerender":false});</script>',
             (new QuickModeReCaptchaInitScriptBuilder())->visible([
                 'sitekey' => 'public-key',
                 'theme' => 'light',
@@ -31,5 +33,18 @@ final class QuickModeReCaptchaInitScriptBuilderTest extends TestCase
 
         self::assertStringContainsString('key\\";alert(1);\\/\\/', $script);
         self::assertStringNotContainsString('key";alert(1);//', $script);
+    }
+
+    public function testEncodesInvisibleRecaptchaConfiguration(): void
+    {
+        self::assertSame(
+            '{"sitekey":"public-key","badge":"bottomright","hasFlashUpload":false,"resetFlagOnCallback":true}',
+            (new QuickModeReCaptchaInitScriptBuilder())->encode([
+                'sitekey' => 'public-key',
+                'badge' => 'bottomright',
+                'hasFlashUpload' => false,
+                'resetFlagOnCallback' => true,
+            ])
+        );
     }
 }

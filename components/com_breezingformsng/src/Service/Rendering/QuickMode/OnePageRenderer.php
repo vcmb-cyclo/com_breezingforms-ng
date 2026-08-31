@@ -1017,7 +1017,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
                                 RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-invisible.js');
 
-                                echo '<script data-usercentrics="reCAPTCHA" type="text/javascript">bfInitInvisibleReCaptcha(' . json_encode([
+                                echo '<script data-usercentrics="reCAPTCHA" type="text/javascript">bfInitInvisibleReCaptcha(' . $this->quickModeReCaptchaInitScriptBuilder()->encode([
                                     'sitekey' => $mdata['pubkey'],
                                     'badge' => $badge == 'red' ? '' : $badge,
                                     'hasFlashUpload' => $this->hasFlashUpload,

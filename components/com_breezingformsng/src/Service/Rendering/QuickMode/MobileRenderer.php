@@ -892,33 +892,7 @@ HTML;
                                                                                     fsize = '(' + plupload.formatSize(files[i].size) + ') ';
                                                                                 }
                                                                                 JQuery('#bfFlashFileQueue" . $mdata['dbId'] . "').append('<div class=\"bfFileQueueItem\" id=\"' + files[i].id + 'queueitem\"><div id=\"' + files[i].id + 'thumb\"></div><div id=\"' + files[i].id + '\"><img id=\"' + files[i].id + 'cancel\" src=\"" . $this->cancelImagePath . "\" style=\"cursor: pointer; padding-right: 10px;\" border=\"0\"/>' + (iOS ? '' : files[i].name.replace(/[/\\?%*:|\"<>]/g, '')) + ' ' + fsize + '<b id=\"' + files[i].id + 'msg\" style=\"color:red;\"></b></div></div>');
-                                                                                var file_ = files[i];
-                                                                                var uploader_ = uploader;
-                                                                                var bfUploaders_ = bfUploaders;
-                                                                                JQuery('#' + files[i].id + 'cancel').click(
-                                                                                    function(){
-                                                                                        for( var i = 0; i < bfUploaders_.length; i++ ){
-                                                                                            bfUploaders_[i].stop();
-                                                                                        }
-                                                                                        var id_ = this.id.split('cancel');
-                                                                                        id_ = id_[0];
-                                                                                        uploader_.removeFile(id_);
-                                                                                        JQuery('#'+id_+'queue').remove();
-                                                                                        JQuery('#'+id_+'queueitem').remove();
-                                                                                        bfFlashUploadersLength--;
-                                                                                        for( var i = 0; i < bfUploaders_.length; i++ ){
-                                                                                            bfUploaders_[i].start();
-                                                                                        }
-                                                                                        // re-enable button if there is none left
-                                                                                        if( " . $multiSelection . " == false ){
-                                                                                            var the_size = JQuery('#bfFlashFileQueue" . $mdata['dbId'] . " .bfFileQueueItem').size();
-                                                                                            if( the_size == 0 ){
-                                                                                                JQuery('#bfPickFiles" . $mdata['dbId'] . "').css('display','block');
-                                                                                                JQuery('#bfPickFiles" . $mdata['dbId'] . "holder').css('display','none');
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                );
+" . QuickModeUploadCancelScriptBuilder::build((string) $multiSelection, (int) $mdata['dbId'], false, chr(10)) . "
 " . QuickModeUploadValidationScriptBuilder::build((int) $uploadOptions['maxBytes'], strtolower($exts), (string) json_encode(' ' . Text::_('COM_BREEZINGFORMSNG_FLASH_UPLOADER_TOO_LARGE')), (string) json_encode(' ' . Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED')), chr(10)) . "
                                                                             }
                                                                         }

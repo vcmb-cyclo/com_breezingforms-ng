@@ -413,39 +413,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                             }
                         }
 
-                        function bf_validate_prevpage(page)
-                        {
-                            if(typeof bfUseErrorAlerts != "undefined"){
-                             JQuery(".bfErrorMessage").html("");
-                             JQuery(".bfErrorMessage").css("display","none");
-                            }
-
-                            error = ff_validation(ff_currentpage);
-                            if (error != "") {
-
-                               if(typeof bfUseErrorAlerts == "undefined"){
-                                   alert(error);
-                                } else {
-                                   bfShowErrors(error);
-                                }
-                                ff_validationFocus("");
-								/* need to test this */
-								/*
-								JQuery(".bfErrorMessage").css("display","none");
-                                ff_currentpage = ff_getPageByName(ff_validationFocusName);
-                                JQuery("#bfPage"+ff_currentpage+" .bfErrorMessage").css("display","block");
-								ladda_button.ladda("stop");
-								*/
-
-                            } else{
-
-                                if(page > 0){
-                                 JQuery("#bfPage"+(page)).ScrollTo({offsetTop: 50});
-                                 ff_currentpage = page;
-                                 ff_initialize("pageentry");
-                                }
-                            }
-                        } // ff_validate_prevpage
+                        ' . (new QuickModePreviousPageValidationBuilder())->build("\n") . '
 
 '
         );

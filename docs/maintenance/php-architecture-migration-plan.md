@@ -70,6 +70,7 @@
 | Finalisation — wrapper ReCaptcha | Markup du wrapper ReCaptcha historique extrait, activé uniquement pour l’enveloppe legacy et couvert | Commit `092a2a9fa` |
 | QuickMode — URLs ReCaptcha | URLs Google visible/invisible mutualisées dans `QuickModeReCaptchaInitScriptBuilder` et réutilisées par Classic, Bootstrap et OnePage, avec snapshots conservés | Commit `4952cfb94` |
 | QuickMode — configuration ReCaptcha | Normalisation des configurations visible/invisible mutualisée dans `QuickModeReCaptchaInitScriptBuilder`, sans modifier les paramètres propres aux trois renderers | Commit `56879a38f` |
+| QuickMode — rendu ReCaptcha | Markup, configuration et chargement des assets ReCaptcha mutualisés dans `QuickModeReCaptchaFieldBuilder`, avec enveloppes de thème conservées dans les trois renderers | Lot committé |
 | Finalisation — balise form QuickMode | Assemblage de la balise `<form>` extrait, calcul d’URL conservé dans l’orchestrateur et classe historique préservée | Commit `4f5b8559d` |
 | ContentBuilder — wrapper readonly | Enveloppe du script des champs non éditables extraite et couverte, avec marqueurs historiques conservés | Commit `3e1723d15` |
 | Finalisation — wrapper enregistrement éditable | Chargement JavaScript de l’enregistrement éditable extrait dans un builder, avec nettoyage historique de `seccode` couvert | Commit `f3b6f8d97` |
@@ -1618,6 +1619,13 @@ Le corps JavaScript de rechargement CAPTCHA est désormais centralisé dans
 `4d706e95`. Le nettoyage du champ, le focus et l'ajout de
 `bfMathRandom` sont couverts par un test unitaire ; les balises et icônes
 visuelles restent propres à chaque renderer.
+
+Le rendu ReCaptcha visible et invisible est désormais centralisé dans
+`QuickModeReCaptchaFieldBuilder`. Le builder conserve la configuration
+spécifique de chaque renderer (réinitialisation, upload Flash et widget
+visible), enregistre les scripts via `RuntimeAssetLoader` et laisse uniquement
+les enveloppes Bootstrap/OnePage et Classic aux renderers. Les snapshots des
+trois parcours et les branches clé absente/visible/invisible sont couvertes.
 
 La normalisation des options d'upload est désormais centralisée dans
 `QuickModeUploadOptionsBuilder` et branchée dans les quatre renderers par

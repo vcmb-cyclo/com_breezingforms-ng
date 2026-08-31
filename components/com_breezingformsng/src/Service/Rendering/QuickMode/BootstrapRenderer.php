@@ -79,7 +79,7 @@ class BootstrapRenderer
     private ?QuickModeSubmitActionBuilder $quickModeSubmitActionBuilderService = null;
     private ?QuickModeCalendarOptionsBuilder $quickModeCalendarOptionsBuilderService = null;
     private ?QuickModeHtmlTextareaScriptBuilder $quickModeHtmlTextareaScriptBuilderService = null;
-    private ?QuickModeReCaptchaInitScriptBuilder $quickModeReCaptchaInitScriptBuilderService = null;
+    private ?QuickModeReCaptchaFieldBuilder $quickModeReCaptchaFieldBuilderService = null;
     private ?QuickModeDeactivationScriptBuilder $quickModeDeactivationScriptBuilderService = null;
 
     private function quickModeCalendarOptionsBuilder(): QuickModeCalendarOptionsBuilder
@@ -97,9 +97,9 @@ class BootstrapRenderer
         return $this->quickModeHtmlTextareaScriptBuilderService ??= new QuickModeHtmlTextareaScriptBuilder();
     }
 
-    private function quickModeReCaptchaInitScriptBuilder(): QuickModeReCaptchaInitScriptBuilder
+    private function quickModeReCaptchaFieldBuilder(): QuickModeReCaptchaFieldBuilder
     {
-        return $this->quickModeReCaptchaInitScriptBuilderService ??= new QuickModeReCaptchaInitScriptBuilder();
+        return $this->quickModeReCaptchaFieldBuilderService ??= new QuickModeReCaptchaFieldBuilder();
     }
 
     public function bsClass($key)
@@ -876,73 +876,15 @@ class BootstrapRenderer
                         echo '<div class="' . $this->bsClass('form-group') . ' ' . $this->bsClass('other-form-group') . '">';
                         echo $label;
                         echo '<span class="' . $this->bsClass('nonform-control') . '">';
-                        if (isset($mdata['pubkey']) && $mdata['pubkey'] != '') {
-                            if (!isset($mdata['invisibleCaptcha']) || !$mdata['invisibleCaptcha']) {
-                                $http = 'https';
-
-                                $getLangTag = $this->p->app->getLanguage()->getTag();
-                                $getLangSlug = explode('-', $getLangTag);
-                                $reCaptchaLang = 'hl=' . $getLangSlug[0];
-
-                                $size = (isset($mdata['size']) && $mdata['size'] != '') ? $mdata['size'] : 'normal';
-
-                                RuntimeAssetLoader::script(
-                                    $this->p->app,
-                                    $this->quickModeReCaptchaInitScriptBuilder()->visibleApiUrl($getLangTag),
-                                    ['data-usercentrics' => 'reCAPTCHA']
-                                );
-                                RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-visible.js');
-
-                                echo '
-                                                    <div style="display: inline-block !important; vertical-align: middle;">
-                                                        <div class="' . $this->bsClass('control-group') . '">
-                                                            <div class="' . $this->bsClass('controls') . '">
-                                                                    <div id="newrecaptcha"></div>
-                                                                </div>
-                                                        </div>
-                                                    </div>
-                                                    ' . $this->quickModeReCaptchaInitScriptBuilder()->visible(
-                                    $this->quickModeReCaptchaInitScriptBuilder()->visibleConfiguration($mdata, false)
-                                );
-                            } elseif (isset($mdata['invisibleCaptcha']) && $mdata['invisibleCaptcha']) {
-                                $http = 'https';
-
-                                $badge = str_replace('invisible_', '', trim($mdata['theme']));
-
-                                if ($badge == 'inline') {
-                                    ?>
-                                                <div style="display: inline-block !important; vertical-align: middle;">
-                                                    <div class="<?php echo $this->bsClass('control-group'); ?>">
-                                                        <div class="<?php echo $this->bsClass('controls') ?>">
-                                                            <div id="bfInvisibleReCaptchaContainer"></div>
-                                                            <div id="bfInvisibleReCaptcha"></div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                        <?php
-                                } else {
-                                    ?>
-                                                <div id="bfInvisibleReCaptchaContainer"></div>
-                                                <div id="bfInvisibleReCaptcha"></div>
-                                    <?php
-                                }
-
-                                RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-invisible.js');
-                                ?>
-
-                                            <script data-usercentrics="reCAPTCHA" type="text/javascript">bfInitInvisibleReCaptcha(<?php echo $this->quickModeReCaptchaInitScriptBuilder()->encode(
-                                            $this->quickModeReCaptchaInitScriptBuilder()->invisibleConfiguration($mdata, $this->hasFlashUpload, true)
-                                            ); ?>);</script>
-                                            <script data-usercentrics="reCAPTCHA"
-                                                src="' . $this->quickModeReCaptchaInitScriptBuilder()->invisibleApiUrl() . '" async
-                                                defer></script>
-                                    <?php
-                            }
-                        } else {
-                            echo '<span class="bfCaptcha">' . "\n";
-                            echo 'WARNING: No public key given for ReCaptcha element!';
-                            echo '</span>' . "\n";
-                        }
+                        echo $this->quickModeReCaptchaFieldBuilder()->build(
+                            $mdata,
+                            $this->p->app,
+                            $this->hasFlashUpload,
+                            false,
+                            true,
+                            $this->bsClass('control-group'),
+                            $this->bsClass('controls')
+                        );
 
                         echo '</span>';
                         echo '</div>';

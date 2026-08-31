@@ -1088,6 +1088,10 @@ Les appels de messagerie restants utilisent désormais l'API Joomla 6
 le callback Sofort et le double opt-in de `SubmissionEngine`. Une vérification
 automatisée empêche le retour des noms de méthodes historiques.
 
+Le déplacement des fichiers uploadés dans `SubmissionEngine` utilise
+désormais `Joomla\\Filesystem\\File::copy()` sans suppression d'erreur et
+traite explicitement un retour négatif avant de supprimer la source.
+
 Les quatre renderers QuickMode ont encore une baseline PHPCS distincte ; le
 contrôle direct fait apparaître des violations de formatage héritées. Ce lot
 reste séparé de la mutualisation fonctionnelle pour conserver des commits

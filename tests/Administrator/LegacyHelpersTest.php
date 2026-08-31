@@ -48,6 +48,8 @@ final class LegacyHelpersTest extends TestCase
         self::assertStringContainsString('->send()', $helpers);
         self::assertStringNotContainsString('->AddAddress(', $helpers . $sofort . $submission);
         self::assertStringNotContainsString('->Send()', $helpers . $sofort . $submission);
+        self::assertStringNotContainsString('@File::copy(', $submission);
+        self::assertStringContainsString('if (!File::copy(', $submission);
     }
 
     public function testJoomla6BootstrapDoesNotLoadObsoleteMamboConstants(): void

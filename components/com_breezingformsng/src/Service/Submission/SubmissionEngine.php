@@ -288,9 +288,13 @@ final class SubmissionEngine
                                                                 if ($this->processor->status != _FF_STATUS_OK)
                                                                     return;
 
-                                                                if (@is_readable($sourcePath . $file) && @file_exists($baseDir) && @is_dir($baseDir)) {
-                                                                    @File::copy($sourcePath . $file, $path);
-                                                                } else {
+                                                                if (!is_readable($sourcePath . $file) || !file_exists($baseDir) || !is_dir($baseDir)) {
+                                                                    $this->processor->status = _FF_STATUS_UPLOAD_FAILED;
+                                                                    $this->processor->message = Text::_('COM_BREEZINGFORMSNG_PROCESS_FILEMOVEFAILED');
+                                                                    return;
+                                                                }
+
+                                                                if (!File::copy($sourcePath . $file, $path)) {
                                                                     $this->processor->status = _FF_STATUS_UPLOAD_FAILED;
                                                                     $this->processor->message = Text::_('COM_BREEZINGFORMSNG_PROCESS_FILEMOVEFAILED');
                                                                     return;

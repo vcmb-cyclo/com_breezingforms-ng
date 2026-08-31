@@ -886,7 +886,7 @@ class BootstrapRenderer
 
                                 RuntimeAssetLoader::script(
                                     $this->p->app,
-                                    $http . '://www.google.com/recaptcha/api.js?' . $reCaptchaLang . '&onload=onloadBFNewRecaptchaCallback&render=explicit',
+                                    $this->quickModeReCaptchaInitScriptBuilder()->visibleApiUrl($getLangTag),
                                     ['data-usercentrics' => 'reCAPTCHA']
                                 );
                                 RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-visible.js');
@@ -938,7 +938,7 @@ class BootstrapRenderer
                                             'resetFlagOnCallback' => true,
                                         ]); ?>);</script>
                                             <script data-usercentrics="reCAPTCHA"
-                                                src="https://www.google.com/recaptcha/api.js?onload=onloadBFNewRecaptchaCallback&render=explicit" async
+                                                src="' . $this->quickModeReCaptchaInitScriptBuilder()->invisibleApiUrl() . '" async
                                                 defer></script>
                                     <?php
                             }

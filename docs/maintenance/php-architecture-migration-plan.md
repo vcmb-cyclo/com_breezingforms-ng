@@ -68,6 +68,7 @@
 | Finalisation — caractérisation des modes | Sorties exactes des champs de soumission frontend, backend et preview verrouillées par tests | Commit `dc73ec0fc` |
 | Finalisation — choix mobile | Construction du script et du markup de choix mobile extraite, calcul de l’URL conservé dans l’orchestrateur | Commit `39a4c1da0` |
 | Finalisation — wrapper ReCaptcha | Markup du wrapper ReCaptcha historique extrait, activé uniquement pour l’enveloppe legacy et couvert | Commit `092a2a9fa` |
+| QuickMode — URLs ReCaptcha | URLs Google visible/invisible mutualisées dans `QuickModeReCaptchaInitScriptBuilder` et réutilisées par Classic, Bootstrap et OnePage, avec snapshots conservés | Lot courant |
 | Finalisation — balise form QuickMode | Assemblage de la balise `<form>` extrait, calcul d’URL conservé dans l’orchestrateur et classe historique préservée | Commit `4f5b8559d` |
 | ContentBuilder — wrapper readonly | Enveloppe du script des champs non éditables extraite et couverte, avec marqueurs historiques conservés | Commit `3e1723d15` |
 | Finalisation — wrapper enregistrement éditable | Chargement JavaScript de l’enregistrement éditable extrait dans un builder, avec nettoyage historique de `seccode` couvert | Commit `f3b6f8d97` |

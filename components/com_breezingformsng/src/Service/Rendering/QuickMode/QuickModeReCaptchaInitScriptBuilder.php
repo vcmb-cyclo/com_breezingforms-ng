@@ -17,6 +17,19 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode;
 /** Builds the shared visible ReCaptcha initialization script. */
 final class QuickModeReCaptchaInitScriptBuilder
 {
+    public function visibleApiUrl(string $languageTag): string
+    {
+        $language = explode('-', $languageTag)[0];
+
+        return 'https://www.google.com/recaptcha/api.js?hl=' . $language
+            . '&onload=onloadBFNewRecaptchaCallback&render=explicit';
+    }
+
+    public function invisibleApiUrl(): string
+    {
+        return 'https://www.google.com/recaptcha/api.js?onload=onloadBFNewRecaptchaCallback&render=explicit';
+    }
+
     /** @param array<string, mixed> $configuration */
     public function visible(array $configuration): string
     {

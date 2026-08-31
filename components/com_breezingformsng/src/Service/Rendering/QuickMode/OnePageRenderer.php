@@ -969,7 +969,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
                                 RuntimeAssetLoader::script(
                                     $this->p->app,
-                                    $http . '://www.google.com/recaptcha/api.js?' . $reCaptchaLang . '&onload=onloadBFNewRecaptchaCallback&render=explicit',
+                                    $this->quickModeReCaptchaInitScriptBuilder()->visibleApiUrl($getLangTag),
                                     ['data-usercentrics' => 'reCAPTCHA']
                                 );
                                 RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-visible.js');
@@ -1018,7 +1018,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                                     'hasFlashUpload' => $this->hasFlashUpload,
                                     'resetFlagOnCallback' => false,
                                 ]) . ');</script>
-                                                  <script data-usercentrics="reCAPTCHA" src="https://www.google.com/recaptcha/api.js?onload=onloadBFNewRecaptchaCallback&render=explicit" async defer></script>
+                                                  <script data-usercentrics="reCAPTCHA" src="' . $this->quickModeReCaptchaInitScriptBuilder()->invisibleApiUrl() . '" async defer></script>
                                                   ';
                             }
                         } else {

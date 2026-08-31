@@ -9,6 +9,22 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\QuickModeReC
 
 final class QuickModeReCaptchaInitScriptBuilderTest extends TestCase
 {
+    public function testBuildsTheVisibleGoogleApiUrlForTheActiveLanguage(): void
+    {
+        self::assertSame(
+            'https://www.google.com/recaptcha/api.js?hl=fr&onload=onloadBFNewRecaptchaCallback&render=explicit',
+            (new QuickModeReCaptchaInitScriptBuilder())->visibleApiUrl('fr-FR')
+        );
+    }
+
+    public function testBuildsTheInvisibleGoogleApiUrl(): void
+    {
+        self::assertSame(
+            'https://www.google.com/recaptcha/api.js?onload=onloadBFNewRecaptchaCallback&render=explicit',
+            (new QuickModeReCaptchaInitScriptBuilder())->invisibleApiUrl()
+        );
+    }
+
     public function testBuildsVisibleRecaptchaInitializationScript(): void
     {
         self::assertSame(

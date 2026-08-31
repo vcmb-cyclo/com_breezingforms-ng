@@ -49,6 +49,7 @@
 | QuickMode — mapping Bootstrap | Mapping Bootstrap 5 des classes mutualisé entre Bootstrap et OnePage, résolution publique `bsClass()` conservée | Commit `658078588` |
 | Finalisation — champs de soumission | Champs cachés communs frontend/backend/preview extraits avec conservation des différences `act`/`ff_frame` | Commit `be602b94f` |
 | Finalisation — caractérisation des modes | Sorties exactes des champs de soumission frontend, backend et preview verrouillées par tests | Commit `dc73ec0fc` |
+| Finalisation — choix mobile | Construction du script et du markup de choix mobile extraite, calcul de l’URL conservé dans l’orchestrateur | Commit `39a4c1da0` |
 | `RenderingEngine::view()` — validation | Extensions de fichiers, valeurs par défaut et scripts CAPTCHA extraits et couverts | Builders de validation dédiés |
 | `RenderingEngine::view()` — CAPTCHA | Sélection `Captcha` / `ReCaptcha`, endpoints site/admin et générateurs JavaScript isolés, ordre historique préservé | Commits `4a070774`, `8e3e9a7a`, `4563ae11`, `d328c4f8`, `75c0ca2b`, `1cea0c84` |
 | `RenderingEngine::view()` — Query List | Préparation extraite et variantes par défaut/checkbox/résultat vide couvertes | Commits `4070ec0f`, `b358e7e9` |
@@ -571,6 +572,11 @@ preview conservent leurs marqueurs spécifiques (`act` ou `ff_frame`), tandis
 que le formulaire et la tâche de soumission suivent une construction commune
 testée. Les sorties exactes des trois variantes sont désormais verrouillées
 par `dc73ec0fc`.
+
+Le markup du choix mobile est désormais construit par
+`MobileChoiceMarkupBuilder` (`39a4c1da0`). Le calcul de l'URL et la
+normalisation des paramètres restent dans `RenderingEngine`, tandis que la
+sortie JavaScript/HTML historique est couverte par un test dédié.
 
 Les sorties anticipées de `RenderingEngine::view()` après activation du buffer
 et du gestionnaire d'erreurs nettoient désormais leur propre état via

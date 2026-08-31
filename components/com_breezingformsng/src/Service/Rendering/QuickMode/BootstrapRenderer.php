@@ -1272,9 +1272,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
             if (!$this->useErrorAlerts) {
                 $showDefaultErrors = $this->useDefaultErrors || (!$this->useDefaultErrors && !$this->useBalloonErrors);
                 $this->p->app->getDocument()->getWebAssetManager()->addInlineScript(
-                    'var bfUseErrorAlerts = false;' . "\n"
-                    . 'var bfShowDefaultErrors = ' . ($showDefaultErrors ? 'true' : 'false') . ';' . "\n"
-                    . 'var bfErrorPageScoped = false;' . "\n"
+                    QuickModeErrorRuntimeConfigBuilder::build($showDefaultErrors, false, "\n")
                 );
                 RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-error-alerts-bootstrap.js');
             }

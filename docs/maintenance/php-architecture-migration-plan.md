@@ -1062,10 +1062,12 @@ Le callback Query List `ff_selectAllQueryRows` est désormais construit par
 `QueryListSelectAllScriptBuilder` (`0b1229d37`). La logique de pagination,
 la remise à zéro des lignes hors page et la synchronisation de la case globale
 sont couvertes séparément ; le callback de navigation `ff_dispQueryPage` reste
-encore partiellement dans l'orchestrateur, mais son markup de navigation est
+partiellement dans l'orchestrateur, mais son markup de navigation est
 désormais construit par `QueryListNavigationBuilder` (`c93d06eb7`). Les
 libellés traduits sont injectés par le moteur et les liens de navigation sont
-couverts indépendamment ; le cœur de mise à jour des lignes reste à isoler.
+couverts indépendamment ; le cœur de mise à jour des lignes est désormais
+fourni par `QueryListRowsRefreshBuilder` et composé dans
+`QueryListPageScriptBuilder` (`7ee50bccc`).
 
 Le wrapper caché `bfReCaptchaWrap` est désormais construit par
 `CaptchaWrapperMarkupBuilder` (`092a2a9fa`). Il reste limité au mode

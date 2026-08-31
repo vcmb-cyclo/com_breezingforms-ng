@@ -76,6 +76,7 @@ class ClassicRenderer
     private ?QuickModeSubmitActionBuilder $quickModeSubmitActionBuilderService = null;
     private ?QuickModeCalendarOptionsBuilder $quickModeCalendarOptionsBuilderService = null;
     private ?QuickModeHtmlTextareaScriptBuilder $quickModeHtmlTextareaScriptBuilderService = null;
+    private ?QuickModeReCaptchaInitScriptBuilder $quickModeReCaptchaInitScriptBuilderService = null;
     private ?QuickModeDeactivationScriptBuilder $quickModeDeactivationScriptBuilderService = null;
 
     private function quickModeCalendarOptionsBuilder(): QuickModeCalendarOptionsBuilder
@@ -91,6 +92,11 @@ class ClassicRenderer
     private function quickModeHtmlTextareaScriptBuilder(): QuickModeHtmlTextareaScriptBuilder
     {
         return $this->quickModeHtmlTextareaScriptBuilderService ??= new QuickModeHtmlTextareaScriptBuilder();
+    }
+
+    private function quickModeReCaptchaInitScriptBuilder(): QuickModeReCaptchaInitScriptBuilder
+    {
+        return $this->quickModeReCaptchaInitScriptBuilderService ??= new QuickModeReCaptchaInitScriptBuilder();
     }
 
     private function quickModeTextFieldStrategy(): QuickModeTextFieldStrategy
@@ -1135,12 +1141,12 @@ float:left;
                                                     <div style="display: inline-block !important; vertical-align: middle;">
                                                         <div id="newrecaptcha"></div>
                                                     </div>
-                                                    <script data-usercentrics="reCAPTCHA" type="text/javascript">bfInitVisibleReCaptcha(' . json_encode([
+                                                    ' . $this->quickModeReCaptchaInitScriptBuilder()->visible([
                     'sitekey' => $mdata['pubkey'],
                     'theme' => trim($mdata['theme']) == '' ? 'light' : trim($mdata['theme']),
                     'size' => $size,
                     'resetOnRerender' => true,
-                ]) . ');</script>';
+                ]);
             } elseif (isset($mdata['invisibleCaptcha']) && $mdata['invisibleCaptcha']) {
                 $http = 'https';
 

@@ -255,36 +255,6 @@ final class QuickmodeHtml
             . ($showTranslations ? 'block' : 'none') . '"); });'
         );
 
-        if ($formId > 0) {
-            ?>
-            <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-                <div class="d-flex flex-wrap align-items-center gap-1 bfng-seg">
-                <?php if (count($languages) > 1) : ?>
-                <div onclick="location.href = 'index.php?option=com_breezingformsng&format=html&task=quickmode.display&formName=translationtest&form=<?php echo $formId ?>&active_language_code='"
-                    class="bfLanguageButton bfng-seg__opt<?php echo $active_language_code == $default || $active_language_code == '' ? ' bfLanguageButtonActive' : '' ?>">
-                    <?php echo $default; ?>
-                </div>
-                <?php
-                foreach ($languages as $languageCode) {
-                    if ($languageCode !== $default) {
-                        ?>
-                        <div onclick="location.href = 'index.php?option=com_breezingformsng&format=html&task=quickmode.display&formName=translationtest&form=<?php echo $formId ?>&active_language_code=<?php echo rawurlencode($languageCode); ?>'"
-                            class="bfLanguageButton bfng-seg__opt<?php echo $active_language_code === $languageCode ? ' bfLanguageButtonActive' : '' ?>">
-                            <?php echo htmlspecialchars($languageCode, ENT_QUOTES, 'UTF-8'); ?>
-                        </div>
-                        <?php
-                    }
-                }
-                ?>
-                <?php endif; ?>
-                </div>
-                <?php self::renderSection('form_state_actions', get_defined_vars()); ?>
-                <span id="bfUnsavedBadge" class="bfng-badge bfng-badge--unpublished" hidden>
-                    <?php echo Text::_('COM_BREEZINGFORMSNG_QM_UNSAVED_CHANGES'); ?>
-                </span>
-            </div>
-            <?php
-        }
         ?>
         <div style="display:none;visibility:hidden;" id="bfSaveQueue" class="bfng-message bfng-message--info"></div>
         <div id="bfQuickModeWrapper" class="bfClearfix bfng bfng-split">
@@ -330,6 +300,35 @@ final class QuickmodeHtml
 
 
             <div id="bfQuickModeRight" class="bfClearfix bfng-split__main">
+
+                <?php if ($formId > 0) : ?>
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                    <div class="d-flex flex-wrap align-items-center gap-1 bfng-seg">
+                    <?php if (count($languages) > 1) : ?>
+                    <div onclick="location.href = 'index.php?option=com_breezingformsng&format=html&task=quickmode.display&formName=translationtest&form=<?php echo $formId ?>&active_language_code='"
+                        class="bfLanguageButton bfng-seg__opt<?php echo $active_language_code == $default || $active_language_code == '' ? ' bfLanguageButtonActive' : '' ?>">
+                        <?php echo $default; ?>
+                    </div>
+                    <?php
+                    foreach ($languages as $languageCode) {
+                        if ($languageCode !== $default) {
+                            ?>
+                            <div onclick="location.href = 'index.php?option=com_breezingformsng&format=html&task=quickmode.display&formName=translationtest&form=<?php echo $formId ?>&active_language_code=<?php echo rawurlencode($languageCode); ?>'"
+                                class="bfLanguageButton bfng-seg__opt<?php echo $active_language_code === $languageCode ? ' bfLanguageButtonActive' : '' ?>">
+                                <?php echo htmlspecialchars($languageCode, ENT_QUOTES, 'UTF-8'); ?>
+                            </div>
+                            <?php
+                        }
+                    }
+                    ?>
+                    <?php endif; ?>
+                    </div>
+                    <?php self::renderSection('form_state_actions', get_defined_vars()); ?>
+                    <span id="bfUnsavedBadge" class="bfng-badge bfng-badge--unpublished" hidden>
+                        <?php echo Text::_('COM_BREEZINGFORMSNG_QM_UNSAVED_CHANGES'); ?>
+                    </span>
+                </div>
+                <?php endif; ?>
 
                 <form name="bfForm" onsubmit="return false">
 

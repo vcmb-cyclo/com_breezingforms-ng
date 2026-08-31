@@ -89,8 +89,8 @@
   width: 100%;
 }
 .bfng-split__aside {
-  flex: 0 0 300px;
-  width: 300px;
+  flex: 0 0 360px;
+  width: 360px;
   min-width: 0;
 }
 .bfng-split__main {

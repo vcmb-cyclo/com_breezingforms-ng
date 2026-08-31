@@ -134,7 +134,10 @@ isolé derrière un service, y compris la liaison du sous-enregistrement et le
 cas utilisateur invité. La génération du JavaScript `bfLoadEditable()` est maintenant
 extraite dans `EditableRecordHydrationScriptBuilder` (`a8325a7c`) et couverte
 pour les champs simples, checkbox/radio, listes, valeurs vides et types
-inconnus ; le nettoyage `InputFilter` reste explicitement dans `view()`.
+inconnus. Son enveloppe de chargement et le nettoyage historique de
+`ff_nm_seccode[]` sont maintenant isolés dans
+`EditableRecordScriptWrapperBuilder` (`f3b6f8d97`) ; le nettoyage
+`InputFilter` reste explicitement dans `view()`.
 
 - La recherche du dernier enregistrement, les requêtes
   `#__facileforms_records`/`#__facileforms_subrecords` et le résultat typé sont
@@ -148,7 +151,8 @@ requêtes de chargement d'un enregistrement éditable.
 ### 2.2 Génération des valeurs éditables BreezingForms
 
 État : générateur indépendant committé dans `f685ff5e` et branché dans
-`RenderingEngine::view()` par `c2ae9a76`.
+`RenderingEngine::view()` par `c2ae9a76`, avec l'enveloppe
+`bfLoadEditable()` isolée dans `f3b6f8d97`.
 
 - Extraire le JavaScript de remplissage des champs simples : texte, textarea,
   nombre, champ caché et calendrier.
@@ -343,10 +347,17 @@ trois providers couverts. Les champs de contexte ContentBuilder
 
 ### 4.3 Variantes frontend, backend et preview
 
-- Créer une stratégie de finalisation par mode d'exécution.
-- Mutualiser les champs cachés réellement identiques.
+État : les champs cachés communs sont mutualisés par
+`FormSubmissionFieldsBuilder` (`be602b94f`) et les sorties des trois variantes
+sont verrouillées par `dc73ec0fc`. Les différences de route, iframe, cible,
+bordure et template restent dans les branches d'orchestration ; la
+finalisation complète par mode doit encore être caractérisée avec un runtime
+Joomla réel.
+
+- Ajouter une stratégie de finalisation par mode d'exécution après cette
+  caractérisation runtime.
 - Conserver les différences de route, iframe, cible, bordure et template.
-- Couvrir chaque mode par un test de sortie complet.
+- Étendre les tests de sortie aux parcours ContentBuilder et Query List.
 
 ### 4.4 Fermeture et traçage
 

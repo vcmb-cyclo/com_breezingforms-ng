@@ -178,9 +178,9 @@ overflow:hidden;width: 100%;
     border-bottom-color: #fff;
 }
 
-.tab-items,
-.tab-element,
-.tab-form {
+.tab-items:not(.bfng-tabs *),
+.tab-element:not(.bfng-tabs *),
+.tab-form:not(.bfng-tabs *) {
     padding-right: 0 !important;
     background: none !important;
 }

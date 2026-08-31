@@ -24,19 +24,26 @@ $formSelection = Factory::getApplication()->getInput()->getInt('form_selection',
       <strong><?= Text::_('COM_BREEZINGFORMSNG_RECORD_META'); ?></strong>
     </div>
     <div class="card-body">
-      <dl class="row mb-0">
-        <dt class="col-sm-2"><?= Text::_('COM_BREEZINGFORMSNG_ID'); ?></dt>
-        <dd class="col-sm-4"><?= (int) $record->id; ?></dd>
-        <dt class="col-sm-2"><?= Text::_('COM_BREEZINGFORMSNG_FORM'); ?></dt>
-        <dd class="col-sm-4"><?= htmlspecialchars((string) ($record->form_title ?? '')); ?></dd>
-
-        <dt class="col-sm-1"><?= Text::_('COM_BREEZINGFORMSNG_SUBMITTED'); ?></dt>
-        <dd class="col-sm-3"><?= $submitted; ?></dd>
-        <dt class="col-sm-1"><?= Text::_('COM_BREEZINGFORMSNG_USER'); ?></dt>
-        <dd class="col-sm-3"><?= htmlspecialchars((string) ($record->user_full_name ?: $record->username)); ?></dd>
-        <dt class="col-sm-1"><?= Text::_('COM_BREEZINGFORMSNG_IP'); ?></dt>
-        <dd class="col-sm-3"><?= htmlspecialchars((string) ($record->ip ?? '')); ?></dd>
-      </dl>
+      <div class="row">
+        <div class="col-sm-6">
+          <dl class="row mb-0">
+            <dt class="col-sm-4"><?= Text::_('COM_BREEZINGFORMSNG_ID'); ?></dt>
+            <dd class="col-sm-8"><?= (int) $record->id; ?></dd>
+            <dt class="col-sm-4"><?= Text::_('COM_BREEZINGFORMSNG_SUBMITTED'); ?></dt>
+            <dd class="col-sm-8"><?= $submitted; ?></dd>
+          </dl>
+        </div>
+        <div class="col-sm-6">
+          <dl class="row mb-0">
+            <dt class="col-sm-4"><?= Text::_('COM_BREEZINGFORMSNG_FORM'); ?></dt>
+            <dd class="col-sm-8"><?= htmlspecialchars((string) ($record->form_title ?? '')); ?></dd>
+            <dt class="col-sm-4"><?= Text::_('COM_BREEZINGFORMSNG_USER'); ?></dt>
+            <dd class="col-sm-8"><?= htmlspecialchars((string) ($record->user_full_name ?: $record->username)); ?></dd>
+            <dt class="col-sm-4"><?= Text::_('COM_BREEZINGFORMSNG_IP'); ?></dt>
+            <dd class="col-sm-8"><?= htmlspecialchars((string) ($record->ip ?? '')); ?></dd>
+          </dl>
+        </div>
+      </div>
     </div>
   </div>
 

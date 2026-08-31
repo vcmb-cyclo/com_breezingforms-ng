@@ -88,6 +88,7 @@ final class RenderingEngine
     private ?FormOpeningMarkupBuilder $formOpeningMarkupBuilderService = null;
     private ?FormOptionalContextFieldsBuilder $formOptionalContextFieldsBuilderService = null;
     private ?FormSubmissionFieldsBuilder $formSubmissionFieldsBuilderService = null;
+    private ?MobileChoiceMarkupBuilder $mobileChoiceMarkupBuilderService = null;
     private ?AdditionalHiddenFieldsBuilder $additionalHiddenFieldsBuilderService = null;
     private ?PaymentProviderDetector $paymentProviderDetectorService = null;
     private ?ContentBuilderFileValueParser $contentBuilderFileValueParserService = null;
@@ -353,6 +354,11 @@ final class RenderingEngine
     private function formSubmissionFieldsBuilder(): FormSubmissionFieldsBuilder
     {
         return $this->formSubmissionFieldsBuilderService ??= new FormSubmissionFieldsBuilder();
+    }
+
+    private function mobileChoiceMarkupBuilder(): MobileChoiceMarkupBuilder
+    {
+        return $this->mobileChoiceMarkupBuilderService ??= new MobileChoiceMarkupBuilder();
     }
 
     private function additionalHiddenFieldsBuilder(): AdditionalHiddenFieldsBuilder
@@ -1719,12 +1725,11 @@ final class RenderingEngine
         $returnUrl = $currentUrl;
         $returnUrl = (strstr($returnUrl, '?non_mobile=1') !== false ? str_replace('?non_mobile=1', '', $returnUrl) : str_replace('&non_mobile=1', '', $returnUrl));
         $returnUrl = $returnUrl . (strstr($returnUrl, '?') !== false ? '&' : '?') . 'mobile=1';
-        echo '<script type="text/javascript">
-                <!--
-                var bf_mobile_url = ' . json_encode($returnUrl) . ';
-                //-->
-                </script>';
-        echo '<div style="display: block; text-align: center;"><button class="ff_elem btn btn-primary" onclick="location.href=bf_mobile_url;"><span>' . Text::_('COM_BREEZINGFORMSNG_MOBILE_VERSION') . '</span></button></div><div></div>';
+        echo $this->mobileChoiceMarkupBuilder()->build(
+            $returnUrl,
+            Text::_('COM_BREEZINGFORMSNG_MOBILE_VERSION'),
+            nl()
+        );
     }
 
     private function syncMobileSessionPreference(): void

@@ -50,6 +50,7 @@
 | QuickMode OnePage — validation suivante | Callback `bf_validate_nextpage` extrait dans un builder pur, avec erreur, focus, Ladda et activation de la page couverts | Commit `114dd4d17` |
 | QuickMode OnePage — validation soumission | Callback `bf_validate_submit` extrait dans un builder pur, avec erreurs, focus, restauration du bouton et soumission couverts | Commit `280fccd6e` |
 | QuickMode OnePage — restauration soumission | Callback `bf_restore_submitbutton` extrait dans un builder pur, avec clonage, remplacement et rebinding Ladda couverts | Commit `bfe93521e` |
+| QuickMode — markup d’erreur Bootstrap | Conteneur `bfErrorMessage` partagé entre Bootstrap et OnePage, avec classes de thème injectées et sortie couverte | Commit `9d5a288c2` |
 | QuickMode — expression éditeur | Construction de l’expression JavaScript de lecture des éditeurs mutualisée entre Bootstrap et OnePage, API publique conservée | Commit `43592c8bd` |
 | QuickMode — mapping Bootstrap | Mapping Bootstrap 5 des classes mutualisé entre Bootstrap et OnePage, résolution publique `bsClass()` conservée | Commit `658078588` |
 | Finalisation — champs de soumission | Champs cachés communs frontend/backend/preview extraits avec conservation des différences `act`/`ff_frame` | Commit `be602b94f` |
@@ -852,6 +853,12 @@ succès, le focus, la restauration du bouton et l'appel à `ff_submitForm()`
 sont couverts par un test dédié ; les responsabilités de restauration du
 bouton sont désormais isolées dans `QuickModeSubmitButtonRestoreBuilder`
 (`bfe93521e`) ; elles conservent leurs dépendances JavaScript historiques.
+
+Le conteneur d'erreur Bootstrap est désormais construit par
+`QuickModeErrorMessageMarkupBuilder` (`9d5a288c2`) et partagé par Bootstrap et
+OnePage. Les classes de thème restent fournies par chaque renderer, tandis
+que le markup caché commun est testé indépendamment ; les variantes Classic et
+Mobile restent distinctes.
 
 La baseline PHPCS est maintenant sans erreur sur les services modernes, les
 quatre renderers QuickMode et leurs traits (`e25d501f`, `14985d4d`, `288b42a4`,

@@ -62,6 +62,7 @@
 | `RenderingEngine::view()` — Query List | Préparation extraite et variantes par défaut/checkbox/résultat vide couvertes | Commits `4070ec0f`, `b358e7e9` |
 | `RenderingEngine::view()` — Query List sélection globale | Callback JavaScript paginé `ff_selectAllQueryRows` extrait et couvert, avec conservation des sélections de page et de la ligne globale | Commit `0b1229d37` |
 | `RenderingEngine::view()` — Query List navigation | Markup JavaScript des liens première/précédente/suivante/dernière page extrait et couvert avec libellés injectés | Commit `c93d06eb7` |
+| `RenderingEngine::view()` — Query List lignes | Calcul de page et rafraîchissement JavaScript des lignes visibles/masquées extrait et couvert | Commit `7ee50bccc` |
 | `RenderingEngine::view()` — hydratation d'un enregistrement éditable | Nettoyage conservé dans l'orchestrateur, génération JavaScript extraite et couverte par famille de contrôle | Commit `a8325a7c` |
 | Rendu HTML classique — texte statique, rectangle, image, infobulle et icône | Markup `Static Text/HTML`, `Rectangle`, `Image`, `Tooltip` et `Icon` extrait et couvert sans modifier le HTML produit | Commits `43bc8b9d`, `ec310eabb`, `08f6bc4ee`, `1e23287f8`, `3acfe4d66` |
 | Rendu HTML classique — champ caché | Markup `Hidden Input` extrait et couvert avec conservation du nom et de la valeur historiques | Commit `0bacb6fc7` |
@@ -628,6 +629,12 @@ Le wrapper `bfLoadEditable` est désormais construit par
 nettoyage des valeurs et la génération du contenu d'hydratation, tandis que
 le chargement JavaScript, l'identifiant du formulaire et l'effacement
 historique de `ff_nm_seccode[]` sont isolés et testés.
+
+Le calcul de page et le rafraîchissement des lignes Query List sont désormais
+construits par `QueryListRowsRefreshBuilder` (`7ee50bccc`). Le déplacement
+des valeurs, la gestion des colonnes masquées et le masquage des lignes hors
+page sont testés indépendamment ; la fonction de navigation conserve encore
+son orchestration finale et ses appels de callbacks.
 
 L'enveloppe du script global de validation est désormais construite par
 `FormValidationScriptWrapperBuilder` (`9b92acb55`). Les contrôles de fichiers

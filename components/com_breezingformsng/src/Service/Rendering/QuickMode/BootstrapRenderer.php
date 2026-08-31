@@ -777,20 +777,7 @@ class BootstrapRenderer
                                                                                 {title : " . json_encode(Text::_('COM_BREEZINGFORMSNG_CHOOSE_FILE')) . ", extensions : '" . $exts . "'}
                                                                         ]
                                                                 });
-                                                                uploader.bind('FilesAdded', function(up, files) {
-
-                                                                        for (var i in files) {
-                                                                                if(typeof files[i].id != 'undefined' && files[i].id != null){
-                                                                                    var fsize = '';
-                                                                                    if(typeof files[i].size != 'undefined'){
-                                                                                        fsize = '(' + plupload.formatSize(files[i].size) + ') ';
-                                                                                    }
-                                                                                    if(typeof bfUploadFileAdded == 'function'){
-                                                                                        bfUploadFileAdded(files[i]);
-                                                                                    }
-                                                                                    JQuery('#bfFileQueue').append( '<div id=\"' + files[i].id + 'queue\">' + (iOS ? '' : files[i].name.replace(/[/\\?%*:|\"<>]/g, '')) + ' '+fsize+'<b></b></div>' );
-                                                                                }
-                                                                        }
+" . QuickModeUploadQueueEntryScriptBuilder::build(chr(10), true) . "
                                                                         for (var i in files) {
                                                                             if(typeof files[i].id != 'undefined' && files[i].id != null){
                                                                                 var error = false;

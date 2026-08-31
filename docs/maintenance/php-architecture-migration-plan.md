@@ -756,6 +756,13 @@ entrées. Le même audit a ensuite supprimé l'état `formId` jamais relu de
 appelé ; le niveau 4 est ainsi ramené à 50 diagnostics sans ajouter de
 suppression artificielle dans la baseline.
 
+Dans `ExportEngine`, la branche inconditionnelle de reconstruction des données
+de fichiers est supprimée et la détection du marqueur PDF utilise uniquement
+les offsets éventuellement absents. Le parcours d'export conserve ses sorties
+et le test de régression vérifie que cette branche morte ne revient pas.
+Cette correction supprime les trois diagnostics PHPStan niveau 4 du service ;
+le total restant est de 47 diagnostics.
+
 ## Phase 7 — Réduire les façades historiques
 
 Cette phase commence seulement lorsque leurs responsabilités ont été extraites

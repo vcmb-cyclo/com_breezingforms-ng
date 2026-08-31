@@ -42,6 +42,14 @@ final class CallbackExportUploadPermissionTest extends TestCase
         $engine->random_str(1, '');
     }
 
+    public function testExportEngineDoesNotRetainAnUnconditionalBranch(): void
+    {
+        $source = file_get_contents(self::ROOT . '/components/com_breezingformsng/src/Service/Export/ExportEngine.php');
+
+        self::assertIsString($source);
+        self::assertStringNotContainsString('if (true)', $source);
+    }
+
     public function testUploadStorageReportsMissingDirectoryWithoutMovingFile(): void
     {
         $moved = false;

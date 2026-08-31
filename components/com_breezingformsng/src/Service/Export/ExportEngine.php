@@ -245,20 +245,18 @@ final class ExportEngine
                                 $_i++;
                             }
                         } else {
-                            if (true) {
-                                $next = count($this->processor->savedata);
-                                $this->processor->savedata[$next] = array();
-                                $this->processor->savedata[$next][_FF_DATA_ID] = $_rec->recElementId;
-                                $this->processor->savedata[$next][_FF_DATA_NAME] = $_rec->recName;
-                                $this->processor->savedata[$next][_FF_DATA_TITLE] = strip_tags($_rec->recTitle);
-                                $this->processor->savedata[$next][_FF_DATA_TYPE] = $_rec->recType;
-                                $this->processor->savedata[$next][_FF_DATA_VALUE] = '';
-                                $_is_values = explode("\n", $_rec->recValue);
-                                foreach ($_is_values as $_is_value) {
-                                    $this->processor->savedata[$next][_FF_DATA_VALUE] .= $_is_value . "\n";
-                                }
-                                $this->processor->savedata[$next][_FF_DATA_VALUE] = rtrim($this->processor->savedata[$next][_FF_DATA_VALUE]);
+                            $next = count($this->processor->savedata);
+                            $this->processor->savedata[$next] = array();
+                            $this->processor->savedata[$next][_FF_DATA_ID] = $_rec->recElementId;
+                            $this->processor->savedata[$next][_FF_DATA_NAME] = $_rec->recName;
+                            $this->processor->savedata[$next][_FF_DATA_TITLE] = strip_tags($_rec->recTitle);
+                            $this->processor->savedata[$next][_FF_DATA_TYPE] = $_rec->recType;
+                            $this->processor->savedata[$next][_FF_DATA_VALUE] = '';
+                            $_is_values = explode("\n", $_rec->recValue);
+                            foreach ($_is_values as $_is_value) {
+                                $this->processor->savedata[$next][_FF_DATA_VALUE] .= $_is_value . "\n";
                             }
+                            $this->processor->savedata[$next][_FF_DATA_VALUE] = rtrim($this->processor->savedata[$next][_FF_DATA_VALUE]);
                         }
                     }
                 }
@@ -781,7 +779,7 @@ final class ExportEngine
         $regex = '<!--(.+?)=(.+?)-->';
         preg_match_all($regex, str_replace(' ', '', $c), $matches_array);
 
-        if (isset($matches_array[1]) && isset($matches_array[1][0]) && trim($matches_array[1][0]) == 'fm' && isset($matches_array[2]) && isset($matches_array[2][0])) {
+        if (isset($matches_array[1][0]) && trim($matches_array[1][0]) == 'fm' && isset($matches_array[2][0])) {
 
             $fm = $matches_array[2][0];
 

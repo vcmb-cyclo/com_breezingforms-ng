@@ -28,3 +28,29 @@
 .bfng-btn--ghost         { border-color: transparent; background: transparent; color: var(--bfng-text-2); }
 .bfng-btn--danger        { border-color: var(--bfng-danger); color: var(--bfng-danger); }
 .bfng-btn--icon          { width: var(--bfng-control-h); padding: 0; justify-content: center; }
+
+#newStuffBar { display: flex; flex-wrap: wrap; gap: var(--bfng-space-4); }
+
+/* .bfng-field: label column + control(s), see charte section 05.
+   Deliberately not a CSS grid: property wraps in the existing templates
+   sometimes hold more than one control after the label (e.g. a Yes/No
+   radio pair) - grid item auto-placement would scatter those across
+   extra rows instead of keeping them inline. inline-block degrades
+   safely regardless of how many trailing children a wrap has. */
+.bfng-field {
+  padding: var(--bfng-space-4) var(--bfng-space-5);
+  border-bottom: 1px solid var(--bfng-border);
+}
+.bfng-field:hover { background: var(--bfng-surface-2); }
+.bfng-field__label {
+  display: inline-block;
+  width: 190px;
+  vertical-align: top;
+  padding-top: var(--bfng-space-2);
+  font-size: var(--bfng-fs-sm);
+  color: var(--bfng-text-2);
+}
+.bfng-field__label + * { font-size: var(--bfng-fs-base); }
+@media (max-width: 900px) {
+  .bfng-field__label { display: block; width: auto; padding-top: 0; margin-bottom: var(--bfng-space-2); }
+}

@@ -67,7 +67,7 @@ overflow:hidden;width: 100%;
         width: 75%;
     }
     
-    #bfQuickModeWrapper label.bfPropertyLabel {
+    #bfQuickModeWrapper label.bfPropertyLabel:not(.bfng-field__label) {
         float: none !important;
         min-width: 100%;
         display:block;
@@ -99,7 +99,7 @@ overflow:hidden;width: 100%;
 	padding: 10px;
 }
 
-#bfQuickModeWrapper label.bfPropertyLabel {
+#bfQuickModeWrapper label.bfPropertyLabel:not(.bfng-field__label) {
 	float: left;
 	min-width: 40%;
 	margin-right: 10px;
@@ -188,7 +188,7 @@ overflow:hidden;width: 100%;
     margin-bottom: 10px;
 }
 
-.bfPropertyWrap, .bfPropertyWrap:active, .bfPropertyWrap:visited{
+.bfPropertyWrap:not(.bfng-field), .bfPropertyWrap:not(.bfng-field):active, .bfPropertyWrap:not(.bfng-field):visited{
     min-height: 30px;
     background-color: transparent;
     padding: 5px;
@@ -201,7 +201,7 @@ overflow:hidden;width: 100%;
     border-bottom-color: #fafafa;
 }
 
-.bfPropertyWrap:hover{
+.bfPropertyWrap:not(.bfng-field):hover{
     background-color: #FCFCFC;
     border-left-style: solid;
     border-left-width: 3px;

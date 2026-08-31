@@ -273,12 +273,15 @@ final class QuickmodeHtml
 
                 <form id="newStuffBar" onsubmit="return false;">
                     <button class="bfng-btn bfng-btn--primary" id="bfNewPageButton">
+                        <i class="fa-solid fa-plus" aria-hidden="true"></i>
                         <?php echo Text::_('COM_BREEZINGFORMSNG_NEW_PAGE'); ?>
                     </button>
                     <button class="bfng-btn bfng-btn--primary" id="bfNewSectionButton">
+                        <i class="fa-solid fa-plus" aria-hidden="true"></i>
                         <?php echo Text::_('COM_BREEZINGFORMSNG_NEW_SECTION'); ?>
                     </button>
                     <button class="bfng-btn bfng-btn--primary" id="bfNewElementButton">
+                        <i class="fa-solid fa-plus" aria-hidden="true"></i>
                         <?php echo Text::_('COM_BREEZINGFORMSNG_NEW_ELEMENT'); ?>
                     </button>
                 </form>

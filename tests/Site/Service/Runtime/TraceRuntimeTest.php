@@ -17,6 +17,10 @@ if (!class_exists(HTML_facileFormsProcessor::class)) {
     require_once __DIR__ . '/../../../../components/com_breezingformsng/src/Support/processor_facade.php';
 }
 
+if (!function_exists('Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Runtime\\nl')) {
+    eval('namespace Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Runtime; function nl(): string { return "\\r\\n"; }');
+}
+
 final class TraceRuntimeTest extends TestCase
 {
     public function testTraceAndTraceLineRecordMessagesAndUpdateTheCurrentLine(): void
@@ -73,6 +77,56 @@ final class TraceRuntimeTest extends TestCase
         self::assertStringContainsString('COM_BREEZINGFORMSNG_PROCESS_WARNSTK', $processor->traceBuffer);
     }
 
+    public function testEvalTraceHonorsModeAndEscapesTheExpression(): void
+    {
+        $processor = $this->processor(_FF_TRACEMODE_EVAL);
+        $runtime = new TraceRuntime($processor);
+
+        $runtime->traceEval('answer <x>');
+        self::assertStringContainsString('eval(answer &lt;x&gt;)', $processor->traceBuffer);
+
+        $buffer = $processor->traceBuffer;
+        $processor->traceMode = 0;
+        $runtime->traceEval('ignored');
+        self::assertSame($buffer, $processor->traceBuffer);
+    }
+
+    public function testDumpTraceEmitsTheScriptAndClearsTheBuffer(): void
+    {
+        $processor = $this->processor(0);
+        $processor->traceBuffer = 'trace message';
+        $processor->dying = true;
+
+        ob_start();
+        try {
+            (new TraceRuntime($processor))->dumpTrace();
+            $output = ob_get_contents();
+        } finally {
+            ob_end_clean();
+        }
+
+        self::assertIsString($output);
+        self::assertStringContainsString('<script type="text/javascript">', $output);
+        self::assertStringContainsString('trace message', $output);
+        self::assertNull($processor->traceBuffer);
+    }
+
+    public function testSuicideMarksTheProcessorOnlyOnce(): void
+    {
+        $processor = $this->processor(0);
+        $runtime = new TraceRuntime($processor);
+        $previousReporting = error_reporting();
+
+        try {
+            self::assertTrue($runtime->suicide());
+            self::assertTrue($processor->dying);
+            self::assertSame(0, error_reporting());
+            self::assertFalse($runtime->suicide());
+        } finally {
+            error_reporting($previousReporting);
+        }
+    }
+
     public function testFacadeRetainsGlobalAdaptersWithoutTraceImplementation(): void
     {
         $source = file_get_contents(
@@ -82,8 +136,21 @@ final class TraceRuntimeTest extends TestCase
         self::assertIsString($source);
         self::assertStringContainsString('(new TraceRuntime($ff_processor))->traceFunction(', $source);
         self::assertStringContainsString('(new TraceRuntime($ff_processor))->traceExit(', $source);
+        self::assertStringContainsString('$this->traceRuntime()->dumpTrace();', $source);
+        self::assertStringContainsString('$this->traceRuntime()->traceEval($name);', $source);
+        self::assertStringContainsString('return $this->traceRuntime()->suicide();', $source);
+        self::assertStringContainsString('return $this->traceRuntime()->bury();', $source);
         self::assertStringNotContainsString('COM_BREEZINGFORMSNG_PROCESS_ENTER', $source);
         self::assertStringNotContainsString('array_push($ff_processor->traceStack', $source);
+
+        $codeToolsSource = file_get_contents(
+            __DIR__ . '/../../../../components/com_breezingformsng/src/Service/Runtime/CodeToolsRuntime.php'
+        );
+
+        self::assertIsString($codeToolsSource);
+        self::assertStringContainsString('$this->traceRuntime()->dumpTrace();', $codeToolsSource);
+        self::assertStringContainsString('$this->traceRuntime()->traceEval($name);', $codeToolsSource);
+        self::assertStringNotContainsString('echo \'<pre>\' . $this->processor->traceBuffer', $codeToolsSource);
     }
 
     private function processor(int $traceMode): HTML_facileFormsProcessor

@@ -864,6 +864,12 @@ entrées de pièces/fonctions, sorties de pile et avertissements de pile vide
 restent identiques ; `TraceRuntimeTest` couvre aussi le formatage des arguments
 null, booléens, numériques, chaînes, tableaux et objets.
 
+Les opérations de sortie et d'arrêt de trace (`dumpTrace`, `traceEval`,
+`suicide` et `bury`) sont maintenant regroupées dans le même service. La façade
+publique et `CodeToolsRuntime` conservent leurs méthodes historiques comme
+délégations, tandis que les sorties script, l'échappement de l'expression `eval`
+et l'idempotence de l'arrêt sont couvertes par `TraceRuntimeTest`.
+
 La requête de chargement du formulaire ne conserve plus dans la façade que la
 lecture de `FormTable` ; le chargement des éléments publiés est délégué à
 `FormElementLoader`, ce qui laisse une frontière SQL testable sans modifier les

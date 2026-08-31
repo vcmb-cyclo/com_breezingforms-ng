@@ -235,6 +235,7 @@ class HTML_facileFormsProcessor
     public $database;
     private ?UploadRuntime $uploadRuntimeService = null;
     private ?CodeToolsRuntime $codeToolsRuntimeService = null;
+    private ?TraceRuntime $traceRuntimeService = null;
     private ?ScriptingEngine $scriptingEngineService = null;
     private ?ExportEngine $exportEngineService = null;
     private ?NotificationEngine $notificationEngineService = null;
@@ -525,23 +526,23 @@ class HTML_facileFormsProcessor
 
     public function dumpTrace()
     {
-        $this->codeToolsRuntime()->dumpTrace();
+        $this->traceRuntime()->dumpTrace();
     }
 
     public function traceEval($name)
     {
-        $this->codeToolsRuntime()->traceEval($name);
+        $this->traceRuntime()->traceEval($name);
     }
 
     public function suicide()
     {
-        return $this->codeToolsRuntime()->suicide();
+        return $this->traceRuntime()->suicide();
     }
 
     /** @phpstan-impure */
     public function bury()
     {
-        return $this->codeToolsRuntime()->bury();
+        return $this->traceRuntime()->bury();
     }
 
     public function findToken(&$code, &$spos, &$offs)
@@ -567,6 +568,11 @@ class HTML_facileFormsProcessor
     private function codeToolsRuntime(): CodeToolsRuntime
     {
         return $this->codeToolsRuntimeService ??= new CodeToolsRuntime($this);
+    }
+
+    private function traceRuntime(): TraceRuntime
+    {
+        return $this->traceRuntimeService ??= new TraceRuntime($this);
     }
 
     /**

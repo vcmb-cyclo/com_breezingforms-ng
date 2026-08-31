@@ -1002,6 +1002,10 @@ buffer sont contrôlés avant fermeture.
 `ImageResizer` rejette désormais explicitement les chemins absents ou non
 lisibles avant d'interroger EXIF/GD, sans suppression d'erreur sur ces lectures.
 
+`IntegratorRuntime` réutilise désormais `StoredPhpExecutor` pour exécuter les
+scripts d'intégration dans son scope avec le contexte `$value` explicite; le
+retour et le scope d'exécution sont couverts par des tests unitaires.
+
 Les tests d'existence des assets statiques des trois renderers QuickMode
 utilisent désormais `is_file()` sans masquage d'erreur; leurs sorties restent
 couvertes par les tests de caractérisation des renderers.

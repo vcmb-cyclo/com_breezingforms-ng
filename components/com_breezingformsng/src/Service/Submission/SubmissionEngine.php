@@ -118,6 +118,13 @@ final class SubmissionEngine
         return ['default' => $result->path, 'server' => $result->serverPath];
     }
 
+    public function measureTime(): float
+    {
+        $time = explode(' ', microtime());
+
+        return ((float) $time[0] + (float) $time[1]) / 1000;
+    }
+
     function collectSubmitdata($cbResult = null)
     {
         if ($this->processor->dying || $this->processor->submitdata)
@@ -131,7 +138,7 @@ final class SubmissionEngine
         $names = array();
         if (count($this->processor->rows)) {
             $time_passed = 0;
-            $start_time = $this->processor->measureTime();
+            $start_time = $this->measureTime();
             $max_exec_time = ini_get('max_execution_time');
             $max_time = !empty($max_exec_time) ? intval($max_exec_time) / 2 : 15;
             foreach ($this->processor->rows as $row) {
@@ -649,7 +656,7 @@ final class SubmissionEngine
                     } // switch
                     $names[] = $row->name;
                 } // if
-                $time_passed = $this->processor->measureTime();
+                            $time_passed = $this->measureTime();
                 if (($time_passed - $start_time) > $max_time) {
                     //break;
                 }

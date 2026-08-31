@@ -86,4 +86,20 @@ final class SubmissionEngineArchitectureTest extends TestCase
         self::assertStringContainsString('return $this->submissionEngine()->saveUpload(', $facadeSource);
         self::assertStringNotContainsString('UploadError::', $facadeSource);
     }
+
+    public function testTimingFacadeDelegatesToSubmissionEngine(): void
+    {
+        $submissionSource = file_get_contents(
+            __DIR__ . '/../../../../components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php'
+        );
+        $facadeSource = file_get_contents(
+            __DIR__ . '/../../../../components/com_breezingformsng/src/Support/processor_facade.php'
+        );
+
+        self::assertIsString($submissionSource);
+        self::assertIsString($facadeSource);
+        self::assertStringContainsString('public function measureTime(): float', $submissionSource);
+        self::assertStringContainsString('return $this->submissionEngine()->measureTime();', $facadeSource);
+        self::assertStringNotContainsString('microtime()', $facadeSource);
+    }
 }

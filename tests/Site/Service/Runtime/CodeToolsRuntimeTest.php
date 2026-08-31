@@ -52,7 +52,7 @@ final class CodeToolsRuntimeTest extends TestCase
     public function testMeasureTimeConvertsBothMicrotimePartsToFloat(): void
     {
         $source = file_get_contents(
-            __DIR__ . '/../../../../components/com_breezingformsng/src/Support/processor_facade.php'
+            __DIR__ . '/../../../../components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php'
         );
 
         self::assertIsString($source);

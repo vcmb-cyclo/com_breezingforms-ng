@@ -882,9 +882,7 @@ class HTML_facileFormsProcessor
 
     public function measureTime()
     {
-        $time = explode(' ', microtime());
-
-        return ((float) $time[0] + (float) $time[1]) / 1000;
+        return $this->submissionEngine()->measureTime();
     }
 
     private function uploadRuntime(): UploadRuntime

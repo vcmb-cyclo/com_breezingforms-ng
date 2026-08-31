@@ -833,6 +833,12 @@ fichier et traduire les erreurs. `HTML_facileFormsProcessor` conserve la même
 signature publique comme délégation, sans garder la logique d'upload ni le
 mapping des statuts.
 
+Le calcul de temporisation utilisé pendant la collecte des données est
+également porté par `SubmissionEngine`. La façade conserve `measureTime()`
+pour les scripts PHP stockés, mais ne contient plus l’implémentation de
+`microtime()` ; le calcul et ses appelants internes sont regroupés dans le
+pipeline de soumission.
+
 Les deux gardes locales `if (!$halt)` de `SubmissionEngine` ont ensuite été
 retirées : `$halt` était initialisé à `false` et ses seules affectations à
 `true` précédaient immédiatement `exit`. Le contrôle CAPTCHA, les pièces de

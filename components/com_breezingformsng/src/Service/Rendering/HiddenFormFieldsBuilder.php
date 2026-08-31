@@ -78,7 +78,8 @@ final class HiddenFormFieldsBuilder
         $fields = '';
         if ($backend || $frame) {
             $fields .= $indent . '<input type="hidden" name="option" value="com_breezingformsng"/>' . $newline;
-            $fields .= $indent . '<input type="hidden" name="' . ($backend ? 'act' : 'ff_frame') . '" value="' . ($backend ? 'run' : '1') . '"/>' . $newline;
+            $fields .= $indent . '<input type="hidden" name="' . ($backend ? 'act' : 'ff_frame')
+                . '" value="' . ($backend ? 'run' : '1') . '"/>' . $newline;
         }
 
         $fields .= $indent . '<input type="hidden" name="ff_form" value="'

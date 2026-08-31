@@ -36,8 +36,11 @@ final class LegacyScriptTagWrapperBuilder
             . '</script>' . $newline;
     }
 
-    public function formValidationOpen(string $fileExtensionsCheck, string $captchaFunction, string $newline = "\n"): string
-    {
+    public function formValidationOpen(
+        string $fileExtensionsCheck,
+        string $captchaFunction,
+        string $newline = "\n"
+    ): string {
         return '<script type="text/javascript">' . $newline
             . '<!--' . $newline
             . $newline

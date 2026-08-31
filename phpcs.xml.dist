@@ -31,6 +31,8 @@
     <file>components/com_breezingformsng/src/Service/Rendering/FormModeFinalizationBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/FormOpeningMarkupBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/FormOptionalContextFieldsBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/HiddenFormFieldsBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/LegacyScriptTagWrapperBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicTextInputBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicTextareaBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicSelectBuilder.php</file>

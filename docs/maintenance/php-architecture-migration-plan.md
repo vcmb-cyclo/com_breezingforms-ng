@@ -566,6 +566,11 @@ Les builders de cycle du formulaire (`FormOpeningMarkupBuilder`,
 PHPCS ; leurs tests unitaires dédiés fournissent déjà la caractérisation des
 variantes de mode et de contexte.
 
+Les builders mutualisés de champs cachés et d’habillage des scripts historiques
+(`HiddenFormFieldsBuilder` et `LegacyScriptTagWrapperBuilder`) rejoignent aussi
+PHPCS après un nettoyage syntaxique limité ; leurs tests unitaires existants
+conservent la caractérisation des fragments générés.
+
 Le premier nettoyage ciblé de cette baseline PHPCS est réalisé dans
 `QuickModeSelectBuilder`, `QuickModeCaptchaMarkupBuilder` et
 `QuickModeUploadOptionsBuilder` (`eaf8b2d1`) : leurs sorties sont inchangées et

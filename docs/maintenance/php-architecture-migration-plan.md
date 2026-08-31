@@ -57,6 +57,7 @@
 | QuickMode OnePage — soumission AJAX | Callback `bf_ajax_submit()` extrait dans un builder pur, avec échec, succès direct et page Thank You couverts | Commit `01ab2d4bd` |
 | QuickMode — miniature upload | Callback `bfUploadImageThumb()` partagé entre les quatre renderers, avec chemin Moxie et repli FileReader couverts | Commit `704ccbea2` |
 | QuickMode — entrée queue upload | Première boucle `FilesAdded` partagée entre les quatre renderers, avec callback externe et libellé nettoyé couverts | Commit `e6956c7d5` |
+| QuickMode — ligne queue upload | Markup de ligne `bfFileQueueItem` mutualisé avec variantes de nom et d’attribut image couvertes | Commit `e081b2f44` |
 | QuickMode — progression upload | Callback plupload `UploadProgress` partagé entre les quatre renderers, avec mise à jour de la barre et du pourcentage couverte | Commit `1e28a79b2` |
 | QuickMode — fin upload | Callback plupload `FileUploaded` partagé entre les quatre renderers, avec message serveur et nettoyage de ligne couverts | Commit `6d3bfbb27` |
 | QuickMode — validation upload | Validation client de taille/extensions et nettoyage des lignes invalides partagé entre les quatre renderers | Commit `fea7df7b6` |
@@ -883,6 +884,12 @@ libellé nettoyé à `#bfFileQueue`, est désormais générée par
 `QuickModeUploadQueueEntryScriptBuilder` (`e6956c7d5`). La variante Bootstrap
 conservant sa ligne vide historique est paramétrée explicitement et la sortie
 est couverte par un test dédié.
+
+Le markup de ligne `bfFileQueueItem` est désormais généré par
+`QuickModeUploadQueueItemMarkupBuilder` (`e081b2f44`). Les variantes de nom
+conditionnel des renderers Bootstrap/OnePage, l’attribut `border` de Mobile et
+les chemins d’image d’annulation sont paramétrés explicitement et couverts
+par des tests dédiés.
 
 Les quatre renderers ne possèdent plus chacun leurs cinq adaptateurs privés de
 calendrier : `CalendarOptionsTrait` (`05090635f`) délègue les booléens, le

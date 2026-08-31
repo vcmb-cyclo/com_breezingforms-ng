@@ -987,6 +987,10 @@ est couvert par des tests d'encodage et d'absence de fichier.
 attributs `action`, `name`, `id` et `class`; le test couvre les guillemets et
 les séparateurs HTML.
 
+`QuickModeUploadConfigurationBuilder` échappe désormais les valeurs injectées
+dans les chaînes JavaScript de configuration; les champs, tickets, runtimes,
+URL et extensions contenant des apostrophes sont testés.
+
 `UploadStorage` vérifie désormais directement le résultat de `chmod`, sans
 masquer les erreurs système, et conserve les statuts de stockage testés.
 

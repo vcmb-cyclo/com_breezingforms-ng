@@ -38,4 +38,24 @@ final class QuickModeUploadConfigurationBuilderTest extends TestCase
         self::assertStringContainsString("url : '/site/index.php'", $script);
         self::assertStringContainsString('{title : "Choose file", extensions : \'jpg,png\'}', $script);
     }
+
+    public function testEscapesValuesInsertedIntoJavaScriptStrings(): void
+    {
+        $script = (new QuickModeUploadConfigurationBuilder())->build(
+            12,
+            "field'Name",
+            "ticket'Value",
+            "/site/'",
+            44,
+            "html5'",
+            "jpg');alert(1);//",
+            'true',
+            '"Choose file"'
+        );
+
+        self::assertStringContainsString("itemName : 'field\\'Name'", $script);
+        self::assertStringContainsString("bfFlashUploadTicket: 'ticket\\'Value'", $script);
+        self::assertStringContainsString("extensions : 'jpg\\');alert(1);//'", $script);
+        self::assertStringNotContainsString("extensions : 'jpg');alert", $script);
+    }
 }

@@ -299,7 +299,11 @@ final class SubmissionEngine
                                                                     $this->processor->message = Text::_('COM_BREEZINGFORMSNG_PROCESS_FILEMOVEFAILED');
                                                                     return;
                                                                 }
-                                                                @File::delete($sourcePath . $file);
+                                                                if (!File::delete($sourcePath . $file)) {
+                                                                    $this->processor->status = _FF_STATUS_UPLOAD_FAILED;
+                                                                    $this->processor->message = Text::_('COM_BREEZINGFORMSNG_PROCESS_FILEMOVEFAILED');
+                                                                    return;
+                                                                }
 
                                                                 $serverPath = $path;
 

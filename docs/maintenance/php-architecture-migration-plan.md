@@ -1090,7 +1090,8 @@ automatisée empêche le retour des noms de méthodes historiques.
 
 Le déplacement des fichiers uploadés dans `SubmissionEngine` utilise
 désormais `Joomla\\Filesystem\\File::copy()` sans suppression d'erreur et
-traite explicitement un retour négatif avant de supprimer la source.
+traite explicitement les retours négatifs de copie et de suppression avant de
+valider le déplacement.
 
 Les quatre renderers QuickMode ont encore une baseline PHPCS distincte ; le
 contrôle direct fait apparaître des violations de formatage héritées. Ce lot

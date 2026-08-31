@@ -572,7 +572,7 @@ conservés comme filet de sortie.
 Le double `RenderingEngineProcessorDouble` du harnais de caractérisation est
 désormais isolé dans son propre fichier de test. Le fichier principal respecte
 ainsi la règle PHPCS d'une classe par fichier ; ses avertissements de longueur
-de ligne historiques restent regroupés pour un nettoyage ultérieur.
+de ligne ont également été supprimés sans modifier les sorties caractérisées.
 
 Les contrôles Classic de saisie (`TextInput`, `Textarea` et `Select`) sont
 également passés sous PHPCS après le découpage neutre d'une ligne trop longue

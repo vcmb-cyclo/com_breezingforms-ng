@@ -57,19 +57,31 @@ if (!class_exists('Joomla\\CMS\\Component\\ComponentHelper')) {
 }
 
 if (!function_exists('Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering\\QuickMode\\bf_b64dec')) {
-    eval('namespace Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering\\QuickMode; function bf_b64dec(string $value): string { return (string) base64_decode($value, true); }');
+    eval(
+        'namespace Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering\\QuickMode; '
+        . 'function bf_b64dec(string $value): string { return (string) base64_decode($value, true); }'
+    );
 }
 
 if (!function_exists('Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering\\bf_b64dec')) {
-    eval('namespace Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering; function bf_b64dec(string $value): string { return (string) base64_decode($value, true); }');
+    eval(
+        'namespace Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering; '
+        . 'function bf_b64dec(string $value): string { return (string) base64_decode($value, true); }'
+    );
 }
 
 if (!function_exists('Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering\\nl')) {
-    eval('namespace Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering; function nl(): string { return "\\n"; }');
+    eval(
+        'namespace Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering; '
+        . 'function nl(): string { return "\\n"; }'
+    );
 }
 
 if (!function_exists('Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering\\indentc')) {
-    eval('namespace Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering; function indentc(int $level): string { return str_repeat("\\t", $level); }');
+    eval(
+        'namespace Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering; '
+        . 'function indentc(int $level): string { return str_repeat("\\t", $level); }'
+    );
 }
 
 if (!class_exists('Joomla\\Database\\ParameterType')) {
@@ -414,7 +426,10 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertSame('onload', $processor->linkedCallbacks[0]['function']);
         self::assertStringContainsString('ff_resizepage(1, 360);', $processor->linkedCallbacks[0]['code']);
         self::assertStringContainsString('ff_showgrid();', $processor->linkedCallbacks[0]['code']);
-        self::assertStringContainsString('ff_contact_submitted(5,"\\u003Csaved\\u003E");', $processor->linkedCallbacks[0]['code']);
+        self::assertStringContainsString(
+            'ff_contact_submitted(5,"\\u003Csaved\\u003E");',
+            $processor->linkedCallbacks[0]['code']
+        );
     }
 
     public function testSubmittedOnloadIsOmittedWithoutCallbackOrPresentationHooks(): void
@@ -715,7 +730,10 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertSame('p', $processor->executedPieces[0]['type']);
         self::assertSame(24, $processor->executedPieces[0]['id']);
         self::assertNull($processor->executedPieces[0]['pane']);
-        self::assertStringContainsString('COM_BREEZINGFORMSNG_PROCESS_BFPIECE Library piece', $processor->executedPieces[0]['name']);
+        self::assertStringContainsString(
+            'COM_BREEZINGFORMSNG_PROCESS_BFPIECE Library piece',
+            $processor->executedPieces[0]['name']
+        );
     }
 
     public function testAfterFormCustomPieceRendersAndPropagatesBuryState(): void
@@ -818,7 +836,10 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertSame('p', $processor->executedPieces[0]['type']);
         self::assertSame(25, $processor->executedPieces[0]['id']);
         self::assertNull($processor->executedPieces[0]['pane']);
-        self::assertStringContainsString('COM_BREEZINGFORMSNG_PROCESS_AFPIECE After library piece', $processor->executedPieces[0]['name']);
+        self::assertStringContainsString(
+            'COM_BREEZINGFORMSNG_PROCESS_AFPIECE After library piece',
+            $processor->executedPieces[0]['name']
+        );
     }
 
     public function testFormRenderingClosureEmitsWrapperCloseTag(): void
@@ -877,7 +898,10 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         $resolver = (new ReflectionClass(TokenizedDirectoryResolver::class))->newInstanceWithoutConstructor();
         $engineReflection->getProperty('tokenizedDirectoryResolverService')->setValue($engine, $resolver);
 
-        self::assertSame('uploads/user_name/{field}/file_.txt', $engine->makeSafeFolder('uploads/user name/{field}/file?.txt'));
+        self::assertSame(
+            'uploads/user_name/{field}/file_.txt',
+            $engine->makeSafeFolder('uploads/user name/{field}/file?.txt')
+        );
     }
 
     public function testHeaderRendersProcessorVariablesThroughSharedHeaderRenderer(): void
@@ -1078,9 +1102,15 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
             ->invokeArgs($engine, [&$library, &$linked]);
 
         self::assertFalse($shouldReturn);
-        self::assertSame(['ff_hideIconBorder', 'ff_dispIconBorder'], array_column($processor->linkedCallbacks, 'function'));
+        self::assertSame(
+            ['ff_hideIconBorder', 'ff_dispIconBorder'],
+            array_column($processor->linkedCallbacks, 'function')
+        );
         self::assertStringContainsString('element.style.border = "none";', $processor->linkedCallbacks[0]['code']);
-        self::assertStringContainsString('element.style.border = "1px outset";', $processor->linkedCallbacks[1]['code']);
+        self::assertStringContainsString(
+            'element.style.border = "1px outset";',
+            $processor->linkedCallbacks[1]['code']
+        );
     }
 
     public function testRegisterIconBorderScriptsStopsAfterFirstCallbackWhenBuried(): void
@@ -1112,7 +1142,10 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
             ->invokeArgs($engine, [&$library, &$linked]);
 
         self::assertTrue($shouldReturn);
-        self::assertSame(['ff_hideIconBorder', 'ff_dispIconBorder'], array_column($processor->linkedCallbacks, 'function'));
+        self::assertSame(
+            ['ff_hideIconBorder', 'ff_dispIconBorder'],
+            array_column($processor->linkedCallbacks, 'function')
+        );
     }
 
     public function testRegisterElementCallbacksPreservesCallbackOrder(): void
@@ -1220,8 +1253,14 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         $linked = [];
         $method = (new ReflectionClass($engine))->getMethod('registerStaticTextScanCallback');
 
-        $method->invokeArgs($engine, [(object) ['type' => 'Static Text/HTML', 'data1' => '<p>content</p>'], &$library, &$linked]);
-        $method->invokeArgs($engine, [(object) ['type' => 'Text', 'data1' => 'ignored'], &$library, &$linked]);
+        $method->invokeArgs(
+            $engine,
+            [(object) ['type' => 'Static Text/HTML', 'data1' => '<p>content</p>'], &$library, &$linked]
+        );
+        $method->invokeArgs(
+            $engine,
+            [(object) ['type' => 'Text', 'data1' => 'ignored'], &$library, &$linked]
+        );
 
         self::assertCount(1, $processor->linkedCallbacks);
         self::assertSame('#scanonly', $processor->linkedCallbacks[0]['function']);
@@ -1343,7 +1382,10 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
 
         $this->captureCaptchaScript($processor);
 
-        self::assertSame('ff_dispQueryPage', $processor->linkedCallbacks[array_key_last($processor->linkedCallbacks)]['function']);
+        self::assertSame(
+            'ff_dispQueryPage',
+            $processor->linkedCallbacks[array_key_last($processor->linkedCallbacks)]['function']
+        );
         $queryCode = $processor->linkedCallbacks[array_key_last($processor->linkedCallbacks)]['code'];
         self::assertStringContainsString('function ff_dispQueryPage(id,page)', $queryCode);
         self::assertStringContainsString('ff_queryCurrPage[id] = page;', $queryCode);
@@ -1464,7 +1506,10 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
 
         self::assertStringContainsString('</div><!-- form end -->', $html);
         self::assertStringContainsString('name="ff_runmode" value="1"', $html);
-        self::assertStringContainsString('name="return" value="administrator/index.php?option=com_breezingformsng"', $html);
+        self::assertStringContainsString(
+            'name="return" value="administrator/index.php?option=com_breezingformsng"',
+            $html
+        );
         self::assertStringContainsString('name="tmpl" value="component"', $html);
         self::assertStringNotContainsString('<piece>', $html);
     }
@@ -1525,11 +1570,17 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
         self::assertInstanceOf(
             BootstrapRenderer::class,
-            (new QuickModeRendererFactory())->create($processor, ['themebootstrapThemeEngine' => 'bootstrap', 'themebootstrapMode' => false])
+            (new QuickModeRendererFactory())->create(
+                $processor,
+                ['themebootstrapThemeEngine' => 'bootstrap', 'themebootstrapMode' => false]
+            )
         );
         self::assertInstanceOf(
             OnePageRenderer::class,
-            (new QuickModeRendererFactory())->create($processor, ['themebootstrapThemeEngine' => 'bootstrap', 'themebootstrapMode' => true])
+            (new QuickModeRendererFactory())->create(
+                $processor,
+                ['themebootstrapThemeEngine' => 'bootstrap', 'themebootstrapMode' => true]
+            )
         );
         self::assertInstanceOf(
             ClassicRenderer::class,

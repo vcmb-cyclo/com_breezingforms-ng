@@ -74,6 +74,7 @@ class ClassicRenderer
     private ?QuickModeHtmlTextareaScriptBuilder $quickModeHtmlTextareaScriptBuilderService = null;
     private ?QuickModeReCaptchaFieldBuilder $quickModeReCaptchaFieldBuilderService = null;
     private ?QuickModeDeactivationScriptBuilder $quickModeDeactivationScriptBuilderService = null;
+    private ?QuickModeHintContentResolver $quickModeHintContentResolverService = null;
 
     private function quickModeDeactivationScriptBuilder(): QuickModeDeactivationScriptBuilder
     {
@@ -88,6 +89,11 @@ class ClassicRenderer
     private function quickModeReCaptchaFieldBuilder(): QuickModeReCaptchaFieldBuilder
     {
         return $this->quickModeReCaptchaFieldBuilderService ??= new QuickModeReCaptchaFieldBuilder();
+    }
+
+    private function quickModeHintContentResolver(): QuickModeHintContentResolver
+    {
+        return $this->quickModeHintContentResolverService ??= new QuickModeHintContentResolver();
     }
 
     private function quickModeTextFieldStrategy(): QuickModeTextFieldStrategy
@@ -518,11 +524,10 @@ float:left;
                                 $tipClose  = '</span></span>';
                                 $tipScript = '';
                             } else {
-                                $tooltipContent = trim($mdata['hint']);
-                                $hintParts = explode('<<<style', $tooltipContent, 2);
-                                if (count($hintParts) > 1 && trim($hintParts[0]) !== '') {
-                                    $tooltipContent = trim($hintParts[1]);
-                                }
+                                $tooltipContent = $this->quickModeHintContentResolver()->resolve(
+                                    (string) $mdata['hint'],
+                                    true
+                                );
                                 $tipOpen = '<span title="<strong>'
                                     . htmlspecialchars(strip_tags(trim($mdata['label'])), ENT_QUOTES, 'UTF-8')
                                     . '</strong><br />' . str_replace(

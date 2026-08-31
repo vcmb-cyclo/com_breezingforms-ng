@@ -73,6 +73,7 @@ class OnePageRenderer
     private ?QuickModeHtmlTextareaScriptBuilder $quickModeHtmlTextareaScriptBuilderService = null;
     private ?QuickModeReCaptchaFieldBuilder $quickModeReCaptchaFieldBuilderService = null;
     private ?QuickModeDeactivationScriptBuilder $quickModeDeactivationScriptBuilderService = null;
+    private ?QuickModeHintContentResolver $quickModeHintContentResolverService = null;
 
     private function quickModeDeactivationScriptBuilder(): QuickModeDeactivationScriptBuilder
     {
@@ -87,6 +88,11 @@ class OnePageRenderer
     private function quickModeReCaptchaFieldBuilder(): QuickModeReCaptchaFieldBuilder
     {
         return $this->quickModeReCaptchaFieldBuilderService ??= new QuickModeReCaptchaFieldBuilder();
+    }
+
+    private function quickModeHintContentResolver(): QuickModeHintContentResolver
+    {
+        return $this->quickModeHintContentResolverService ??= new QuickModeHintContentResolver();
     }
 
     public function bsClass($key)
@@ -634,12 +640,10 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                                 ) . '" class="editlinktip hasTooltip">';
                                 $tipClose = '</span>';
                             } else {
-                                $content = trim($mdata['hint']);
-                                // compat
-                                $explodeHint = explode('<<<style', trim($mdata['hint']));
-                                if (count($explodeHint) > 1 && trim($explodeHint[0]) != '') {
-                                    $content = trim($explodeHint[1]);
-                                }
+                                $content = $this->quickModeHintContentResolver()->resolve(
+                                    (string) $mdata['hint'],
+                                    false
+                                );
                                 $tipOpen = '<span class="hasTooltip" title="' . HTMLHelper::tooltipText($content) . '">';
                                 $tipClose = '</span>';
                             }

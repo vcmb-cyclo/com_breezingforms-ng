@@ -819,6 +819,13 @@ de Joomla est actif, tout en supprimant une dépendance globale que l'analyse
 statique ne pouvait pas représenter ; le niveau 4 ne conserve plus que les deux
 gardes de soumission interrompues par `exit`.
 
+Les deux gardes locales `if (!$halt)` de `SubmissionEngine` ont ensuite été
+retirées : `$halt` était initialisé à `false` et ses seules affectations à
+`true` précédaient immédiatement `exit`. Le contrôle CAPTCHA, les pièces de
+soumission et les sorties d'erreur conservent donc leur ordre et leur
+comportement, sans état local inopérant ; le niveau 4 ne signale plus ces
+conditions.
+
 ## Phase 7 — Réduire les façades historiques
 
 Cette phase commence seulement lorsque leurs responsabilités ont été extraites

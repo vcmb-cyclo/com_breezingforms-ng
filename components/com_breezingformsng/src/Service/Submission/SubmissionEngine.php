@@ -653,10 +653,7 @@ final class SubmissionEngine
         $this->processor->sendNotificationAfterPayment = false;
 
         // handle Begin Submit piece
-        $halt = false;
         $this->processor->collectSubmitdata($cbResult);
-
-        if (!$halt) {
 
             for ($i = 0; $i < $this->processor->rowcount; $i++) {
                 $row = $this->processor->rows[$i];
@@ -664,7 +661,6 @@ final class SubmissionEngine
                     VendorHelper::load();
                     $securimage = new Securimage();
                     if (!$securimage->check($this->processor->app->getInput()->getString('bfCaptchaEntry', ''))) {
-                        $halt = true;
                         $this->processor->status = _FF_STATUS_CAPTCHA_FAILED;
                         exit;
                     }
@@ -694,7 +690,6 @@ final class SubmissionEngine
                                         // all good
                                     } else {
 
-                                        $halt = true;
                                         $this->processor->status = _FF_STATUS_CAPTCHA_FAILED;
                                         exit;
                                     }
@@ -728,10 +723,6 @@ final class SubmissionEngine
                         }
                 }
             }
-        }
-
-        if (!$halt) {
-
             $code = '';
 
             switch ($this->processor->formrow->piece3cond) {
@@ -961,8 +952,6 @@ final class SubmissionEngine
 
             if ($this->processor->bury())
                 return;
-        }
-
         switch ($this->processor->status) {
             case _FF_STATUS_OK:
                 $message = Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITSUCCESS');

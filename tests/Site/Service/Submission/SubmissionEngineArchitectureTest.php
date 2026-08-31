@@ -48,6 +48,7 @@ final class SubmissionEngineArchitectureTest extends TestCase
         self::assertIsString($runtimeSource);
         self::assertStringNotContainsString('$j15', $submissionSource);
         self::assertStringNotContainsString('SqueezeBox.loadModal', $submissionSource);
+        self::assertStringNotContainsString('$halt', $submissionSource);
         self::assertStringNotContainsString('_FF_DEBUG_', $facadeSource . $runtimeSource);
     }
 }

@@ -84,6 +84,7 @@ final class RenderingEngine
     private ?FormClosingMarkupBuilder $formClosingMarkupBuilderService = null;
     private ?FormOpeningMarkupBuilder $formOpeningMarkupBuilderService = null;
     private ?FormOptionalContextFieldsBuilder $formOptionalContextFieldsBuilderService = null;
+    private ?FormModeFinalizationBuilder $formModeFinalizationBuilderService = null;
     private ?QuickModeFormTagBuilder $quickModeFormTagBuilderService = null;
     private ?FileExtensionsCheckBuilder $fileExtensionsCheckBuilderService = null;
     private ?QueryListSelectAllScriptBuilder $queryListSelectAllScriptBuilderService = null;
@@ -340,6 +341,11 @@ final class RenderingEngine
     private function formOptionalContextFieldsBuilder(): FormOptionalContextFieldsBuilder
     {
         return $this->formOptionalContextFieldsBuilderService ??= new FormOptionalContextFieldsBuilder();
+    }
+
+    private function formModeFinalizationBuilder(): FormModeFinalizationBuilder
+    {
+        return $this->formModeFinalizationBuilderService ??= new FormModeFinalizationBuilder();
     }
 
     private function quickModeFormTagBuilder(): QuickModeFormTagBuilder
@@ -1399,153 +1405,80 @@ final class RenderingEngine
 
         switch ($this->processor->runmode) {
             case _FF_RUNMODE_FRONTEND:
-                echo $this->hiddenFormFieldsBuilder()->context([
-                    'ff_contentid' => $this->processor->app->getInput()->getInt('ff_contentid', 0),
-                    'ff_applic' => $this->processor->app->getInput()->getWord('ff_applic', ''),
+                $input = $this->processor->app->getInput();
+                $context = [
+                    'ff_contentid' => $input->getInt('ff_contentid', 0),
+                    'ff_applic' => $input->getWord('ff_applic', ''),
                     'ff_record_id' => $this->processor->record_id,
-                    'ff_module_id' => $this->processor->app->getInput()->getInt('ff_module_id', 0),
-                ], indentc(1));
-                echo $this->hiddenFormFieldsBuilder()->submission(
-                    (int) $this->processor->form,
-                    indentc(1),
-                    nl()
-                ) .
-                    $this->hiddenFormFieldsBuilder()->token(
-                        \Joomla\CMS\HTML\HTMLHelper::_('form.token'),
-                        indentc(1),
-                        nl()
-                    );
-                echo $this->formOptionalContextFieldsBuilder()->build(
-                    $this->processor->target,
-                    (bool) $this->processor->inframe,
-                    (bool) $this->processor->border,
-                    $this->processor->page,
-                    $this->processor->align,
-                    $this->processor->top,
-                    indentc(1),
-                    true,
-                    true,
-                    true,
-                    true,
+                    'ff_module_id' => $input->getInt('ff_module_id', 0),
+                ];
+                $routing = $this->hiddenFormFieldsBuilder()->routing($input->getString('return', ''), $input->getString('tmpl', ''), nl());
+                $technical = $input->getInt('cb_form_id', 0)
+                    ? $this->contentBuilderTechnicalFieldsBuilder()->build('', $input->getInt('cb_form_id', 0), $input->getInt('cb_record_id', 0), $input->getBool('cbIsNew', false))
+                    : '';
+                echo $this->formModeFinalizationBuilder()->frontend(
+                    $this->hiddenFormFieldsBuilder()->context($context, indentc(1)),
+                    $this->hiddenFormFieldsBuilder()->submission((int) $this->processor->form, indentc(1), nl()),
+                    $this->hiddenFormFieldsBuilder()->token(\Joomla\CMS\HTML\HTMLHelper::_('form.token'), indentc(1), nl()),
+                    $this->formOptionalContextFieldsBuilder()->build($this->processor->target, (bool) $this->processor->inframe, (bool) $this->processor->border, $this->processor->page, $this->processor->align, $this->processor->top, indentc(1), true, true, true, true, nl()),
+                    $this->hiddenFormFieldsBuilder()->additional($ff_otherparams, indentc(1), nl()),
+                    $technical,
+                    $routing,
                     nl()
                 );
-                echo $this->hiddenFormFieldsBuilder()->additional($ff_otherparams, indentc(1), nl());
-                if ($this->processor->app->getInput()->getInt('cb_form_id', 0)) {
-                    echo $this->contentBuilderTechnicalFieldsBuilder()->build(
-                        '',
-                        $this->processor->app->getInput()->getInt('cb_form_id', 0),
-                        $this->processor->app->getInput()->getInt('cb_record_id', 0),
-                        $this->processor->app->getInput()->getBool('cbIsNew', false)
-                    );
-                }
-                echo $this->hiddenFormFieldsBuilder()->routing(
-                    $this->processor->app->getInput()->getString('return', ''),
-                    $this->processor->app->getInput()->getString('tmpl', ''),
-                    nl()
-                );
-                echo '</form>' . nl();
                 break;
 
             case _FF_RUNMODE_BACKEND:
-                echo $this->hiddenFormFieldsBuilder()->submission(
-                    (int) $this->processor->form,
-                    indentc(1),
-                    nl(),
-                    true
-                ) .
-                    $this->hiddenFormFieldsBuilder()->token(
-                        \Joomla\CMS\HTML\HTMLHelper::_('form.token'),
-                        indentc(1),
-                        nl()
-                    ) .
-                    $this->hiddenFormFieldsBuilder()->context([
-                        'ff_contentid' => $this->processor->app->getInput()->getInt('ff_contentid', 0),
-                        'ff_applic' => $this->processor->app->getInput()->getWord('ff_applic', ''),
-                        'ff_record_id' => $this->processor->record_id,
-                        'ff_module_id' => $this->processor->app->getInput()->getInt('ff_module_id', 0),
-                        'ff_runmode' => $this->processor->runmode,
-                    ], indentc(1));
-                echo $this->formOptionalContextFieldsBuilder()->build(
-                    $this->processor->target,
-                    (bool) $this->processor->inframe,
-                    (bool) $this->processor->border,
-                    $this->processor->page,
-                    $this->processor->align,
-                    $this->processor->top,
-                    indentc(1),
-                    true,
-                    true,
-                    true,
-                    true,
+                $input = $this->processor->app->getInput();
+                $context = [
+                    'ff_contentid' => $input->getInt('ff_contentid', 0),
+                    'ff_applic' => $input->getWord('ff_applic', ''),
+                    'ff_record_id' => $this->processor->record_id,
+                    'ff_module_id' => $input->getInt('ff_module_id', 0),
+                    'ff_runmode' => $this->processor->runmode,
+                ];
+                $routing = $this->hiddenFormFieldsBuilder()->routing($input->getString('return', ''), $input->getString('tmpl', ''), nl());
+                $technical = $input->getInt('cb_form_id', 0)
+                    ? $this->contentBuilderTechnicalFieldsBuilder()->build('', $input->getInt('cb_form_id', 0), $input->getInt('cb_record_id', 0), $input->getBool('cbIsNew', false))
+                    : '';
+                echo $this->formModeFinalizationBuilder()->backend(
+                    $this->hiddenFormFieldsBuilder()->submission((int) $this->processor->form, indentc(1), nl(), true),
+                    $this->hiddenFormFieldsBuilder()->token(\Joomla\CMS\HTML\HTMLHelper::_('form.token'), indentc(1), nl()),
+                    $this->hiddenFormFieldsBuilder()->context($context, indentc(1)),
+                    $this->formOptionalContextFieldsBuilder()->build($this->processor->target, (bool) $this->processor->inframe, (bool) $this->processor->border, $this->processor->page, $this->processor->align, $this->processor->top, indentc(1), true, true, true, true, nl()),
+                    $technical,
+                    $routing,
                     nl()
                 );
-                if ($this->processor->app->getInput()->getInt('cb_form_id', 0)) {
-                    echo $this->contentBuilderTechnicalFieldsBuilder()->build(
-                        '',
-                        $this->processor->app->getInput()->getInt('cb_form_id', 0),
-                        $this->processor->app->getInput()->getInt('cb_record_id', 0),
-                        $this->processor->app->getInput()->getBool('cbIsNew', false)
-                    );
-                }
-                echo $this->hiddenFormFieldsBuilder()->routing(
-                    $this->processor->app->getInput()->getString('return', ''),
-                    $this->processor->app->getInput()->getString('tmpl', ''),
-                    nl()
-                );
-                echo '</form>' . nl();
                 break;
 
-            default: // _FF_RUNMODE_PREVIEW:
-                if ($this->processor->inframe) {
-                    echo $this->hiddenFormFieldsBuilder()->submission(
-                        (int) $this->processor->form,
-                        indentc(1),
-                        nl(),
-                        false,
-                        true
-                    ) .
-                    $this->hiddenFormFieldsBuilder()->token(
-                        \Joomla\CMS\HTML\HTMLHelper::_('form.token'),
-                        indentc(1),
-                        nl()
-                    ) .
-                    $this->hiddenFormFieldsBuilder()->context([
-                        'ff_contentid' => $this->processor->app->getInput()->getInt('ff_contentid', 0),
-                        'ff_applic' => $this->processor->app->getInput()->getWord('ff_applic', ''),
-                        'ff_record_id' => $this->processor->record_id,
-                        'ff_module_id' => $this->processor->app->getInput()->getInt('ff_module_id', 0),
-                        'ff_runmode' => $this->processor->runmode,
-                    ], indentc(1));
-                    echo $this->formOptionalContextFieldsBuilder()->build(
-                        $this->processor->target,
-                        (bool) $this->processor->inframe,
-                        (bool) $this->processor->border,
-                        $this->processor->page,
-                        $this->processor->align,
-                        $this->processor->top,
-                        indentc(1),
-                        false,
-                        true,
-                        false,
-                        false,
-                        nl()
-                    );
-                    if ($this->processor->app->getInput()->getInt('cb_form_id', 0)) {
-                        echo $this->contentBuilderTechnicalFieldsBuilder()->build(
-                            '',
-                            $this->processor->app->getInput()->getInt('cb_form_id', 0),
-                            $this->processor->app->getInput()->getInt('cb_record_id', 0),
-                            $this->processor->app->getInput()->getBool('cbIsNew', false)
-                        );
-                    }
-                    echo $this->hiddenFormFieldsBuilder()->routing(
-                        $this->processor->app->getInput()->getString('return', ''),
-                        $this->processor->app->getInput()->getString('tmpl', ''),
-                        nl()
-                    );
-                    echo '</form>' . nl();
-                } // if
-        } // if
+            default:
+                if (!$this->processor->inframe) {
+                    break;
+                }
+                $input = $this->processor->app->getInput();
+                $context = [
+                    'ff_contentid' => $input->getInt('ff_contentid', 0),
+                    'ff_applic' => $input->getWord('ff_applic', ''),
+                    'ff_record_id' => $this->processor->record_id,
+                    'ff_module_id' => $input->getInt('ff_module_id', 0),
+                    'ff_runmode' => $this->processor->runmode,
+                ];
+                $routing = $this->hiddenFormFieldsBuilder()->routing($input->getString('return', ''), $input->getString('tmpl', ''), nl());
+                $technical = $input->getInt('cb_form_id', 0)
+                    ? $this->contentBuilderTechnicalFieldsBuilder()->build('', $input->getInt('cb_form_id', 0), $input->getInt('cb_record_id', 0), $input->getBool('cbIsNew', false))
+                    : '';
+                echo $this->formModeFinalizationBuilder()->preview(
+                    true,
+                    $this->hiddenFormFieldsBuilder()->submission((int) $this->processor->form, indentc(1), nl(), false, true),
+                    $this->hiddenFormFieldsBuilder()->token(\Joomla\CMS\HTML\HTMLHelper::_('form.token'), indentc(1), nl()),
+                    $this->hiddenFormFieldsBuilder()->context($context, indentc(1)),
+                    $this->formOptionalContextFieldsBuilder()->build($this->processor->target, (bool) $this->processor->inframe, (bool) $this->processor->border, $this->processor->page, $this->processor->align, $this->processor->top, indentc(1), false, true, false, false, nl()),
+                    $technical,
+                    $routing,
+                    nl()
+                );
+        }
         if ($this->executeAfterFormPiece()) {
             $this->abortViewRendering();
             return;

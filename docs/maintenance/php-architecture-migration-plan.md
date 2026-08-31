@@ -1062,6 +1062,12 @@ isolés en builders testés : `FormContextFieldsBuilder` (`f7d06454`),
 séparateur de lignes (`0261acd4`). Les champs conditionnels propres à chaque
 mode restent à caractériser avant une éventuelle extraction.
 
+L'ordre final des champs cachés et la fermeture du formulaire sont désormais
+assemblés par `FormModeFinalizationBuilder` (lot de finalisation courant) pour les modes
+frontend, backend et preview. Les décisions Joomla et la génération des
+fragments restent dans `RenderingEngine`, tandis que les variantes d'ordre
+et l'absence de sortie preview hors iframe sont couvertes par des tests.
+
 Les quatre renderers QuickMode ont encore une baseline PHPCS distincte ; le
 contrôle direct fait apparaître des violations de formatage héritées. Ce lot
 reste séparé de la mutualisation fonctionnelle pour conserver des commits

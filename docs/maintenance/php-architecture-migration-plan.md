@@ -858,6 +858,12 @@ la même initialisation de `rows` et `rowcount`, mais la requête, ses filtres
 `published`, son ordre d'affichage et sa liaison typée sont testés directement
 dans `FormElementLoaderTest`.
 
+Les fonctions globales de traçage utilisées par le code PHP instrumenté sont
+maintenant de simples adaptateurs vers `TraceRuntime`. Les messages, lignes,
+entrées de pièces/fonctions, sorties de pile et avertissements de pile vide
+restent identiques ; `TraceRuntimeTest` couvre aussi le formatage des arguments
+null, booléens, numériques, chaînes, tableaux et objets.
+
 Les deux gardes locales `if (!$halt)` de `SubmissionEngine` ont ensuite été
 retirées : `$halt` était initialisé à `false` et ses seules affectations à
 `true` précédaient immédiatement `exit`. Le contrôle CAPTCHA, les pièces de

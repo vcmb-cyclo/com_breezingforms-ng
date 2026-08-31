@@ -15,7 +15,6 @@ use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 use Joomla\Database\DatabaseInterface;
-use Joomla\Database\ParameterType;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Environment\Browser;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\FormDisplayContextResolver;
@@ -25,6 +24,7 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampFacto
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\CodeToolsRuntime;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\ErrorHandlerRuntime;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\FormElementLoader;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\TraceRuntime;
 use Vcmb\Component\BreezingformsNG\Site\Service\Scripting\ScriptingEngine;
 use Vcmb\Component\BreezingformsNG\Site\Service\Export\ExportEngine;
 use Vcmb\Component\BreezingformsNG\Site\Service\Integration\RecaptchaVerifier;
@@ -87,21 +87,11 @@ if (is_file($cbngBasePath . '/com_contentbuilderng.xml')) {
 function ff_trace($msg = null)
 {
     global $ff_processor;
-
-    if (
-        $ff_processor->dying ||
-        ($ff_processor->traceMode & _FF_TRACEMODE_DISABLE) ||
-        !($ff_processor->traceMode & _FF_TRACEMODE_MESSAGE)
-    )
+    if (!$ff_processor instanceof HTML_facileFormsProcessor) {
         return;
-    $level = count($ff_processor->traceStack);
-    $trc = '';
-    for ($l = 0; $l < $level; $l++)
-        $trc .= '  ';
-    $trc .= Text::_('COM_BREEZINGFORMSNG_PROCESS_MSGUNKNOWN') . ": $msg\n";
-    $ff_processor->traceBuffer .= htmlspecialchars($trc, ENT_QUOTES);
-    if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
-        $ff_processor->dumpTrace();
+    }
+
+    (new TraceRuntime($ff_processor))->trace($msg);
 }
 
 // ff_trace
@@ -109,22 +99,11 @@ function ff_trace($msg = null)
 function _ff_trace($line, $msg = null)
 {
     global $ff_processor;
-
-    // version for patched code
-    if ($ff_processor->dying || ($ff_processor->traceMode & _FF_TRACEMODE_DISABLE))
+    if (!$ff_processor instanceof HTML_facileFormsProcessor) {
         return;
-    $level = count($ff_processor->traceStack);
-    if ($msg && ($ff_processor->traceMode & _FF_TRACEMODE_MESSAGE)) {
-        $trc = '';
-        for ($l = 0; $l < $level; $l++)
-            $trc .= '  ';
-        $trc .= Text::_('COM_BREEZINGFORMSNG_PROCESS_LINE') . " $line: $msg\n";
-        $ff_processor->traceBuffer .= htmlspecialchars($trc, ENT_QUOTES);
-        if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
-            $ff_processor->dumpTrace();
-    } // if
-    if ($level)
-        $ff_processor->traceStack[$level - 1][3] = $line;
+    }
+
+    (new TraceRuntime($ff_processor))->traceLine($line, $msg);
 }
 
 // _ff_trace
@@ -132,18 +111,11 @@ function _ff_trace($line, $msg = null)
 function _ff_getMode(&$newmode, &$name)
 {
     global $ff_processor;
+    if (!$ff_processor instanceof HTML_facileFormsProcessor) {
+        return null;
+    }
 
-    $oldmode = $ff_processor->traceMode;
-    if (is_null($newmode) || ($newmode & _FF_TRACEMODE_PRIORITY) < ($oldmode & _FF_TRACEMODE_PRIORITY)) {
-        $newmode = $oldmode;
-        $ret = $oldmode;
-    } else {
-        $newmode = ($oldmode & ~_FF_TRACEMODE_VARIABLE) | ($newmode & _FF_TRACEMODE_VARIABLE);
-        if ($oldmode != $newmode)
-            $ff_processor->traceMode = $newmode;
-        $ret = ($newmode & _FF_TRACEMODE_LOCAL) ? $oldmode : $newmode;
-    } // if
-    return $ret;
+    return (new TraceRuntime($ff_processor))->getMode($newmode, $name);
 }
 
 // _ff_getmode
@@ -151,22 +123,11 @@ function _ff_getMode(&$newmode, &$name)
 function _ff_tracePiece($newmode, $name, $line, $type, $id, $pane)
 {
     global $ff_processor;
-
-    if ($ff_processor->dying || ($ff_processor->traceMode & _FF_TRACEMODE_DISABLE))
+    if (!$ff_processor instanceof HTML_facileFormsProcessor) {
         return;
-    $oldmode = _ff_getMode($newmode, $name);
-    if ($newmode & _FF_TRACEMODE_PIECE) {
-        $level = count($ff_processor->traceStack);
-        for ($l = 0; $l < $level; $l++)
-            $ff_processor->traceBuffer .= '  ';
-        $ff_processor->traceBuffer .= htmlspecialchars(
-            "+" . Text::_('COM_BREEZINGFORMSNG_PROCESS_ENTER') . " $name " . Text::_('COM_BREEZINGFORMSNG_PROCESS_ATLINE') . " $line\n",
-            ENT_QUOTES
-        );
-        if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
-            $ff_processor->dumpTrace();
-    } // if
-    array_push($ff_processor->traceStack, array($oldmode, 'p', $name, $line, $type, $id, $pane));
+    }
+
+    (new TraceRuntime($ff_processor))->tracePiece($newmode, $name, $line, $type, $id, $pane);
 }
 
 // _ff_tracePiece
@@ -174,56 +135,11 @@ function _ff_tracePiece($newmode, $name, $line, $type, $id, $pane)
 function _ff_traceFunction($newmode, $name, $line, $type, $id, $pane, &$args)
 {
     global $ff_processor;
-
-    if ($ff_processor->dying || ($ff_processor->traceMode & _FF_TRACEMODE_DISABLE))
+    if (!$ff_processor instanceof HTML_facileFormsProcessor) {
         return;
-    $oldmode = _ff_getMode($newmode, $name);
-    if ($newmode & _FF_TRACEMODE_FUNCTION) {
-        $level = count($ff_processor->traceStack);
-        $trc = '';
-        for ($l = 0; $l < $level; $l++)
-            $trc .= '  ';
-        $trc .= "+" . Text::_('COM_BREEZINGFORMSNG_PROCESS_ENTER') . " $name(";
-        if ($args) {
-            $next = false;
-            foreach ($args as $arg) {
-                if ($next)
-                    $trc .= ', ';
-                else
-                    $next = true;
-                if (is_null($arg))
-                    $trc .= 'null';
-                else
-                    if (is_bool($arg)) {
-                        $trc .= $arg ? 'true' : 'false';
-                    } else
-                        if (is_numeric($arg))
-                            $trc .= $arg;
-                        else
-                            if (is_string($arg)) {
-                                $arg = preg_replace('/([\\s]+)/si', ' ', $arg);
-                                if (strlen($arg) > _FF_TRACE_NAMELIMIT)
-                                    $arg = substr($arg, 0, _FF_TRACE_NAMELIMIT - 3) . '...';
-                                $trc .= "'$arg'";
-                            } else
-                                if (is_array($arg))
-                                    $trc .= Text::_('COM_BREEZINGFORMSNG_PROCESS_ARRAY');
-                                else
-                                    if (is_object($arg))
-                                        $trc .= Text::_('COM_BREEZINGFORMSNG_PROCESS_OBJECT');
-                                    else
-                                        if (is_resource($arg))
-                                            $trc .= Text::_('COM_BREEZINGFORMSNG_PROCESS_RESOURCE');
-                                        else
-                                            $trc .= Text::_('COM_BREEZINGFORMSNG_PROCESS_UNKNOWN');
-            } // foreach
-        } // if
-        $trc .= ") " . Text::_('COM_BREEZINGFORMSNG_PROCESS_ATLINE') . " $line\n";
-        $ff_processor->traceBuffer .= htmlspecialchars($trc, ENT_QUOTES);
-        if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
-            $ff_processor->dumpTrace();
-    } // if
-    array_push($ff_processor->traceStack, array($oldmode, 'f', $name, $line, $type, $id, $pane));
+    }
+
+    (new TraceRuntime($ff_processor))->traceFunction($newmode, $name, $line, $type, $id, $pane, $args);
 }
 
 // _ff_traceFunction
@@ -231,43 +147,11 @@ function _ff_traceFunction($newmode, $name, $line, $type, $id, $pane, &$args)
 function _ff_traceExit($line, $retval = null)
 {
     global $ff_processor;
+    if (!$ff_processor instanceof HTML_facileFormsProcessor) {
+        return $retval;
+    }
 
-    if ($ff_processor->dying || ($ff_processor->traceMode & _FF_TRACEMODE_DISABLE))
-        return;
-    $info = array_pop($ff_processor->traceStack);
-    if ($info) {
-        $oldmode = $ff_processor->traceMode;
-        $newmode = $info[0];
-        $kind = $info[1];
-        $name = $info[2];
-        $type = $info[4];
-        $id = $info[5];
-        $pane = $info[6];
-        if ($kind == 'p')
-            $visible = $oldmode & _FF_TRACEMODE_PIECE;
-        else
-            $visible = $oldmode & _FF_TRACEMODE_FUNCTION;
-        if ($visible) {
-            $level = count($ff_processor->traceStack);
-            for ($l = 0; $l < $level; $l++)
-                $ff_processor->traceBuffer .= '  ';
-            $ff_processor->traceBuffer .= htmlspecialchars(
-                "-" . Text::_('COM_BREEZINGFORMSNG_PROCESS_LEAVE') . " $name " . Text::_('COM_BREEZINGFORMSNG_PROCESS_ATLINE') . " $line\n",
-                ENT_QUOTES
-            );
-            if ($oldmode & _FF_TRACEMODE_DIRECT)
-                $ff_processor->dumpTrace();
-        } // if
-        if ($oldmode != $newmode)
-            $ff_processor->traceMode = ($oldmode & ~_FF_TRACEMODE_VARIABLE) | ($newmode & _FF_TRACEMODE_VARIABLE);
-    } else {
-        $ff_processor->traceBuffer .= htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_PROCESS_WARNSTK') . "\n", ENT_QUOTES);
-        if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
-            $ff_processor->dumpTrace();
-        $type = $id = $pane = null;
-        $name = Text::_('COM_BREEZINGFORMSNG_PROCESS_UNKNOWN');
-    } // if
-    return $retval;
+    return (new TraceRuntime($ff_processor))->traceExit($line, $retval);
 }
 
 // _ff_traceExit

@@ -268,14 +268,17 @@ harnais Joomla/ContentBuilder permettant de tester les dépendances runtime.
 
 État : générateur indépendant committé dans `8bfd520e` et branché dans
 `RenderingEngine::view()` par `21a0a812`, en respectant le cycle de création de
-`bfDeactivateField`.
+`bfDeactivateField`. Le critère de sortie est atteint ; la récupération
+runtime des identifiants reste dans `view()` jusqu'à la disponibilité d'un
+harnais ContentBuilder d'intégration.
 
-- Extraire la récupération des identifiants non éditables.
-- Extraire le script de désactivation et de masquage des contrôles.
-- Couvrir les champs avec contrôle visible, sans contrôle visible et les
+- [x] Extraire le script de désactivation et de masquage des contrôles.
+- [x] Couvrir les champs avec contrôle visible, sans contrôle visible et les
   groupes de contrôles.
-- Préserver les règles de lecture seule et les suffixes frontend/admin des
+- [x] Préserver les règles de lecture seule et les suffixes frontend/admin des
   permissions.
+- [ ] Extraire la récupération des identifiants non éditables après mise en
+  place d'un harnais ContentBuilder d'intégration.
 
 Critère de sortie : le script `bfDisableContentBuilderFields()` est construit
 et testé indépendamment de `view()`.

@@ -43,9 +43,6 @@ use CB\Component\Contentbuilderng\Administrator\Service\ListSupportService;
 use CB\Component\Contentbuilderng\Administrator\Service\PermissionService;
 use CB\Component\Contentbuilderng\Administrator\Helper\RuntimeContextHelper;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\TokenizedDirectoryResolver;
-use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\BootstrapRenderer;
-use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\ClassicRenderer;
-use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\OnePageRenderer;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RuntimeAssetLoader;
 
 /**
@@ -106,6 +103,7 @@ final class RenderingEngine
     private ?ContentBuilderSelectHydrationScriptBuilder $contentBuilderSelectHydrationScriptBuilderService = null;
     private ?ContentBuilderFileHydrationScriptBuilder $contentBuilderFileHydrationScriptBuilderService = null;
     private ?ContentBuilderEditableRecordScriptBuilder $contentBuilderEditableRecordScriptBuilderService = null;
+    private ?QuickModeRendererFactory $quickModeRendererFactoryService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -463,6 +461,11 @@ final class RenderingEngine
             fn(string $value, int $width, string $break, bool $cut): string =>
                 ContentbuilderngHelper::contentbuilderng_wordwrap($value, $width, $break, $cut)
         );
+    }
+
+    private function quickModeRendererFactory(): QuickModeRendererFactory
+    {
+        return $this->quickModeRendererFactoryService ??= new QuickModeRendererFactory();
     }
 
     public function cbCheckPermissions(): array
@@ -1262,7 +1265,7 @@ final class RenderingEngine
             } // for
         } else if (trim($this->processor->formrow->template_code_processed) == 'QuickMode') {
 
-            $quickMode = $this->createQuickModeRenderer($rootMdata);
+            $quickMode = $this->quickModeRendererFactory()->create($this->processor, $rootMdata);
             $this->processor->quickmode = $quickMode;
 
             $quickMode->render();
@@ -1387,24 +1390,6 @@ final class RenderingEngine
         $this->closeFormRendering();
         $this->finishViewRendering();
 
-    }
-
-    /**
-     * Create the renderer selected by the QuickMode theme settings.
-     *
-     * @param array<string, mixed> $rootMdata
-     */
-    private function createQuickModeRenderer(array $rootMdata): object
-    {
-        if (isset($rootMdata['themebootstrapThemeEngine']) && $rootMdata['themebootstrapThemeEngine'] == 'bootstrap') {
-            if (isset($rootMdata['themebootstrapMode']) && $rootMdata['themebootstrapMode']) {
-                return new OnePageRenderer($this->processor);
-            }
-
-            return new BootstrapRenderer($this->processor);
-        }
-
-        return new ClassicRenderer($this->processor);
     }
 
     /**

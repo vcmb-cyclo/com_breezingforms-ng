@@ -16,6 +16,7 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Upload\TokenizedDirectoryResolve
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\BootstrapRenderer;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\ClassicRenderer;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\OnePageRenderer;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickModeRendererFactory;
 
 if (!defined('JPATH_ADMINISTRATOR')) {
     define('JPATH_ADMINISTRATOR', __DIR__ . '/../../../../administrator');
@@ -1531,19 +1532,17 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
 
         $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
         (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
-        $method = (new ReflectionClass($engine))->getMethod('createQuickModeRenderer');
-
         self::assertInstanceOf(
             BootstrapRenderer::class,
-            $method->invoke($engine, ['themebootstrapThemeEngine' => 'bootstrap', 'themebootstrapMode' => false])
+            (new QuickModeRendererFactory())->create($processor, ['themebootstrapThemeEngine' => 'bootstrap', 'themebootstrapMode' => false])
         );
         self::assertInstanceOf(
             OnePageRenderer::class,
-            $method->invoke($engine, ['themebootstrapThemeEngine' => 'bootstrap', 'themebootstrapMode' => true])
+            (new QuickModeRendererFactory())->create($processor, ['themebootstrapThemeEngine' => 'bootstrap', 'themebootstrapMode' => true])
         );
         self::assertInstanceOf(
             ClassicRenderer::class,
-            $method->invoke($engine, ['themebootstrapThemeEngine' => 'classic'])
+            (new QuickModeRendererFactory())->create($processor, ['themebootstrapThemeEngine' => 'classic'])
         );
     }
 

@@ -1217,6 +1217,12 @@ extensions image et le repli `FileReader` sont couverts par un test dédié ;
 les différences de markup et la configuration plupload restent dans chaque
 renderer.
 
+La configuration commune de l'objet `plupload.Uploader` est désormais fournie
+par `QuickModeUploadConfigurationBuilder` (`218990e11`) et utilisée par les
+renderers Classic, Bootstrap et OnePage. Les différences d'URL SEF sont
+injectées explicitement ; les callbacks et les enveloppes visuelles restent
+propres à chaque renderer.
+
 Le callback plupload `UploadProgress` est désormais généré par
 `QuickModeUploadProgressScriptBuilder` (`1e28a79b2`) pour les quatre renderers.
 La mise à jour du pourcentage et de la barre visuelle reste inchangée et est

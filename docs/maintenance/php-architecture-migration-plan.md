@@ -1864,6 +1864,9 @@ Input/Server nécessaires à ce harnais.
 La même couverture verrouille désormais la branche \`livesite = 0\`, la racine
 Joomla par défaut et le jeu de paramètres dédié à \`com_contacts\`.
 
+Le jeu de paramètres \`com_weblinks\` est également verrouillé : seuls
+\`option\`, \`Itemid\` et \`catid\` sont collectés pour ce contexte.
+
 Les délégations modernisées de \`CodeToolsRuntime\` sont caractérisées
 directement : nettoyage et détection de code, export JavaScript, résolution
 des classes et formatage du mode de trace. Le parsing/eval historique reste

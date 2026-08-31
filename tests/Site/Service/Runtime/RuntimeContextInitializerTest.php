@@ -121,6 +121,33 @@ final class RuntimeContextInitializerTest extends TestCase
         );
     }
 
+    public function testCollectsOnlyWeblinksParameters(): void
+    {
+        $application = new CMSApplication();
+        $application->getInput()->values = [
+            'option' => 'com_weblinks',
+            'Itemid' => '11',
+            'catid' => '6',
+            'task' => 'links.display',
+            'id' => '99',
+        ];
+
+        $result = (new RuntimeContextInitializer($application, $this->configuration(0)))->initialize(
+            'https://example.test/',
+            null,
+            null
+        );
+
+        self::assertSame(
+            [
+                'option' => 'com_weblinks',
+                'Itemid' => '11',
+                'catid' => '6',
+            ],
+            $result['otherParameters']
+        );
+    }
+
     private function configuration(int $liveSite): FormConfiguration
     {
         $configuration = (new ReflectionClass(FormConfiguration::class))->newInstanceWithoutConstructor();

@@ -976,6 +976,9 @@ La résolution des modèles d'e-mail principaux et de mailback est mutualisée
 par `MailTemplateResolver`, avec priorité au modèle HTML puis texte du
 formulaire avant les modèles par défaut ; ces variantes sont testées.
 
+`UploadStorage` vérifie désormais directement le résultat de `chmod`, sans
+masquer les erreurs système, et conserve les statuts de stockage testés.
+
 Les paramètres additionnels `ff_otherparams` du mode frontend sont désormais
 générés par `AdditionalHiddenFieldsBuilder` via `bb469b88`, avec ordre,
 encodage URL et échappement HTML couverts. La détection des providers de

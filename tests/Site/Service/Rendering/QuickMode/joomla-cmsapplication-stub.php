@@ -211,6 +211,11 @@ namespace Joomla\CMS\Application {
             {
                 return (bool) ($this->values[$name] ?? $default);
             }
+
+            public function set(string $name, mixed $value): void
+            {
+                $this->values[$name] = $value;
+            }
         }
     }
 

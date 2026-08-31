@@ -1484,10 +1484,16 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         $processor->traceMode = 0;
         $processor->buryOnCallNumber = null;
         $GLOBALS['ff_otherparams'] = [];
+        $processor->app->getInput()->set('cb_form_id', 88);
+        $processor->app->getInput()->set('cb_record_id', 144);
+        $processor->app->getInput()->set('cbIsNew', true);
 
         $html = $this->captureCaptchaScript($processor);
 
         self::assertStringContainsString('</div><!-- form end -->', $html);
+        self::assertStringContainsString('name="cb_form_id" value="88"', $html);
+        self::assertStringContainsString('name="cb_record_id" value="144"', $html);
+        self::assertStringContainsString('name="cbIsNew" value="1"', $html);
         self::assertStringNotContainsString('<piece>', $html);
     }
 

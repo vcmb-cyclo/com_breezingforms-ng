@@ -26,6 +26,10 @@ if (!defined('_FF_RUNMODE_FRONTEND')) {
     define('_FF_RUNMODE_FRONTEND', 0);
 }
 
+if (!defined('_FF_RUNMODE_BACKEND')) {
+    define('_FF_RUNMODE_BACKEND', 1);
+}
+
 if (!class_exists(HTML_facileFormsProcessor::class)) {
     require_once __DIR__ . '/../../../../components/com_breezingformsng/src/Support/processor_facade.php';
 }
@@ -1443,6 +1447,34 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         $html = $this->captureCaptchaScript($processor);
 
         self::assertStringContainsString('</div><!-- form end -->', $html);
+        self::assertStringNotContainsString('<piece>', $html);
+    }
+
+    public function testViewReachesBackendFinalizationWithRunmodeContext(): void
+    {
+        $processor = $this->makeProcessorReadyForCaptchaScript([]);
+        $processor->formrow->name = 'contact';
+        $processor->formrow->piece2cond = 0;
+        $processor->formrow->script1cond = 0;
+        $processor->formrow->script1id = 0;
+        $processor->formrow->script1code = '';
+        $processor->formrow->script2cond = 0;
+        $processor->formrow->script2id = 0;
+        $processor->formrow->script2code = '';
+        $processor->formrow->class2 = '';
+        $processor->form_id = 7;
+        $processor->target = 0;
+        $processor->align = 0;
+        $processor->top = 0;
+        $processor->runmode = _FF_RUNMODE_BACKEND;
+        $processor->traceMode = 0;
+        $processor->buryOnCallNumber = null;
+        $GLOBALS['ff_otherparams'] = [];
+
+        $html = $this->captureCaptchaScript($processor);
+
+        self::assertStringContainsString('</div><!-- form end -->', $html);
+        self::assertStringContainsString('name="ff_runmode" value="1"', $html);
         self::assertStringNotContainsString('<piece>', $html);
     }
 

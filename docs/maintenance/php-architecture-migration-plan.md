@@ -55,6 +55,7 @@
 | QuickMode — configuration runtime des erreurs | Déclaration `bfUseErrorAlerts`/`bfShowDefaultErrors`/`bfErrorPageScoped` partagée, avec portée de page explicite | Commit `45fc45988` |
 | QuickMode OnePage — fermeture Thank You | Redirection `bf_remodal_close()` extraite dans un builder pur, avec panier et URL formulaire conservés | Commit `ca2b8f42d` |
 | QuickMode OnePage — soumission AJAX | Callback `bf_ajax_submit()` extrait dans un builder pur, avec échec, succès direct et page Thank You couverts | Commit `01ab2d4bd` |
+| QuickMode — miniature upload | Callback `bfUploadImageThumb()` partagé entre les quatre renderers, avec chemin Moxie et repli FileReader couverts | Commit `704ccbea2` |
 | QuickMode — expression éditeur | Construction de l’expression JavaScript de lecture des éditeurs mutualisée entre Bootstrap et OnePage, API publique conservée | Commit `43592c8bd` |
 | QuickMode — mapping Bootstrap | Mapping Bootstrap 5 des classes mutualisé entre Bootstrap et OnePage, résolution publique `bsClass()` conservée | Commit `658078588` |
 | Finalisation — champs de soumission | Champs cachés communs frontend/backend/preview extraits avec conservation des différences `act`/`ff_frame` | Commit `be602b94f` |
@@ -445,8 +446,11 @@ propres à chaque thème.
    script de rechargement via `QuickModeCaptchaReloadScriptBuilder`
    (`4d706e95`). Les actions de navigation et de soumission sont maintenant
    mutualisées via `QuickModePagingActionBuilder` (`10d7dc6a`, `04e09cf6`) et
-   `QuickModeSubmitActionBuilder` (`4dd3e3dd`). Les scripts de validation
-   complets restent à traiter ; le callback AJAX OnePage est maintenant isolé
+   `QuickModeSubmitActionBuilder` (`4dd3e3dd`). La miniature image est
+   maintenant partagée via `QuickModeUploadThumbnailScriptBuilder`
+   (`704ccbea2`) ; le markup et les callbacks de configuration complète de
+   l'uploader restent à traiter. Les scripts de validation complets restent à
+   traiter ; le callback AJAX OnePage est maintenant isolé
    dans `QuickModeAjaxSubmitScriptBuilder`, avec ses branches succès/échec
    caractérisées.
 
@@ -836,6 +840,13 @@ Mobile. La valeur numérique utilisée par le contrôle client de taille est
 `9535e3a`, supprimant le dernier recalcul PHP de cette limite. Le markup et
 les callbacks de configuration complète de l'uploader restent à extraire par
 sous-lots.
+
+Le callback JavaScript `bfUploadImageThumb()` est désormais généré par
+`QuickModeUploadThumbnailScriptBuilder` (`704ccbea2`) pour les quatre
+renderers. Le chemin Moxie, la destruction après intégration, la détection des
+extensions image et le repli `FileReader` sont couverts par un test dédié ;
+les différences de markup et la configuration plupload restent dans chaque
+renderer.
 
 Les quatre renderers ne possèdent plus chacun leurs cinq adaptateurs privés de
 calendrier : `CalendarOptionsTrait` (`05090635f`) délègue les booléens, le

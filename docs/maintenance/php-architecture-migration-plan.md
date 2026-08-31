@@ -45,6 +45,7 @@
 | `RenderingEngine::view()` — scripts | Bibliothèques, callbacks formulaire et `onload` extraits et couverts | `RenderingEngine` |
 | QuickMode — règles de bascule | Parsing `toggleFields` mutualisé entre les quatre renderers, avec API publique conservée et valeurs multi-mots couvertes | Commit `37c554755` |
 | QuickMode — options calendrier | Normalisation des booléens, formats Pickadate, premier jour et années mutualisée entre les quatre renderers | Commit `a2e025609` |
+| QuickMode — adaptateurs calendrier | Cinq adaptateurs privés de calendrier mutualisés dans un trait commun aux quatre renderers | Commit `05090635f` |
 | QuickMode — expression éditeur | Construction de l’expression JavaScript de lecture des éditeurs mutualisée entre Bootstrap et OnePage, API publique conservée | Commit `43592c8bd` |
 | QuickMode — mapping Bootstrap | Mapping Bootstrap 5 des classes mutualisé entre Bootstrap et OnePage, résolution publique `bsClass()` conservée | Commit `658078588` |
 | Finalisation — champs de soumission | Champs cachés communs frontend/backend/preview extraits avec conservation des différences `act`/`ff_frame` | Commit `be602b94f` |
@@ -824,6 +825,12 @@ Mobile. La valeur numérique utilisée par le contrôle client de taille est
 `9535e3a`, supprimant le dernier recalcul PHP de cette limite. Le markup et
 les callbacks de configuration complète de l'uploader restent à extraire par
 sous-lots.
+
+Les quatre renderers ne possèdent plus chacun leurs cinq adaptateurs privés de
+calendrier : `CalendarOptionsTrait` (`05090635f`) délègue les booléens, le
+format Pickadate, le premier jour et la plage d'années au builder partagé. Les
+sorties QuickMode restent inchangées et la duplication d'orchestration est
+réduite sans créer de classe de base commune.
 
 La baseline PHPCS est maintenant sans erreur sur les services modernes, les
 quatre renderers QuickMode et leurs traits (`e25d501f`, `14985d4d`, `288b42a4`,

@@ -32,6 +32,7 @@ if (!class_exists(\TCPDF::class)) {
 
 class PdfDocument extends \TCPDF
 {
+    private ?PdfFontDirectoryScanner $fontDirectoryScannerService = null;
 
     public string $form_name = '';
     public bool $mailback = false;
@@ -90,8 +91,7 @@ class PdfDocument extends \TCPDF
         if( is_dir(JPATH_SITE.'/media/breezingforms/pdftpl/fonts/') ){
 
             $sourcePath = JPATH_SITE.'/media/breezingforms/pdftpl/fonts/';
-            if (@file_exists($sourcePath) && @is_readable($sourcePath) && @is_dir($sourcePath) && $handle = @opendir($sourcePath)) {
-                while (false !== ($file = @readdir($handle))) {
+            foreach ($this->fontDirectoryScanner()->scan($sourcePath) as $file) {
                     if($file!="." && $file!=".." && $this->endsWith(strtolower($file), '.php')) {
                         $file_sep = explode('.', $file);
                         if(count($file_sep) > 1){
@@ -120,8 +120,6 @@ class PdfDocument extends \TCPDF
                             }
                         }
                     }
-                }
-                @closedir($handle);
             }
         }
 
@@ -152,8 +150,7 @@ class PdfDocument extends \TCPDF
         if( is_dir(JPATH_SITE.'/media/breezingforms/pdftpl/fonts/') ){
 
             $sourcePath = JPATH_SITE.'/media/breezingforms/pdftpl/fonts/';
-            if (@file_exists($sourcePath) && @is_readable($sourcePath) && @is_dir($sourcePath) && $handle = @opendir($sourcePath)) {
-                while (false !== ($file = @readdir($handle))) {
+            foreach ($this->fontDirectoryScanner()->scan($sourcePath) as $file) {
                     if($file!="." && $file!=".." && $this->endsWith(strtolower($file), '.php')) {
                         $file_sep = explode('.', $file);
                         if(count($file_sep) > 1){
@@ -182,8 +179,6 @@ class PdfDocument extends \TCPDF
                             }
                         }
                     }
-                }
-                @closedir($handle);
             }
         }
 
@@ -303,5 +298,10 @@ class PdfDocument extends \TCPDF
     public function endsWith(string $haystack, string $needle): bool
     {
         return str_ends_with($haystack, $needle);
+    }
+
+    private function fontDirectoryScanner(): PdfFontDirectoryScanner
+    {
+        return $this->fontDirectoryScannerService ??= new PdfFontDirectoryScanner();
     }
 }

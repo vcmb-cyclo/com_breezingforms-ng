@@ -967,6 +967,11 @@ Le nettoyage du cache de paiement est désormais porté par
 `PaymentCacheCleaner`, en conservant son critère distinct de nommage à quatre
 segments et son expiration à 24 heures ; ses cas limites sont testés.
 
+La lecture du répertoire de polices PDF est mutualisée par
+`PdfFontDirectoryScanner` entre le document PDF, l'export et l'export des
+enregistrements. La sélection des fichiers réguliers lisibles et le répertoire
+absent sont couverts par des tests unitaires.
+
 Les paramètres additionnels `ff_otherparams` du mode frontend sont désormais
 générés par `AdditionalHiddenFieldsBuilder` via `bb469b88`, avec ordre,
 encodage URL et échappement HTML couverts. La détection des providers de

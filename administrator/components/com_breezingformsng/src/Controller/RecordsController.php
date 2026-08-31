@@ -18,6 +18,7 @@ use Joomla\Utilities\ArrayHelper;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\RecordModel;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\AjaxStateService;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\PdfDocument;
+use Vcmb\Component\BreezingformsNG\Administrator\Service\PdfFontDirectoryScanner;
 
 class RecordsController extends BaseController
 {
@@ -217,11 +218,7 @@ class RecordsController extends BaseController
         $activeFound = false;
         $ttfName = '';
         $fontDir = JPATH_SITE . '/media/breezingforms/pdftpl/fonts/';
-        if (is_dir($fontDir) && ($dh = @opendir($fontDir))) {
-            while (false !== ($f = @readdir($dh))) {
-                if ($f === '.' || $f === '..') {
-                    continue;
-                }
+        foreach ((new PdfFontDirectoryScanner())->scan($fontDir) as $f) {
                 $lower = strtolower($f);
                 if (str_ends_with($lower, '.php')) {
                     $parts = explode('.', $f);
@@ -237,8 +234,6 @@ class RecordsController extends BaseController
                     $pdf->SetFont($ttfName ?: implode('_', $parts));
                     $activeFound = true;
                 }
-            }
-            @closedir($dh);
         }
 
         if (!$activeFound) {

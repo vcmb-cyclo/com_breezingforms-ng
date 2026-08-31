@@ -47,6 +47,7 @@ use CB\Component\Contentbuilderng\Administrator\Service\ArticleService;
 use CB\Component\Contentbuilderng\Administrator\Service\ListSupportService;
 use CB\Component\Contentbuilderng\Administrator\Service\PermissionService;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\PdfDocument;
+use Vcmb\Component\BreezingformsNG\Administrator\Service\PdfFontDirectoryScanner;
 use Vcmb\Component\BreezingformsNG\Site\Service\Notification\MailSender;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampFormatter;
 
@@ -715,8 +716,7 @@ final class ExportEngine
         if (is_dir(JPATH_SITE . '/media/breezingforms/pdftpl/fonts/')) {
 
             $sourcePath = JPATH_SITE . '/media/breezingforms/pdftpl/fonts/';
-            if (@file_exists($sourcePath) && @is_readable($sourcePath) && @is_dir($sourcePath) && $handle = @opendir($sourcePath)) {
-                while (false !== ($file = @readdir($handle))) {
+            foreach ((new PdfFontDirectoryScanner())->scan($sourcePath) as $file) {
                     if ($file != "." && $file != ".." && $this->processor->endsWith(strtolower($file), '.php')) {
                         $file_sep = explode('.', $file);
                         if (count($file_sep) > 1) {
@@ -749,8 +749,6 @@ final class ExportEngine
                             }
                         }
                     }
-                }
-                @closedir($handle);
             }
         }
 

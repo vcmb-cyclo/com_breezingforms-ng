@@ -979,6 +979,10 @@ formulaire avant les modèles par défaut ; ces variantes sont testées.
 `UploadStorage` vérifie désormais directement le résultat de `chmod`, sans
 masquer les erreurs système, et conserve les statuts de stockage testés.
 
+L'assemblage des chunks du callback Flash est désormais isolé dans
+`FlashChunkAssembler`; la concaténation des fichiers existants et le rejet
+d'un chunk absent sont couverts par des tests unitaires.
+
 Les paramètres additionnels `ff_otherparams` du mode frontend sont désormais
 générés par `AdditionalHiddenFieldsBuilder` via `bb469b88`, avec ordre,
 encodage URL et échappement HTML couverts. La détection des providers de

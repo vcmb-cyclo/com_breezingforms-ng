@@ -19,6 +19,7 @@ use Joomla\CMS\Uri\Uri;
 use Joomla\Database\ParameterType;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Filesystem\File;
+use Vcmb\Component\BreezingformsNG\Site\Service\Upload\FlashChunkAssembler;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\FlashUploadSizeValidator;
 
 /**
@@ -26,6 +27,8 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Upload\FlashUploadSizeValidator;
  */
 final class FlashUploadCallback
 {
+    private ?FlashChunkAssembler $chunkAssemblerService = null;
+
     public function __construct(
         private readonly CMSApplication $application,
         private readonly DatabaseInterface $database,
@@ -62,7 +65,7 @@ final class FlashUploadCallback
         if ($formIdCount > 0) {
             $tempFile = (string) ($uploadedFile['tmp_name'] ?? '');
             $targetPath = JPATH_SITE . '/components/com_breezingformsng/uploads/';
-            if (@file_exists($targetPath) && @is_dir($targetPath)) {
+            if (is_dir($targetPath)) {
                 $secureTicket = $this->application->getSession()->get('secure_ticket', '', 'com_breezingformsng');
                 if ($secureTicket == '') {
                     mt_srand();
@@ -73,29 +76,9 @@ final class FlashUploadCallback
                 $targetFile = str_replace('//', '/', $targetPath) . 'chunks/' . $input->getInt('offset', 0) . '_' . bf_sanitizeFilename($input->getString('name', 'unknown')) . '_' . $input->getString('itemName', '') . '_' . $input->getString('bfFlashUploadTicket', '') . '_' . $secureTicket . '_chunktmp';
                 $finaltargetFile = str_replace('//', '/', $targetPath) . bf_sanitizeFilename($input->getString('name', 'unknown')) . '_' . $input->getString('itemName', '') . '_' . $input->getString('bfFlashUploadTicket', '') . '_' . $secureTicket . '_flashtmp';
 
-                if (@File::upload($tempFile, $targetFile)) {
-
-                    $chunky = @file_get_contents($targetFile);
-
-                    // ok, here we try native PHP file operation
-                    // to prevent opening and readin the file
-                    if (@is_writable(str_replace('//', '/', $targetPath))) {
-                        $fp = @fopen($finaltargetFile, 'ab');
-                        @fwrite($fp, $chunky);
-                        @fclose($fp);
-                    } else {
-                        // as last resort, we use the
-                        // joomla api that uses FTP if possible
-                        // and if the folder is not writable
-                        // and hope the file is not exceeding the
-                        // php memory limit
-                        $final = '';
-                        if (@file_exists($finaltargetFile)) {
-                            $final = @file_get_contents($finaltargetFile);
-                        }
-                        $newbuf = $final . $chunky;
-                        @File::write($finaltargetFile, $newbuf);
-                    }
+                if (File::upload($tempFile, $targetFile)
+                    && $this->chunkAssembler()->append($targetFile, $finaltargetFile, $targetPath)
+                ) {
 
                     $dataObject = json_decode(bf_b64dec($objectList[0]->template_code), true);
 
@@ -112,7 +95,7 @@ final class FlashUploadCallback
                         $this->application->close();
                     }
 
-                    @File::delete($targetFile);
+                    File::delete($targetFile);
                 } else {
                     echo Text::_('COM_BREEZINGFORMSNG_PROCESS_UPLOADFAILED');
                 }
@@ -124,6 +107,11 @@ final class FlashUploadCallback
         }
     }
     $this->application->close();
+    }
+
+    private function chunkAssembler(): FlashChunkAssembler
+    {
+        return $this->chunkAssemblerService ??= new FlashChunkAssembler();
     }
 
 }

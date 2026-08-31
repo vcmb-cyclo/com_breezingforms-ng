@@ -74,33 +74,26 @@ final class RenderingEngine
     private ?ClassicQueryListMarkupBuilder $classicQueryListMarkupBuilderService = null;
     private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
     private ?EditableRecordHydrationScriptBuilder $editableRecordHydrationScriptBuilderService = null;
-    private ?EditableRecordScriptWrapperBuilder $editableRecordScriptWrapperBuilderService = null;
+    private ?HiddenFormFieldsBuilder $hiddenFormFieldsBuilderService = null;
+    private ?LegacyScriptTagWrapperBuilder $legacyScriptTagWrapperBuilderService = null;
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
     private ?ContentBuilderSignatureScriptBuilder $contentBuilderSignatureScriptBuilderService = null;
     private ?ContentBuilderFileUploadScriptBuilder $contentBuilderFileUploadScriptBuilderService = null;
     private ?EditableRecordLoader $editableRecordLoaderService = null;
     private ?PostRenderScriptBuilder $postRenderScriptBuilderService = null;
-    private ?PaymentMethodFieldBuilder $paymentMethodFieldBuilderService = null;
     private ?ContentBuilderTechnicalFieldsBuilder $contentBuilderTechnicalFieldsBuilderService = null;
-    private ?FormRoutingFieldsBuilder $formRoutingFieldsBuilderService = null;
-    private ?FormTokenFieldBuilder $formTokenFieldBuilderService = null;
-    private ?FormContextFieldsBuilder $formContextFieldsBuilderService = null;
     private ?FormClosingMarkupBuilder $formClosingMarkupBuilderService = null;
     private ?FormOpeningMarkupBuilder $formOpeningMarkupBuilderService = null;
     private ?FormOptionalContextFieldsBuilder $formOptionalContextFieldsBuilderService = null;
-    private ?FormSubmissionFieldsBuilder $formSubmissionFieldsBuilderService = null;
     private ?MobileChoiceMarkupBuilder $mobileChoiceMarkupBuilderService = null;
     private ?CaptchaWrapperMarkupBuilder $captchaWrapperMarkupBuilderService = null;
     private ?QuickModeFormTagBuilder $quickModeFormTagBuilderService = null;
-    private ?ContentBuilderReadonlyScriptWrapperBuilder $contentBuilderReadonlyScriptWrapperBuilderService = null;
-    private ?FormValidationScriptWrapperBuilder $formValidationScriptWrapperBuilderService = null;
     private ?FileExtensionsCheckBuilder $fileExtensionsCheckBuilderService = null;
     private ?QueryListSelectAllScriptBuilder $queryListSelectAllScriptBuilderService = null;
     private ?QueryListNavigationBuilder $queryListNavigationBuilderService = null;
     private ?QueryListRowsRefreshBuilder $queryListRowsRefreshBuilderService = null;
     private ?QueryListPaginationTailBuilder $queryListPaginationTailBuilderService = null;
     private ?QueryListStateLibraryBuilder $queryListStateLibraryBuilderService = null;
-    private ?AdditionalHiddenFieldsBuilder $additionalHiddenFieldsBuilderService = null;
     private ?PaymentProviderDetector $paymentProviderDetectorService = null;
     private ?ContentBuilderFileValueParser $contentBuilderFileValueParserService = null;
     private ?ContentBuilderFileDisplayNameBuilder $contentBuilderFileDisplayNameBuilderService = null;
@@ -115,7 +108,6 @@ final class RenderingEngine
     private ?ContentBuilderValueHydrationScriptBuilder $contentBuilderValueHydrationScriptBuilderService = null;
     private ?ContentBuilderChoiceHydrationScriptBuilder $contentBuilderChoiceHydrationScriptBuilderService = null;
     private ?ContentBuilderSelectHydrationScriptBuilder $contentBuilderSelectHydrationScriptBuilderService = null;
-    private ?ContentBuilderEditableScriptWrapperBuilder $contentBuilderEditableScriptWrapperBuilderService = null;
     private ?ContentBuilderFileHydrationScriptBuilder $contentBuilderFileHydrationScriptBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
@@ -297,9 +289,14 @@ final class RenderingEngine
             new EditableRecordHydrationScriptBuilder($this->contentBuilderValueScriptBuilder());
     }
 
-    private function editableRecordScriptWrapperBuilder(): EditableRecordScriptWrapperBuilder
+    private function hiddenFormFieldsBuilder(): HiddenFormFieldsBuilder
     {
-        return $this->editableRecordScriptWrapperBuilderService ??= new EditableRecordScriptWrapperBuilder();
+        return $this->hiddenFormFieldsBuilderService ??= new HiddenFormFieldsBuilder();
+    }
+
+    private function legacyScriptTagWrapperBuilder(): LegacyScriptTagWrapperBuilder
+    {
+        return $this->legacyScriptTagWrapperBuilderService ??= new LegacyScriptTagWrapperBuilder();
     }
 
     private function contentBuilderReadonlyScriptBuilder(): ContentBuilderReadonlyScriptBuilder
@@ -327,30 +324,14 @@ final class RenderingEngine
         return $this->postRenderScriptBuilderService ??= new PostRenderScriptBuilder();
     }
 
-    private function paymentMethodFieldBuilder(): PaymentMethodFieldBuilder
-    {
-        return $this->paymentMethodFieldBuilderService ??= new PaymentMethodFieldBuilder();
-    }
 
     private function contentBuilderTechnicalFieldsBuilder(): ContentBuilderTechnicalFieldsBuilder
     {
         return $this->contentBuilderTechnicalFieldsBuilderService ??= new ContentBuilderTechnicalFieldsBuilder();
     }
 
-    private function formRoutingFieldsBuilder(): FormRoutingFieldsBuilder
-    {
-        return $this->formRoutingFieldsBuilderService ??= new FormRoutingFieldsBuilder();
-    }
 
-    private function formTokenFieldBuilder(): FormTokenFieldBuilder
-    {
-        return $this->formTokenFieldBuilderService ??= new FormTokenFieldBuilder();
-    }
 
-    private function formContextFieldsBuilder(): FormContextFieldsBuilder
-    {
-        return $this->formContextFieldsBuilderService ??= new FormContextFieldsBuilder();
-    }
 
     private function formClosingMarkupBuilder(): FormClosingMarkupBuilder
     {
@@ -367,10 +348,6 @@ final class RenderingEngine
         return $this->formOptionalContextFieldsBuilderService ??= new FormOptionalContextFieldsBuilder();
     }
 
-    private function formSubmissionFieldsBuilder(): FormSubmissionFieldsBuilder
-    {
-        return $this->formSubmissionFieldsBuilderService ??= new FormSubmissionFieldsBuilder();
-    }
 
     private function mobileChoiceMarkupBuilder(): MobileChoiceMarkupBuilder
     {
@@ -387,15 +364,7 @@ final class RenderingEngine
         return $this->quickModeFormTagBuilderService ??= new QuickModeFormTagBuilder();
     }
 
-    private function contentBuilderReadonlyScriptWrapperBuilder(): ContentBuilderReadonlyScriptWrapperBuilder
-    {
-        return $this->contentBuilderReadonlyScriptWrapperBuilderService ??= new ContentBuilderReadonlyScriptWrapperBuilder();
-    }
 
-    private function formValidationScriptWrapperBuilder(): FormValidationScriptWrapperBuilder
-    {
-        return $this->formValidationScriptWrapperBuilderService ??= new FormValidationScriptWrapperBuilder();
-    }
 
     private function fileExtensionsCheckBuilder(): FileExtensionsCheckBuilder
     {
@@ -427,10 +396,6 @@ final class RenderingEngine
         return $this->queryListStateLibraryBuilderService ??= new QueryListStateLibraryBuilder();
     }
 
-    private function additionalHiddenFieldsBuilder(): AdditionalHiddenFieldsBuilder
-    {
-        return $this->additionalHiddenFieldsBuilderService ??= new AdditionalHiddenFieldsBuilder();
-    }
 
     private function paymentProviderDetector(): PaymentProviderDetector
     {
@@ -502,10 +467,6 @@ final class RenderingEngine
         return $this->contentBuilderSelectHydrationScriptBuilderService ??= new ContentBuilderSelectHydrationScriptBuilder();
     }
 
-    private function contentBuilderEditableScriptWrapperBuilder(): ContentBuilderEditableScriptWrapperBuilder
-    {
-        return $this->contentBuilderEditableScriptWrapperBuilderService ??= new ContentBuilderEditableScriptWrapperBuilder();
-    }
 
     private function contentBuilderFileHydrationScriptBuilder(): ContentBuilderFileHydrationScriptBuilder
     {
@@ -679,7 +640,7 @@ final class RenderingEngine
 
         $capFunc = $this->buildCaptchaScript($captchaError, $capFunc);
 
-        echo $this->formValidationScriptWrapperBuilder()->open(
+        echo $this->legacyScriptTagWrapperBuilder()->formValidationOpen(
             $fileExtensionsCheck,
             $capFunc,
             nl()
@@ -783,7 +744,7 @@ final class RenderingEngine
             }
         } // if
 
-        echo $this->formValidationScriptWrapperBuilder()->close(nl());
+        echo $this->legacyScriptTagWrapperBuilder()->formValidationClose(nl());
 
         if ($icons > 0) {
             RuntimeAssetLoader::script(
@@ -833,7 +794,7 @@ final class RenderingEngine
 
                 $js = $this->editableRecordHydrationScriptBuilder()->build($recordEntries, (int) $this->processor->form);
 
-                echo $this->editableRecordScriptWrapperBuilder()->build(
+                echo $this->legacyScriptTagWrapperBuilder()->editableRecord(
                     (int) $this->processor->form,
                     $js,
                     nl()
@@ -970,7 +931,7 @@ final class RenderingEngine
                 }
             }
 
-            echo $this->contentBuilderEditableScriptWrapperBuilder()->build(
+            echo $this->legacyScriptTagWrapperBuilder()->contentBuilderEditable(
                 (int) $this->processor->form,
                 $cbJs,
                 $js
@@ -982,7 +943,7 @@ final class RenderingEngine
             $cbNonEditableFields = ListSupportService::createFromRuntimeContext()->getListNonEditableElements($cbResult['data']['id']);
             if (count($cbNonEditableFields)) {
                 $this->processor->app->getDocument()->getWebAssetManager()->addInlineScript('<!--' . nl() . 'var bfDeactivateField = new Array();' . nl() . '//-->');
-                echo $this->contentBuilderReadonlyScriptWrapperBuilder()->build(
+                echo $this->legacyScriptTagWrapperBuilder()->contentBuilderReadonly(
                     $this->contentBuilderReadonlyScriptBuilder()->build($cbNonEditableFields),
                     nl()
                 );
@@ -1495,23 +1456,23 @@ final class RenderingEngine
         }
 
         if ($this->paymentProviderDetector()->hasSupportedProvider($this->processor->rows)) {
-            echo $this->paymentMethodFieldBuilder()->build(indentc(1));
+            echo $this->hiddenFormFieldsBuilder()->paymentMethod(indentc(1));
         }
 
         switch ($this->processor->runmode) {
             case _FF_RUNMODE_FRONTEND:
-                echo $this->formContextFieldsBuilder()->build([
+                echo $this->hiddenFormFieldsBuilder()->context([
                     'ff_contentid' => $this->processor->app->getInput()->getInt('ff_contentid', 0),
                     'ff_applic' => $this->processor->app->getInput()->getWord('ff_applic', ''),
                     'ff_record_id' => $this->processor->record_id,
                     'ff_module_id' => $this->processor->app->getInput()->getInt('ff_module_id', 0),
                 ], indentc(1));
-                echo $this->formSubmissionFieldsBuilder()->build(
+                echo $this->hiddenFormFieldsBuilder()->submission(
                     (int) $this->processor->form,
                     indentc(1),
                     nl()
                 ) .
-                    $this->formTokenFieldBuilder()->build(
+                    $this->hiddenFormFieldsBuilder()->token(
                         \Joomla\CMS\HTML\HTMLHelper::_('form.token'),
                         indentc(1),
                         nl()
@@ -1530,7 +1491,7 @@ final class RenderingEngine
                     true,
                     nl()
                 );
-                echo $this->additionalHiddenFieldsBuilder()->build($ff_otherparams, indentc(1), nl());
+                echo $this->hiddenFormFieldsBuilder()->additional($ff_otherparams, indentc(1), nl());
                 if ($this->processor->app->getInput()->getInt('cb_form_id', 0)) {
                     echo $this->contentBuilderTechnicalFieldsBuilder()->build(
                         '',
@@ -1539,7 +1500,7 @@ final class RenderingEngine
                         $this->processor->app->getInput()->getBool('cbIsNew', false)
                     );
                 }
-                echo $this->formRoutingFieldsBuilder()->build(
+                echo $this->hiddenFormFieldsBuilder()->routing(
                     $this->processor->app->getInput()->getString('return', ''),
                     $this->processor->app->getInput()->getString('tmpl', ''),
                     nl()
@@ -1548,18 +1509,18 @@ final class RenderingEngine
                 break;
 
             case _FF_RUNMODE_BACKEND:
-                echo $this->formSubmissionFieldsBuilder()->build(
+                echo $this->hiddenFormFieldsBuilder()->submission(
                     (int) $this->processor->form,
                     indentc(1),
                     nl(),
                     true
                 ) .
-                    $this->formTokenFieldBuilder()->build(
+                    $this->hiddenFormFieldsBuilder()->token(
                         \Joomla\CMS\HTML\HTMLHelper::_('form.token'),
                         indentc(1),
                         nl()
                     ) .
-                    $this->formContextFieldsBuilder()->build([
+                    $this->hiddenFormFieldsBuilder()->context([
                         'ff_contentid' => $this->processor->app->getInput()->getInt('ff_contentid', 0),
                         'ff_applic' => $this->processor->app->getInput()->getWord('ff_applic', ''),
                         'ff_record_id' => $this->processor->record_id,
@@ -1588,7 +1549,7 @@ final class RenderingEngine
                         $this->processor->app->getInput()->getBool('cbIsNew', false)
                     );
                 }
-                echo $this->formRoutingFieldsBuilder()->build(
+                echo $this->hiddenFormFieldsBuilder()->routing(
                     $this->processor->app->getInput()->getString('return', ''),
                     $this->processor->app->getInput()->getString('tmpl', ''),
                     nl()
@@ -1598,19 +1559,19 @@ final class RenderingEngine
 
             default: // _FF_RUNMODE_PREVIEW:
                 if ($this->processor->inframe) {
-                    echo $this->formSubmissionFieldsBuilder()->build(
+                    echo $this->hiddenFormFieldsBuilder()->submission(
                         (int) $this->processor->form,
                         indentc(1),
                         nl(),
                         false,
                         true
                     ) .
-                    $this->formTokenFieldBuilder()->build(
+                    $this->hiddenFormFieldsBuilder()->token(
                         \Joomla\CMS\HTML\HTMLHelper::_('form.token'),
                         indentc(1),
                         nl()
                     ) .
-                    $this->formContextFieldsBuilder()->build([
+                    $this->hiddenFormFieldsBuilder()->context([
                         'ff_contentid' => $this->processor->app->getInput()->getInt('ff_contentid', 0),
                         'ff_applic' => $this->processor->app->getInput()->getWord('ff_applic', ''),
                         'ff_record_id' => $this->processor->record_id,
@@ -1639,7 +1600,7 @@ final class RenderingEngine
                             $this->processor->app->getInput()->getBool('cbIsNew', false)
                         );
                     }
-                    echo $this->formRoutingFieldsBuilder()->build(
+                    echo $this->hiddenFormFieldsBuilder()->routing(
                         $this->processor->app->getInput()->getString('return', ''),
                         $this->processor->app->getInput()->getString('tmpl', ''),
                         nl()

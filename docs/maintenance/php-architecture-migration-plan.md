@@ -541,6 +541,88 @@ et que les appels publics nécessaires sont identifiés.
 - Ne pas conserver de chemin alternatif pour les anciennes versions de Joomla
   ou PHP.
 
+## Phase 8 — Consolider les builders triviaux
+
+Ajoutée le 2026-08-31, en retour sur les phases 1 à 5 : l'extraction
+systématique de chaque bloc de `RenderingEngine::view()` en sa propre classe
+a, dans une minorité de cas, produit des classes disproportionnées par
+rapport à ce qu'elles font — un fichier, une propriété et un getter
+lazy-init dans `RenderingEngine`, et un fichier de test, pour une seule
+chaîne statique sans branchement ni réutilisation. `PaymentMethodFieldBuilder`
+en est l'exemple type :
+
+```php
+public function build(string $indentation): string
+{
+    return $indentation . '<input type="hidden" name="ff_payment_method" id="bfPaymentMethod" value=""/>' . "\n";
+}
+```
+
+### Critère de consolidation
+
+Une classe extraite est candidate à un regroupement quand elle cumule :
+
+1. **Aucune branche conditionnelle** (ou une seule, triviale) — une pure
+   fonction de mise en forme, sans logique à isoler.
+2. **Un seul appelant** — aucun bénéfice de réutilisation qui justifierait
+   un fichier séparé (à l'inverse des builders `QuickMode*Builder` partagés
+   entre les 4 renderers, dont l'extraction élimine une vraie duplication et
+   reste hors périmètre de cette phase).
+3. **Un thème réel commun** avec d'autres classes du même profil — sans
+   thème partagé, forcer un regroupement ne ferait que déplacer le problème
+   vers une classe fourre-tout, ce qui n'est pas non plus souhaitable.
+
+Analyse quantitative (branches conditionnelles + nombre de fichiers
+appelants, sur l'ensemble des classes `*Builder` de
+`components/com_breezingformsng/src/Service/Rendering`) : deux
+regroupements clairs identifiés (ci-dessous), et six classes triviales sans
+partenaire thématique clair (`ClassNameResolver`,
+`ContentBuilderFileDisplayNameBuilder`, `MobileChoiceMarkupBuilder`,
+`QuickModeSubmitButtonRestoreBuilder`, `QueryListStateLibraryBuilder`,
+`CaptchaEndpointBuilder`) — laissées telles quelles, faute de regroupement
+honnête.
+
+### 8.1 `HiddenFormFieldsBuilder` — champs `<input type="hidden">`
+
+Consolide 6 classes qui construisaient chacune des champs cachés du
+formulaire rendu, sans logique substantielle :
+`PaymentMethodFieldBuilder`, `FormTokenFieldBuilder`,
+`AdditionalHiddenFieldsBuilder`, `FormRoutingFieldsBuilder`,
+`FormSubmissionFieldsBuilder`, `FormContextFieldsBuilder` → méthodes
+`paymentMethod()`, `token()`, `additional()`, `routing()`, `submission()`,
+`context()`.
+
+### 8.2 `LegacyScriptTagWrapperBuilder` — habillage `<script>` historique
+
+Consolide 4 classes qui enveloppaient chacune un fragment JavaScript dans le
+tag `<script><!-- ... //--></script>` hérité du rendu historique :
+`ContentBuilderReadonlyScriptWrapperBuilder`,
+`FormValidationScriptWrapperBuilder`, `EditableRecordScriptWrapperBuilder`,
+`ContentBuilderEditableScriptWrapperBuilder` → méthodes
+`contentBuilderReadonly()`, `formValidationOpen()`/`formValidationClose()`,
+`editableRecord()`, `contentBuilderEditable()`.
+
+### Méthode de vérification
+
+Chaque corps de méthode a été comparé octet pour octet à la classe d'origine
+avant toute suppression (extraction automatisée des deux corps, comparaison
+stricte) — aucune des 10 méthodes déplacées n'a changé de comportement. Les
+propriétés/getters lazy-init et points d'appel de `RenderingEngine.php` ont
+été mis à jour vers les deux nouvelles classes ; les 10 anciens fichiers et
+leurs 10 fichiers de test ont été supprimés après fusion des cas de test
+dans deux fichiers de test consolidés. Suite complète verte, PHPStan propre,
+build + validation du package.
+
+### Note sur les mentions historiques
+
+Les phases 1 à 6 ci-dessus continuent de citer les 10 anciennes classes par
+leur nom (avec leur hash de commit) : ce sont des enregistrements
+historiques du travail effectué à l'époque, exacts au moment où ils ont été
+écrits — ils n'ont pas été réécrits rétroactivement pour ne pas fausser la
+traçabilité. Les classes qu'ils nomment sont désormais des méthodes de
+`HiddenFormFieldsBuilder` ou `LegacyScriptTagWrapperBuilder` (voir 8.1/8.2
+ci-dessus pour la correspondance).
+
 ## Travail en parallèle
 
 | Couloir | Fichiers principaux | Peut avancer avec |

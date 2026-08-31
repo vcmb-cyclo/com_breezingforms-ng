@@ -778,23 +778,19 @@ class BootstrapRenderer
 " . QuickModeUploadThumbnailScriptBuilder::build($base, chr(10)) . "
                                                         JQuery(document).ready(
                                                             function() {
-                                                                var iOS = ( navigator.userAgent.match(/(iPad|iPhone|iPod)/i) ? true : false );
-                                                                var uploader = new plupload.Uploader({
-                                                                        max_retries: 10,
-                                                                        multi_selection: " . $multiSelection . ",
-                                                                        unique_names: iOS,
-                                                                        chunk_size: '100kb',
-                                                                        runtimes : '" . $runtimes . "',
-                                                                        browse_button : 'bfPickFiles" . $mdata['dbId'] . "',
-                                                                        container: 'bfUploadContainer" . $mdata['dbId'] . "',
-                                                                        file_data_name: 'Filedata',
-                                                                        multipart_params: { form: " . $this->p->form . ", itemName : '" . $mdata['bfName'] . "', bfFlashUploadTicket: '" . $this->flashUploadTicket . "', option: 'com_breezingformsng', format: 'html', flashUpload: 'true', Itemid: 0 },
-                                                                        url : '" . $base . ($this->p->app->getConfig()->get('sef') && !$this->p->app->getConfig()->get('sef_rewrite') ? 'index.php/' : '') . ($this->p->app->getInput()->getCmd('lang', '') && $this->p->app->getConfig()->get('sef') ? ($this->p->app->getConfig()->get('sef_rewrite') ? 'index.php' : '') : 'index.php') . "',
-                                                                        flash_swf_url : '" . $base . "components/com_breezingformsng/libraries/jquery/plupload/Moxie.swf',
-                                                                        filters : [
-                                                                                {title : " . json_encode(Text::_('COM_BREEZINGFORMSNG_CHOOSE_FILE')) . ", extensions : '" . $exts . "'}
-                                                                        ]
-                                                                });
+" . (new QuickModeUploadConfigurationBuilder())->build(
+    (int) $this->p->form,
+    (string) $mdata['bfName'],
+    (string) $this->flashUploadTicket,
+    (string) $base,
+    (int) $mdata['dbId'],
+    (string) $runtimes,
+    (string) $exts,
+    (string) $multiSelection,
+    (string) json_encode(Text::_('COM_BREEZINGFORMSNG_CHOOSE_FILE')),
+    chr(10),
+    (string) ($base . ($this->p->app->getConfig()->get('sef') && !$this->p->app->getConfig()->get('sef_rewrite') ? 'index.php/' : '') . ($this->p->app->getInput()->getCmd('lang', '') && $this->p->app->getConfig()->get('sef') ? ($this->p->app->getConfig()->get('sef_rewrite') ? 'index.php' : '') : 'index.php'))
+) . "
 " . QuickModeUploadQueueEntryScriptBuilder::build(chr(10), true) . "
                                                                         for (var i in files) {
                                                                             if(typeof files[i].id != 'undefined' && files[i].id != null){

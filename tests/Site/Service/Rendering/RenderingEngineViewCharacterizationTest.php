@@ -1478,4 +1478,33 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertStringNotContainsString('<piece>', $html);
     }
 
+    public function testViewReachesPreviewFinalizationOnlyInsideFrame(): void
+    {
+        $processor = $this->makeProcessorReadyForCaptchaScript([]);
+        $processor->formrow->name = 'preview';
+        $processor->formrow->piece2cond = 0;
+        $processor->formrow->script1cond = 0;
+        $processor->formrow->script1id = 0;
+        $processor->formrow->script1code = '';
+        $processor->formrow->script2cond = 0;
+        $processor->formrow->script2id = 0;
+        $processor->formrow->script2code = '';
+        $processor->formrow->class2 = '';
+        $processor->form_id = 7;
+        $processor->target = 0;
+        $processor->align = 0;
+        $processor->top = 0;
+        $processor->runmode = 2;
+        $processor->inframe = 1;
+        $processor->traceMode = 0;
+        $processor->buryOnCallNumber = null;
+        $GLOBALS['ff_otherparams'] = [];
+
+        $html = $this->captureCaptchaScript($processor);
+
+        self::assertStringContainsString('</div><!-- form end -->', $html);
+        self::assertStringContainsString('name="ff_runmode" value="2"', $html);
+        self::assertStringContainsString('name="ff_frame" value="1"', $html);
+    }
+
 }

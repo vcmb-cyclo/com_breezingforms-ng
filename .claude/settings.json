@@ -16,7 +16,15 @@
       "Bash(node /home/xavier/.claude/skills/browser-automation/browser.mjs \"http://localhost:9080/administrator/index.php\" --script /tmp/claude-1000/-home-xavier-workspaces-vcmb-com-breezingformsng/4dd3c0c5-8903-43f6-9bf4-0d7c12f24754/scratchpad/check-customjs.mjs --timeout 30000)",
       "Bash(node -c media/com_breezingformsng/js/custom.js)",
       "Bash(node --check media/com_breezingformsng/js/custom.js)",
-      "Bash(node /home/xavier/.claude/skills/browser-automation/browser.mjs \"http://localhost:9080/administrator/index.php\" --script /tmp/claude-1000/-home-xavier-workspaces-vcmb-com-breezingformsng/4dd3c0c5-8903-43f6-9bf4-0d7c12f24754/scratchpad/check-icon-content.mjs --timeout 30000)"
+      "Bash(node /home/xavier/.claude/skills/browser-automation/browser.mjs \"http://localhost:9080/administrator/index.php\" --script /tmp/claude-1000/-home-xavier-workspaces-vcmb-com-breezingformsng/4dd3c0c5-8903-43f6-9bf4-0d7c12f24754/scratchpad/check-icon-content.mjs --timeout 30000)",
+      "Bash(pdfinfo \"/home/xavier/workspaces/vcmb/com_breezingformsng/docs/Charte graphique BreezingFormsNG.pdf\")",
+      "Bash(php -l administrator/components/com_breezingformsng/src/Helper/QuickmodeHtml.php)",
+      "Bash(python3 -c \"import json; json.load\\(open\\('media/com_breezingformsng/joomla.asset.json'\\)\\)\")",
+      "Bash(node /home/xavier/.claude/skills/browser-automation/browser.mjs \"http://localhost:9080/administrator/index.php\" --script /tmp/claude-1000/-home-xavier-workspaces-vcmb-com-breezingformsng/4dd3c0c5-8903-43f6-9bf4-0d7c12f24754/scratchpad/verify-field3.mjs --timeout 30000)",
+      "Bash(node /home/xavier/.claude/skills/browser-automation/browser.mjs \"http://localhost:9080/administrator/index.php\" --script /tmp/claude-1000/-home-xavier-workspaces-vcmb-com-breezingformsng/4dd3c0c5-8903-43f6-9bf4-0d7c12f24754/scratchpad/verify-field2.mjs --timeout 30000)"
+    ],
+    "additionalDirectories": [
+      "/home/xavier/.claude/projects/-home-xavier-workspaces-vcmb-com-breezingformsng"
     ]
   }
 }

@@ -19,8 +19,9 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering;
  */
 final class ClassicQueryListRowBuilder
 {
-    public function __construct(private readonly ClassicQueryListCellBuilder $cellBuilder = new ClassicQueryListCellBuilder())
-    {
+    public function __construct(
+        private readonly ClassicQueryListCellBuilder $cellBuilder = new ClassicQueryListCellBuilder()
+    ) {
     }
 
     /**

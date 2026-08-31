@@ -539,6 +539,11 @@ Les deux builders Classic déjà conformes (`ClassicHiddenInputBuilder` et
 builders Classic attendent un nettoyage par famille accompagné de leurs
 caractérisations.
 
+La famille Classic Query List est désormais entièrement suivie par PHPCS :
+settings, header, cellule, ligne, footer et enveloppe passent le contrôle
+après un découpage de quatre lignes trop longues, avec leurs tests directs
+conservés comme filet de sortie.
+
 Le premier nettoyage ciblé de cette baseline PHPCS est réalisé dans
 `QuickModeSelectBuilder`, `QuickModeCaptchaMarkupBuilder` et
 `QuickModeUploadOptionsBuilder` (`eaf8b2d1`) : leurs sorties sont inchangées et

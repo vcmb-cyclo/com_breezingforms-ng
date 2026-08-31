@@ -83,7 +83,8 @@ final class ClassicQueryListHeaderBuilder
 
             if ($columnIndex === 0 && $selectionMode > 0) {
                 $cell = $selectionMode === 1
-                    ? '<th' . $attributes . '><input type="checkbox" id="ff_cb' . $rowId . '" onclick="ff_selectAllQueryRows(' . $rowId . ',this.checked);" /></th>'
+                    ? '<th' . $attributes . '><input type="checkbox" id="ff_cb' . $rowId
+                        . '" onclick="ff_selectAllQueryRows(' . $rowId . ',this.checked);" /></th>'
                     : '<th' . $attributes . '></th>';
             } else {
                 $cell = '<th' . $attributes . '>' . $titleResolver($column) . '</th>';

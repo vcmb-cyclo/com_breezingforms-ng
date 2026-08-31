@@ -16,6 +16,11 @@
     <file>components/com_breezingformsng/src/Service/Rendering/ClassNameResolver.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicHiddenInputBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicQueryListMarkupBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ClassicQueryListSettingsBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ClassicQueryListHeaderBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ClassicQueryListCellBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ClassicQueryListRowBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ClassicQueryListFooterBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderValueScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderReadonlyScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderSignatureScriptBuilder.php</file>

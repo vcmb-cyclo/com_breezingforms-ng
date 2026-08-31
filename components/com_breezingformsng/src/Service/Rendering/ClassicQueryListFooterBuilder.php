@@ -58,7 +58,8 @@ final class ClassicQueryListFooterBuilder
                 for ($page = 2; $page <= $pages; $page++) {
                     $footer .= $compactNewline === ''
                         ? '<a href="javascript:ff_dispQueryPage(' . $rowId . ',' . $page . ');">' . $page . '</a> '
-                        : '<a href="javascript:ff_dispQueryPage(' . $rowId . ',' . $page . ');">' . $page . '</a> ' . $compactNewline;
+                        : '<a href="javascript:ff_dispQueryPage(' . $rowId . ',' . $page
+                            . ');">' . $page . '</a> ' . $compactNewline;
                 }
                 $footer .= $compactNewline;
             }

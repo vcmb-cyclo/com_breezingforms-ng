@@ -21,7 +21,15 @@ final class ClassicQueryListSettingsBuilder
 {
     /**
      * @param callable(string): string $classResolver
-     * @return array{tableAttributes: string, headerClass: string, oddClass: string, evenClass: string, footerClass: string, footerCellClass: string, pageNavigation: int}
+     * @return array{
+     *     tableAttributes: string,
+     *     headerClass: string,
+     *     oddClass: string,
+     *     evenClass: string,
+     *     footerClass: string,
+     *     footerCellClass: string,
+     *     pageNavigation: int
+     * }
      */
     public function build(string $settingsText, int $width, callable $classResolver): array
     {

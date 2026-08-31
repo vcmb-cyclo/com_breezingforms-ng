@@ -148,6 +148,23 @@ final class RuntimeContextInitializerTest extends TestCase
         );
     }
 
+    public function testUsesDefaultParameterSetAndIgnoresArrayValues(): void
+    {
+        $application = new CMSApplication();
+        $application->getInput()->values = [
+            'option' => ['com_content'],
+            'Itemid' => ['11'],
+        ];
+
+        $result = (new RuntimeContextInitializer($application, $this->configuration(0)))->initialize(
+            'https://example.test',
+            '/component',
+            null
+        );
+
+        self::assertSame([], $result['otherParameters']);
+    }
+
     private function configuration(int $liveSite): FormConfiguration
     {
         $configuration = (new ReflectionClass(FormConfiguration::class))->newInstanceWithoutConstructor();

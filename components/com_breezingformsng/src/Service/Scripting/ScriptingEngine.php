@@ -95,7 +95,7 @@ final class ScriptingEngine
                 $ret = $this->scriptingRuntime()->executePiece($this->processor, $code, $name, $type, $id, $pane);
             } catch (Error $e) {
                 $this->processor->app->enqueueMessage($e->getMessage() . " in $name.", 'error');
-                if (\defined('JDEBUG') && JDEBUG) {
+                if ($this->processor->app->getConfig()->get('debug', false)) {
                     Log::add( "PHP piece '$name' : " .$e->getMessage(), Log::DEBUG, 'BF Piece');
                 }
             }
@@ -215,7 +215,7 @@ final class ScriptingEngine
                 $value
             );
         } catch (Error $e) {
-            if (\defined('JDEBUG') && JDEBUG) {
+            if ($this->processor->app->getConfig()->get('debug', false)) {
                 $this->processor->app->enqueueMessage($e->getMessage() . " in {$elem->name}.", 'error');
                 Log::add("Piece PHP '{$elem->name}' invalid :" . $e->getMessage(), Log::DEBUG, 'BF Piece');
             }
@@ -241,7 +241,7 @@ final class ScriptingEngine
                     $coldefs
                 );
             } catch (Error $e) {
-                if (\defined('JDEBUG') && JDEBUG) {
+                if ($this->processor->app->getConfig()->get('debug', false)) {
                     $this->processor->app->enqueueMessage($e->getMessage() . " in {$elem->name}.", 'error');
                     Log::add("PHP piece '{$elem->name}' : " . $e->getMessage(), Log::DEBUG, 'BF Piece');
                 }

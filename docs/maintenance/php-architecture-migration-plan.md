@@ -812,6 +812,13 @@ désormais directement sur l'erreur nullable du résultat, et les instructions
 inatteignables de `_ff_errorHandler` sont supprimées. Le filet architectural
 verrouille ces invariants ; le niveau 4 descend à 5 diagnostics.
 
+Les trois journaux d'erreur de `ScriptingEngine` utilisent désormais la
+configuration `debug` de l'application Joomla au lieu de la constante globale
+`JDEBUG`. Le comportement de journalisation est conservé lorsque le mode debug
+de Joomla est actif, tout en supprimant une dépendance globale que l'analyse
+statique ne pouvait pas représenter ; le niveau 4 ne conserve plus que les deux
+gardes de soumission interrompues par `exit`.
+
 ## Phase 7 — Réduire les façades historiques
 
 Cette phase commence seulement lorsque leurs responsabilités ont été extraites

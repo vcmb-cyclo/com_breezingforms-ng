@@ -1850,6 +1850,11 @@ désactivation de la résolution fournisseur et repli pour une adresse invalide.
 La résolution DNS n'est pas déclenchée par les tests, ce qui rend le filet
 déterministe.
 
+La frontière \`RuntimeAssetLoader\` est caractérisée avec les doubles Joomla
+existants : normalisation d'un chemin sous-répertoire, enregistrement
+idempotent des scripts, génération de noms dépendant des attributs et
+enregistrement des feuilles de style hors du chemin racine.
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

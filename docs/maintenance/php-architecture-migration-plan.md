@@ -1467,6 +1467,12 @@ Les endpoints injectés dans les callbacks CAPTCHA historiques sont désormais
 conservent leurs délimiteurs et leur comportement, avec couverture des URL
 hostiles (`b80c88d37`).
 
+Le markup d'image des moyens de paiement est désormais mutualisé dans
+`QuickModePaymentImageBuilder`, utilisé par Classic et le trait Bootstrap.
+Les sources et textes alternatifs sont échappés et testés, tandis que les
+callbacks de paiement et les valeurs historiques restent propres à chaque
+renderer (`1cd836395`).
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

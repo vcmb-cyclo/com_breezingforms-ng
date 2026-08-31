@@ -1321,6 +1321,32 @@ package. Correctifs CSS vérifiés en direct (avant/après). Baseline PHPStan à
 suppression des entrées résiduelles liées au rendu mobile, aux trois renderers
 QuickMode et au mailer (`f57d08761`, `ed2abded1` et `9aa2c6409`).
 
+## Phase 16 — Déclaration manifeste des thèmes Classic
+
+Ajoutée le 2026-08-31 après l'audit du paquet d'installation. Les thèmes
+Classic restaurés sous `media/breezingforms/themes/` étaient bien suivis par
+Git et présents dans l'archive construite, mais aucun élément `<media>` du
+manifeste ne déclarait ce répertoire : une installation Joomla neuve ne les
+copie donc pas sur le site. Le renderer et `QuickmodeModel` cherchant ces
+fichiers à cet emplacement, le défaut pouvait rester invisible sur une
+instance déjà migrée.
+
+Le manifeste regroupe maintenant les deux arborescences dans un seul bloc
+`<media folder="media">` : `com_breezingformsng` pour les assets du composant
+et `breezingforms/themes` pour les thèmes Classic. Cette forme est nécessaire
+car l'installateur Joomla traite le nœud `<media>` du manifeste comme un bloc
+unique. Le validateur de paquet vérifie cette déclaration et la présence des
+thèmes `default` et `aqua`; le smoke-test Joomla 6 vérifie également les deux
+fichiers `theme.css` après installation réelle.
+
+### Vérification
+
+Le test de manifeste passe, la suite complète passe (633 tests, 1 962
+assertions), PHPCS et le XML du manifeste sont valides, le paquet est validé
+et le smoke-test Joomla 6 installation/update/frontend confirme la présence
+effective de `media/breezingforms/themes/default/theme.css` et
+`media/breezingforms/themes/aqua/theme.css`.
+
 ## Travail en parallèle
 
 | Couloir | Fichiers principaux | Peut avancer avec |

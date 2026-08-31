@@ -112,6 +112,13 @@ docker exec -e HTTP_HOST=localhost "${web_container}" php /var/www/html/cli/joom
     --quiet \
     --no-interaction
 
+for theme_file in themes/default/theme.css themes/aqua/theme.css; do
+    if ! docker exec "${web_container}" test -f "/var/www/html/media/breezingforms/${theme_file}"; then
+        echo "Installed package is missing /media/breezingforms/${theme_file}." >&2
+        exit 1
+    fi
+done
+
 table_prefix="$(
     docker exec -e HTTP_HOST=localhost "${web_container}" php -r '
         require "/var/www/html/configuration.php";

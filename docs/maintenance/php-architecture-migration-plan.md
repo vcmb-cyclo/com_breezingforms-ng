@@ -556,6 +556,10 @@ Le builder Classic CAPTCHA rejoint également le périmètre après découpage
 neutre de ses chaînes d'attributs et de script de rechargement ; son test
 direct conserve la couverture des dimensions et de l'endpoint historique.
 
+Le builder Classic de texte statique, d'icône, rectangle et infobulle est
+également passé sous PHPCS après découpage neutre de ses chaînes de rendu ;
+ses dix tests directs verrouillent les variantes de layout et d'échappement.
+
 Le premier nettoyage ciblé de cette baseline PHPCS est réalisé dans
 `QuickModeSelectBuilder`, `QuickModeCaptchaMarkupBuilder` et
 `QuickModeUploadOptionsBuilder` (`eaf8b2d1`) : leurs sorties sont inchangées et

@@ -724,6 +724,12 @@ signature Joomla 6 à deux arguments de Installer::uninstall(). Le troisième
 argument d'application, obsolète, est supprimé et les deux diagnostics PHPStan
 associés sont éliminés ; le test du script vérifie l'absence de cette forme.
 
+Les fichiers uploadés de `SubmissionEngine` alimentent désormais le buffer
+`sfdata`, consommé par les notifications Salesforce, au lieu d'une propriété
+`sfadata` inexistante (`33b7fb4d5`). Le diagnostic PHPStan et sa régression
+structurelle sont supprimés de la baseline ; celle-ci compte maintenant
+14 entrées.
+
 ## Phase 7 — Réduire les façades historiques
 
 Cette phase commence seulement lorsque leurs responsabilités ont été extraites

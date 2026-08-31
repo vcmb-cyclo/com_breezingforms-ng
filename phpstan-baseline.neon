@@ -79,12 +79,6 @@ parameters:
 			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
 
 		-
-			message: '#^Access to an undefined property HTML_facileFormsProcessor\:\:\$sfadata\.$#'
-			identifier: property.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
-
-		-
 			message: '#^Call to an undefined method Joomla\\CMS\\Mail\\MailerInterface\:\:isHtml\(\)\.$#'
 			identifier: method.notFound
 			count: 1

@@ -1117,6 +1117,12 @@ L'assemblage final de `ff_dispQueryPage` est maintenant confié à
 de navigation et de fin de pagination. Le moteur conserve la traduction des
 libellés, les options du formulaire et l'appel `linkcode`.
 
+L'enregistrement des callbacks de formulaire et d'élément est maintenant
+mutualisé dans `CallbackRegistrationService`. L'ordre `init`/`action`/
+`validate`, les points d'arrêt `bury()` et la fermeture historique du buffer
+après validation restent inchangés et sont couverts par le harnais de
+caractérisation et un test direct du service.
+
 L'enveloppe du script global de validation est désormais construite par
 `FormValidationScriptWrapperBuilder` (`9b92acb55`). Les contrôles de fichiers
 et de CAPTCHA restent générés par leurs services respectifs, tandis que les

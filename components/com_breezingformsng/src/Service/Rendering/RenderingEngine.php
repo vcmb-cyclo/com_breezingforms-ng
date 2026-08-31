@@ -107,6 +107,7 @@ final class RenderingEngine
     private ?FormOnloadScriptBuilder $formOnloadScriptBuilderService = null;
     private ?QueryListRowPreparationService $queryListRowPreparationService = null;
     private ?QueryListPageScriptBuilder $queryListPageScriptBuilderService = null;
+    private ?CallbackRegistrationService $callbackRegistrationService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -491,6 +492,11 @@ final class RenderingEngine
             $this->queryListNavigationBuilder(),
             $this->queryListPaginationTailBuilder()
         );
+    }
+
+    private function callbackRegistrationService(): CallbackRegistrationService
+    {
+        return $this->callbackRegistrationService ??= new CallbackRegistrationService($this->processor);
     }
 
     public function cbCheckPermissions(): array
@@ -1666,53 +1672,7 @@ final class RenderingEngine
      */
     private function registerElementCallbacks(object $row, array &$library, array &$linked): bool
     {
-        $this->processor->addFunction(
-            $row->script1cond,
-            $row->script1id,
-            'ff_' . $row->name . '_init',
-            $row->script1code,
-            $library,
-            $linked,
-            'e',
-            $row->id,
-            1
-        );
-        if ($this->processor->bury()) {
-            return true;
-        }
-
-        $this->processor->addFunction(
-            $row->script2cond,
-            $row->script2id,
-            'ff_' . $row->name . '_action',
-            $row->script2code,
-            $library,
-            $linked,
-            'e',
-            $row->id,
-            1
-        );
-        if ($this->processor->bury()) {
-            return true;
-        }
-
-        $this->processor->addFunction(
-            $row->script3cond,
-            $row->script3id,
-            'ff_' . $row->name . '_validate',
-            $row->script3code,
-            $library,
-            $linked,
-            'e',
-            $row->id,
-            1
-        );
-        if ($this->processor->bury()) {
-            ob_end_clean();
-            return true;
-        }
-
-        return false;
+        return $this->callbackRegistrationService()->registerElement($row, $library, $linked);
     }
 
     /**
@@ -1805,34 +1765,12 @@ final class RenderingEngine
      */
     private function addFormScripts(array &$library, array &$linked): bool
     {
-        $this->processor->addFunction(
-            $this->processor->formrow->script1cond,
-            $this->processor->formrow->script1id,
-            'ff_' . $this->processor->formrow->name . '_init',
-            $this->processor->formrow->script1code,
+        return $this->callbackRegistrationService()->registerForm(
+            $this->processor->formrow,
             $library,
             $linked,
-            'f',
-            $this->processor->form,
-            1
+            (int) $this->processor->form
         );
-        if ($this->processor->bury()) {
-            return true;
-        }
-
-        $this->processor->addFunction(
-            $this->processor->formrow->script2cond,
-            $this->processor->formrow->script2id,
-            'ff_' . $this->processor->formrow->name . '_submitted',
-            $this->processor->formrow->script2code,
-            $library,
-            $linked,
-            'f',
-            $this->processor->form,
-            1
-        );
-
-        return $this->processor->bury();
     }
 
     // view

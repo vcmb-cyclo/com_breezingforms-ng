@@ -17,6 +17,7 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\BootstrapRen
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\ClassicRenderer;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\OnePageRenderer;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickModeRendererFactory;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\CallbackRegistrationService;
 
 if (!defined('JPATH_ADMINISTRATOR')) {
     define('JPATH_ADMINISTRATOR', __DIR__ . '/../../../../administrator');
@@ -447,6 +448,30 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         $processor->buryAfterFirstCallback = true;
         self::assertTrue($method->invokeArgs($engine, [&$library, &$linked]));
         self::assertSame(['ff_contact_init'], $processor->callbackNames);
+    }
+
+    public function testCallbackRegistrationServiceRegistersFormCallbacksDirectly(): void
+    {
+        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
+        $service = new CallbackRegistrationService($processor);
+        $library = [];
+        $linked = [];
+
+        self::assertFalse($service->registerForm(
+            (object) [
+                'name' => 'contact',
+                'script1cond' => 0,
+                'script1id' => 1,
+                'script1code' => 'init',
+                'script2cond' => 0,
+                'script2id' => 2,
+                'script2code' => 'submitted',
+            ],
+            $library,
+            $linked,
+            12
+        ));
+        self::assertSame(['ff_contact_init', 'ff_contact_submitted'], $processor->callbackNames);
     }
 
     public function testInitialOnloadInitializesFormPageGridAndHeight(): void

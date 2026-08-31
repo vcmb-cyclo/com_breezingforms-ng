@@ -3,7 +3,7 @@
     color: red;
 }
 
-.bfLanguageButton{
+.bfLanguageButton:not(.bfng-seg__opt){
     display: inline-block;
     width: 40px;
     height: 30px;
@@ -16,8 +16,8 @@
     margin-bottom: 5px;
 }
 
-.bfLanguageButton.bfLanguageButtonActive{
-    background-color: red;   
+.bfLanguageButton.bfLanguageButtonActive:not(.bfng-seg__opt){
+    background-color: red;
 }
 
 #bfQuickModeWrapper, #bfQuickModeWrapper li, #bfQuickModeWrapper li a, #bfQuickModeWrapper label{

@@ -955,7 +955,7 @@ legend {
     padding: 10px 5px 5px;
 }
 
-.bfLanguageButton {
+.bfLanguageButton:not(.bfng-seg__opt) {
     background-color: #eaeaea;
     color: #333333;
     cursor: pointer;
@@ -969,7 +969,7 @@ legend {
     width: 50px;
 }
 
-.bfLanguageButton.bfLanguageButtonActive {
+.bfLanguageButton.bfLanguageButtonActive:not(.bfng-seg__opt) {
     background-color: #98CB02;
     color: #fff;
 }

@@ -256,10 +256,10 @@ final class QuickmodeHtml
         if ($formId > 0) {
             ?>
             <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-                <div class="d-flex flex-wrap align-items-center gap-1">
+                <div class="d-flex flex-wrap align-items-center gap-1 bfng-seg">
                 <?php if (count($languages) > 1) : ?>
                 <div onclick="location.href = 'index.php?option=com_breezingformsng&format=html&task=quickmode.display&formName=translationtest&form=<?php echo $formId ?>&active_language_code='"
-                    class="bfLanguageButton<?php echo $active_language_code == $default || $active_language_code == '' ? ' bfLanguageButtonActive' : '' ?>">
+                    class="bfLanguageButton bfng-seg__opt<?php echo $active_language_code == $default || $active_language_code == '' ? ' bfLanguageButtonActive' : '' ?>">
                     <?php echo $default; ?>
                 </div>
                 <?php
@@ -267,7 +267,7 @@ final class QuickmodeHtml
                     if ($languageCode !== $default) {
                         ?>
                         <div onclick="location.href = 'index.php?option=com_breezingformsng&format=html&task=quickmode.display&formName=translationtest&form=<?php echo $formId ?>&active_language_code=<?php echo rawurlencode($languageCode); ?>'"
-                            class="bfLanguageButton<?php echo $active_language_code === $languageCode ? ' bfLanguageButtonActive' : '' ?>">
+                            class="bfLanguageButton bfng-seg__opt<?php echo $active_language_code === $languageCode ? ' bfLanguageButtonActive' : '' ?>">
                             <?php echo htmlspecialchars($languageCode, ENT_QUOTES, 'UTF-8'); ?>
                         </div>
                         <?php

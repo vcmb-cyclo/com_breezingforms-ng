@@ -89,6 +89,44 @@
   .bfng-split__main { flex-basis: auto; width: 100%; }
 }
 
+/* .bfng-seg / .bfng-seg__opt: replaces .bfLanguageButton's blue/red
+   (admin.css) and grey/green (custom.css, competing definition) tile
+   look (charte section 07). Stays in its current spot in the panel
+   body rather than the charte's fuller vision of moving into the
+   Joomla toolbar - that's a bigger relocation, tracked separately.
+   .bfLanguageButton/.bfLanguageButtonActive are kept as-is: no JS
+   reads them, but the active state is server-rendered via that exact
+   class name (QuickmodeHtml::showApplication()), so it stays the
+   state hook - .bfng-seg__opt is purely the visual layer. */
+.bfng-seg {
+  border-radius: var(--bfng-radius);
+}
+.bfng-seg__opt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: var(--bfng-control-h-sm);
+  padding: 0 var(--bfng-space-3);
+  border: 1px solid var(--bfng-border-strong);
+  border-radius: var(--bfng-radius-sm);
+  background: var(--bfng-surface);
+  color: var(--bfng-text-2);
+  font-size: var(--bfng-fs-xs);
+  cursor: pointer;
+  transition: background var(--bfng-t), border-color var(--bfng-t), color var(--bfng-t);
+}
+.bfng-seg__opt:hover {
+  background: var(--bfng-surface-2);
+  border-color: var(--bfng-accent-500);
+  color: var(--bfng-text);
+}
+.bfng-seg__opt.bfLanguageButtonActive {
+  background: var(--bfng-accent-500);
+  border-color: var(--bfng-accent-600);
+  color: #fff;
+}
+
 /* .bfng-tree: cosmetic layer only, over jTree's own tree_component.css.
    jTree owns collapse/expand via .tree li.open/.closed toggling display
    on the nested <ul> - none of that is touched here, only color/spacing

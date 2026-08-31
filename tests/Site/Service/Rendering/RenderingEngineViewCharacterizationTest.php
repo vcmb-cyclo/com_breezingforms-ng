@@ -548,7 +548,6 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
     {
         $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
         $processor->form = 12;
-        $processor->legacy_wrap = true;
         $processor->queryCols = ['stale'];
         $processor->queryRows = ['stale'];
         $processor->formrow = (object) [
@@ -586,17 +585,14 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertSame([], $processor->queryRows);
         self::assertSame('completed', $processor->status);
         self::assertSame('Saved', $processor->message);
-        self::assertStringContainsString('id="bfReCaptchaWrap"', $html);
         self::assertStringContainsString('id="ff_formdiv12"', $html);
         self::assertStringContainsString('bfFormDiv resolved-form-class', $html);
-        self::assertStringContainsString('bfPage-m bfClearfix', $html);
     }
 
-    public function testFormRenderingInitializationUsesModernWrapperWithoutRecaptchaTable(): void
+    public function testFormRenderingInitializationBuildsFormWrapperMarkup(): void
     {
         $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
         $processor->form = 4;
-        $processor->legacy_wrap = false;
         $processor->formrow = (object) [
             'template_code_processed' => 'QuickMode',
             'class1' => '',
@@ -839,54 +835,12 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertStringContainsString('COM_BREEZINGFORMSNG_PROCESS_AFPIECE After library piece', $processor->executedPieces[0]['name']);
     }
 
-    public function testFormRenderingClosureMatchesLegacyWrapperMode(): void
+    public function testFormRenderingClosureEmitsWrapperCloseTag(): void
     {
         $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
         $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
         (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
         $method = (new ReflectionClass($engine))->getMethod('closeFormRendering');
-
-        $processor->legacy_wrap = false;
-        ob_start();
-        try {
-            $method->invoke($engine);
-            $modernHtml = ob_get_contents();
-        } finally {
-            ob_end_clean();
-        }
-
-        $processor->legacy_wrap = true;
-        ob_start();
-        try {
-            $method->invoke($engine);
-            $legacyHtml = ob_get_contents();
-        } finally {
-            ob_end_clean();
-        }
-
-        self::assertSame("</div><!-- form end -->\n", $modernHtml);
-        self::assertStringContainsString('bfPage-bl', $legacyHtml);
-        self::assertStringContainsString('<!-- form end -->', $legacyHtml);
-    }
-
-    public function testFormRenderingInitializationPreservesLegacyCaptchaWrapper(): void
-    {
-        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
-        $processor->app = new CMSApplication();
-        $processor->form = 23;
-        $processor->legacy_wrap = true;
-        $processor->formrow = (object) [
-            'template_code_processed' => 'QuickMode',
-            'class1' => '',
-        ];
-        $processor->status = '';
-        $processor->message = '';
-        $processor->queryCols = ['old'];
-        $processor->queryRows = ['old'];
-
-        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
-        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
-        $method = (new ReflectionClass($engine))->getMethod('initializeFormRendering');
 
         ob_start();
         try {
@@ -896,12 +850,7 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
             ob_end_clean();
         }
 
-        self::assertSame([], $processor->queryCols);
-        self::assertSame([], $processor->queryRows);
-        self::assertStringContainsString('id="bfReCaptchaWrap"', $html);
-        self::assertStringContainsString('<div id="ff_formdiv23"', $html);
-        self::assertSame('', $processor->status);
-        self::assertSame('', $processor->message);
+        self::assertSame("</div><!-- form end -->\n", $html);
     }
 
     public function testViewFinalizationPreservesTraceOrdering(): void

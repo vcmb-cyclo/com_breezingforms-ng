@@ -84,7 +84,6 @@ final class RenderingEngine
     private ?FormClosingMarkupBuilder $formClosingMarkupBuilderService = null;
     private ?FormOpeningMarkupBuilder $formOpeningMarkupBuilderService = null;
     private ?FormOptionalContextFieldsBuilder $formOptionalContextFieldsBuilderService = null;
-    private ?CaptchaWrapperMarkupBuilder $captchaWrapperMarkupBuilderService = null;
     private ?QuickModeFormTagBuilder $quickModeFormTagBuilderService = null;
     private ?FileExtensionsCheckBuilder $fileExtensionsCheckBuilderService = null;
     private ?QueryListSelectAllScriptBuilder $queryListSelectAllScriptBuilderService = null;
@@ -346,12 +345,6 @@ final class RenderingEngine
         return $this->formOptionalContextFieldsBuilderService ??= new FormOptionalContextFieldsBuilder();
     }
 
-
-    private function captchaWrapperMarkupBuilder(): CaptchaWrapperMarkupBuilder
-    {
-        return $this->captchaWrapperMarkupBuilderService ??= new CaptchaWrapperMarkupBuilder();
-    }
-
     private function quickModeFormTagBuilder(): QuickModeFormTagBuilder
     {
         return $this->quickModeFormTagBuilderService ??= new QuickModeFormTagBuilder();
@@ -580,10 +573,6 @@ final class RenderingEngine
             require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
 
             $rootMdata = $this->loadQuickModeMetadata();
-
-            if (isset($rootMdata['themebootstrapThemeEngine']) && $rootMdata['themebootstrapThemeEngine'] == 'bootstrap') {
-                $this->processor->legacy_wrap = false;
-            }
         }
 
         // CONTENTBUILDER BEGIN
@@ -1660,17 +1649,11 @@ final class RenderingEngine
         $this->processor->queryCols = [];
         $this->processor->queryRows = [];
 
-        if (trim($this->processor->formrow->template_code_processed) == 'QuickMode' && $this->processor->legacy_wrap) {
-            echo $this->captchaWrapperMarkupBuilder()->build(true, '');
-        }
-
         echo $this->formOpeningMarkupBuilder()->build(
             (string) $this->processor->form,
             $this->processor->formrow->class1 != ''
                 ? $this->processor->getClassName($this->processor->formrow->class1)
-                : '',
-            (bool) $this->processor->legacy_wrap,
-            nl()
+                : ''
         );
 
         $this->processor->status = $this->processor->app->getInput()->getCmd('ff_status', '');
@@ -1679,7 +1662,7 @@ final class RenderingEngine
 
     private function closeFormRendering(): void
     {
-        echo $this->formClosingMarkupBuilder()->build((bool) $this->processor->legacy_wrap, nl());
+        echo $this->formClosingMarkupBuilder()->build(nl());
     }
 
     private function abortViewRendering(): void

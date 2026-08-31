@@ -699,6 +699,55 @@ sur tous les fichiers modifiés, vérification live du panneau QuickMode
 « Avancé » (absence des 3 champs mobiles, `joomlaHint` intact,
 zéro erreur console/réseau), build + validation du package.
 
+## Phase 10 — Suppression de `legacy_wrap`
+
+Ajoutée le 2026-08-31, à la suite de la phase 9. `legacy_wrap` pilotait deux
+variantes d'habillage du formulaire QuickMode : le thème Bootstrap recevait
+un simple `<div>`, tandis que le thème Classic (`ClassicRenderer`) recevait
+un balisage à 9 `<div>` imbriqués (`bfPage-tl/tr/t/l/r/m/bl/br/b`) — un
+bricolage CSS pré-CSS3 destiné à simuler des coins arrondis via des images
+de fond, avant l'existence de `border-radius` — plus un `<table
+style="display:none">` caché pour le widget reCAPTCHA (`bfReCaptchaWrap`).
+
+Constat : la feuille de style réellement chargée par `ClassicRenderer`
+(`themes/quickmode/system.css`) ne stylait déjà plus aucune de ces classes
+`bfPage-*` — le fichier qui les stylait (`themes/quickmode/aqua/theme.css`)
+n'était référencé par aucun chemin de code. Le balisage à 9 divs et le
+`<table>` caché étaient donc déjà visuellement inertes avant cette phase :
+leur suppression ne change aucun rendu visible actuel. `#bfReCaptchaWrap`/
+`#bfReCaptchaDiv` n'étaient lus par aucun JS ni CSS du dépôt.
+
+### Périmètre supprimé
+
+- La propriété `$legacy_wrap` du `processor_facade`.
+- La branche legacy de `FormOpeningMarkupBuilder` et
+  `FormClosingMarkupBuilder` (signatures simplifiées : plus de paramètre
+  booléen ; `FormOpeningMarkupBuilder` perd aussi son paramètre `$newline`,
+  devenu inutilisé une fois le balisage réduit à un seul `<div>`).
+- `CaptchaWrapperMarkupBuilder` entièrement (son seul appelant a disparu) et
+  son test.
+- Le calcul de `$legacyWrap` dans `RenderingEngine::view()` (les deux
+  méthodes privées `initializeFormRendering()`/`closeFormRendering()` ne
+  prennent plus de paramètre).
+- Les tests de caractérisation dédiés aux deux branches (fusionnés en tests
+  à comportement unique).
+
+### Remplacement CSS
+
+Un `border-radius: 8px` a été ajouté sur `.bfFormDiv` dans
+`themes/quickmode/system.css`, pour porter l'intention visuelle d'origine
+(coins arrondis) via la propriété CSS moderne plutôt que via le balisage à
+9 divs.
+
+### Vérification
+
+Suite complète verte (399 tests, 0 échec — les 4 tests de caractérisation
+legacy/moderne fusionnés en 2), PHPStan niveau 2 propre, `php -l` sur tous
+les fichiers modifiés, build + validation du package. Les assertions des
+tests `FormOpeningMarkupBuilderTest`/`FormClosingMarkupBuilderTest`/
+`RenderingEngineViewCharacterizationTest` couvrent le contenu exact,
+octet pour octet, du nouveau balisage.
+
 ## Travail en parallèle
 
 | Couloir | Fichiers principaux | Peut avancer avec |

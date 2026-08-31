@@ -7,6 +7,10 @@
 
 /* ##### General BreezingForms Default styles ##### */
 
+.bfFormDiv {
+    border-radius: 8px;
+}
+
 .bfQuickMode .bfSignature{
     width: 45%;
     display: inline-block;

@@ -543,7 +543,6 @@ class HTML_facileFormsProcessor
     public $opt_token = "9562384751";
     public $draggableDivIds = array();
     public $quickmode = null;
-    public $legacy_wrap = true;
     public $app;
     public $database;
     private ?UploadRuntime $uploadRuntimeService = null;

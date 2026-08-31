@@ -17,19 +17,11 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\FormClosingMarkupBuild
 
 final class FormClosingMarkupBuilderTest extends TestCase
 {
-    public function testBuildsModernWrapperClosure(): void
+    public function testBuildsWrapperClosure(): void
     {
         self::assertSame(
             "</div><!-- form end -->\n",
-            (new FormClosingMarkupBuilder())->build(false, "\n")
-        );
-    }
-
-    public function testBuildsLegacyWrapperClosure(): void
-    {
-        self::assertSame(
-            "</div></div></div><div class=\"bfPage-bl\"><div class=\"bfPage-br\"><div class=\"bfPage-b\"></div></div></div></div><!-- form end -->\n",
-            (new FormClosingMarkupBuilder())->build(true, "\n")
+            (new FormClosingMarkupBuilder())->build("\n")
         );
     }
 }

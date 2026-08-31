@@ -17,19 +17,19 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\FormOpeningMarkupBuild
 
 final class FormOpeningMarkupBuilderTest extends TestCase
 {
-    public function testBuildsModernWrapperWithOptionalClass(): void
+    public function testBuildsWrapperWithOptionalClass(): void
     {
         self::assertSame(
             '<div id="ff_formdiv12" class="bfFormDiv custom-form">',
-            (new FormOpeningMarkupBuilder())->build('12', 'custom-form', false)
+            (new FormOpeningMarkupBuilder())->build('12', 'custom-form')
         );
     }
 
-    public function testBuildsLegacyWrapperAndNewline(): void
+    public function testBuildsWrapperWithoutClass(): void
     {
         self::assertSame(
-            "<div id=\"ff_formdiv12\" class=\"bfFormDiv\"><div class=\"bfPage-tl\"><div class=\"bfPage-tr\"><div class=\"bfPage-t\"></div></div></div><div class=\"bfPage-l\"><div class=\"bfPage-r\"><div class=\"bfPage-m bfClearfix\">\n",
-            (new FormOpeningMarkupBuilder())->build('12', '', true, "\n")
+            '<div id="ff_formdiv12" class="bfFormDiv">',
+            (new FormOpeningMarkupBuilder())->build('12', '')
         );
     }
 }

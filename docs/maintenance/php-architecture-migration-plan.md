@@ -1573,10 +1573,12 @@ champs non éditables et reçoit les opérations dépendantes du runtime via des
 closures typées. `RenderingEngine::view()` ne conserve plus que l’orchestration
 et l’enveloppe historique (`09cf02975`).
 
-Le harnais unitaire couvre également les branches QuickMode d’upload (compteur,
+Le harnais unitaire couvre également les branches QuickMode d'upload (compteur,
 validation, contrôles de suppression et désactivation) ainsi que la résolution
-et l’encodage d’une signature existante (`7fe0e95a9`). La validation avec le
-runtime ContentBuilder installé reste un contrôle d’intégration séparé.
+et l'encodage d'une signature existante (`7fe0e95a9`). La validation avec le
+runtime ContentBuilder installé reste un contrôle d'intégration séparé. Il
+couvre désormais aussi l'absence de signature et le rejet explicite des
+chemins qui sortent du répertoire autorisé.
 
 Les branches radio, liste de sélection et calendrier de l’orchestrateur sont
 également caractérisées dans le harnais local (`efefb400c`).

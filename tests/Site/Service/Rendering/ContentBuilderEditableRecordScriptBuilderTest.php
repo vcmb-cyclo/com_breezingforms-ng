@@ -107,6 +107,23 @@ final class ContentBuilderEditableRecordScriptBuilderTest extends TestCase
         self::assertStringContainsString('base64,', $result['javascript']);
     }
 
+    public function testSkipsMissingAndOutOfDirectorySignatures(): void
+    {
+        $missing = $this->record(42, 'missing_signature', 'Signature', 'missing.png');
+        $outside = $this->record(43, 'outside_signature', 'Signature', '../' . basename(__FILE__));
+
+        $result = $this->builder()->build(
+            [$missing, $outside],
+            [],
+            true,
+            7,
+            __DIR__
+        );
+
+        self::assertSame('', $result['contentBuilderScript']);
+        self::assertSame('', $result['javascript']);
+    }
+
     public function testBuildsRadioSelectAndCalendarHydration(): void
     {
         $radio = $this->record(51, 'gender', 'Radio Group', 'female');

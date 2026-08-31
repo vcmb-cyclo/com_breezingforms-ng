@@ -17,7 +17,30 @@ use Joomla\CMS\Factory;
 $record = $this->record;
 $tz = Factory::getApplication()->get('offset');
 $submitted = htmlspecialchars((string) ($record->submitted ?? ''));
-$formSelection = Factory::getApplication()->getInput()->getInt('form_selection', 0);
+$formSelection = $this->formSelection;
+$searchTerm = $this->searchTerm;
+$listOrder = $this->listOrder;
+$listDirn = $this->listDirn;
+$limit = $this->limit;
+$limitStart = $this->limitStart;
+$recordUrl = static function (int $recordId) use ($formSelection, $searchTerm, $listOrder, $listDirn, $limit, $limitStart): string {
+  $query = [
+    'option'           => 'com_breezingformsng',
+    'view'             => 'records',
+    'layout'           => 'edit',
+    'record_id'        => $recordId,
+    'form_selection'   => $formSelection,
+    'filter_order'     => $listOrder,
+    'filter_order_Dir' => $listDirn,
+    'limit'            => $limit,
+    'limitstart'       => $limitStart,
+  ];
+  if ($searchTerm !== '') {
+    $query['searchterm'] = $searchTerm;
+  }
+
+  return 'index.php?' . http_build_query($query, '', '&', PHP_QUERY_RFC3986);
+};
 ?>
 <form action="index.php?option=com_breezingformsng" method="post" name="adminForm" id="adminForm">
 
@@ -85,13 +108,18 @@ $formSelection = Factory::getApplication()->getInput()->getInt('form_selection',
   <input type="hidden" name="task" value="records.save">
   <input type="hidden" name="record_id" value="<?= (int) $record->id; ?>">
   <input type="hidden" name="form_selection" value="<?= $formSelection; ?>">
+  <input type="hidden" name="searchterm" value="<?= htmlspecialchars($searchTerm, ENT_QUOTES, 'UTF-8'); ?>">
+  <input type="hidden" name="filter_order" value="<?= htmlspecialchars($listOrder, ENT_QUOTES, 'UTF-8'); ?>">
+  <input type="hidden" name="filter_order_Dir" value="<?= htmlspecialchars($listDirn, ENT_QUOTES, 'UTF-8'); ?>">
+  <input type="hidden" name="limit" value="<?= $limit; ?>">
+  <input type="hidden" name="limitstart" value="<?= $limitStart; ?>">
   <?= HTMLHelper::_('form.token'); ?>
 </form>
 
 <nav class="d-flex justify-content-between mt-3" aria-label="<?= Text::_('JLIB_HTML_PAGINATION'); ?>">
   <?php if ($this->prevRecordId !== null): ?>
     <a class="btn btn-secondary"
-      href="index.php?option=com_breezingformsng&amp;view=records&amp;layout=edit&amp;record_id=<?= $this->prevRecordId; ?>&amp;form_selection=<?= $formSelection; ?>">
+      href="<?= htmlspecialchars($recordUrl($this->prevRecordId), ENT_QUOTES, 'UTF-8'); ?>">
       &laquo; <?= Text::_('JPREVIOUS'); ?>
     </a>
   <?php else: ?>
@@ -100,7 +128,7 @@ $formSelection = Factory::getApplication()->getInput()->getInt('form_selection',
 
   <?php if ($this->nextRecordId !== null): ?>
     <a class="btn btn-secondary"
-      href="index.php?option=com_breezingformsng&amp;view=records&amp;layout=edit&amp;record_id=<?= $this->nextRecordId; ?>&amp;form_selection=<?= $formSelection; ?>">
+      href="<?= htmlspecialchars($recordUrl($this->nextRecordId), ENT_QUOTES, 'UTF-8'); ?>">
       <?= Text::_('JNEXT'); ?> &raquo;
     </a>
   <?php else: ?>

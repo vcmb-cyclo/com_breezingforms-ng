@@ -53,10 +53,6 @@ class RecordsModel extends BaseDatabaseModel
 
     public function getItems(int $formSelection, string $searchTerm, int $limitStart, int $limit, string $listOrder, string $listDirn): array
     {
-        $orderCol = self::ALLOWED_SORTS[$listOrder] ?? 'records.submitted';
-        $dir = strtoupper($listDirn) === 'ASC' ? 'ASC' : 'DESC';
-        $orderSql = $orderCol . ' ' . $dir . ($orderCol !== 'records.id' ? ', records.id ' . $dir : '');
-
         $db = $this->getDatabase();
         $query = $db->getQuery(true)
             ->select([
@@ -67,10 +63,51 @@ class RecordsModel extends BaseDatabaseModel
             ])
             ->from($db->quoteName('#__facileforms_records', 'records'))
             ->join('INNER', $db->quoteName('#__facileforms_forms', 'forms') . ' ON forms.id = records.form')
-            ->order($orderSql);
+            ->order($this->getOrderSql($listOrder, $listDirn));
         $this->applyWhere($query, $db, $formSelection, $searchTerm);
         $db->setQuery($query, $limitStart, $limit);
         return $db->loadAssocList();
+    }
+
+    /**
+     * Return the record immediately before or after the current one in the
+     * same ordered result set as the records list.
+     */
+    public function getAdjacentRecordId(
+        int $recordId,
+        int $formSelection,
+        string $searchTerm,
+        string $listOrder,
+        string $listDirn,
+        string $direction
+    ): ?int {
+        $db = $this->getDatabase();
+        $query = $db->getQuery(true)
+            ->select($db->quoteName('records.id'))
+            ->from($db->quoteName('#__facileforms_records', 'records'))
+            ->join('INNER', $db->quoteName('#__facileforms_forms', 'forms') . ' ON forms.id = records.form')
+            ->order($this->getOrderSql($listOrder, $listDirn));
+        $this->applyWhere($query, $db, $formSelection, $searchTerm);
+        $db->setQuery($query);
+
+        $recordIds = array_map('intval', $db->loadColumn());
+        $position = array_search($recordId, $recordIds, true);
+
+        if ($position === false) {
+            return null;
+        }
+
+        $adjacentPosition = $direction === 'prev' ? $position - 1 : $position + 1;
+
+        return $recordIds[$adjacentPosition] ?? null;
+    }
+
+    private function getOrderSql(string $listOrder, string $listDirn): string
+    {
+        $orderCol = self::ALLOWED_SORTS[$listOrder] ?? 'records.submitted';
+        $dir = strtoupper($listDirn) === 'ASC' ? 'ASC' : 'DESC';
+
+        return $orderCol . ' ' . $dir . ($orderCol !== 'records.id' ? ', records.id ' . $dir : '');
     }
 
     private function applyWhere(QueryInterface $query, DatabaseInterface $db, int $formSelection, string $searchTerm): void

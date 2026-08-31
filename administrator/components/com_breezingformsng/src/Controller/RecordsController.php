@@ -37,7 +37,7 @@ class RecordsController extends BaseController
         $this->app->redirect(
             'index.php?option=com_breezingformsng&view=records&layout=edit'
             . '&record_id=' . $input->getInt('record_id', 0)
-            . '&form_selection=' . $input->getInt('form_selection', 0)
+            . $this->listStateQuery($input)
         );
     }
 
@@ -54,7 +54,6 @@ class RecordsController extends BaseController
         $app = $this->app;
         $input = $app->getInput();
         $recordId = $input->getInt('record_id', 0);
-        $formSelection = $input->getInt('form_selection', 0);
 
         if ($recordId > 0) {
             $values = $input->post->get('element', [], 'array');
@@ -68,7 +67,7 @@ class RecordsController extends BaseController
         $app->redirect(
             'index.php?option=com_breezingformsng&view=records&layout=edit'
             . '&record_id=' . $recordId
-            . '&form_selection=' . $formSelection
+            . $this->listStateQuery($input)
         );
     }
 
@@ -573,10 +572,29 @@ class RecordsController extends BaseController
 
     private function listUrl(\Joomla\Input\Input $input): string
     {
-        $formSelection = $input->getInt('form_selection', 0);
-        $searchTerm = $input->getString('searchterm', '');
-        return 'index.php?option=com_breezingformsng&view=records'
-            . ($formSelection > 0 ? '&form_selection=' . $formSelection : '')
-            . ($searchTerm !== '' ? '&searchterm=' . rawurlencode($searchTerm) : '');
+        return 'index.php?option=com_breezingformsng&view=records' . $this->listStateQuery($input);
+    }
+
+    private function listStateQuery(\Joomla\Input\Input $input): string
+    {
+        $query = '&form_selection=' . $input->getInt('form_selection', 0);
+        $searchTerm = trim((string) $input->getString('searchterm', ''));
+        $filterOrder = trim((string) $input->getString('filter_order', ''));
+        $filterDir = strtolower(trim((string) $input->getString('filter_order_Dir', '')));
+
+        if ($searchTerm !== '') {
+            $query .= '&searchterm=' . rawurlencode($searchTerm);
+        }
+        if ($filterOrder !== '') {
+            $query .= '&filter_order=' . rawurlencode($filterOrder);
+        }
+        if ($filterDir !== '') {
+            $query .= '&filter_order_Dir=' . rawurlencode($filterDir);
+        }
+
+        $query .= '&limit=' . max(1, $input->getInt('limit', 20));
+        $query .= '&limitstart=' . max(0, $input->getInt('limitstart', 0));
+
+        return $query;
     }
 }

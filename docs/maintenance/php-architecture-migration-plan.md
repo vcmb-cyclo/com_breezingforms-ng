@@ -115,6 +115,7 @@
 | ContentBuilder — source/enregistrement runtime | Le smoke résout une source BreezingForms réelle via `FormSourceFactory` et exerce `ContentBuilderRecordLoader` sur le parcours nouveau, avec nettoyage de la fixture | Validé par le smoke Joomla |
 | PHPCS | Actif sur les services modernes, les builders ContentBuilder et `HiddenFieldTrait` | `phpcs.xml.dist`, commit `2e58c4bb` |
 | PHPStan | Niveau 2 sur le composant, avec baseline | `phpstan.neon.dist`, 11 entrées dans la baseline |
+| Navigation des enregistrements admin | Les liens précédent/suivant réutilisent le formulaire, la recherche et le tri de la liste courante ; l'état est conservé pendant l'édition | `RecordsModel::getAdjacentRecordId()`, `tests/Administrator/RecordsNavigationTest.php` |
 
 ## Phase 1 — Terminer la préparation des éléments classiques
 
@@ -1346,6 +1347,36 @@ assertions), PHPCS et le XML du manifeste sont valides, le paquet est validé
 et le smoke-test Joomla 6 installation/update/frontend confirme la présence
 effective de `media/breezingforms/themes/default/theme.css` et
 `media/breezingforms/themes/aqua/theme.css`.
+
+## Phase 17 — Navigation des enregistrements selon la liste courante
+
+Ajoutée le 2026-08-31 après constat que l'écran d'édition calculait le
+précédent/suivant uniquement par identifiant dans le même formulaire. Cette
+logique ignorait donc le tri choisi et pouvait sortir du résultat affiché
+lorsqu'une recherche ou un formulaire était sélectionné.
+
+### Périmètre
+
+- `RecordsModel` construit maintenant la séquence de navigation à partir de
+  la même requête filtrée et ordonnée que `getItems()` : formulaire,
+  recherche, colonne de tri et direction sont communs aux deux parcours.
+- Les enregistrements « tous formulaires » peuvent à nouveau être parcourus
+  entre formulaires, tandis qu'un enregistrement absent du résultat filtré ne
+  reçoit aucun voisin.
+- Les liens de la liste et de l'écran d'édition transmettent le formulaire,
+  la recherche, le tri, la direction et l'état de pagination. Ces champs sont
+  aussi renvoyés par `save()` et `cancel()` afin de rester dans la liste de
+  départ.
+- La navigation par identifiant historique de `RecordModel` est supprimée
+  pour éviter deux définitions divergentes de l'ordre des enregistrements.
+
+### Vérification
+
+Le test ciblé couvre le tri descendant avec formulaire et recherche, le tri
+ascendant sans filtre, l'absence d'un voisin hors résultat et la propagation
+de l'état dans les templates. La suite complète passe avec 638 tests et 1 989
+assertions ; PHPCS (150 fichiers configurés), PHPStan niveau 2, `php -l` sur
+les fichiers modifiés et `git diff --check` sont verts.
 
 ## Travail en parallèle
 

@@ -36,35 +36,6 @@ class RecordModel extends BaseDatabaseModel
         return $db->loadObject() ?: null;
     }
 
-    /**
-     * The next/previous record id within the same form, ordered by id -
-     * used for the prev/next navigation on the record edit screen.
-     */
-    public function getAdjacentRecordId(int $recordId, int $formId, string $direction): ?int
-    {
-        $db = $this->getDatabase();
-        $query = $db->getQuery(true)
-            ->select($db->quoteName('id'))
-            ->from($db->quoteName('#__facileforms_records'))
-            ->where($db->quoteName('form') . ' = :formId')
-            ->bind(':formId', $formId, ParameterType::INTEGER)
-            ->bind(':recordId', $recordId, ParameterType::INTEGER)
-            ->setLimit(1);
-
-        if ($direction === 'next') {
-            $query->where($db->quoteName('id') . ' > :recordId')
-                ->order($db->quoteName('id') . ' ASC');
-        } else {
-            $query->where($db->quoteName('id') . ' < :recordId')
-                ->order($db->quoteName('id') . ' DESC');
-        }
-
-        $db->setQuery($query);
-        $result = $db->loadResult();
-
-        return $result !== null ? (int) $result : null;
-    }
-
     public function getEditableElements(int $formId): array
     {
         $db = $this->getDatabase();

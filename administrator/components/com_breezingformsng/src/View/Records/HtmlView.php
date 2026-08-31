@@ -98,6 +98,33 @@ class HtmlView extends BaseHtmlView
 
     private function prepareListData(\Joomla\CMS\Application\CMSApplication $app, \Joomla\Input\Input $input): void
     {
+        $this->prepareListState($app, $input);
+
+        $component = $app->bootComponent('com_breezingformsng');
+
+        if (!$component instanceof MVCFactoryServiceInterface) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        /** @var RecordsModel $model */
+        $model = $component->getMVCFactory()->createModel('Records', 'Administrator');
+
+        $this->forms = $model->getForms();
+        $this->total = $model->getTotal($this->formSelection, $this->searchTerm);
+        $this->records = $model->getItems(
+            $this->formSelection,
+            $this->searchTerm,
+            $this->limitStart,
+            $this->limit,
+            $this->listOrder,
+            $this->listDirn
+        );
+
+        $app->getDocument()->getWebAssetManager()->useScript('table.columns');
+    }
+
+    private function prepareListState(\Joomla\CMS\Application\CMSApplication $app, \Joomla\Input\Input $input): void
+    {
         $session = $app->getSession();
 
         $this->formSelection = $input->getInt('form_selection', 0);
@@ -125,28 +152,6 @@ class HtmlView extends BaseHtmlView
             $this->listDirn = (string) $session->get('bf.records_dir', 'desc');
             $this->listDirn = $this->listDirn === 'asc' ? 'asc' : 'desc';
         }
-
-        $component = $app->bootComponent('com_breezingformsng');
-
-        if (!$component instanceof MVCFactoryServiceInterface) {
-            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
-        }
-
-        /** @var RecordsModel $model */
-        $model = $component->getMVCFactory()->createModel('Records', 'Administrator');
-
-        $this->forms = $model->getForms();
-        $this->total = $model->getTotal($this->formSelection, $this->searchTerm);
-        $this->records = $model->getItems(
-            $this->formSelection,
-            $this->searchTerm,
-            $this->limitStart,
-            $this->limit,
-            $this->listOrder,
-            $this->listDirn
-        );
-
-        $app->getDocument()->getWebAssetManager()->useScript('table.columns');
     }
 
     private function prepareEditData(\Joomla\Input\Input $input): void
@@ -154,6 +159,7 @@ class HtmlView extends BaseHtmlView
         $recordId = $input->getInt('record_id', 0);
         /** @var CMSApplication $app */
         $app = Factory::getApplication();
+        $this->prepareListState($app, $input);
 
         if ($recordId < 1) {
             $app->redirect('index.php?option=com_breezingformsng&view=records');
@@ -181,9 +187,28 @@ class HtmlView extends BaseHtmlView
             (string) $this->record->name
         );
 
-        $formId = (int) $this->record->form;
-        $this->prevRecordId = $model->getAdjacentRecordId($recordId, $formId, 'prev');
-        $this->nextRecordId = $model->getAdjacentRecordId($recordId, $formId, 'next');
+        /** @var RecordsModel $recordsModel */
+        $recordsModel = $component->getMVCFactory()->createModel('Records', 'Administrator');
+        if (!$recordsModel instanceof RecordsModel) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        $this->prevRecordId = $recordsModel->getAdjacentRecordId(
+            $recordId,
+            $this->formSelection,
+            $this->searchTerm,
+            $this->listOrder,
+            $this->listDirn,
+            'prev'
+        );
+        $this->nextRecordId = $recordsModel->getAdjacentRecordId(
+            $recordId,
+            $this->formSelection,
+            $this->searchTerm,
+            $this->listOrder,
+            $this->listDirn,
+            'next'
+        );
     }
 
     private function prepareListToolbar(): void

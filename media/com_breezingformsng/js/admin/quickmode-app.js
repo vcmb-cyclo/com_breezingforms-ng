@@ -932,6 +932,19 @@
             // request, since it is a child of the document being replaced.
             // No-ops immediately if the Options tab was never rendered
             // (formId === 0, nothing to save there yet).
+            function syncOptionsEditors($wrap) {
+                var instances = (window.Joomla && Joomla.editors && Joomla.editors.instances) || {};
+
+                $wrap.find('textarea').each(function () {
+                    var field = this;
+                    var editor = instances[field.id] || instances[field.name];
+
+                    if (editor && typeof editor.getValue === 'function') {
+                        field.value = editor.getValue();
+                    }
+                });
+            }
+
             function submitOptionsTab(callback) {
                 var $wrap = JQuery('#bfOptionsFieldsWrap');
                 if ($wrap.length === 0) {
@@ -951,6 +964,7 @@
                 JQuery('#jf_title').val(JQuery('#bfFormTitle').val());
                 JQuery('#jf_name').val(JQuery('#bfFormName').val());
                 JQuery('#jf_description').val(JQuery('#bfFormDescription').val());
+                syncOptionsEditors($wrap);
 
                 var $iframe = JQuery('#bfOptionsSaveFrame');
                 $iframe.one('load', callback);

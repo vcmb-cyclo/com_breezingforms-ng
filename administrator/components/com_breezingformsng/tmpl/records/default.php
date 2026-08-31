@@ -33,6 +33,25 @@ $pageUrl = function (int $start) use ($listOrder, $listDirn, $formSelection, $se
         . '&limitstart=' . $start;
 };
 
+$editUrl = static function (int $recordId) use ($listOrder, $listDirn, $formSelection, $searchTerm, $limit, $limitStart): string {
+    $query = [
+        'option'            => 'com_breezingformsng',
+        'view'              => 'records',
+        'layout'            => 'edit',
+        'record_id'         => $recordId,
+        'form_selection'    => $formSelection,
+        'filter_order'      => $listOrder,
+        'filter_order_Dir'  => $listDirn,
+        'limit'             => $limit,
+        'limitstart'        => $limitStart,
+    ];
+    if ($searchTerm !== '') {
+        $query['searchterm'] = $searchTerm;
+    }
+
+    return 'index.php?' . http_build_query($query, '', '&', PHP_QUERY_RFC3986);
+};
+
 $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key), ENT_QUOTES, 'UTF-8');
 ?>
 <form action="index.php?option=com_breezingformsng&amp;view=records" method="post" name="adminForm" id="adminForm">
@@ -87,7 +106,7 @@ $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key)
             <td class="text-center"><?= HTMLHelper::_('grid.id', $i, $recId); ?></td>
             <td><?= $recId; ?></td>
             <td>
-              <a href="index.php?option=com_breezingformsng&view=records&layout=edit&record_id=<?= $recId; ?>&form_selection=<?= $this->formSelection; ?>" title="<?= $headerTitle('JACTION_EDIT'); ?>">
+              <a href="<?= htmlspecialchars($editUrl($recId), ENT_QUOTES, 'UTF-8'); ?>" title="<?= $headerTitle('JACTION_EDIT'); ?>">
                 <?= htmlspecialchars((string) $rec['form_title']); ?>
               </a>
             </td>

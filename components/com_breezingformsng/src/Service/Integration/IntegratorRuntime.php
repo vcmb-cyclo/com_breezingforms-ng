@@ -126,6 +126,7 @@ class IntegratorRuntime
         try {
             $ret = $db->setQuery($query)->loadObjectList();
         } catch (\Exception $e) {
+            $ret = [];
             echo $e->getMessage();
         } // try
 

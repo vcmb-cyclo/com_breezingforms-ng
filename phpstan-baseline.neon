@@ -505,12 +505,6 @@ parameters:
 			path: components/com_breezingformsng/src/Service/Integration/IntegratorRuntime.php
 
 		-
-			message: '#^Variable \$ret might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: components/com_breezingformsng/src/Service/Integration/IntegratorRuntime.php
-
-		-
 			message: '#^Access to an undefined property Joomla\\Http\\Response\:\:\$body\.$#'
 			identifier: property.notFound
 			count: 3

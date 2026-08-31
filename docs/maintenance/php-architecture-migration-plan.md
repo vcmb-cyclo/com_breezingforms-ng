@@ -113,7 +113,7 @@
 | ContentBuilder — loaders runtime | Le smoke Joomla insère puis relit une association publiée avec les loaders BFNG via l’API Database réelle, avant nettoyage de la fixture | Commit `3e22ac75d` |
 | ContentBuilder — source/enregistrement runtime | Le smoke résout une source BreezingForms réelle via `FormSourceFactory` et exerce `ContentBuilderRecordLoader` sur le parcours nouveau, avec nettoyage de la fixture | Validé par le smoke Joomla |
 | PHPCS | Actif sur les services modernes, les builders ContentBuilder et `HiddenFieldTrait` | `phpcs.xml.dist`, commit `2e58c4bb` |
-| PHPStan | Niveau 2 sur le composant, avec baseline | `phpstan.neon.dist`, 125 entrées dans la baseline |
+| PHPStan | Niveau 2 sur le composant, avec baseline | `phpstan.neon.dist`, 124 entrées dans la baseline |
 
 ## Phase 1 — Terminer la préparation des éléments classiques
 
@@ -646,7 +646,7 @@ warning ; PHPCS et PHPStan restent également verts.
 
 ### 6.2 Réduire la baseline PHPStan
 
-- Classer les 125 entrées actuelles par fichier et par catégorie.
+- Classer les 124 entrées actuelles par fichier et par catégorie.
 - Corriger d'abord les erreurs dans les services extraits et les nouveaux DTO.
 - Distinguer les défauts des stubs Joomla des erreurs réelles du composant.
 - Ne jamais ajouter une entrée de baseline pour un nouveau code.
@@ -689,6 +689,11 @@ réservée au harnais Joomla/ContentBuilder.
 avant un fichier de police ne lise pas de variables indéfinies. Les quatre
 occurrences PHPStan correspondantes sont supprimées de la baseline ; les tests
 de normalisation et de scan des polices restent verts.
+
+`IntegratorRuntime::getCriteria()` retourne maintenant une liste vide lorsqu'une
+lecture SQL échoue, au lieu de retourner une variable non initialisée. Ce
+contrat est verrouillé par un test avec double de base de données ; une entrée
+PHPStan est ainsi supprimée.
 
 ## Phase 7 — Réduire les façades historiques
 
@@ -1095,7 +1100,7 @@ aucune référence obsolète (`01d17251a`).
 
 Suite complète verte, PHPStan niveau 2 propre, build + validation du
 package. Correctifs CSS vérifiés en direct (avant/après). Baseline PHPStan à
-125 entrées (contre 251 au dernier relevé historique de ce document), après
+124 entrées (contre 251 au dernier relevé historique de ce document), après
 suppression des entrées résiduelles liées au rendu mobile et aux trois
 renderers QuickMode (`f57d08761` et le lot courant).
 

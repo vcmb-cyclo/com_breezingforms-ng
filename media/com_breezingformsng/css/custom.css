@@ -850,7 +850,7 @@ quick mode
     height: inherit;
 }
 
-.bfFadingMessage {
+.bfFadingMessage:not(.bfng-message) {
     margin-bottom: 10px;
     padding: 10px;
     background-color: #dff0d8;

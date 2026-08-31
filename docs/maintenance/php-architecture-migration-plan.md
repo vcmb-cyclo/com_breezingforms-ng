@@ -991,6 +991,10 @@ sont couverts par des tests unitaires.
 le matcher et vérifie explicitement l'accessibilité du répertoire source; les
 gardes de matching dupliquées ont été supprimées.
 
+`ImageResizer` dispose désormais d'un filet de tests dédié pour la détection
+PNG et les trois géométries de redimensionnement, en complément des tests de
+taille mémoire et de capacité déjà présents.
+
 Les tests d'existence des assets statiques des trois renderers QuickMode
 utilisent désormais `is_file()` sans masquage d'erreur; leurs sorties restent
 couvertes par les tests de caractérisation des renderers.

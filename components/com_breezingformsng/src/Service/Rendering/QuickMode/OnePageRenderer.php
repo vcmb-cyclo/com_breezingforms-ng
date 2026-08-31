@@ -907,7 +907,12 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 							//-->
                                                         </script>
 							";
-                        echo '<input class="ff_elem" ' . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="hidden" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+                        echo QuickModeFileInputBuilder::build(
+                            $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+                            'hidden',
+                            (string) $mdata['bfName'],
+                            (int) $mdata['dbId']
+                        );
                         //}else{
                         //    echo '<input class="ff_elem" '.$tabIndex.$onclick.$onblur.$onchange.$onfocus.$onselect.$readonly.'type="file" name="ff_nm_'.$mdata['bfName'].'[]" id="ff_elem'.$mdata['dbId'].'"/>'."\n";
                         //}

@@ -1463,9 +1463,19 @@ float:left;
 							//-->
                                                         </script>
 							";
-            echo '<input class="ff_elem" ' . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="hidden" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+            echo QuickModeFileInputBuilder::build(
+                $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+                'hidden',
+                (string) $mdata['bfName'],
+                (int) $mdata['dbId']
+            );
         } else {
-            echo '<input class="ff_elem" ' . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="file" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+            echo QuickModeFileInputBuilder::build(
+                $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+                'file',
+                (string) $mdata['bfName'],
+                (int) $mdata['dbId']
+            );
         }
         if ($mdata['attachToAdminMail']) {
             echo '<input type="hidden" name="attachToAdminMail[' . $mdata['bfName'] . ']" value="true"/>' . "\n";

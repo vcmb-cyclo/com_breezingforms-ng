@@ -175,5 +175,43 @@ final class UploadPathResolverTest extends TestCase
             rmdir($baseDirectory);
         }
     }
+
+    public function testResolvesIdentityAndDateTokensInTokenizedDirectory(): void
+    {
+        $baseDirectory = sys_get_temp_dir() . '/bfng-tokenized-' . bin2hex(random_bytes(4));
+
+        try {
+            $result = (new TokenizedDirectoryResolver(new Input()))->resolve(
+                $baseDirectory . '/{userid}/{username}/{name}/{field}/{date}_{time}_{datetime}|download',
+                [],
+                'Attachment',
+                [],
+                [],
+                ['id' => 12, 'username' => 'xavier', 'name' => 'Xavier'],
+                '2024-01-02 03:04:05',
+                'UTC'
+            );
+
+            $relative = '12/xavier_12/Xavier_12/attachment/'
+                . '2024_01_02_03_04_05_2024_01_02_03_04_05';
+            self::assertSame($baseDirectory . '/' . $relative . '/download', $result);
+            self::assertDirectoryExists($baseDirectory . '/' . $relative);
+        } finally {
+            if (is_dir($baseDirectory)) {
+                $iterator = new \RecursiveIteratorIterator(
+                    new \RecursiveDirectoryIterator($baseDirectory, \FilesystemIterator::SKIP_DOTS),
+                    \RecursiveIteratorIterator::CHILD_FIRST
+                );
+                foreach ($iterator as $item) {
+                    if ($item->isDir()) {
+                        rmdir($item->getPathname());
+                    } else {
+                        unlink($item->getPathname());
+                    }
+                }
+                rmdir($baseDirectory);
+            }
+        }
+    }
 }
 }

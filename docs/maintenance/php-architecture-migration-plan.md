@@ -1538,6 +1538,13 @@ Bootstrap/OnePage. Les marqueurs de champ et classes de bouton propres au
 thème restent paramétrables ; les sorties caractérisées et l’échappement du
 marqueur sont testés (`5ac9a8786`).
 
+Le parcours de génération des scripts d’un enregistrement ContentBuilder est
+maintenant isolé dans `ContentBuilderEditableRecordScriptBuilder`. Il traite
+les familles de valeurs, choix, listes, fichiers et signatures, filtre les
+champs non éditables et reçoit les opérations dépendantes du runtime via des
+closures typées. `RenderingEngine::view()` ne conserve plus que l’orchestration
+et l’enveloppe historique (`09cf02975`).
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

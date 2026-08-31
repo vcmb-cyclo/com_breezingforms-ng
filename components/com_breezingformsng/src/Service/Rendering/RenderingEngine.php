@@ -92,6 +92,7 @@ final class RenderingEngine
     private ?CaptchaWrapperMarkupBuilder $captchaWrapperMarkupBuilderService = null;
     private ?QuickModeFormTagBuilder $quickModeFormTagBuilderService = null;
     private ?ContentBuilderReadonlyScriptWrapperBuilder $contentBuilderReadonlyScriptWrapperBuilderService = null;
+    private ?FormValidationScriptWrapperBuilder $formValidationScriptWrapperBuilderService = null;
     private ?AdditionalHiddenFieldsBuilder $additionalHiddenFieldsBuilderService = null;
     private ?PaymentProviderDetector $paymentProviderDetectorService = null;
     private ?ContentBuilderFileValueParser $contentBuilderFileValueParserService = null;
@@ -379,6 +380,11 @@ final class RenderingEngine
         return $this->contentBuilderReadonlyScriptWrapperBuilderService ??= new ContentBuilderReadonlyScriptWrapperBuilder();
     }
 
+    private function formValidationScriptWrapperBuilder(): FormValidationScriptWrapperBuilder
+    {
+        return $this->formValidationScriptWrapperBuilderService ??= new FormValidationScriptWrapperBuilder();
+    }
+
     private function additionalHiddenFieldsBuilder(): AdditionalHiddenFieldsBuilder
     {
         return $this->additionalHiddenFieldsBuilderService ??= new AdditionalHiddenFieldsBuilder();
@@ -623,12 +629,11 @@ final class RenderingEngine
 
         $capFunc = $this->buildCaptchaScript($captchaError, $capFunc);
 
-        echo
-            '<script type="text/javascript">' . nl() .
-            '<!--' . nl() .
-            '' . nl() .
-            $fileExtensionsCheck .
-            $capFunc;
+        echo $this->formValidationScriptWrapperBuilder()->open(
+            $fileExtensionsCheck,
+            $capFunc,
+            nl()
+        );
 
         [$library, $linked] = $this->createScriptLibraryState();
 
@@ -817,8 +822,7 @@ final class RenderingEngine
             }
         } // if
 
-        echo '//-->' . nl() .
-            '</script>' . nl();
+        echo $this->formValidationScriptWrapperBuilder()->close(nl());
 
         if ($icons > 0) {
             RuntimeAssetLoader::script(

@@ -748,6 +748,44 @@ tests `FormOpeningMarkupBuilderTest`/`FormClosingMarkupBuilderTest`/
 `RenderingEngineViewCharacterizationTest` couvrent le contenu exact,
 octet pour octet, du nouveau balisage.
 
+## Phase 11 — Nettoyage des assets QuickMode orphelins
+
+Ajoutée le 2026-08-31, à la suite de la phase 10. En investiguant l'origine
+visuelle du balisage à 9 divs supprimé en phase 10, découverte que
+`components/com_breezingformsng/themes/quickmode/` contenait un ensemble
+d'assets totalement hors d'atteinte du code actuel :
+
+- 6 dossiers de skins d'origine BreezingForms (2010-2013) : `aqua/`,
+  `breeze/`, `default/`, `glossy_blue/`, `glossy_gray/`, `qmtheme/`.
+- `system.ie6.css`, `system.ie7.css`, `system.ie.css` — feuilles
+  conditionnelles pour Internet Explorer 6/7.
+- `mobile-system.css` — résidu de la phase 9 (suppression du rendu mobile).
+- `images/` (icônes, spinner ajax-loader) et les doublons
+  `ajax-loader.gif/png`, `cancel.png`, `upload.png`, `img/icon_info_old.png`
+  à la racine (`ClassicRenderer` charge en réalité ses icônes cancel/upload
+  depuis `media/breezingforms/themes/`, pas ce dossier).
+
+Vérification de la logique de sélection réelle
+(`QuickmodeModel::scanThemeDir()`) : le menu déroulant « Thème » de l'admin
+scanne dynamiquement `media/breezingforms/themes/` (Classic, un seul skin
+réel aujourd'hui : `vcmb_j5`, le thème maison) et
+`media/breezingforms/themes-bootstrap5/` (Bootstrap/OnePage, dossier
+inexistant). Aucun de ces deux chemins ne pointe vers
+`components/com_breezingformsng/themes/quickmode/<skin>/` — les 6 dossiers
+supprimés n'étaient donc sélectionnables par aucune voie du code actuel.
+
+### Conservé
+
+`system.css` (seule feuille chargée par `ClassicRenderer`, ligne 184) et
+`img/icon_info.png` (seule image qu'il référence, via une unique règle
+`url()` dans `system.css`).
+
+### Vérification
+
+252 fichiers supprimés (uniquement des assets CSS/images/HTML, aucun PHP).
+Suite complète verte (399 tests), PHPStan niveau 2 propre, build +
+validation du package (assets absents de l'archive, `system.css` présent).
+
 ## Travail en parallèle
 
 | Couloir | Fichiers principaux | Peut avancer avec |

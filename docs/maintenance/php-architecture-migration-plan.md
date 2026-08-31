@@ -1495,6 +1495,10 @@ La branche de finalisation backend est désormais caractérisée séparément,
 notamment l'émission du champ `ff_runmode`, avec la même vérification de
 fermeture et de nettoyage (`4f89b4029`).
 
+La branche preview est également couverte sur son parcours in-frame, avec
+vérification de `ff_runmode`, `ff_frame` et de la fermeture du formulaire
+(`b1a2b5973`).
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

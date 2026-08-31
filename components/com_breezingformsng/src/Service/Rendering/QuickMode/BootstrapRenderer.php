@@ -78,16 +78,16 @@ class BootstrapRenderer
     private ?QuickModePagingActionBuilder $quickModePagingActionBuilderService = null;
     private ?QuickModeSubmitActionBuilder $quickModeSubmitActionBuilderService = null;
     private ?QuickModeCalendarOptionsBuilder $quickModeCalendarOptionsBuilderService = null;
-    private ?QuickModeDeactivatedSectionScriptBuilder $quickModeDeactivatedSectionScriptBuilderService = null;
+    private ?QuickModeDeactivationScriptBuilder $quickModeDeactivationScriptBuilderService = null;
 
     private function quickModeCalendarOptionsBuilder(): QuickModeCalendarOptionsBuilder
     {
         return $this->quickModeCalendarOptionsBuilderService ??= new QuickModeCalendarOptionsBuilder();
     }
 
-    private function quickModeDeactivatedSectionScriptBuilder(): QuickModeDeactivatedSectionScriptBuilder
+    private function quickModeDeactivationScriptBuilder(): QuickModeDeactivationScriptBuilder
     {
-        return $this->quickModeDeactivatedSectionScriptBuilderService ??= new QuickModeDeactivatedSectionScriptBuilder();
+        return $this->quickModeDeactivationScriptBuilderService ??= new QuickModeDeactivationScriptBuilder();
     }
 
     public function bsClass($key)
@@ -434,7 +434,7 @@ class BootstrapRenderer
                 }
             } elseif ($mdata['type'] == 'section') {
                 if (isset($dataObject['properties']['name']) && isset($mdata['off']) && $mdata['off']) {
-                    echo $this->quickModeDeactivatedSectionScriptBuilder()->build($dataObject['properties']['name']);
+                    echo $this->quickModeDeactivationScriptBuilder()->section($dataObject['properties']['name']);
                 }
                 /* translatables */
                 if (isset($mdata['title_translation' . $this->language_tag]) && $mdata['title_translation' . $this->language_tag] != '') {
@@ -1009,7 +1009,7 @@ class BootstrapRenderer
                 }
 
                 if (isset($mdata['bfName']) && isset($mdata['off']) && $mdata['off']) {
-                    echo '<script type="text/javascript">bfRegisterDeactivatedField(' . json_encode($mdata['bfName']) . ');</script>' . "\n";
+                    echo $this->quickModeDeactivationScriptBuilder()->field($mdata['bfName']);
                 }
 
                 if ($mdata['bfType'] == 'bfFile') {

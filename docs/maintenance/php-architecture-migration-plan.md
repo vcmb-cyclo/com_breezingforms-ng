@@ -1603,7 +1603,9 @@ le test de caractérisation de `view()` utilise la factory (`1c9e497ab`).
 Le script de désactivation des sections est désormais partagé par Classic,
 Bootstrap et OnePage via `QuickModeDeactivatedSectionScriptBuilder`. Le nom
 de section reste encodé en JSON et la sortie historique est verrouillée par
-un test dédié.
+un test dédié. Le même `QuickModeDeactivationScriptBuilder` centralise
+également le script `bfRegisterDeactivatedField` des trois renderers, sans
+modifier leurs conditions d'activation.
 
 La factory est également incluse dans le périmètre PHPCS ; le ruleset complet
 reste vert après son ajout (`7434564bc`).

@@ -14,12 +14,19 @@ declare(strict_types=1);
 
 namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode;
 
-/** Builds the script registering a disabled QuickMode section. */
-final class QuickModeDeactivatedSectionScriptBuilder
+/** Builds scripts registering disabled QuickMode sections and fields. */
+final class QuickModeDeactivationScriptBuilder
 {
-    public function build(string $name, string $newline = "\n"): string
+    public function section(string $name, string $newline = "\n"): string
     {
         return '<script type="text/javascript">bfRegisterDeactivatedSection('
+            . json_encode($name)
+            . ');</script>' . $newline;
+    }
+
+    public function field(string $name, string $newline = "\n"): string
+    {
+        return '<script type="text/javascript">bfRegisterDeactivatedField('
             . json_encode($name)
             . ');</script>' . $newline;
     }

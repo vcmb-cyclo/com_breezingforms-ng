@@ -590,6 +590,11 @@ les en-têtes attendus, la réponse est normalisée et une panne réseau produit
 une chaîne vide sans accès réseau réel (`PayPalCallbackTest`). Les traitements
 complets PayPal, Sofort et Stripe restent à caractériser avant extraction.
 
+La règle commune de limite des téléchargements payants est maintenant portée
+par `PaymentDownloadPolicy`, injectée dans les trois callbacks PayPal, Sofort
+et Stripe. Ses frontières sont testées et un test de régression vérifie que
+les callbacks délèguent bien cette décision au service partagé.
+
 Le premier nettoyage ciblé de cette baseline PHPCS est réalisé dans
 `QuickModeSelectBuilder`, `QuickModeCaptchaMarkupBuilder` et
 `QuickModeUploadOptionsBuilder` (`eaf8b2d1`) : leurs sorties sont inchangées et

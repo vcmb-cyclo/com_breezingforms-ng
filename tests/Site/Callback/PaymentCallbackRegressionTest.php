@@ -71,6 +71,20 @@ final class PaymentCallbackRegressionTest extends TestCase
         }
     }
 
+    public function testDownloadCallbacksDelegateAttemptLimitToSharedPolicy(): void
+    {
+        foreach (['StripeCallback', 'PayPalCallback', 'SofortCallback'] as $callback) {
+            $source = $this->read("components/com_breezingformsng/src/Service/Callback/{$callback}.php");
+
+            self::assertStringContainsString('$this->downloadPolicy->canDownload(', $source, $callback);
+            self::assertStringNotContainsString(
+                'paypal_download_tries < $options[\'downloadTries\']',
+                $source,
+                $callback
+            );
+        }
+    }
+
     private function read(string $path): string
     {
         $source = file_get_contents(self::ROOT . '/' . $path);

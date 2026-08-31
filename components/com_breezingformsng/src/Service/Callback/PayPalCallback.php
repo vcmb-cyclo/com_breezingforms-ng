@@ -25,14 +25,17 @@ use Joomla\Http\HttpFactory;
 final class PayPalCallback
 {
     private readonly Http $http;
+    private readonly PaymentDownloadPolicy $downloadPolicy;
 
     public function __construct(
         private readonly CMSApplication $application,
         private readonly DatabaseInterface $database,
         private readonly RedirectHelper $redirectHelper,
         ?Http $http = null,
+        ?PaymentDownloadPolicy $downloadPolicy = null,
     ) {
         $this->http = $http ?? HttpFactory::getHttp();
+        $this->downloadPolicy = $downloadPolicy ?? new PaymentDownloadPolicy();
     }
 
     public function confirmIpn(): void
@@ -416,7 +419,10 @@ final class PayPalCallback
 
                     if (count($downloads) == 1) {
 
-                        if ($downloads[0]->paypal_download_tries < $options['downloadTries']) {
+                        if ($this->downloadPolicy->canDownload(
+                            (int) $downloads[0]->paypal_download_tries,
+                            (int) $options['downloadTries']
+                        )) {
 
                             $updateQuery = $db->getQuery(true)
                                 ->update($db->quoteName('#__facileforms_records'))

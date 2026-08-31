@@ -25,12 +25,16 @@ use Joomla\CMS\Mail\MailerFactoryInterface;
  */
 final class SofortCallback
 {
+    private readonly PaymentDownloadPolicy $downloadPolicy;
+
     public function __construct(
         private readonly CMSApplication $application,
         private readonly DatabaseInterface $database,
         private readonly RedirectHelper $redirectHelper,
         private readonly MailerFactoryInterface $mailerFactory,
+        ?PaymentDownloadPolicy $downloadPolicy = null,
     ) {
+        $this->downloadPolicy = $downloadPolicy ?? new PaymentDownloadPolicy();
     }
 
     public function success(): void
@@ -342,7 +346,10 @@ final class SofortCallback
 
                     if (count($downloads) == 1) {
 
-                        if ($downloads[0]->paypal_download_tries < $options['downloadTries']) {
+                        if ($this->downloadPolicy->canDownload(
+                            (int) $downloads[0]->paypal_download_tries,
+                            (int) $options['downloadTries']
+                        )) {
 
                             $updateQuery = $db->getQuery(true)
                                 ->update($db->quoteName('#__facileforms_records'))

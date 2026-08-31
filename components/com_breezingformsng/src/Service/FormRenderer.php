@@ -22,8 +22,8 @@ use Joomla\CMS\Uri\Uri;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RuntimeAssetLoader;
 use Joomla\Database\ParameterType;
 use Joomla\Database\DatabaseInterface;
-use Joomla\Filesystem\File;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RequestParameterParser;
+use Vcmb\Component\BreezingformsNG\Site\Service\Upload\TemporaryUploadFileCleaner;
 
 /**
  * Renders a form (ff_task=view) or processes a submission (ff_task=submit)
@@ -31,6 +31,8 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RequestParameterParser;
  */
 final class FormRenderer
 {
+    private ?TemporaryUploadFileCleaner $temporaryUploadFileCleanerService = null;
+
     public function __construct(
         private readonly CMSApplication $application,
         private readonly DatabaseInterface $database,
@@ -464,48 +466,15 @@ $ff_request = array();
             } // if task = view
             if ($left > 3)
                 $align = $left;
-            // remove temporary flash upload files if any
-            $sourcePath = JPATH_SITE . '/components/com_breezingformsng/uploads/';
-            if (@file_exists($sourcePath) && @is_readable($sourcePath) && @is_dir($sourcePath) && $handle = @opendir($sourcePath)) {
-                while (false !== ($file = @readdir($handle))) {
-                    if ($file != "." && $file != "..") {
-                        $parts = explode('_', $file);
-                        if (count($parts) >= 5) {
-                            if ($parts[count($parts) - 1] == 'flashtmp') {
-                                if (@file_exists($sourcePath . $file) && @is_readable($sourcePath . $file)) {
-                                    $fileCreationTime = @filectime($sourcePath . $file);
-                                    $fileAge = time() - $fileCreationTime;
-                                    if ($fileAge >= 86400) {
-                                        @File::delete($sourcePath . $file);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                @closedir($handle);
-            }
-            // remove temporary chunked upload files if any
-            $sourcePath = JPATH_SITE . '/components/com_breezingformsng/uploads/chunks';
-            if (@file_exists($sourcePath) && @is_readable($sourcePath) && @is_dir($sourcePath) && $handle = @opendir($sourcePath)) {
-                while (false !== ($file = @readdir($handle))) {
-                    if ($file != "." && $file != "..") {
-                        $parts = explode('_', $file);
-                        if (count($parts) >= 5) {
-                            if ($parts[count($parts) - 1] == 'chunktmp') {
-                                if (@file_exists($sourcePath . $file) && @is_readable($sourcePath . $file)) {
-                                    $fileCreationTime = @filectime($sourcePath . $file);
-                                    $fileAge = time() - $fileCreationTime;
-                                    if ($fileAge >= 86400) {
-                                        @File::delete($sourcePath . $file);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                @closedir($handle);
-            }
+            // remove temporary flash and chunked upload files if any
+            $this->temporaryUploadFileCleaner()->purge(
+                JPATH_SITE . '/components/com_breezingformsng/uploads/',
+                '_flashtmp'
+            );
+            $this->temporaryUploadFileCleaner()->purge(
+                JPATH_SITE . '/components/com_breezingformsng/uploads/chunks',
+                '_chunktmp'
+            );
             // purge payment cache
             $sourcePath = JPATH_SITE . '/media/breezingforms/payment_cache/';
             if (@file_exists($sourcePath) && @is_readable($sourcePath) && @is_dir($sourcePath) && $handle = @opendir($sourcePath)) {
@@ -670,5 +639,10 @@ $ff_request = array();
             } // if
         } // if
     } // if
+    }
+
+    private function temporaryUploadFileCleaner(): TemporaryUploadFileCleaner
+    {
+        return $this->temporaryUploadFileCleanerService ??= new TemporaryUploadFileCleaner();
     }
 }

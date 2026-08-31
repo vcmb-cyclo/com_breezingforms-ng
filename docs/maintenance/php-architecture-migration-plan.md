@@ -955,6 +955,10 @@ du formulaire (wrapper moderne/legacy, identifiant et classe personnalisée)
 est désormais construit par `FormOpeningMarkupBuilder` via `e77be68a`, avec
 ses deux variantes couvertes par des tests unitaires.
 
+La purge des fichiers temporaires Flash et chunked est désormais mutualisée
+par `TemporaryUploadFileCleaner` dans `FormRenderer`. Les suffixes, le critère
+de nommage historique et l'expiration sont couverts par des tests unitaires.
+
 Les paramètres additionnels `ff_otherparams` du mode frontend sont désormais
 générés par `AdditionalHiddenFieldsBuilder` via `bb469b88`, avec ordre,
 encodage URL et échappement HTML couverts. La détection des providers de

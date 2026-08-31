@@ -37,6 +37,21 @@ final class ContentBuilderEditableRecordScriptBuilderTest extends TestCase
         self::assertStringContainsString('ff_form7', $result['javascript']);
     }
 
+    public function testDoesNotMutateRecordValuesWhileCleaningThem(): void
+    {
+        $record = $this->record(23, 'title', 'Text', '  Hello  ');
+        $builder = new ContentBuilderEditableRecordScriptBuilder(
+            static fn(string $value): string => trim($value),
+            static fn(string $value, int $width, string $break, bool $cut): string =>
+                wordwrap($value, $width, $break, $cut)
+        );
+
+        $result = $builder->build([$record], [], false, 7, sys_get_temp_dir());
+
+        self::assertStringContainsString('Hello', $result['javascript']);
+        self::assertSame('  Hello  ', $record->recValue);
+    }
+
     public function testSkipsNonEditableRecordsAndNonQuickModeFiles(): void
     {
         $file = new stdClass();

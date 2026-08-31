@@ -1570,8 +1570,10 @@ Le parcours de génération des scripts d’un enregistrement ContentBuilder est
 maintenant isolé dans `ContentBuilderEditableRecordScriptBuilder`. Il traite
 les familles de valeurs, choix, listes, fichiers et signatures, filtre les
 champs non éditables et reçoit les opérations dépendantes du runtime via des
-closures typées. `RenderingEngine::view()` ne conserve plus que l’orchestration
-et l’enveloppe historique (`09cf02975`).
+closures typées. Le nettoyage des valeurs s'effectue désormais dans une
+variable locale afin de ne pas modifier les objets d'enregistrement fournis.
+`RenderingEngine::view()` ne conserve plus que l’orchestration et l’enveloppe
+historique (`09cf02975`).
 
 Le harnais unitaire couvre également les branches QuickMode d'upload (compteur,
 validation, contrôles de suppression et désactivation) ainsi que la résolution

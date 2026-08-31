@@ -36,7 +36,7 @@ final class ContentBuilderEditableRecordScriptBuilder
                 continue;
             }
 
-            $entry->recValue = ($this->cleanValue)((string) $entry->recValue);
+            $recordValue = ($this->cleanValue)((string) $entry->recValue);
 
             switch ($entry->recType) {
                 case 'File Upload':
@@ -50,7 +50,7 @@ final class ContentBuilderEditableRecordScriptBuilder
                     }
 
                     $fileSupport = new ContentBuilderFileSupportBuilder();
-                    $fileValue = $fileSupport->parseValue((string) $entry->recValue);
+                    $fileValue = $fileSupport->parseValue($recordValue);
                     $count = $fileValue['count'];
                     $contentBuilderScript .= '\n'
                         . '                                    cbFlashElemCnt["ff_elem' . $entry->recElementId . '"] = '
@@ -79,7 +79,7 @@ final class ContentBuilderEditableRecordScriptBuilder
                 case 'Signature':
                     $signaturePath = (new ContentBuilderFileSupportBuilder())->resolveSignature(
                         $signatureDirectory,
-                        (string) $entry->recValue
+                        $recordValue
                     );
                     if ($signaturePath !== null) {
                         $encoded = (new ContentBuilderSignatureImageEncoder())->encode($signaturePath);
@@ -100,7 +100,7 @@ final class ContentBuilderEditableRecordScriptBuilder
                         (string) $entry->recType,
                         (string) $entry->recName,
                         (int) $entry->recElementId,
-                        $entry->recValue
+                        $recordValue
                     );
                     break;
 
@@ -110,7 +110,7 @@ final class ContentBuilderEditableRecordScriptBuilder
                         'checkbox',
                         (string) $entry->recName,
                         $formId,
-                        (string) $entry->recValue
+                        $recordValue
                     );
                     break;
 
@@ -120,14 +120,14 @@ final class ContentBuilderEditableRecordScriptBuilder
                         'radio',
                         (string) $entry->recName,
                         $formId,
-                        (string) $entry->recValue
+                        $recordValue
                     );
                     break;
 
                 case 'Select List':
                     $javascript .= (new ContentBuilderSelectHydrationScriptBuilder())->build(
                         (int) $entry->recElementId,
-                        (string) $entry->recValue
+                        $recordValue
                     );
                     break;
             }

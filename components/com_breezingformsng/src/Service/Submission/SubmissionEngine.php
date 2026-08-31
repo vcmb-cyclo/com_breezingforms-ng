@@ -904,7 +904,7 @@ final class SubmissionEngine
                         $mailer->setSubject(Text::_('COM_BREEZINGFORMSNG_FORMS_DOUBLE_OPT_EMAIL_SUBJECT'));
                         $mailer->setBody($body);
                         $mailer->setSender($sender);
-                        $mailer->Send();
+                        $mailer->send();
                     }
                 }
             }

@@ -367,27 +367,27 @@ function bf_sendNotificationBySession($session)
 			$mail = bf_createMail($from, $fromname, $subject, $body, $alt_sender);
 			if (is_array($recipient)) {
 				foreach ($recipient as $to) {
-					$mail->AddAddress($to);
+					$mail->addRecipient($to);
 				}
 			} else {
-				$mail->AddAddress($recipient);
+				$mail->addRecipient($recipient);
 			}
 
 			if ($attachment) {
 				if (is_array($attachment)) {
 					foreach ($attachment as $fname) {
-						$mail->AddAttachment($fname);
+						$mail->addAttachment($fname);
 					}
 				} else {
-					$mail->AddAttachment($attachment);
+					$mail->addAttachment($attachment);
 				}
 			} // if
 
 			if (isset($html)) {
-				$mail->IsHTML($html);
+				$mail->isHtml($html);
 			}
 
-			$mail->Send();
+			$mail->send();
 		}
 	}
 
@@ -431,27 +431,27 @@ function bf_sendNotificationByPaymentCache($formId, $recordId, $type = 'admin')
 			$mail = bf_createMail($from, $fromname, $subject, $body, $alt_sender);
 			if (is_array($recipient)) {
 				foreach ($recipient as $to) {
-					$mail->AddAddress($to);
+					$mail->addRecipient($to);
 				}
 			} else {
-				$mail->AddAddress($recipient);
+				$mail->addRecipient($recipient);
 			}
 
 			if ($attachment) {
 				if (is_array($attachment)) {
 					foreach ($attachment as $fname) {
-						$mail->AddAttachment($fname);
+						$mail->addAttachment($fname);
 					}
 				} else {
-					$mail->AddAttachment($attachment);
+					$mail->addAttachment($attachment);
 				}
 			} // if
 
 			if (isset($html)) {
-				$mail->IsHTML($html);
+				$mail->isHtml($html);
 			}
 
-			$mail->Send();
+			$mail->send();
 		}
 	}
 }

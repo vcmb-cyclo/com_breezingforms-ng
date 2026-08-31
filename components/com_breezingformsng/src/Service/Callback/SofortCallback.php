@@ -265,8 +265,8 @@ final class SofortCallback
 
                             for ($i = 0; $i < $recipientsSize; $i++) {
                                 if (bf_is_email($recipients[$i])) {
-                                    $mailer->AddAddress($recipients[$i]);
-                                    $mailer->Send();
+                                    $mailer->addRecipient($recipients[$i]);
+                                    $mailer->send();
                                 }
                             }
 

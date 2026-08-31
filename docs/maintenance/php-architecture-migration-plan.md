@@ -1081,6 +1081,11 @@ pour les tableaux d'octets, et le retrait des magic quotes est un no-op puisque
 ce mécanisme n'existe plus. Ces contrats sont couverts par
 `LegacyHelpersTest`.
 
+Les appels de messagerie restants utilisent désormais l'API Joomla 6
+(`addRecipient`, `addAttachment`, `isHtml` et `send`) dans la façade helpers,
+le callback Sofort et le double opt-in de `SubmissionEngine`. Une vérification
+automatisée empêche le retour des noms de méthodes historiques.
+
 Les quatre renderers QuickMode ont encore une baseline PHPCS distincte ; le
 contrôle direct fait apparaître des violations de formatage héritées. Ce lot
 reste séparé de la mutualisation fonctionnelle pour conserver des commits

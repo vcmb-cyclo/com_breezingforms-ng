@@ -262,7 +262,9 @@ prioritaire et le dernier `ReCaptcha` est conservé, comme dans le flux
 historique. Les valeurs par défaut sont produites par
 `CaptchaValidationDefaultsBuilder` (`41612fa2`). Les deux générateurs de
 JavaScript sont désormais extraits dans `CaptchaLegacyValidationScriptBuilder`
-et `CaptchaReCaptchaValidationScriptBuilder` (`75c0ca2b`, `1cea0c84`) ; les
+et `CaptchaReCaptchaValidationScriptBuilder` (`75c0ca2b`, `1cea0c84`) ; leurs
+appels sont orchestrés par `CaptchaValidationScriptBuilder`, avec tests
+du callback par défaut, du CAPTCHA legacy et du ReCaptcha ; les
 variantes et leurs interpolations sont couvertes par les tests unitaires et le
 test de caractérisation de `RenderingEngineViewCharacterizationTest`.
 La phase 2.3 est donc couverte pour les scripts de signature et de contrôles

@@ -98,6 +98,7 @@ final class RenderingEngine
     private ?CaptchaValidationRowSelector $captchaValidationRowSelectorService = null;
     private ?CaptchaLegacyValidationScriptBuilder $captchaLegacyValidationScriptBuilderService = null;
     private ?CaptchaReCaptchaValidationScriptBuilder $captchaReCaptchaValidationScriptBuilderService = null;
+    private ?CaptchaValidationScriptBuilder $captchaValidationScriptBuilderService = null;
     private ?ContentBuilderValueHydrationScriptBuilder $contentBuilderValueHydrationScriptBuilderService = null;
     private ?ContentBuilderChoiceHydrationScriptBuilder $contentBuilderChoiceHydrationScriptBuilderService = null;
     private ?ContentBuilderSelectHydrationScriptBuilder $contentBuilderSelectHydrationScriptBuilderService = null;
@@ -477,6 +478,16 @@ final class RenderingEngine
         return $this->captchaReCaptchaValidationScriptBuilderService ??= new CaptchaReCaptchaValidationScriptBuilder();
     }
 
+    private function captchaValidationScriptBuilder(): CaptchaValidationScriptBuilder
+    {
+        return $this->captchaValidationScriptBuilderService ??= new CaptchaValidationScriptBuilder(
+            $this->captchaSupportBuilder(),
+            $this->captchaValidationRowSelector(),
+            $this->captchaLegacyValidationScriptBuilder(),
+            $this->captchaReCaptchaValidationScriptBuilder()
+        );
+    }
+
     private function contentBuilderValueHydrationScriptBuilder(): ContentBuilderValueHydrationScriptBuilder
     {
         return $this->contentBuilderValueHydrationScriptBuilderService ??= new ContentBuilderValueHydrationScriptBuilder();
@@ -705,9 +716,14 @@ final class RenderingEngine
             trim((string) $this->processor->formrow->template_code) != ''
         );
 
-        [$captchaError, $capFunc] = $this->createCaptchaDefaults();
-
-        $capFunc = $this->buildCaptchaScript($captchaError, $capFunc);
+        $capFunc = $this->captchaValidationScriptBuilder()->build(
+            Uri::root(true),
+            $this->processor->app->isClient('administrator'),
+            (int) $this->processor->form,
+            $this->processor->rows,
+            $this->processor->rowcount,
+            Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')
+        );
 
         echo $this->legacyScriptTagWrapperBuilder()->formValidationOpen(
             $fileExtensionsCheck,
@@ -1643,7 +1659,7 @@ final class RenderingEngine
     }
 
     /**
-     * Create the default CAPTCHA error payload and submit callback.
+     * Keep the existing characterization seam for the default CAPTCHA data.
      *
      * @return array{0: string, 1: string}
      */
@@ -1652,49 +1668,6 @@ final class RenderingEngine
         return $this->captchaSupportBuilder()->validationDefaults(
             Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')
         );
-    }
-
-    /**
-     * Build the legacy CAPTCHA/ReCaptcha submit-validation script for the
-     * first Captcha or ReCaptcha row found on the form. Preserves the
-     * original control flow verbatim: a "Captcha" row breaks out of the
-     * loop immediately, while a "ReCaptcha" row does not - if a form has
-     * multiple ReCaptcha rows, the last one silently wins. Returns
-     * $capFunc unchanged (createCaptchaDefaults()'s default) when neither
-     * row type is present.
-     */
-    private function buildCaptchaScript(string $captchaError, string $capFunc): string
-    {
-        $endpoints = $this->captchaSupportBuilder()->endpoints(
-            Uri::root(true),
-            $this->processor->app->isClient('administrator'),
-            (int) $this->processor->form
-        );
-
-        $row = $this->captchaValidationRowSelector()->select(
-            $this->processor->rows,
-            $this->processor->rowcount
-        );
-
-        if ($row !== null) {
-            if ($row->type == "Captcha") {
-                return $this->captchaLegacyValidationScriptBuilder()->build(
-                    $captchaError,
-                    $endpoints['image'],
-                    $endpoints['check'],
-                    (int) $row->page
-                );
-            } elseif ($row->type == "ReCaptcha") {
-
-                return $this->captchaReCaptchaValidationScriptBuilder()->build(
-                    $captchaError,
-                    $endpoints['recaptcha'],
-                    (int) $row->page
-                );
-        }
-        }
-
-        return $capFunc;
     }
 
     /**

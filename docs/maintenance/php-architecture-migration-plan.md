@@ -1573,6 +1573,9 @@ La sélection Classic, Bootstrap et OnePage est désormais isolée dans
 conditionnelle des renderers ; les trois branches sont testées directement et
 le test de caractérisation de `view()` utilise la factory (`1c9e497ab`).
 
+La factory est également incluse dans le périmètre PHPCS ; le ruleset complet
+reste vert après son ajout (`7434564bc`).
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

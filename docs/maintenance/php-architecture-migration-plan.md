@@ -56,6 +56,7 @@
 | QuickMode OnePage — fermeture Thank You | Redirection `bf_remodal_close()` extraite dans un builder pur, avec panier et URL formulaire conservés | Commit `ca2b8f42d` |
 | QuickMode OnePage — soumission AJAX | Callback `bf_ajax_submit()` extrait dans un builder pur, avec échec, succès direct et page Thank You couverts | Commit `01ab2d4bd` |
 | QuickMode — miniature upload | Callback `bfUploadImageThumb()` partagé entre les quatre renderers, avec chemin Moxie et repli FileReader couverts | Commit `704ccbea2` |
+| QuickMode — entrée queue upload | Première boucle `FilesAdded` partagée entre les quatre renderers, avec callback externe et libellé nettoyé couverts | Commit `e6956c7d5` |
 | QuickMode — progression upload | Callback plupload `UploadProgress` partagé entre les quatre renderers, avec mise à jour de la barre et du pourcentage couverte | Commit `1e28a79b2` |
 | QuickMode — fin upload | Callback plupload `FileUploaded` partagé entre les quatre renderers, avec message serveur et nettoyage de ligne couverts | Commit `6d3bfbb27` |
 | QuickMode — validation upload | Validation client de taille/extensions et nettoyage des lignes invalides partagé entre les quatre renderers | Commit `fea7df7b6` |
@@ -868,7 +869,7 @@ extraire.
 La validation client des fichiers est désormais générée par
 `QuickModeUploadValidationScriptBuilder` (`fea7df7b6`) pour les quatre
 renderers. La limite de taille, les extensions autorisées, les messages
-d’erreur et le nettoyage des files invalides sont couverts par un test dédié ;
+d’erreur et le nettoyage des fichiers invalides sont couverts par un test dédié ;
 les paramètres propres au champ restent injectés par chaque renderer.
 
 La gestion d’annulation est désormais générée par
@@ -876,6 +877,12 @@ La gestion d’annulation est désormais générée par
 L’arrêt puis le redémarrage des uploaders, la suppression des lignes, le
 compteur global et les deux variantes de réactivation du bouton sont couverts
 par des tests dédiés.
+
+La première boucle `FilesAdded`, qui notifie `bfUploadFileAdded()` et ajoute le
+libellé nettoyé à `#bfFileQueue`, est désormais générée par
+`QuickModeUploadQueueEntryScriptBuilder` (`e6956c7d5`). La variante Bootstrap
+conservant sa ligne vide historique est paramétrée explicitement et la sortie
+est couverte par un test dédié.
 
 Les quatre renderers ne possèdent plus chacun leurs cinq adaptateurs privés de
 calendrier : `CalendarOptionsTrait` (`05090635f`) délègue les booléens, le

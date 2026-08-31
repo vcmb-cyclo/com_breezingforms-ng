@@ -188,6 +188,7 @@ final class QuickmodeHtml
         $wa->useScript('com_breezingformsng.quickmode-elements');
         $wa->useScript('com_breezingformsng.quickmode-app');
         $wa->useScript('com_breezingformsng.jquery-restore');
+        $wa->useScript('com_breezingformsng.quickmode-form-dirty');
 
         $wa->addInlineScript(self::buildConfigScript(
             $iconBase,
@@ -277,6 +278,9 @@ final class QuickmodeHtml
                 <?php endif; ?>
                 </div>
                 <?php self::renderSection('form_state_actions', get_defined_vars()); ?>
+                <span id="bfUnsavedBadge" class="bfng-badge bfng-badge--unpublished" hidden>
+                    <?php echo Text::_('COM_BREEZINGFORMSNG_QM_UNSAVED_CHANGES'); ?>
+                </span>
             </div>
             <?php
         }
@@ -429,6 +433,7 @@ final class QuickmodeHtml
                      than display:none so the browser still processes its
                      navigation/load event while hidden. -->
                 <iframe name="bfOptionsSaveFrame" id="bfOptionsSaveFrame"
+                    src="about:blank"
                     style="position:absolute; width:1px; height:1px; left:-9999px;"
                     title="<?php echo Text::_('COM_BREEZINGFORMSNG_OPTIONS'); ?>"></iframe>
 

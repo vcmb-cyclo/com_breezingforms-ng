@@ -88,6 +88,15 @@
     },
 
     {
+      "name": "com_breezingformsng.quickmode-form-dirty",
+      "type": "script",
+      "uri": "media/com_breezingformsng/js/admin/quickmode-form-dirty.js",
+      "dependencies": ["com_breezingformsng.quickmode-app"],
+      "attributes": {"defer": true},
+      "version": "auto"
+    },
+
+    {
       "name": "com_breezingformsng.center",
       "type": "script",
       "uri": "components/com_breezingformsng/libraries/jquery/center.js",

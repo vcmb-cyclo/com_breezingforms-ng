@@ -127,6 +127,28 @@
   color: #fff;
 }
 
+/* .bfng-badge: charte section 05 - "contour teinté, hauteur 18 px, 11 px
+   de texte, jamais un aplat saturé". #bfUnsavedBadge (QuickMode "unsaved
+   changes" indicator, toggled by quickmode-form-dirty.js) uses the
+   --unpublished variant; hidden by default via the HTML hidden attribute. */
+.bfng-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 var(--bfng-space-3);
+  border: 1px solid;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+.bfng-badge--unpublished {
+  border-color: var(--bfng-warning);
+  color: var(--bfng-warning);
+  background: color-mix(in oklab, var(--bfng-warning) 8%, var(--bfng-surface));
+}
+
 /* .bfng-tree: cosmetic layer only, over jTree's own tree_component.css.
    jTree owns collapse/expand via .tree li.open/.closed toggling display
    on the nested <ul> - none of that is touched here, only color/spacing

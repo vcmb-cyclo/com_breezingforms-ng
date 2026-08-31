@@ -774,6 +774,12 @@
                 }
 
                 app = new BF_QuickModeApp();
+                // Exposed read-only for quickmode-form-dirty.js's "unsaved changes"
+                // badge, which needs to detect tree structure edits (create/move/
+                // delete) alongside bfForm's own field changes - those mutate
+                // app.dataObject directly (see onmove/create/remove above),
+                // outside of any form this script's own listeners can see.
+                window.BFQMApp = app;
                 var mdata = app.getProperties(app.selectedTreeElement);
                 if (mdata) {
                     var item = app.findDataObjectItem('bfQuickModeRoot', app.dataObject);

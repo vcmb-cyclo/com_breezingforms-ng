@@ -84,7 +84,7 @@ final class EditableRecordHydrationScriptBuilder
     {
         return '
 							for(var i = 0;i < document.ff_form' . $formId . '.elements.length;i++){
-								if(document.ff_form' . $formId . '.elements[i].type == "' . $type . '" && document.ff_form' . $formId . '.elements[i].name == "ff_nm_' . $name . '[]" && document.ff_form' . $formId . '.elements[i].value == ' . json_encode($value) . '){
+					if(document.ff_form' . $formId . '.elements[i].type == "' . $type . '" && document.ff_form' . $formId . '.elements[i].name == "ff_nm_' . $name . '[]" && document.ff_form' . $formId . '.elements[i].value == ' . $this->encodeJavaScriptValue($value) . '){
 									if(typeof JQuery != "undefined" && !JQuery(document.ff_form' . $formId . '.elements[i]).attr("checked")){
 									    JQuery(document.ff_form' . $formId . '.elements[i]).click();
 									}
@@ -95,11 +95,19 @@ final class EditableRecordHydrationScriptBuilder
     private function buildSelectScript(int $elementId, string $value): string
     {
         return 'for(var i = 0; i < document.getElementById("ff_elem' . $elementId . '").options.length; i++){
-								if(document.getElementById("ff_elem' . $elementId . '").options[i].value == ' . json_encode($value) . '){
+					if(document.getElementById("ff_elem' . $elementId . '").options[i].value == ' . $this->encodeJavaScriptValue($value) . '){
 									if(typeof JQuery != "undefined" && !JQuery(document.getElementById("ff_elem' . $elementId . '").options[i]).attr("selected")){
 									    JQuery(document.getElementById("ff_elem' . $elementId . '").options[i]).attr("selected", true).trigger("change");
 									}
 								}
-							}' . "\n";
+				}' . "\n";
+    }
+
+    private function encodeJavaScriptValue(string $value): string
+    {
+        return (string) json_encode(
+            $value,
+            JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_INVALID_UTF8_SUBSTITUTE
+        );
     }
 }

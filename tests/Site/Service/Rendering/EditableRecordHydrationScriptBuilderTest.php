@@ -35,7 +35,7 @@ final class EditableRecordHydrationScriptBuilderTest extends TestCase
         self::assertStringContainsString('type == "checkbox"', $script);
         self::assertStringContainsString('type == "radio"', $script);
         self::assertStringContainsString('options[i].value == "FR"', $script);
-        self::assertStringContainsString('"red & blue"', $script);
+        self::assertStringContainsString('"red \\u0026 blue"', $script);
     }
 
     public function testSkipsEmptySingleCheckboxAndUnknownEntries(): void
@@ -60,5 +60,17 @@ final class EditableRecordHydrationScriptBuilderTest extends TestCase
 
         self::assertStringContainsString('Hello', $script);
         self::assertSame('  Hello  ', $entry->value);
+    }
+
+    public function testEscapesScriptTerminatorsInChoiceAndSelectValues(): void
+    {
+        $value = '</script><script>alert(1)</script>';
+        $script = (new EditableRecordHydrationScriptBuilder())->build([
+            (object) ['type' => 'Checkbox Group', 'name' => 'unsafe', 'element' => 21, 'value' => $value],
+            (object) ['type' => 'Select List', 'name' => 'unsafe-select', 'element' => 22, 'value' => $value],
+        ], 9);
+
+        self::assertStringNotContainsString('</script>', $script);
+        self::assertStringContainsString('\\u003C\\/script\\u003E', $script);
     }
 }

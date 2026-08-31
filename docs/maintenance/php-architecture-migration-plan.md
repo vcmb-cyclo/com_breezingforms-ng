@@ -160,7 +160,9 @@ inconnus. Son enveloppe de chargement et le nettoyage historique de
 `ff_nm_seccode[]` sont maintenant isolés dans
 `EditableRecordScriptWrapperBuilder` (`f3b6f8d97`) ; le nettoyage
 `InputFilter` est injecté dans le builder sous forme de closure, sans mutation
-des entrées.
+des entrées. Les valeurs réinjectées dans les contrôles checkbox/radio et les
+listes utilisent en outre un encodage JavaScript avec protection des balises
+HTML ; les séquences `</script>` sont couvertes par un test de régression.
 
 - La recherche du dernier enregistrement, les requêtes
   `#__facileforms_records`/`#__facileforms_subrecords` et le résultat typé sont

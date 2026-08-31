@@ -788,31 +788,31 @@ a {
 
 /* custom full-screen styles */
 
-:full-screen .main {
+:fullscreen .main {
     background-color: #ccc;
     font-size: 24px;
     width: 95%;
 }
 
-:full-screen .main {
+:fullscreen .main {
     background-color: #ccc;
     font-size: 24px;
     width: 95%;
 }
 
-:full-screen .fs {
+:fullscreen .fs {
     display: none
 }
 
-:full-screen .fs {
+:fullscreen .fs {
     display: none
 }
 
-:full-screen .rs {
+:fullscreen .rs {
     display: block
 }
 
-:full-screen .rs {
+:fullscreen .rs {
     display: block
 }
 

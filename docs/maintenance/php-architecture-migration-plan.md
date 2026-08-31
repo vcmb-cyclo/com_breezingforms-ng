@@ -1568,6 +1568,11 @@ Le package a ensuite été reconstruit depuis les fichiers versionnés ; sa list
 contient les nouveaux services QuickMode et ContentBuilder, et le même smoke
 test a de nouveau réussi sur cette archive reconstruite.
 
+La sélection Classic, Bootstrap et OnePage est désormais isolée dans
+`QuickModeRendererFactory`. `RenderingEngine` ne porte plus la construction
+conditionnelle des renderers ; les trois branches sont testées directement et
+le test de caractérisation de `view()` utilise la factory (`1c9e497ab`).
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

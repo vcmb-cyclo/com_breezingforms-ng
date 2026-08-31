@@ -209,7 +209,7 @@ final class QuickmodeHtml
         ?>
 
         <div style="float:left; margin-right: 3px;">
-            <?php ToolbarHelper::custom('save', 'save.png', 'save_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_QUICKMODE_SAVE'), false); ?>
+            <?php ToolbarHelper::apply('save', 'JTOOLBAR_APPLY'); ?>
             <?php
             if ($formId != 0) {
                 ToolbarHelper::custom('preview', 'publish.png', 'save_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_QUICKMODE_PREVIEW'), false);
@@ -329,18 +329,12 @@ final class QuickmodeHtml
                                 <div>
                                     <br />
                                     <div class="bfFadingMessage" style="display:none"></div>
-                                    <input type="submit" class="btn btn-secondary"
-                                        value="<?php echo Text::_('COM_BREEZINGFORMSNG_PROPERTIES_SAVE'); ?>"
-                                        id="bfPropertySaveButtonTop" />
                                     <?php self::renderSection('properties_form', get_defined_vars()); ?>
                                     <?php self::renderSection('properties_page', get_defined_vars()); ?>
                                     <?php self::renderSection('properties_section', get_defined_vars()); ?>
                                     <?php self::renderSection('properties_element', get_defined_vars()); ?>
                                     <!-- ELEMENT PROPERTIES END -->
                                     <div class="bfFadingMessage" style="display:none"></div>
-                                    <input type="submit" class="btn btn-secondary"
-                                        value="<?php echo Text::_('COM_BREEZINGFORMSNG_PROPERTIES_SAVE'); ?>"
-                                        id="bfPropertySaveButton" />
                                     <br />
                                     <br />
 
@@ -352,16 +346,10 @@ final class QuickmodeHtml
                                     <br />
 
                                     <div class="bfFadingMessage" style="display:none"></div>
-                                    <input type="submit" class="btn btn-secondary"
-                                        value="<?php echo Text::_('COM_BREEZINGFORMSNG_PROPERTIES_SAVE'); ?>"
-                                        id="bfAdvancedSaveButtonTop" />
                                     <?php self::renderSection('advanced_form', get_defined_vars()); ?>
                                     <?php self::renderSection('advanced_element', get_defined_vars()); ?>
                                     <br />
                                     <div class="bfFadingMessage" style="display:none"></div>
-                                    <input type="submit" class="btn btn-secondary"
-                                        value="<?php echo Text::_('COM_BREEZINGFORMSNG_PROPERTIES_SAVE'); ?>"
-                                        id="bfAdvancedSaveButton" />
                                     <br />
                                     <br />
 
@@ -382,9 +370,10 @@ final class QuickmodeHtml
                                             .tab-content for Bootstrap's ".tab-content > .tab-pane"
                                             CSS to hide/show it - see quickmode-options-tab-plan.md),
                                             and nesting a second <form> inside bfForm is invalid
-                                            HTML. bfOptionsSaveButton below moves these fields
-                                            into a detached <form> at click time instead - see
-                                            quickmode-app.js.
+                                            HTML. The standard toolbar "Enregistrer" button moves
+                                            these fields into a detached <form>, posted into a
+                                            hidden iframe, as part of saving everything in one
+                                            click - see quickmode-app.js's submitOptionsTab().
                                         -->
                                         <div id="bfOptionsFieldsWrap">
                                             <?php
@@ -404,11 +393,8 @@ final class QuickmodeHtml
                                             ?>
                                             <input type="hidden" name="id" value="<?php echo (int) $formId; ?>">
                                             <input type="hidden" name="task" value="forms.save">
-                                            <input type="hidden" name="return_tab" value="options">
                                             <?php echo HTMLHelper::_('form.token'); ?>
                                         </div>
-                                        <input type="submit" class="btn btn-secondary" id="bfOptionsSaveButton"
-                                            value="<?php echo Text::_('COM_BREEZINGFORMSNG_PROPERTIES_SAVE'); ?>" />
                                     <?php endif; ?>
                                     <br />
                                 </div>
@@ -419,7 +405,14 @@ final class QuickmodeHtml
 
                 </form>
 
-            </div> <!-- ##### bfQuickModeRight end ##### -->
+                <!-- Target for the "Options" tab's fields when the standard toolbar
+                     "Enregistrer" button saves everything - see
+                     quickmode-app.js's submitOptionsTab(). Kept off-screen rather
+                     than display:none so the browser still processes its
+                     navigation/load event while hidden. -->
+                <iframe name="bfOptionsSaveFrame" id="bfOptionsSaveFrame"
+                    style="position:absolute; width:1px; height:1px; left:-9999px;"
+                    title="<?php echo Text::_('COM_BREEZINGFORMSNG_OPTIONS'); ?>"></iframe>
 
             </div> <!-- ##### bfQuickModeRight end ##### -->
 

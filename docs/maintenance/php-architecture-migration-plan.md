@@ -1239,8 +1239,10 @@ ce mécanisme n'existe plus. Ces contrats sont couverts par
 
 Dans `cbCheckPermissions()`, une instance unique de `PermissionService` est
 désormais réutilisée pour la paire `setPermissions()`/`checkPermissions()` et
-pour l'autorisation `fullarticle`. Le contrat d'autorisation reste inchangé ;
-la branche d'intégration complète demeure à valider avec ContentBuilderNG
+pour l'autorisation `fullarticle`. L'objet Input n'est capturé qu'après la
+détection de ContentBuilderNG, ce qui conserve le retour neutre lorsque le
+runtime externe est absent. Le contrat d'autorisation reste inchangé ; la
+branche d'intégration complète demeure à valider avec ContentBuilderNG
 installé.
 
 Les appels de messagerie restants utilisent désormais l'API Joomla 6

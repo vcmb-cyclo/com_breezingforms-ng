@@ -564,6 +564,7 @@ final class RenderingEngine
         $cbFull = false;
 
         if (file_exists(JPATH_ADMINISTRATOR . '/components/com_contentbuilderng/com_contentbuilderng.xml')) {
+            $input = $this->processor->app->getInput();
 
             if ($this->processor->app->isClient('administrator')) {
                 $cbFrontend = false;
@@ -595,7 +596,7 @@ final class RenderingEngine
             }
 
             // test if all published contentbuilder views allow creating new submissions
-            if (!$this->processor->app->getInput()->getInt('cb_record_id', 0) || !$this->processor->app->getInput()->getInt('cb_form_id', 0)) {
+            if (!$input->getInt('cb_record_id', 0) || !$input->getInt('cb_form_id', 0)) {
 
                 $permissionService = PermissionService::createFromRuntimeContext();
                 $cbAuth = true;
@@ -614,19 +615,19 @@ final class RenderingEngine
                 }
             }
 
-            if ($this->processor->app->getInput()->getInt('cb_form_id', 0)) {
+            if ($input->getInt('cb_form_id', 0)) {
 
                 // test the permissions of given record
                 $permissionService = PermissionService::createFromRuntimeContext();
-                if ($this->processor->app->getInput()->getInt('cb_record_id', 0)) {
-                    $permissionService->setPermissions($this->processor->app->getInput()->getInt('cb_form_id', 0), $this->processor->app->getInput()->getInt('cb_record_id', 0), $cbFrontend ? '_fe' : '');
+                if ($input->getInt('cb_record_id', 0)) {
+                    $permissionService->setPermissions($input->getInt('cb_form_id', 0), $input->getInt('cb_record_id', 0), $cbFrontend ? '_fe' : '');
                     $permissionService->checkPermissions('edit', Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_EDIT_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
                 } else {
-                    $permissionService->setPermissions($this->processor->app->getInput()->getInt('cb_form_id', 0), 0, $cbFrontend ? '_fe' : '');
+                    $permissionService->setPermissions($input->getInt('cb_form_id', 0), 0, $cbFrontend ? '_fe' : '');
                     $permissionService->checkPermissions('new', Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_NEW_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
                 }
 
-                $cbFormId = $this->processor->app->getInput()->getInt('cb_form_id', 0);
+                $cbFormId = $input->getInt('cb_form_id', 0);
                 $query = $db->getQuery(true)
                     ->select('*')
                     ->from($db->quoteName('#__contentbuilderng_forms'))
@@ -638,9 +639,9 @@ final class RenderingEngine
                 if (is_array($cbData)) {
                     $cbFull = $cbFrontend ? $permissionService->authorizeFe('fullarticle') : $permissionService->authorize('fullarticle');
                     $cbForm = FormSourceFactory::getForm('com_breezingformsng', $cbData['reference_id']);
-                    $cbRecord = $cbForm->getRecord($this->processor->app->getInput()->getInt('cb_record_id', 0), $cbData['published_only'], $cbFrontend ? ($cbData['own_only_fe'] ? $this->processor->app->getIdentity()->get('id', 0) : -1) : ($cbData['own_only'] ? $this->processor->app->getIdentity()->get('id', 0) : -1), $cbFrontend ? $cbData['show_all_languages_fe'] : true);
+                    $cbRecord = $cbForm->getRecord($input->getInt('cb_record_id', 0), $cbData['published_only'], $cbFrontend ? ($cbData['own_only_fe'] ? $this->processor->app->getIdentity()->get('id', 0) : -1) : ($cbData['own_only'] ? $this->processor->app->getIdentity()->get('id', 0) : -1), $cbFrontend ? $cbData['show_all_languages_fe'] : true);
 
-                    if (!count($cbRecord) && !$this->processor->app->getInput()->getBool('cbIsNew', false)) {
+                    if (!count($cbRecord) && !$input->getBool('cbIsNew', false)) {
                         throw new Exception(Text::_('COM_CONTENTBUILDERNG_RECORD_NOT_FOUND'), 404);
                     }
                 }

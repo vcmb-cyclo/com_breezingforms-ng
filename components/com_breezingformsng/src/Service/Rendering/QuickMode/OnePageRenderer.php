@@ -287,54 +287,14 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                             Ladda.bind("#bfSubmitButton");
                         });
 
-                        function bf_ajax_submit(){
-                            var url = JQuery("#' . $this->p->form_id . '").attr("action"); // the script where you handle the form input.
-                            var posting = JQuery.post( url, JQuery("#' . $this->p->form_id . '").serialize() );
-
-                            JQuery(".bfPage").css("pointer-events","none");
-                            JQuery(".bfPage").css("opacity","0.4");
-                            JQuery("#remodal-thankyou-msg").html("");
-
-                            posting.fail(function(jqXHR, textStatus, errorThrown) {
-                                ladda_button.ladda("stop");
-                                var err = ' . json_encode(Text::_('COM_BREEZINGFORMSNG_ERROR')) . ';
-                                alert( err + ": " + textStatus );
-                                console.log(errorThrown);
-                                console.log(jqXHR);
-                                if(typeof crbc_cart_url != "undefined"){
-                                    location.href = crbc_cart_url;
-                                }else{
-                                    location.href = ' . json_encode(Uri::getInstance()->toString()) . ';
-                                }
-                            });
-
-                            posting.done(function( data ) {
-                                JQuery("#bfSubmitMessage").css("visibility","hidden");
-                                JQuery("#bfSubmitMessage").css("display","none");
-                                JQuery("#bfSubmitMessage").css("z-index","999999");
-                                if(' . $has_last_page . '){
-                                    ladda_button.ladda("stop");
-                                    var cloned = JQuery(".bfPage").last().clone();
-                                    JQuery("#remodal-thankyou-msg").html(JQuery(".bfPage").last().clone().html());
-                                    JQuery(cloned).remove();
-                                    ff_currentpage = JQuery(".bfPage").size() + 1;
-                                    var inst = JQuery("[data-remodal-id=modal]").remodal();
-                                    inst.open();
-
-                                }else{
-                                    alert(' . json_encode(Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITSUCCESS')) . ');
-                                    JQuery(".bfPage").css("pointer-events","auto");
-                                    JQuery(".bfPage").css("opacity","1.0");
-                                    ff_currentpage = JQuery(".bfPage").size() + 1;
-                                    ladda_button.ladda("stop");
-                                    if(typeof crbc_cart_url != "undefined"){
-                                        location.href = crbc_cart_url;
-                                    }else{
-                                        location.href = ' . json_encode(Uri::getInstance()->toString()) . ';
-                                    }
-                                }
-                            });
-                        }
+                        ' . QuickModeAjaxSubmitScriptBuilder::build(
+                            (int) $this->p->form_id,
+                            $has_last_page === 'true',
+                            (string) json_encode(Text::_('COM_BREEZINGFORMSNG_ERROR')),
+                            (string) json_encode(Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITSUCCESS')),
+                            (string) json_encode(Uri::getInstance()->toString()),
+                            "\n"
+                        ) . '
 
                         ' . (new QuickModeSubmitButtonRestoreBuilder())->build("\n") . '
 

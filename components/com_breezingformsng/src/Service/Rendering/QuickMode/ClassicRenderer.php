@@ -332,6 +332,8 @@ float:left;
 
     public function process(&$dataObject, $parent = null, $parentPage = null, $index = 0, $childrenLength = 0)
     {
+        $mdata = null;
+
         if (isset($dataObject['attributes']) && isset($dataObject['properties'])) {
             $options = array('type' => 'normal', 'displayType' => 'breaks');
             if ($parent != null && $parent['type'] == 'section') {

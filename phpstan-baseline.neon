@@ -625,12 +625,6 @@ parameters:
 			path: components/com_breezingformsng/src/Service/Rendering/QuickMode/BootstrapRenderer.php
 
 		-
-			message: '#^Variable \$mdata might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: components/com_breezingformsng/src/Service/Rendering/QuickMode/BootstrapRenderer.php
-
-		-
 			message: '#^Call to an undefined method Joomla\\CMS\\Editor\\Editor\:\:getContent\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -643,20 +637,8 @@ parameters:
 			path: components/com_breezingformsng/src/Service/Rendering/QuickMode/ClassicRenderer.php
 
 		-
-			message: '#^Variable \$mdata might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: components/com_breezingformsng/src/Service/Rendering/QuickMode/ClassicRenderer.php
-
-		-
 			message: '#^Function bf_b64dec not found\.$#'
 			identifier: function.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/Rendering/QuickMode/OnePageRenderer.php
-
-		-
-			message: '#^Variable \$mdata might not be defined\.$#'
-			identifier: variable.undefined
 			count: 1
 			path: components/com_breezingformsng/src/Service/Rendering/QuickMode/OnePageRenderer.php
 

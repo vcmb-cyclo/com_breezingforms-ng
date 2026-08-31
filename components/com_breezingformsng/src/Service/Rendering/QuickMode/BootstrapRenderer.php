@@ -337,6 +337,8 @@ class BootstrapRenderer
 
     public function process(&$dataObject, $parent = null, $parentPage = null, $index = 0, $childrenLength = 0, $parentFull = null)
     {
+        $mdata = null;
+
         if (isset($dataObject['attributes']) && isset($dataObject['properties'])) {
             HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
 

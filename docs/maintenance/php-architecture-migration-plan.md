@@ -1478,6 +1478,10 @@ sortie anticipée déclenchée par une pièce « before form » qui demande
 `bury`, et vérifie que les sections de validation suivantes ne sont pas
 émises (`0a2ce63d5`).
 
+Le même harnais couvre désormais l'abandon après les callbacks de formulaire,
+en vérifiant l'ordre des callbacks `init` et `submitted` et l'absence des
+sections d'éléments et de Query List (`5a50a93fd`).
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

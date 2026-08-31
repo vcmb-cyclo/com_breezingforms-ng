@@ -802,6 +802,16 @@ interne sur `cbRecordId` est supprimée puisque la garde englobante le rend déj
 vrai. La redirection `return` et les contrôles `force_login`/`force_url` restent
 inchangés ; le niveau 4 descend à 19 diagnostics.
 
+Les branches de diagnostic `_FF_DEBUG` ont été supprimées de `CodeToolsRuntime`
+et de la façade processeur : le drapeau était fixé à zéro et ces blocs ne
+pouvaient donc jamais produire de sortie. Les deux anciens blocs modaux
+`SqueezeBox` de PayPal/Sofort ont également été retirés, car `$j15` était
+initialisé à `false` sans jamais être activé ; les formulaires et la soumission
+automatique restent inchangés. Le traitement des erreurs d'upload s'appuie
+désormais directement sur l'erreur nullable du résultat, et les instructions
+inatteignables de `_ff_errorHandler` sont supprimées. Le filet architectural
+verrouille ces invariants ; le niveau 4 descend à 5 diagnostics.
+
 ## Phase 7 — Réduire les façades historiques
 
 Cette phase commence seulement lorsque leurs responsabilités ont été extraites

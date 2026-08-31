@@ -1006,9 +1006,6 @@ final class SubmissionEngine
             $head = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
 
             if (is_array($areas)) {
-                $j15 = false;
-
-
                 $paymentAction = true;
 
                 switch ($this->processor->app->getInput()->getString('ff_payment_method', '')) {
@@ -1329,30 +1326,6 @@ transition: box-shadow .15s linear;
                                     if (!$this->processor->inline)
                                         $html .= "</form></body></html>";
 
-                                    // TODO: let the user decide to use modal or simple alert
-                                    if ($j15) {
-                                        $html .= '<script type="text/javascript">' . nl() .
-                                            indentc(1) . '<!--' . nl() .
-                                            indentc(2) . '
-
-										    SqueezeBox.initialize({});
-
-										    SqueezeBox.loadModal = function(modalUrl,handler,x,y) {
-										    		this.initialize();
-										      		var options = $merge(options || {}, Json.evaluate("{handler: \'" + handler + "\', size: {x: " + x +", y: " + y + "}}"));
-													this.setOptions(this.presets, options);
-													this.assignOptions();
-													this.setContent(handler,modalUrl);
-										   	};
-
-										    SqueezeBox.loadModal("' . Uri::root() . 'index.php?raw=true&option=com_breezingformsng&showPayPalConnectMsg=true","iframe",300,100);
-
-										 	
-
-										' . nl() .
-                                            indentc(1) . '// -->' . nl() .
-                                            '</script>' . nl();
-                                    }
                                     $html .= '<script type="text/javascript"><!--' . nl() . 'document.ff_submitform.submit();' . nl() . '//--></script>';
                                     echo $html;
 
@@ -1445,28 +1418,6 @@ transition: box-shadow .15s linear;
 									<!-- sofortüberweisung.de -->
 									';
 
-                                    if ($j15) {
-                                        // TODO: let the user decide to use modal or simple alert
-                                        $html .= '<script type="text/javascript">' . nl() .
-                                            indentc(1) . '<!--' . nl() .
-                                            indentc(2) . '
-
-										    SqueezeBox.initialize({});
-
-										    SqueezeBox.loadModal = function(modalUrl,handler,x,y) {
-										    		this.initialize();
-										      		var options = $merge(options || {}, Json.evaluate("{handler: \'" + handler + "\', size: {x: " + x +", y: " + y + "}}"));
-													this.setOptions(this.presets, options);
-													this.assignOptions();
-													this.setContent(handler,modalUrl);
-										   	};
-
-										    SqueezeBox.loadModal("' . Uri::root() . 'index.php?raw=true&option=com_breezingformsng&showPayPalConnectMsg=true","iframe",300,100);
-
-										' . nl() .
-                                            indentc(1) . '// -->' . nl() .
-                                            '</script>' . nl();
-                                    }
                                     $html .= '<script type="text/javascript"><!--' . nl() . 'document.ff_submitform.submit();' . nl() . '//--></script>';
 
                                     if (!$this->processor->inline)

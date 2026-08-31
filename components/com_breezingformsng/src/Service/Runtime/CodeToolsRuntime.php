@@ -345,21 +345,6 @@ final class CodeToolsRuntime
             $dst .= substr($code, $cpos, $spos - $cpos);
         $line--;
         $dst .= "_ff_traceExit($line);";
-        if (_FF_DEBUG & _FF_DEBUG_PATCHEDCODE) {
-            $this->processor->traceBuffer .= htmlspecialchars(
-                "\n_FF_DEBUG_PATCHEDCODE:" .
-                "\n  Mode = " . $this->dispTraceMode($mode) .
-                "\n  Name = $name" .
-                "\n  Link = $type $id $pane" .
-                "\n------ begin patched code ------" .
-                "\n$dst" .
-                "\n------- end patched code -------" .
-                "\n",
-                ENT_QUOTES
-            );
-            if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT)
-                $this->dumpTrace();
-        } // if
         return $dst;
     }
 
@@ -506,17 +491,6 @@ final class CodeToolsRuntime
                     } // if
                 } else
                     $disable = false;
-                if (_FF_DEBUG & _FF_DEBUG_DIRECTIVE) {
-                    $_deb = "\n_FF_DEBUG_DIRECTIVE:";
-                    if ($first)
-                        $_deb .= "\n  Previous mode=" . $this->dispTraceMode($oldMode);
-                    $_deb .= "\n  Trace mode   =" . $this->dispTraceMode($this->processor->traceMode) .
-                        "\n  New mode     =" . $this->dispTraceMode($mode) .
-                        "\n";
-                    $this->processor->traceBuffer .= htmlspecialchars($_deb, ENT_QUOTES);
-                    if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT)
-                        $this->dumpTrace();
-                } // if
             } // if trace directive
             if (!$disable) {
                 if (!$name) {

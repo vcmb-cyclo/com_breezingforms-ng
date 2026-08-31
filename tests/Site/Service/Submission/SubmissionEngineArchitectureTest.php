@@ -30,4 +30,24 @@ final class SubmissionEngineArchitectureTest extends TestCase
         self::assertStringContainsString('/** @var Mail $mailer */', $source);
         self::assertStringContainsString('$mailer->isHtml(true);', $source);
     }
+
+    public function testSubmissionFlowContainsNoDisabledLegacyDebugOrPaymentModalBranches(): void
+    {
+        $submissionSource = file_get_contents(
+            __DIR__ . '/../../../../components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php'
+        );
+        $facadeSource = file_get_contents(
+            __DIR__ . '/../../../../components/com_breezingformsng/src/Support/processor_facade.php'
+        );
+        $runtimeSource = file_get_contents(
+            __DIR__ . '/../../../../components/com_breezingformsng/src/Service/Runtime/CodeToolsRuntime.php'
+        );
+
+        self::assertIsString($submissionSource);
+        self::assertIsString($facadeSource);
+        self::assertIsString($runtimeSource);
+        self::assertStringNotContainsString('$j15', $submissionSource);
+        self::assertStringNotContainsString('SqueezeBox.loadModal', $submissionSource);
+        self::assertStringNotContainsString('_FF_DEBUG_', $facadeSource . $runtimeSource);
+    }
 }

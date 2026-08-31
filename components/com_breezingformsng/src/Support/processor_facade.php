@@ -73,13 +73,6 @@ define('_FF_TRACEMODE_PRIORITY', 7);
 define('_FF_TRACEMODE_TOPIC', 120);
 define('_FF_TRACEMODE_VARIABLE', 248);
 
-// debugging flags
-define('_FF_DEBUG_PATCHEDCODE', 1);
-define('_FF_DEBUG_ENTER', 2);
-define('_FF_DEBUG_EXIT', 4);
-define('_FF_DEBUG_DIRECTIVE', 8);
-define('_FF_DEBUG', 0);
-
 $cbngBasePath = JPATH_ADMINISTRATOR . '/components/com_contentbuilderng';
 if (is_file($cbngBasePath . '/com_contentbuilderng.xml')) {
     require_once $cbngBasePath . '/src/Helper/ContentbuilderngHelper.php';
@@ -139,14 +132,6 @@ function _ff_getMode(&$newmode, &$name)
     global $ff_processor;
 
     $oldmode = $ff_processor->traceMode;
-    if (_FF_DEBUG & _FF_DEBUG_ENTER)
-        $ff_processor->traceBuffer .= htmlspecialchars(
-            "\n_FF_DEBUG_ENTER:" .
-            "\n  Name              = $name" .
-            "\n  Old mode before   = " . $ff_processor->dispTraceMode($oldmode) .
-            "\n  New mode before   = " . $ff_processor->dispTraceMode($newmode),
-            ENT_QUOTES
-        );
     if (is_null($newmode) || ($newmode & _FF_TRACEMODE_PRIORITY) < ($oldmode & _FF_TRACEMODE_PRIORITY)) {
         $newmode = $oldmode;
         $ret = $oldmode;
@@ -155,16 +140,6 @@ function _ff_getMode(&$newmode, &$name)
         if ($oldmode != $newmode)
             $ff_processor->traceMode = $newmode;
         $ret = ($newmode & _FF_TRACEMODE_LOCAL) ? $oldmode : $newmode;
-    } // if
-    if (_FF_DEBUG & _FF_DEBUG_ENTER) {
-        $ff_processor->traceBuffer .= htmlspecialchars(
-            "\n  Old mode compiled = " . $ff_processor->dispTraceMode($ret) .
-            "\n  New mode compiled = " . $ff_processor->dispTraceMode($newmode) .
-            "\n",
-            ENT_QUOTES
-        );
-        if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
-            $ff_processor->dumpTrace();
     } // if
     return $ret;
 }
@@ -266,18 +241,6 @@ function _ff_traceExit($line, $retval = null)
         $type = $info[4];
         $id = $info[5];
         $pane = $info[6];
-        if (_FF_DEBUG & _FF_DEBUG_EXIT) {
-            $ff_processor->traceBuffer .= htmlspecialchars(
-                "\n_FF_DEBUG_EXIT:" .
-                "\n  Info     = $kind $name at line $line" .
-                "\n  Old mode = " . $ff_processor->dispTraceMode($oldmode) .
-                "\n  New mode = " . $ff_processor->dispTraceMode($newmode) .
-                "\n",
-                ENT_QUOTES
-            );
-            if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
-                $ff_processor->dumpTrace();
-        } // if
         if ($kind == 'p')
             $visible = $oldmode & _FF_TRACEMODE_PIECE;
         else
@@ -342,13 +305,9 @@ function _ff_errorHandler($errno, $errstr, $errfile, $errline)
             $msg .= "E_DEPRECATED";
             break;
         case 2048:
-            if (_FF_IGNORE_STRICT)
-                return;
-            $msg .= "E_STRICT";
-            break;
+            return;
         case 16384: // JLanguage deprecation error
             return;
-            break;
         default:
             $msg .= $errno;
             $fail = true;
@@ -898,7 +857,7 @@ class HTML_facileFormsProcessor
             $resize_bgcolor === null ? null : (string) $resize_bgcolor
         );
 
-        if (!$result->isSuccessful()) {
+        if ($result->error !== null) {
             $this->status = _FF_STATUS_UPLOAD_FAILED;
             $this->message = Text::_(match ($result->error) {
                 UploadError::DirectoryMissing => 'COM_BREEZINGFORMSNG_PROCESS_DIRNOTEXISTS',

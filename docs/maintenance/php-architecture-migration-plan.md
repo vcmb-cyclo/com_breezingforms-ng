@@ -1532,6 +1532,12 @@ submit/image, callbacks, fournisseurs et sorties historiques sont couvertes,
 tandis que les wrappers propres aux thèmes restent dans les renderers
 (`40b282362`).
 
+Le cœur canvas et bouton de réinitialisation des signatures est maintenant
+mutualisé dans `QuickModeSignatureMarkupBuilder` entre Classic et
+Bootstrap/OnePage. Les marqueurs de champ et classes de bouton propres au
+thème restent paramétrables ; les sorties caractérisées et l’échappement du
+marqueur sont testés (`5ac9a8786`).
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

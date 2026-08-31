@@ -963,6 +963,10 @@ Le scan des thèmes de `QuickmodeModel` utilise désormais `DirectoryIterator`,
 avec les répertoires techniques explicitement exclus et les cas de répertoire
 absent couverts par un test unitaire.
 
+Le nettoyage du cache de paiement est désormais porté par
+`PaymentCacheCleaner`, en conservant son critère distinct de nommage à quatre
+segments et son expiration à 24 heures ; ses cas limites sont testés.
+
 Les paramètres additionnels `ff_otherparams` du mode frontend sont désormais
 générés par `AdditionalHiddenFieldsBuilder` via `bb469b88`, avec ordre,
 encodage URL et échappement HTML couverts. La détection des providers de

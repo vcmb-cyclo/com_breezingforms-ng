@@ -19,11 +19,11 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
-use Joomla\Filesystem\File;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RuntimeAssetLoader;
 use Joomla\Database\ParameterType;
 use Joomla\Database\DatabaseInterface;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RequestParameterParser;
+use Vcmb\Component\BreezingformsNG\Site\Service\Upload\PaymentCacheCleaner;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\TemporaryUploadFileCleaner;
 
 /**
@@ -33,6 +33,7 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Upload\TemporaryUploadFileCleane
 final class FormRenderer
 {
     private ?TemporaryUploadFileCleaner $temporaryUploadFileCleanerService = null;
+    private ?PaymentCacheCleaner $paymentCacheCleanerService = null;
 
     public function __construct(
         private readonly CMSApplication $application,
@@ -476,25 +477,9 @@ $ff_request = array();
                 JPATH_SITE . '/components/com_breezingformsng/uploads/chunks',
                 '_chunktmp'
             );
-            // purge payment cache
-            $sourcePath = JPATH_SITE . '/media/breezingforms/payment_cache/';
-            if (@file_exists($sourcePath) && @is_readable($sourcePath) && @is_dir($sourcePath) && $handle = @opendir($sourcePath)) {
-                while (false !== ($file = @readdir($handle))) {
-                    if ($file != "." && $file != "..") {
-                        $parts = explode('_', $file);
-                        if (count($parts) == 4) {
-                            if (@file_exists($sourcePath . $file) && @is_readable($sourcePath . $file)) {
-                                $fileCreationTime = @filectime($sourcePath . $file);
-                                $fileAge = time() - $fileCreationTime;
-                                if ($fileAge >= 86400) {
-                                    @File::delete($sourcePath . $file);
-                                }
-                            }
-                        }
-                    }
-                }
-                @closedir($handle);
-            }
+            $this->paymentCacheCleaner()->purge(
+                JPATH_SITE . '/media/breezingforms/payment_cache/'
+            );
 
             $ff_processor = new HTML_facileFormsProcessor(
                 $this->application,
@@ -645,5 +630,10 @@ $ff_request = array();
     private function temporaryUploadFileCleaner(): TemporaryUploadFileCleaner
     {
         return $this->temporaryUploadFileCleanerService ??= new TemporaryUploadFileCleaner();
+    }
+
+    private function paymentCacheCleaner(): PaymentCacheCleaner
+    {
+        return $this->paymentCacheCleanerService ??= new PaymentCacheCleaner();
     }
 }

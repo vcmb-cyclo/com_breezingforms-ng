@@ -106,6 +106,7 @@ final class PaymentCallbackRegressionTest extends TestCase
             'foreach ($areas as $area)',
             substr($source, $stripeStart, $paypalStart - $stripeStart)
         );
+        self::assertStringNotContainsString('isset($stripeemail)', $source);
     }
 
     private function read(string $path): string

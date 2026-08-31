@@ -475,12 +475,6 @@ parameters:
 			path: components/com_breezingformsng/src/Service/FormRenderer.php
 
 		-
-			message: '#^Variable \$ff_applic in isset\(\) always exists and is not nullable\.$#'
-			identifier: isset.variable
-			count: 7
-			path: components/com_breezingformsng/src/Service/FormRenderer.php
-
-		-
 			message: '#^Access to an undefined property Joomla\\Http\\Response\:\:\$body\.$#'
 			identifier: property.notFound
 			count: 1
@@ -699,12 +693,6 @@ parameters:
 		-
 			message: '#^Function bf_sanitizeFilename not found\.$#'
 			identifier: function.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
-
-		-
-			message: '#^Variable \$stripeemail in isset\(\) always exists and is not nullable\.$#'
-			identifier: isset.variable
 			count: 1
 			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
 

@@ -99,7 +99,7 @@ $ff_request = array();
     if ($runmode == _FF_RUNMODE_FRONTEND) {
 
         // is this called by a module?
-        if (isset($ff_applic) && $ff_applic == 'mod_facileforms') {
+        if ($ff_applic == 'mod_facileforms') {
 
             // get the module parameters
             $formname = $params->get('ff_mod_name');
@@ -119,7 +119,7 @@ $ff_request = array();
 
             $this->application->getSession()->set('ff_editableMod' . $xModuleId . $formname, intval($params->get('ff_mod_editable', $editable)));
             $this->application->getSession()->set('ff_editable_overrideMod' . $xModuleId . $formname, intval($params->get('ff_mod_editable_override', $editable_override)));
-        } else if (isset($ff_applic) && $ff_applic == 'plg_facileforms') {
+        } else if ($ff_applic == 'plg_facileforms') {
 
             $formname = htmlentities($this->application->getInput()->getString('ff_name', ''), ENT_QUOTES, 'UTF-8');
             $page = htmlentities((string) $this->application->getInput()->getString('ff_page', 1), ENT_QUOTES, 'UTF-8');
@@ -261,17 +261,17 @@ $ff_request = array();
         $pluginEditableOverrideKey = 'ff_editable_overridePlg' . $contentId . $form->name;
 
         // set by plugin
-        if ($session->get($pluginEditableKey, 0) != 0 && ($this->application->getInput()->getString('ff_applic', '') == 'plg_facileforms' || (isset($ff_applic) && $ff_applic == 'plg_facileforms'))) {
+        if ($session->get($pluginEditableKey, 0) != 0 && ($this->application->getInput()->getString('ff_applic', '') == 'plg_facileforms' || $ff_applic == 'plg_facileforms')) {
             $editable = $session->get($pluginEditableKey, 0);
         }
 
         // set by plugin
-        if ($session->get($pluginEditableOverrideKey, 0) != 0 && ($this->application->getInput()->getString('ff_applic', '') == 'plg_facileforms' || (isset($ff_applic) && $ff_applic == 'plg_facileforms'))) {
+        if ($session->get($pluginEditableOverrideKey, 0) != 0 && ($this->application->getInput()->getString('ff_applic', '') == 'plg_facileforms' || $ff_applic == 'plg_facileforms')) {
             $editable_override = $session->get($pluginEditableOverrideKey, 0);
         }
 
         // set by module
-        if (($this->application->getInput()->getString('ff_applic', '') == 'mod_facileforms' || (isset($ff_applic) && $ff_applic == 'mod_facileforms'))) {
+        if (($this->application->getInput()->getString('ff_applic', '') == 'mod_facileforms' || $ff_applic == 'mod_facileforms')) {
             if ($this->application->getSession()->get('ff_editableMod' . $xModuleId . $form->name, 0) != 0) {
                 $editable = $this->application->getSession()->get('ff_editableMod' . $xModuleId . $form->name, 0);
             } else if ($this->application->getSession()->get('ff_editableMod' . $this->application->getInput()->getInt('ff_module_id', 0) . $form->name, 0) != 0) {
@@ -280,7 +280,7 @@ $ff_request = array();
         }
 
         // set by module
-        if (($this->application->getInput()->getString('ff_applic', '') == 'mod_facileforms' || (isset($ff_applic) && $ff_applic == 'mod_facileforms'))) {
+        if (($this->application->getInput()->getString('ff_applic', '') == 'mod_facileforms' || $ff_applic == 'mod_facileforms')) {
             if ($this->application->getSession()->get('ff_editable_overrideMod' . $xModuleId . $form->name, 0) != 0) {
                 $editable_override = $this->application->getSession()->get('ff_editable_overrideMod' . $xModuleId . $form->name, 0);
             } else if ($this->application->getSession()->get('ff_editable_overrideMod' . $this->application->getInput()->getInt('ff_module_id', 0) . $form->name, 0) != 0) {
@@ -288,7 +288,7 @@ $ff_request = array();
             }
         }
 
-        if ((!isset($ff_applic) || $ff_applic != 'plg_facileforms') && $pagetitle && $form->title != '' && !($this->application->getInput()->getInt('cb_form_id', 0) || $this->application->getInput()->getCmd('cb_record_id', ''))) {
+        if ($ff_applic != 'plg_facileforms' && $pagetitle && $form->title != '' && !($this->application->getInput()->getInt('cb_form_id', 0) || $this->application->getInput()->getCmd('cb_record_id', ''))) {
             if ($menu_item_title != '') {
                 $this->application->getDocument()->setTitle($menu_item_title);
             } else if ($pagetitle) { // being set by module, false implies no change at all

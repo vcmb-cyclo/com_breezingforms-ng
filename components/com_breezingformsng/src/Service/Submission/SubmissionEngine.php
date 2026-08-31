@@ -1184,7 +1184,7 @@ transition: box-shadow .15s linear;
                                         description: ' . json_encode($options['itemname']) . ',
                                         currency: ' . json_encode(strtolower($options['currencyCode'])) . ',
                                         amount: ' . json_encode($options['amount']) . ',
-                                        email: ' . (isset($stripeemail) ? json_encode($stripeemail) : json_encode('')) . ',
+                                        email: ' . json_encode($stripeemail) . ',
 									    zipCode : true,
 									    billingAddress: true,
 									    closed: function () { 

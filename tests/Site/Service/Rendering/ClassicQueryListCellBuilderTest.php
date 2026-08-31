@@ -53,4 +53,34 @@ final class ClassicQueryListCellBuilderTest extends TestCase
         self::assertNotSame('', $builder->build($column, 'y', 1, 1, 71, 'items', 0, false, $skip, static fn (string $class): string => $class));
         self::assertSame(0, $skip);
     }
+
+    public function testNormalizesDynamicColumnSpanBeforeUpdatingSkip(): void
+    {
+        $column = (object) [
+            'thspan' => '3',
+            'align' => 0,
+            'valign' => 0,
+            'wrap' => 0,
+            'class2' => '',
+            'class3' => '',
+            'width' => 0,
+            'widthmd' => false,
+        ];
+        $skip = 0;
+
+        (new ClassicQueryListCellBuilder())->build(
+            $column,
+            'value',
+            0,
+            0,
+            72,
+            'items',
+            0,
+            true,
+            $skip,
+            static fn (string $class): string => $class
+        );
+
+        self::assertSame(1, $skip);
+    }
 }

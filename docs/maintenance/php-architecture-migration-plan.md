@@ -739,6 +739,12 @@ désormais l'identifiant d'instance Joomla (`ff_elem...`) et
 supprimé et sa régression est couverte par
 `ClassicRendererEditorValueTest`.
 
+Le compteur de colonnes fusionnées de `ClassicQueryListCellBuilder` convertit
+désormais explicitement `thspan` en entier avant d'alimenter son paramètre par
+référence `skip`. Cette normalisation supprime les diagnostics PHPStan du
+niveau 3 sans modifier le markup Query List ; la valeur dynamique est couverte
+par `ClassicQueryListCellBuilderTest`.
+
 ## Phase 7 — Réduire les façades historiques
 
 Cette phase commence seulement lorsque leurs responsabilités ont été extraites

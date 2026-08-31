@@ -63,7 +63,7 @@ final class ClassicQueryListCellBuilder
             $attributes .= ' class="' . $classResolver((string) $className) . '"';
         }
         if ($skip === 0 && $column->thspan > 1) {
-            $skip = $column->thspan - 1;
+            $skip = (int) $column->thspan - 1;
         }
         if ($skip > 0 && (int) $column->width > 0) {
             $style .= 'width:' . $column->width . ($column->widthmd ? '%;' : 'px;');

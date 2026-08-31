@@ -55,7 +55,7 @@ class RecordsController extends BaseController
         $formSelection = $input->getInt('form_selection', 0);
 
         if ($recordId > 0) {
-            $values = $input->get('element', [], 'post', 'array');
+            $values = $input->post->get('element', [], 'array');
             $this->getRecordModel()->saveRecord(
                 $recordId,
                 is_array($values) ? $values : [],
@@ -76,7 +76,7 @@ class RecordsController extends BaseController
 
         $app = $this->app;
         $input = $app->getInput();
-        $ids = $input->get('cid', [], 'post', 'array');
+        $ids = $input->post->get('cid', [], 'array');
         ArrayHelper::toInteger($ids);
         $contentComponent = $app->bootComponent('com_content');
 
@@ -160,7 +160,7 @@ class RecordsController extends BaseController
 
         $app = $this->app;
         $input = $app->getInput();
-        $ids = $input->get('cid', [], 'post', 'array');
+        $ids = $input->post->get('cid', [], 'array');
         ArrayHelper::toInteger($ids);
         $formSelection = $input->getInt('form_selection', 0);
 
@@ -272,7 +272,7 @@ class RecordsController extends BaseController
 
         $app = $this->app;
         $input = $app->getInput();
-        $ids = $input->get('cid', [], 'post', 'array');
+        $ids = $input->post->get('cid', [], 'array');
         ArrayHelper::toInteger($ids);
         $formSelection = $input->getInt('form_selection', 0);
 
@@ -388,7 +388,7 @@ class RecordsController extends BaseController
 
         $app = $this->app;
         $input = $app->getInput();
-        $ids = $input->get('cid', [], 'post', 'array');
+        $ids = $input->post->get('cid', [], 'array');
         ArrayHelper::toInteger($ids);
         $formSelection = $input->getInt('form_selection', 0);
 
@@ -487,7 +487,7 @@ class RecordsController extends BaseController
 
         $app = $this->app;
         $input = $app->getInput();
-        $ids = $input->get('cid', [], 'post', 'array');
+        $ids = $input->post->get('cid', [], 'array');
         ArrayHelper::toInteger($ids);
         $this->getRecordModel()->setFlagsBatch($ids, $column, $value);
 

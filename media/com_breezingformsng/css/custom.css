@@ -239,15 +239,15 @@ main input[type="radio"]:not(old):not(#bfOptionsFieldsWrap *) {
     margin-left: 0;
 }
 
-main input[type="checkbox"]:not(old) + label,
-main input[type="radio"]:not(old) + label {
+main input[type="checkbox"]:not(old):not(#bfOptionsFieldsWrap *) + label,
+main input[type="radio"]:not(old):not(#bfOptionsFieldsWrap *) + label {
     display: inline-block;
     margin-left: -1.5em;
     line-height: 1.5em;
 }
 
-main input[type="checkbox"]:not([style*="none"]) + label > span,
-main input[type="radio"]:not([style*="none"]) + label > span {
+main input[type="checkbox"]:not([style*="none"]):not(#bfOptionsFieldsWrap *) + label > span,
+main input[type="radio"]:not([style*="none"]):not(#bfOptionsFieldsWrap *) + label > span {
     display: inline-block;
     width: 0.875em;
     height: 0.875em;
@@ -264,19 +264,19 @@ main input[type="radio"]:not([style*="none"]) + label > span {
     vertical-align: bottom;
 }
 
-main input[type="checkbox"]:not(old) + label > span {
+main input[type="checkbox"]:not(old):not(#bfOptionsFieldsWrap *) + label > span {
     background: transparent !important;
 }
 
-main input[type="radio"]:not(old) + label > span {
+main input[type="radio"]:not(old):not(#bfOptionsFieldsWrap *) + label > span {
     border-radius: 1em !important;
     border: 3px solid #ddd;
     width: 0.6em;
     height: 0.6em;
 }
 
-main input[type="checkbox"]:not(old):checked + label > span,
-main input[type="radio"]:not(old):checked + label > span {
+main input[type="checkbox"]:not(old):not(#bfOptionsFieldsWrap *):checked + label > span,
+main input[type="radio"]:not(old):not(#bfOptionsFieldsWrap *):checked + label > span {
     background-image: linear-gradient(rgb(224, 224, 224), rgb(240, 240, 240));
     background-image: linear-gradient(rgb(224, 224, 224), rgb(240, 240, 240));
     background-image: linear-gradient(rgb(224, 224, 224), rgb(240, 240, 240));
@@ -284,7 +284,7 @@ main input[type="radio"]:not(old):checked + label > span {
     background-image: linear-gradient(rgb(224, 224, 224), rgb(240, 240, 240));
 }
 
-main input[type="checkbox"]:not(old):checked + label > span::before {
+main input[type="checkbox"]:not(old):not(#bfOptionsFieldsWrap *):checked + label > span::before {
     content: "\2713 ";
     display: block;
     width: 1em;
@@ -296,7 +296,7 @@ main input[type="checkbox"]:not(old):checked + label > span::before {
     font-weight: bold;
 }
 
-main input[type="radio"]:not(old):checked + label > span > span {
+main input[type="radio"]:not(old):not(#bfOptionsFieldsWrap *):checked + label > span > span {
     display: block;
     height: 100%;
     margin: 0;

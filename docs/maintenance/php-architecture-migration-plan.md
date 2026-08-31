@@ -840,6 +840,38 @@ validation du package (images supprimées absentes de l'archive,
 `theme.css` présent). Suite complète verte (399 tests, aucun fichier PHP
 touché).
 
+## Phase 14 — Correction du chevauchement des radios natives dans l'onglet Options
+
+Ajoutée le 2026-08-31. Régression signalée par l'utilisateur : dans l'onglet
+QuickMode « Options » → « Général », le champ « Publié(s) » (Oui/Non,
+markup Bootstrap 5 natif de `forms/edit.php`) affichait le cercle radio
+chevauchant le texte du label.
+
+Cause : `media/com_breezingformsng/css/custom.css` contient un skin CSS
+personnalisé pour les radios/checkboxes de l'éditeur QuickMode (technique
+`opacity:0` sur l'input natif + `<span>` dessiné à la place, un procédé du
+même esprit pré-Bootstrap que le balisage `bfPage-*` supprimé en phase 10).
+Une exemption `:not(#bfOptionsFieldsWrap *)` avait déjà été ajoutée sur la
+toute première règle du skin (`opacity`/`width`) pour laisser les radios
+Bootstrap natives de l'onglet Options intactes — mais **pas** sur les 7
+autres règles du même bloc (`+ label`, `+ label > span`, `:checked + label
+> span`, etc.), documentée par erreur comme complète (« so its normal
+Bootstrap sizing applies too, not just visibility »). La règle
+`main input[...]:not(old) + label { margin-left: -1.5em; }`, non exemptée,
+s'appliquait quand même aux labels Bootstrap natifs de `#bfOptionsFieldsWrap`
+et les tirait par-dessus le cercle du radio.
+
+Corrigé : ajout de `:not(#bfOptionsFieldsWrap *)` aux 7 règles restantes du
+bloc, pour que l'exemption corresponde enfin à ce que le commentaire du
+bloc décrivait déjà.
+
+### Vérification
+
+Vérification live avant/après (capture de la ligne « Publié(s) ») :
+chevauchement confirmé avant correctif, cercle et texte correctement
+séparés après déploiement du CSS corrigé. Suite complète verte (399 tests,
+aucun fichier PHP touché), build + validation du package.
+
 ## Travail en parallèle
 
 | Couloir | Fichiers principaux | Peut avancer avec |

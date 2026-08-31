@@ -99,6 +99,7 @@ final class RenderingEngine
     private ?QueryListNavigationBuilder $queryListNavigationBuilderService = null;
     private ?QueryListRowsRefreshBuilder $queryListRowsRefreshBuilderService = null;
     private ?QueryListPaginationTailBuilder $queryListPaginationTailBuilderService = null;
+    private ?QueryListStateLibraryBuilder $queryListStateLibraryBuilderService = null;
     private ?AdditionalHiddenFieldsBuilder $additionalHiddenFieldsBuilderService = null;
     private ?PaymentProviderDetector $paymentProviderDetectorService = null;
     private ?ContentBuilderFileValueParser $contentBuilderFileValueParserService = null;
@@ -421,6 +422,11 @@ final class RenderingEngine
         return $this->queryListPaginationTailBuilderService ??= new QueryListPaginationTailBuilder();
     }
 
+    private function queryListStateLibraryBuilder(): QueryListStateLibraryBuilder
+    {
+        return $this->queryListStateLibraryBuilderService ??= new QueryListStateLibraryBuilder();
+    }
+
     private function additionalHiddenFieldsBuilder(): AdditionalHiddenFieldsBuilder
     {
         return $this->additionalHiddenFieldsBuilderService ??= new AdditionalHiddenFieldsBuilder();
@@ -737,13 +743,9 @@ final class RenderingEngine
         } // if
 
         if ($qcode != '') {
-            $library[] = array('ff_queryCurrPage', 'var ff_queryCurrPage = new Array();');
-            $library[] = array('ff_queryPageSize', 'var ff_queryPageSize = new Array();');
-            $library[] = array('ff_queryCols', 'var ff_queryCols = new Array();');
-            $library[] = array('ff_queryCheckbox', 'var ff_queryCheckbox = new Array();');
-            $library[] = array('ff_queryHeader', 'var ff_queryHeader = new Array();');
-            $library[] = array('ff_queryPagenav', 'var ff_queryPagenav = new Array();');
-            $library[] = array('ff_queryRows', 'var ff_queryRows = new Array();' . nl() . $qcode);
+            foreach ($this->queryListStateLibraryBuilder()->build($qcode, nl()) as $entry) {
+                $library[] = $entry;
+            }
 
             $library[] = array(
                 'ff_selectAllQueryRows',

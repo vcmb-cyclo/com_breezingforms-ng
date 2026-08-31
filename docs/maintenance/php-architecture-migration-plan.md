@@ -574,13 +574,10 @@ Une classe extraite est candidate à un regroupement quand elle cumule :
 
 Analyse quantitative (branches conditionnelles + nombre de fichiers
 appelants, sur l'ensemble des classes `*Builder` de
-`components/com_breezingformsng/src/Service/Rendering`) : deux
-regroupements clairs identifiés (ci-dessous), et six classes triviales sans
-partenaire thématique clair (`ClassNameResolver`,
-`ContentBuilderFileDisplayNameBuilder`, `MobileChoiceMarkupBuilder`,
-`QuickModeSubmitButtonRestoreBuilder`, `QueryListStateLibraryBuilder`,
-`CaptchaEndpointBuilder`) — laissées telles quelles, faute de regroupement
-honnête.
+`components/com_breezingformsng/src/Service/Rendering`) : cinq
+regroupements cohérents sont désormais réalisés. Les classes restantes sans
+partenaire honnête (`ClassNameResolver`, `MobileChoiceMarkupBuilder`,
+`QueryListStateLibraryBuilder`, `ProcessorHeaderRenderer`) restent isolées.
 
 ### 8.1 `HiddenFormFieldsBuilder` — champs `<input type="hidden">`
 
@@ -602,16 +599,39 @@ tag `<script><!-- ... //--></script>` hérité du rendu historique :
 `contentBuilderReadonly()`, `formValidationOpen()`/`formValidationClose()`,
 `editableRecord()`, `contentBuilderEditable()`.
 
+### 8.3 `ContentBuilderFileSupportBuilder`
+
+Consolide `ContentBuilderFileDisplayNameBuilder`,
+`ContentBuilderFileValueParser` et `ContentBuilderSignatureFileResolver` dans
+`ContentBuilderFileSupportBuilder` (`9db625e10`). Les sorties d'échappement,
+de parsing des lignes et de résolution des signatures sont couvertes dans un
+test commun ; les trois anciens fichiers et leurs tests ont été supprimés.
+
+### 8.4 `QuickModeOnePageCallbackScriptBuilder`
+
+Consolide `QuickModeSubmitButtonRestoreBuilder` et
+`QuickModeRemodalCloseScriptBuilder` dans
+`QuickModeOnePageCallbackScriptBuilder` (`ea627bbdf`). Les callbacks de
+restauration Ladda et de fermeture du modal conservent leur sortie historique
+et sont testés ensemble.
+
+### 8.5 `CaptchaSupportBuilder`
+
+Consolide `CaptchaEndpointBuilder` et `CaptchaValidationDefaultsBuilder` dans
+`CaptchaSupportBuilder` (`5bf333ab8`). Le wrapper `legacy_wrap` avait déjà été
+supprimé en phase 10 ; il n'a donc pas été recréé dans ce regroupement. Les
+endpoints frontend/administrateur et les valeurs de validation sont testés.
+
 ### Méthode de vérification
 
 Chaque corps de méthode a été comparé octet pour octet à la classe d'origine
 avant toute suppression (extraction automatisée des deux corps, comparaison
 stricte) — aucune des 10 méthodes déplacées n'a changé de comportement. Les
 propriétés/getters lazy-init et points d'appel de `RenderingEngine.php` ont
-été mis à jour vers les deux nouvelles classes ; les 10 anciens fichiers et
-leurs 10 fichiers de test ont été supprimés après fusion des cas de test
-dans deux fichiers de test consolidés. Suite complète verte, PHPStan propre,
-build + validation du package.
+été mis à jour vers les nouvelles classes ; les anciens fichiers concernés et
+leurs tests ont été supprimés après fusion des cas de test dans trois fichiers
+de test consolidés. Suite complète verte, PHPStan propre et PHPCS vert sur les
+nouveaux services.
 
 ### Note sur les mentions historiques
 

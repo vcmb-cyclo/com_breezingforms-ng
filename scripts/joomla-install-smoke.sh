@@ -162,6 +162,8 @@ if [[ -n "${contentbuilder_archive}" ]]; then
         require "/var/www/html/includes/framework.php";
         require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFormAssociationLoader.php";
         require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFormDataLoader.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderRecordLoader.php";
+        require "/var/www/html/components/com_breezingformsng/src/Support/processor_facade.php";
 
         $db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
         $referenceId = 987654;
@@ -178,6 +180,19 @@ if [[ -n "${contentbuilder_archive}" ]]; then
         $db->execute();
         $formId = (int) $db->insertid();
 
+        $sourceQuery = $db->getQuery(true)
+            ->insert($db->quoteName("#__facileforms_forms"))
+            ->columns($db->quoteName(["name", "title", "published", "template_code"]))
+            ->values(implode(",", [
+                $db->quote("BFNG smoke source"),
+                $db->quote("BFNG smoke source"),
+                1,
+                $db->quote(""),
+            ]));
+        $db->setQuery($sourceQuery);
+        $db->execute();
+        $sourceId = (int) $db->insertid();
+
         try {
             $associationLoader = new \Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderFormAssociationLoader($db);
             $dataLoader = new \Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderFormDataLoader($db);
@@ -188,10 +203,42 @@ if [[ -n "${contentbuilder_archive}" ]]; then
             if (!is_array($data) || (int) ($data["reference_id"] ?? 0) !== $referenceId) {
                 throw new \RuntimeException("ContentBuilder form data loader returned unexpected data");
             }
+
+            $source = \CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory::getForm(
+                "com_breezingformsng",
+                $sourceId
+            );
+            if (!is_object($source)) {
+                throw new \RuntimeException("ContentBuilder source factory returned no BFNG form");
+            }
+            $recordLoader = new \Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderRecordLoader(
+                static function (string $sourceReferenceId, int $recordId, bool $publishedOnly, int $ownerId, bool $allLanguages) use ($source): array {
+                    return (array) $source->getRecord($recordId, $publishedOnly, $ownerId, $allLanguages);
+                }
+            );
+            if ($recordLoader->load(
+                [
+                    "reference_id" => $sourceId,
+                    "published_only" => 0,
+                    "own_only_fe" => 0,
+                    "show_all_languages_fe" => 1,
+                ],
+                0,
+                true,
+                0,
+                true,
+                "record not found"
+            ) !== []) {
+                throw new \RuntimeException("ContentBuilder record loader returned an unexpected new-record payload");
+            }
         } finally {
             $db->setQuery($db->getQuery(true)
                 ->delete($db->quoteName("#__contentbuilderng_forms"))
                 ->where($db->quoteName("id") . " = " . $formId));
+            $db->execute();
+            $db->setQuery($db->getQuery(true)
+                ->delete($db->quoteName("#__facileforms_forms"))
+                ->where($db->quoteName("id") . " = " . $sourceId));
             $db->execute();
         }
     '

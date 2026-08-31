@@ -1078,6 +1078,8 @@ Le rendu Classic des groupes radio et checkbox est désormais mutualisé dans
 labels, états checked/disabled, lignes invalides et mode sans retour à la ligne.
 Les traductions du groupe et les différences d'enveloppe restent dans
 `ClassicRenderer`.
+Les deux points d'entrée Classic radio/checkbox délèguent désormais à une
+méthode paramétrée unique, sans changer leurs sorties caractérisées.
 
 Lots récemment terminés : tests d'intégration des variantes Query List et du
 point d'arrêt `bury()` dans la première boucle (`7a19ffeb`), contrôles de

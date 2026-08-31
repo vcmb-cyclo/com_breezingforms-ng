@@ -654,11 +654,11 @@ float:left;
                         break;
 
                     case 'bfRadioGroup':
-                        $this->renderRadioGroupField($mdata, $tabIndex, $onclick, $onblur, $onchange, $onfocus, $onselect, $readonly);
+                        $this->renderChoiceGroupField('radio', $mdata, $tabIndex, $onclick, $onblur, $onchange, $onfocus, $onselect, $readonly);
                         break;
 
                     case 'bfCheckboxGroup':
-                        $this->renderCheckboxGroupField($mdata, $tabIndex, $onclick, $onblur, $onchange, $onfocus, $onselect, $readonly);
+                        $this->renderChoiceGroupField('checkbox', $mdata, $tabIndex, $onclick, $onblur, $onchange, $onfocus, $onselect, $readonly);
                         break;
 
                     case 'bfCheckbox':
@@ -892,7 +892,7 @@ float:left;
         }
     }
 
-    private function renderRadioGroupField(array $mdata, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
+    private function renderChoiceGroupField(string $type, array $mdata, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
     {
         /* translatables */
         if (isset($mdata['group_translation' . $this->language_tag]) && $mdata['group_translation' . $this->language_tag] != '') {
@@ -900,27 +900,7 @@ float:left;
         }
         /* translatables end */
         echo $this->classicChoiceGroupBuilder()->build(
-            'radio',
-            (int) $mdata['dbId'],
-            (string) $mdata['bfName'],
-            (string) $mdata['group'],
-            (bool) $mdata['wrap'],
-            (string) $mdata['labelPosition'],
-            $tabIndex,
-            $onclick . $onblur . $onchange . $onfocus . $onselect,
-            $readonly !== ''
-        );
-    }
-
-    private function renderCheckboxGroupField(array $mdata, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
-    {
-        /* translatables */
-        if (isset($mdata['group_translation' . $this->language_tag]) && $mdata['group_translation' . $this->language_tag] != '') {
-            $mdata['group'] = $mdata['group_translation' . $this->language_tag];
-        }
-        /* translatables end */
-        echo $this->classicChoiceGroupBuilder()->build(
-            'checkbox',
+            $type,
             (int) $mdata['dbId'],
             (string) $mdata['bfName'],
             (string) $mdata['group'],

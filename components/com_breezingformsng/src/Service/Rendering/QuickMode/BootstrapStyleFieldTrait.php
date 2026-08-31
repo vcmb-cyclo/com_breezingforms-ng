@@ -282,15 +282,6 @@ trait BootstrapStyleFieldTrait
         string $onselect,
         string $readonly
     ): void {
-        $type = 'text';
-
-        if ($mdata['password']) {
-            $type = 'password';
-        }
-        $maxlength = '';
-        if (is_numeric($mdata['maxLength'])) {
-            $maxlength = 'maxlength="' . intval($mdata['maxLength']) . '" ';
-        }
         $size = '';
 
         if ($mdata['size'] != '') {
@@ -309,34 +300,16 @@ trait BootstrapStyleFieldTrait
                     . ' iconf--fumi" aria-hidden="true"></i>';
             }
         }
-        /* translatables */
-        if (
-            isset($mdata['value_translation' . $this->language_tag])
-            && $mdata['value_translation' . $this->language_tag] != ''
-        ) {
-            $mdata['value'] = $mdata['value_translation' . $this->language_tag];
-        }
-
-        if (
-            isset($mdata['placeholder_translation' . $this->language_tag])
-            && $mdata['placeholder_translation' . $this->language_tag] != ''
-        ) {
-            $mdata['placeholder'] = $mdata['placeholder_translation' . $this->language_tag];
-        }
-        /* translatables end */
-
         echo '<div class="' . $this->bsClass('controls') . ' ' . $this->bsClass('form-inline') . '">';
         echo '<div class="' . $this->bsClass('form-group') . '">';
         echo $label;
         echo $icon;
-        echo $this->quickModeInputBuilder()->build(
+        echo $this->quickModeTextFieldStrategy()->textfield(
+            $mdata,
+            $this->language_tag,
             $this->bsClass('form-control') . ' ff_elem inputbox',
-            $type,
-            (string) $mdata['bfName'],
-            (string) $mdata['value'],
-            (int) $mdata['dbId'],
-            $size . $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
-            (string) ($mdata['placeholder'] ?? '')
+            $size . $tabIndex,
+            $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly
         );
         echo '</div>';
         echo '</div>';
@@ -359,15 +332,6 @@ trait BootstrapStyleFieldTrait
         string $onselect,
         string $readonly
     ): void {
-        $type = 'number';
-
-        if ($mdata['range']) {
-            $type = 'range';
-        }
-        $maxlength = '';
-        if (is_numeric($mdata['maxLength'])) {
-            $maxlength = 'max="' . intval($mdata['maxLength']) . '" ';
-        }
         $icon = '';
         if (
             $this->rootMdata['themebootstrapThemeEngine'] == 'bootstrap'
@@ -380,29 +344,18 @@ trait BootstrapStyleFieldTrait
                     . ' iconf--fumi" aria-hidden="true"></i>';
             }
         }
-        /* translatables */
-
-        if (
-            isset($mdata['placeholder_translation' . $this->language_tag])
-            && $mdata['placeholder_translation' . $this->language_tag] != ''
-        ) {
-            $mdata['placeholder'] = '000';
-        }
-        /* translatables end */
-
         echo '<div class="' . $this->bsClass('controls') . ' ' . $this->bsClass('form-inline') . '">';
         echo '<div class="' . $this->bsClass('form-group') . '">';
         echo $label;
         echo $icon;
-        echo $this->quickModeInputBuilder()->build(
+        echo $this->quickModeTextFieldStrategy()->numberInput(
+            $mdata,
+            $this->language_tag,
             $this->bsClass('form-control') . ' ff_elem inputbox',
-            $type,
-            (string) $mdata['bfName'],
-            (string) $mdata['value'],
-            (int) $mdata['dbId'],
-            $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
-            (string) ($mdata['placeholder'] ?? ''),
-            ' step="' . $mdata['step'] . '" max="' . $mdata['max'] . '" min="' . $mdata['min'] . '"'
+            $tabIndex,
+            $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+            'maxlength',
+            true
         );
         echo '</div>';
         echo '</div>';

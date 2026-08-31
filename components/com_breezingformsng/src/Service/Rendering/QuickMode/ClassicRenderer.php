@@ -56,6 +56,7 @@ class ClassicRenderer
     private $language_tag = '';
     private $hasResponsiveDatePicker = false;
     private ?QuickModeInputBuilder $quickModeInputBuilderService = null;
+    private ?QuickModeTextFieldStrategy $quickModeTextFieldStrategyService = null;
     private ?QuickModeTextareaBuilder $quickModeTextareaBuilderService = null;
     private ?QuickModeCheckboxBuilder $quickModeCheckboxBuilderService = null;
     private ?QuickModeSelectBuilder $quickModeSelectBuilderService = null;
@@ -76,6 +77,11 @@ class ClassicRenderer
     private function quickModeCalendarOptionsBuilder(): QuickModeCalendarOptionsBuilder
     {
         return $this->quickModeCalendarOptionsBuilderService ??= new QuickModeCalendarOptionsBuilder();
+    }
+
+    private function quickModeTextFieldStrategy(): QuickModeTextFieldStrategy
+    {
+        return $this->quickModeTextFieldStrategyService ??= new QuickModeTextFieldStrategy();
     }
 
     public function headers()
@@ -786,38 +792,16 @@ float:left;
 
     private function renderTextfieldField(array $mdata, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
     {
-        $type = 'text';
-
-        if ($mdata['password']) {
-            $type = 'password';
-        }
-        $maxlength = '';
-        if (is_numeric($mdata['maxLength'])) {
-            $maxlength = 'maxlength="' . intval($mdata['maxLength']) . '" ';
-        }
         $size = '';
         if ($mdata['size'] != '') {
             $size = 'style="width:' . htmlentities(strip_tags($mdata['size'])) . '" ';
         }
-
-        /* translatables */
-        if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
-            $mdata['value'] = $mdata['value_translation' . $this->language_tag];
-        }
-
-        if (isset($mdata['placeholder_translation' . $this->language_tag]) && $mdata['placeholder_translation' . $this->language_tag] != '') {
-            $mdata['placeholder'] = $mdata['placeholder_translation' . $this->language_tag];
-        }
-        /* translatables end */
-
-        echo $this->quickModeInputBuilder()->build(
+        echo $this->quickModeTextFieldStrategy()->textfield(
+            $mdata,
+            $this->language_tag,
             'ff_elem',
-            $type,
-            (string) $mdata['bfName'],
-            (string) $mdata['value'],
-            (int) $mdata['dbId'],
-            $size . $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
-            (string) ($mdata['placeholder'] ?? '')
+            $size . $tabIndex,
+            $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly
         );
         if ($mdata['mailbackAsSender']) {
             echo '<input type="hidden" name="mailbackSender[' . $mdata['bfName'] . ']" value="true"/>' . "\n";
@@ -826,32 +810,13 @@ float:left;
 
     private function renderNumberInputField(array $mdata, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
     {
-        $type = 'number';
-
-        if ($mdata['range']) {
-            $type = 'range';
-        }
-        $maxlength = '';
-        if (is_numeric($mdata['maxLength'])) {
-            $maxlength = 'max="' . intval($mdata['maxLength']) . '" ';
-        }
-
-        /* translatables */
-
-        if (isset($mdata['placeholder_translation' . $this->language_tag]) && $mdata['placeholder_translation' . $this->language_tag] != '') {
-            $mdata['placeholder'] = $mdata['placeholder_translation' . $this->language_tag];
-        }
-        /* translatables end */
-
-        echo $this->quickModeInputBuilder()->build(
+        echo $this->quickModeTextFieldStrategy()->numberInput(
+            $mdata,
+            $this->language_tag,
             'ff_elem inputbox',
-            $type,
-            (string) $mdata['bfName'],
-            (string) $mdata['value'],
-            (int) $mdata['dbId'],
-            $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
-            (string) ($mdata['placeholder'] ?? ''),
-            ' step="' . $mdata['step'] . '" max="' . $mdata['max'] . '" min="' . $mdata['min'] . '"'
+            $tabIndex,
+            $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+            'max'
         );
 
         // set size of element, number input doesn't allow size attr

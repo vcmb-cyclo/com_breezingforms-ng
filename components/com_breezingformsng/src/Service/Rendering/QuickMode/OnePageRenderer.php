@@ -57,6 +57,7 @@ class OnePageRenderer
     private $hasResponsiveDatePicker = false;
     private $bsClasses = array();
     private ?QuickModeInputBuilder $quickModeInputBuilderService = null;
+    private ?QuickModeTextFieldStrategy $quickModeTextFieldStrategyService = null;
     private ?QuickModeTextareaBuilder $quickModeTextareaBuilderService = null;
     private ?QuickModeCheckboxBuilder $quickModeCheckboxBuilderService = null;
     private ?QuickModeSelectBuilder $quickModeSelectBuilderService = null;
@@ -88,6 +89,11 @@ class OnePageRenderer
     private function quickModeInputBuilder(): QuickModeInputBuilder
     {
         return $this->quickModeInputBuilderService ??= new QuickModeInputBuilder();
+    }
+
+    private function quickModeTextFieldStrategy(): QuickModeTextFieldStrategy
+    {
+        return $this->quickModeTextFieldStrategyService ??= new QuickModeTextFieldStrategy();
     }
 
     private function quickModeTextareaBuilder(): QuickModeTextareaBuilder

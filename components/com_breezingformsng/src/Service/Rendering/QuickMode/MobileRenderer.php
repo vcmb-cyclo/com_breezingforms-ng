@@ -51,6 +51,7 @@ class MobileRenderer
 
     private $hasResponsiveDatePicker = false;
     private ?QuickModeInputBuilder $quickModeInputBuilderService = null;
+    private ?QuickModeTextFieldStrategy $quickModeTextFieldStrategyService = null;
     private ?QuickModeTextareaBuilder $quickModeTextareaBuilderService = null;
     private ?QuickModeCheckboxBuilder $quickModeCheckboxBuilderService = null;
     private ?QuickModeSelectBuilder $quickModeSelectBuilderService = null;
@@ -110,6 +111,11 @@ class MobileRenderer
     private function quickModeInputBuilder(): QuickModeInputBuilder
     {
         return $this->quickModeInputBuilderService ??= new QuickModeInputBuilder();
+    }
+
+    private function quickModeTextFieldStrategy(): QuickModeTextFieldStrategy
+    {
+        return $this->quickModeTextFieldStrategyService ??= new QuickModeTextFieldStrategy();
     }
 
     private function quickModeTextareaBuilder(): QuickModeTextareaBuilder
@@ -616,34 +622,12 @@ HTML;
 
                 switch ($mdata['bfType']) {
                     case 'bfTextfield':
-                        $type = 'text';
-
-                        if ($mdata['password']) {
-                            $type = 'password';
-                        }
-                        $maxlength = '';
-                        if (is_numeric($mdata['maxLength'])) {
-                            $maxlength = 'maxlength="' . intval($mdata['maxLength']) . '" ';
-                        }
-
-                        /* translatables */
-                        if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
-                            $mdata['value'] = $mdata['value_translation' . $this->language_tag];
-                        }
-
-                        if (isset($mdata['placeholder_translation' . $this->language_tag]) && $mdata['placeholder_translation' . $this->language_tag] != '') {
-                            $mdata['placeholder'] = $mdata['placeholder_translation' . $this->language_tag];
-                        }
-                        /* translatables end */
-
-                        echo $this->quickModeInputBuilder()->build(
+                        echo $this->quickModeTextFieldStrategy()->textfield(
+                            $mdata,
+                            $this->language_tag,
                             'ff_elem',
-                            $type,
-                            (string) $mdata['bfName'],
-                            (string) $mdata['value'],
-                            (int) $mdata['dbId'],
-                            $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
-                            (string) ($mdata['placeholder'] ?? '')
+                            $tabIndex,
+                            $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly
                         );
                         if ($mdata['mailbackAsSender']) {
                             echo '<input type="hidden" name="mailbackSender[' . $mdata['bfName'] . ']" value="true"/>' . "\n";
@@ -651,31 +635,15 @@ HTML;
                         break;
 
                     case 'bfNumberInput':
-                        $type = 'number';
-
-                        if ($mdata['range']) {
-                            $type = 'range';
-                        }
-
-                        $maxlength = '';
-                        if (is_numeric($mdata['maxLength'])) {
-                            $maxlength = 'maxlength="' . intval($mdata['maxlength']) . '" ';
-                        }
-
-                        /* translatables */
-                        if (isset($mdata['placeholder_translation' . $this->language_tag]) && $mdata['placeholder_translation' . $this->language_tag] != '') {
-                            $mdata['placeholder'] = $mdata['placeholder_translation' . $this->language_tag];
-                        }
-                        /* translatables end */
-
-                        echo $this->quickModeInputBuilder()->build(
+                        echo $this->quickModeTextFieldStrategy()->numberInput(
+                            $mdata,
+                            $this->language_tag,
                             'ff_elem',
-                            $type,
-                            (string) $mdata['bfName'],
-                            (string) $mdata['value'],
-                            (int) $mdata['dbId'],
-                            $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
-                            (string) ($mdata['placeholder'] ?? ''),
+                            $tabIndex,
+                            $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+                            'maxlength',
+                            false,
+                            false
                         );
                         break;
 

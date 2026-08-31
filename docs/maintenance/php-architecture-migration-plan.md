@@ -1112,6 +1112,11 @@ exécution de la requête et production de l'état JavaScript sont regroupées
 dans un service testable. `RenderingEngine` ne conserve que le compteur de
 checkboxes, le stockage dans l'état du processeur et l'assemblage du script.
 
+L'assemblage final de `ff_dispQueryPage` est maintenant confié à
+`QueryListPageScriptBuilder`, qui compose les services de rafraîchissement,
+de navigation et de fin de pagination. Le moteur conserve la traduction des
+libellés, les options du formulaire et l'appel `linkcode`.
+
 L'enveloppe du script global de validation est désormais construite par
 `FormValidationScriptWrapperBuilder` (`9b92acb55`). Les contrôles de fichiers
 et de CAPTCHA restent générés par leurs services respectifs, tandis que les

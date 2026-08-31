@@ -106,6 +106,7 @@ final class RenderingEngine
     private ?QuickModeRendererFactory $quickModeRendererFactoryService = null;
     private ?FormOnloadScriptBuilder $formOnloadScriptBuilderService = null;
     private ?QueryListRowPreparationService $queryListRowPreparationService = null;
+    private ?QueryListPageScriptBuilder $queryListPageScriptBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -483,6 +484,15 @@ final class RenderingEngine
         );
     }
 
+    private function queryListPageScriptBuilder(): QueryListPageScriptBuilder
+    {
+        return $this->queryListPageScriptBuilderService ??= new QueryListPageScriptBuilder(
+            $this->queryListRowsRefreshBuilder(),
+            $this->queryListNavigationBuilder(),
+            $this->queryListPaginationTailBuilder()
+        );
+    }
+
     public function cbCheckPermissions(): array
     {
         // CONTENTBUILDER BEGIN
@@ -702,30 +712,19 @@ final class RenderingEngine
                 $this->queryListSelectAllScriptBuilder()->build(nl())
             );
 
-            $code = 'function ff_dispQueryPage(id,page)' . nl() .
-                '{' . nl() .
-                '    var forced = false;' . nl() .
-                '    if (arguments.length>2) forced = arguments[2];' . nl() .
-                $this->queryListRowsRefreshBuilder()->build(nl()) .
-                '    if (pagenav > 0 && pagesize > 0) {' . nl() .
-                '        var navi = \'\';' . nl() .
-                $this->queryListNavigationBuilder()->build([
+            $code = $this->queryListPageScriptBuilder()->build(
+                [
                     'start' => Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGESTART'),
                     'previous' => Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV'),
                     'next' => Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT'),
                     'end' => Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEEND'),
-                ], nl()) . nl() .
-                '        rows[header+pagesize].cells[0].innerHTML = navi;' . nl() .
-                '    } // if' . nl() .
-                '    ff_queryCurrPage[id] = page;' . nl();
-            $code .= $this->queryListPaginationTailBuilder()->build(
+                ],
                 (bool) $qcheckboxes,
                 (int) $this->processor->formrow->heightmode,
                 (int) $this->processor->formrow->height,
                 (bool) $this->processor->inframe,
                 nl()
-            ) .
-                '} // ff_dispQueryPage';
+            );
             $this->processor->linkcode('ff_dispQueryPage', $library, $linked, $code);
             if ($this->processor->bury()) {
                 $this->abortViewRendering();

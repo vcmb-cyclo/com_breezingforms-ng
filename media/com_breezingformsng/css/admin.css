@@ -254,53 +254,6 @@ overflow:hidden;width: 100%;
 }
 
 
-#bfAvailableFieldsOpen{
-    padding: 10px;
-    background-color: #faa732;
-    color: #ffffff;
-    cursor: pointer;
-}
-
-#bfAvailableFields{
-    display: none;
-    max-height: 400px;
-    overflow: auto;
-    width: 500px;
-    margin-top: 10px;
-}
-
-@media (max-width: 767px) {
-    #bfAvailableFields{
-        width: 100%;
-    }
-}
-
-#bfAvailableFields table{
-    border: 0;
-}
-
-#bfAvailableFields table td {
-    padding-bottom: 10px;
-}
-
-
-.bfAvailableFields label {
-    vertical-align: text-bottom;
-    text-align: center;
-}
-
-.bfAvailableField {
-    text-align: center;
-    display: table-cell;
-    vertical-align: middle;
-    background-color: #2d89ef;
-    width: 120px;
-    color: #ffffff;
-    height: 60px;
-}
-
-
-
 /* Search */
 
 #bfSearchMenu{
@@ -342,31 +295,6 @@ overflow:hidden;width: 100%;
     border: none;
     padding: 0;
   }
-}
-
-#bfSearch{
-    display: none;
-    max-height: 400px;
-    overflow: auto;
-    width: 500px;
-    margin-top: 10px;
-}
-
-@media (max-width: 767px) {
-    #bfSearch{
-        display: none;
-        max-height: 400px;
-        overflow: auto;
-        width: 100%;
-        margin-top: 10px;
-    }
-}
-
-#bfSearchOpen{
-    padding: 10px;
-    background-color: #faa732;
-    color: #ffffff;
-    cursor: pointer;
 }
 
 #bfrecordsearch {
@@ -411,38 +339,6 @@ overflow:hidden;width: 100%;
 
 .ui-dialog{
     z-index: 200001;
-}
-
-.bfDetailsTable{
-    width: 100%;
-}
-
-.bfDetailsTable td
-{
-    padding: 5px;
-}
-
-.bfDetailsTable tr:nth-child(2n){
-    background: #F5F5F5;
-}
-
-.bfDetailsTableLabelCol{
-    width: 20%;
-    overflow: auto;
-    max-width: 100px !important;
-}
-
-.bfDetailsTableLabelCol strong{
-    color: #bbb;
-}
-
-.bfDetailsTableValueCol{
-    width: 30%;
-}
-
-.bfDetailsTableHead{
-    background: #92c1ff;
-    color: #ffffff;
 }
 
 .ct-records-cell-centered{

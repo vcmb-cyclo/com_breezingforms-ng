@@ -94,7 +94,6 @@ main select:not(#bfOptionsFieldsWrap *) {
     -o-appearance: none !important;
     appearance: none !important;
     -webkit-border-radius: 0 !important;
-    -moz-border-radius: 0 !important;
     border-radius: 0 !important;
     padding-right: 37px !important;
     color: #777 !important;
@@ -159,13 +158,7 @@ main select option:hover {
     color: #fff !important;
 }
 
-main select::-ms-expand {
-    display: none;
-}
 
-main select.desktopDropDown::-ms-expand {
-    display: none !important;
-}
 
 main select[multiple="multiple"],
 main select[multiple="multiple"]:focus {
@@ -291,8 +284,6 @@ joomla-toolbar-button {
 
 .bfPropertyWrap .btn-secondary {
     display: inline-block;
-    *display: inline;
-    *zoom: 1;
     padding: 4px 12px;
     margin-bottom: 0;
     font-size: 13px;
@@ -304,7 +295,6 @@ joomla-toolbar-button {
     color: #333;
     border: 1px solid #b3b3b3;
     -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     margin-bottom: 10px;
@@ -736,10 +726,6 @@ main .pagination ul {
 
 main .pagination ul > li > a,
 main .pagination ul > li > span {
-    -moz-border-bottom-colors: none;
-    -moz-border-left-colors: none;
-    -moz-border-right-colors: none;
-    -moz-border-top-colors: none;
     background-color: #fff;
     border-color: #ddd;
     border-image: none;
@@ -1244,16 +1230,6 @@ Manage records delete win
     .ui-button:active {
         background: #D5D5D5 !important;
     }
-    .bfAvailableField {
-        background-color: #eaeaea;
-        color: #333333;
-        display: table-cell;
-        height: 39px;
-        padding: 5px;
-        text-align: center;
-        vertical-align: middle;
-        width: 113px;
-    }
     main #bfRecordsTableContainer input[type="checkbox"]:not(old) + label, main #bfRecordsTableContainer input[type="radio"]:not(old) + label {
         margin-left: 0 !important;
         top: -9px !important;
@@ -1288,13 +1264,6 @@ Manage records delete win
     html {
         font-size: 100%;
     }
-    .bfDetailsTableLabelCol strong {
-        color: #999;
-    }
-    .bfDetailsTableHead {
-        background-color: #3F51B5;
-        color: #fff;
-    }
     /*
 Manage records select list and filter button
 */
@@ -1307,30 +1276,6 @@ Manage records select list and filter button
         padding: 5px;
         position: absolute;
         top: 0;
-    }
-    #bfSearchOpen {
-        background-color: #eaeaea;
-        color: #333333;
-        cursor: pointer;
-        padding: 9px;
-        font-weight: 400;
-    }
-    #bfSearch {
-        display: none;
-        margin-top: 0;
-        max-height: 400px;
-        overflow: auto;
-        padding: 10px;
-        width: 500px;
-        box-shadow: 0 1px 3px rgba(33, 33, 33, 0.2);
-        background: #fff;
-    }
-    #bfAvailableFieldsOpen {
-        background-color: #eaeaea;
-        color: #333333;
-        cursor: pointer;
-        padding: 9px;
-        font-weight: 400;
     }
     #bfAvailableFieldsWrapper {
         background-color: transparent;
@@ -1350,48 +1295,6 @@ main #bfAvailableFieldsWrapper input[type="checkbox"]:not(old) {
     font-size: 1em;
     opacity: 1;
 } */
-    #bfAvailableFields {
-        display: none;
-        margin-top: 10px;
-        max-height: 400px;
-        overflow: auto;
-        padding: 10px;
-        width: 500px;
-        box-shadow: 0 1px 3px rgba(33, 33, 33, 0.2);
-        background: #fff;
-    }
-    #bfSearch .bfFilterTriggerer {
-        background: #92c923 none repeat scroll 0 0 !important;
-        border: 1px solid #92c923;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-        color: #ffffff !important;
-        padding: 7px 15px;
-        text-decoration: none !important;
-        text-shadow: none !important;
-    }
-    #bfSearch .bfFilterTriggerer:hover,
-    #bfSearch .bfFilterTriggerer:focus {
-        background: #2E7D32 !important;
-        border: 1px solid #2E7D32;
-        text-decoration: none !important;
-    }
-    #bfSearch .btn-secondary {
-        background: #eaeaea none repeat scroll 0 0 !important;
-        border: 1px solid #eaeaea;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-        color: #333 !important;
-        padding: 7px 15px;
-        text-shadow: none !important;
-        text-decoration: none !important;
-    }
-    #bfSearch .btn-secondary:hover,
-    #bfSearch .btn-secondary:focus {
-        background: #d5d5d5 !important;
-        border: 1px solid #d5d5d5;
-        text-decoration: none !important;
-    }
     /******************
 Integrator
 *******************/
@@ -1763,14 +1666,8 @@ Mobile view
         #bfAvailableFieldsWrapper {
             left: 0;
         }
-        #bfAvailableFields {
-            width: 100%;
-        }
         #bfSearchWrapper {
             position: relative;
-        }
-        #bfSearch {
-            width: 100%;
         }
         #SelectOptionDialog {
             width: 100% !important;

@@ -1438,6 +1438,21 @@ comportement suivantes.
 
 ## Vérification obligatoire par lot
 
+## Lots récents
+
+`ContentBuilderSignatureScriptBuilder` protège désormais le sélecteur de champ
+par un littéral JavaScript JSON strict ; `QuickModeCaptchaMarkupBuilder`
+échappe les valeurs d'attribut HTML et `QuickModeCaptchaReloadScriptBuilder`
+protège l'URL injectée dans le callback de rechargement. Les tests couvrent
+les entrées contenant des guillemets et du code JavaScript ; les snapshots
+CAPTCHA des quatre thèmes ont été actualisés pour l'encodage HTML attendu
+(`8ed97fb3c`).
+
+`QuickModeUploadQueueItemMarkupBuilder` échappe maintenant le chemin de
+l'image d'annulation à la fois pour le fragment HTML et pour la chaîne
+JavaScript qui l'embarque. Une régression d'injection dans ce chemin est
+couverte par un test dédié (`5aec57c30`).
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

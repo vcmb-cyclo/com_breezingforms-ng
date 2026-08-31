@@ -29,7 +29,6 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Integration\RecaptchaVerifier;
 use Vcmb\Component\BreezingformsNG\Site\Service\Notification\NotificationEngine;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\RenderingEngine;
 use Vcmb\Component\BreezingformsNG\Site\Service\Submission\SubmissionEngine;
-use Vcmb\Component\BreezingformsNG\Site\Service\Upload\UploadError;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\UploadRuntime;
 use Vcmb\Component\BreezingformsNG\Site\Table\FormTable;
 
@@ -829,52 +828,19 @@ class HTML_facileFormsProcessor
      */
     public function saveUpload($filename, $userfile_name, $destpath, $timestamp, $useUrl = false, $useUrlDownloadDirectory = '', $resize_target_width = 0, $resize_target_height = 0, $resize_type = '', $resize_bgcolor = '#ffffff', $field_name = '')
     {
-        global $mosConfig_fileperms;
-
-        if ($this->dying) {
-            return '';
-        }
-
-        $identity = $this->app->getIdentity();
-        $filemode = isset($mosConfig_fileperms)
-            ? ($mosConfig_fileperms === '' ? null : octdec($mosConfig_fileperms))
-            : 0644;
-        $result = $this->uploadRuntime()->store(
-            (string) $filename,
-            (string) $userfile_name,
-            (string) $destpath,
-            $this->findtags,
-            $this->replacetags,
-            $this->rows,
-            (string) $this->submitted,
-            (string) $this->app->get('offset'),
-            [
-                'username' => $identity->get('username'),
-                'id' => $identity->get('id'),
-                'name' => $identity->get('name'),
-            ],
-            (bool) $this->app->getSession()->get('bfFileUploadOverride', true),
-            $filemode,
-            (bool) $useUrl,
-            (int) $resize_target_width,
-            (int) $resize_target_height,
-            (string) $resize_type,
-            $resize_bgcolor === null ? null : (string) $resize_bgcolor
+        return $this->submissionEngine()->saveUpload(
+            $filename,
+            $userfile_name,
+            $destpath,
+            $timestamp,
+            $useUrl,
+            $useUrlDownloadDirectory,
+            $resize_target_width,
+            $resize_target_height,
+            $resize_type,
+            $resize_bgcolor,
+            $field_name
         );
-
-        if ($result->error !== null) {
-            $this->status = _FF_STATUS_UPLOAD_FAILED;
-            $this->message = Text::_(match ($result->error) {
-                UploadError::DirectoryMissing => 'COM_BREEZINGFORMSNG_PROCESS_DIRNOTEXISTS',
-                UploadError::FileExists => 'COM_BREEZINGFORMSNG_PROCESS_FILEEXISTS',
-                UploadError::MoveFailed => 'COM_BREEZINGFORMSNG_PROCESS_FILEMOVEFAILED',
-                UploadError::ChmodFailed => 'COM_BREEZINGFORMSNG_PROCESS_FILECHMODFAILED',
-            });
-
-            return '';
-        }
-
-        return ['default' => $result->path, 'server' => $result->serverPath];
     }
 
     public function exifImageType($filename)

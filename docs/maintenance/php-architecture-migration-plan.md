@@ -827,6 +827,12 @@ Le service vérifie désormais le statut HTTP avant le décodage et transforme
 également une réponse JSON invalide en échec booléen ; le contrat ne laisse
 plus remonter une erreur de parsing provenant du endpoint externe.
 
+La logique historique de `saveUpload()` est maintenant portée par
+`SubmissionEngine`, qui utilise directement `UploadRuntime` pour stocker le
+fichier et traduire les erreurs. `HTML_facileFormsProcessor` conserve la même
+signature publique comme délégation, sans garder la logique d'upload ni le
+mapping des statuts.
+
 Les deux gardes locales `if (!$halt)` de `SubmissionEngine` ont ensuite été
 retirées : `$halt` était initialisé à `false` et ses seules affectations à
 `true` précédaient immédiatement `exit`. Le contrôle CAPTCHA, les pièces de

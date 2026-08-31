@@ -69,4 +69,21 @@ final class SubmissionEngineArchitectureTest extends TestCase
         self::assertStringContainsString('new RecaptchaVerifier()', $facadeSource);
         self::assertStringNotContainsString('google.com/recaptcha', $submissionSource);
     }
+
+    public function testUploadFacadeDelegatesStorageAndStatusMappingToSubmissionEngine(): void
+    {
+        $submissionSource = file_get_contents(
+            __DIR__ . '/../../../../components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php'
+        );
+        $facadeSource = file_get_contents(
+            __DIR__ . '/../../../../components/com_breezingformsng/src/Support/processor_facade.php'
+        );
+
+        self::assertIsString($submissionSource);
+        self::assertIsString($facadeSource);
+        self::assertStringContainsString('public function saveUpload(', $submissionSource);
+        self::assertStringContainsString('$this->uploadRuntime()->store(', $submissionSource);
+        self::assertStringContainsString('return $this->submissionEngine()->saveUpload(', $facadeSource);
+        self::assertStringNotContainsString('UploadError::', $facadeSource);
+    }
 }

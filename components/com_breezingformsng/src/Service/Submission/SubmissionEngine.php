@@ -41,6 +41,8 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Integration\DropboxUploader;
 use Vcmb\Component\BreezingformsNG\Site\Service\Integration\RecaptchaVerifier;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampFormatter;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\FlashUploadFileMatcher;
+use Vcmb\Component\BreezingformsNG\Site\Service\Upload\UploadError;
+use Vcmb\Component\BreezingformsNG\Site\Service\Upload\UploadRuntime;
 use Vcmb\Component\BreezingformsNG\Site\Service\Security\HtmlSanitizer;
 use Vcmb\Component\BreezingformsNG\Administrator\Helper\VendorHelper;
 use CB\Component\Contentbuilderng\Administrator\Helper\ContentbuilderngHelper;
@@ -57,12 +59,63 @@ final class SubmissionEngine
     private ?SubmissionTimestampFormatter $uploadTimestampFormatterService = null;
     private ?HtmlSanitizer $htmlSanitizerService = null;
     private ?FlashUploadFileMatcher $flashUploadFileMatcherService = null;
+    private ?UploadRuntime $uploadRuntimeService = null;
 
     public function __construct(
         private readonly HTML_facileFormsProcessor $processor,
         private readonly MailerFactoryInterface $mailerFactory,
         private readonly RecaptchaVerifier $recaptchaVerifier,
     ) {
+    }
+
+    public function saveUpload($filename, $userfile_name, $destpath, $timestamp, $useUrl = false, $useUrlDownloadDirectory = '', $resize_target_width = 0, $resize_target_height = 0, $resize_type = '', $resize_bgcolor = '#ffffff', $field_name = '')
+    {
+        global $mosConfig_fileperms;
+
+        if ($this->processor->dying) {
+            return '';
+        }
+
+        $identity = $this->processor->app->getIdentity();
+        $filemode = isset($mosConfig_fileperms)
+            ? ($mosConfig_fileperms === '' ? null : octdec($mosConfig_fileperms))
+            : 0644;
+        $result = $this->uploadRuntime()->store(
+            (string) $filename,
+            (string) $userfile_name,
+            (string) $destpath,
+            $this->processor->findtags,
+            $this->processor->replacetags,
+            $this->processor->rows,
+            (string) $this->processor->submitted,
+            (string) $this->processor->app->get('offset'),
+            [
+                'username' => $identity->get('username'),
+                'id' => $identity->get('id'),
+                'name' => $identity->get('name'),
+            ],
+            (bool) $this->processor->app->getSession()->get('bfFileUploadOverride', true),
+            $filemode,
+            (bool) $useUrl,
+            (int) $resize_target_width,
+            (int) $resize_target_height,
+            (string) $resize_type,
+            $resize_bgcolor === null ? null : (string) $resize_bgcolor
+        );
+
+        if ($result->error !== null) {
+            $this->processor->status = _FF_STATUS_UPLOAD_FAILED;
+            $this->processor->message = Text::_(match ($result->error) {
+                UploadError::DirectoryMissing => 'COM_BREEZINGFORMSNG_PROCESS_DIRNOTEXISTS',
+                UploadError::FileExists => 'COM_BREEZINGFORMSNG_PROCESS_FILEEXISTS',
+                UploadError::MoveFailed => 'COM_BREEZINGFORMSNG_PROCESS_FILEMOVEFAILED',
+                UploadError::ChmodFailed => 'COM_BREEZINGFORMSNG_PROCESS_FILECHMODFAILED',
+            });
+
+            return '';
+        }
+
+        return ['default' => $result->path, 'server' => $result->serverPath];
     }
 
     function collectSubmitdata($cbResult = null)
@@ -1621,6 +1674,11 @@ transition: box-shadow .15s linear;
     function removeDangerousHtml($value)
     {
         return $this->htmlSanitizer()->sanitize((string) $value);
+    }
+
+    private function uploadRuntime(): UploadRuntime
+    {
+        return $this->uploadRuntimeService ??= new UploadRuntime($this->processor->app->getInput());
     }
 
     private function htmlSanitizer(): HtmlSanitizer

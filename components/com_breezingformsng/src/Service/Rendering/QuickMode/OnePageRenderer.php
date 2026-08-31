@@ -858,12 +858,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                         echo '<span class="' . $this->bsClass('nonform-control') . '">';
                         //if( ( isset( $mdata['flashUploader'] ) && $mdata['flashUploader'] ) || ( isset( $mdata['html5'] ) && $mdata['html5'] ) ){
 
-                        $base = explode('/', Uri::base());
-                        if (isset($base[count($base) - 2]) && $base[count($base) - 2] == 'administrator') {
-                            unset($base[count($base) - 2]);
-                            $base = array_merge($base);
-                        }
-                        $base = implode('/', $base);
+                        $base = (new QuickModeUploadBasePathBuilder())->build(Uri::base());
 
                         echo '<input type="hidden" id="flashUpload' . $mdata['bfName'] . '" name="flashUpload' . $mdata['bfName'] . '" value="bfFlashFileQueue' . $mdata['dbId'] . '"/>' . "\n";
                         $this->hasFlashUpload = true;

@@ -1351,6 +1351,12 @@ renderers Classic, Bootstrap et OnePage. Les différences d'URL SEF sont
 injectées explicitement ; les callbacks et les enveloppes visuelles restent
 propres à chaque renderer.
 
+Le calcul du chemin de base de l'uploader, y compris la suppression du segment
+`administrator` dans l'URI backend historique, est désormais centralisé dans
+`QuickModeUploadBasePathBuilder`. Les cas frontend, backend et chemin non
+concerné sont couverts par un test dédié ; la construction du markup et la
+configuration plupload restent propres à chaque renderer.
+
 Les callbacks contigus d'entrée de file (`FilesAdded` initial et ajout des
 fichiers) sont désormais composés par
 `QuickModeUploadEntryCallbacksBuilder`; les variantes Bootstrap et Classic sont

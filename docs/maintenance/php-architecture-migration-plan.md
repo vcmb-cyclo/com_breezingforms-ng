@@ -1491,6 +1491,10 @@ formulaire QuickMode vide : ouverture et fermeture du formulaire, champs de
 contexte, validation et nettoyage du buffer sont couverts sans dépendance
 Joomla externe (`502998adb`).
 
+La branche de finalisation backend est désormais caractérisée séparément,
+notamment l'émission du champ `ff_runmode`, avec la même vérification de
+fermeture et de nettoyage (`4f89b4029`).
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

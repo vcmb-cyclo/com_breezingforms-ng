@@ -181,7 +181,7 @@ final class SubmissionEngine
                                 mt_srand();
                                 if (isset($tickets[$this->processor->app->getInput()->getString('bfFlashUploadTicket', (string) mt_rand(0, mt_getrandmax()))])) {
                                     $sourcePath = JPATH_SITE . '/components/com_breezingformsng/uploads/';
-                                    if (@file_exists($sourcePath) && @is_readable($sourcePath) && @is_dir($sourcePath)) {
+                                    if (is_dir($sourcePath) && is_readable($sourcePath)) {
 
                                         $timezone = (string) $this->processor->app->get('offset');
                                         $date_stamp = $this->uploadTimestampFormatter()->formatPattern(
@@ -207,15 +207,7 @@ final class SubmissionEngine
 
                                             $file = basename($glob_file);
 
-                                            if ($file != "." && $file != "..") {
-                                                $parts = explode('_', $file);
-                                                if (count($parts) >= 5) {
-                                                    if ($parts[count($parts) - 1] == 'flashtmp') {
-
-                                                        if ($parts[count($parts) - 3] == $this->processor->app->getInput()->getString('bfFlashUploadTicket', '')) {
-
-
-                                                            if ($parts[count($parts) - 4] == $row->name) {
+                                            $parts = explode('_', $file);
 
                                                                 unset($parts[count($parts) - 1]);
                                                                 unset($parts[count($parts) - 1]);
@@ -336,11 +328,6 @@ final class SubmissionEngine
                                                                 if (strpos(strtolower($row->data1), '{cbsite}') === 0) {
                                                                     $is_relative[$serverPath] = true;
                                                                 }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
                                         }
                                     }
                                 }

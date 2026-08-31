@@ -987,6 +987,10 @@ La sélection des fichiers Flash terminés par champ et ticket est désormais
 isolée dans `FlashUploadFileMatcher`; les suffixes et les fichiers étrangers
 sont couverts par des tests unitaires.
 
+`SubmissionEngine` s'appuie désormais directement sur les fichiers filtrés par
+le matcher et vérifie explicitement l'accessibilité du répertoire source; les
+gardes de matching dupliquées ont été supprimées.
+
 Les tests d'existence des assets statiques des trois renderers QuickMode
 utilisent désormais `is_file()` sans masquage d'erreur; leurs sorties restent
 couvertes par les tests de caractérisation des renderers.

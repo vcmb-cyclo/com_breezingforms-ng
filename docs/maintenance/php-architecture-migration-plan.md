@@ -1499,6 +1499,10 @@ La branche preview est également couverte sur son parcours in-frame, avec
 vérification de `ff_runmode`, `ff_frame` et de la fermeture du formulaire
 (`b1a2b5973`).
 
+La sélection du renderer QuickMode par les métadonnées est maintenant
+caractérisée pour Classic, Bootstrap et OnePage, avec des métadonnées de
+constructeur explicites dans le harnais (`912e7ed47`).
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

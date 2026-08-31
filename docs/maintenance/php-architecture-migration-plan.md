@@ -106,6 +106,7 @@
 | ContentBuilder — valeurs éditables | Générateurs d’hydratation par famille créés, couverts et branchés dans `view()` | Commits `f685ff5e`, `c2ae9a76`, `084fc749`, `e8d531cd`, `152def4c` |
 | ContentBuilder — champs non éditables | Générateur indépendant créé, couvert et branché dans `view()` | Commits `8bfd520e`, `21a0a812` |
 | ContentBuilder — résolution des signatures | Résolution, lecture et encodage des fichiers isolés et testés | Commits `b31b5c47`, `e9386794` |
+| ContentBuilder — orchestration des permissions | Création, édition/nouveau et accès `fullarticle` délégués à `ContentBuilderPermissionChecker`, avec adaptateur et contrat local testés | Lot courant |
 | PHPCS | Actif sur les services modernes, les builders ContentBuilder et `HiddenFieldTrait` | `phpcs.xml.dist`, commit `2e58c4bb` |
 | PHPStan | Niveau 2 sur le composant, avec baseline | `phpstan.neon.dist`, 193 entrées dans la baseline |
 

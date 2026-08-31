@@ -107,6 +107,7 @@ final class RenderingEngine
     private ?ContentBuilderNonEditableFieldsResolver $contentBuilderNonEditableFieldsResolverService = null;
     private ?ContentBuilderFormAssociationLoader $contentBuilderFormAssociationLoaderService = null;
     private ?ContentBuilderFormDataLoader $contentBuilderFormDataLoaderService = null;
+    private ?ContentBuilderPermissionChecker $contentBuilderPermissionCheckerService = null;
     private ?QuickModeRendererFactory $quickModeRendererFactoryService = null;
     private ?FormOnloadScriptBuilder $formOnloadScriptBuilderService = null;
     private ?QueryListRowPreparationService $queryListRowPreparationService = null;
@@ -542,6 +543,15 @@ final class RenderingEngine
         );
     }
 
+    private function contentBuilderPermissionChecker(): ContentBuilderPermissionChecker
+    {
+        return $this->contentBuilderPermissionCheckerService ??= new ContentBuilderPermissionChecker(
+            static fn(): ContentBuilderPermissionGateway => new ContentBuilderPermissionServiceAdapter(
+                PermissionService::createFromRuntimeContext()
+            )
+        );
+    }
+
     private function quickModeRendererFactory(): QuickModeRendererFactory
     {
         return $this->quickModeRendererFactoryService ??= new QuickModeRendererFactory();
@@ -623,39 +633,29 @@ final class RenderingEngine
             // test if all published contentbuilder views allow creating new submissions
             if (!$input->getInt('cb_record_id', 0) || !$input->getInt('cb_form_id', 0)) {
 
-                $permissionService = PermissionService::createFromRuntimeContext();
-                $cbAuth = true;
-                foreach ($cbForms as $cbFormId) {
-                    $permissionService->setPermissions($cbFormId, 0, $cbFrontend ? '_fe' : '');
-                    $cbAuth = $cbFrontend
-                        ? $permissionService->authorizeFe('new')
-                        : $permissionService->authorize('new');
-                    if (!$cbAuth) {
-                        break;
-                    }
-                }
-
-                if (count($cbForms) && !$cbAuth) {
-                    throw new Exception(Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_NEW_NOT_ALLOWED'), 403);
-                }
+                $this->contentBuilderPermissionChecker()->assertCanCreate(
+                    $cbForms,
+                    $cbFrontend,
+                    Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_NEW_NOT_ALLOWED'),
+                    Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_NEW_NOT_ALLOWED')
+                );
             }
 
             if ($input->getInt('cb_form_id', 0)) {
 
                 // test the permissions of given record
-                $permissionService = PermissionService::createFromRuntimeContext();
-                if ($input->getInt('cb_record_id', 0)) {
-                    $permissionService->setPermissions($input->getInt('cb_form_id', 0), $input->getInt('cb_record_id', 0), $cbFrontend ? '_fe' : '');
-                    $permissionService->checkPermissions('edit', Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_EDIT_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
-                } else {
-                    $permissionService->setPermissions($input->getInt('cb_form_id', 0), 0, $cbFrontend ? '_fe' : '');
-                    $permissionService->checkPermissions('new', Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_NEW_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
-                }
+                $permissionService = $this->contentBuilderPermissionChecker()->assertCanEditOrCreate(
+                    $input->getInt('cb_form_id', 0),
+                    $input->getInt('cb_record_id', 0),
+                    $cbFrontend,
+                    Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_EDIT_NOT_ALLOWED'),
+                    Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_NEW_NOT_ALLOWED')
+                );
 
                 $cbFormId = $input->getInt('cb_form_id', 0);
                 $cbData = $this->contentBuilderFormDataLoader()->load($cbFormId);
                 if (is_array($cbData)) {
-                    $cbFull = $cbFrontend ? $permissionService->authorizeFe('fullarticle') : $permissionService->authorize('fullarticle');
+                    $cbFull = $this->contentBuilderPermissionChecker()->canViewFullArticle($permissionService, $cbFrontend);
                     $cbForm = FormSourceFactory::getForm('com_breezingformsng', $cbData['reference_id']);
                     $cbRecord = $cbForm->getRecord($input->getInt('cb_record_id', 0), $cbData['published_only'], $cbFrontend ? ($cbData['own_only_fe'] ? $this->processor->app->getIdentity()->get('id', 0) : -1) : ($cbData['own_only'] ? $this->processor->app->getIdentity()->get('id', 0) : -1), $cbFrontend ? $cbData['show_all_languages_fe'] : true);
 

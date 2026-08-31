@@ -299,7 +299,7 @@ final class QuickmodeHtml
                     <div id="menutab">
                         <input id="triggerScrollable" type="checkbox"><label class="triggerScrollableLabel"
                             for="triggerScrollable">Keep panel docked</label>
-                        <ul class="nav nav-tabs" role="tablist">
+                        <ul class="nav nav-tabs bfng-tabs" role="tablist">
                             <li class="nav-item" role="presentation">
                                 <button type="button" class="nav-link active tab-items" id="fragment-1-tab"
                                     data-bs-toggle="tab" data-bs-target="#fragment-1" role="tab"

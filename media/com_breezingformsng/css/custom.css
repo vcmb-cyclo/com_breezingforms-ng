@@ -887,11 +887,11 @@ quick mode
     background: #FCFCFC;
 }
 
-#menutab .nav-item {
+#menutab .nav-tabs:not(.bfng-tabs) .nav-item {
     margin: 0 7px 0 0 !important;
 }
 
-#menutab .nav-link {
+#menutab .nav-tabs:not(.bfng-tabs) .nav-link {
     background: #f5f5f5;
     border: 1px solid #eaeaea;
     height: 30px;
@@ -900,14 +900,14 @@ quick mode
     color: #333333;
 }
 
-#menutab .nav-link.active {
+#menutab .nav-tabs:not(.bfng-tabs) .nav-link.active {
     background: transparent;
     border-top: 1px solid #3F51B5 !important;
     border-bottom: 1px solid #fff !important;
     color: #555 !important;
 }
 
-#menutab .nav-link:hover {
+#menutab .nav-tabs:not(.bfng-tabs) .nav-link:hover {
     background: #fff !important;
 }
 

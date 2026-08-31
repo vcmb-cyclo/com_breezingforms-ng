@@ -49,6 +49,28 @@
   font-weight: 600;
 }
 
+.bfng-tabs { border-bottom: 1px solid var(--bfng-border); gap: var(--bfng-space-4); }
+.bfng-tabs .nav-link {
+  background: var(--bfng-surface-2);
+  border: 1px solid var(--bfng-border);
+  border-bottom: none;
+  border-top: 2px solid transparent;
+  border-radius: var(--bfng-radius) var(--bfng-radius) 0 0;
+  color: var(--bfng-text-2);
+  font-size: var(--bfng-fs-sm);
+  padding: calc(var(--bfng-space-3) - 1px) var(--bfng-space-5) var(--bfng-space-3);
+}
+.bfng-tabs .nav-link:hover { background: var(--bfng-surface-3); color: var(--bfng-text); }
+.bfng-tabs .nav-link.active {
+  background: var(--bfng-surface);
+  color: var(--bfng-accent-700);
+  border-color: var(--bfng-border);
+  border-top-color: var(--bfng-accent-500);
+  border-bottom: 1px solid var(--bfng-surface);
+  margin-bottom: -1px;
+  font-weight: 600;
+}
+
 /* .bfng-field: label column + control(s), see charte section 05.
    Deliberately not a CSS grid: property wraps in the existing templates
    sometimes hold more than one control after the label (e.g. a Yes/No
@@ -69,6 +91,7 @@
   color: var(--bfng-text-2);
 }
 .bfng-field__label + * { font-size: var(--bfng-fs-base); }
+.bfng-field select { min-width: 240px; max-width: 100%; }
 @media (max-width: 900px) {
   .bfng-field__label { display: block; width: auto; padding-top: 0; margin-bottom: var(--bfng-space-2); }
 }

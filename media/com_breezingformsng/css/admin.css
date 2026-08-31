@@ -150,7 +150,7 @@ overflow:hidden;width: 100%;
 }
 
 /* option tabs */
-#menutab .nav-tabs {
+#menutab .nav-tabs:not(.bfng-tabs) {
     height: 37px;
     border-bottom: none;
 }
@@ -161,7 +161,7 @@ overflow:hidden;width: 100%;
     }
 }
 
-#menutab .nav-link {
+#menutab .nav-tabs:not(.bfng-tabs) .nav-link {
     padding: 3px 12px !important;
     background: #0088CC !important;
     color: #fff !important;
@@ -170,7 +170,7 @@ overflow:hidden;width: 100%;
     border-radius: 0;
 }
 
-#menutab .nav-link.active {
+#menutab .nav-tabs:not(.bfng-tabs) .nav-link.active {
     background: #fff !important;
     color: #0088CC !important;
     border: 1px solid #0088CC;

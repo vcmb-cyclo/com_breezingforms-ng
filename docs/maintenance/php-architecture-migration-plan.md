@@ -338,6 +338,11 @@ d'un champ ou d'un nœud.
 
 ### 4.1 Scripts post-rendu
 
+La garde d'entrée de `RenderingEngine::view()` impose désormais le mode
+QuickMode avant le chargement des métadonnées ; la condition interne
+redondante a été supprimée afin que l'orchestrateur n'entretienne pas un
+chemin impossible.
+
 État : `PostRenderScriptBuilder` extrait et branché dans `view()` par
 `ad9dd75f`, avec couverture des trois fonctions différées et de leur garde
 JQuery/`bfToggleFieldsLoaded`.

@@ -550,14 +550,9 @@ final class RenderingEngine
             return;
         }
 
-        $rootMdata = [];
+        require_once JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php';
 
-        if (trim($this->processor->formrow->template_code_processed) == 'QuickMode') {
-
-            require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
-
-            $rootMdata = $this->loadQuickModeMetadata();
-        }
+        $rootMdata = $this->loadQuickModeMetadata();
 
         // CONTENTBUILDER BEGIN
         $cbResult = $this->processor->cbCheckPermissions();

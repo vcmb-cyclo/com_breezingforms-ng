@@ -394,7 +394,7 @@ final class SubmissionEngine
                                 $serverPaths = implode(nl(), $serverPaths);
 
                                 if ($this->processor->trim($paths)) {
-                                    $this->processor->sfadata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $paths, $serverPaths);
+                                    $this->processor->sfdata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $paths, $serverPaths);
                                 }
 
                                 if (

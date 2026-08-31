@@ -931,6 +931,9 @@ final class RenderingEngine
 
             for ($i = 0; $i < $this->processor->rowcount; $i++) {
                 $row = &$this->processor->rows[$i];
+                $data1 = '';
+                $data2 = '';
+                $data3 = '';
                 if (!is_numeric($row->width))
                     $row->width = 0;
                 if (!is_numeric($row->height))

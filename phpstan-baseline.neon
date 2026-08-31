@@ -685,24 +685,6 @@ parameters:
 			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
 
 		-
-			message: '#^Variable \$data1 might not be defined\.$#'
-			identifier: variable.undefined
-			count: 12
-			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
-
-		-
-			message: '#^Variable \$data2 might not be defined\.$#'
-			identifier: variable.undefined
-			count: 10
-			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
-
-		-
-			message: '#^Variable \$data3 might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
-
-		-
 			message: '#^Constant _FF_RUNMODE_PREVIEW not found\.$#'
 			identifier: constant.notFound
 			count: 1

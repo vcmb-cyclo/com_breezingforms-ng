@@ -21,6 +21,7 @@ use Joomla\Database\DatabaseInterface;
 use Joomla\String\StringHelper;
 use Joomla\CMS\Filter\OutputFilter;
 use Joomla\CMS\Mail\MailerFactoryInterface;
+use Joomla\CMS\Mail\MailerInterface;
 
 function bf_sanitizeFilename($fileName, $defaultIfEmpty = 'upload', $separator = '_', $lowerCase = true)
 {
@@ -175,7 +176,7 @@ function bf_endsWith($haystack, $needle)
  * @param string $subject
  * @param string $body
  *
- * @return JMail
+ * @return MailerInterface
  */
 
 

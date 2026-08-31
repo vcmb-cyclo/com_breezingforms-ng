@@ -1823,6 +1823,12 @@ La résolution SQL du callback `script2cond` après soumission est désormais
 portée par `SubmittedCallbackNameResolver`. `RenderingEngine` ne conserve que
 la composition de l'`onload` et son enregistrement.
 
+Le parseur `RequestParameterParser` dispose maintenant d'un filet de sécurité
+direct sur les paramètres séparés par `&` ou `&amp;`, les valeurs vides, les
+noms ignorés et les valeurs contenant plusieurs signes `=`. Le comportement
+historique de la préparation des paramètres runtime est ainsi verrouillé avant
+toute évolution de son appelant.
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

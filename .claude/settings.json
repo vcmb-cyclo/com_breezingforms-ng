@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker cp *)",
+      "Bash(sed -i \"s|/tmp/com_contentbuilderng-6.1.9.zip|/home/xavier/workspaces/vcmb/com_contentbuilderng/build/com_contentbuilderng-6.1.9.zip|\" /tmp/claude-1000/-home-xavier-workspaces-vcmb-com-breezingformsng/4dd3c0c5-8903-43f6-9bf4-0d7c12f24754/scratchpad/install-cb2.mjs)",
+      "Bash(node /home/xavier/.claude/skills/browser-automation/browser.mjs \"http://localhost:9080/administrator/index.php\" --script /tmp/claude-1000/-home-xavier-workspaces-vcmb-com-breezingformsng/4dd3c0c5-8903-43f6-9bf4-0d7c12f24754/scratchpad/install-cb2.mjs --timeout 60000)",
+      "Bash(node /home/xavier/.claude/skills/browser-automation/browser.mjs \"http://localhost:9080/index.php?Itemid=438\" --timeout 20000)",
+      "Bash(node /home/xavier/.claude/skills/browser-automation/browser.mjs \"http://localhost:9080/index.php?Itemid=438\" --script /tmp/claude-1000/-home-xavier-workspaces-vcmb-com-breezingformsng/4dd3c0c5-8903-43f6-9bf4-0d7c12f24754/scratchpad/get-error.mjs --timeout 20000)",
+      "Bash(echo \"exit: $?\")",
+      "Bash(node /home/xavier/.claude/skills/browser-automation/browser.mjs \"http://localhost:9080/administrator/index.php\" --script /tmp/claude-1000/-home-xavier-workspaces-vcmb-com-breezingformsng/4dd3c0c5-8903-43f6-9bf4-0d7c12f24754/scratchpad/check-other-radio2.mjs --timeout 30000)",
+      "Bash(vendor/bin/phpunit)",
+      "Bash(bash scripts/validate-package.sh build/com_breezingformsng-6.1.0-RC03.zip)",
+      "Bash(unzip -l build/com_breezingformsng-6.1.0-RC03.zip)",
+      "Bash(awk '{sum+=$1} END {print sum/1024/1024 \" MB\"}')",
+      "Bash(php -l administrator/components/com_breezingformsng/src/View/Quickmode/HtmlView.php)",
+      "Bash(node /home/xavier/.claude/skills/browser-automation/browser.mjs \"http://localhost:9080/administrator/index.php\" --script /tmp/claude-1000/-home-xavier-workspaces-vcmb-com-breezingformsng/4dd3c0c5-8903-43f6-9bf4-0d7c12f24754/scratchpad/check-customjs.mjs --timeout 30000)",
+      "Bash(node -c media/com_breezingformsng/js/custom.js)",
+      "Bash(node --check media/com_breezingformsng/js/custom.js)",
+      "Bash(node /home/xavier/.claude/skills/browser-automation/browser.mjs \"http://localhost:9080/administrator/index.php\" --script /tmp/claude-1000/-home-xavier-workspaces-vcmb-com-breezingformsng/4dd3c0c5-8903-43f6-9bf4-0d7c12f24754/scratchpad/check-icon-content.mjs --timeout 30000)"
+    ]
+  }
+}

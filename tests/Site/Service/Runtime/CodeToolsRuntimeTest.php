@@ -87,6 +87,36 @@ final class CodeToolsRuntimeTest extends TestCase
         self::assertStringContainsString('_ff_traceExit(', $patched);
     }
 
+    public function testFindsLexicalTokensAndAdvancesOffsets(): void
+    {
+        $runtime = new CodeToolsRuntime($this->processor());
+        $code = 'function answer();';
+        $position = 0;
+        $offset = -1;
+
+        self::assertSame('function', $runtime->findToken($code, $position, $offset));
+        self::assertSame(0, $offset);
+        self::assertSame(8, $position);
+        self::assertSame('(', $runtime->findToken($code, $position, $offset));
+        self::assertSame(15, $offset);
+    }
+
+    public function testFindsRealTokensOutsideCommentsAndTracksLines(): void
+    {
+        $runtime = new CodeToolsRuntime($this->processor());
+        $code = "function answer() { // ignored\n return 42; }";
+        $position = 0;
+        $offset = -1;
+        $line = 1;
+
+        self::assertSame('function', $runtime->findRealToken($code, $position, $offset, $line));
+        self::assertSame('(', $runtime->findRealToken($code, $position, $offset, $line));
+        self::assertSame(')', $runtime->findRealToken($code, $position, $offset, $line));
+        self::assertSame('{', $runtime->findRealToken($code, $position, $offset, $line));
+        self::assertSame('return', $runtime->findRealToken($code, $position, $offset, $line));
+        self::assertSame(2, $line);
+    }
+
     private function processor(int $template = 0, string $suffix = ''): HTML_facileFormsProcessor
     {
         $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();

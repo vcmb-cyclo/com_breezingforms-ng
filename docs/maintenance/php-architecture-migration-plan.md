@@ -1872,6 +1872,10 @@ est désactivée, et les points d'instrumentation produits par
 \`patchCode\` pour une fonction et son retour. Ces tests précèdent toute
 extraction supplémentaire de ce code historique.
 
+Les primitives lexicales \`findToken\` et \`findRealToken\` sont également
+caractérisées sur l'avancement des offsets, les tokens de structure, les
+commentaires de ligne et le suivi des numéros de ligne.
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

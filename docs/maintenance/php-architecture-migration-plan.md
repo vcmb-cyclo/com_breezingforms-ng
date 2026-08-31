@@ -1600,6 +1600,11 @@ La sélection Classic, Bootstrap et OnePage est désormais isolée dans
 conditionnelle des renderers ; les trois branches sont testées directement et
 le test de caractérisation de `view()` utilise la factory (`1c9e497ab`).
 
+Le script de désactivation des sections est désormais partagé par Classic,
+Bootstrap et OnePage via `QuickModeDeactivatedSectionScriptBuilder`. Le nom
+de section reste encodé en JSON et la sortie historique est verrouillée par
+un test dédié.
+
 La factory est également incluse dans le périmètre PHPCS ; le ruleset complet
 reste vert après son ajout (`7434564bc`).
 

@@ -75,10 +75,16 @@ class ClassicRenderer
     private ?QuickModePagingActionBuilder $quickModePagingActionBuilderService = null;
     private ?QuickModeSubmitActionBuilder $quickModeSubmitActionBuilderService = null;
     private ?QuickModeCalendarOptionsBuilder $quickModeCalendarOptionsBuilderService = null;
+    private ?QuickModeDeactivatedSectionScriptBuilder $quickModeDeactivatedSectionScriptBuilderService = null;
 
     private function quickModeCalendarOptionsBuilder(): QuickModeCalendarOptionsBuilder
     {
         return $this->quickModeCalendarOptionsBuilderService ??= new QuickModeCalendarOptionsBuilder();
+    }
+
+    private function quickModeDeactivatedSectionScriptBuilder(): QuickModeDeactivatedSectionScriptBuilder
+    {
+        return $this->quickModeDeactivatedSectionScriptBuilderService ??= new QuickModeDeactivatedSectionScriptBuilder();
     }
 
     private function quickModeTextFieldStrategy(): QuickModeTextFieldStrategy
@@ -380,7 +386,7 @@ float:left;
                 }
             } elseif ($mdata['type'] == 'section') {
                 if (isset($dataObject['properties']['name']) && isset($mdata['off']) && $mdata['off']) {
-                    echo '<script type="text/javascript">bfRegisterDeactivatedSection(' . json_encode($dataObject['properties']['name']) . ');</script>' . "\n";
+                    echo $this->quickModeDeactivatedSectionScriptBuilder()->build($dataObject['properties']['name']);
                 }
 
                 /* translatables */

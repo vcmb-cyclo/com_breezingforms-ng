@@ -1834,6 +1834,11 @@ les modes non entiers, la désactivation, les variantes de transport, les
 priorités, la portée et les combinaisons de sujets sont couvertes sans
 dépendance au processeur historique.
 
+Les services \`SubmissionTimestampFactory\` et
+\`SubmissionTimestampFormatter\` disposent maintenant de tests directs sur le
+format SQL, le nommage de fichier et les formats personnalisés. Leurs doubles
+de date restent confinés aux tests purs, sans élargir le bootstrap Joomla.
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

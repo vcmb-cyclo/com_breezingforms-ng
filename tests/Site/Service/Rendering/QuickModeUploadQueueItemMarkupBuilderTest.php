@@ -39,4 +39,16 @@ final class QuickModeUploadQueueItemMarkupBuilderTest extends TestCase
         self::assertStringContainsString('style="cursor: pointer; padding-right: 10px;" border="0"/>', $script);
         self::assertStringNotContainsString('" />', $script);
     }
+
+    public function testEscapesCancelImagePathInHtmlAndJavaScript(): void
+    {
+        $script = QuickModeUploadQueueItemMarkupBuilder::build(
+            65,
+            "/cancel\"' onerror='alert(1)",
+            false,
+            false
+        );
+
+        self::assertStringContainsString('src="/cancel&quot;&#039; onerror=&#039;alert(1)"', $script);
+    }
 }

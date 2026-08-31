@@ -14,6 +14,16 @@ final class QuickModeUploadQueueItemMarkupBuilder
         bool $conditionalName,
         bool $includeBorderAttribute,
     ): string {
+        $escapedCancelImagePath = htmlspecialchars(
+            $cancelImagePath,
+            ENT_QUOTES | ENT_SUBSTITUTE,
+            'UTF-8'
+        );
+        $escapedCancelImagePath = str_replace(
+            ['\\', "'"],
+            ['\\\\', "\\'"],
+            $escapedCancelImagePath
+        );
         $name = $conditionalName
             ? "(iOS ? '' : files[i].name.replace(/[/\\?%*:|\"<>]/g, '') ? files[i].name.replace(/[/\\?%*:|\"<>]/g, '') : '')"
             : "(iOS ? '' : files[i].name.replace(/[/\\?%*:|\"<>]/g, ''))";
@@ -24,7 +34,7 @@ JAVASCRIPT;
 
         return strtr($markup, [
             '{{DB_ID}}' => (string) $dbId,
-            '{{CANCEL_IMAGE}}' => $cancelImagePath,
+            '{{CANCEL_IMAGE}}' => $escapedCancelImagePath,
             '{{BORDER}}' => $includeBorderAttribute ? ' border="0"' : '',
             '{{IMAGE_END}}' => $includeBorderAttribute ? '/>' : ' />',
             '{{NAME}}' => $name,

@@ -61,6 +61,7 @@ final class SubmissionEngine
     public function __construct(
         private readonly HTML_facileFormsProcessor $processor,
         private readonly MailerFactoryInterface $mailerFactory,
+        private readonly RecaptchaVerifier $recaptchaVerifier,
     ) {
     }
 
@@ -676,7 +677,7 @@ final class SubmissionEngine
                                 if ($element['bfType'] == 'ReCaptcha') {
 
                                     try {
-                                        $verified = (new RecaptchaVerifier())->verify(
+                                        $verified = $this->recaptchaVerifier->verify(
                                             (string) $element['privkey'],
                                             $this->processor->app->getInput()->getString('g-recaptcha-response', ''),
                                             $this->processor->app->getInput()->server->getString('REMOTE_ADDR', '')

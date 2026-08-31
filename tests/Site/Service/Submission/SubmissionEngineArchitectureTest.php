@@ -51,4 +51,22 @@ final class SubmissionEngineArchitectureTest extends TestCase
         self::assertStringNotContainsString('$halt', $submissionSource);
         self::assertStringNotContainsString('_FF_DEBUG_', $facadeSource . $runtimeSource);
     }
+
+    public function testServerRecaptchaVerificationIsInjectedFromItsDedicatedService(): void
+    {
+        $submissionSource = file_get_contents(
+            __DIR__ . '/../../../../components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php'
+        );
+        $facadeSource = file_get_contents(
+            __DIR__ . '/../../../../components/com_breezingformsng/src/Support/processor_facade.php'
+        );
+
+        self::assertIsString($submissionSource);
+        self::assertIsString($facadeSource);
+        self::assertStringContainsString('private readonly RecaptchaVerifier $recaptchaVerifier', $submissionSource);
+        self::assertStringContainsString('$this->recaptchaVerifier->verify(', $submissionSource);
+        self::assertStringNotContainsString('new RecaptchaVerifier())->verify(', $submissionSource);
+        self::assertStringContainsString('new RecaptchaVerifier()', $facadeSource);
+        self::assertStringNotContainsString('google.com/recaptcha', $submissionSource);
+    }
 }

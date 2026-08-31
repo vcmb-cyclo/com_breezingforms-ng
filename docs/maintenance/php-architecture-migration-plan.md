@@ -819,6 +819,11 @@ de Joomla est actif, tout en supprimant une dépendance globale que l'analyse
 statique ne pouvait pas représenter ; le niveau 4 ne conserve plus que les deux
 gardes de soumission interrompues par `exit`.
 
+La vérification serveur ReCaptcha est maintenant injectée dans
+`SubmissionEngine` via `RecaptchaVerifier`. L'orchestrateur ne connaît plus
+que le contrat booléen du service ; l'URL Google, le transport HTTP et le
+parsing JSON restent confinés au fichier dédié et à `RecaptchaVerifierTest`.
+
 Les deux gardes locales `if (!$halt)` de `SubmissionEngine` ont ensuite été
 retirées : `$halt` était initialisé à `false` et ses seules affectations à
 `true` précédaient immédiatement `exit`. Le contrôle CAPTCHA, les pièces de

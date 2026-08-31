@@ -25,6 +25,7 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampFacto
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\CodeToolsRuntime;
 use Vcmb\Component\BreezingformsNG\Site\Service\Scripting\ScriptingEngine;
 use Vcmb\Component\BreezingformsNG\Site\Service\Export\ExportEngine;
+use Vcmb\Component\BreezingformsNG\Site\Service\Integration\RecaptchaVerifier;
 use Vcmb\Component\BreezingformsNG\Site\Service\Notification\NotificationEngine;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\RenderingEngine;
 use Vcmb\Component\BreezingformsNG\Site\Service\Submission\SubmissionEngine;
@@ -546,7 +547,11 @@ class HTML_facileFormsProcessor
 
     private function submissionEngine(): SubmissionEngine
     {
-        return $this->submissionEngineService ??= new SubmissionEngine($this, $this->mailerFactory);
+        return $this->submissionEngineService ??= new SubmissionEngine(
+            $this,
+            $this->mailerFactory,
+            new RecaptchaVerifier()
+        );
     }
 
     public function sendEmailNotification()

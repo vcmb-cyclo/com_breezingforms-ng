@@ -53,6 +53,7 @@
 | QuickMode — markup d’erreur Bootstrap | Conteneur `bfErrorMessage` partagé entre Bootstrap et OnePage, avec classes de thème injectées et sortie couverte | Commit `9d5a288c2` |
 | QuickMode — widget de progression | Markup et script `bfUpdateProgress()` partagés entre Bootstrap et OnePage, avec variante page Thank You couverte | Commit `5cb2da294` |
 | QuickMode — configuration runtime des erreurs | Déclaration `bfUseErrorAlerts`/`bfShowDefaultErrors`/`bfErrorPageScoped` partagée, avec portée de page explicite | Commit `45fc45988` |
+| QuickMode OnePage — fermeture Thank You | Redirection `bf_remodal_close()` extraite dans un builder pur, avec panier et URL formulaire conservés | Commit `ca2b8f42d` |
 | QuickMode — expression éditeur | Construction de l’expression JavaScript de lecture des éditeurs mutualisée entre Bootstrap et OnePage, API publique conservée | Commit `43592c8bd` |
 | QuickMode — mapping Bootstrap | Mapping Bootstrap 5 des classes mutualisé entre Bootstrap et OnePage, résolution publique `bsClass()` conservée | Commit `658078588` |
 | Finalisation — champs de soumission | Champs cachés communs frontend/backend/preview extraits avec conservation des différences `act`/`ff_frame` | Commit `be602b94f` |
@@ -873,6 +874,11 @@ La déclaration runtime des erreurs est désormais construite par
 partagent les trois variables de configuration, tandis que la portée des
 erreurs reste explicitement paramétrée (`false` pour Bootstrap, `true` pour
 OnePage) et testée.
+
+La fermeture du modal Thank You est désormais construite par
+`QuickModeRemodalCloseScriptBuilder` (`ca2b8f42`). La priorité donnée à
+`crbc_cart_url`, puis le retour vers l'URL courante du formulaire, restent
+inchangés et sont couverts par un test dédié.
 
 La baseline PHPCS est maintenant sans erreur sur les services modernes, les
 quatre renderers QuickMode et leurs traits (`e25d501f`, `14985d4d`, `288b42a4`,

@@ -245,7 +245,8 @@ balises inattendues et la restauration des `<br>` sont couverts. La
 validation QuickMode est désormais centralisée dans
 `ContentBuilderFlashUploadValidationBuilder` via `6d4afd92`, avec émission
 unique du callback `ff_flashupload_not_empty`. Les parcours runtime complets
-des fichiers restent à éprouver avec un harnais ContentBuilder/Joomla. La
+des fichiers sont désormais exercés par le smoke Joomla/ContentBuilder
+(`fe1d09532`), qui vérifie le comptage et le markup des fichiers existants. La
 phase de restauration JavaScript des contrôles de fichiers est désormais
 isolée dans `ContentBuilderFileHydrationScriptBuilder` via `757f27446`.
 
@@ -254,8 +255,9 @@ les valeurs vides, les fichiers absents et les fichiers présents ; la lecture
 et l'encodage sont isolés dans des services unitaires et branchés dans
 `RenderingEngine` via `e9386794`. Le parseur de valeurs de fichiers couvre
 également les fins de ligne CRLF, les lignes vides et les noms Unicode via
-`e8582b59`. L'intégration runtime complète des signatures reste à éprouver
-avec un harnais ContentBuilder/Joomla.
+`e8582b59`. Le smoke Joomla/ContentBuilder (`fe1d09532`) restaure désormais
+une signature depuis un fichier réel, encode son contenu et supprime la
+fixture dans un bloc `finally`.
 
 Pour le CAPTCHA, la construction des endpoints image, validation legacy et
 ReCaptcha est désormais isolée dans `CaptchaEndpointBuilder` via `8e3e9a7a`.
@@ -276,8 +278,7 @@ test de caractérisation de `RenderingEngineViewCharacterizationTest`.
 Un test d’architecture vérifie en outre que le JavaScript de validation ne
 réintègre pas `RenderingEngine`.
 La phase 2.3 est donc couverte pour les scripts de signature et de contrôles
-de fichiers ; l'intégration complète ContentBuilder reste conditionnée à un
-harnais Joomla/ContentBuilder permettant de tester les dépendances runtime.
+de fichiers, y compris leurs dépendances runtime Joomla/ContentBuilder.
 
 La requête d'association des formulaires ContentBuilder est désormais isolée
 dans `ContentBuilderFormAssociationLoader`, avec vérification des filtres
@@ -1152,12 +1153,14 @@ Règles de coordination :
 
 ## Ordre recommandé des prochains lots
 
-1. Harnais ContentBuilder pour le parcours complet des fichiers et des
-   signatures, puis validation de la lecture SQL de l'enregistrement.
+1. ~~Harnais ContentBuilder pour le parcours complet des fichiers et des
+   signatures, puis validation de la lecture SQL de l'enregistrement.~~
+   Terminé par `72a4d2632` et `fe1d09532`.
 2. Poursuivre les stratégies de contrôles restantes dans les wrappers
    Classic et Bootstrap/OnePage, après les branchements déjà réalisés
    (`065cef94`, `f3d04e55`).
-3. Harnais ContentBuilder pour les parcours runtime fichiers/signatures.
+3. ~~Harnais ContentBuilder pour les parcours runtime fichiers/signatures.~~
+   Terminé par `fe1d09532`.
 4. Rendu HTML classique par famille de nœuds.
 5. Réduction progressive des avertissements PHPCS et PHPStan après chaque
    extraction fonctionnelle.

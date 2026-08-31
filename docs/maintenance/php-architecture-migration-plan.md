@@ -1453,6 +1453,13 @@ l'image d'annulation à la fois pour le fragment HTML et pour la chaîne
 JavaScript qui l'embarque. Une régression d'injection dans ce chemin est
 couverte par un test dédié (`5aec57c30`).
 
+`QuickModeUploadThumbnailScriptBuilder` protège la base d'URL de `Moxie.swf`
+dans son littéral JavaScript (`a5f57ce15`). Les messages de taille et
+d'extension ainsi que la liste d'extensions sont désormais encodés au point
+de construction par `QuickModeUploadValidationScriptBuilder`, ce qui retire
+le pré-encodage divergent des trois renderers (`474408bee`). Les sorties
+normales et les chemins d'upload des quatre thèmes sont caractérisés.
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

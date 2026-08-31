@@ -92,6 +92,26 @@
 }
 .bfng-field__label + * { font-size: var(--bfng-fs-base); }
 .bfng-field select { min-width: 240px; max-width: 100%; }
+
+/* #bfOptionsFieldsWrap embeds forms/edit.php's own native Bootstrap
+   .row/.col-form-label markup (shared with the standalone Configuration
+   screen, charte section 06 ".bfng-config") - deliberately not
+   restructured into .bfng-field, only re-skinned with the same tokens
+   so it reads as part of the same system next to the Propriétés/Avancé
+   tabs either side of it. */
+#bfOptionsFieldsWrap .row.mb-3 {
+  border-bottom: 1px solid var(--bfng-border);
+  padding-bottom: var(--bfng-space-4);
+}
+#bfOptionsFieldsWrap .col-form-label {
+  color: var(--bfng-text-2);
+  font-size: var(--bfng-fs-sm);
+}
+#bfOptionsFieldsWrap .form-control:focus,
+#bfOptionsFieldsWrap .form-select:focus {
+  border-color: var(--bfng-accent-500);
+  box-shadow: var(--bfng-focus-ring);
+}
 @media (max-width: 900px) {
   .bfng-field__label { display: block; width: auto; padding-top: 0; margin-bottom: var(--bfng-space-2); }
 }

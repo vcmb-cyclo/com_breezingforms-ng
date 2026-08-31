@@ -24,6 +24,7 @@
     <file>components/com_breezingformsng/src/Service/Rendering/QueryListRowPreparationService.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QueryListPageScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/CallbackRegistrationService.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/FormPieceExecutionService.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/HiddenFieldTrait.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/BootstrapStyleFieldTrait.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeInputBuilder.php</file>

@@ -31,7 +31,7 @@ use Vcmb\Component\BreezingformsNG\Administrator\Helper\FormsAdvancedOptionsHtml
 
 HTMLHelper::_('bootstrap.tab');
 ?>
-  <ul class="nav nav-tabs" id="<?= $tabId; ?>" role="tablist">
+  <ul class="nav nav-tabs bfng-tabs" id="<?= $tabId; ?>" role="tablist">
     <li class="nav-item" role="presentation">
       <button class="nav-link active" id="tab-general" data-bs-toggle="tab" data-bs-target="#pane-general"
               type="button" role="tab"><?= Text::_('COM_BREEZINGFORMSNG_FORMS_TAB_GENERAL'); ?><?php if ($tabEntryCounts['general'] > 0): ?> <span class="badge bg-primary text-white"><?= $tabEntryCounts['general']; ?></span><?php endif; ?></button>

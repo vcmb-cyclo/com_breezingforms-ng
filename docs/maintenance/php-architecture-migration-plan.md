@@ -1618,6 +1618,11 @@ mutualisées dans `CallbackRegistrationService`. Les petits blocs restants de
 `before/after` et la résolution SQL de l'`onload` soumis nécessitent une
 frontière runtime Joomla plus large pour éviter le surdécoupage.
 
+Les pièces `before/after` sont désormais exécutées par
+`FormPieceExecutionService` : la requête commune des pièces publiées et les
+branches custom/library sont isolées, tandis que `RenderingEngine` conserve
+les libellés traduits et le nettoyage du rendu interrompu.
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

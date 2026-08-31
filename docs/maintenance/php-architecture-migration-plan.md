@@ -303,8 +303,8 @@ caractériser dans un runtime Joomla/ContentBuilder.
   groupes de contrôles.
 - [x] Préserver les règles de lecture seule et les suffixes frontend/admin des
   permissions.
-- [ ] Extraire la récupération des identifiants non éditables après mise en
-  place d'un harnais ContentBuilder d'intégration.
+- [x] Extraire la récupération des identifiants non éditables après mise en
+  place d'un harnais ContentBuilder d'intégration (`ContentBuilderNonEditableFieldsResolver`).
 
 Critère de sortie : le script `bfDisableContentBuilderFields()` est construit
 et testé indépendamment de `view()`.

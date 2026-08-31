@@ -182,6 +182,7 @@ final class QuickmodeHtml
         $wa->useScript('com_breezingformsng.jquery-alias');
         $wa->useScript('com_breezingformsng.jtree');
         $wa->useScript('bootstrap.tab');
+        $wa->useScript('bootstrap.dropdown');
         $wa->useScript('com_breezingformsng.base64');
         $wa->useScript('com_breezingformsng.center');
         $wa->useScript('com_breezingformsng.scroll');
@@ -290,22 +291,39 @@ final class QuickmodeHtml
 
             <div id="bfQuickModeLeft" class="bfClearfix bfng-split__aside">
 
-                <form id="newStuffBar" onsubmit="return false;">
-                    <button class="bfng-btn bfng-btn--primary" id="bfNewPageButton">
-                        <i class="fa-solid fa-plus" aria-hidden="true"></i>
-                        <?php echo Text::_('COM_BREEZINGFORMSNG_NEW_PAGE'); ?>
-                    </button>
-                    <button class="bfng-btn bfng-btn--primary" id="bfNewSectionButton">
-                        <i class="fa-solid fa-plus" aria-hidden="true"></i>
-                        <?php echo Text::_('COM_BREEZINGFORMSNG_NEW_SECTION'); ?>
-                    </button>
-                    <button class="bfng-btn bfng-btn--primary" id="bfNewElementButton">
-                        <i class="fa-solid fa-plus" aria-hidden="true"></i>
-                        <?php echo Text::_('COM_BREEZINGFORMSNG_NEW_ELEMENT'); ?>
-                    </button>
-                </form>
-                <input id="scrollElementList" type="checkbox"><label for="scrollElementList"
-                    class="scrollElementListLabel">Scroll element list</label>
+                <div class="d-flex align-items-start justify-content-between gap-2">
+                    <form id="newStuffBar" onsubmit="return false;">
+                        <button class="bfng-btn bfng-btn--primary" id="bfNewPageButton">
+                            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                            <?php echo Text::_('COM_BREEZINGFORMSNG_NEW_PAGE'); ?>
+                        </button>
+                        <button class="bfng-btn bfng-btn--primary" id="bfNewSectionButton">
+                            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                            <?php echo Text::_('COM_BREEZINGFORMSNG_NEW_SECTION'); ?>
+                        </button>
+                        <button class="bfng-btn bfng-btn--primary" id="bfNewElementButton">
+                            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                            <?php echo Text::_('COM_BREEZINGFORMSNG_NEW_ELEMENT'); ?>
+                        </button>
+                    </form>
+                    <div class="dropdown">
+                        <button type="button" class="bfng-btn bfng-btn--ghost bfng-btn--icon" data-bs-toggle="dropdown" aria-expanded="false"
+                            title="<?php echo htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_QM_TREE_SETTINGS'), ENT_QUOTES, 'UTF-8'); ?>">
+                            <i class="fa-solid fa-gear" aria-hidden="true"></i>
+                            <span class="visually-hidden"><?php echo Text::_('COM_BREEZINGFORMSNG_QM_TREE_SETTINGS'); ?></span>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end p-3">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="triggerScrollable">
+                                <label class="form-check-label" for="triggerScrollable"><?php echo Text::_('COM_BREEZINGFORMSNG_QM_KEEP_PANEL_DOCKED'); ?></label>
+                            </div>
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" id="scrollElementList">
+                                <label class="form-check-label" for="scrollElementList"><?php echo Text::_('COM_BREEZINGFORMSNG_QM_SCROLL_ELEMENT_LIST'); ?></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div id="bfElementExplorer" class="bfng-tree"></div>
 
             </div> <!-- ##### bfQuickModeLeft end ##### -->
@@ -316,8 +334,6 @@ final class QuickmodeHtml
                 <form name="bfForm" onsubmit="return false">
 
                     <div id="menutab">
-                        <input id="triggerScrollable" type="checkbox"><label class="triggerScrollableLabel"
-                            for="triggerScrollable">Keep panel docked</label>
                         <ul class="nav nav-tabs bfng-tabs" role="tablist">
                             <li class="nav-item" role="presentation">
                                 <button type="button" class="nav-link active tab-items" id="fragment-1-tab"

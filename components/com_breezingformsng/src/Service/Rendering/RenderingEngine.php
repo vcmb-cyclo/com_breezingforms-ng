@@ -92,6 +92,7 @@ final class RenderingEngine
     private ?QueryListRowsRefreshBuilder $queryListRowsRefreshBuilderService = null;
     private ?QueryListPaginationTailBuilder $queryListPaginationTailBuilderService = null;
     private ?QueryListStateLibraryBuilder $queryListStateLibraryBuilderService = null;
+    private ?QueryListRowStateBuilder $queryListRowStateBuilderService = null;
     private ?PaymentProviderDetector $paymentProviderDetectorService = null;
     private ?ContentBuilderFileSupportBuilder $contentBuilderFileSupportBuilderService = null;
     private ?ContentBuilderFlashUploadValidationBuilder $contentBuilderFlashUploadValidationBuilderService = null;
@@ -383,6 +384,11 @@ final class RenderingEngine
     private function queryListStateLibraryBuilder(): QueryListStateLibraryBuilder
     {
         return $this->queryListStateLibraryBuilderService ??= new QueryListStateLibraryBuilder();
+    }
+
+    private function queryListRowStateBuilder(): QueryListRowStateBuilder
+    {
+        return $this->queryListRowStateBuilderService ??= new QueryListRowStateBuilder();
     }
 
 
@@ -1750,26 +1756,21 @@ final class RenderingEngine
             $pageNavigation = $settings[8];
         }
 
-        $queryCode .= nl() .
-            'ff_queryCurrPage[' . $row->id . '] = 1;' . nl() .
-            'ff_queryPageSize[' . $row->id . '] = ' . $row->height . ';' . nl() .
-            'ff_queryCheckbox[' . $row->id . '] = ' . $checkbox . ';' . nl() .
-            'ff_queryHeader[' . $row->id . '] = ' . $header . ';' . nl() .
-            'ff_queryPagenav[' . $row->id . '] = ' . $pageNavigation . ';' . nl() .
-            'ff_queryCols[' . $row->id . '] = [';
-
-        foreach ($columns as $index => $column) {
-            $queryCode .= $column->thspan > 0 ? '1' : '0';
-            if ($index < count($columns) - 1) {
-                $queryCode .= ',';
-            }
-        }
-
-        $queryCode .= '];' . nl();
         $this->processor->queryRows[$key] = [];
         $this->processor->execQuery($row, $this->processor->queryRows[$key], $columns);
-        $queryCode .= 'ff_queryRows[' . $row->id . '] = ' .
-            $this->processor->expJsValue($this->processor->queryRows[$key]) . ';' . nl();
+        $queryCode .= $this->queryListRowStateBuilder()->build(
+            (int) $row->id,
+            (int) $row->height,
+            (int) $checkbox,
+            $header,
+            (int) $pageNavigation,
+            array_map(
+                static fn (object $column): int => $column->thspan > 0 ? 1 : 0,
+                $columns
+            ),
+            $this->processor->expJsValue($this->processor->queryRows[$key]),
+            nl()
+        );
 
         unset($columns);
     }

@@ -1028,6 +1028,12 @@ L'initialisation des tableaux JavaScript Query List est désormais fournie par
 explicitement couverts ; l'orchestration de la liaison des callbacks demeure
 dans `RenderingEngine`.
 
+Les affectations d'état propres à chaque ligne Query List sont désormais
+construites par `QueryListRowStateBuilder`. La préparation conserve dans
+`RenderingEngine` la compilation des colonnes et l'exécution de la requête,
+tandis que la génération de `ff_queryCurrPage`, `ff_queryCols` et
+`ff_queryRows` est pure et couverte par un test de sortie exacte.
+
 L'enveloppe du script global de validation est désormais construite par
 `FormValidationScriptWrapperBuilder` (`9b92acb55`). Les contrôles de fichiers
 et de CAPTCHA restent générés par leurs services respectifs, tandis que les

@@ -976,18 +976,6 @@ parameters:
 			message: '#^Function bf_b64dec not found\.$#'
 			identifier: function.notFound
 			count: 1
-			path: /home/xavier/workspaces/vcmb/com_breezingformsng/components/com_breezingformsng/src/Service/Rendering/QuickMode/MobileRenderer.php
-
-		-
-			message: '#^Variable \$mdata might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: /home/xavier/workspaces/vcmb/com_breezingformsng/components/com_breezingformsng/src/Service/Rendering/QuickMode/MobileRenderer.php
-
-		-
-			message: '#^Function bf_b64dec not found\.$#'
-			identifier: function.notFound
-			count: 1
 			path: /home/xavier/workspaces/vcmb/com_breezingformsng/components/com_breezingformsng/src/Service/Rendering/QuickMode/OnePageRenderer.php
 
 		-
@@ -1034,12 +1022,6 @@ parameters:
 
 		-
 			message: '#^Function bf_b64dec not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: /home/xavier/workspaces/vcmb/com_breezingformsng/components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
-
-		-
-			message: '#^Function bf_is_mobile not found\.$#'
 			identifier: function.notFound
 			count: 1
 			path: /home/xavier/workspaces/vcmb/com_breezingformsng/components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
@@ -1124,12 +1106,6 @@ parameters:
 
 		-
 			message: '#^Function bf_is_email not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: /home/xavier/workspaces/vcmb/com_breezingformsng/components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
-
-		-
-			message: '#^Function bf_is_mobile not found\.$#'
 			identifier: function.notFound
 			count: 1
 			path: /home/xavier/workspaces/vcmb/com_breezingformsng/components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php

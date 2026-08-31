@@ -1769,7 +1769,7 @@ supprimés ont été retirées de `phpcs.xml.dist`, et le dernier warning de
 longueur de `QuickModeCheckboxBuilder` a été éliminé sans changement de sortie
 (`380d7bd7c`). Le ruleset complet passe maintenant sans erreur ni warning.
 
-Le smoke test Joomla 6 du package `6.1.0-RC03` a été exécuté avec succès :
+Le smoke test Joomla 6 du package `6.1.0-RC04` a été exécuté avec succès :
 installation, réinstallation de mise à jour, enregistrement des extensions,
 création des tables, réponse frontend HTTP 200 et génération d’une image
 CAPTCHA Securimage sont validés.

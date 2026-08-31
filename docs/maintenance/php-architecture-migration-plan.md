@@ -57,6 +57,7 @@
 | QuickMode OnePage — soumission AJAX | Callback `bf_ajax_submit()` extrait dans un builder pur, avec échec, succès direct et page Thank You couverts | Commit `01ab2d4bd` |
 | QuickMode — miniature upload | Callback `bfUploadImageThumb()` partagé entre les quatre renderers, avec chemin Moxie et repli FileReader couverts | Commit `704ccbea2` |
 | QuickMode — progression upload | Callback plupload `UploadProgress` partagé entre les quatre renderers, avec mise à jour de la barre et du pourcentage couverte | Commit `1e28a79b2` |
+| QuickMode — fin upload | Callback plupload `FileUploaded` partagé entre les quatre renderers, avec message serveur et nettoyage de ligne couverts | Commit `6d3bfbb27` |
 | QuickMode — expression éditeur | Construction de l’expression JavaScript de lecture des éditeurs mutualisée entre Bootstrap et OnePage, API publique conservée | Commit `43592c8bd` |
 | QuickMode — mapping Bootstrap | Mapping Bootstrap 5 des classes mutualisé entre Bootstrap et OnePage, résolution publique `bsClass()` conservée | Commit `658078588` |
 | Finalisation — champs de soumission | Champs cachés communs frontend/backend/preview extraits avec conservation des différences `act`/`ff_frame` | Commit `be602b94f` |
@@ -854,6 +855,13 @@ Le callback plupload `UploadProgress` est désormais généré par
 La mise à jour du pourcentage et de la barre visuelle reste inchangée et est
 couverte par un test de sortie ; les callbacks d’ajout, d’erreur et de fin
 d’upload restent à traiter par sous-lots.
+
+Le callback plupload `FileUploaded` est désormais généré par
+`QuickModeUploadCompletedScriptBuilder` (`6d3bfbb27`) pour les quatre
+renderers. La restitution éventuelle de la réponse serveur et la suppression
+de la ligne de queue sont couvertes par un test dédié ; la validation de la
+liste de fichiers et la configuration complète de l’uploader restent à
+extraire.
 
 Les quatre renderers ne possèdent plus chacun leurs cinq adaptateurs privés de
 calendrier : `CalendarOptionsTrait` (`05090635f`) délègue les booléens, le

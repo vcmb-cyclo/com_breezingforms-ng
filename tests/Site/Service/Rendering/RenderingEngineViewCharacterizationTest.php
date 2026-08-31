@@ -13,6 +13,9 @@ use ReflectionClass;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\FileExtensionsCheckBuilder;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\RenderingEngine;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\TokenizedDirectoryResolver;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\BootstrapRenderer;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\ClassicRenderer;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\OnePageRenderer;
 
 if (!defined('JPATH_ADMINISTRATOR')) {
     define('JPATH_ADMINISTRATOR', __DIR__ . '/../../../../administrator');
@@ -1505,6 +1508,43 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertStringContainsString('</div><!-- form end -->', $html);
         self::assertStringContainsString('name="ff_runmode" value="2"', $html);
         self::assertStringContainsString('name="ff_frame" value="1"', $html);
+    }
+
+    public function testViewSelectsQuickModeRendererFromTemplateMetadata(): void
+    {
+        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
+        $processor->app = new CMSApplication();
+        $processor->formrow = (object) [
+            'template_code' => base64_encode(json_encode([
+                'properties' => [
+                    'themebootstrapThemeEngine' => 'bootstrap',
+                    'themebootstrapMode' => false,
+                    'fadeIn' => false,
+                    'useErrorAlerts' => false,
+                    'rollover' => false,
+                    'rolloverColor' => '',
+                    'theme' => '',
+                ],
+            ], JSON_THROW_ON_ERROR)),
+        ];
+        $processor->form = 7;
+
+        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
+        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
+        $method = (new ReflectionClass($engine))->getMethod('createQuickModeRenderer');
+
+        self::assertInstanceOf(
+            BootstrapRenderer::class,
+            $method->invoke($engine, ['themebootstrapThemeEngine' => 'bootstrap', 'themebootstrapMode' => false])
+        );
+        self::assertInstanceOf(
+            OnePageRenderer::class,
+            $method->invoke($engine, ['themebootstrapThemeEngine' => 'bootstrap', 'themebootstrapMode' => true])
+        );
+        self::assertInstanceOf(
+            ClassicRenderer::class,
+            $method->invoke($engine, ['themebootstrapThemeEngine' => 'classic'])
+        );
     }
 
 }

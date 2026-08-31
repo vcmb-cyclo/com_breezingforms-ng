@@ -1521,6 +1521,11 @@ est maintenant produit par `QuickModeHiddenFieldBuilder`, appelé par le trait
 commun. La sortie historique est caractérisée et les attributs nom/id sont
 échappés dans le builder pur (`d4756b71c`).
 
+Le contrôle natif utilisé par les branches d'upload QuickMode est maintenant
+mutualisé dans `QuickModeFileInputBuilder` pour Classic, Bootstrap et OnePage.
+Les variantes `file` et placeholder `hidden`, les attributs d'événements et
+les noms de champs sont couverts sans modification des snapshots (`299157a91`).
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

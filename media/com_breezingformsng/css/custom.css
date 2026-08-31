@@ -269,10 +269,18 @@ joomla-toolbar-button {
     border-radius: 0 !important;
 }
 
-.form-control:focus,
-.has-focus .form-control {
-    background: #f8f8f8 none repeat scroll 0 0;
-    border-color: #3f51b5;
+/*
+ * Excludes #bfOptionsFieldsWrap for the same reason as admin.css's
+ * input/textarea/select rule: the QuickMode "Options" tab embeds the
+ * classic forms/edit.php content there (native Bootstrap
+ * .form-control/.form-select), which this legacy flat-focus look would
+ * otherwise override with a hardcoded light background regardless of
+ * theme - see docs/maintenance/quickmode-options-tab-plan.md.
+ * .has-focus is dead: nothing in this codebase ever sets that class.
+ */
+.form-control:focus:not(#bfOptionsFieldsWrap *) {
+    background: var(--bfng-surface, #f8f8f8) none repeat scroll 0 0;
+    border-color: var(--bfng-accent-600, #3f51b5);
     box-shadow: none;
     outline: 0 none;
 }

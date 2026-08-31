@@ -691,12 +691,6 @@ parameters:
 			path: components/com_breezingformsng/src/Service/Scripting/ScriptingEngine.php
 
 		-
-			message: '#^Undefined variable\: \$name$#'
-			identifier: variable.undefined
-			count: 4
-			path: components/com_breezingformsng/src/Service/Scripting/ScriptingEngine.php
-
-		-
 			message: '#^Access to an undefined property HTML_facileFormsProcessor\:\:\$sfadata\.$#'
 			identifier: property.notFound
 			count: 1

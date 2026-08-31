@@ -216,8 +216,8 @@ final class ScriptingEngine
             );
         } catch (Error $e) {
             if (\defined('JDEBUG') && JDEBUG) {
-                $this->processor->app->enqueueMessage($e->getMessage() . " in $name.", 'error');
-                Log::add( "Piece PHP '$name' invalid :"  . $e->getMessage(), Log::DEBUG, 'BF Piece');
+                $this->processor->app->enqueueMessage($e->getMessage() . " in {$elem->name}.", 'error');
+                Log::add("Piece PHP '{$elem->name}' invalid :" . $e->getMessage(), Log::DEBUG, 'BF Piece');
             }
         }
     }
@@ -242,8 +242,8 @@ final class ScriptingEngine
                 );
             } catch (Error $e) {
                 if (\defined('JDEBUG') && JDEBUG) {
-                    $this->processor->app->enqueueMessage($e->getMessage() . " in $name.", 'error');
-                    Log::add( "PHP piece '$name' : " .$e->getMessage(), Log::DEBUG, 'BF Piece');
+                    $this->processor->app->enqueueMessage($e->getMessage() . " in {$elem->name}.", 'error');
+                    Log::add("PHP piece '{$elem->name}' : " . $e->getMessage(), Log::DEBUG, 'BF Piece');
                 }
             }
 

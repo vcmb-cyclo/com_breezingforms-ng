@@ -464,10 +464,10 @@ propres à chaque thème.
    `QuickModeSubmitActionBuilder` (`4dd3e3dd`). La miniature image est
    maintenant partagée via `QuickModeUploadThumbnailScriptBuilder`
    (`704ccbea2`) ; le markup et les callbacks de configuration complète de
-   l'uploader restent à traiter. Les scripts de validation complets restent à
-   traiter ; le callback AJAX OnePage est maintenant isolé
-   dans `QuickModeAjaxSubmitScriptBuilder`, avec ses branches succès/échec
-   caractérisées.
+   l'uploader sont désormais extraits par sous-lots et couverts par tests.
+   Les enveloppes visuelles restent dans les renderers ; le callback AJAX
+   OnePage est maintenant isolé dans `QuickModeAjaxSubmitScriptBuilder`, avec
+   ses branches succès/échec caractérisées.
 
 Pour chaque type :
 
@@ -1391,8 +1391,15 @@ bouton d'upload sont partagées par `ddea69f8` dans les renderers Classic et
 Mobile. La valeur numérique utilisée par le contrôle client de taille est
 également fournie par le builder et consommée par les quatre renderers via
 `9535e3a`, supprimant le dernier recalcul PHP de cette limite. Le markup et
-les callbacks de configuration complète de l'uploader restent à extraire par
-sous-lots.
+les callbacks de configuration complète de l'uploader sont désormais répartis
+dans `QuickModeUploadEntryCallbacksBuilder`,
+`QuickModeUploadFileAddedHandlerBuilder`,
+`QuickModeUploadProgressScriptBuilder`,
+`QuickModeUploadCompletedScriptBuilder`,
+`QuickModeUploadValidationScriptBuilder` et
+`QuickModeUploadCancelScriptBuilder`; leurs sorties sont testées. Les
+enveloppes visuelles et les différences de thème restent propres aux
+renderers.
 
 Le callback JavaScript `bfUploadImageThumb()` est désormais généré par
 `QuickModeUploadThumbnailScriptBuilder` (`704ccbea2`) pour les quatre

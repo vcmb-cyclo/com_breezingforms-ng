@@ -213,3 +213,62 @@ en fixant `tempForm.method` comme propriété DOM directe après
 Vérifié par capture réseau (méthode POST confirmée, redirection vers
 `#fragment-3`) et par l'état `display`/`active` calculé de chaque
 `.tab-pane` (un seul visible à la fois, positions normales).
+
+### Correctif du 2026-08-31 — mise en forme manquante sur l'onglet Options
+
+Retour utilisateur en direct : les Oui/Non et autres contrôles de l'onglet
+Options apparaissaient sans mise en forme. Deux feuilles de style héritées
+(`admin.css`, `custom.css`), jamais conçues pour cohabiter avec du contenu
+Bootstrap réel, ciblaient `#bfQuickModeWrapper`/`main input`/`main select`
+sans exclusion, avec un usage massif de `!important`. Le pire cas :
+`main input[type="checkbox"]:not(old), input[type="radio"]` fixe
+`opacity: 0 !important` en s'appuyant sur un habillage `<label><span>`
+personnalisé — absent du balisage `.form-check` de `forms/edit.php` —
+rendant tous les Oui/Non de l'onglet Options invisibles. Un commentaire
+existant documentait déjà exactement ce problème pour `.bfPropertyWrap`
+(les propres bascules Oui/Non de QuickMode). Correctif : exclusion de
+`#bfOptionsFieldsWrap` sur chaque règle concernée, dans les deux fichiers,
+suivant ce précédent — aucun autre écran admin n'est affecté. Vérifié via
+`getComputedStyle()` et l'inspection des règles CSS réellement appliquées
+(pas seulement une impression visuelle) : bordures/arrondis/fonds Bootstrap
+corrects sur les champs texte, cases/boutons radio à leur taille normale.
+
+### Correctif du 2026-08-31 — bouton « Enregistrer » standard
+
+Demande utilisateur : remplacer les 6 boutons inline « Enregistrer les
+propriétés » (Propriétés/Avancé, haut/bas) et le bouton de l'onglet
+Options par le bouton « Enregistrer » standard de la barre d'outils Joomla,
+en un seul clic pour tout sauvegarder. Détails complets dans le message de
+commit `9719e0a1` ; résumé :
+
+- `ToolbarHelper::custom('save', ...)` (icônes PNG héritées, libellé
+  non standard) → `ToolbarHelper::apply('save', 'JTOOLBAR_APPLY')`
+  (« Enregistrer » — `JTOOLBAR_SAVE` donne « Enregistrer & Fermer »,
+  sémantique erronée ici).
+- Découverte bloquante : les boutons inline n'étaient pas cosmétiques —
+  changer de nœud dans l'arbre écrase les champs affichés avec les
+  données de l'arbre JSON, et seul un clic sur ces boutons committait
+  l'inverse. Retenu : commit automatique du nœud sortant à chaque
+  changement de sélection (`onselect`), sans validation des champs
+  obligatoires (choix explicite de l'utilisateur).
+- Sauvegarde Options unifiée sans rechargement de page intermédiaire :
+  les champs sont déplacés vers un `<form>` soumis dans un iframe caché
+  (`bfOptionsSaveFrame`), enchaîné après la sauvegarde JSON QuickMode
+  existante, avant la redirection finale (qui préserve désormais l'onglet
+  actif au moment du clic).
+- Bug d'intégrité trouvé en testant en direct : `title`/`name`/`description`
+  existent à la fois dans l'arbre JSON QuickMode et comme colonnes SQL
+  propres, écrites aussi par le formulaire Options — poster l'instantané
+  périmé de l'onglet Options écrasait silencieusement ce que la sauvegarde
+  JSON venait d'écrire. Corrigé en synchronisant ces trois champs depuis
+  QuickMode juste avant l'envoi (QuickMode fait autorité sur ces trois
+  champs partagés).
+- Bug non lié trouvé au passage : `</div>` de fermeture de
+  `#bfQuickModeRight` dupliqué depuis le correctif précédent — corrigé.
+
+Vérifié en direct de bout en bout : édition d'un champ Propriétés suivie
+d'un changement de nœud sans sauvegarde (aucune perte), sauvegarde unique
+persistant à la fois les propriétés QuickMode et un champ MailChimp de
+l'onglet Options, retour sur l'onglet actif au moment du clic, et
+confirmation explicite du bug de préséance title/name/description avant
+et après correctif.

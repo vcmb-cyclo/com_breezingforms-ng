@@ -348,35 +348,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                             Ladda.bind("#bfSubmitButton");
                         }
 
-                        function bf_validate_submit(element, action)
-                        {
-                            if(typeof bfUseErrorAlerts != "undefined"){
-                             JQuery(".bfErrorMessage").html("");
-                             JQuery(".bfErrorMessage").css("display","none");
-                            }
-                            error = ff_validation(0);
-
-                            if (error != "") {
-
-                                if(typeof bfUseErrorAlerts == "undefined"){
-                                   alert(error);
-                                } else {
-                                   bfShowErrors(error);
-                                }
-
-                                ff_validationFocus();
-
-                               JQuery(".bfErrorMessage").css("display","none");
-                                ff_currentpage = ff_getPageByName(ff_validationFocusName);
-                                JQuery(ff_currentpage+" .bfErrorMessage").css("display","block");
-
-                                bf_restore_submitbutton();
-
-                            } else {
-
-                                ff_submitForm();
-                            }
-                        } // ff_validate_submit
+                        ' . (new QuickModeSubmitValidationBuilder())->build("\n") . '
 
                         ' . (new QuickModeNextPageValidationBuilder())->build("\n") . '
 

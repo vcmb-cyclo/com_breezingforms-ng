@@ -105,6 +105,7 @@ final class RenderingEngine
     private ?ContentBuilderFileHydrationScriptBuilder $contentBuilderFileHydrationScriptBuilderService = null;
     private ?ContentBuilderEditableRecordScriptBuilder $contentBuilderEditableRecordScriptBuilderService = null;
     private ?ContentBuilderNonEditableFieldsResolver $contentBuilderNonEditableFieldsResolverService = null;
+    private ?ContentBuilderFormAssociationLoader $contentBuilderFormAssociationLoaderService = null;
     private ?QuickModeRendererFactory $quickModeRendererFactoryService = null;
     private ?FormOnloadScriptBuilder $formOnloadScriptBuilderService = null;
     private ?QueryListRowPreparationService $queryListRowPreparationService = null;
@@ -526,6 +527,13 @@ final class RenderingEngine
         );
     }
 
+    private function contentBuilderFormAssociationLoader(): ContentBuilderFormAssociationLoader
+    {
+        return $this->contentBuilderFormAssociationLoaderService ??= new ContentBuilderFormAssociationLoader(
+            $this->processor->database
+        );
+    }
+
     private function quickModeRendererFactory(): QuickModeRendererFactory
     {
         return $this->quickModeRendererFactoryService ??= new QuickModeRendererFactory();
@@ -597,18 +605,7 @@ final class RenderingEngine
             }
 
             $db = $this->processor->database;
-
-            $referenceId = (int) $this->processor->form;
-            $query = $db->getQuery(true)
-                ->select($db->quoteName('id'))
-                ->from($db->quoteName('#__contentbuilderng_forms'))
-                ->where($db->quoteName('type') . ' = ' . $db->quote('com_breezingformsng'))
-                ->where($db->quoteName('reference_id') . ' = :referenceId')
-                ->where($db->quoteName('published') . ' = 1')
-                ->bind(':referenceId', $referenceId, ParameterType::INTEGER);
-            $db->setQuery($query);
-
-            $cbForms = $db->loadColumn();
+            $cbForms = $this->contentBuilderFormAssociationLoader()->load((int) $this->processor->form);
 
             // if no BF form is associated with contentbuilder, we don't need no further checks
             if (!count($cbForms)) {

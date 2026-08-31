@@ -273,6 +273,12 @@ La phase 2.3 est donc couverte pour les scripts de signature et de contrôles
 de fichiers ; l'intégration complète ContentBuilder reste conditionnée à un
 harnais Joomla/ContentBuilder permettant de tester les dépendances runtime.
 
+La requête d'association des formulaires ContentBuilder est désormais isolée
+dans `ContentBuilderFormAssociationLoader`, avec vérification des filtres
+`type`, `reference_id` et `published` ainsi que du binding entier. Les étapes
+de permission et de chargement d'enregistrement restent dépendantes du runtime
+ContentBuilder.
+
 ### 2.4 Champs ContentBuilder non éditables
 
 État : générateur indépendant committé dans `8bfd520e` et branché dans

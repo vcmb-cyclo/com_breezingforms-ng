@@ -35,7 +35,7 @@ $formSelection = Factory::getApplication()->getInput()->getInt('form_selection',
         </span>
       </div>
       <div class="row">
-        <div class="col-sm-3">
+        <div class="col-sm-4">
           <dl class="row mb-0">
             <dt class="col-sm-4"><?= Text::_('COM_BREEZINGFORMSNG_ID'); ?></dt>
             <dd class="col-sm-8"><?= (int) $record->id; ?></dd>
@@ -43,19 +43,14 @@ $formSelection = Factory::getApplication()->getInput()->getInt('form_selection',
             <dd class="col-sm-8"><?= $submitted; ?></dd>
           </dl>
         </div>
-        <div class="col-sm-9">
+        <div class="col-sm-8">
           <dl class="row mb-0">
             <dt class="col-sm-4"><?= Text::_('COM_BREEZINGFORMSNG_FORM'); ?></dt>
             <dd class="col-sm-8"><?= htmlspecialchars((string) ($record->form_title ?? '')); ?></dd>
             <dt class="col-sm-4"><?= Text::_('COM_BREEZINGFORMSNG_USER'); ?></dt>
-            <dd class="col-sm-8">
-              <?= htmlspecialchars(
-                (string) ($record->user_full_name ?: $record->username)
-                  . ' (' . (string) ($record->ip ?? '') . ')',
-                ENT_QUOTES,
-                'UTF-8'
-              ); ?>
-            </dd>
+            <dd class="col-sm-8"><?= htmlspecialchars((string) ($record->user_full_name ?: $record->username)); ?></dd>
+            <dt class="col-sm-4"><?= Text::_('COM_BREEZINGFORMSNG_IP'); ?></dt>
+            <dd class="col-sm-8"><?= htmlspecialchars((string) ($record->ip ?? '')); ?></dd>
           </dl>
         </div>
       </div>

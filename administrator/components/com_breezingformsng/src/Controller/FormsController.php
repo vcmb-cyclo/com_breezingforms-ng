@@ -194,7 +194,7 @@ class FormsController extends BaseController
             $ids = $this->selectedIds($input);
             if (!empty($ids)) {
                 $this->getFormModel()->deleteItems($ids);
-                $app->enqueueMessage(Text::_('JLIB_APPLICATION_DELETE_SUCCESS'), 'message');
+                $app->enqueueMessage(Text::_('COM_BREEZINGFORMSNG_DELETE_SUCCESS'), 'message');
             }
         }
 

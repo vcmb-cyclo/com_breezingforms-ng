@@ -94,7 +94,7 @@ class MenusController extends BaseController
             $ids = (array) $input->get('cid', [], 'INT');
             if (!empty($ids)) {
                 $this->getMenuModel()->deleteItems($ids);
-                $app->enqueueMessage(Text::_('JLIB_APPLICATION_DELETE_SUCCESS'), 'message');
+                $app->enqueueMessage(Text::_('COM_BREEZINGFORMSNG_DELETE_SUCCESS'), 'message');
             }
         }
 

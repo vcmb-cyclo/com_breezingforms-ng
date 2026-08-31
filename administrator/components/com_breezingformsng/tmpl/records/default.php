@@ -116,7 +116,7 @@ $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key)
   </table>
 
   <?php if ($totalPages > 1): ?>
-  <nav aria-label="<?= Text::_('JPAGINATION'); ?>">
+  <nav aria-label="<?= Text::_('JLIB_HTML_PAGINATION'); ?>">
     <ul class="pagination justify-content-center">
       <?php if ($currentPage > 0): ?>
         <li class="page-item"><a class="page-link" href="<?= $pageUrl(0); ?>">&laquo;</a></li>

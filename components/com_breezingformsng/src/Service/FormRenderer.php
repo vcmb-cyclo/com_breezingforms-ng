@@ -19,6 +19,7 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
+use Joomla\Filesystem\File;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RuntimeAssetLoader;
 use Joomla\Database\ParameterType;
 use Joomla\Database\DatabaseInterface;

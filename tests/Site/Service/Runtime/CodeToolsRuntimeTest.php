@@ -49,6 +49,19 @@ final class CodeToolsRuntimeTest extends TestCase
         self::assertSame('unchanged', $runtime->dispTraceMode('unchanged'));
     }
 
+    public function testMeasureTimeConvertsBothMicrotimePartsToFloat(): void
+    {
+        $source = file_get_contents(
+            __DIR__ . '/../../../../components/com_breezingformsng/src/Support/processor_facade.php'
+        );
+
+        self::assertIsString($source);
+        self::assertStringContainsString(
+            '((float) $time[0] + (float) $time[1]) / 1000',
+            $source
+        );
+    }
+
     public function testRejectsEmptyOrDyingEvalCode(): void
     {
         $processor = $this->processor();

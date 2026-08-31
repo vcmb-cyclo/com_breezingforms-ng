@@ -946,7 +946,7 @@ class HTML_facileFormsProcessor
     {
         $time = explode(' ', microtime());
 
-        return ((float) $time[0] + $time[1]) / 1000;
+        return ((float) $time[0] + (float) $time[1]) / 1000;
     }
 
     private function uploadRuntime(): UploadRuntime

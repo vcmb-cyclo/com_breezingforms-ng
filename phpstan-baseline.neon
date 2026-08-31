@@ -697,12 +697,6 @@ parameters:
 			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
 
 		-
-			message: '#^Binary operation "\+" between float and string results in an error\.$#'
-			identifier: binaryOp.invalid
-			count: 1
-			path: components/com_breezingformsng/src/Support/processor_facade.php
-
-		-
 			message: '#^Constant _FACILEFORMS_PROCESS_UNKTYPE not found\.$#'
 			identifier: constant.notFound
 			count: 1

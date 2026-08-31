@@ -36,8 +36,12 @@ final class ContentBuilderFileSupportBuilder
             return null;
         }
 
-        $path = $directory . $fileName;
+        if ($fileName !== basename($fileName)) {
+            return null;
+        }
 
-        return file_exists($path) ? $path : null;
+        $path = rtrim($directory, '/\\') . '/' . $fileName;
+
+        return is_file($path) ? $path : null;
     }
 }

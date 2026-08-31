@@ -45,6 +45,7 @@ final class ContentBuilderFileSupportBuilderTest extends TestCase
             self::assertSame($directory . 'signature.png', $builder->resolveSignature($directory, 'signature.png'));
             self::assertNull($builder->resolveSignature($directory, 'missing.png'));
             self::assertNull($builder->resolveSignature($directory, ''));
+            self::assertNull($builder->resolveSignature($directory, '../signature.png'));
         } finally {
             unlink($directory . 'signature.png');
             rmdir($directory);

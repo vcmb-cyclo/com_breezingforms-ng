@@ -976,6 +976,10 @@ La résolution des modèles d'e-mail principaux et de mailback est mutualisée
 par `MailTemplateResolver`, avec priorité au modèle HTML puis texte du
 formulaire avant les modèles par défaut ; ces variantes sont testées.
 
+La résolution des signatures ContentBuilder est désormais limitée à des
+fichiers réguliers nommés dans le répertoire prévu; le cas de traversal est
+couvert par le test du support fichiers.
+
 `UploadStorage` vérifie désormais directement le résultat de `chmod`, sans
 masquer les erreurs système, et conserve les statuts de stockage testés.
 

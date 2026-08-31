@@ -1330,7 +1330,7 @@ float:left;
         $src = '';
         if ($mdata['image'] != '') {
             $type = 'image';
-            $src = 'src="' . $mdata['image'] . '" ';
+            $src = QuickModePaymentImageBuilder::build((string) $mdata['image']);
         } else {
             $value = 'value="PayPal" ';
         }
@@ -1355,7 +1355,7 @@ float:left;
         $src = '';
         if ($mdata['image'] != '') {
             $type = 'image';
-            $src = 'src="' . $mdata['image'] . '" ';
+            $src = QuickModePaymentImageBuilder::build((string) $mdata['image']);
         } else {
             $value = 'value="PayPal" ';
         }
@@ -1380,7 +1380,7 @@ float:left;
         $src = '';
         if ($mdata['image'] != '') {
             $type = 'image';
-            $src = 'src="' . $mdata['image'] . '" ';
+            $src = QuickModePaymentImageBuilder::build((string) $mdata['image']);
         } else {
             $value = 'value="Sofortueberweisung" ';
         }

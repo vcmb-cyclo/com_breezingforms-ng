@@ -574,7 +574,7 @@ trait BootstrapStyleFieldTrait
         $src = '';
         if ($mdata['image'] != '') {
             $type = 'image';
-            $src = 'src="' . $mdata['image'] . '" alt="Stripe" ';
+            $src = QuickModePaymentImageBuilder::build((string) $mdata['image'], 'Stripe');
         } else {
             $value = 'value="Stripe" ';
         }
@@ -623,7 +623,7 @@ trait BootstrapStyleFieldTrait
         $src = '';
         if ($mdata['image'] != '') {
             $type = 'image';
-            $src = 'src="' . $mdata['image'] . '" alt="PayPal" ';
+            $src = QuickModePaymentImageBuilder::build((string) $mdata['image'], 'PayPal');
         } else {
             $value = 'value="PayPal" ';
         }
@@ -671,7 +671,7 @@ trait BootstrapStyleFieldTrait
         $src = '';
         if ($mdata['image'] != '') {
             $type = 'image';
-            $src = 'src="' . $mdata['image'] . '" alt="Sofort.com" ';
+            $src = QuickModePaymentImageBuilder::build((string) $mdata['image'], 'Sofort.com');
         } else {
             $value = 'value="Sofortueberweisung" ';
         }

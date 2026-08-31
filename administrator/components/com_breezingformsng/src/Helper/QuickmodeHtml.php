@@ -283,9 +283,9 @@ final class QuickmodeHtml
         }
         ?>
         <div style="display:none;visibility:hidden;" id="bfSaveQueue" class="bfng-message bfng-message--info"></div>
-        <div id="bfQuickModeWrapper" class="bfClearfix bfng">
+        <div id="bfQuickModeWrapper" class="bfClearfix bfng bfng-split">
 
-            <div id="bfQuickModeLeft" class="bfClearfix">
+            <div id="bfQuickModeLeft" class="bfClearfix bfng-split__aside">
 
                 <form id="newStuffBar" onsubmit="return false;">
                     <button class="bfng-btn bfng-btn--primary" id="bfNewPageButton">
@@ -308,7 +308,7 @@ final class QuickmodeHtml
             </div> <!-- ##### bfQuickModeLeft end ##### -->
 
 
-            <div id="bfQuickModeRight" class="bfClearfix">
+            <div id="bfQuickModeRight" class="bfClearfix bfng-split__main">
 
                 <form name="bfForm" onsubmit="return false">
 

@@ -47,26 +47,26 @@
 overflow:hidden;width: 100%;
 }
 
-#bfQuickModeLeft {
+#bfQuickModeLeft:not(.bfng-split__aside) {
 	float: left;
 	width: 300px;
 }
 
-#bfQuickModeRight {
+#bfQuickModeRight:not(.bfng-split__main) {
 	padding-left: 310px;
 }
 
 @media (max-width: 767px) {
-    #bfQuickModeLeft {
+    #bfQuickModeLeft:not(.bfng-split__aside) {
 	float: none;
 	width: 100%;
     }
-    
-    #bfQuickModeRight {
+
+    #bfQuickModeRight:not(.bfng-split__main) {
 	padding-left: 0;
         width: 75%;
     }
-    
+
     #bfQuickModeWrapper label.bfPropertyLabel:not(.bfng-field__label) {
         float: none !important;
         min-width: 100%;

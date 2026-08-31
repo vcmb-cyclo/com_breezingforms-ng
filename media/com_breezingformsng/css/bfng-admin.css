@@ -63,6 +63,32 @@
 .bfng-message--warning { border-left-color: var(--bfng-warning); background: color-mix(in oklab, var(--bfng-warning) 8%, var(--bfng-surface)); }
 .bfng-message--danger  { border-left-color: var(--bfng-danger);  background: color-mix(in oklab, var(--bfng-danger) 8%, var(--bfng-surface)); }
 
+/* .bfng-split: replaces #bfQuickModeWrapper/Left/Right's float-based
+   two-column layout (charte section 07, "Supprime les float et le
+   padding-left: 310px"). Ids/existing classes are kept - custom.js
+   still prepends icons into "#bfQuickModeRight .tab-items"/".tab-element"
+   regardless of how the column is laid out - only the box model changes. */
+.bfng-split {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--bfng-space-6);
+  width: 100%;
+}
+.bfng-split__aside {
+  flex: 0 0 300px;
+  width: 300px;
+  min-width: 0;
+}
+.bfng-split__main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+@media (max-width: 767px) {
+  .bfng-split { flex-direction: column; }
+  .bfng-split__aside,
+  .bfng-split__main { flex-basis: auto; width: 100%; }
+}
+
 /* .bfng-tree: cosmetic layer only, over jTree's own tree_component.css.
    jTree owns collapse/expand via .tree li.open/.closed toggling display
    on the nested <ul> - none of that is touched here, only color/spacing

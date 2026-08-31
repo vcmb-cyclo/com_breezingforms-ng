@@ -875,11 +875,11 @@ quick mode
     box-shadow: none;
 }
 
-#bfQuickModeRight {
+#bfQuickModeRight:not(.bfng-split__main) {
     padding-left: 0; margin-left:430px;
 }
 
-#bfQuickModeLeft {
+#bfQuickModeLeft:not(.bfng-split__aside) {
     float: left;
     width: 360px;
     padding: 20px;
@@ -1560,13 +1560,13 @@ toogle sidebar and main-content
 @MEDIA
 ********************************/
     @media (max-width:1280px) {
-        #bfQuickModeLeft {
+        #bfQuickModeLeft:not(.bfng-split__aside) {
             float: left;
             width: 285px;
             margin-bottom: 25px;
             padding: 15px 0 15px 15px;
         }
-        #bfQuickModeRight {
+        #bfQuickModeRight:not(.bfng-split__main) {
             margin-left: 300px;
         }
     }
@@ -1690,10 +1690,10 @@ Mobile view
 		#bfQuickModeWrapper select {
 			width:100%;
 		}
-		#bfQuickModeLeft {
+		#bfQuickModeLeft:not(.bfng-split__aside) {
             width: 100%;
         }
-        #bfQuickModeRight {
+        #bfQuickModeRight:not(.bfng-split__main) {
             width: 100%;
             margin-left: 0;
         }

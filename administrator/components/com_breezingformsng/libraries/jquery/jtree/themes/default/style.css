@@ -24,7 +24,7 @@
 .tree-default .rtl li.closed, #jstree-dragged.tree-default .rtl li li.open { background:url("fplus_rtl.gif") right 4px no-repeat; margin-right:0; padding-right:16px; }
 
 /* DEFAULT, HOVER, CLICKED, LOADING STATES */
-.tree-default li a, .tree-default li span { background-color:transparent; background-repeat:no-repeat; background-position:4px 1px; padding:1px 4px 1px 23px; background-image:url("f.png"); border-radius:3px; -moz-border-radius:3px; -webkit-border-radius:3px; }
+.tree-default li a, .tree-default li span { background-color:transparent; background-repeat:no-repeat; background-position:4px 1px; padding:1px 4px 1px 23px; background-image:url("f.png"); border-radius:3px; }
 .tree-default li a:hover, .tree-default li a.hover { background-color: #e7f4f9; border:1px solid #d8f0fa; padding:0px 3px 0px 22px; background-position:3px 0px;  }
 .tree-default li a.clicked, .tree-default li a.clicked:hover, .tree-default li span.clicked { background-color: #beebff; border:1px solid #99defd; padding:0px 3px 0px 22px; background-position:3px 0px;  }
 .tree-default li span.clicked { padding:0px 3px 0px 20px; }
@@ -40,5 +40,5 @@
 .tree-default-context { width:160px; background:#F0F0F0 url("context.gif") 22px 0 repeat-y; border:1px solid silver; position:absolute; }
 .tree-default-context a, .tree-default-context a.disabled:hover { display:block; text-decoration:none; color:black; line-height:20px; background-repeat: no-repeat; background-position:2px center; padding:1px 0 1px 25px; background-color:transparent; border:1px solid #f0f0f0; border-width:0 1px; margin:0; }
 .tree-default-context a:hover { background-color:#e7f4f9; border:1px solid #d8f0fa; padding:0 0 0 25px; margin:0; }
-.tree-default-context a.disabled, .tree-default-context a.disabled:hover { color:silver; opacity:0.5; -ms-filter:'alpha(opacity=50)'; filter:alpha(opacity=50); zoom:1; }
+.tree-default-context a.disabled, .tree-default-context a.disabled:hover { color:silver; opacity:0.5; zoom:1; }
 .tree-default-context .separator { background:#FFFFFF;border-top:1px solid #E0E0E0;font-size:1px;height:1px;line-height:1px;margin:0 2px 0 24px;min-height:1px;display:block; }

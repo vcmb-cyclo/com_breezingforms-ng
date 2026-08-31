@@ -36,4 +36,17 @@ final class QuickModeTextareaBuilderTest extends TestCase
             $html
         );
     }
+
+    public function testEscapesClassAndFieldName(): void
+    {
+        $html = (new QuickModeTextareaBuilder())->build(
+            'ff_elem" onfocus="alert(1)',
+            'message" onfocus="alert(2)',
+            'value',
+            21
+        );
+
+        self::assertStringContainsString('ff_elem&quot; onfocus=&quot;alert(1)', $html);
+        self::assertStringContainsString('ff_nm_message&quot; onfocus=&quot;alert(2)[]', $html);
+    }
 }

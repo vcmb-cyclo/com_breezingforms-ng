@@ -38,4 +38,18 @@ final class QuickModeSelectBuilderTest extends TestCase
             (new QuickModeSelectBuilder())->build('ff_elem', 'empty', 15, '', false)
         );
     }
+
+    public function testEscapesClassAndFieldName(): void
+    {
+        $html = (new QuickModeSelectBuilder())->build(
+            'ff_elem" onfocus="alert(1)',
+            'choice" onfocus="alert(2)',
+            14,
+            '',
+            false
+        );
+
+        self::assertStringContainsString('ff_elem&quot; onfocus=&quot;alert(1)', $html);
+        self::assertStringContainsString('ff_nm_choice&quot; onfocus=&quot;alert(2)[]', $html);
+    }
 }

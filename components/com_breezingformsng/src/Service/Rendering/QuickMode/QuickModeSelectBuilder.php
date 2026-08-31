@@ -24,10 +24,12 @@ final class QuickModeSelectBuilder
         string $style = '',
         bool $includeChosenAttribute = true
     ): string {
+        $escapedClass = htmlspecialchars($class, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $escapedFieldName = htmlspecialchars($fieldName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $html = '<select ' . ($includeChosenAttribute ? 'data-chosen="no-chzn" ' : '')
-            . 'class="' . $class . '" ' . $style
+            . 'class="' . $escapedClass . '" ' . $style
             . ($multiple ? 'multiple="multiple" ' : '') . $attributes
-            . 'name="ff_nm_' . $fieldName . '[]" id="ff_elem' . $elementId . '">' . "\n";
+            . 'name="ff_nm_' . $escapedFieldName . '[]" id="ff_elem' . $elementId . '">' . "\n";
 
         foreach (explode("\n", str_replace("\r", '', $list)) as $line) {
             $parts = explode(';', $line);

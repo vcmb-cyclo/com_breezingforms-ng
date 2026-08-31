@@ -9,10 +9,21 @@
     <file>components/com_breezingformsng/src/Service/Rendering/JavascriptCompressor.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/JavascriptValueExporter.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ProcessorHeaderRenderer.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/CaptchaLegacyValidationScriptBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/CaptchaReCaptchaValidationScriptBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/CaptchaSupportBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/CaptchaValidationRowSelector.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ClassNameResolver.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderValueScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderReadonlyScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderSignatureScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderFileUploadScriptBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderChoiceHydrationScriptBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderFileHydrationScriptBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderFileSupportBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderSelectHydrationScriptBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderSignatureImageEncoder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderValueHydrationScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/EditableRecord.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/EditableRecordLoader.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/PostRenderScriptBuilder.php</file>
@@ -26,6 +37,14 @@
     <file>components/com_breezingformsng/src/Service/Rendering/CallbackRegistrationService.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/FormPieceExecutionService.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/SubmittedCallbackNameResolver.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/PaymentProviderDetector.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QueryListNavigationBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QueryListPaginationTailBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QueryListRowStateBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QueryListRowsRefreshBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QueryListSelectAllScriptBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QueryListStateLibraryBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickModeFormTagBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/HiddenFieldTrait.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/BootstrapStyleFieldTrait.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeInputBuilder.php</file>

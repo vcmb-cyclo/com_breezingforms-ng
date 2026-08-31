@@ -528,6 +528,12 @@ Les autres builders QuickMode purs déjà couverts par des tests directs sont
 et callbacks d'upload. `QuickModePaymentImageBuilder` a reçu uniquement une
 mise en forme de son attribut optionnel ; sa sortie reste inchangée.
 
+Le périmètre inclut maintenant aussi les services de rendu extraits et propres
+déjà couverts (`Captcha*`, `ClassNameResolver`, les hydratateurs ContentBuilder,
+les services Query List, `PaymentProviderDetector` et les builders de formulaire).
+Les builders Classic historiques qui nécessitent encore des corrections de
+style restent volontairement hors périmètre jusqu'à leur nettoyage ciblé.
+
 Le premier nettoyage ciblé de cette baseline PHPCS est réalisé dans
 `QuickModeSelectBuilder`, `QuickModeCaptchaMarkupBuilder` et
 `QuickModeUploadOptionsBuilder` (`eaf8b2d1`) : leurs sorties sont inchangées et

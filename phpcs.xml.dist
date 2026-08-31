@@ -14,6 +14,8 @@
     <file>components/com_breezingformsng/src/Service/Rendering/CaptchaSupportBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/CaptchaValidationRowSelector.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ClassNameResolver.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ClassicHiddenInputBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ClassicQueryListMarkupBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderValueScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderReadonlyScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderSignatureScriptBuilder.php</file>

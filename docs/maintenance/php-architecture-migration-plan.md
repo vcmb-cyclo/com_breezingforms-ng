@@ -534,6 +534,11 @@ les services Query List, `PaymentProviderDetector` et les builders de formulaire
 Les builders Classic historiques qui nécessitent encore des corrections de
 style restent volontairement hors périmètre jusqu'à leur nettoyage ciblé.
 
+Les deux builders Classic déjà conformes (`ClassicHiddenInputBuilder` et
+`ClassicQueryListMarkupBuilder`) rejoignent également le ruleset ; les autres
+builders Classic attendent un nettoyage par famille accompagné de leurs
+caractérisations.
+
 Le premier nettoyage ciblé de cette baseline PHPCS est réalisé dans
 `QuickModeSelectBuilder`, `QuickModeCaptchaMarkupBuilder` et
 `QuickModeUploadOptionsBuilder` (`eaf8b2d1`) : leurs sorties sont inchangées et

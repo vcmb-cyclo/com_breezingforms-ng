@@ -35,6 +35,16 @@ use Joomla\CMS\Uri\Uri;
 
 trait BootstrapStyleFieldTrait
 {
+    private ?QuickModeBootstrapChoiceGroupBuilder $quickModeBootstrapChoiceGroupBuilderService = null;
+
+    private function quickModeBootstrapChoiceGroupBuilder(): QuickModeBootstrapChoiceGroupBuilder
+    {
+        return $this->quickModeBootstrapChoiceGroupBuilderService ??= new QuickModeBootstrapChoiceGroupBuilder(
+            $this->quickModeGroupOptionBuilder(),
+            fn(string $class): string => $this->bsClass($class)
+        );
+    }
+
     /**
      * @param array<string, mixed> $mdata
      */
@@ -746,56 +756,16 @@ trait BootstrapStyleFieldTrait
         string $readonly,
         string $wrapClass = ''
     ): void {
-        /* translatables */
-        if (
-            isset($mdata['group_translation' . $this->language_tag])
-            && $mdata['group_translation' . $this->language_tag] != ''
-        ) {
-            $mdata['group'] = $mdata['group_translation' . $this->language_tag];
-        }
-        /* translatables end */
-
-        if ($mdata['group'] != '') {
-            echo '<div class="' . $this->bsClass('controls') . ' ' . $this->bsClass('form-inline') . '">';
-            echo '<div class="' . $this->bsClass('form-group') . ' ' . $this->bsClass('radio-form-group') . '">';
-            echo $label;
-            echo '<span class="' . $this->bsClass('nonform-control') . '">';
-            if ($mdata['wrap']) {
-                echo '<div' . ($wrapClass !== '' ? ' class="' . $wrapClass . '"' : '')
-                    . ' style="display: inline-block; vertical-align: top;">';
-            }
-            $mdata['group'] = str_replace("\r", '', $mdata['group']);
-            $gEx = explode("\n", $mdata['group']);
-            $lines = count($gEx);
-            for ($i = 0; $i < $lines; $i++) {
-                $idExt = $i != 0 ? '_' . $i : '';
-                $iEx = explode(";", $gEx[$i]);
-                $iCnt = count($iEx);
-                if ($iCnt == 3) {
-                    $inlineClass = $mdata['wrap'] ? '' : ' ' . $this->bsClass('inline');
-                    echo '<div class="form-check' . $inlineClass . '">';
-                    echo $this->quickModeGroupOptionBuilder()->build(
-                        'radio',
-                        'ff_elem form-check-input',
-                        (string) $mdata['bfName'],
-                        (string) $iEx[2],
-                        (string) $mdata['dbId'] . $idExt,
-                        $iEx[0] == 1,
-                        $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect
-                            . ($readonly ? ' disabled="disabled" ' : '')
-                    ) . "\n";
-                    echo '<label class="' . $this->bsClass('radio') . '" id="bfGroupLabel' . $mdata['dbId']
-                        . $idExt . '" for="ff_elem' . $mdata['dbId'] . $idExt . '">' . trim($iEx[1]) . '</label>';
-                    echo '</div>';
-                }
-            }
-            if ($mdata['wrap']) {
-                echo '</div>';
-            }
-            echo '</span>';
-            echo '</div>';
-            echo '</div>';
-        }
+        echo $this->quickModeBootstrapChoiceGroupBuilder()->build(
+            'radio',
+            $mdata,
+            $this->language_tag,
+            $label,
+            $tabIndex,
+            $onclick . $onblur . $onchange . $onfocus . $onselect,
+            $readonly,
+            $wrapClass
+        );
     }
 
     /**
@@ -813,55 +783,15 @@ trait BootstrapStyleFieldTrait
         string $readonly,
         string $wrapClass = ''
     ): void {
-        /* translatables */
-        if (
-            isset($mdata['group_translation' . $this->language_tag])
-            && $mdata['group_translation' . $this->language_tag] != ''
-        ) {
-            $mdata['group'] = $mdata['group_translation' . $this->language_tag];
-        }
-        /* translatables end */
-        if ($mdata['group'] != '') {
-            echo '<div class="' . $this->bsClass('controls') . ' ' . $this->bsClass('form-inline') . '">';
-            echo '<div class="' . $this->bsClass('form-group') . ' ' . $this->bsClass('radio-form-group') . '">';
-            echo $label;
-            echo '<span class="' . $this->bsClass('nonform-control') . '">';
-            if ($mdata['wrap']) {
-                echo '<div' . ($wrapClass !== '' ? ' class="' . $wrapClass . '"' : '')
-                    . ' style="display: inline-block; vertical-align: top;">';
-            }
-            $mdata['group'] = str_replace("\r", '', $mdata['group']);
-            $gEx = explode("\n", $mdata['group']);
-            $lines = count($gEx);
-
-            for ($i = 0; $i < $lines; $i++) {
-                $idExt = $i != 0 ? '_' . $i : '';
-                $iEx = explode(";", $gEx[$i]);
-                $iCnt = count($iEx);
-                if ($iCnt == 3) {
-                    $inlineClass = $mdata['wrap'] ? '' : ' ' . $this->bsClass('inline');
-                    echo '<div class="form-check' . $inlineClass . '">';
-                    echo $this->quickModeGroupOptionBuilder()->build(
-                        'checkbox',
-                        'ff_elem form-check-input',
-                        (string) $mdata['bfName'],
-                        (string) $iEx[2],
-                        (string) $mdata['dbId'] . $idExt,
-                        $iEx[0] == 1,
-                        $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect
-                            . ($readonly ? ' disabled="disabled" ' : '')
-                    ) . "\n";
-                    echo '<label class="' . $this->bsClass('checkbox') . '" id="bfGroupLabel' . $mdata['dbId']
-                        . $idExt . '" for="ff_elem' . $mdata['dbId'] . $idExt . '">' . trim($iEx[1]) . '</label>';
-                    echo '</div>';
-                }
-            }
-            if ($mdata['wrap']) {
-                echo '</div>';
-            }
-            echo '</span>';
-            echo '</div>';
-            echo '</div>';
-        }
+        echo $this->quickModeBootstrapChoiceGroupBuilder()->build(
+            'checkbox',
+            $mdata,
+            $this->language_tag,
+            $label,
+            $tabIndex,
+            $onclick . $onblur . $onchange . $onfocus . $onselect,
+            $readonly,
+            $wrapClass
+        );
     }
 }

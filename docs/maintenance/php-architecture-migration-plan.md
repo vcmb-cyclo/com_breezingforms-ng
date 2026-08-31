@@ -1453,6 +1453,9 @@ partagés via `QuickModeGroupOptionBuilder` et branchés dans les quatre
 renderers par `a85bed34`. Les différences d'enveloppe, de label, de saut de
 ligne et de classe Bootstrap restent dans les renderers ; les valeurs et
 attributs des options sont testés avec leurs variantes checked/unchecked.
+Les enveloppes Bootstrap et OnePage de ces groupes sont maintenant mutualisées
+dans `QuickModeBootstrapChoiceGroupBuilder`, tandis que les classes de thème
+restent injectées par le trait commun.
 
 Le rendu du champ `bfSubmitButton` est désormais partagé via
 `QuickModeSubmitButtonBuilder` et branché dans Classic, Mobile et le trait

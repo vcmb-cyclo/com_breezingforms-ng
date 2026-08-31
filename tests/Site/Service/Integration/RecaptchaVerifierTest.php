@@ -5,12 +5,30 @@ declare(strict_types=1);
 namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Integration;
 
 use Joomla\Http\Http;
+use Joomla\Http\Response;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Vcmb\Component\BreezingformsNG\Site\Service\Integration\RecaptchaVerifier;
 
 if (!class_exists(Http::class)) {
     eval('namespace Joomla\\Http; class Http { public function post($url, $data, array $headers = [], $timeout = null) {} }');
+}
+
+if (!class_exists(Response::class)) {
+    eval(
+        'namespace Joomla\\Http;'
+        . 'class Response {'
+        . '  private string $bodyContents;'
+        . '  private int $statusCode;'
+        . '  public function __construct(string $body = "", int $status = 200) {'
+        . '    $this->bodyContents = $body;'
+        . '    $this->statusCode = $status;'
+        . '  }'
+        . '  public function getBody() { return $this; }'
+        . '  public function getStatusCode(): int { return $this->statusCode; }'
+        . '  public function __toString(): string { return $this->bodyContents; }'
+        . '}'
+    );
 }
 
 final class RecaptchaVerifierTest extends TestCase
@@ -34,7 +52,7 @@ final class RecaptchaVerifierTest extends TestCase
                 'https://www.google.com/recaptcha/api/siteverify',
                 ['secret' => 'secret', 'response' => 'response', 'remoteip' => '127.0.0.1']
             )
-            ->willReturn((object) ['body' => '{"success":true}', 'code' => 200]);
+            ->willReturn(new Response('{"success":true}', 200));
 
         self::assertTrue((new RecaptchaVerifier($http))->verify('secret', 'response', '127.0.0.1'));
     }
@@ -52,7 +70,7 @@ final class RecaptchaVerifierTest extends TestCase
         $http = $this->createMock(Http::class);
         $http->expects(self::once())
             ->method('post')
-            ->willReturn((object) ['body' => $body, 'code' => $status]);
+            ->willReturn(new Response($body, $status));
 
         self::assertFalse((new RecaptchaVerifier($http))->verify('secret', 'response', '127.0.0.1'));
     }

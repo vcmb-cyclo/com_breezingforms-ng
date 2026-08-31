@@ -34,7 +34,7 @@ final class PayPalCallback
         ?Http $http = null,
         ?PaymentDownloadPolicy $downloadPolicy = null,
     ) {
-        $this->http = $http ?? HttpFactory::getHttp();
+        $this->http = $http ?? (new HttpFactory())->getHttp();
         $this->downloadPolicy = $downloadPolicy ?? new PaymentDownloadPolicy();
     }
 
@@ -479,7 +479,7 @@ final class PayPalCallback
                 ['Content-Type' => 'application/x-www-form-urlencoded'],
             );
 
-            return trim((string) $response->body);
+            return trim((string) $response->getBody());
         } catch (\RuntimeException) {
             return '';
         }

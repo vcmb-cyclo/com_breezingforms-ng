@@ -6,6 +6,7 @@ namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Callback;
 
 use Joomla\CMS\Application\CMSApplication;
 use Joomla\Http\Http;
+use Joomla\Http\Response;
 use Joomla\Database\DatabaseInterface;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
@@ -16,6 +17,23 @@ require_once __DIR__ . '/../Rendering/QuickMode/joomla-cmsapplication-stub.php';
 
 if (!class_exists(Http::class)) {
     eval('namespace Joomla\\Http; class Http { public function post($url, $data, array $headers = [], $timeout = null) {} }');
+}
+
+if (!class_exists(Response::class)) {
+    eval(
+        'namespace Joomla\\Http;'
+        . 'class Response {'
+        . '  private string $bodyContents;'
+        . '  private int $statusCode;'
+        . '  public function __construct(string $body = "", int $status = 200) {'
+        . '    $this->bodyContents = $body;'
+        . '    $this->statusCode = $status;'
+        . '  }'
+        . '  public function getBody() { return $this; }'
+        . '  public function getStatusCode(): int { return $this->statusCode; }'
+        . '  public function __toString(): string { return $this->bodyContents; }'
+        . '}'
+    );
 }
 
 if (!class_exists(CMSApplication::class)) {
@@ -38,7 +56,7 @@ final class PayPalCallbackTest extends TestCase
                 'cmd=_notify-validate&txn_id=abc',
                 ['Content-Type' => 'application/x-www-form-urlencoded']
             )
-            ->willReturn((object) ['body' => " VERIFIED \n"]);
+            ->willReturn(new Response(" VERIFIED \n"));
 
         self::assertSame(
             'VERIFIED',

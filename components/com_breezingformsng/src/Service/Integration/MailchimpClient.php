@@ -19,7 +19,7 @@ final class MailchimpClient
 
     public function __construct(?Http $http = null)
     {
-        $this->http = $http ?? HttpFactory::getHttp();
+        $this->http = $http ?? (new HttpFactory())->getHttp();
     }
 
     public function request(string $apiKey, string $method, string $resource, ?array $payload = null): array
@@ -43,12 +43,11 @@ final class MailchimpClient
             default => throw new RuntimeException('Unsupported Mailchimp HTTP method.'),
         };
 
-        $decoded = (string) $result->body === ''
-            ? []
-            : json_decode((string) $result->body, true, 512, JSON_THROW_ON_ERROR);
+        $body = (string) $result->getBody();
+        $decoded = $body === '' ? [] : json_decode($body, true, 512, JSON_THROW_ON_ERROR);
 
-        if ($result->code < 200 || $result->code >= 300) {
-            throw new RuntimeException((string) ($decoded['detail'] ?? $result->body));
+        if ($result->getStatusCode() < 200 || $result->getStatusCode() >= 300) {
+            throw new RuntimeException((string) ($decoded['detail'] ?? $body));
         }
 
         return $decoded;

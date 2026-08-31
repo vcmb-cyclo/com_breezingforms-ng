@@ -187,18 +187,6 @@ parameters:
 			path: components/com_breezingformsng/src/Service/Callback/FlashUploadCallback.php
 
 		-
-			message: '#^Access to an undefined property Joomla\\Http\\Response\:\:\$body\.$#'
-			identifier: property.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/Callback/PayPalCallback.php
-
-		-
-			message: '#^Static call to instance method Joomla\\Http\\HttpFactory\:\:getHttp\(\)\.$#'
-			identifier: method.staticCall
-			count: 1
-			path: components/com_breezingformsng/src/Service/Callback/PayPalCallback.php
-
-		-
 			message: '#^Access to an undefined property Joomla\\CMS\\Mail\\MailerInterface\:\:\$Body\.$#'
 			identifier: property.notFound
 			count: 1
@@ -241,82 +229,10 @@ parameters:
 			path: components/com_breezingformsng/src/Service/FormRenderer.php
 
 		-
-			message: '#^Access to an undefined property Joomla\\Http\\Response\:\:\$body\.$#'
-			identifier: property.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/Integration/DropboxUploader.php
-
-		-
-			message: '#^Access to an undefined property Joomla\\Http\\Response\:\:\$code\.$#'
-			identifier: property.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/Integration/DropboxUploader.php
-
-		-
-			message: '#^Static call to instance method Joomla\\Http\\HttpFactory\:\:getHttp\(\)\.$#'
-			identifier: method.staticCall
-			count: 1
-			path: components/com_breezingformsng/src/Service/Integration/DropboxUploader.php
-
-		-
 			message: '#^Call to static method getApplication\(\) on an unknown class Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Integration\\Factory\.$#'
 			identifier: class.notFound
 			count: 3
 			path: components/com_breezingformsng/src/Service/Integration/IntegratorRuntime.php
-
-		-
-			message: '#^Access to an undefined property Joomla\\Http\\Response\:\:\$body\.$#'
-			identifier: property.notFound
-			count: 3
-			path: components/com_breezingformsng/src/Service/Integration/MailchimpClient.php
-
-		-
-			message: '#^Access to an undefined property Joomla\\Http\\Response\:\:\$code\.$#'
-			identifier: property.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/Integration/MailchimpClient.php
-
-		-
-			message: '#^Static call to instance method Joomla\\Http\\HttpFactory\:\:getHttp\(\)\.$#'
-			identifier: method.staticCall
-			count: 1
-			path: components/com_breezingformsng/src/Service/Integration/MailchimpClient.php
-
-		-
-			message: '#^Access to an undefined property Joomla\\Http\\Response\:\:\$body\.$#'
-			identifier: property.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/Integration/RecaptchaVerifier.php
-
-		-
-			message: '#^Access to an undefined property Joomla\\Http\\Response\:\:\$code\.$#'
-			identifier: property.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/Integration/RecaptchaVerifier.php
-
-		-
-			message: '#^Static call to instance method Joomla\\Http\\HttpFactory\:\:getHttp\(\)\.$#'
-			identifier: method.staticCall
-			count: 1
-			path: components/com_breezingformsng/src/Service/Integration/RecaptchaVerifier.php
-
-		-
-			message: '#^Access to an undefined property Joomla\\Http\\Response\:\:\$body\.$#'
-			identifier: property.notFound
-			count: 6
-			path: components/com_breezingformsng/src/Service/Integration/SalesforceClient.php
-
-		-
-			message: '#^Access to an undefined property Joomla\\Http\\Response\:\:\$code\.$#'
-			identifier: property.notFound
-			count: 3
-			path: components/com_breezingformsng/src/Service/Integration/SalesforceClient.php
-
-		-
-			message: '#^Static call to instance method Joomla\\Http\\HttpFactory\:\:getHttp\(\)\.$#'
-			identifier: method.staticCall
-			count: 1
-			path: components/com_breezingformsng/src/Service/Integration/SalesforceClient.php
 
 		-
 			message: '#^Function bf_b64dec not found\.$#'

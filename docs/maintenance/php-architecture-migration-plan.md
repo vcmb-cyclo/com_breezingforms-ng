@@ -1080,8 +1080,9 @@ générés par `AdditionalHiddenFieldsBuilder` via `bb469b88`, avec ordre,
 encodage URL et échappement HTML couverts. La détection des providers de
 paiement est désormais isolée dans `PaymentProviderDetector` via `b5d1a55e`;
 les trois providers historiques et l'absence de provider sont couverts par
-des tests unitaires. Les champs conditionnels de finalisation restent les
-prochains points à caractériser.
+des tests unitaires. Les champs conditionnels de finalisation sont désormais
+caractérisés dans les trois parcours ; les appels de lecture Joomla restent
+dans l'orchestrateur car ils dépendent du contexte d'exécution.
 
 Les champs conditionnels `target`, `frame`, `border`, `page`, `align` et `top`
 sont désormais générés par `FormOptionalContextFieldsBuilder` via
@@ -1209,8 +1210,9 @@ isolés en builders testés : `FormContextFieldsBuilder` (`f7d06454`),
 `FormOpeningMarkupBuilder` (`e77be68a`) et `FormClosingMarkupBuilder`
 (`301ba9f1`). La génération du token et des paramètres de routage reste
 également partagée (`462b2984`, `f183a4ce`), avec conservation explicite du
-séparateur de lignes (`0261acd4`). Les champs conditionnels propres à chaque
-mode restent à caractériser avant une éventuelle extraction.
+séparateur de lignes (`0261acd4`). La préparation du contexte et des champs
+techniques est centralisée dans `RenderingEngine` ; seules les lectures
+Joomla/ContentBuilder propres au runtime restent dans l'orchestrateur.
 
 L'ordre final des champs cachés et la fermeture du formulaire sont désormais
 assemblés par `FormModeFinalizationBuilder` (lot de finalisation courant) pour les modes

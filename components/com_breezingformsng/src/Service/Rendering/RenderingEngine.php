@@ -97,6 +97,7 @@ final class RenderingEngine
     private ?FileExtensionsCheckBuilder $fileExtensionsCheckBuilderService = null;
     private ?QueryListSelectAllScriptBuilder $queryListSelectAllScriptBuilderService = null;
     private ?QueryListNavigationBuilder $queryListNavigationBuilderService = null;
+    private ?QueryListRowsRefreshBuilder $queryListRowsRefreshBuilderService = null;
     private ?AdditionalHiddenFieldsBuilder $additionalHiddenFieldsBuilderService = null;
     private ?PaymentProviderDetector $paymentProviderDetectorService = null;
     private ?ContentBuilderFileValueParser $contentBuilderFileValueParserService = null;
@@ -407,6 +408,11 @@ final class RenderingEngine
     private function queryListNavigationBuilder(): QueryListNavigationBuilder
     {
         return $this->queryListNavigationBuilderService ??= new QueryListNavigationBuilder();
+    }
+
+    private function queryListRowsRefreshBuilder(): QueryListRowsRefreshBuilder
+    {
+        return $this->queryListRowsRefreshBuilderService ??= new QueryListRowsRefreshBuilder();
     }
 
     private function additionalHiddenFieldsBuilder(): AdditionalHiddenFieldsBuilder
@@ -742,45 +748,7 @@ final class RenderingEngine
                 '{' . nl() .
                 '    var forced = false;' . nl() .
                 '    if (arguments.length>2) forced = arguments[2];' . nl() .
-                '    var qrows = ff_queryRows[id];' . nl() .
-                '    var cnt = qrows.length;' . nl() .
-                '    var currpage = ff_queryCurrPage[id];' . nl() .
-                '    var pagesize = ff_queryPageSize[id];' . nl() .
-                '    var pagenav = ff_queryPagenav[id];' . nl() .
-                '    var lastpage = 1;' . nl() .
-                '    if (pagesize > 0) {' . nl() .
-                '        lastpage = parseInt((cnt+pagesize-1)/pagesize);' . nl() .
-                '        if (lastpage == 1) pagesize = cnt;' . nl() .
-                '    } // if' . nl() .
-                '    if (page < 1) page = 1;' . nl() .
-                '    if (page > lastpage) page = lastpage;' . nl() .
-                '    if (!forced && page == currpage) return;' . nl() .
-                '    var p, c;' . nl() .
-                '    for (p = 1; p < page; p++) cnt -= pagesize;' . nl() .
-                '    if (cnt > pagesize) cnt = pagesize;' . nl() .
-                '    var start = (page-1) * pagesize;' . nl() .
-                '    var rows = document.getElementById(\'ff_elem\'+id).rows;' . nl() .
-                '    var cols = ff_queryCols[id];' . nl() .
-                '    var checkbox = ff_queryCheckbox[id];' . nl() .
-                '    var header = ff_queryHeader[id];' . nl() .
-                '    for (p = 0; p < cnt; p++) {' . nl() .
-                '        var qrow = qrows[start+p];' . nl() .
-                '        var row = rows[header+p];' . nl() .
-                '        var cc = 0;' . nl() .
-                '        for (c = 0; c < cols.length; c++)' . nl() .
-                '            if (cols[c]) {' . nl() .
-                '                if (c==0 && checkbox>0) {' . nl() .
-                '                    document.getElementById(\'ff_cb\'+id+\'_\'+p).value = qrow[c];' . nl() .
-                '                    cc++;' . nl() .
-                '                } else' . nl() .
-                '                    row.cells[cc++].innerHTML = qrow[c];' . nl() .
-                '            } // if' . nl() .
-                '        row.style.display = \'\';' . nl() .
-                '    } // for' . nl() .
-                '    for (p = cnt; p < pagesize; p++) {' . nl() .
-                '        var row = rows[p+header];' . nl() .
-                '        row.style.display = \'none\';' . nl() .
-                '    } // for' . nl() .
+                $this->queryListRowsRefreshBuilder()->build(nl()) .
                 '    if (pagenav > 0 && pagesize > 0) {' . nl() .
                 '        var navi = \'\';' . nl() .
                 $this->queryListNavigationBuilder()->build([

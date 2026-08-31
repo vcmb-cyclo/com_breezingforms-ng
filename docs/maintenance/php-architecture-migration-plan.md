@@ -410,8 +410,9 @@ propres à chaque thème.
 
 - `HiddenFieldTrait` : partagé par les quatre renderers.
 - `BootstrapStyleFieldTrait` : partagé par Bootstrap et OnePage.
-- Classic et Mobile : logique de champs encore largement dupliquée.
-- Les quatre classes restent volumineuses, pour un total d'environ 6 900
+- Classic : wrappers et logique d'enveloppe encore largement spécifiques ;
+  Bootstrap et OnePage partagent déjà leur trait.
+- Les trois classes restent volumineuses, pour un total d'environ 4 200
   lignes avec leurs traits.
 
 ### Stratégie cible
@@ -921,8 +922,9 @@ Règles de coordination :
 
 1. Harnais ContentBuilder pour le parcours complet des fichiers et des
    signatures, puis validation de la lecture SQL de l'enregistrement.
-2. Étendre la stratégie `QuickModeInputBuilder` aux wrappers Bootstrap et
-   OnePage, après le premier branchement Classic/Mobile (`065cef94`).
+2. Poursuivre les stratégies de contrôles restantes dans les wrappers
+   Classic et Bootstrap/OnePage, après les branchements déjà réalisés
+   (`065cef94`, `f3d04e55`).
 3. Harnais ContentBuilder pour les parcours runtime fichiers/signatures.
 4. Rendu HTML classique par famille de nœuds.
 5. Réduction progressive des avertissements PHPCS et PHPStan après chaque
@@ -1606,6 +1608,15 @@ Les deux scripts `onload` de formulaire sont maintenant produits par
 hooks de hauteur/grille, le callback après soumission et l'omission complète
 quand aucun hook n'est requis ; `RenderingEngine` conserve la résolution des
 callbacks et leur enregistrement via `linkcode` (`FormOnloadScriptBuilder`).
+
+La préparation complète d'une ligne Query List et l'assemblage de
+`ff_dispQueryPage` sont respectivement portés par
+`QueryListRowPreparationService` et `QueryListPageScriptBuilder`. Les
+registrations de callbacks formulaire, élément, icône et scan `#scanonly` sont
+mutualisées dans `CallbackRegistrationService`. Les petits blocs restants de
+`RenderingEngine` sont conservés lorsqu'ils sont trop courts ; les pièces
+`before/after` et la résolution SQL de l'`onload` soumis nécessitent une
+frontière runtime Joomla plus large pour éviter le surdécoupage.
 
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.

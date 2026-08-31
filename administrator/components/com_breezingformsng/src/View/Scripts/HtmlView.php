@@ -9,6 +9,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Scripts;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Factory;
@@ -49,6 +50,7 @@ class HtmlView extends BaseHtmlView
             throw new \RuntimeException('Unable to create BreezingForms NG scripts model.');
         }
 
+        /** @var CMSApplication $app */
         $app = Factory::getApplication();
         $input = $app->getInput();
 

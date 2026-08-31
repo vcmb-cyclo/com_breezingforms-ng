@@ -130,7 +130,9 @@ $pkg  = $this->pkg;
 </form>
 
 <?php
-$bfDocument = Factory::getApplication()->getDocument();
+/** @var \Joomla\CMS\Application\CMSApplication $app */
+$app = Factory::getApplication();
+$bfDocument = $app->getDocument();
 $bfDocument->getWebAssetManager()->useScript('com_breezingformsng.admin-form');
 $bfDocument->addScriptOptions('com_breezingformsng.admin-form', ['cancelTask' => 'menus.cancel']);
 ?>

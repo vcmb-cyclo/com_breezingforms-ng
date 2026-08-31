@@ -12,6 +12,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Helper;
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\HTML\HTMLHelper;
@@ -156,12 +157,14 @@ final class QuickmodeHtml
         $optionsPieceBeginSubmit = $advancedOptions['pieceBeginSubmit'] ?? [];
         $optionsPieceEndSubmit = $advancedOptions['pieceEndSubmit'] ?? [];
 
+        /** @var CMSApplication $app */
+        $app = Factory::getApplication();
         $active_language_code = htmlentities(
-            Factory::getApplication()->getInput()->getString('active_language_code', ''),
+            $app->getInput()->getString('active_language_code', ''),
             ENT_QUOTES,
             'UTF-8'
         );
-        $wa = Factory::getApplication()->getDocument()->getWebAssetManager();
+        $wa = $app->getDocument()->getWebAssetManager();
         HTMLHelper::_('bootstrap.modal');
         HTMLHelper::_('bootstrap.tooltip', '.hasTooltip');
         $wa->useScript('keepalive');

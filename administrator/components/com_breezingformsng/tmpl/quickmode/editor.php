@@ -17,15 +17,17 @@ use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 
-$document = Factory::getApplication()->getDocument();
+/** @var \Joomla\CMS\Application\CMSApplication $app */
+$app = Factory::getApplication();
+$document = $app->getDocument();
 
-if (Factory::getApplication()->getInput()->getCmd('task') === 'quickmode.editor') {
+if ($app->getInput()->getCmd('task') === 'quickmode.editor') {
     $document->getWebAssetManager()->addInlineScript('
     parent.jQuery(".modal-header .close").trigger("click");
     ');
 }
 
-$active_language_code = Factory::getApplication()->getInput()->getString('active_language_code', '');
+$active_language_code = $app->getInput()->getString('active_language_code', '');
 if ($active_language_code != '') {
     $active_language_code = '_translation' . $active_language_code;
 }
@@ -35,7 +37,7 @@ $document->addScriptOptions('com_breezingformsng.quickmode-editor', [
     'langSuffix' => $active_language_code,
 ]);
 
-$editor = Editor::getInstance(Factory::getApplication()->get('editor'));
+$editor = Editor::getInstance($app->get('editor'));
 ?>
 <form action="index.php" method="post" name="adminForm" id="adminForm">
     <input type="submit" class="btn btn-primary" value="<?php echo Text::_('JSAVE'); ?>" onclick="saveText();" /><br /><br />

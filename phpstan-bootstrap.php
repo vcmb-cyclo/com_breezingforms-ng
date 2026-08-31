@@ -35,3 +35,13 @@ foreach (
 }
 
 \defined('JDEBUG') || \define('JDEBUG', false);
+
+// Runmode constants defined at runtime by
+// components/com_breezingformsng/src/Support/runtime_bootstrap.php - declared
+// here too so PHPStan can resolve them in files that assume that bootstrap
+// already ran (the legacy stored-script runtime), without adding the whole
+// Support/ bootstrap chain (with its top-level dispatch side effects) to the
+// analysed paths.
+\defined('_FF_RUNMODE_FRONTEND') || \define('_FF_RUNMODE_FRONTEND', 0);
+\defined('_FF_RUNMODE_BACKEND') || \define('_FF_RUNMODE_BACKEND', 1);
+\defined('_FF_RUNMODE_PREVIEW') || \define('_FF_RUNMODE_PREVIEW', 2);

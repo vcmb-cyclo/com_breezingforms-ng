@@ -9,6 +9,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
@@ -18,6 +19,7 @@ use Joomla\Database\DatabaseInterface;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\ScriptManager;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\ScriptModel;
 
+/** @property CMSApplication $app */
 class ScriptsController extends BaseController
 {
     public function add(): void

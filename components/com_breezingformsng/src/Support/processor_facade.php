@@ -238,7 +238,7 @@ function _ff_traceFunction($newmode, $name, $line, $type, $id, $pane, &$args)
                                         if (is_resource($arg))
                                             $trc .= Text::_('COM_BREEZINGFORMSNG_PROCESS_RESOURCE');
                                         else
-                                            $trc .= _FACILEFORMS_PROCESS_UNKTYPE;
+                                            $trc .= Text::_('COM_BREEZINGFORMSNG_PROCESS_UNKNOWN');
             } // foreach
         } // if
         $trc .= ") " . Text::_('COM_BREEZINGFORMSNG_PROCESS_ATLINE') . " $line\n";

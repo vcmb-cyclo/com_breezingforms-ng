@@ -6,6 +6,7 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Integration;
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
+use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 use Vcmb\Component\BreezingformsNG\Site\Service\Scripting\StoredPhpExecutor;

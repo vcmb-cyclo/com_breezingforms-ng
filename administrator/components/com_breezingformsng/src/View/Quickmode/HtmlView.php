@@ -9,8 +9,10 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Quickmode;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\MVC\Factory\MVCFactoryServiceInterface;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Toolbar\ToolbarHelper;
@@ -56,8 +58,10 @@ class HtmlView extends BaseHtmlView
 
     public function display($tpl = null): void
     {
-        Factory::getApplication()->getInput()->set('hidemainmenu', 1);
-        $input  = Factory::getApplication()->getInput();
+        /** @var CMSApplication $app */
+        $app = Factory::getApplication();
+        $app->getInput()->set('hidemainmenu', 1);
+        $input  = $app->getInput();
         $layout = $input->getCmd('layout', '');
 
         if ($layout === 'editor') {
@@ -117,7 +121,7 @@ class HtmlView extends BaseHtmlView
             ['label' => $this->formTitle !== '' ? $this->formTitle : Text::_('COM_BREEZINGFORMSNG_INSTALLER_UNKNOWN')],
         ]);
 
-        $doc = Factory::getApplication()->getDocument();
+        $doc = $app->getDocument();
         $doc->setTitle(strip_tags($pageTitle));
         $doc->getWebAssetManager()->addInlineStyle(
             '.icon-logo_left{
@@ -166,10 +170,7 @@ class HtmlView extends BaseHtmlView
 
     private function getQuickmodeModel(): QuickmodeModel
     {
-        $model = Factory::getApplication()
-            ->bootComponent('com_breezingformsng')
-            ->getMVCFactory()
-            ->createModel('Quickmode', 'Administrator', ['ignore_request' => true]);
+        $model = $this->getMVCFactory()->createModel('Quickmode', 'Administrator', ['ignore_request' => true]);
 
         if (!$model instanceof QuickmodeModel) {
             throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
@@ -184,10 +185,7 @@ class HtmlView extends BaseHtmlView
      */
     private function getFormModel(): FormModel
     {
-        $model = Factory::getApplication()
-            ->bootComponent('com_breezingformsng')
-            ->getMVCFactory()
-            ->createModel('Form', 'Administrator', ['ignore_request' => true]);
+        $model = $this->getMVCFactory()->createModel('Form', 'Administrator', ['ignore_request' => true]);
 
         if (!$model instanceof FormModel) {
             throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
@@ -198,15 +196,23 @@ class HtmlView extends BaseHtmlView
 
     private function getFormsModel(): FormsModel
     {
-        $model = Factory::getApplication()
-            ->bootComponent('com_breezingformsng')
-            ->getMVCFactory()
-            ->createModel('Forms', 'Administrator', ['ignore_request' => true]);
+        $model = $this->getMVCFactory()->createModel('Forms', 'Administrator', ['ignore_request' => true]);
 
         if (!$model instanceof FormsModel) {
             throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
         }
 
         return $model;
+    }
+
+    private function getMVCFactory(): \Joomla\CMS\MVC\Factory\MVCFactoryInterface
+    {
+        $component = Factory::getApplication()->bootComponent('com_breezingformsng');
+
+        if (!$component instanceof MVCFactoryServiceInterface) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        return $component->getMVCFactory();
     }
 }

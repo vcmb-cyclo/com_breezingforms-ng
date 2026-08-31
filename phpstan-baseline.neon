@@ -1,18 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:setUserState\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: administrator/components/com_breezingformsng/src/Controller/AboutController.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/Controller/PiecesController.php
-
-		-
 			message: '#^Call to method synchElements\(\) on an unknown class CB\\Component\\Contentbuilderng\\Administrator\\Service\\FormSupportService\.$#'
 			identifier: class.notFound
 			count: 1
@@ -43,130 +31,10 @@ parameters:
 			path: administrator/components/com_breezingformsng/src/Controller/QuickmodeController.php
 
 		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/Controller/ScriptsController.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/Helper/QuickmodeHtml.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Table\\Table\:\:setLocation\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/Model/MenuModel.php
-
-		-
-			message: '#^Method Joomla\\CMS\\Table\\Table\:\:delete\(\) invoked with 2 parameters, 0\-1 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: administrator/components/com_breezingformsng/src/Model/MenuModel.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\MVC\\Model\\ModelInterface\:\:delete\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/Model/RecordModel.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\MVC\\Model\\ModelInterface\:\:getError\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/Model/RecordModel.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/View/BreezingformsNG/HtmlView.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/View/Integrator/HtmlView.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Extension\\ComponentInterface\:\:getMVCFactory\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/View/Integrator/HtmlView.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: administrator/components/com_breezingformsng/src/View/Pieces/HtmlView.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getSession\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/View/Pieces/HtmlView.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
-			identifier: method.notFound
-			count: 3
-			path: administrator/components/com_breezingformsng/src/View/Pieces/Renderer.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/View/Quickmode/HtmlView.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Extension\\ComponentInterface\:\:getMVCFactory\(\)\.$#'
-			identifier: method.notFound
-			count: 3
-			path: administrator/components/com_breezingformsng/src/View/Quickmode/HtmlView.php
-
-		-
 			message: '#^Call to an undefined method Joomla\\CMS\\Toolbar\\ToolbarButton\:\:toggleSplit\(\)\.$#'
 			identifier: method.notFound
 			count: 2
 			path: administrator/components/com_breezingformsng/src/View/Records/HtmlView.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: administrator/components/com_breezingformsng/src/View/Scripts/HtmlView.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getSession\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/View/Scripts/HtmlView.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
-			identifier: method.notFound
-			count: 3
-			path: administrator/components/com_breezingformsng/src/View/Scripts/Renderer.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/tmpl/forms/edit.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/tmpl/menus/edit.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/tmpl/quickmode/editor.php
 
 		-
 			message: '#^Call to static method createFromRuntimeContext\(\) on an unknown class CB\\Component\\Contentbuilderng\\Administrator\\Service\\ListSupportService\.$#'
@@ -179,24 +47,6 @@ parameters:
 			identifier: class.notFound
 			count: 1
 			path: components/com_breezingformsng/src/Service/Export/ExportEngine.php
-
-		-
-			message: '#^Constant _FF_RUNMODE_FRONTEND not found\.$#'
-			identifier: constant.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/FormRenderer.php
-
-		-
-			message: '#^Constant _FF_RUNMODE_PREVIEW not found\.$#'
-			identifier: constant.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/FormRenderer.php
-
-		-
-			message: '#^Call to static method getApplication\(\) on an unknown class Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Integration\\Factory\.$#'
-			identifier: class.notFound
-			count: 3
-			path: components/com_breezingformsng/src/Service/Integration/IntegratorRuntime.php
 
 		-
 			message: '#^Call to an undefined method Joomla\\CMS\\Editor\\Editor\:\:getContent\(\)\.$#'
@@ -229,24 +79,6 @@ parameters:
 			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
 
 		-
-			message: '#^Constant _FF_RUNMODE_BACKEND not found\.$#'
-			identifier: constant.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
-
-		-
-			message: '#^Constant _FF_RUNMODE_FRONTEND not found\.$#'
-			identifier: constant.notFound
-			count: 2
-			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
-
-		-
-			message: '#^Constant _FF_RUNMODE_PREVIEW not found\.$#'
-			identifier: constant.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/Scripting/ScriptingEngine.php
-
-		-
 			message: '#^Access to an undefined property HTML_facileFormsProcessor\:\:\$sfadata\.$#'
 			identifier: property.notFound
 			count: 1
@@ -257,27 +89,3 @@ parameters:
 			identifier: method.notFound
 			count: 1
 			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
-
-		-
-			message: '#^Constant _FF_RUNMODE_BACKEND not found\.$#'
-			identifier: constant.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
-
-		-
-			message: '#^Constant _FF_RUNMODE_FRONTEND not found\.$#'
-			identifier: constant.notFound
-			count: 2
-			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
-
-		-
-			message: '#^Constant _FACILEFORMS_PROCESS_UNKTYPE not found\.$#'
-			identifier: constant.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Support/processor_facade.php
-
-		-
-			message: '#^Constant _FF_RUNMODE_FRONTEND not found\.$#'
-			identifier: constant.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Support/processor_facade.php

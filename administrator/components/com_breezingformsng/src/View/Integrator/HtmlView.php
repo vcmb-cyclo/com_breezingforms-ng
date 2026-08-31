@@ -11,8 +11,10 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Integrator;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\MVC\Factory\MVCFactoryServiceInterface;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
@@ -76,7 +78,9 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
             Uri::base() . 'index.php?option=com_breezingformsng&view=integrator&layout=help&tmpl=component'
         );
 
-        $document = Factory::getApplication()->getDocument();
+        /** @var CMSApplication $app */
+        $app      = Factory::getApplication();
+        $document = $app->getDocument();
         $wa       = $document->getWebAssetManager();
         $wa->useScript('com_breezingformsng.admin-sort');
         $wa->registerAndUseScript(
@@ -138,9 +142,13 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
 
     private function getIntegratorModel(): IntegratorModel
     {
-        $model = Factory::getApplication()
-            ->bootComponent('com_breezingformsng')
-            ->getMVCFactory()
+        $component = Factory::getApplication()->bootComponent('com_breezingformsng');
+
+        if (!$component instanceof MVCFactoryServiceInterface) {
+            throw new \RuntimeException('IntegratorModel not found');
+        }
+
+        $model = $component->getMVCFactory()
             ->createModel('Integrator', 'Administrator');
 
         if (!$model instanceof IntegratorModel) {

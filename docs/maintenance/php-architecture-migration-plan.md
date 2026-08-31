@@ -569,6 +569,11 @@ settings, header, cellule, ligne, footer et enveloppe passent le contrôle
 après un découpage de quatre lignes trop longues, avec leurs tests directs
 conservés comme filet de sortie.
 
+Le double `RenderingEngineProcessorDouble` du harnais de caractérisation est
+désormais isolé dans son propre fichier de test. Le fichier principal respecte
+ainsi la règle PHPCS d'une classe par fichier ; ses avertissements de longueur
+de ligne historiques restent regroupés pour un nettoyage ultérieur.
+
 Les contrôles Classic de saisie (`TextInput`, `Textarea` et `Select`) sont
 également passés sous PHPCS après le découpage neutre d'une ligne trop longue
 dans chaque builder ; leurs tests directs couvrent toujours leurs sorties.

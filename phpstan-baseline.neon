@@ -1,66 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Variable \$editor might not be defined\.$#'
-			identifier: variable.undefined
-			count: 3
-			path: administrator/components/com_breezingformsng/layouts/forms/advanced_options.php
-
-		-
-			message: '#^Variable \$initScripts might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: administrator/components/com_breezingformsng/layouts/forms/advanced_options.php
-
-		-
-			message: '#^Variable \$pieceAfter might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: administrator/components/com_breezingformsng/layouts/forms/advanced_options.php
-
-		-
-			message: '#^Variable \$pieceBefore might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: administrator/components/com_breezingformsng/layouts/forms/advanced_options.php
-
-		-
-			message: '#^Variable \$pieceBeginSubmit might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: administrator/components/com_breezingformsng/layouts/forms/advanced_options.php
-
-		-
-			message: '#^Variable \$pieceEndSubmit might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: administrator/components/com_breezingformsng/layouts/forms/advanced_options.php
-
-		-
-			message: '#^Variable \$pkg might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: administrator/components/com_breezingformsng/layouts/forms/advanced_options.php
-
-		-
-			message: '#^Variable \$submittedScripts might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: administrator/components/com_breezingformsng/layouts/forms/advanced_options.php
-
-		-
-			message: '#^Variable \$tabEntryCounts might not be defined\.$#'
-			identifier: variable.undefined
-			count: 7
-			path: administrator/components/com_breezingformsng/layouts/forms/advanced_options.php
-
-		-
-			message: '#^Variable \$tabId might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: administrator/components/com_breezingformsng/layouts/forms/advanced_options.php
-
-		-
 			message: '#^Calling self\:\:renderCodeMirror\(\) outside of class scope\.$#'
 			identifier: outOfClass.self
 			count: 2
@@ -79,12 +19,6 @@ parameters:
 			path: administrator/components/com_breezingformsng/layouts/quickmode/advanced_element.php
 
 		-
-			message: '#^Variable \$active_language_code might not be defined\.$#'
-			identifier: variable.undefined
-			count: 4
-			path: administrator/components/com_breezingformsng/layouts/quickmode/advanced_element.php
-
-		-
 			message: '#^Calling self\:\:decodeJsonArray\(\) outside of class scope\.$#'
 			identifier: outOfClass.self
 			count: 1
@@ -95,42 +29,6 @@ parameters:
 			identifier: function.notFound
 			count: 16
 			path: administrator/components/com_breezingformsng/layouts/quickmode/advanced_form.php
-
-		-
-			message: '#^Variable \$dataObjectString might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: administrator/components/com_breezingformsng/layouts/quickmode/advanced_form.php
-
-		-
-			message: '#^Variable \$themes might not be defined\.$#'
-			identifier: variable.undefined
-			count: 3
-			path: administrator/components/com_breezingformsng/layouts/quickmode/advanced_form.php
-
-		-
-			message: '#^Variable \$themesbootstrap might not be defined\.$#'
-			identifier: variable.undefined
-			count: 3
-			path: administrator/components/com_breezingformsng/layouts/quickmode/advanced_form.php
-
-		-
-			message: '#^Variable \$debugMode might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: administrator/components/com_breezingformsng/layouts/quickmode/form_state_actions.php
-
-		-
-			message: '#^Variable \$formId might not be defined\.$#'
-			identifier: variable.undefined
-			count: 8
-			path: administrator/components/com_breezingformsng/layouts/quickmode/form_state_actions.php
-
-		-
-			message: '#^Variable \$published might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: administrator/components/com_breezingformsng/layouts/quickmode/form_state_actions.php
 
 		-
 			message: '#^Calling self\:\:renderCodeMirror\(\) outside of class scope\.$#'
@@ -145,68 +43,14 @@ parameters:
 			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_element.php
 
 		-
-			message: '#^Variable \$active_language_code might not be defined\.$#'
-			identifier: variable.undefined
-			count: 33
-			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_element.php
-
-		-
-			message: '#^Variable \$isAzureBootstrapTheme might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_element.php
-
-		-
 			message: '#^Function bf_tooltipText not found\.$#'
 			identifier: function.notFound
 			count: 18
 			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_form.php
 
 		-
-			message: '#^Variable \$active_language_code might not be defined\.$#'
-			identifier: variable.undefined
-			count: 5
-			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_form.php
-
-		-
-			message: '#^Variable \$formDesc might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_form.php
-
-		-
-			message: '#^Variable \$formEmailadr might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_form.php
-
-		-
-			message: '#^Variable \$formEmailntf might not be defined\.$#'
-			identifier: variable.undefined
-			count: 3
-			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_form.php
-
-		-
-			message: '#^Variable \$formName might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_form.php
-
-		-
-			message: '#^Variable \$formTitle might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_form.php
-
-		-
 			message: '#^Function bf_tooltipText not found\.$#'
 			identifier: function.notFound
-			count: 2
-			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_page.php
-
-		-
-			message: '#^Variable \$active_language_code might not be defined\.$#'
-			identifier: variable.undefined
 			count: 2
 			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_page.php
 
@@ -214,12 +58,6 @@ parameters:
 			message: '#^Function bf_tooltipText not found\.$#'
 			identifier: function.notFound
 			count: 7
-			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_section.php
-
-		-
-			message: '#^Variable \$active_language_code might not be defined\.$#'
-			identifier: variable.undefined
-			count: 3
 			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_section.php
 
 		-

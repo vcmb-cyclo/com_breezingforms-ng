@@ -7,6 +7,8 @@
 
 defined('_JEXEC') or die;
 
+/** @var string $active_language_code */
+/** @var bool $isAzureBootstrapTheme */
 use Joomla\CMS\Language\Text;
 ?>
                                     <div class="bfProperties" id="bfElementProperties" style="display:none">

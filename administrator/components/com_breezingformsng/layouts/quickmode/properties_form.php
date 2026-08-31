@@ -7,6 +7,12 @@
 
 defined('_JEXEC') or die;
 
+/** @var string $active_language_code */
+/** @var string $formDesc */
+/** @var string $formEmailadr */
+/** @var int $formEmailntf */
+/** @var string $formName */
+/** @var string $formTitle */
 use Joomla\CMS\Language\Text;
 ?>
                                     <!-- FORM PROPERTIES BEGIN -->

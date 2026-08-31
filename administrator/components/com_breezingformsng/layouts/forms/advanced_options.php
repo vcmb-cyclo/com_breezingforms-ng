@@ -25,6 +25,20 @@
 
 defined('_JEXEC') or die;
 
+/**
+ * @var \stdClass $f
+ * @var string $pkg
+ * @var \Joomla\CMS\Editor\Editor|null $editor
+ * @var string $tabId
+ * @var array<string, int> $tabEntryCounts
+ * @var array<int, \stdClass> $initScripts
+ * @var array<int, \stdClass> $submittedScripts
+ * @var array<int, \stdClass> $pieceBefore
+ * @var array<int, \stdClass> $pieceAfter
+ * @var array<int, \stdClass> $pieceBeginSubmit
+ * @var array<int, \stdClass> $pieceEndSubmit
+ */
+
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Vcmb\Component\BreezingformsNG\Administrator\Helper\FormsAdvancedOptionsHtml;

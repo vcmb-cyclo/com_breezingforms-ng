@@ -7,6 +7,7 @@
 
 defined('_JEXEC') or die;
 
+/** @var string $active_language_code */
 use Joomla\CMS\HTML\Helpers\Bootstrap;
 use Joomla\CMS\Language\Text;
 ?>

@@ -7,6 +7,9 @@
 
 defined('_JEXEC') or die;
 
+/** @var string $dataObjectString */
+/** @var array<int, string> $themes */
+/** @var array<int, string> $themesbootstrap */
 use Joomla\CMS\Language\Text;
 ?>
                                     <div class="bfAdvanced" id="bfPageAdvanced" style="display:none">

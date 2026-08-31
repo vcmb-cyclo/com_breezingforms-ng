@@ -7,6 +7,9 @@
 
 defined('_JEXEC') or die;
 
+/** @var int $debugMode */
+/** @var int $formId */
+/** @var int $published */
 use Joomla\CMS\Language\Text;
 ?>
 <div class="d-flex align-items-center gap-3 ms-auto">

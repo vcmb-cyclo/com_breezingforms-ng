@@ -7,6 +7,7 @@
 
 defined('_JEXEC') or die;
 
+/** @var string $active_language_code */
 use Joomla\CMS\Language\Text;
 ?>
                                     <div class="bfAdvanced" id="bfSectionAdvanced" style="display:none">

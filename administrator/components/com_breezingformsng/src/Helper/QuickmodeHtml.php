@@ -131,8 +131,21 @@ final class QuickmodeHtml
      *     saved yet (formId === 0) - the tab then shows a placeholder
      *     instead of the settings block.
      */
-    public static function showApplication($formId, $formName, $formTitle, $formDesc, $formEmailntf, $formEmailadr, $published, $debugMode, $dataObjectString, $elementScripts, $themes, $themesbootstrap, array $advancedOptions = [])
-    {
+    public static function showApplication(
+        int $formId,
+        string $formName,
+        string $formTitle,
+        string $formDesc,
+        int $formEmailntf,
+        string $formEmailadr,
+        int $published,
+        int $debugMode,
+        string $dataObjectString,
+        array $elementScripts,
+        array $themes,
+        array $themesbootstrap,
+        array $advancedOptions = []
+    ) {
         $optionsForm = $advancedOptions['form'] ?? null;
         $optionsEditor = $advancedOptions['editor'] ?? null;
         $optionsTabEntryCounts = $advancedOptions['tabEntryCounts'] ?? [];

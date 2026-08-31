@@ -560,6 +560,12 @@ Le builder Classic de texte statique, d'icône, rectangle et infobulle est
 également passé sous PHPCS après découpage neutre de ses chaînes de rendu ;
 ses dix tests directs verrouillent les variantes de layout et d'échappement.
 
+Les builders de cycle du formulaire (`FormOpeningMarkupBuilder`,
+`FormClosingMarkupBuilder`, `FormModeFinalizationBuilder` et
+`FormOptionalContextFieldsBuilder`) sont désormais inclus dans le périmètre
+PHPCS ; leurs tests unitaires dédiés fournissent déjà la caractérisation des
+variantes de mode et de contexte.
+
 Le premier nettoyage ciblé de cette baseline PHPCS est réalisé dans
 `QuickModeSelectBuilder`, `QuickModeCaptchaMarkupBuilder` et
 `QuickModeUploadOptionsBuilder` (`eaf8b2d1`) : leurs sorties sont inchangées et

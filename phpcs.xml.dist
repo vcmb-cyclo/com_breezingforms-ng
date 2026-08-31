@@ -27,6 +27,10 @@
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicGraphicButtonBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicCaptchaBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicStaticTextBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/FormClosingMarkupBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/FormModeFinalizationBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/FormOpeningMarkupBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/FormOptionalContextFieldsBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicTextInputBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicTextareaBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicSelectBuilder.php</file>

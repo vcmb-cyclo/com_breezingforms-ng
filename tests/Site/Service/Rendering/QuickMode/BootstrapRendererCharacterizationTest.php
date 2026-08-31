@@ -74,11 +74,15 @@ final class BootstrapRendererCharacterizationTest extends TestCase
     /** @var array<string, string> */
     private const BS_CLASSES = [
         'controls' => '',
+        'alert' => 'alert',
+        'alert-error' => 'alert-error',
         'form-inline' => 'bf-form-inline',
         'control-group' => 'mb-3',
         'control-label' => 'form-label',
         'form-control' => 'form-control',
         'form-group' => 'bf-form-group mb-3',
+        'form-actions' => 'form-actions',
+        'form-actions-buttons' => 'form-actions-buttons',
         'icon-question-sign' => 'fas fa-question-circle',
         'icon-asterisk' => 'fas fa-asterisk',
         'nonform-control' => 'nonform-control',
@@ -100,6 +104,8 @@ final class BootstrapRendererCharacterizationTest extends TestCase
         'well' => 'card',
         'well-small' => 'card-body',
         'icon-calendar' => 'fas fa-calendar',
+        'float-start' => 'float-start',
+        'float-end' => 'float-end',
     ];
 
     public function testTextfieldElement(): void

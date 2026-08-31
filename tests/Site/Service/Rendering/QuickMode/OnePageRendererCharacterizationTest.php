@@ -399,7 +399,10 @@ final class OnePageRendererCharacterizationTest extends TestCase
     {
         yield 'bfTextfield' => ['bfTextfield', ['bfName' => 'name']];
         yield 'bfTextarea' => ['bfTextarea', ['bfName' => 'message', 'width' => '', 'height' => '']];
-        yield 'bfNumberInput' => ['bfNumberInput', ['bfName' => 'age', 'range' => false, 'step' => 1, 'max' => 120, 'min' => 0]];
+        yield 'bfNumberInput' => [
+            'bfNumberInput',
+            ['bfName' => 'age', 'range' => false, 'step' => 1, 'max' => 120, 'min' => 0],
+        ];
     }
 
     public function testSummarizeElement(): void
@@ -538,8 +541,12 @@ final class OnePageRendererCharacterizationTest extends TestCase
         $this->setPrivate($renderer, 'language_tag', 'zz-ZZ');
         $this->setPrivate($renderer, 'bsClasses', [5 => [
             'controls' => '',
+            'alert' => 'alert',
+            'alert-error' => 'alert-error',
             'form-inline' => 'bf-form-inline',
             'form-group' => 'bf-form-group mb-3',
+            'form-actions' => 'form-actions',
+            'form-actions-buttons' => 'form-actions-buttons',
             'control-group' => 'mb-3',
             'control-label' => 'form-label',
             'form-control' => 'form-control',
@@ -563,6 +570,8 @@ final class OnePageRendererCharacterizationTest extends TestCase
             'well' => 'card',
             'well-small' => 'card-body',
             'icon-calendar' => 'fas fa-calendar',
+            'float-start' => 'float-start',
+            'float-end' => 'float-end',
         ]]);
 
         return $renderer;

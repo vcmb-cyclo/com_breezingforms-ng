@@ -519,6 +519,11 @@ couvertes par les snapshots. Le compteur est passé de 64 à 0 warnings de
 longueur pour ce trait. Les quatre renderers passent toujours la
 caractérisation PHPUnit et le sous-périmètre QuickMode passe PHPStan.
 
+Les fixtures de caractérisation Bootstrap et OnePage fournissent désormais
+toutes les classes de thème demandées par les chemins de navigation. La suite
+PHPUnit ne produit plus les 11 warnings de clés absentes et termine sans
+warning ; PHPCS et PHPStan restent également verts.
+
 ### 6.2 Réduire la baseline PHPStan
 
 - Classer les 251 entrées actuelles par fichier et par catégorie.

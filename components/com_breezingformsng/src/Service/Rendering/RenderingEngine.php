@@ -96,6 +96,7 @@ final class RenderingEngine
     private ?FormValidationScriptWrapperBuilder $formValidationScriptWrapperBuilderService = null;
     private ?FileExtensionsCheckBuilder $fileExtensionsCheckBuilderService = null;
     private ?QueryListSelectAllScriptBuilder $queryListSelectAllScriptBuilderService = null;
+    private ?QueryListNavigationBuilder $queryListNavigationBuilderService = null;
     private ?AdditionalHiddenFieldsBuilder $additionalHiddenFieldsBuilderService = null;
     private ?PaymentProviderDetector $paymentProviderDetectorService = null;
     private ?ContentBuilderFileValueParser $contentBuilderFileValueParserService = null;
@@ -401,6 +402,11 @@ final class RenderingEngine
     private function queryListSelectAllScriptBuilder(): QueryListSelectAllScriptBuilder
     {
         return $this->queryListSelectAllScriptBuilderService ??= new QueryListSelectAllScriptBuilder();
+    }
+
+    private function queryListNavigationBuilder(): QueryListNavigationBuilder
+    {
+        return $this->queryListNavigationBuilderService ??= new QueryListNavigationBuilder();
     }
 
     private function additionalHiddenFieldsBuilder(): AdditionalHiddenFieldsBuilder
@@ -777,36 +783,12 @@ final class RenderingEngine
                 '    } // for' . nl() .
                 '    if (pagenav > 0 && pagesize > 0) {' . nl() .
                 '        var navi = \'\';' . nl() .
-                '        if (pagenav<=4) {' . nl() .
-                '            if (page>1) navi += \'<a href="javascript:ff_dispQueryPage(\'+id+\',1);">\';' . nl() .
-                '            navi += \'&lt;&lt;\';' . nl() .
-                '            if (pagenav<=2) navi += \' ' . Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGESTART') . '\';' . nl() .
-                '            if (page>1) navi += \'<\/a>\';' . nl() .
-                '            navi += \' \';' . nl() .
-                '            if (page>1) navi += \'<a href="javascript:ff_dispQueryPage(\'+id+\',\'+(page-1)+\');">\';' . nl() .
-                '            navi += \'&lt;\';' . nl() .
-                '            if (pagenav<=2) navi += \' ' . Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV') . '\';' . nl() .
-                '            if (page>1) navi += \'<\/a>\';' . nl() .
-                '            navi += \' \';' . nl() .
-                '        } // if' . nl() .
-                '        if (pagenav % 2) {' . nl() .
-                '            for (p = 1; p <= lastpage; p++)' . nl() .
-                '                if (p == page) ' . nl() .
-                '                    navi += p+\' \';' . nl() .
-                '                else' . nl() .
-                '                    navi += \'<a href="javascript:ff_dispQueryPage(\'+id+\',\'+p+\');">\'+p+\'<\/a> \';' . nl() .
-                '        } // if' . nl() .
-                '        if (pagenav<=4) {' . nl() .
-                '            if (page<lastpage) navi += \'<a href="javascript:ff_dispQueryPage(\'+id+\',\'+(page+1)+\');">\';' . nl() .
-                '            if (pagenav<=2) navi += \'' . Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT') . ' \';' . nl() .
-                '            navi += \'&gt;\';' . nl() .
-                '            if (page<lastpage) navi += \'<\/a>\';' . nl() .
-                '            navi += \' \';' . nl() .
-                '            if (page<lastpage) navi += \'<a href="javascript:ff_dispQueryPage(\'+id+\',\'+lastpage+\');">\';' . nl() .
-                '            if (pagenav<=2) navi += \'' . Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEEND') . ' \';' . nl() .
-                '            navi += \'&gt;&gt;\';' . nl() .
-                '            if (page<lastpage) navi += \'<\/a>\';' . nl() .
-                '        } // if' . nl() .
+                $this->queryListNavigationBuilder()->build([
+                    'start' => Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGESTART'),
+                    'previous' => Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV'),
+                    'next' => Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT'),
+                    'end' => Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEEND'),
+                ], nl()) . nl() .
                 '        rows[header+pagesize].cells[0].innerHTML = navi;' . nl() .
                 '    } // if' . nl() .
                 '    ff_queryCurrPage[id] = page;' . nl();

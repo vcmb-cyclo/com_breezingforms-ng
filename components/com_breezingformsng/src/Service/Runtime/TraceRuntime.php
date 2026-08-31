@@ -202,4 +202,85 @@ final class TraceRuntime
 
         return $retval;
     }
+
+    public function dumpTrace(): void
+    {
+        if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT) {
+            $html = ob_get_contents();
+            ob_end_clean();
+            echo htmlspecialchars($html, ENT_QUOTES) . $this->processor->traceBuffer;
+            ob_start();
+            $this->processor->traceBuffer = null;
+            return;
+        }
+
+        if (!$this->processor->traceBuffer) {
+            return;
+        }
+
+        if ($this->processor->traceMode & _FF_TRACEMODE_APPEND) {
+            echo '<pre>' . $this->processor->traceBuffer . '</pre>';
+            $this->processor->traceBuffer = null;
+            return;
+        }
+
+        echo '<script type="text/javascript">' . nl()
+            . '<!--' . nl();
+        if ($this->processor->dying) {
+            echo 'console.log(' . json_encode($this->processor->traceBuffer) . ')' . nl();
+        }
+        echo '-->' . nl() . '</script>' . nl();
+        $this->processor->traceBuffer = null;
+    }
+
+    public function traceEval(mixed $name): void
+    {
+        if (
+            ($this->processor->traceMode & _FF_TRACEMODE_DISABLE)
+            || !($this->processor->traceMode & _FF_TRACEMODE_EVAL)
+            || $this->processor->dying
+        ) {
+            return;
+        }
+
+        $this->processor->traceBuffer .= str_repeat('  ', count($this->processor->traceStack));
+        $this->processor->traceBuffer .= htmlspecialchars("eval($name)\n", ENT_QUOTES);
+        if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT) {
+            $this->dumpTrace();
+        }
+    }
+
+    public function suicide(): bool
+    {
+        if ($this->processor->dying) {
+            return false;
+        }
+
+        $this->processor->dying = true;
+        $rep = 0;
+        $this->processor->errrep = error_reporting($rep);
+
+        return true;
+    }
+
+    public function bury(): bool
+    {
+        if (!$this->processor->dying) {
+            return false;
+        }
+
+        if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT) {
+            $this->dumpTrace();
+        }
+        ob_end_clean();
+        if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT) {
+            echo '</pre>';
+        } else {
+            $this->dumpTrace();
+        }
+        error_reporting($this->processor->errrep);
+        restore_error_handler();
+
+        return true;
+    }
 }

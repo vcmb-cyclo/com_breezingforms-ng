@@ -22,7 +22,19 @@ final class FormSubmissionFieldsBuilderTest extends TestCase
     {
         $builder = new FormSubmissionFieldsBuilder();
 
-        self::assertStringContainsString('name="act" value="run"', $builder->build(13, "\t", "\r\n", true));
-        self::assertStringContainsString('name="ff_frame" value="1"', $builder->build(14, "\t", "\r\n", false, true));
+        self::assertSame(
+            "\t<input type=\"hidden\" name=\"option\" value=\"com_breezingformsng\"/>\r\n"
+            . "\t<input type=\"hidden\" name=\"act\" value=\"run\"/>\r\n"
+            . "\t<input type=\"hidden\" name=\"ff_form\" value=\"13\"/>\r\n"
+            . "\t<input type=\"hidden\" name=\"ff_task\" value=\"submit\"/>\r\n",
+            $builder->build(13, "\t", "\r\n", true)
+        );
+        self::assertSame(
+            "\t<input type=\"hidden\" name=\"option\" value=\"com_breezingformsng\"/>\r\n"
+            . "\t<input type=\"hidden\" name=\"ff_frame\" value=\"1\"/>\r\n"
+            . "\t<input type=\"hidden\" name=\"ff_form\" value=\"14\"/>\r\n"
+            . "\t<input type=\"hidden\" name=\"ff_task\" value=\"submit\"/>\r\n",
+            $builder->build(14, "\t", "\r\n", false, true)
+        );
     }
 }

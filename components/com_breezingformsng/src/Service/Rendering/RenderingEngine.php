@@ -95,6 +95,7 @@ final class RenderingEngine
     private ?ContentBuilderReadonlyScriptWrapperBuilder $contentBuilderReadonlyScriptWrapperBuilderService = null;
     private ?FormValidationScriptWrapperBuilder $formValidationScriptWrapperBuilderService = null;
     private ?FileExtensionsCheckBuilder $fileExtensionsCheckBuilderService = null;
+    private ?QueryListSelectAllScriptBuilder $queryListSelectAllScriptBuilderService = null;
     private ?AdditionalHiddenFieldsBuilder $additionalHiddenFieldsBuilderService = null;
     private ?PaymentProviderDetector $paymentProviderDetectorService = null;
     private ?ContentBuilderFileValueParser $contentBuilderFileValueParserService = null;
@@ -395,6 +396,11 @@ final class RenderingEngine
     private function fileExtensionsCheckBuilder(): FileExtensionsCheckBuilder
     {
         return $this->fileExtensionsCheckBuilderService ??= new FileExtensionsCheckBuilder();
+    }
+
+    private function queryListSelectAllScriptBuilder(): QueryListSelectAllScriptBuilder
+    {
+        return $this->queryListSelectAllScriptBuilderService ??= new QueryListSelectAllScriptBuilder();
     }
 
     private function additionalHiddenFieldsBuilder(): AdditionalHiddenFieldsBuilder
@@ -723,30 +729,7 @@ final class RenderingEngine
 
             $library[] = array(
                 'ff_selectAllQueryRows',
-                'function ff_selectAllQueryRows(id,checked)' . nl() .
-                '{' . nl() .
-                '    if (!ff_queryCheckbox[id]) return;' . nl() .
-                '    var cnt = ff_queryRows[id].length;' . nl() .
-                '    var pagesize = ff_queryPageSize[id];' . nl() .
-                '    if (pagesize > 0) {' . nl() .
-                '        lastpage = parseInt((cnt+pagesize-1)/pagesize);' . nl() .
-                '        if (lastpage == 1)' . nl() .
-                '           pagesize = cnt;' . nl() .
-                '        else {' . nl() .
-                '            var currpage = ff_queryCurrPage[id];' . nl() .
-                '            var p;' . nl() .
-                '            for (p = 1; p < currpage; p++) cnt -= pagesize;' . nl() .
-                '            if (cnt > pagesize) cnt = pagesize;' . nl() .
-                '        } // if' . nl() .
-                '    } // if' . nl() .
-                '    var curr;' . nl() .
-                '    for (curr = 0; curr < cnt; curr++)' . nl() .
-                '        document.getElementById(\'ff_cb\'+id+\'_\'+curr).checked = checked;' . nl() .
-                '    for (curr = cnt; curr < pagesize; curr++)' . nl() .
-                '        document.getElementById(\'ff_cb\'+id+\'_\'+curr).checked = false;' . nl() .
-                '    if (ff_queryCheckbox[id]==1)' . nl() .
-                '        document.getElementById(\'ff_cb\'+id).checked = checked;' . nl() .
-                '} // ff_selectAllQueryRows'
+                $this->queryListSelectAllScriptBuilder()->build(nl())
             );
 
             $code = 'function ff_dispQueryPage(id,page)' . nl() .

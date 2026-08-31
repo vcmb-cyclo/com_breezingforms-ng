@@ -778,6 +778,12 @@ contrat est verrouillé par `PublicFacadeApiTest`. Cette correction retire dix
 faux diagnostics d'analyse et porte le niveau 4 à 31 diagnostics, sans
 modifier la façade publique.
 
+Les cinq accès nullsafe suivis d'une coalescence dans `ScriptingEngine` sont
+également simplifiés : l'opérateur `??` protège déjà l'accès à la propriété
+dans ce contexte. Les chemins de génération des callbacks restent couverts
+par les caractérisations `RenderingEngine::view()` ; le niveau 4 descend à 26
+diagnostics.
+
 ## Phase 7 — Réduire les façades historiques
 
 Cette phase commence seulement lorsque leurs responsabilités ont été extraites

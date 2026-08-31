@@ -18,6 +18,7 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\ClassicRende
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\OnePageRenderer;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickModeRendererFactory;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\CallbackRegistrationService;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\SubmittedCallbackNameResolver;
 
 if (!defined('JPATH_ADMINISTRATOR')) {
     define('JPATH_ADMINISTRATOR', __DIR__ . '/../../../../administrator');
@@ -472,6 +473,17 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
             12
         ));
         self::assertSame(['ff_contact_init', 'ff_contact_submitted'], $processor->callbackNames);
+    }
+
+    public function testSubmittedCallbackNameResolverPreservesCustomAndEmptyModes(): void
+    {
+        $resolver = new SubmittedCallbackNameResolver(null);
+
+        self::assertSame(
+            'ff_contact_submitted',
+            $resolver->resolve((object) ['script2cond' => 2, 'name' => 'contact'])
+        );
+        self::assertSame('', $resolver->resolve((object) ['script2cond' => 0, 'name' => 'contact']));
     }
 
     public function testInitialOnloadInitializesFormPageGridAndHeight(): void

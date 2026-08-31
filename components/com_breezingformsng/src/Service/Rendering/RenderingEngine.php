@@ -109,6 +109,7 @@ final class RenderingEngine
     private ?QueryListPageScriptBuilder $queryListPageScriptBuilderService = null;
     private ?CallbackRegistrationService $callbackRegistrationService = null;
     private ?FormPieceExecutionService $formPieceExecutionService = null;
+    private ?SubmittedCallbackNameResolver $submittedCallbackNameResolverService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -504,6 +505,13 @@ final class RenderingEngine
     {
         return $this->formPieceExecutionService ??= new FormPieceExecutionService(
             $this->processor,
+            $this->processor->database
+        );
+    }
+
+    private function submittedCallbackNameResolver(): SubmittedCallbackNameResolver
+    {
+        return $this->submittedCallbackNameResolverService ??= new SubmittedCallbackNameResolver(
             $this->processor->database
         );
     }
@@ -1533,26 +1541,7 @@ final class RenderingEngine
      */
     private function linkSubmittedOnload(array &$library, array &$linked): void
     {
-        $functionName = '';
-
-        switch ($this->processor->formrow->script2cond) {
-            case 1:
-                $script2id = (int) $this->processor->formrow->script2id;
-                $query = $this->processor->database->getQuery(true)
-                    ->select('name')
-                    ->from($this->processor->database->quoteName('#__facileforms_scripts'))
-                    ->where($this->processor->database->quoteName('id') . ' = :script2id')
-                    ->where($this->processor->database->quoteName('published') . ' = 1')
-                    ->bind(':script2id', $script2id, ParameterType::INTEGER);
-                $this->processor->database->setQuery($query);
-                $functionName = $this->processor->database->loadResult();
-                break;
-            case 2:
-                $functionName = 'ff_' . $this->processor->formrow->name . '_submitted';
-                break;
-            default:
-                break;
-        }
+        $functionName = $this->submittedCallbackNameResolver()->resolve($this->processor->formrow);
 
         $code = $this->formOnloadScriptBuilder()->submitted(
             (string) $functionName,

@@ -1623,6 +1623,10 @@ Les pièces `before/after` sont désormais exécutées par
 branches custom/library sont isolées, tandis que `RenderingEngine` conserve
 les libellés traduits et le nettoyage du rendu interrompu.
 
+La résolution SQL du callback `script2cond` après soumission est désormais
+portée par `SubmittedCallbackNameResolver`. `RenderingEngine` ne conserve que
+la composition de l'`onload` et son enregistrement.
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

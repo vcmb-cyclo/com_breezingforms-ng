@@ -95,9 +95,8 @@ final class RenderingEngine
     private ?ContentBuilderFileSupportBuilder $contentBuilderFileSupportBuilderService = null;
     private ?ContentBuilderFlashUploadValidationBuilder $contentBuilderFlashUploadValidationBuilderService = null;
     private ?ContentBuilderSignatureImageEncoder $contentBuilderSignatureImageEncoderService = null;
-    private ?CaptchaEndpointBuilder $captchaEndpointBuilderService = null;
+    private ?CaptchaSupportBuilder $captchaSupportBuilderService = null;
     private ?CaptchaValidationRowSelector $captchaValidationRowSelectorService = null;
-    private ?CaptchaValidationDefaultsBuilder $captchaValidationDefaultsBuilderService = null;
     private ?CaptchaLegacyValidationScriptBuilder $captchaLegacyValidationScriptBuilderService = null;
     private ?CaptchaReCaptchaValidationScriptBuilder $captchaReCaptchaValidationScriptBuilderService = null;
     private ?ContentBuilderValueHydrationScriptBuilder $contentBuilderValueHydrationScriptBuilderService = null;
@@ -402,9 +401,9 @@ final class RenderingEngine
         return $this->contentBuilderSignatureImageEncoderService ??= new ContentBuilderSignatureImageEncoder();
     }
 
-    private function captchaEndpointBuilder(): CaptchaEndpointBuilder
+    private function captchaSupportBuilder(): CaptchaSupportBuilder
     {
-        return $this->captchaEndpointBuilderService ??= new CaptchaEndpointBuilder();
+        return $this->captchaSupportBuilderService ??= new CaptchaSupportBuilder();
     }
 
     private function captchaValidationRowSelector(): CaptchaValidationRowSelector
@@ -412,10 +411,6 @@ final class RenderingEngine
         return $this->captchaValidationRowSelectorService ??= new CaptchaValidationRowSelector();
     }
 
-    private function captchaValidationDefaultsBuilder(): CaptchaValidationDefaultsBuilder
-    {
-        return $this->captchaValidationDefaultsBuilderService ??= new CaptchaValidationDefaultsBuilder();
-    }
 
     private function captchaLegacyValidationScriptBuilder(): CaptchaLegacyValidationScriptBuilder
     {
@@ -1221,7 +1216,7 @@ final class RenderingEngine
                         );
                         break;
                     case 'Captcha':
-                        $captcha_url = $this->captchaEndpointBuilder()->build(
+                        $captcha_url = $this->captchaSupportBuilder()->endpoints(
                             Uri::root(true),
                             $this->processor->app->isClient('administrator'),
                             (int) $this->processor->form
@@ -1985,7 +1980,7 @@ final class RenderingEngine
      */
     private function createCaptchaDefaults(): array
     {
-        return $this->captchaValidationDefaultsBuilder()->build(
+        return $this->captchaSupportBuilder()->validationDefaults(
             Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')
         );
     }
@@ -2001,7 +1996,7 @@ final class RenderingEngine
      */
     private function buildCaptchaScript(string $captchaError, string $capFunc): string
     {
-        $endpoints = $this->captchaEndpointBuilder()->build(
+        $endpoints = $this->captchaSupportBuilder()->endpoints(
             Uri::root(true),
             $this->processor->app->isClient('administrator'),
             (int) $this->processor->form

@@ -98,6 +98,7 @@ final class RenderingEngine
     private ?QueryListSelectAllScriptBuilder $queryListSelectAllScriptBuilderService = null;
     private ?QueryListNavigationBuilder $queryListNavigationBuilderService = null;
     private ?QueryListRowsRefreshBuilder $queryListRowsRefreshBuilderService = null;
+    private ?QueryListPaginationTailBuilder $queryListPaginationTailBuilderService = null;
     private ?AdditionalHiddenFieldsBuilder $additionalHiddenFieldsBuilderService = null;
     private ?PaymentProviderDetector $paymentProviderDetectorService = null;
     private ?ContentBuilderFileValueParser $contentBuilderFileValueParserService = null;
@@ -413,6 +414,11 @@ final class RenderingEngine
     private function queryListRowsRefreshBuilder(): QueryListRowsRefreshBuilder
     {
         return $this->queryListRowsRefreshBuilderService ??= new QueryListRowsRefreshBuilder();
+    }
+
+    private function queryListPaginationTailBuilder(): QueryListPaginationTailBuilder
+    {
+        return $this->queryListPaginationTailBuilderService ??= new QueryListPaginationTailBuilder();
     }
 
     private function additionalHiddenFieldsBuilder(): AdditionalHiddenFieldsBuilder
@@ -760,13 +766,13 @@ final class RenderingEngine
                 '        rows[header+pagesize].cells[0].innerHTML = navi;' . nl() .
                 '    } // if' . nl() .
                 '    ff_queryCurrPage[id] = page;' . nl();
-            if ($qcheckboxes)
-                $code .= '    if (checkbox) ff_selectAllQueryRows(id, false);' . nl();
-            if ($this->processor->formrow->heightmode > 0)
-                $code .= '    ff_resizepage(' . $this->processor->formrow->heightmode . ', ' . $this->processor->formrow->height . ');' . nl();
-            if ($this->processor->inframe)
-                $code .= '    parent.window.scrollTo(0,0);' . nl();
-            $code .= '    window.scrollTo(0,0);' . nl() .
+            $code .= $this->queryListPaginationTailBuilder()->build(
+                (bool) $qcheckboxes,
+                (int) $this->processor->formrow->heightmode,
+                (int) $this->processor->formrow->height,
+                (bool) $this->processor->inframe,
+                nl()
+            ) .
                 '} // ff_dispQueryPage';
             $this->processor->linkcode('ff_dispQueryPage', $library, $linked, $code);
             if ($this->processor->bury()) {

@@ -919,30 +919,7 @@ HTML;
                                                                                         }
                                                                                     }
                                                                                 );
-                                                                                var thebytes = " . $uploadOptions['maxBytes'] . ";
-                                                                                if(thebytes > 0 && typeof files[i].size != 'undefined' && files[i].size > thebytes){
-                                                                                     alert(" . json_encode(' ' . Text::_('COM_BREEZINGFORMSNG_FLASH_UPLOADER_TOO_LARGE')) . ");
-                                                                                     error = true;
-                                                                                }
-                                                                                var ext = files[i].name.replace(/[/\\?%*:|\"<>]/g, '').split('.').pop().toLowerCase();
-                                                                                var exts = '" . strtolower($exts) . "'.split(',');
-                                                                                var found = 0;
-                                                                                for (var x in exts){
-                                                                                    if(exts[x] == ext){
-                                                                                        found++;
-                                                                                    }
-                                                                                }
-                                                                                if(found == 0){
-                                                                                    alert(" . json_encode(' ' . Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED')) . ");
-                                                                                    error = true;
-                                                                                }
-                                                                                if(error){
-                                                                                    JQuery('#'+files[i].id+'queue').remove();
-                                                                                    JQuery('#'+files[i].id+'queueitem').remove();
-                                                                                }else{
-                                                                                    bfFlashUploadersLength++;
-                                                                                }
-                                                                                bfUploadImageThumb(files[i]);
+" . QuickModeUploadValidationScriptBuilder::build((int) $uploadOptions['maxBytes'], strtolower($exts), (string) json_encode(' ' . Text::_('COM_BREEZINGFORMSNG_FLASH_UPLOADER_TOO_LARGE')), (string) json_encode(' ' . Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED')), chr(10)) . "
                                                                             }
                                                                         }
                                                                         // disable the button if no multi upload

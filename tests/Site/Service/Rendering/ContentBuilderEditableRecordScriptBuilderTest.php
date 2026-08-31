@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Rendering;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use stdClass;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderEditableRecordScriptBuilder;
 
@@ -156,6 +157,46 @@ final class ContentBuilderEditableRecordScriptBuilderTest extends TestCase
         self::assertStringContainsString('type == "radio"', $result['javascript']);
         self::assertStringContainsString('ff_elem52', $result['javascript']);
         self::assertStringContainsString('ff_nm_birthdate[]', $result['javascript']);
+    }
+
+    #[DataProvider('simpleValueTypes')]
+    public function testBuildsHydrationForEachRemainingSimpleValueType(string $type, string $name): void
+    {
+        $result = $this->builder()->build(
+            [$this->record(61, $name, $type, 'value')],
+            [],
+            false,
+            9,
+            sys_get_temp_dir()
+        );
+
+        self::assertStringContainsString('ff_nm_' . $name . '[]', $result['javascript']);
+        self::assertStringContainsString('value', $result['javascript']);
+    }
+
+    /**
+     * @return array<string, array{string, string}>
+     */
+    public static function simpleValueTypes(): array
+    {
+        return [
+            'textarea' => ['Textarea', 'description'],
+            'number' => ['Number Input', 'quantity'],
+            'hidden' => ['Hidden Input', 'token'],
+        ];
+    }
+
+    public function testIgnoresUnsupportedRecordTypes(): void
+    {
+        $result = $this->builder()->build(
+            [$this->record(62, 'unknown', 'Unsupported', 'value')],
+            [],
+            true,
+            9,
+            sys_get_temp_dir()
+        );
+
+        self::assertSame(['contentBuilderScript' => '', 'javascript' => ''], $result);
     }
 
     private function record(int $elementId, string $name, string $type, string $value): stdClass

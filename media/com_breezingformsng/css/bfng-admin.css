@@ -31,6 +31,38 @@
 
 #newStuffBar { display: flex; flex-wrap: wrap; gap: var(--bfng-space-4); }
 
+/* .bfng-message: replaces #bfSaveQueue's fixed-350px Verdana box and
+   .bfFadingMessage's Bootstrap-3-green box (charte section 07). Both
+   elements keep their historical id/class for the JS that targets them
+   (quickmode-app.js writes innerHTML / calls fadeIn()/fadeOut() on them
+   unchanged) - only the visual layer moves here. Icon is a CSS ::before
+   (FontAwesome, already loaded by Joomla) rather than the charte's
+   Lucide glyph: this session's icon decision is to stay on FontAwesome
+   rather than add a new icon-set dependency (see migration plan). */
+.bfng-message {
+  margin-top: var(--bfng-space-4);
+  padding: var(--bfng-space-3) var(--bfng-space-5);
+  border-left: 3px solid var(--bfng-accent-500);
+  background: color-mix(in oklab, var(--bfng-accent-500) 8%, var(--bfng-surface));
+  border-radius: var(--bfng-radius-sm);
+  font: normal var(--bfng-fs-sm)/1.4 var(--bfng-font-ui);
+  color: var(--bfng-text);
+  width: auto;
+  text-align: left;
+}
+.bfng-message::before {
+  font: normal normal 900 var(--bfng-fs-md)/1 "Font Awesome 6 Free";
+  margin-right: var(--bfng-space-3);
+  color: var(--bfng-accent-500);
+}
+.bfng-message--info::before    { content: "\f05a"; }
+.bfng-message--success::before { content: "\f058"; color: var(--bfng-success); }
+.bfng-message--warning::before { content: "\f071"; color: var(--bfng-warning); }
+.bfng-message--danger::before  { content: "\f057"; color: var(--bfng-danger); }
+.bfng-message--success { border-left-color: var(--bfng-success); background: color-mix(in oklab, var(--bfng-success) 8%, var(--bfng-surface)); }
+.bfng-message--warning { border-left-color: var(--bfng-warning); background: color-mix(in oklab, var(--bfng-warning) 8%, var(--bfng-surface)); }
+.bfng-message--danger  { border-left-color: var(--bfng-danger);  background: color-mix(in oklab, var(--bfng-danger) 8%, var(--bfng-surface)); }
+
 /* .bfng-tree: cosmetic layer only, over jTree's own tree_component.css.
    jTree owns collapse/expand via .tree li.open/.closed toggling display
    on the nested <ul> - none of that is touched here, only color/spacing

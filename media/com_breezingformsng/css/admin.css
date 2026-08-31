@@ -31,7 +31,7 @@
     min-width: 90% !important;
 }
 
-#bfSaveQueue{
+#bfSaveQueue:not(.bfng-message){
 	font: 11px Verdana, Geneva, sans-serif;
 	border: 2px solid #E5E5E5;
 	background-color: #F5F5F5;
@@ -184,7 +184,7 @@ overflow:hidden;width: 100%;
     background: none !important;
 }
 
-.bfFadingMessage{
+.bfFadingMessage:not(.bfng-message){
     margin-bottom: 10px;
 }
 

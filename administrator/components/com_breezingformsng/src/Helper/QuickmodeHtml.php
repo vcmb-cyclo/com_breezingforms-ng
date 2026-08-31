@@ -282,7 +282,7 @@ final class QuickmodeHtml
             <?php
         }
         ?>
-        <div style="display:none;visibility:hidden;" id="bfSaveQueue"></div>
+        <div style="display:none;visibility:hidden;" id="bfSaveQueue" class="bfng-message bfng-message--info"></div>
         <div id="bfQuickModeWrapper" class="bfClearfix bfng">
 
             <div id="bfQuickModeLeft" class="bfClearfix">
@@ -347,13 +347,13 @@ final class QuickmodeHtml
                             <div id="fragment-1" class="tab-pane fade show active" role="tabpanel" aria-labelledby="fragment-1-tab">
                                 <div>
                                     <br />
-                                    <div class="bfFadingMessage" style="display:none"></div>
+                                    <div class="bfFadingMessage bfng-message bfng-message--info" style="display:none"></div>
                                     <?php self::renderSection('properties_form', get_defined_vars()); ?>
                                     <?php self::renderSection('properties_page', get_defined_vars()); ?>
                                     <?php self::renderSection('properties_section', get_defined_vars()); ?>
                                     <?php self::renderSection('properties_element', get_defined_vars()); ?>
                                     <!-- ELEMENT PROPERTIES END -->
-                                    <div class="bfFadingMessage" style="display:none"></div>
+                                    <div class="bfFadingMessage bfng-message bfng-message--info" style="display:none"></div>
                                     <br />
                                     <br />
 
@@ -364,11 +364,11 @@ final class QuickmodeHtml
                                 <div>
                                     <br />
 
-                                    <div class="bfFadingMessage" style="display:none"></div>
+                                    <div class="bfFadingMessage bfng-message bfng-message--info" style="display:none"></div>
                                     <?php self::renderSection('advanced_form', get_defined_vars()); ?>
                                     <?php self::renderSection('advanced_element', get_defined_vars()); ?>
                                     <br />
-                                    <div class="bfFadingMessage" style="display:none"></div>
+                                    <div class="bfFadingMessage bfng-message bfng-message--info" style="display:none"></div>
                                     <br />
                                     <br />
 

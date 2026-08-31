@@ -821,6 +821,25 @@ complète verte (399 tests, aucun fichier PHP touché), PHPStan niveau 2
 propre, build + validation du package (skins présents dans l'archive sous
 `media/breezingforms/themes/`, absents de l'ancien chemin).
 
+## Phase 13 — Nettoyage des règles `bfPage-*` mortes dans `aqua/theme.css`
+
+Ajoutée le 2026-08-31, à la suite de la phase 12. Comme signalé dans la
+réserve de la phase 12, `aqua/theme.css` était le seul des 6 skins
+restaurés à référencer les classes `bfPage-tl/tr/t/l/r/m/bl/br/b`,
+supprimées du balisage en phase 10 : ~10 règles CSS sans effet, ciblant
+des éléments qui ne sont plus émis. Supprimées, avec les 8 images
+`bg_page-*.png` qu'elles étaient les seules à référencer (`img/`
+conserve les images encore utilisées : boutons, légendes, fieldsets,
+rollover).
+
+### Vérification
+
+Vérification live : `media/breezingforms/themes/aqua/theme.css` répond
+200, plus aucune règle `bfPage-*` dans le contenu servi. Build +
+validation du package (images supprimées absentes de l'archive,
+`theme.css` présent). Suite complète verte (399 tests, aucun fichier PHP
+touché).
+
 ## Travail en parallèle
 
 | Couloir | Fichiers principaux | Peut avancer avec |

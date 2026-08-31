@@ -23,25 +23,6 @@
 
 /* ##### General BreezingForms styles ##### */
 
-.bfPage-tl { background: transparent url('img/bg_page-tl.png') top left no-repeat; }
-.bfPage-tr { background: transparent url('img/bg_page-tr.png') top right no-repeat; }
-.bfPage-t { height: 15px; background: transparent url('img/bg_page-t.png') 0 0 repeat-x; margin: 0 24px; }
-
-.bfPage-l { background: transparent url('img/bg_page-l.png') 0 0 repeat-y; }
-.bfPage-r { background: transparent url('img/bg_page-r.png') 100% 0 repeat-y; }
-
-.bfPage-m {
-    margin: 0 24px;
-    padding-top: 10px;
-    background: #e8e8e8;
-    position: relative;
-    left: -1px;
-}
-
-.bfPage-bl { background: transparent url('img/bg_page-bl.png') bottom left no-repeat; }
-.bfPage-br { background: transparent url('img/bg_page-br.png') bottom right no-repeat; }
-.bfPage-b { height: 25px; background: transparent url('img/bg_page-b.png') 0 0 repeat-x; margin: 0 24px; }
-
 .bfQuickMode {
     width: 100%;
     padding: 0px;
@@ -334,10 +315,5 @@
     .bfQuickMode .bfNoSection .bfFieldset-wrapper.bfWrapperInline .bfFieldset-bl {
         position: relative;
         top: 0;
-    }
-
-    .bfPage-bl{
-        position: relative !important;
-        top: -1px !important;
     }
 }

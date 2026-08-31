@@ -22,6 +22,10 @@ if (!defined('JPATH_SITE')) {
     define('JPATH_SITE', __DIR__ . '/../../../../');
 }
 
+if (!defined('_FF_RUNMODE_FRONTEND')) {
+    define('_FF_RUNMODE_FRONTEND', 0);
+}
+
 if (!class_exists(HTML_facileFormsProcessor::class)) {
     require_once __DIR__ . '/../../../../components/com_breezingformsng/src/Support/processor_facade.php';
 }
@@ -29,7 +33,22 @@ if (!class_exists(HTML_facileFormsProcessor::class)) {
 require_once __DIR__ . '/QuickMode/joomla-text-stub.php';
 require_once __DIR__ . '/QuickMode/joomla-uri-stub.php';
 require_once __DIR__ . '/QuickMode/joomla-route-stub.php';
+require_once __DIR__ . '/QuickMode/joomla-htmlhelper-stub.php';
 require_once __DIR__ . '/QuickMode/joomla-cmsapplication-stub.php';
+
+if (!class_exists('Joomla\\CMS\\Component\\ComponentHelper')) {
+    eval('namespace Joomla\\CMS\\Component; final class ComponentHelper {
+        public static function getParams(string $name): object {
+            return new class {
+                public function get(string $key, mixed $default = null): mixed { return $default; }
+            };
+        }
+    }');
+}
+
+if (!function_exists('Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering\\QuickMode\\bf_b64dec')) {
+    eval('namespace Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering\\QuickMode; function bf_b64dec(string $value): string { return (string) base64_decode($value, true); }');
+}
 
 if (!function_exists('Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering\\bf_b64dec')) {
     eval('namespace Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering; function bf_b64dec(string $value): string { return (string) base64_decode($value, true); }');
@@ -37,6 +56,10 @@ if (!function_exists('Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering
 
 if (!function_exists('Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering\\nl')) {
     eval('namespace Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering; function nl(): string { return "\\n"; }');
+}
+
+if (!function_exists('Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering\\indentc')) {
+    eval('namespace Vcmb\\Component\\BreezingformsNG\\Site\\Service\\Rendering; function indentc(int $level): string { return str_repeat("\\t", $level); }');
 }
 
 if (!class_exists('Joomla\\Database\\ParameterType')) {
@@ -1395,6 +1418,32 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         $queryCode = $processor->linkedCallbacks[array_key_last($processor->linkedCallbacks)]['code'];
         self::assertStringContainsString('function ff_dispQueryPage(id,page)', $queryCode);
         self::assertStringContainsString('ff_queryCurrPage[id] = page;', $queryCode);
+    }
+
+    public function testViewReachesFinalizationForAnEmptyQuickModeForm(): void
+    {
+        $processor = $this->makeProcessorReadyForCaptchaScript([]);
+        $processor->formrow->name = 'contact';
+        $processor->formrow->piece2cond = 0;
+        $processor->formrow->script1cond = 0;
+        $processor->formrow->script1id = 0;
+        $processor->formrow->script1code = '';
+        $processor->formrow->script2cond = 0;
+        $processor->formrow->script2id = 0;
+        $processor->formrow->script2code = '';
+        $processor->formrow->class2 = '';
+        $processor->form_id = 7;
+        $processor->target = 0;
+        $processor->align = 0;
+        $processor->top = 0;
+        $processor->traceMode = 0;
+        $processor->buryOnCallNumber = null;
+        $GLOBALS['ff_otherparams'] = [];
+
+        $html = $this->captureCaptchaScript($processor);
+
+        self::assertStringContainsString('</div><!-- form end -->', $html);
+        self::assertStringNotContainsString('<piece>', $html);
     }
 
 }

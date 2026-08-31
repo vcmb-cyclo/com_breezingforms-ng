@@ -202,6 +202,11 @@ namespace Joomla\CMS\Application {
                 return (string) ($this->values[$name] ?? $default);
             }
 
+            public function getWord(string $name, string $default = ''): string
+            {
+                return (string) ($this->values[$name] ?? $default);
+            }
+
             public function getBool(string $name, bool $default = false): bool
             {
                 return (bool) ($this->values[$name] ?? $default);

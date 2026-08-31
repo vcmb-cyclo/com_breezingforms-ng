@@ -18,4 +18,16 @@ final class SubmissionEngineArchitectureTest extends TestCase
         self::assertStringNotContainsString('->sfadata', $source);
         self::assertStringContainsString('$this->processor->sfdata[] = array(', $source);
     }
+
+    public function testDoubleOptInUsesTheConcreteJoomlaMailerContract(): void
+    {
+        $source = file_get_contents(
+            __DIR__ . '/../../../../components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php'
+        );
+
+        self::assertIsString($source);
+        self::assertStringContainsString('use Joomla\\CMS\\Mail\\Mail;', $source);
+        self::assertStringContainsString('/** @var Mail $mailer */', $source);
+        self::assertStringContainsString('$mailer->isHtml(true);', $source);
+    }
 }

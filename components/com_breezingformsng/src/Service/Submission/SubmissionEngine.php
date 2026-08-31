@@ -36,6 +36,7 @@ use Joomla\CMS\Environment\Browser;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Log\Log;
+use Joomla\CMS\Mail\Mail;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 use Vcmb\Component\BreezingformsNG\Site\Service\Integration\DropboxUploader;
 use Vcmb\Component\BreezingformsNG\Site\Service\Integration\RecaptchaVerifier;
@@ -842,6 +843,7 @@ final class SubmissionEngine
                 $uri = Uri::getInstance();
                 $domainAddress = $uri->toString(array('scheme', 'host', 'port', 'path'));
 
+                /** @var Mail $mailer */
                 $mailer = $this->mailerFactory->createMailer();
                 $config = $this->processor->app->getConfig();
 

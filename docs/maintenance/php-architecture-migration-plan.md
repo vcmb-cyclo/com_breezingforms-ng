@@ -729,7 +729,10 @@ Les fichiers uploadés de `SubmissionEngine` alimentent désormais le buffer
 `sfdata`, consommé par les notifications Salesforce, au lieu d'une propriété
 `sfadata` inexistante (`33b7fb4d5`). Le diagnostic PHPStan et sa régression
 structurelle sont supprimés de la baseline. Celle-ci compte maintenant
-13 entrées. Le parcours des textarea HTML de `ClassicRenderer` utilise
+11 entrées. Le double opt-in de `SubmissionEngine` documente désormais le
+contrat concret `Joomla\\CMS\\Mail\\Mail` déjà utilisé par `MailSender` pour
+`isHtml()`, ce qui supprime le dernier diagnostic de type mailer de la
+baseline. Le parcours des textarea HTML de `ClassicRenderer` utilise
 désormais l'identifiant d'instance Joomla (`ff_elem...`) et
 `QuickModeEditorValueBuilder`, comme les parcours Bootstrap et OnePage. L'appel
 à `Editor::getContent()` n'étant pas disponible dans l'API Joomla 6, il a été

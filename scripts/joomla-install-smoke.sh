@@ -142,6 +142,16 @@ if [[ -n "${contentbuilder_archive}" ]]; then
         echo "ContentBuilder NG component registration was not found." >&2
         exit 1
     fi
+
+    contentbuilder_forms_table_count="$(
+        docker exec -e MYSQL_PWD=joomla "${db_container}" mysql -N -ujoomla joomla \
+            -e "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '${table_prefix}contentbuilderng_forms';"
+    )"
+
+    if [[ "${contentbuilder_forms_table_count}" -ne 1 ]]; then
+        echo "ContentBuilder NG forms table was not installed correctly." >&2
+        exit 1
+    fi
 fi
 
 plugin_count="$(

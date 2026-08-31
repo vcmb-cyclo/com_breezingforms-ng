@@ -1798,8 +1798,11 @@ test a de nouveau réussi sur cette archive reconstruite.
 
 Le smoke test accepte désormais `CONTENTBUILDER_ARCHIVE` pour installer et
 vérifier ContentBuilderNG avant BFNG. Cette variante a été exécutée avec
-`/home/xavier/workspaces/vcmb/com_contentbuilderng.zip` et a réussi sur Joomla
+`/home/xavier/workspaces/vcmb/com_contentbuilderng/build/com_contentbuilderng-6.1.9.zip` et a réussi sur Joomla
 6, levant le blocage de validation d’intégration (`cb1822792`).
+Le contrôle vérifie désormais aussi la présence de la table publiée
+`contentbuilderng_forms`, utilisée par la lecture des associations et des
+métadonnées de `RenderingEngine`.
 
 La sélection Classic, Bootstrap et OnePage est désormais isolée dans
 `QuickModeRendererFactory`. `RenderingEngine` ne porte plus la construction

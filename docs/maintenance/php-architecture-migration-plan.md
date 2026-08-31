@@ -1512,6 +1512,10 @@ Les builders partagés `QuickModeInputBuilder`, `QuickModeCheckboxBuilder` et
 d'attributs dynamiques, avec couverture des classes, types, noms et
 identifiants hostiles (`92f6e3e59`).
 
+`QuickModeTextareaBuilder` et `QuickModeSelectBuilder` appliquent maintenant
+la même règle aux classes et noms de champs partagés par les renderers, avec
+tests d'injection et snapshots inchangés (`b80711c89`).
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

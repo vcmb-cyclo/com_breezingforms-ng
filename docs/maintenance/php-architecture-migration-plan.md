@@ -60,6 +60,7 @@
 | `RenderingEngine::view()` — validation | Extensions de fichiers, valeurs par défaut et scripts CAPTCHA extraits et couverts | Builders de validation dédiés |
 | `RenderingEngine::view()` — CAPTCHA | Sélection `Captcha` / `ReCaptcha`, endpoints site/admin et générateurs JavaScript isolés, ordre historique préservé | Commits `4a070774`, `8e3e9a7a`, `4563ae11`, `d328c4f8`, `75c0ca2b`, `1cea0c84` |
 | `RenderingEngine::view()` — Query List | Préparation extraite et variantes par défaut/checkbox/résultat vide couvertes | Commits `4070ec0f`, `b358e7e9` |
+| `RenderingEngine::view()` — Query List sélection globale | Callback JavaScript paginé `ff_selectAllQueryRows` extrait et couvert, avec conservation des sélections de page et de la ligne globale | Commit `0b1229d37` |
 | `RenderingEngine::view()` — hydratation d'un enregistrement éditable | Nettoyage conservé dans l'orchestrateur, génération JavaScript extraite et couverte par famille de contrôle | Commit `a8325a7c` |
 | Rendu HTML classique — texte statique, rectangle, image, infobulle et icône | Markup `Static Text/HTML`, `Rectangle`, `Image`, `Tooltip` et `Icon` extrait et couvert sans modifier le HTML produit | Commits `43bc8b9d`, `ec310eabb`, `08f6bc4ee`, `1e23287f8`, `3acfe4d66` |
 | Rendu HTML classique — champ caché | Markup `Hidden Input` extrait et couvert avec conservation du nom et de la valeur historiques | Commit `0bacb6fc7` |
@@ -595,6 +596,12 @@ Le markup du choix mobile est désormais construit par
 `MobileChoiceMarkupBuilder` (`39a4c1da0`). Le calcul de l'URL et la
 normalisation des paramètres restent dans `RenderingEngine`, tandis que la
 sortie JavaScript/HTML historique est couverte par un test dédié.
+
+Le callback Query List `ff_selectAllQueryRows` est désormais construit par
+`QueryListSelectAllScriptBuilder` (`0b1229d37`). La logique de pagination,
+la remise à zéro des lignes hors page et la synchronisation de la case globale
+sont couvertes séparément ; le callback de navigation `ff_dispQueryPage` reste
+encore à isoler.
 
 Le wrapper caché `bfReCaptchaWrap` est désormais construit par
 `CaptchaWrapperMarkupBuilder` (`092a2a9fa`). Il reste limité au mode

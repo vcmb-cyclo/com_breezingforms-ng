@@ -82,9 +82,11 @@ final class EditableRecordHydrationScriptBuilder
 
     private function buildChoiceScript(string $type, string $name, int $formId, string $value): string
     {
+        $escapedName = $this->encodeJavaScriptValue('ff_nm_' . $name . '[]');
+
         return '
 							for(var i = 0;i < document.ff_form' . $formId . '.elements.length;i++){
-					if(document.ff_form' . $formId . '.elements[i].type == "' . $type . '" && document.ff_form' . $formId . '.elements[i].name == "ff_nm_' . $name . '[]" && document.ff_form' . $formId . '.elements[i].value == ' . $this->encodeJavaScriptValue($value) . '){
+					if(document.ff_form' . $formId . '.elements[i].type == "' . $type . '" && document.ff_form' . $formId . '.elements[i].name == ' . $escapedName . ' && document.ff_form' . $formId . '.elements[i].value == ' . $this->encodeJavaScriptValue($value) . '){
 									if(typeof JQuery != "undefined" && !JQuery(document.ff_form' . $formId . '.elements[i]).attr("checked")){
 									    JQuery(document.ff_form' . $formId . '.elements[i]).click();
 									}

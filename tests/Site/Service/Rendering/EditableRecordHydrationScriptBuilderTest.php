@@ -73,4 +73,19 @@ final class EditableRecordHydrationScriptBuilderTest extends TestCase
         self::assertStringNotContainsString('</script>', $script);
         self::assertStringContainsString('\\u003C\\/script\\u003E', $script);
     }
+
+    public function testEscapesChoiceFieldNames(): void
+    {
+        $script = (new EditableRecordHydrationScriptBuilder())->build([
+            (object) [
+                'type' => 'Radio Group',
+                'name' => 'choice";alert(1);//',
+                'element' => 23,
+                'value' => 'yes',
+            ],
+        ], 9);
+
+        self::assertStringContainsString('ff_nm_choice\\u0022;alert(1);\\/\\/', $script);
+        self::assertStringNotContainsString('name == "ff_nm_choice";alert(1);//', $script);
+    }
 }

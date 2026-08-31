@@ -163,6 +163,8 @@ inconnus. Son enveloppe de chargement et le nettoyage historique de
 des entrées. Les valeurs réinjectées dans les contrôles checkbox/radio et les
 listes utilisent en outre un encodage JavaScript avec protection des balises
 HTML ; les séquences `</script>` sont couvertes par un test de régression.
+Le nom complet des champs checkbox/radio est encodé par la même voie, avec un
+test dédié contre les guillemets et séparateurs JavaScript.
 
 - La recherche du dernier enregistrement, les requêtes
   `#__facileforms_records`/`#__facileforms_subrecords` et le résultat typé sont

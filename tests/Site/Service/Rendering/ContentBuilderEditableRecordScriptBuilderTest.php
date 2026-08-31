@@ -63,6 +63,50 @@ final class ContentBuilderEditableRecordScriptBuilderTest extends TestCase
         self::assertSame('', $result['javascript']);
     }
 
+    public function testBuildsQuickModeFileUploadHydration(): void
+    {
+        $file = new stdClass();
+        $file->recElementId = 31;
+        $file->recName = 'document';
+        $file->recType = 'File Upload';
+        $file->recValue = "document.pdf\nsecond.jpg";
+
+        $result = $this->builder()->build(
+            [$file],
+            [],
+            true,
+            7,
+            sys_get_temp_dir()
+        );
+
+        self::assertSame(1, substr_count($result['contentBuilderScript'], 'function ff_flashupload_not_empty'));
+        self::assertStringContainsString('cbFlashElemCnt["ff_elem31"] = 2;', $result['contentBuilderScript']);
+        self::assertStringContainsString('cb_delete_31[0]', $result['javascript']);
+        self::assertStringContainsString('cb_delete_31[1]', $result['javascript']);
+        self::assertStringContainsString('bfDeactivateField["ff_nm_document[]"]', $result['javascript']);
+    }
+
+    public function testBuildsSignatureHydrationFromAnExistingFile(): void
+    {
+        $signature = new stdClass();
+        $signature->recElementId = 41;
+        $signature->recName = 'drawn_signature';
+        $signature->recType = 'Signature';
+        $signature->recValue = basename(__FILE__);
+
+        $result = $this->builder()->build(
+            [$signature],
+            [],
+            true,
+            7,
+            __DIR__
+        );
+
+        self::assertStringContainsString('ff_nm_drawn_signature[]', $result['javascript']);
+        self::assertStringContainsString('data:image', $result['javascript']);
+        self::assertStringContainsString('base64,', $result['javascript']);
+    }
+
     private function builder(): ContentBuilderEditableRecordScriptBuilder
     {
         return new ContentBuilderEditableRecordScriptBuilder(

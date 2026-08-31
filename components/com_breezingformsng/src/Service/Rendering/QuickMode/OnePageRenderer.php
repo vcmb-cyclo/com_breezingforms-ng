@@ -949,14 +949,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                                                                         }
                                                                 });
 " . QuickModeUploadProgressScriptBuilder::build(chr(10)) . "
-                                                                uploader.bind('FileUploaded', function(up, file, response) {
-                                                                    if(response.response!=''){
-                                                                        if(response.response !== null){
-                                                                            alert(response.response);
-                                                                        }
-                                                                    }
-                                                                    JQuery('#'+file.id+'queue').remove();
-                                                                });
+" . QuickModeUploadCompletedScriptBuilder::build(chr(10)) . "
                                                                 uploader.init();
                                                                 bfUploaders.push(uploader);
                                                             });

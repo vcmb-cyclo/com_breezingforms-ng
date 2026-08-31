@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service;
 
+require_once __DIR__ . '/Rendering/QuickMode/joomla-uri-stub.php';
+
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Vcmb\Component\BreezingformsNG\Site\Service\Export\ExportEngine;
@@ -16,6 +18,11 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Upload\UploadStorage;
 final class CallbackExportUploadPermissionTest extends TestCase
 {
     private const ROOT = __DIR__ . '/../../..';
+
+    protected function setUp(): void
+    {
+        defined('JPATH_SITE') || define('JPATH_SITE', self::ROOT);
+    }
 
     public function testExportHelpersGenerateUsableValues(): void
     {
@@ -109,6 +116,31 @@ final class CallbackExportUploadPermissionTest extends TestCase
             foreach (glob($directory . '/*') ?: [] as $file) {
                 @unlink($file);
             }
+            @rmdir($directory);
+        }
+    }
+
+    public function testUploadStorageReturnsPublicUrlAndServerPath(): void
+    {
+        $directory = self::ROOT . '/.tmp-bfng-upload-' . bin2hex(random_bytes(4));
+        self::assertTrue(mkdir($directory));
+
+        try {
+            $storage = new UploadStorage(
+                new ImageResizer(),
+                static function (string $source, string $destination): bool {
+                    return file_put_contents($destination, 'uploaded') !== false;
+                }
+            );
+
+            $result = $storage->store('/tmp/upload.tmp', $directory, 'submission.txt', false, null, true);
+
+            self::assertTrue($result->isSuccessful());
+            $relativeDirectory = str_replace(JPATH_SITE . '/', '', $directory);
+            self::assertSame('http://example.test/' . $relativeDirectory . '/submission.txt', $result->path);
+            self::assertSame($directory . '/submission.txt', $result->serverPath);
+        } finally {
+            @unlink($directory . '/submission.txt');
             @rmdir($directory);
         }
     }

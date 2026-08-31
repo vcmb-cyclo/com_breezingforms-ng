@@ -1886,6 +1886,10 @@ délégations sans upload réel : parsing des tailles, détection d'une image
 absente et recherche récursive d'un élément QuickMode. Le double \`Input\`
 reste limité au test du constructeur.
 
+La branche URL de \`UploadStorage\` est maintenant couverte en complément des
+chemins serveur existants : elle vérifie la séparation entre URL publique et
+chemin disque, avec un répertoire contrôlé et nettoyé par le test.
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

@@ -745,6 +745,14 @@ référence `skip`. Cette normalisation supprime les diagnostics PHPStan du
 niveau 3 sans modifier le markup Query List ; la valeur dynamique est couverte
 par `ClassicQueryListCellBuilderTest`.
 
+Les contrats déjà typés de l'administration Joomla 6 sont maintenant utilisés
+directement dans `QuickmodeHtml`, `ImportModel`, `QuickmodeModel` et les
+templates About : les tests de type redondants, accès nullsafe impossibles et
+catch d'exception jamais levée sont supprimés. Les chemins JSON QuickMode
+valides et invalides sont couverts par `QuickmodeHtmlTest`. Le niveau 4 passe
+de 53 à 52 diagnostics après ce lot ; la baseline niveau 2 reste à 11
+entrées.
+
 ## Phase 7 — Réduire les façades historiques
 
 Cette phase commence seulement lorsque leurs responsabilités ont été extraites

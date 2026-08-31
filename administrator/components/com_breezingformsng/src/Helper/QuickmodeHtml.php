@@ -171,8 +171,7 @@ final class QuickmodeHtml
         $iconBase = Uri::root() . 'media/com_breezingformsng/images/quickmode/';
         $decodedThemeObject = null;
         $decodedThemeObject = self::decodeJsonArray((string) $dataObjectString);
-        $isAzureBootstrapTheme = is_array($decodedThemeObject)
-            && isset($decodedThemeObject['properties'])
+        $isAzureBootstrapTheme = isset($decodedThemeObject['properties'])
             && is_array($decodedThemeObject['properties'])
             && (($decodedThemeObject['properties']['themebootstrapThemeEngine'] ?? '') === 'bootstrap')
             && (($decodedThemeObject['properties']['themebootstrap'] ?? '') === 'Azure');

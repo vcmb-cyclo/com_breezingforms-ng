@@ -637,12 +637,7 @@ class QuickmodeModel extends BaseDatabaseModel
                     ->bind(':form', $form, ParameterType::INTEGER);
                 $this->db->setQuery($checkQuery);
 
-                $elementCheck = [];
-                try {
-                    $elementCheck = $this->db->loadObjectList();
-                } catch (\InvalidArgumentException $e) {
-                    // ignore
-                }
+                $elementCheck = $this->db->loadObjectList();
 
                 foreach ($elementCheck as $check) {
                     if ((int) $check->id !== (int) $element['dbId']) {

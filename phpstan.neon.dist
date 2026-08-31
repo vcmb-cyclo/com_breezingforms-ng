@@ -16,6 +16,8 @@ parameters:
         - administrator/components/com_breezingformsng/vendor
         - administrator/components/com_breezingformsng/libraries
         - components/com_breezingformsng/libraries
+    scanFiles:
+        - administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php
     scanDirectories:
         - joomla-stubs/libraries
     treatPhpDocTypesAsCertain: false

@@ -1,66 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Calling self\:\:renderCodeMirror\(\) outside of class scope\.$#'
-			identifier: outOfClass.self
-			count: 2
-			path: administrator/components/com_breezingformsng/layouts/quickmode/advanced_element.php
-
-		-
-			message: '#^Function bf_tooltipText not found\.$#'
-			identifier: function.notFound
-			count: 106
-			path: administrator/components/com_breezingformsng/layouts/quickmode/advanced_element.php
-
-		-
-			message: '#^Function bf_tooltiptext not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/layouts/quickmode/advanced_element.php
-
-		-
-			message: '#^Calling self\:\:decodeJsonArray\(\) outside of class scope\.$#'
-			identifier: outOfClass.self
-			count: 1
-			path: administrator/components/com_breezingformsng/layouts/quickmode/advanced_form.php
-
-		-
-			message: '#^Function bf_tooltipText not found\.$#'
-			identifier: function.notFound
-			count: 16
-			path: administrator/components/com_breezingformsng/layouts/quickmode/advanced_form.php
-
-		-
-			message: '#^Calling self\:\:renderCodeMirror\(\) outside of class scope\.$#'
-			identifier: outOfClass.self
-			count: 1
-			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_element.php
-
-		-
-			message: '#^Function bf_tooltipText not found\.$#'
-			identifier: function.notFound
-			count: 136
-			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_element.php
-
-		-
-			message: '#^Function bf_tooltipText not found\.$#'
-			identifier: function.notFound
-			count: 18
-			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_form.php
-
-		-
-			message: '#^Function bf_tooltipText not found\.$#'
-			identifier: function.notFound
-			count: 2
-			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_page.php
-
-		-
-			message: '#^Function bf_tooltipText not found\.$#'
-			identifier: function.notFound
-			count: 7
-			path: administrator/components/com_breezingformsng/layouts/quickmode/properties_section.php
-
-		-
 			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:setUserState\(\)\.$#'
 			identifier: method.notFound
 			count: 2
@@ -172,12 +112,6 @@ parameters:
 			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:setHeader\(\)\.$#'
 			identifier: method.notFound
 			count: 11
-			path: administrator/components/com_breezingformsng/src/Controller/RecordsController.php
-
-		-
-			message: '#^Method Joomla\\Input\\Input\:\:get\(\) invoked with 4 parameters, 1\-3 required\.$#'
-			identifier: arguments.count
-			count: 6
 			path: administrator/components/com_breezingformsng/src/Controller/RecordsController.php
 
 		-
@@ -379,12 +313,6 @@ parameters:
 			path: components/com_breezingformsng/src/Service/Callback/FlashUploadCallback.php
 
 		-
-			message: '#^Function bf_sanitizeFilename not found\.$#'
-			identifier: function.notFound
-			count: 2
-			path: components/com_breezingformsng/src/Service/Callback/FlashUploadCallback.php
-
-		-
 			message: '#^Method Joomla\\Session\\SessionInterface\:\:get\(\) invoked with 3 parameters, 1\-2 required\.$#'
 			identifier: arguments.count
 			count: 1
@@ -400,12 +328,6 @@ parameters:
 			message: '#^Access to an undefined property Joomla\\Http\\Response\:\:\$body\.$#'
 			identifier: property.notFound
 			count: 1
-			path: components/com_breezingformsng/src/Service/Callback/PayPalCallback.php
-
-		-
-			message: '#^Function bf_sendNotificationByPaymentCache not found\.$#'
-			identifier: function.notFound
-			count: 4
 			path: components/com_breezingformsng/src/Service/Callback/PayPalCallback.php
 
 		-
@@ -425,24 +347,6 @@ parameters:
 			identifier: property.notFound
 			count: 1
 			path: components/com_breezingformsng/src/Service/Callback/SofortCallback.php
-
-		-
-			message: '#^Function bf_is_email not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/Callback/SofortCallback.php
-
-		-
-			message: '#^Function bf_sendNotificationByPaymentCache not found\.$#'
-			identifier: function.notFound
-			count: 2
-			path: components/com_breezingformsng/src/Service/Callback/SofortCallback.php
-
-		-
-			message: '#^Function bf_sendNotificationByPaymentCache not found\.$#'
-			identifier: function.notFound
-			count: 2
-			path: components/com_breezingformsng/src/Service/Callback/StripeCallback.php
 
 		-
 			message: '#^Method Joomla\\Session\\SessionInterface\:\:clear\(\) invoked with 1 parameter, 0 required\.$#'
@@ -559,24 +463,6 @@ parameters:
 			path: components/com_breezingformsng/src/Service/Notification/NotificationEngine.php
 
 		-
-			message: '#^Function bf_endsWith not found\.$#'
-			identifier: function.notFound
-			count: 5
-			path: components/com_breezingformsng/src/Service/Notification/NotificationEngine.php
-
-		-
-			message: '#^Function bf_is_email not found\.$#'
-			identifier: function.notFound
-			count: 3
-			path: components/com_breezingformsng/src/Service/Notification/NotificationEngine.php
-
-		-
-			message: '#^Function bf_startsWith not found\.$#'
-			identifier: function.notFound
-			count: 5
-			path: components/com_breezingformsng/src/Service/Notification/NotificationEngine.php
-
-		-
 			message: '#^Function bf_b64dec not found\.$#'
 			identifier: function.notFound
 			count: 1
@@ -609,13 +495,13 @@ parameters:
 		-
 			message: '#^Call to static method createFromRuntimeContext\(\) on an unknown class CB\\Component\\Contentbuilderng\\Administrator\\Service\\ListSupportService\.$#'
 			identifier: class.notFound
-			count: 2
+			count: 1
 			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
 
 		-
 			message: '#^Call to static method createFromRuntimeContext\(\) on an unknown class CB\\Component\\Contentbuilderng\\Administrator\\Service\\PermissionService\.$#'
 			identifier: class.notFound
-			count: 2
+			count: 1
 			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
 
 		-
@@ -682,18 +568,6 @@ parameters:
 			message: '#^Function bf_b64enc not found\.$#'
 			identifier: function.notFound
 			count: 3
-			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
-
-		-
-			message: '#^Function bf_is_email not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
-
-		-
-			message: '#^Function bf_sanitizeFilename not found\.$#'
-			identifier: function.notFound
-			count: 1
 			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
 
 		-

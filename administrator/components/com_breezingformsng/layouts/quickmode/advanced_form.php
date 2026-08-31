@@ -161,7 +161,7 @@ use Joomla\CMS\Language\Text;
                                                 </div>
 
                                                 <?php
-                                                $dbObject = self::decodeJsonArray((string) $dataObjectString);
+                                                $dbObject = \Vcmb\Component\BreezingformsNG\Administrator\Helper\QuickmodeHtml::decodeJsonArray((string) $dataObjectString);
                                                 if (isset($dbObject['properties']['themebootstrap'])) {
                                                     $themeboostrapfolder = $dbObject['properties']['themebootstrap'];
                                                     $folder = 'themes-bootstrap5';

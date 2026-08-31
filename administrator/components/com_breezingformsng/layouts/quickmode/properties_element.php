@@ -1515,7 +1515,7 @@ use Joomla\CMS\Language\Text;
                                                         </div>
 
                                                         <?php
-                                                        echo self::renderCodeMirror('bfValidationCode');
+                                                        echo \Vcmb\Component\BreezingformsNG\Administrator\Helper\QuickmodeHtml::renderCodeMirror('bfValidationCode');
                                                         ?>
 
                                                     </div>

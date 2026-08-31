@@ -27,7 +27,7 @@ require_once JPATH_SITE . '/administrator/components/com_breezingformsng/librari
 
 final class QuickmodeHtml
 {
-    private static function decodeJsonArray(string $json): array
+    public static function decodeJsonArray(string $json): array
     {
         $decoded = json_decode($json, true);
 

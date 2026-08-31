@@ -1126,7 +1126,7 @@ use Joomla\CMS\Language\Text;
                                                     </div>
 
                                                     <?php
-                                                    echo self::renderCodeMirror('bfInitCode');
+                                                    echo \Vcmb\Component\BreezingformsNG\Administrator\Helper\QuickmodeHtml::renderCodeMirror('bfInitCode');
                                                     ?>
                                                 </div>
                                             </div>
@@ -1216,7 +1216,7 @@ use Joomla\CMS\Language\Text;
                                                         <?php echo Text::_('COM_BREEZINGFORMSNG_CREATE_CODE_FRAMEWORK') ?>
                                                     </div>
                                                     <?php
-                                                    echo self::renderCodeMirror('bfActionCode');
+                                                    echo \Vcmb\Component\BreezingformsNG\Administrator\Helper\QuickmodeHtml::renderCodeMirror('bfActionCode');
                                                     ?>
                                                 </div>
                                             </div>

@@ -846,6 +846,12 @@ jour de la trace sont regroupées dans `ErrorHandlerRuntime`. Les niveaux de
 dépréciation ignorés, le court-circuit pendant l'arrêt du processeur et le
 format du message sont couverts par `ErrorHandlerRuntimeTest`.
 
+Le style inline explicitement marqué « fixing J3 css » a été retiré de la
+branche Classic de `RenderingEngine::view()`. BFNG cible Joomla 6 ; cette
+correction de présentation propre à Joomla 3 n'a donc plus sa place dans le
+pipeline moderne. Un test d'architecture verrouille l'absence de ce bloc sans
+modifier les snapshots de rendu.
+
 Les deux gardes locales `if (!$halt)` de `SubmissionEngine` ont ensuite été
 retirées : `$halt` était initialisé à `false` et ses seules affectations à
 `true` précédaient immédiatement `exit`. Le contrôle CAPTCHA, les pièces de

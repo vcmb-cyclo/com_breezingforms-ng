@@ -860,19 +860,6 @@ final class RenderingEngine
 
         if (trim($this->processor->formrow->template_code_processed) == '') {
 
-            // fixing J3 css
-            $this->processor->app->getDocument()->getWebAssetManager()->addInlineStyle(
-                '
-             .bfFormDiv input[type=checkbox][id^="ff_elem"], input[type=radio][id^="ff_elem"]{
-                vertical-align: text-bottom;
-             }
-             .bfFormDiv input[type=checkbox][id^="ff_elem"] + [id^="ff_lbl"], input[type=radio][id^="ff_elem"] + [id^="ff_lbl"]{
-                display: inline;
-                vertical-align: text-top;
-             }
-             '
-            );
-
             for ($i = 0; $i < $this->processor->rowcount; $i++) {
                 $row = &$this->processor->rows[$i];
                 $data1 = '';

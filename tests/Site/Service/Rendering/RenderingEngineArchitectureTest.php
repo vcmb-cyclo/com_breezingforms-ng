@@ -39,4 +39,16 @@ final class RenderingEngineArchitectureTest extends TestCase
         self::assertStringNotContainsString('private function buildCaptchaScript(', $source);
         self::assertStringNotContainsString('function bfValidateCaptcha()', $source);
     }
+
+    public function testClassicRenderingContainsNoJoomlaThreeCompatibilityStyle(): void
+    {
+        $source = file_get_contents(
+            __DIR__ . '/../../../../components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php'
+        );
+
+        self::assertIsString($source);
+        self::assertStringNotContainsString('fixing J3 css', $source);
+        self::assertStringNotContainsString('vertical-align: text-bottom', $source);
+        self::assertStringNotContainsString('vertical-align: text-top', $source);
+    }
 }

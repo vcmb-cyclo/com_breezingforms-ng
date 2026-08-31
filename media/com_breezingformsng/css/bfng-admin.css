@@ -1,0 +1,30 @@
+/**
+ * BreezingForms NG - admin components (charte graphique v1.0)
+ *
+ * Component rules only, built on the tokens in bfng-tokens.css (loaded as
+ * a dependency - see joomla.asset.json). See
+ * docs/charte-graphique-breezingformsng.md, sections 05/08.
+ *
+ * @package BreezingFormsNG
+ * @copyright Copyright (C) 2024-2026 by XDA+GIL
+ * @license GNU General Public License version 2 or later; see LICENSE.txt
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ **/
+
+.bfng-btn {
+  display: inline-flex; align-items: center; gap: var(--bfng-space-3);
+  height: var(--bfng-control-h); padding: 0 var(--bfng-space-5);
+  border: 1px solid var(--bfng-border-strong); border-radius: var(--bfng-radius);
+  background: var(--bfng-surface); color: var(--bfng-text);
+  font: 500 var(--bfng-fs-sm)/1 var(--bfng-font-ui);
+  cursor: pointer; transition: background var(--bfng-t), border-color var(--bfng-t);
+}
+.bfng-btn:hover         { background: var(--bfng-surface-2); border-color: var(--bfng-accent-500); }
+.bfng-btn:active         { background: var(--bfng-accent-50); border-color: var(--bfng-accent-700); }
+.bfng-btn[disabled]      { opacity: .45; pointer-events: none; }
+.bfng-btn--primary       { border-color: var(--bfng-accent-500); color: var(--bfng-accent-700); font-weight: 600; }
+.bfng-btn--primary:hover { background: var(--bfng-accent-50); border-color: var(--bfng-accent-600); }
+.bfng-btn--ghost         { border-color: transparent; background: transparent; color: var(--bfng-text-2); }
+.bfng-btn--danger        { border-color: var(--bfng-danger); color: var(--bfng-danger); }
+.bfng-btn--icon          { width: var(--bfng-control-h); padding: 0; justify-content: center; }

@@ -713,9 +713,3 @@ parameters:
 			identifier: arguments.count
 			count: 2
 			path: script.php
-
-		-
-			message: '#^PHPDoc tag @return with type void is incompatible with native type bool\.$#'
-			identifier: return.phpDocType
-			count: 1
-			path: script.php

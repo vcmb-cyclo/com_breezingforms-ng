@@ -2349,7 +2349,7 @@ class com_breezingformsngInstallerScript
     /**
      * method to run before an install/update/uninstall method
      *
-     * @return void
+     * @return bool
      */
 
     public function preflight(string $type, $parent): bool

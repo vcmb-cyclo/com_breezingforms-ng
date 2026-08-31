@@ -1460,6 +1460,13 @@ de construction par `QuickModeUploadValidationScriptBuilder`, ce qui retire
 le pré-encodage divergent des trois renderers (`474408bee`). Les sorties
 normales et les chemins d'upload des quatre thèmes sont caractérisés.
 
+Les endpoints injectés dans les callbacks CAPTCHA historiques sont désormais
+échappés comme contenu de littéral JavaScript par
+`CaptchaLegacyValidationScriptBuilder` et
+`CaptchaReCaptchaValidationScriptBuilder`. Les flux AJAX legacy et ReCaptcha
+conservent leurs délimiteurs et leur comportement, avec couverture des URL
+hostiles (`b80c88d37`).
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

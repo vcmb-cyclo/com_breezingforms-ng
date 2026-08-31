@@ -31,6 +31,20 @@
 
 #newStuffBar { display: flex; flex-wrap: wrap; gap: var(--bfng-space-4); }
 
+/* .bfng-tree-toolbar: pins the tree-header gear button to the top-right
+   corner regardless of how many lines #newStuffBar's buttons wrap onto
+   (align-items-start on a plain flex row left it vertically centered
+   against the wrapped button stack instead of flush with the first row). */
+.bfng-tree-toolbar {
+  position: relative;
+  padding-right: calc(var(--bfng-control-h) + var(--bfng-space-3));
+}
+.bfng-tree-toolbar__settings {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
 /* .bfng-message: replaces #bfSaveQueue's fixed-350px Verdana box and
    .bfFadingMessage's Bootstrap-3-green box (charte section 07). Both
    elements keep their historical id/class for the JS that targets them

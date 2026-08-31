@@ -291,7 +291,7 @@ final class QuickmodeHtml
 
             <div id="bfQuickModeLeft" class="bfClearfix bfng-split__aside">
 
-                <div class="d-flex align-items-start justify-content-between gap-2">
+                <div class="bfng-tree-toolbar">
                     <form id="newStuffBar" onsubmit="return false;">
                         <button class="bfng-btn bfng-btn--primary" id="bfNewPageButton">
                             <i class="fa-solid fa-plus" aria-hidden="true"></i>
@@ -306,7 +306,7 @@ final class QuickmodeHtml
                             <?php echo Text::_('COM_BREEZINGFORMSNG_NEW_ELEMENT'); ?>
                         </button>
                     </form>
-                    <div class="dropdown">
+                    <div class="dropdown bfng-tree-toolbar__settings">
                         <button type="button" class="bfng-btn bfng-btn--ghost bfng-btn--icon" data-bs-toggle="dropdown" aria-expanded="false"
                             title="<?php echo htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_QM_TREE_SETTINGS'), ENT_QUOTES, 'UTF-8'); ?>">
                             <i class="fa-solid fa-gear" aria-hidden="true"></i>

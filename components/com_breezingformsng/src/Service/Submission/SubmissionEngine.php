@@ -40,6 +40,7 @@ use Joomla\CMS\Mail\MailerFactoryInterface;
 use Vcmb\Component\BreezingformsNG\Site\Service\Integration\DropboxUploader;
 use Vcmb\Component\BreezingformsNG\Site\Service\Integration\RecaptchaVerifier;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampFormatter;
+use Vcmb\Component\BreezingformsNG\Site\Service\Upload\FlashUploadFileMatcher;
 use Vcmb\Component\BreezingformsNG\Site\Service\Security\HtmlSanitizer;
 use Vcmb\Component\BreezingformsNG\Administrator\Helper\VendorHelper;
 use CB\Component\Contentbuilderng\Administrator\Helper\ContentbuilderngHelper;
@@ -55,6 +56,7 @@ final class SubmissionEngine
 {
     private ?SubmissionTimestampFormatter $uploadTimestampFormatterService = null;
     private ?HtmlSanitizer $htmlSanitizerService = null;
+    private ?FlashUploadFileMatcher $flashUploadFileMatcherService = null;
 
     public function __construct(
         private readonly HTML_facileFormsProcessor $processor,
@@ -195,7 +197,13 @@ final class SubmissionEngine
 
                                         // trying glob instead of readdir()
 
-                                        foreach (glob($sourcePath . '*') as $glob_file) {
+                                        foreach ($this->flashUploadFileMatcher()->find(
+                                            $sourcePath,
+                                            $row->name,
+                                            $this->processor->app->getInput()->getString('bfFlashUploadTicket', '')
+                                        ) as $flashFile) {
+
+                                            $glob_file = $flashFile['path'];
 
                                             $file = basename($glob_file);
 
@@ -609,6 +617,11 @@ final class SubmissionEngine
                 }
             } // for
         }
+    }
+
+    private function flashUploadFileMatcher(): FlashUploadFileMatcher
+    {
+        return $this->flashUploadFileMatcherService ??= new FlashUploadFileMatcher();
     }
 
     // collectSubmitdata

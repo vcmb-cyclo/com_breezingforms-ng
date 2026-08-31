@@ -59,6 +59,7 @@
 | QuickMode — progression upload | Callback plupload `UploadProgress` partagé entre les quatre renderers, avec mise à jour de la barre et du pourcentage couverte | Commit `1e28a79b2` |
 | QuickMode — fin upload | Callback plupload `FileUploaded` partagé entre les quatre renderers, avec message serveur et nettoyage de ligne couverts | Commit `6d3bfbb27` |
 | QuickMode — validation upload | Validation client de taille/extensions et nettoyage des lignes invalides partagé entre les quatre renderers | Commit `fea7df7b6` |
+| QuickMode — annulation upload | Annulation, arrêt/redémarrage des uploaders et réactivation du bouton partagés, avec variantes historiques couvertes | Commit `6cf0473ad` |
 | QuickMode — expression éditeur | Construction de l’expression JavaScript de lecture des éditeurs mutualisée entre Bootstrap et OnePage, API publique conservée | Commit `43592c8bd` |
 | QuickMode — mapping Bootstrap | Mapping Bootstrap 5 des classes mutualisé entre Bootstrap et OnePage, résolution publique `bsClass()` conservée | Commit `658078588` |
 | Finalisation — champs de soumission | Champs cachés communs frontend/backend/preview extraits avec conservation des différences `act`/`ff_frame` | Commit `be602b94f` |
@@ -869,6 +870,12 @@ La validation client des fichiers est désormais générée par
 renderers. La limite de taille, les extensions autorisées, les messages
 d’erreur et le nettoyage des files invalides sont couverts par un test dédié ;
 les paramètres propres au champ restent injectés par chaque renderer.
+
+La gestion d’annulation est désormais générée par
+`QuickModeUploadCancelScriptBuilder` (`6cf0473ad`) pour les quatre renderers.
+L’arrêt puis le redémarrage des uploaders, la suppression des lignes, le
+compteur global et les deux variantes de réactivation du bouton sont couverts
+par des tests dédiés.
 
 Les quatre renderers ne possèdent plus chacun leurs cinq adaptateurs privés de
 calendrier : `CalendarOptionsTrait` (`05090635f`) délègue les booléens, le

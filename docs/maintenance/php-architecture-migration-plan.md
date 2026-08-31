@@ -770,6 +770,14 @@ dupliqués à l'intérieur de leur garde déjà validée. `FormRenderer` supprim
 chemins de rendu restent couverts par les caractérisations QuickMode et le
 niveau 4 est ramené à 41 diagnostics.
 
+La façade `HTML_facileFormsProcessor` documente maintenant explicitement les
+délégués qui mutent son état ou leurs paramètres avec `@phpstan-impure`
+(`bury`, callbacks, traitement des scripts et fonctions de normalisation).
+PHPStan ne mémorise plus à tort un état antérieur à travers ces appels ; le
+contrat est verrouillé par `PublicFacadeApiTest`. Cette correction retire dix
+faux diagnostics d'analyse et porte le niveau 4 à 31 diagnostics, sans
+modifier la façade publique.
+
 ## Phase 7 — Réduire les façades historiques
 
 Cette phase commence seulement lorsque leurs responsabilités ont été extraites

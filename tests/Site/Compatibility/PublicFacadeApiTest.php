@@ -87,6 +87,19 @@ final class PublicFacadeApiTest extends TestCase
         self::assertStringContainsString("'BFIntegrate' => 'BFIntegrate.php'", $source);
     }
 
+    public function testStatefulFacadeDelegatesAreMarkedImpureForStaticAnalysis(): void
+    {
+        $source = $this->read('components/com_breezingformsng/src/Support/processor_facade.php');
+
+        foreach (['cbCheckPermissions', 'collectSubmitdata', 'logToDatabase', 'execPiece', 'linkcode', 'trim', 'nonblank', 'bury'] as $method) {
+            self::assertMatchesRegularExpression(
+                '/@phpstan-impure\s*\*\/\s*public function ' . $method . '\s*\(/',
+                $source,
+                "Missing impure contract for {$method}()"
+            );
+        }
+    }
+
     /**
      * @return iterable<string, array{string, string}>
      */

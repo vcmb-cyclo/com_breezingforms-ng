@@ -553,6 +553,7 @@ class HTML_facileFormsProcessor
         return $this->renderingEngine()->makeSafeFolder($path);
     }
 
+    /** @phpstan-impure */
     public function cbCheckPermissions()
     {
         return $this->renderingEngine()->cbCheckPermissions();
@@ -568,6 +569,7 @@ class HTML_facileFormsProcessor
         return $this->renderingEngineService ??= new RenderingEngine($this);
     }
 
+    /** @phpstan-impure */
     public function collectSubmitdata($cbResult = null)
     {
         return $this->submissionEngine()->collectSubmitdata($cbResult);
@@ -629,6 +631,7 @@ class HTML_facileFormsProcessor
         return $this->notificationEngineService ??= new NotificationEngine($this);
     }
 
+    /** @phpstan-impure */
     public function logToDatabase($cbResult = null)
     {
         return $this->exportEngine()->logToDatabase($cbResult);
@@ -697,6 +700,7 @@ class HTML_facileFormsProcessor
         return $this->scriptingEngine()->getPieceByName($name, $id);
     }
 
+    /** @phpstan-impure */
     public function execPiece($code, $name, $type, $id, $pane)
     {
         return $this->scriptingEngine()->execPiece($code, $name, $type, $id, $pane);
@@ -752,6 +756,7 @@ class HTML_facileFormsProcessor
         return $this->scriptingEngine()->compressJavascript($str);
     }
 
+    /** @phpstan-impure */
     public function linkcode($func, &$library, &$linked, $code, $type = null, $id = null, $pane = null)
     {
         return $this->scriptingEngine()->linkcode($func, $library, $linked, $code, $type, $id, $pane);
@@ -782,11 +787,13 @@ class HTML_facileFormsProcessor
         return $this->codeToolsRuntime()->dispTraceMode($mode);
     }
 
+    /** @phpstan-impure */
     public function trim(&$code)
     {
         return $this->codeToolsRuntime()->trim($code);
     }
 
+    /** @phpstan-impure */
     public function nonblank(&$code)
     {
         return $this->codeToolsRuntime()->nonblank($code);
@@ -822,6 +829,7 @@ class HTML_facileFormsProcessor
         return $this->codeToolsRuntime()->suicide();
     }
 
+    /** @phpstan-impure */
     public function bury()
     {
         return $this->codeToolsRuntime()->bury();

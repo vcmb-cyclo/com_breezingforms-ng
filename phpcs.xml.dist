@@ -29,8 +29,11 @@
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/HiddenFieldTrait.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/BootstrapStyleFieldTrait.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeInputBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeTextFieldStrategy.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeTextareaBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeTextareaStrategy.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeCheckboxBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeCheckboxStrategy.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeSelectBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeMaxLengthCounterBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeGroupOptionBuilder.php</file>

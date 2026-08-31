@@ -513,6 +513,12 @@ fichiers passent PHPCS sans erreur ni warning. Le ruleset complet passe
 désormais également sans erreur ni warning (`61/61`), après le nettoyage ciblé
 des traits et builders QuickMode ; aucun reformatage global n'a été appliqué.
 
+Les stratégies de contrôles déjà mutualisées (`QuickModeTextFieldStrategy`,
+`QuickModeTextareaStrategy` et `QuickModeCheckboxStrategy`) sont désormais
+incluses explicitement dans le périmètre PHPCS. Elles disposent chacune d'un
+test direct et passent le contrôle sans correction de sortie nécessaire ; ce
+lot étend uniquement le filet de qualité à du code déjà stabilisé.
+
 Le premier nettoyage ciblé de cette baseline PHPCS est réalisé dans
 `QuickModeSelectBuilder`, `QuickModeCaptchaMarkupBuilder` et
 `QuickModeUploadOptionsBuilder` (`eaf8b2d1`) : leurs sorties sont inchangées et

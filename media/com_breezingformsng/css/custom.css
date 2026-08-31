@@ -204,35 +204,17 @@ a[onclick^="addOption"]:focus {
 }
 
 
-/*
-custom radio and checkbox style
-*/
-
-main input[type="checkbox"]:not(old):not(#bfOptionsFieldsWrap *):not(.bfPropertyWrap *),
-main input[type="radio"]:not(old):not(#bfOptionsFieldsWrap *):not(.bfPropertyWrap *) {
-    width: 2em !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    font-size: 1em !important;
-    opacity: 0 !important;
-    cursor: pointer !important;
-}
-
-/* The custom skin above expects an immediate <label><span> sibling to draw the
-   visible control; the QuickMode editor's own Yes/No property toggles (raw
-   <input/> Text pairs inside .bfPropertyWrap, e.g. the "Choisir un moteur de
-   thèmes" and "Bootstrap Mode/Label Top/Hero Unit/..." radios in
-   advanced_form.php) don't follow that markup, so they'd otherwise render
-   fully invisible (opacity: 0 with nothing drawn in its place). Both
-   #bfOptionsFieldsWrap (the QuickMode "Options" tab, embedding
-   forms/edit.php's own Bootstrap .form-check radios/checkboxes - see
-   docs/maintenance/quickmode-options-tab-plan.md) and .bfPropertyWrap are
-   excluded from the rule above entirely, so their normal native/Bootstrap
-   sizing applies too, not just visibility - a separate
-   `.bfPropertyWrap input { opacity: 1 !important }` override used to attempt
-   this instead, but lost to the rule above on specificity (the ID selector
-   inside :not(#bfOptionsFieldsWrap *) outweighs a class selector), leaving
-   every .bfPropertyWrap radio/checkbox invisible. */
+/* The QuickMode admin templates no longer emit the <label><span></span>Text
+   </label> markup this custom-drawn radio/checkbox skin required (verified
+   repo-wide across every admin .php and .js file - zero matches). Left in
+   place it only did harm: any plain <input type="checkbox|radio"/> Text
+   pair anywhere under <main> (e.g. the sidebar's "Scroll element list"
+   checkbox, or the "Choisir un moteur de thèmes"/Bootstrap Mode/Label Top/
+   Hero Unit toggles in advanced_form.php - see the removed
+   #bfOptionsFieldsWrap/.bfPropertyWrap exemptions this skin needed) had its
+   opacity forced to 0 with nothing drawn in its place, rendering it fully
+   invisible. Removed entirely; every checkbox/radio now renders as a plain
+   native control. */
 
 .bfPropertyWrap .form-switch {
     padding-left: 0;
@@ -240,78 +222,6 @@ main input[type="radio"]:not(old):not(#bfOptionsFieldsWrap *):not(.bfPropertyWra
 
 .bfPropertyWrap .form-switch .form-check-input {
     margin-left: 0;
-}
-
-main input[type="checkbox"]:not(old):not(#bfOptionsFieldsWrap *) + label,
-main input[type="radio"]:not(old):not(#bfOptionsFieldsWrap *) + label {
-    display: inline-block;
-    margin-left: -1.5em;
-    line-height: 1.5em;
-}
-
-main input[type="checkbox"]:not([style*="none"]):not(#bfOptionsFieldsWrap *) + label > span,
-main input[type="radio"]:not([style*="none"]):not(#bfOptionsFieldsWrap *) + label > span {
-    display: inline-block;
-    width: 0.875em;
-    height: 0.875em;
-    margin: 0.25em 0.5em 0.25em 0.25em;
-    border: 0.0625em solid rgb(192, 192, 192);
-    border: 1px solid #c0c0c0;
-    border-radius: 0;
-    background: rgb(224, 224, 224);
-    background-image: linear-gradient(rgb(240, 240, 240), rgb(224, 224, 224));
-    background-image: linear-gradient(rgb(240, 240, 240), rgb(224, 224, 224));
-    background-image: linear-gradient(rgb(240, 240, 240), rgb(224, 224, 224));
-    background-image: linear-gradient(rgb(240, 240, 240), rgb(224, 224, 224));
-    background-image: linear-gradient(rgb(240, 240, 240), rgb(224, 224, 224));
-    vertical-align: bottom;
-}
-
-main input[type="checkbox"]:not(old):not(#bfOptionsFieldsWrap *) + label > span {
-    background: transparent !important;
-}
-
-main input[type="radio"]:not(old):not(#bfOptionsFieldsWrap *) + label > span {
-    border-radius: 1em !important;
-    border: 3px solid #ddd;
-    width: 0.6em;
-    height: 0.6em;
-}
-
-main input[type="checkbox"]:not(old):not(#bfOptionsFieldsWrap *):checked + label > span,
-main input[type="radio"]:not(old):not(#bfOptionsFieldsWrap *):checked + label > span {
-    background-image: linear-gradient(rgb(224, 224, 224), rgb(240, 240, 240));
-    background-image: linear-gradient(rgb(224, 224, 224), rgb(240, 240, 240));
-    background-image: linear-gradient(rgb(224, 224, 224), rgb(240, 240, 240));
-    background-image: linear-gradient(rgb(224, 224, 224), rgb(240, 240, 240));
-    background-image: linear-gradient(rgb(224, 224, 224), rgb(240, 240, 240));
-}
-
-main input[type="checkbox"]:not(old):not(#bfOptionsFieldsWrap *):checked + label > span::before {
-    content: "\2713 ";
-    display: block;
-    width: 1em;
-    color: rgb(153, 204, 102);
-    font-size: 0.875em;
-    line-height: 1em;
-    text-align: center;
-    text-shadow: 0 0 0.0714em rgb(115, 153, 77);
-    font-weight: bold;
-}
-
-main input[type="radio"]:not(old):not(#bfOptionsFieldsWrap *):checked + label > span > span {
-    display: block;
-    height: 100%;
-    margin: 0;
-    width: 100%;
-    border: 3px solid #ddd;
-    border-radius: 1em;
-    background: rgb(118, 181, 55);
-    background-image: linear-gradient(rgb(179, 217, 140), rgb(153, 204, 102));
-    background-image: linear-gradient(rgb(179, 217, 140), rgb(153, 204, 102));
-    background-image: linear-gradient(rgb(179, 217, 140), rgb(153, 204, 102));
-    background-image: linear-gradient(rgb(179, 217, 140), rgb(153, 204, 102));
-    background-image: linear-gradient(rgb(179, 217, 140), rgb(153, 204, 102));
 }
 
 #toolbar-options{

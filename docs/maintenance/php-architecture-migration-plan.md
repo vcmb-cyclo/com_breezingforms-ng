@@ -1901,6 +1901,12 @@ destination et sur un masque de fichier alimenté par une valeur de formulaire,
 avec nettoyage HTML et sécurisation du nom final. Les doubles filesystem et
 Input restent confinés au test.
 
+Les trois corrections de fuseau horaire du runtime sont maintenant mutualisées
+par SubmissionTimestampAdjuster, utilisé par SubmissionTimestampFormatter,
+UploadPathResolver et TokenizedDirectoryResolver. Les constructeurs existants
+conservent leur appel direct tout en acceptant explicitement cette stratégie,
+et le comportement historique est validé par les tests concernés.
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

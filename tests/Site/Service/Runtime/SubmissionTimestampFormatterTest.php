@@ -22,6 +22,7 @@ namespace Joomla\CMS\Date {
 namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Runtime {
 
 use PHPUnit\Framework\TestCase;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampAdjuster;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampFormatter;
 
 final class SubmissionTimestampFormatterTest extends TestCase
@@ -46,6 +47,16 @@ final class SubmissionTimestampFormatterTest extends TestCase
                 'UTC',
                 'Y/m/d H:i'
             )
+        );
+    }
+
+    public function testUsesTheSharedTimestampAdjuster(): void
+    {
+        $formatter = new SubmissionTimestampFormatter(new SubmissionTimestampAdjuster());
+
+        self::assertSame(
+            '2024-01-02 03:04:05',
+            $formatter->format('2024-01-02 03:04:05', 'UTC')->submittedAt
         );
     }
 }

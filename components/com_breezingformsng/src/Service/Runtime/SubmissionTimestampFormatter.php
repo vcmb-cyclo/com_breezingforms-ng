@@ -12,15 +12,16 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Runtime;
 
 \defined('_JEXEC') or die;
 
-use DateInterval;
-use DateTimeZone;
-use Joomla\CMS\Date\Date;
-
 final class SubmissionTimestampFormatter
 {
+    public function __construct(
+        private readonly SubmissionTimestampAdjuster $timestampAdjuster = new SubmissionTimestampAdjuster()
+    ) {
+    }
+
     public function format(string $submittedAt, string $timezone): FormattedTimestamp
     {
-        $date = $this->adjustedDate($submittedAt, $timezone);
+        $date = $this->timestampAdjuster->adjust($submittedAt, $timezone);
 
         return new FormattedTimestamp(
             $date->format('Y-m-d H:i:s', true),
@@ -30,20 +31,6 @@ final class SubmissionTimestampFormatter
 
     public function formatPattern(string $submittedAt, string $timezone, string $pattern): string
     {
-        return $this->adjustedDate($submittedAt, $timezone)->format($pattern, true);
-    }
-
-    private function adjustedDate(string $submittedAt, string $timezone): Date
-    {
-        $date = new Date($submittedAt, new DateTimeZone($timezone));
-        $offset = $date->getOffsetFromGMT();
-
-        if ($offset > 0) {
-            $date->add(new DateInterval('PT' . $offset . 'S'));
-        } elseif ($offset < 0) {
-            $date->sub(new DateInterval('PT' . abs($offset) . 'S'));
-        }
-
-        return $date;
+        return $this->timestampAdjuster->adjust($submittedAt, $timezone)->format($pattern, true);
     }
 }

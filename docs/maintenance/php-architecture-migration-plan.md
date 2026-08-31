@@ -1526,6 +1526,12 @@ mutualisé dans `QuickModeFileInputBuilder` pour Classic, Bootstrap et OnePage.
 Les variantes `file` et placeholder `hidden`, les attributs d'événements et
 les noms de champs sont couverts sans modification des snapshots (`299157a91`).
 
+Les contrôles internes des six boutons de paiement Classic et Bootstrap/OnePage
+sont maintenant construits par `QuickModePaymentButtonBuilder`. Les variantes
+submit/image, callbacks, fournisseurs et sorties historiques sont couvertes,
+tandis que les wrappers propres aux thèmes restent dans les renderers
+(`40b282362`).
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

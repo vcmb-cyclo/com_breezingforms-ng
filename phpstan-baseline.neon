@@ -49,12 +49,6 @@ parameters:
 			path: components/com_breezingformsng/src/Service/Export/ExportEngine.php
 
 		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Editor\\Editor\:\:getContent\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/Rendering/QuickMode/ClassicRenderer.php
-
-		-
 			message: '#^Call to static method contentbuilderng_wordwrap\(\) on an unknown class CB\\Component\\Contentbuilderng\\Administrator\\Helper\\ContentbuilderngHelper\.$#'
 			identifier: class.notFound
 			count: 1

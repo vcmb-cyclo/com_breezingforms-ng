@@ -53,6 +53,7 @@ class ClassicRenderer
     private $cancelImagePath = '';
     private $uploadImagePath = '';
     private $htmltextareas = array();
+    private $htmltextareasDbIds = array();
     private $language_tag = '';
     private $hasResponsiveDatePicker = false;
     private ?QuickModeInputBuilder $quickModeInputBuilderService = null;
@@ -112,6 +113,11 @@ class ClassicRenderer
     private function quickModeCheckboxStrategy(): QuickModeCheckboxStrategy
     {
         return $this->quickModeCheckboxStrategyService ??= new QuickModeCheckboxStrategy();
+    }
+
+    public static function getEditorContent(string $editor): string
+    {
+        return QuickModeEditorValueBuilder::build($editor);
     }
 
     public function headers()
@@ -880,6 +886,7 @@ float:left;
             echo '<div style="display: inline-block; vertical-align: top; width: ' . strip_tags($mdata['width']) . ';">';
             $editor = Editor::getInstance($this->p->app->get('editor'));
             $this->htmltextareas[] = 'ff_nm_' . $mdata['bfName'] . '[]';
+            $this->htmltextareasDbIds[] = 'ff_elem' . $mdata['dbId'];
             echo $editor->display('ff_nm_' . $mdata['bfName'] . '[]', htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8'), strip_tags($mdata['width']), strip_tags($mdata['height']), '75', '20', true, 'ff_elem' . $mdata['dbId']);
             echo '<style type="text/css">.toggle-editor{display: none;}</style>';
             echo '</div>';
@@ -1456,16 +1463,15 @@ float:left;
         // we gonna add a blank to each textarea, since the value is transferred upon submit
         // requires a different mandatory validation than ff_valuenotempty
         if (count($this->htmltextareas)) {
-            $editor = Editor::getInstance($this->p->app->get('editor'));
             RuntimeAssetLoader::script(
                 $this->p->app,
                 Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-html-textareas.js'
             );
-            foreach ($this->htmltextareas as $htmltextarea) {
-                $editorContent = rtrim(trim($editor->getContent($htmltextarea)), ';');
+            foreach ($this->htmltextareas as $index => $htmltextarea) {
+                $editorContent = $this->getEditorContent($this->htmltextareasDbIds[$index]);
                 echo $this->quickModeHtmlTextareaScriptBuilder()->build(
                     $htmltextarea,
-                    (string) json_encode($editorContent)
+                    $editorContent
                 );
             }
         }

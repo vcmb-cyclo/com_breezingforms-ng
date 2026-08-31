@@ -11,6 +11,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\CMS\MVC\Factory\MVCFactoryServiceInterface;
 use Joomla\CMS\Response\JsonResponse;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
@@ -77,7 +78,13 @@ class RecordsController extends BaseController
         $input = $app->getInput();
         $ids = $input->get('cid', [], 'post', 'array');
         ArrayHelper::toInteger($ids);
-        $contentFactory = $app->bootComponent('com_content')->getMVCFactory();
+        $contentComponent = $app->bootComponent('com_content');
+
+        if (!$contentComponent instanceof MVCFactoryServiceInterface) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        $contentFactory = $contentComponent->getMVCFactory();
         $this->getRecordModel()->deleteRecords($ids, $contentFactory);
         $app->redirect($this->listUrl($input));
     }
@@ -498,10 +505,19 @@ class RecordsController extends BaseController
 
     private function getRecordModel(): RecordModel
     {
-        return $this->app
-            ->bootComponent('com_breezingformsng')
-            ->getMVCFactory()
-            ->createModel('Record', 'Administrator');
+        $component = $this->app->bootComponent('com_breezingformsng');
+
+        if (!$component instanceof MVCFactoryServiceInterface) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        $model = $component->getMVCFactory()->createModel('Record', 'Administrator');
+
+        if (!$model instanceof RecordModel) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        return $model;
     }
 
     private function getTimezone(): \DateTimeZone

@@ -121,52 +121,10 @@ parameters:
 			path: administrator/components/com_breezingformsng/src/Controller/IntegratorController.php
 
 		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:redirect\(\)\.$#'
-			identifier: method.notFound
-			count: 10
-			path: administrator/components/com_breezingformsng/src/Controller/MenusController.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:setBody\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/Controller/MenusController.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:setHeader\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/Controller/MenusController.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Extension\\ComponentInterface\:\:getMVCFactory\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: administrator/components/com_breezingformsng/src/Controller/MenusController.php
-
-		-
 			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: administrator/components/com_breezingformsng/src/Controller/PiecesController.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:sendHeaders\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/Controller/QuickmodeController.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:setHeader\(\)\.$#'
-			identifier: method.notFound
-			count: 6
-			path: administrator/components/com_breezingformsng/src/Controller/QuickmodeController.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Extension\\ComponentInterface\:\:getMVCFactory\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/Controller/QuickmodeController.php
 
 		-
 			message: '#^Call to method synchElements\(\) on an unknown class CB\\Component\\Contentbuilderng\\Administrator\\Service\\FormSupportService\.$#'
@@ -214,12 +172,6 @@ parameters:
 			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:setHeader\(\)\.$#'
 			identifier: method.notFound
 			count: 11
-			path: administrator/components/com_breezingformsng/src/Controller/RecordsController.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Extension\\ComponentInterface\:\:getMVCFactory\(\)\.$#'
-			identifier: method.notFound
-			count: 2
 			path: administrator/components/com_breezingformsng/src/Controller/RecordsController.php
 
 		-
@@ -403,25 +355,7 @@ parameters:
 			path: administrator/components/com_breezingformsng/src/View/Quickmode/HtmlView.php
 
 		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
-			identifier: method.notFound
-			count: 3
-			path: administrator/components/com_breezingformsng/src/View/Records/HtmlView.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:redirect\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: administrator/components/com_breezingformsng/src/View/Records/HtmlView.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Document\\Document\:\:getToolbar\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/View/Records/HtmlView.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Extension\\ComponentInterface\:\:getMVCFactory\(\)\.$#'
+			message: '#^Call to an undefined method Joomla\\CMS\\Toolbar\\ToolbarButton\:\:toggleSplit\(\)\.$#'
 			identifier: method.notFound
 			count: 2
 			path: administrator/components/com_breezingformsng/src/View/Records/HtmlView.php

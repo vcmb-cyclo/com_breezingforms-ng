@@ -9,9 +9,11 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\CMS\MVC\Factory\MVCFactoryServiceInterface;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 use Joomla\Filesystem\File;
@@ -36,6 +38,7 @@ class QuickmodeController extends BaseController
     {
         $this->checkToken('post');
 
+        /** @var CMSApplication $app */
         $app   = $this->app;
         $input = $app->getInput();
 
@@ -145,10 +148,13 @@ class QuickmodeController extends BaseController
 
     private function getQuickmodeModel(): QuickmodeModel
     {
-        $model = $this->app
-            ->bootComponent('com_breezingformsng')
-            ->getMVCFactory()
-            ->createModel('Quickmode', 'Administrator', ['ignore_request' => true]);
+        $component = $this->app->bootComponent('com_breezingformsng');
+
+        if (!$component instanceof MVCFactoryServiceInterface) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        $model = $component->getMVCFactory()->createModel('Quickmode', 'Administrator', ['ignore_request' => true]);
 
         if (!$model instanceof QuickmodeModel) {
             throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));

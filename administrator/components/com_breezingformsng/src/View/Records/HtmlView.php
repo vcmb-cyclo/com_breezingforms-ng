@@ -9,9 +9,12 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Records;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Application\CMSApplication;
+use Joomla\CMS\Document\HtmlDocument;
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\MVC\Factory\MVCFactoryServiceInterface;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\RecordModel;
@@ -46,6 +49,7 @@ class HtmlView extends BaseHtmlView
 
     public function display($tpl = null)
     {
+        /** @var CMSApplication $app */
         $app = Factory::getApplication();
         $input = $app->getInput();
         $layout = $input->getCmd('layout', 'default');
@@ -119,9 +123,14 @@ class HtmlView extends BaseHtmlView
             $this->listDirn = $this->listDirn === 'asc' ? 'asc' : 'desc';
         }
 
-        $factory = $app->bootComponent('com_breezingformsng')->getMVCFactory();
+        $component = $app->bootComponent('com_breezingformsng');
+
+        if (!$component instanceof MVCFactoryServiceInterface) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
         /** @var RecordsModel $model */
-        $model = $factory->createModel('Records', 'Administrator');
+        $model = $component->getMVCFactory()->createModel('Records', 'Administrator');
 
         $this->forms = $model->getForms();
         $this->total = $model->getTotal($this->formSelection, $this->searchTerm);
@@ -140,6 +149,7 @@ class HtmlView extends BaseHtmlView
     private function prepareEditData(\Joomla\Input\Input $input): void
     {
         $recordId = $input->getInt('record_id', 0);
+        /** @var CMSApplication $app */
         $app = Factory::getApplication();
 
         if ($recordId < 1) {
@@ -147,9 +157,14 @@ class HtmlView extends BaseHtmlView
             return;
         }
 
-        $factory = $app->bootComponent('com_breezingformsng')->getMVCFactory();
+        $component = $app->bootComponent('com_breezingformsng');
+
+        if (!$component instanceof MVCFactoryServiceInterface) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
         /** @var RecordModel $model */
-        $model = $factory->createModel('Record', 'Administrator');
+        $model = $component->getMVCFactory()->createModel('Record', 'Administrator');
 
         $this->record = $model->getRecord($recordId);
         if (!$this->record) {
@@ -166,7 +181,9 @@ class HtmlView extends BaseHtmlView
 
     private function prepareListToolbar(): void
     {
-        $toolbar = $this->getDocument()->getToolbar();
+        /** @var HtmlDocument $document */
+        $document = $this->getDocument();
+        $toolbar = $document->getToolbar();
 
         $exportDropdown = $toolbar
             ->dropdownButton('export-options')
@@ -241,7 +258,9 @@ class HtmlView extends BaseHtmlView
         ToolbarHelper::custom('records.save', 'save', 'save', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_SAVE'), false);
         ToolbarHelper::cancel('records.cancel', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_CANCEL'));
 
-        $document = Factory::getApplication()->getDocument();
+        /** @var CMSApplication $app */
+        $app      = Factory::getApplication();
+        $document = $app->getDocument();
         $wa       = $document->getWebAssetManager();
         $wa->registerAndUseScript(
             'com_breezingformsng.admin-form',

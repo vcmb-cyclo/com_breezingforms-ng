@@ -9,6 +9,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\CMS\MVC\Factory\MVCFactoryServiceInterface;
@@ -21,6 +22,7 @@ use Vcmb\Component\BreezingformsNG\Administrator\Service\AjaxStateService;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\PdfDocument;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\PdfFontDirectoryScanner;
 
+/** @property CMSApplication $app */
 class RecordsController extends BaseController
 {
     public function display($cachable = false, $urlparams = [])

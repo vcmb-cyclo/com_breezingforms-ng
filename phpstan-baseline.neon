@@ -7,60 +7,6 @@ parameters:
 			path: administrator/components/com_breezingformsng/src/Controller/AboutController.php
 
 		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getSession\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/Controller/DisplayController.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:redirect\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/Controller/DisplayController.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Extension\\ComponentInterface\:\:getMVCFactory\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/Controller/DisplayController.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:redirect\(\)\.$#'
-			identifier: method.notFound
-			count: 12
-			path: administrator/components/com_breezingformsng/src/Controller/FormsController.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:setHeader\(\)\.$#'
-			identifier: method.notFound
-			count: 3
-			path: administrator/components/com_breezingformsng/src/Controller/FormsController.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Extension\\ComponentInterface\:\:getMVCFactory\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/Controller/FormsController.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:setBody\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/Controller/IntegratorController.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:setHeader\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/Controller/IntegratorController.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Extension\\ComponentInterface\:\:getMVCFactory\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/Controller/IntegratorController.php
-
-		-
 			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
 			identifier: method.notFound
 			count: 1
@@ -95,24 +41,6 @@ parameters:
 			identifier: class.notFound
 			count: 1
 			path: administrator/components/com_breezingformsng/src/Controller/QuickmodeController.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:redirect\(\)\.$#'
-			identifier: method.notFound
-			count: 8
-			path: administrator/components/com_breezingformsng/src/Controller/RecordsController.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:sendHeaders\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: administrator/components/com_breezingformsng/src/Controller/RecordsController.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:setHeader\(\)\.$#'
-			identifier: method.notFound
-			count: 11
-			path: administrator/components/com_breezingformsng/src/Controller/RecordsController.php
 
 		-
 			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
@@ -154,59 +82,11 @@ parameters:
 			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
 			identifier: method.notFound
 			count: 1
-			path: administrator/components/com_breezingformsng/src/View/About/HtmlView.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getUserState\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: administrator/components/com_breezingformsng/src/View/About/HtmlView.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:setUserState\(\)\.$#'
-			identifier: method.notFound
-			count: 2
-			path: administrator/components/com_breezingformsng/src/View/About/HtmlView.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
-			identifier: method.notFound
-			count: 1
 			path: administrator/components/com_breezingformsng/src/View/BreezingformsNG/HtmlView.php
 
 		-
 			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
 			identifier: method.notFound
-			count: 2
-			path: administrator/components/com_breezingformsng/src/View/Forms/HtmlView.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getSession\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/View/Forms/HtmlView.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getUserStateFromRequest\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/View/Forms/HtmlView.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:redirect\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/View/Forms/HtmlView.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Extension\\ComponentInterface\:\:getMVCFactory\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/View/Forms/HtmlView.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
-			identifier: method.notFound
 			count: 1
 			path: administrator/components/com_breezingformsng/src/View/Integrator/HtmlView.php
 
@@ -215,24 +95,6 @@ parameters:
 			identifier: method.notFound
 			count: 1
 			path: administrator/components/com_breezingformsng/src/View/Integrator/HtmlView.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/View/Menus/HtmlView.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getSession\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/View/Menus/HtmlView.php
-
-		-
-			message: '#^Call to an undefined method Joomla\\CMS\\Extension\\ComponentInterface\:\:getMVCFactory\(\)\.$#'
-			identifier: method.notFound
-			count: 1
-			path: administrator/components/com_breezingformsng/src/View/Menus/HtmlView.php
 
 		-
 			message: '#^Call to an undefined method Joomla\\CMS\\Application\\CMSApplicationInterface\:\:getDocument\(\)\.$#'

@@ -9,8 +9,10 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Menus;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\MVC\Factory\MVCFactoryServiceInterface;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\MenuModel;
@@ -26,11 +28,17 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
 
     public function display($tpl = null): void
     {
-        $input   = Factory::getApplication()->getInput();
+        /** @var CMSApplication $app */
+        $app     = Factory::getApplication();
+        $input   = $app->getInput();
         $layout  = $input->getCmd('layout', 'default');
-        $factory = Factory::getApplication()
-            ->bootComponent('com_breezingformsng')
-            ->getMVCFactory();
+        $component = $app->bootComponent('com_breezingformsng');
+
+        if (!$component instanceof MVCFactoryServiceInterface) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        $factory = $component->getMVCFactory();
 
         /** @var MenuModel $model */
         $model = $factory->createModel('Menu', 'Administrator', ['ignore_request' => true]);
@@ -66,7 +74,7 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
             ToolbarHelper::deleteList('JGLOBAL_CONFIRM_DELETE', 'menus.remove');
             ToolbarHelper::custom('menus.sync', 'refresh', '', 'COM_BREEZINGFORMSNG_MENUS_SYNC', false);
 
-            $document = Factory::getApplication()->getDocument();
+            $document = $app->getDocument();
             $wa       = $document->getWebAssetManager();
             $wa->registerAndUseScript(
                 'com_breezingformsng.admin-form',
@@ -106,7 +114,9 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
 
     private function resolvedPkg(\Joomla\Input\Input $input, MenuModel $model): string
     {
-        $session = Factory::getApplication()->getSession();
+        /** @var CMSApplication $app */
+        $app     = Factory::getApplication();
+        $session = $app->getSession();
         $pkg     = $input->getString('pkg', '__unset__');
 
         if ($pkg === '__unset__') {

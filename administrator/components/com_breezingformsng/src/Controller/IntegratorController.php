@@ -9,9 +9,12 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\CMS\MVC\Factory\MVCFactoryServiceInterface;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\IntegratorModel;
 
+/** @property CMSApplication $app */
 class IntegratorController extends BaseController
 {
     public function display($cachable = false, $urlparams = [])
@@ -240,9 +243,13 @@ class IntegratorController extends BaseController
 
     private function getIntegratorModel(): IntegratorModel
     {
-        $model = $this->app
-            ->bootComponent('com_breezingformsng')
-            ->getMVCFactory()
+        $component = $this->app->bootComponent('com_breezingformsng');
+
+        if (!$component instanceof MVCFactoryServiceInterface) {
+            throw new \RuntimeException('IntegratorModel not found');
+        }
+
+        $model = $component->getMVCFactory()
             ->createModel('Integrator', 'Administrator');
 
         if (!$model instanceof IntegratorModel) {

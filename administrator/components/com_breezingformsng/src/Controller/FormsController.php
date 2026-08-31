@@ -9,13 +9,16 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\CMS\MVC\Factory\MVCFactoryServiceInterface;
 use Joomla\CMS\Response\JsonResponse;
 use Joomla\CMS\Router\Route;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\FormModel;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\AjaxStateService;
 
+/** @property CMSApplication $app */
 class FormsController extends BaseController
 {
     public function display($cachable = false, $urlparams = []): static
@@ -360,9 +363,13 @@ class FormsController extends BaseController
 
     private function getFormModel(): FormModel
     {
-        $model = $this->app
-            ->bootComponent('com_breezingformsng')
-            ->getMVCFactory()
+        $component = $this->app->bootComponent('com_breezingformsng');
+
+        if (!$component instanceof MVCFactoryServiceInterface) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        $model = $component->getMVCFactory()
             ->createModel('Form', 'Administrator', ['ignore_request' => true]);
 
         if (!$model instanceof FormModel) {

@@ -9,6 +9,8 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\About;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Application\CMSApplication;
+use Joomla\CMS\Document\HtmlDocument;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
@@ -31,7 +33,9 @@ class HtmlView extends BaseHtmlView
             return;
         }
 
+        /** @var CMSApplication $app */
         $app = Factory::getApplication();
+        /** @var HtmlDocument $document */
         $document = $app->getDocument();
         $wa = $document->getWebAssetManager();
         $wa->getRegistry()->addExtensionRegistryFile('com_breezingformsng');

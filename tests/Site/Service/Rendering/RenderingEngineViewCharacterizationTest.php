@@ -1355,4 +1355,46 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertSame(['ff_div32'], $processor->draggableDivIds);
     }
 
+    public function testViewLinksQueryListLibraryBeforeTheNextBuryPoint(): void
+    {
+        $processor = $this->makeProcessorReadyForCaptchaScript([
+            (object) [
+                'id' => 33,
+                'type' => 'Query List',
+                'flag1' => 1,
+                'flag2' => 0,
+                'height' => 15,
+                'data1' => '',
+                'data3' => '',
+                'page' => 1,
+                'name' => 'results',
+                'script1cond' => 0,
+                'script1id' => 0,
+                'script1code' => '',
+                'script2cond' => 0,
+                'script2id' => 0,
+                'script2code' => '',
+                'script3cond' => 0,
+                'script3id' => 0,
+                'script3code' => '',
+            ],
+        ]);
+        $processor->formrow->name = 'query';
+        $processor->formrow->script1cond = 0;
+        $processor->formrow->script1id = 0;
+        $processor->formrow->script1code = '';
+        $processor->formrow->script2cond = 0;
+        $processor->formrow->script2id = 0;
+        $processor->formrow->script2code = '';
+        $processor->queryResultRows = [['result', 1]];
+        $processor->buryOnCallNumber = 10;
+
+        $this->captureCaptchaScript($processor);
+
+        self::assertSame('ff_dispQueryPage', $processor->linkedCallbacks[array_key_last($processor->linkedCallbacks)]['function']);
+        $queryCode = $processor->linkedCallbacks[array_key_last($processor->linkedCallbacks)]['code'];
+        self::assertStringContainsString('function ff_dispQueryPage(id,page)', $queryCode);
+        self::assertStringContainsString('ff_queryCurrPage[id] = page;', $queryCode);
+    }
+
 }

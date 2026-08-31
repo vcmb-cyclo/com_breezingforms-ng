@@ -1890,6 +1890,11 @@ La branche URL de \`UploadStorage\` est maintenant couverte en complément des
 chemins serveur existants : elle vérifie la séparation entre URL publique et
 chemin disque, avec un répertoire contrôlé et nettoyé par le test.
 
+Le \`UploadPathResolver\` est caractérisé sur le remplacement de tokens de
+destination et sur un masque de fichier alimenté par une valeur de formulaire,
+avec nettoyage HTML et sécurisation du nom final. Les doubles filesystem et
+Input restent confinés au test.
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

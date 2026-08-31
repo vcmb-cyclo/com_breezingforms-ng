@@ -1829,6 +1829,11 @@ noms ignorés et les valeurs contenant plusieurs signes `=`. Le comportement
 historique de la préparation des paramètres runtime est ainsi verrouillé avant
 toute évolution de son appelant.
 
+Le service pur \`TraceModeFormatter\` est également caractérisé directement :
+les modes non entiers, la désactivation, les variantes de transport, les
+priorités, la portée et les combinaisons de sujets sont couvertes sans
+dépendance au processeur historique.
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

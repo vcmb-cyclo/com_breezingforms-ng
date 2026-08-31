@@ -569,24 +569,22 @@ trait BootstrapStyleFieldTrait
         echo $label;
         echo '<span class="' . $this->bsClass('nonform-control') . '">';
 
-        $value = '';
-        $type = 'submit';
-        $src = '';
-        if ($mdata['image'] != '') {
-            $type = 'image';
-            $src = QuickModePaymentImageBuilder::build((string) $mdata['image'], 'Stripe');
-        } else {
-            $value = 'value="Stripe" ';
-        }
-        if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
-            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Stripe\';'
-                . $mdata['actionFunctionName'] . '(this,\'click\');" ';
-        } else {
-            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Stripe\';" ';
-        }
-        echo '<input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange
-            . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName']
-            . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+        echo QuickModePaymentButtonBuilder::build(
+            'Stripe',
+            (string) $mdata['bfName'],
+            (int) $mdata['dbId'],
+            (string) $mdata['image'],
+            'Stripe',
+            'Stripe',
+            $tabIndex,
+            $onblur,
+            $onchange,
+            $onfocus,
+            $onselect,
+            $readonly,
+            isset($mdata['actionClick']) && $mdata['actionClick'] == 1,
+            (string) ($mdata['actionFunctionName'] ?? '')
+        );
         echo '</span>';
         echo '</div>';
         echo '</div>';
@@ -618,24 +616,22 @@ trait BootstrapStyleFieldTrait
         echo $label;
         echo '<span class="' . $this->bsClass('nonform-control') . '">';
 
-        $value = '';
-        $type = 'submit';
-        $src = '';
-        if ($mdata['image'] != '') {
-            $type = 'image';
-            $src = QuickModePaymentImageBuilder::build((string) $mdata['image'], 'PayPal');
-        } else {
-            $value = 'value="PayPal" ';
-        }
-        if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
-            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'PayPal\';'
-                . $mdata['actionFunctionName'] . '(this,\'click\');" ';
-        } else {
-            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'PayPal\';" ';
-        }
-        echo '<input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange
-            . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName']
-            . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+        echo QuickModePaymentButtonBuilder::build(
+            'PayPal',
+            (string) $mdata['bfName'],
+            (int) $mdata['dbId'],
+            (string) $mdata['image'],
+            'PayPal',
+            'PayPal',
+            $tabIndex,
+            $onblur,
+            $onchange,
+            $onfocus,
+            $onselect,
+            $readonly,
+            isset($mdata['actionClick']) && $mdata['actionClick'] == 1,
+            (string) ($mdata['actionFunctionName'] ?? '')
+        );
         echo '</span>';
         echo '</div>';
         echo '</div>';
@@ -666,24 +662,22 @@ trait BootstrapStyleFieldTrait
         echo '<div class="' . $this->bsClass('form-group') . ' ' . $this->bsClass('other-form-group') . '">';
         echo $label;
         echo '<span class="' . $this->bsClass('nonform-control') . '">';
-        $value = '';
-        $type = 'submit';
-        $src = '';
-        if ($mdata['image'] != '') {
-            $type = 'image';
-            $src = QuickModePaymentImageBuilder::build((string) $mdata['image'], 'Sofort.com');
-        } else {
-            $value = 'value="Sofortueberweisung" ';
-        }
-        if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
-            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Sofortueberweisung\';'
-                . $mdata['actionFunctionName'] . '(this,\'click\');" ';
-        } else {
-            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Sofortueberweisung\';" ';
-        }
-        echo '<input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange
-            . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName']
-            . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+        echo QuickModePaymentButtonBuilder::build(
+            'Sofortueberweisung',
+            (string) $mdata['bfName'],
+            (int) $mdata['dbId'],
+            (string) $mdata['image'],
+            'Sofortueberweisung',
+            'Sofort.com',
+            $tabIndex,
+            $onblur,
+            $onchange,
+            $onfocus,
+            $onselect,
+            $readonly,
+            isset($mdata['actionClick']) && $mdata['actionClick'] == 1,
+            (string) ($mdata['actionFunctionName'] ?? '')
+        );
         echo '</span>';
         echo '</div>';
         echo '</div>';

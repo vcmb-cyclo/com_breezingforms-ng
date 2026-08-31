@@ -1325,21 +1325,22 @@ float:left;
         }
         /* translatables end */
 
-        $value = '';
-        $type = 'submit';
-        $src = '';
-        if ($mdata['image'] != '') {
-            $type = 'image';
-            $src = QuickModePaymentImageBuilder::build((string) $mdata['image']);
-        } else {
-            $value = 'value="PayPal" ';
-        }
-        if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
-            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Stripe\';' . $mdata['actionFunctionName'] . '(this,\'click\');" ';
-        } else {
-            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Stripe\';" ';
-        }
-        echo '<input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+        echo QuickModePaymentButtonBuilder::build(
+            'Stripe',
+            (string) $mdata['bfName'],
+            (int) $mdata['dbId'],
+            (string) $mdata['image'],
+            'PayPal',
+            '',
+            $tabIndex,
+            $onblur,
+            $onchange,
+            $onfocus,
+            $onselect,
+            $readonly,
+            isset($mdata['actionClick']) && $mdata['actionClick'] == 1,
+            (string) ($mdata['actionFunctionName'] ?? '')
+        );
     }
 
     private function renderPayPalField(array $mdata, string $tabIndex, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
@@ -1350,21 +1351,22 @@ float:left;
         }
         /* translatables end */
 
-        $value = '';
-        $type = 'submit';
-        $src = '';
-        if ($mdata['image'] != '') {
-            $type = 'image';
-            $src = QuickModePaymentImageBuilder::build((string) $mdata['image']);
-        } else {
-            $value = 'value="PayPal" ';
-        }
-        if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
-            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'PayPal\';' . $mdata['actionFunctionName'] . '(this,\'click\');" ';
-        } else {
-            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'PayPal\';" ';
-        }
-        echo '<input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+        echo QuickModePaymentButtonBuilder::build(
+            'PayPal',
+            (string) $mdata['bfName'],
+            (int) $mdata['dbId'],
+            (string) $mdata['image'],
+            'PayPal',
+            '',
+            $tabIndex,
+            $onblur,
+            $onchange,
+            $onfocus,
+            $onselect,
+            $readonly,
+            isset($mdata['actionClick']) && $mdata['actionClick'] == 1,
+            (string) ($mdata['actionFunctionName'] ?? '')
+        );
     }
 
     private function renderSofortueberweisungField(array $mdata, string $tabIndex, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
@@ -1375,21 +1377,22 @@ float:left;
         }
         /* translatables end */
 
-        $value = '';
-        $type = 'submit';
-        $src = '';
-        if ($mdata['image'] != '') {
-            $type = 'image';
-            $src = QuickModePaymentImageBuilder::build((string) $mdata['image']);
-        } else {
-            $value = 'value="Sofortueberweisung" ';
-        }
-        if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
-            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Sofortueberweisung\';' . $mdata['actionFunctionName'] . '(this,\'click\');" ';
-        } else {
-            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Sofortueberweisung\';" ';
-        }
-        echo '<input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+        echo QuickModePaymentButtonBuilder::build(
+            'Sofortueberweisung',
+            (string) $mdata['bfName'],
+            (int) $mdata['dbId'],
+            (string) $mdata['image'],
+            'Sofortueberweisung',
+            '',
+            $tabIndex,
+            $onblur,
+            $onchange,
+            $onfocus,
+            $onselect,
+            $readonly,
+            isset($mdata['actionClick']) && $mdata['actionClick'] == 1,
+            (string) ($mdata['actionFunctionName'] ?? '')
+        );
     }
 
     private function renderFileField(array $mdata, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): string

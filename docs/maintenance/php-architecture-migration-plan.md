@@ -1228,6 +1228,12 @@ renderers Classic, Bootstrap et OnePage. Les différences d'URL SEF sont
 injectées explicitement ; les callbacks et les enveloppes visuelles restent
 propres à chaque renderer.
 
+Le corps commun du callback `FilesAdded` est désormais fourni par
+`QuickModeUploadFileAddedHandlerBuilder` (`941f1ed6d`). La boucle de validation,
+la création de la file d'attente et l'annulation sont ainsi mutualisées ; les
+variantes de markup et de réactivation du bouton restent paramétrées par le
+renderer.
+
 Le callback plupload `UploadProgress` est désormais généré par
 `QuickModeUploadProgressScriptBuilder` (`1e28a79b2`) pour les quatre renderers.
 La mise à jour du pourcentage et de la barre visuelle reste inchangée et est

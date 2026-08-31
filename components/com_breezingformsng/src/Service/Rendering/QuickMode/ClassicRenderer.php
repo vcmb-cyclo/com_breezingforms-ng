@@ -1436,18 +1436,17 @@ float:left;
     (string) json_encode(Text::_('COM_BREEZINGFORMSNG_CHOOSE_FILE'))
 ) . "
 " . QuickModeUploadQueueEntryScriptBuilder::build(chr(10)) . "
-                                                                        for (var i in files) {
-                                                                            if(typeof files[i].id != 'undefined' && files[i].id != null){
-                                                                                var error = false;
-                                                                                var fsize = '';
-                                                                                if(typeof files[i].size != 'undefined'){
-                                                                                    fsize = '(' + plupload.formatSize(files[i].size) + ') ';
-                                                                                }
-" . QuickModeUploadQueueItemMarkupBuilder::build((int) $mdata['dbId'], (string) $this->cancelImagePath, false, false) . "
-" . QuickModeUploadCancelScriptBuilder::build((string) $multiSelection, (int) $mdata['dbId'], false, chr(10)) . "
-" . QuickModeUploadValidationScriptBuilder::build((int) $uploadOptions['maxBytes'], strtolower($exts), (string) json_encode(' ' . Text::_('COM_BREEZINGFORMSNG_FLASH_UPLOADER_TOO_LARGE')), (string) json_encode(' ' . Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED')), chr(10)) . "
-                                                                            }
-                                                                        }
+" . QuickModeUploadFileAddedHandlerBuilder::build(
+    (int) $mdata['dbId'],
+    (string) $this->cancelImagePath,
+    false,
+    (string) $multiSelection,
+    (int) $uploadOptions['maxBytes'],
+    (string) $exts,
+    (string) json_encode(' ' . Text::_('COM_BREEZINGFORMSNG_FLASH_UPLOADER_TOO_LARGE')),
+    (string) json_encode(' ' . Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED')),
+    chr(10)
+) . "
                                                                         // disable the button if no multi upload
                                                                         if( " . $multiSelection . " == false ){
                                                                             var the_size = JQuery('#bfFlashFileQueue" . $mdata['dbId'] . " .bfFileQueueItem').size();

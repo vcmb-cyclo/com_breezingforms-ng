@@ -1489,13 +1489,11 @@ transition: box-shadow .15s linear;
 
         // CONTENTBUILDER
         if ($this->processor->app->getInput()->get('cb_controller', null, 'string') != 'edit' && $cbRecordId && is_array($cbResult) && isset($cbResult['data']) && isset($cbResult['data']['id']) && $cbResult['data']['id']) {
-            if ($cbRecordId) {
-                $return = $this->processor->app->getInput()->getString('return', '');
-                if ($return) {
-                    $return = bf_b64dec($return);
-                    if (Uri::isInternal($return)) {
-                        $this->processor->app->redirect($return);
-                    }
+            $return = $this->processor->app->getInput()->getString('return', '');
+            if ($return) {
+                $return = bf_b64dec($return);
+                if (Uri::isInternal($return)) {
+                    $this->processor->app->redirect($return);
                 }
             }
 

@@ -792,6 +792,11 @@ supprimée : elle n'avait plus d'appelant depuis l'extraction de
 `CaptchaSupportBuilderTest`, tandis que `RenderingEngine::view()` conserve ses
 caractérisations d'intégration ; le niveau 4 descend à 20 diagnostics.
 
+Dans la finalisation ContentBuilder de `SubmissionEngine`, la condition
+interne sur `cbRecordId` est supprimée puisque la garde englobante le rend déjà
+vrai. La redirection `return` et les contrôles `force_login`/`force_url` restent
+inchangés ; le niveau 4 descend à 19 diagnostics.
+
 ## Phase 7 — Réduire les façades historiques
 
 Cette phase commence seulement lorsque leurs responsabilités ont été extraites

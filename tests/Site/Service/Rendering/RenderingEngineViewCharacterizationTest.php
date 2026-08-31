@@ -1521,11 +1521,15 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         $processor->traceMode = 0;
         $processor->buryOnCallNumber = null;
         $GLOBALS['ff_otherparams'] = [];
+        $processor->app->getInput()->set('return', 'administrator/index.php?option=com_breezingformsng');
+        $processor->app->getInput()->set('tmpl', 'component');
 
         $html = $this->captureCaptchaScript($processor);
 
         self::assertStringContainsString('</div><!-- form end -->', $html);
         self::assertStringContainsString('name="ff_runmode" value="1"', $html);
+        self::assertStringContainsString('name="return" value="administrator/index.php?option=com_breezingformsng"', $html);
+        self::assertStringContainsString('name="tmpl" value="component"', $html);
         self::assertStringNotContainsString('<piece>', $html);
     }
 
@@ -1550,12 +1554,16 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         $processor->traceMode = 0;
         $processor->buryOnCallNumber = null;
         $GLOBALS['ff_otherparams'] = [];
+        $processor->app->getInput()->set('return', 'index.php?preview=1');
+        $processor->app->getInput()->set('tmpl', 'component');
 
         $html = $this->captureCaptchaScript($processor);
 
         self::assertStringContainsString('</div><!-- form end -->', $html);
         self::assertStringContainsString('name="ff_runmode" value="2"', $html);
         self::assertStringContainsString('name="ff_frame" value="1"', $html);
+        self::assertStringContainsString('name="return" value="index.php?preview=1"', $html);
+        self::assertStringContainsString('name="tmpl" value="component"', $html);
     }
 
     public function testViewSelectsQuickModeRendererFromTemplateMetadata(): void

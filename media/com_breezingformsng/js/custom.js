@@ -9,16 +9,21 @@ jQuery(document).ready(function () {
     toggle fullscreen
     */
 
-    jQuery('main').prepend('<div class="toggle_fullscreen"> <a href="#" id="toggle_fullscreen"><i class="fa fa-up-down-left-right fa-rotate-45 fa-lg" aria-hidden="true"></i></a></div>');
+    var $formStateRow = jQuery('#bfFormPublishedToggle').closest('.d-flex.ms-auto');
+    if ($formStateRow.length) {
+        $formStateRow.append('<a href="#" id="toggle_fullscreen"><i class="fa-solid fa-up-down-left-right fa-rotate-45 fa-lg" aria-hidden="true"></i></a>');
+    } else {
+        jQuery('main').prepend('<div class="toggle_fullscreen"> <a href="#" id="toggle_fullscreen"><i class="fa-solid fa-up-down-left-right fa-rotate-45 fa-lg" aria-hidden="true"></i></a></div>');
+    }
 
-    jQuery('#bfRecordsTableContainer').parent('main').prepend('<div class="toggle_fullscreen_managerecords"> <a href="#" id="toggle_fullscreen_managerecords"><i class="fa fa-up-down-left-right fa-rotate-45 fa-lg" aria-hidden="true"></i></a></div>');
+    jQuery('#bfRecordsTableContainer').parent('main').prepend('<div class="toggle_fullscreen_managerecords"> <a href="#" id="toggle_fullscreen_managerecords"><i class="fa-solid fa-up-down-left-right fa-rotate-45 fa-lg" aria-hidden="true"></i></a></div>');
 
 
     jQuery('#bfRecordsTableContainer').prevAll('.toggle_fullscreen').remove();
 
 
 
-    jQuery('main').append('<a href="#" class="scrollToTop"><i class="fa fa-angle-up fa-3x" aria-hidden="true"></i></a>');
+    jQuery('main').append('<a href="#" class="scrollToTop"><i class="fa-solid fa-angle-up fa-3x" aria-hidden="true"></i></a>');
 
     /*
     breezingforms logo
@@ -112,9 +117,9 @@ jQuery(document).ready(function () {
 
 
 
-    jQuery('#bfQuickModeRight span .tab-items').prepend('<i class="fa fa-cog" aria-hidden="true"></i> ');
+    jQuery('#bfQuickModeRight .tab-items').prepend('<i class="fa-solid fa-gear" aria-hidden="true"></i> ');
 
-    jQuery('#bfQuickModeRight span .tab-element').prepend('<i class="fa fa-cogs" aria-hidden="true"></i> ');
+    jQuery('#bfQuickModeRight .tab-element').prepend('<i class="fa-solid fa-gears" aria-hidden="true"></i> ');
 
 
     //Check to see if the window is top if not then display button

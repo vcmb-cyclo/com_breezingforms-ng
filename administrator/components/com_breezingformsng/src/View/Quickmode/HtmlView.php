@@ -140,6 +140,7 @@ class HtmlView extends BaseHtmlView
         $wa->useScript('com_breezingformsng.quickmode-elements');
         $wa->useScript('com_breezingformsng.quickmode-app');
         $wa->useScript('com_breezingformsng.quickmode-yesno-switch');
+        $wa->useScript('com_breezingformsng.custom-js');
         $wa->registerAndUseScript(
             'com_breezingformsng.quickmode-form-state',
             'media/com_breezingformsng/js/admin/admin-toggle-published.js',

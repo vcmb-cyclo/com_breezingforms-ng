@@ -1568,6 +1568,11 @@ Le package a ensuite été reconstruit depuis les fichiers versionnés ; sa list
 contient les nouveaux services QuickMode et ContentBuilder, et le même smoke
 test a de nouveau réussi sur cette archive reconstruite.
 
+Le smoke test accepte désormais `CONTENTBUILDER_ARCHIVE` pour installer et
+vérifier ContentBuilderNG avant BFNG. Cette variante a été exécutée avec
+`/home/xavier/workspaces/vcmb/com_contentbuilderng.zip` et a réussi sur Joomla
+6, levant le blocage de validation d’intégration (`cb1822792`).
+
 La sélection Classic, Bootstrap et OnePage est désormais isolée dans
 `QuickModeRendererFactory`. `RenderingEngine` ne porte plus la construction
 conditionnelle des renderers ; les trois branches sont testées directement et

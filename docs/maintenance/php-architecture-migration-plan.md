@@ -786,6 +786,41 @@ supprimés n'étaient donc sélectionnables par aucune voie du code actuel.
 Suite complète verte (399 tests), PHPStan niveau 2 propre, build +
 validation du package (assets absents de l'archive, `system.css` présent).
 
+## Phase 12 — Restauration des 6 skins Classic dans `media/breezingforms/themes/`
+
+Ajoutée le 2026-08-31, correction de la phase 11. Les 6 skins supprimés en
+phase 11 (`aqua`, `breeze`, `default`, `glossy_blue`, `glossy_gray`,
+`qmtheme`) n'étaient inatteignables qu'à cause de leur emplacement — pas
+parce qu'ils étaient sans valeur. Sur demande explicite, restaurés depuis
+l'historique git (`git checkout d88a6ea91 --`) puis déplacés vers
+`media/breezingforms/themes/<skin>/`, aux côtés de `vcmb_j5`, le seul
+chemin réellement scanné par `QuickmodeModel::scanThemeDir()` pour peupler
+le sélecteur « Thème » de l'admin (voir phase 11 pour le détail du
+mécanisme de scan).
+
+Point notable retrouvé en creusant l'historique : `media/breezingforms/
+themes/<skin>/` était en fait leur **emplacement d'origine** — le commit
+`d6655c526` (« Legacy files moves ») les avait déplacés vers
+`components/com_breezingforms(ng)/themes/quickmode/` bien avant le
+renommage `com_breezingforms → com_breezingformsng`. Cette restauration
+les ramène donc à leur chemin historique initial ; `git log --follow`
+sur le nouveau chemin remonte sans interruption jusqu'au commit initial.
+
+### Réserve connue
+
+Le skin `aqua` (seul des 6 à référencer les classes `bfPage-tl/tr/t/l/r/
+m/bl/br/b`, supprimées du balisage en phase 10) a environ 10 règles CSS
+qui ne trouveront plus d'élément à cibler — sans effet visuel néfaste,
+juste inertes. Les 5 autres skins ne référençaient pas ce balisage.
+
+### Vérification
+
+Vérification live : les 7 thèmes (`vcmb_j5` + les 6 restaurés) apparaissent
+dans le sélecteur `#bfTheme` de l'admin, zéro erreur console/réseau. Suite
+complète verte (399 tests, aucun fichier PHP touché), PHPStan niveau 2
+propre, build + validation du package (skins présents dans l'archive sous
+`media/breezingforms/themes/`, absents de l'ancien chemin).
+
 ## Travail en parallèle
 
 | Couloir | Fichiers principaux | Peut avancer avec |

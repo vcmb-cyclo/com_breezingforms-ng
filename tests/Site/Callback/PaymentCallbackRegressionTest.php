@@ -94,6 +94,20 @@ final class PaymentCallbackRegressionTest extends TestCase
         self::assertSame(10, substr_count($source, '$this->paymentDownloadPolicy'));
     }
 
+    public function testStripeSubmissionIteratesEveryTemplateArea(): void
+    {
+        $source = $this->read('components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php');
+        $stripeStart = strrpos($source, "case 'Stripe':");
+        $paypalStart = strpos($source, "case 'PayPal':", $stripeStart);
+
+        self::assertIsInt($stripeStart);
+        self::assertIsInt($paypalStart);
+        self::assertStringContainsString(
+            'foreach ($areas as $area)',
+            substr($source, $stripeStart, $paypalStart - $stripeStart)
+        );
+    }
+
     private function read(string $path): string
     {
         $source = file_get_contents(self::ROOT . '/' . $path);

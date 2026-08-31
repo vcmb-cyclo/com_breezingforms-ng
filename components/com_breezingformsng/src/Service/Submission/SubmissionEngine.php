@@ -1015,7 +1015,8 @@ final class SubmissionEngine
 
                     case 'Stripe':
 
-                        foreach ($area['elements'] as $element) {
+                        foreach ($areas as $area) {
+                            foreach ($area['elements'] as $element) {
 
                             if ($element['internalType'] == 'bfStripe') {
 
@@ -1214,6 +1215,7 @@ transition: box-shadow .15s linear;
 
                                 echo $html;
                             }
+                        }
                         }
 
                         break;

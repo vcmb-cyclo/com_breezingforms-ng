@@ -703,12 +703,6 @@ parameters:
 			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
 
 		-
-			message: '#^Variable \$area might not be defined\.$#'
-			identifier: variable.undefined
-			count: 1
-			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
-
-		-
 			message: '#^Variable \$stripeemail in isset\(\) always exists and is not nullable\.$#'
 			identifier: isset.variable
 			count: 1

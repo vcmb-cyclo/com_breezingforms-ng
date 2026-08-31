@@ -338,15 +338,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                             });
                         }
 
-                        function bf_restore_submitbutton(){
-                            var cloned_submit = JQuery(orig_submit_button).clone(true);
-                            var old_submit = JQuery( "#bfSubmitButton" ).replaceWith( JQuery(cloned_submit) );
-                            JQuery(old_submit).remove();
-                            JQuery(cloned_submit).attr("id","bfSubmitButton");
-
-                            ladda_button = JQuery( "#bfSubmitButton" ).ladda();
-                            Ladda.bind("#bfSubmitButton");
-                        }
+                        ' . (new QuickModeSubmitButtonRestoreBuilder())->build("\n") . '
 
                         ' . (new QuickModeSubmitValidationBuilder())->build("\n") . '
 

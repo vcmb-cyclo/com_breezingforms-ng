@@ -3,6 +3,7 @@
 set -euo pipefail
 
 archive="${1:?Usage: scripts/joomla-install-smoke.sh path/to/package.zip}"
+contentbuilder_archive="${CONTENTBUILDER_ARCHIVE:-}"
 joomla_image="${JOOMLA_IMAGE:-joomla:6.0-apache}"
 mysql_image="${MYSQL_IMAGE:-mysql:8.4}"
 run_id="${GITHUB_RUN_ID:-local}-$$"
@@ -94,6 +95,17 @@ docker exec "${web_container}" php -r '
 '
 
 docker cp "${archive}" "${web_container}:${container_archive}" >/dev/null
+
+if [[ -n "${contentbuilder_archive}" ]]; then
+    contentbuilder_container_archive="/tmp/com_contentbuilderng.zip"
+    docker cp "${contentbuilder_archive}" "${web_container}:${contentbuilder_container_archive}" >/dev/null
+    docker exec -e HTTP_HOST=localhost "${web_container}" php /var/www/html/cli/joomla.php extension:install \
+        --path="${contentbuilder_container_archive}" \
+        --live-site=http://localhost \
+        --quiet \
+        --no-interaction
+fi
+
 docker exec -e HTTP_HOST=localhost "${web_container}" php /var/www/html/cli/joomla.php extension:install \
     --path="${container_archive}" \
     --live-site=http://localhost \
@@ -118,6 +130,18 @@ if [[ "${component_count}" -ne 1 ]]; then
     docker exec -e MYSQL_PWD=joomla "${db_container}" mysql -N -ujoomla joomla \
         -e "SELECT extension_id, type, element, name FROM \`${table_prefix}extensions\` WHERE element LIKE '%breezingform%' OR name LIKE '%BreezingForms%';" >&2
     exit 1
+fi
+
+if [[ -n "${contentbuilder_archive}" ]]; then
+    contentbuilder_count="$(
+        docker exec -e MYSQL_PWD=joomla "${db_container}" mysql -N -ujoomla joomla \
+            -e "SELECT COUNT(*) FROM \`${table_prefix}extensions\` WHERE type = 'component' AND element = 'com_contentbuilderng';"
+    )"
+
+    if [[ "${contentbuilder_count}" -ne 1 ]]; then
+        echo "ContentBuilder NG component registration was not found." >&2
+        exit 1
+    fi
 fi
 
 plugin_count="$(

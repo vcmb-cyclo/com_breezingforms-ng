@@ -1881,6 +1881,11 @@ parcours normal et \`disable\`. Le test verrouille aussi le comportement
 historique observé : sans \`first\`, le mot-clé \`disable\` de la directive
 n'empêche pas l'instrumentation du code.
 
+La façade \`UploadRuntime\` dispose maintenant d'une couverture directe de ses
+délégations sans upload réel : parsing des tailles, détection d'une image
+absente et recherche récursive d'un élément QuickMode. Le double \`Input\`
+reste limité au test du constructeur.
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

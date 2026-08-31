@@ -49,11 +49,54 @@ final class CodeToolsRuntimeTest extends TestCase
         self::assertSame('unchanged', $runtime->dispTraceMode('unchanged'));
     }
 
+    public function testRejectsEmptyOrDyingEvalCode(): void
+    {
+        $processor = $this->processor();
+        $runtime = new CodeToolsRuntime($processor);
+        $empty = " \t\n";
+
+        self::assertFalse($runtime->prepareEvalCode($empty, '', '', 0, 0));
+
+        $processor->dying = true;
+        $code = 'return 1;';
+        self::assertFalse($runtime->prepareEvalCode($code, '', '', 0, 0));
+        self::assertSame('return 1;', $code);
+    }
+
+    public function testAppliesReplacementTagsWhenTracingIsDisabled(): void
+    {
+        $processor = $this->processor();
+        $processor->traceMode = _FF_TRACEMODE_DISABLE;
+        $processor->findtags = ['{name}'];
+        $processor->replacetags = ['answer'];
+        $runtime = new CodeToolsRuntime($processor);
+        $code = 'echo {name};';
+
+        self::assertTrue($runtime->prepareEvalCode($code, '', '', 0, 0));
+        self::assertStringContainsString('echo answer;', $code);
+        self::assertStringContainsString("/*'/*", $code);
+    }
+
+    public function testPatchesFunctionAndReturnTracePoints(): void
+    {
+        $runtime = new CodeToolsRuntime($this->processor());
+        $patched = $runtime->patchCode(2, 'function answer() { return 42; }', "O'Reilly", 'e', 7, 1);
+
+        self::assertStringContainsString("_ff_tracePiece(2,'O", $patched);
+        self::assertStringContainsString('_ff_traceFunction(2,__FUNCTION__,1,', $patched);
+        self::assertStringContainsString('_ff_traceExit(', $patched);
+    }
+
     private function processor(int $template = 0, string $suffix = ''): HTML_facileFormsProcessor
     {
         $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();
         $processor->template = $template;
         $processor->suffix = $suffix;
+        $processor->dying = false;
+        $processor->traceMode = 0;
+        $processor->traceBuffer = '';
+        $processor->findtags = [];
+        $processor->replacetags = [];
 
         return $processor;
     }

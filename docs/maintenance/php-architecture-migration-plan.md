@@ -1866,6 +1866,12 @@ directement : nettoyage et détection de code, export JavaScript, résolution
 des classes et formatage du mode de trace. Le parsing/eval historique reste
 séparé, avec son propre besoin de caractérisation plus large.
 
+Le harnais couvre maintenant aussi les branches de garde de
+\`prepareEvalCode\`, l'application des tags de remplacement lorsque la trace
+est désactivée, et les points d'instrumentation produits par
+\`patchCode\` pour une fonction et son retour. Ces tests précèdent toute
+extraction supplémentaire de ce code historique.
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

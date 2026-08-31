@@ -1288,6 +1288,13 @@ Le wrapper caché `bfReCaptchaWrap` est désormais construit par
 `legacy_wrap`, et l'absence de saut de ligne historique est explicitement
 préservée.
 
+La vérification serveur ReCaptcha est isolée dans `RecaptchaVerifier`, qui
+porte uniquement l'appel HTTP vers Google et son contrat booléen. Ses cas de
+secret/réponse absents, de validation réussie, de réponse refusée et de statut
+HTTP en erreur sont couverts par `RecaptchaVerifierTest`. La génération du
+JavaScript de validation reste séparée dans
+`CaptchaReCaptchaValidationScriptBuilder`.
+
 L'assemblage de la balise `<form>` QuickMode est désormais confié à
 `QuickModeFormTagBuilder` (`4f5b8559d`). Le calcul de l'action et la
 résolution de la classe personnalisée restent dans `RenderingEngine`, tandis

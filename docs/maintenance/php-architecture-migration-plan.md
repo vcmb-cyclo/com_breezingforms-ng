@@ -519,6 +519,10 @@ incluses explicitement dans le périmètre PHPCS. Elles disposent chacune d'un
 test direct et passent le contrôle sans correction de sortie nécessaire ; ce
 lot étend uniquement le filet de qualité à du code déjà stabilisé.
 
+Le parseur pur `QuickModeToggleFieldsParser`, déjà couvert par son test direct,
+rejoint également ce périmètre PHPCS afin que la mutualisation des règles de
+bascule soit contrôlée au même niveau que les stratégies de champs.
+
 Le premier nettoyage ciblé de cette baseline PHPCS est réalisé dans
 `QuickModeSelectBuilder`, `QuickModeCaptchaMarkupBuilder` et
 `QuickModeUploadOptionsBuilder` (`eaf8b2d1`) : leurs sorties sont inchangées et

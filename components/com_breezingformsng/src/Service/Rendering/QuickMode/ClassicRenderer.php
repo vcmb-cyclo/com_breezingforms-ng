@@ -184,7 +184,7 @@ float:left;
         RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/themes/quickmode/system.css');
 
         // loading theme
-        if ($this->rootMdata['theme'] != 'none' && @file_exists(JPATH_SITE . '/media/breezingforms/themes/' . $this->rootMdata['theme'] . '/theme.css')) {
+        if ($this->rootMdata['theme'] != 'none' && is_file(JPATH_SITE . '/media/breezingforms/themes/' . $this->rootMdata['theme'] . '/theme.css')) {
             RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/media/breezingforms/themes/' . $this->rootMdata['theme'] . '/theme.css');
         }
     }
@@ -302,10 +302,10 @@ float:left;
         $this->flashUploadTicket = md5(strtotime('now') . mt_rand(0, mt_getrandmax()));
         $this->cancelImagePath = Uri::root(true) . '/media/breezingforms/themes/cancel.png';
         $this->uploadImagePath = Uri::root(true) . '/media/breezingforms/themes/upload.png';
-        if (@file_exists(JPATH_SITE . '/media/breezingforms/themes/' . $this->rootMdata['theme'] . '/img/cancel.png')) {
+        if (is_file(JPATH_SITE . '/media/breezingforms/themes/' . $this->rootMdata['theme'] . '/img/cancel.png')) {
             $this->cancelImagePath = Uri::root(true) . '/media/breezingforms/themes/' . $this->rootMdata['theme'] . '/img/cancel.png';
         }
-        if (@file_exists(JPATH_SITE . '/media/breezingforms/themes/' . $this->rootMdata['theme'] . '/img/upload.png')) {
+        if (is_file(JPATH_SITE . '/media/breezingforms/themes/' . $this->rootMdata['theme'] . '/img/upload.png')) {
             $this->uploadImagePath = Uri::root(true) . '/media/breezingforms/themes/' . $this->rootMdata['theme'] . '/img/upload.png';
         }
     }

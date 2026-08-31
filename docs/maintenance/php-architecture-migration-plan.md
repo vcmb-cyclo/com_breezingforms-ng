@@ -983,6 +983,10 @@ L'assemblage des chunks du callback Flash est désormais isolé dans
 `FlashChunkAssembler`; la concaténation des fichiers existants et le rejet
 d'un chunk absent sont couverts par des tests unitaires.
 
+Les tests d'existence des assets statiques des trois renderers QuickMode
+utilisent désormais `is_file()` sans masquage d'erreur; leurs sorties restent
+couvertes par les tests de caractérisation des renderers.
+
 Les paramètres additionnels `ff_otherparams` du mode frontend sont désormais
 générés par `AdditionalHiddenFieldsBuilder` via `bb469b88`, avec ordre,
 encodage URL et échappement HTML couverts. La détection des providers de

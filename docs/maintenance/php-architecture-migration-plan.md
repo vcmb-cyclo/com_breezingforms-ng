@@ -1224,6 +1224,9 @@ trois modes continuent de choisir leur ordre et leurs marqueurs via
 `FormModeFinalizationBuilder`, tandis que le test de caractérisation de
 `view()` couvre les sorties frontend, backend et preview, y compris l'émission
 des trois champs techniques ContentBuilder lorsque la requête les fournit.
+La construction du tableau de contexte commun est également centralisée dans
+`buildFormContext()`, avec le seul ajout conditionnel de `ff_runmode` pour le
+backend et la preview.
 
 La façade `helpers.php` ne dépend plus des fonctions supprimées ou obsolètes
 de PHP 8.3 pour `bf_isUTF8()` et `bf_stripslashes_deep()`. La validation UTF-8

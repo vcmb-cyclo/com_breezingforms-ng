@@ -348,6 +348,26 @@ final class RenderingEngine
             : '';
     }
 
+    /**
+     * @return array<string, int|string>
+     */
+    private function buildFormContext(bool $includeRunmode): array
+    {
+        $input = $this->processor->app->getInput();
+        $context = [
+            'ff_contentid' => $input->getInt('ff_contentid', 0),
+            'ff_applic' => $input->getWord('ff_applic', ''),
+            'ff_record_id' => $this->processor->record_id,
+            'ff_module_id' => $input->getInt('ff_module_id', 0),
+        ];
+
+        if ($includeRunmode) {
+            $context['ff_runmode'] = $this->processor->runmode;
+        }
+
+        return $context;
+    }
+
 
 
 
@@ -1351,12 +1371,7 @@ final class RenderingEngine
         switch ($this->processor->runmode) {
             case _FF_RUNMODE_FRONTEND:
                 $input = $this->processor->app->getInput();
-                $context = [
-                    'ff_contentid' => $input->getInt('ff_contentid', 0),
-                    'ff_applic' => $input->getWord('ff_applic', ''),
-                    'ff_record_id' => $this->processor->record_id,
-                    'ff_module_id' => $input->getInt('ff_module_id', 0),
-                ];
+                $context = $this->buildFormContext(false);
                 $routing = $this->hiddenFormFieldsBuilder()->routing($input->getString('return', ''), $input->getString('tmpl', ''), nl());
                 $technical = $this->buildContentBuilderTechnicalFields();
                 echo $this->formModeFinalizationBuilder()->frontend(
@@ -1373,13 +1388,7 @@ final class RenderingEngine
 
             case _FF_RUNMODE_BACKEND:
                 $input = $this->processor->app->getInput();
-                $context = [
-                    'ff_contentid' => $input->getInt('ff_contentid', 0),
-                    'ff_applic' => $input->getWord('ff_applic', ''),
-                    'ff_record_id' => $this->processor->record_id,
-                    'ff_module_id' => $input->getInt('ff_module_id', 0),
-                    'ff_runmode' => $this->processor->runmode,
-                ];
+                $context = $this->buildFormContext(true);
                 $routing = $this->hiddenFormFieldsBuilder()->routing($input->getString('return', ''), $input->getString('tmpl', ''), nl());
                 $technical = $this->buildContentBuilderTechnicalFields();
                 echo $this->formModeFinalizationBuilder()->backend(
@@ -1398,13 +1407,7 @@ final class RenderingEngine
                     break;
                 }
                 $input = $this->processor->app->getInput();
-                $context = [
-                    'ff_contentid' => $input->getInt('ff_contentid', 0),
-                    'ff_applic' => $input->getWord('ff_applic', ''),
-                    'ff_record_id' => $this->processor->record_id,
-                    'ff_module_id' => $input->getInt('ff_module_id', 0),
-                    'ff_runmode' => $this->processor->runmode,
-                ];
+                $context = $this->buildFormContext(true);
                 $routing = $this->hiddenFormFieldsBuilder()->routing($input->getString('return', ''), $input->getString('tmpl', ''), nl());
                 $technical = $this->buildContentBuilderTechnicalFields();
                 echo $this->formModeFinalizationBuilder()->preview(

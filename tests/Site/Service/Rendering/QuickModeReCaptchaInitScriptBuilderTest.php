@@ -11,9 +11,19 @@ final class QuickModeReCaptchaInitScriptBuilderTest extends TestCase
 {
     public function testBuildsTheVisibleGoogleApiUrlForTheActiveLanguage(): void
     {
+        $builder = new QuickModeReCaptchaInitScriptBuilder();
+
         self::assertSame(
             'https://www.google.com/recaptcha/api.js?hl=fr&onload=onloadBFNewRecaptchaCallback&render=explicit',
-            (new QuickModeReCaptchaInitScriptBuilder())->visibleApiUrl('fr-FR')
+            $builder->visibleApiUrl('fr-FR')
+        );
+        self::assertSame(
+            'https://www.google.com/recaptcha/api.js?hl=fr&onload=onloadBFNewRecaptchaCallback&render=explicit',
+            $builder->visibleApiUrl('fr')
+        );
+        self::assertSame(
+            'https://www.google.com/recaptcha/api.js?hl=zh&onload=onloadBFNewRecaptchaCallback&render=explicit',
+            $builder->visibleApiUrl('zh-Hant')
         );
     }
 

@@ -852,6 +852,12 @@ correction de présentation propre à Joomla 3 n'a donc plus sa place dans le
 pipeline moderne. Un test d'architecture verrouille l'absence de ce bloc sans
 modifier les snapshots de rendu.
 
+Le chargement SQL des éléments publiés est désormais isolé dans
+`FormElementLoader`. Le constructeur de `HTML_facileFormsProcessor` conserve
+la même initialisation de `rows` et `rowcount`, mais la requête, ses filtres
+`published`, son ordre d'affichage et sa liaison typée sont testés directement
+dans `FormElementLoaderTest`.
+
 Les deux gardes locales `if (!$halt)` de `SubmissionEngine` ont ensuite été
 retirées : `$halt` était initialisé à `false` et ses seules affectations à
 `true` précédaient immédiatement `exit`. Le contrôle CAPTCHA, les pièces de

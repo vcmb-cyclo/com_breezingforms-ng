@@ -24,6 +24,7 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RequestMetadataResolver;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampFactory;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\CodeToolsRuntime;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\ErrorHandlerRuntime;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\FormElementLoader;
 use Vcmb\Component\BreezingformsNG\Site\Service\Scripting\ScriptingEngine;
 use Vcmb\Component\BreezingformsNG\Site\Service\Export\ExportEngine;
 use Vcmb\Component\BreezingformsNG\Site\Service\Integration\RecaptchaVerifier;
@@ -819,18 +820,7 @@ class HTML_facileFormsProcessor
 
         if ($this->formrow->published) {
             $formId = (int) $this->form;
-            $query = $this->database->getQuery(true)
-                ->select('*')
-                ->from($this->database->quoteName('#__facileforms_elements'))
-                ->where($this->database->quoteName('form') . ' = :formId')
-                ->where($this->database->quoteName('published') . ' = 1')
-                ->order([
-                    $this->database->quoteName('page'),
-                    $this->database->quoteName('ordering'),
-                ])
-                ->bind(':formId', $formId, ParameterType::INTEGER);
-            $this->database->setQuery($query);
-            $this->rows = $this->database->loadObjectList();
+            $this->rows = (new FormElementLoader($this->database))->loadPublished($formId);
             $this->rowcount = count($this->rows);
         } // if
         $displayContext = (new FormDisplayContextResolver())->resolve(

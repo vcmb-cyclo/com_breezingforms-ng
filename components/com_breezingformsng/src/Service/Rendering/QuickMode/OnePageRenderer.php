@@ -378,40 +378,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                             }
                         } // ff_validate_submit
 
-                        function bf_validate_nextpage(page)
-                        {
-
-                            if(typeof bfUseErrorAlerts != "undefined"){
-                             JQuery(".bfErrorMessage").html("");
-                             JQuery(".bfErrorMessage").css("display","none");
-                            }
-
-							error = ff_validation(ff_currentpage);
-                            if (error != "") {
-								
-                               if(typeof bfUseErrorAlerts == "undefined"){
-									alert(error);
-                                } else {
-									bfShowErrors(error);
-                                   
-                                } 
-
-								ff_validationFocus("");
-
-
-                                JQuery(".bfErrorMessage").css("display","none");
-                                ff_currentpage = ff_getPageByName(ff_validationFocusName);
-                                JQuery("#bfPage"+ff_currentpage+" .bfErrorMessage").css("display","block");
-                                ladda_button.ladda("stop");
-
-                            } else {
-                                JQuery("#bfPage"+(page)).ScrollTo({offsetTop: 50});
-                                ff_currentpage = page;
-                                ff_initialize("pageentry");
-                                JQuery("#bfPage"+ff_currentpage).css("pointer-events","auto");
-                                JQuery("#bfPage"+ff_currentpage).css("opacity","1");
-                            }
-                        }
+                        ' . (new QuickModeNextPageValidationBuilder())->build("\n") . '
 
                         ' . (new QuickModePreviousPageValidationBuilder())->build("\n") . '
 

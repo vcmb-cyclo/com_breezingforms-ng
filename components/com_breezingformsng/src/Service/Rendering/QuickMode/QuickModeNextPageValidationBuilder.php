@@ -1,0 +1,48 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode;
+
+/** Builds the OnePage next-page validation callback. */
+final class QuickModeNextPageValidationBuilder
+{
+    public function build(string $newline): string
+    {
+        return '                        function bf_validate_nextpage(page)' . $newline .
+            '                        {' . $newline .
+            $newline .
+            '                            if(typeof bfUseErrorAlerts != "undefined"){' . $newline .
+            '                             JQuery(".bfErrorMessage").html("");' . $newline .
+            '                             JQuery(".bfErrorMessage").css("display","none");' . $newline .
+            '                            }' . $newline .
+            $newline .
+            '\t\t\t\t\t\t\t\terror = ff_validation(ff_currentpage);' . $newline .
+            '                            if (error != "") {' . $newline .
+            '\t\t\t\t\t\t\t\t' . $newline .
+            '                               if(typeof bfUseErrorAlerts == "undefined"){' . $newline .
+            '\t\t\t\t\t\t\t\t\talert(error);' . $newline .
+            '                                } else {' . $newline .
+            '\t\t\t\t\t\t\t\t\tbfShowErrors(error);' . $newline .
+            '                                   ' . $newline .
+            '                                } ' . $newline .
+            $newline .
+            '\t\t\t\t\t\t\t\tff_validationFocus("");' . $newline .
+            $newline .
+            '                                JQuery(".bfErrorMessage").css("display","none");' . $newline .
+            '                                ff_currentpage = ff_getPageByName(ff_validationFocusName);' . $newline .
+            '                                JQuery("#bfPage"+ff_currentpage+" .bfErrorMessage")'
+            . '.css("display","block");' . $newline .
+            '                                ladda_button.ladda("stop");' . $newline .
+            $newline .
+            '                            } else {' . $newline .
+            '                                JQuery("#bfPage"+(page)).ScrollTo({offsetTop: 50});' . $newline .
+            '                                ff_currentpage = page;' . $newline .
+            '                                ff_initialize("pageentry");' . $newline .
+            '                                JQuery("#bfPage"+ff_currentpage)'
+            . '.css("pointer-events","auto");' . $newline .
+            '                                JQuery("#bfPage"+ff_currentpage).css("opacity","1");' . $newline .
+            '                            }' . $newline .
+            '                        }' . $newline;
+    }
+}

@@ -48,6 +48,7 @@
 | QuickMode — expression éditeur | Construction de l’expression JavaScript de lecture des éditeurs mutualisée entre Bootstrap et OnePage, API publique conservée | Commit `43592c8bd` |
 | QuickMode — mapping Bootstrap | Mapping Bootstrap 5 des classes mutualisé entre Bootstrap et OnePage, résolution publique `bsClass()` conservée | Commit `658078588` |
 | Finalisation — champs de soumission | Champs cachés communs frontend/backend/preview extraits avec conservation des différences `act`/`ff_frame` | Commit `be602b94f` |
+| Finalisation — caractérisation des modes | Sorties exactes des champs de soumission frontend, backend et preview verrouillées par tests | Commit `dc73ec0fc` |
 | `RenderingEngine::view()` — validation | Extensions de fichiers, valeurs par défaut et scripts CAPTCHA extraits et couverts | Builders de validation dédiés |
 | `RenderingEngine::view()` — CAPTCHA | Sélection `Captcha` / `ReCaptcha`, endpoints site/admin et générateurs JavaScript isolés, ordre historique préservé | Commits `4a070774`, `8e3e9a7a`, `4563ae11`, `d328c4f8`, `75c0ca2b`, `1cea0c84` |
 | `RenderingEngine::view()` — Query List | Préparation extraite et variantes par défaut/checkbox/résultat vide couvertes | Commits `4070ec0f`, `b358e7e9` |
@@ -568,7 +569,8 @@ Les champs cachés de soumission communs aux trois modes sont désormais
 assemblés par `FormSubmissionFieldsBuilder` (`be602b94f`). Frontend, backend et
 preview conservent leurs marqueurs spécifiques (`act` ou `ff_frame`), tandis
 que le formulaire et la tâche de soumission suivent une construction commune
-testée.
+testée. Les sorties exactes des trois variantes sont désormais verrouillées
+par `dc73ec0fc`.
 
 Les sorties anticipées de `RenderingEngine::view()` après activation du buffer
 et du gestionnaire d'erreurs nettoient désormais leur propre état via

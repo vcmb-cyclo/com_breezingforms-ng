@@ -69,7 +69,7 @@
 | Finalisation — choix mobile | Construction du script et du markup de choix mobile extraite, calcul de l’URL conservé dans l’orchestrateur | Commit `39a4c1da0` |
 | Finalisation — wrapper ReCaptcha | Markup du wrapper ReCaptcha historique extrait, activé uniquement pour l’enveloppe legacy et couvert | Commit `092a2a9fa` |
 | QuickMode — URLs ReCaptcha | URLs Google visible/invisible mutualisées dans `QuickModeReCaptchaInitScriptBuilder` et réutilisées par Classic, Bootstrap et OnePage, avec snapshots conservés | Commit `4952cfb94` |
-| QuickMode — configuration ReCaptcha | Normalisation des configurations visible/invisible mutualisée dans `QuickModeReCaptchaInitScriptBuilder`, sans modifier les paramètres propres aux trois renderers | Lot courant |
+| QuickMode — configuration ReCaptcha | Normalisation des configurations visible/invisible mutualisée dans `QuickModeReCaptchaInitScriptBuilder`, sans modifier les paramètres propres aux trois renderers | Commit `56879a38f` |
 | Finalisation — balise form QuickMode | Assemblage de la balise `<form>` extrait, calcul d’URL conservé dans l’orchestrateur et classe historique préservée | Commit `4f5b8559d` |
 | ContentBuilder — wrapper readonly | Enveloppe du script des champs non éditables extraite et couverte, avec marqueurs historiques conservés | Commit `3e1723d15` |
 | Finalisation — wrapper enregistrement éditable | Chargement JavaScript de l’enregistrement éditable extrait dans un builder, avec nettoyage historique de `seccode` couvert | Commit `f3b6f8d97` |

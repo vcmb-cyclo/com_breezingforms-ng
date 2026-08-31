@@ -291,7 +291,7 @@ $ff_request = array();
         if ($ff_applic != 'plg_facileforms' && $pagetitle && $form->title != '' && !($this->application->getInput()->getInt('cb_form_id', 0) || $this->application->getInput()->getCmd('cb_record_id', ''))) {
             if ($menu_item_title != '') {
                 $this->application->getDocument()->setTitle($menu_item_title);
-            } else if ($pagetitle) { // being set by module, false implies no change at all
+            } else { // being set by module, false implies no change at all
                 $this->application->getDocument()->setTitle($form->title);
             }
         }

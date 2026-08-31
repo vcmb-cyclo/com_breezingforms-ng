@@ -763,6 +763,13 @@ et le test de régression vérifie que cette branche morte ne revient pas.
 Cette correction supprime les trois diagnostics PHPStan niveau 4 du service ;
 le total restant est de 47 diagnostics.
 
+Les renderers Classic, Bootstrap et OnePage simplifient ensuite la sélection
+des erreurs par défaut et suppriment les tests de présence de feuille de thème
+dupliqués à l'intérieur de leur garde déjà validée. `FormRenderer` supprime
+également une condition `pagetitle` redondante dans sa branche englobante ; les
+chemins de rendu restent couverts par les caractérisations QuickMode et le
+niveau 4 est ramené à 41 diagnostics.
+
 ## Phase 7 — Réduire les façades historiques
 
 Cette phase commence seulement lorsque leurs responsabilités ont été extraites

@@ -173,7 +173,7 @@ float:left;
 
         if ($this->fading || !$this->useErrorAlerts || $this->rollover) {
             if (!$this->useErrorAlerts) {
-                $showDefaultErrors = $this->useDefaultErrors || (!$this->useDefaultErrors && !$this->useBalloonErrors);
+                $showDefaultErrors = $this->useDefaultErrors || !$this->useBalloonErrors;
                 $this->p->app->getDocument()->getWebAssetManager()->addInlineScript(
                     'var bfUseErrorAlerts = false;' . "\n"
                     . 'var bfShowDefaultErrors = ' . ($showDefaultErrors ? 'true' : 'false') . ';' . "\n"

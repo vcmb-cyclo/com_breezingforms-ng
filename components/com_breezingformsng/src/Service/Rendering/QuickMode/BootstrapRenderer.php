@@ -1071,7 +1071,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
         if ($this->fading || !$this->useErrorAlerts || $this->rollover) {
             if (!$this->useErrorAlerts) {
-                $showDefaultErrors = $this->useDefaultErrors || (!$this->useDefaultErrors && !$this->useBalloonErrors);
+                $showDefaultErrors = $this->useDefaultErrors || !$this->useBalloonErrors;
                 $this->p->app->getDocument()->getWebAssetManager()->addInlineScript(
                     QuickModeErrorRuntimeConfigBuilder::build($showDefaultErrors, false, "\n")
                 );
@@ -1106,9 +1106,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                 if (file_exists($vars_path)) {
                     $vars = file_get_contents($vars_path);
                 }
-                if (file_exists($themecss_path)) {
-                    $themecss = file_get_contents($themecss_path);
-                }
+                $themecss = file_get_contents($themecss_path);
                 if (file_exists($scriptphp_path)) {
                     require_once($scriptphp_path);
                 }

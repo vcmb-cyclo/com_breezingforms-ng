@@ -983,6 +983,10 @@ couvert par le test du support fichiers.
 L'encodeur d'image de signature vérifie également la lisibilité du fichier et
 est couvert par des tests d'encodage et d'absence de fichier.
 
+`QuickModeFormTagBuilder` échappe désormais les valeurs injectées dans les
+attributs `action`, `name`, `id` et `class`; le test couvre les guillemets et
+les séparateurs HTML.
+
 `UploadStorage` vérifie désormais directement le résultat de `chmod`, sans
 masquer les erreurs système, et conserve les statuts de stockage testés.
 

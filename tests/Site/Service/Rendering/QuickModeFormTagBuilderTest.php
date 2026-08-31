@@ -34,4 +34,17 @@ final class QuickModeFormTagBuilderTest extends TestCase
             (new QuickModeFormTagBuilder())->build('/submit', 'ff2', 'custom', "\r\n")
         );
     }
+
+    public function testEscapesAttributeValues(): void
+    {
+        $html = (new QuickModeFormTagBuilder())->build(
+            '/submit?name=one&mode="unsafe"',
+            'form"id',
+            'custom" class="injected'
+        );
+
+        self::assertStringContainsString('action="/submit?name=one&amp;mode=&quot;unsafe&quot;"', $html);
+        self::assertStringContainsString('name="form&quot;id"', $html);
+        self::assertStringContainsString('class="custom&quot; class=&quot;injected"', $html);
+    }
 }

@@ -25,13 +25,13 @@ final class QuickModeFormTagBuilder
         string $customClass = '',
         string $newline = "\n"
     ): string {
-        $params = ' action="' . $action . '"'
+        $params = ' action="' . htmlspecialchars($action, ENT_QUOTES, 'UTF-8') . '"'
             . ' method="post"'
-            . ' name="' . $formId . '"'
-            . ' id="' . $formId . '"'
+            . ' name="' . htmlspecialchars($formId, ENT_QUOTES, 'UTF-8') . '"'
+            . ' id="' . htmlspecialchars($formId, ENT_QUOTES, 'UTF-8') . '"'
             . ' enctype="multipart/form-data"';
         if ($customClass !== '') {
-            $params .= ' class="' . $customClass . '"';
+            $params .= ' class="' . htmlspecialchars($customClass, ENT_QUOTES, 'UTF-8') . '"';
         }
 
         return '<form data-ajax="false"' . $params

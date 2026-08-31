@@ -87,6 +87,7 @@ final class RenderingEngine
     private ?FormClosingMarkupBuilder $formClosingMarkupBuilderService = null;
     private ?FormOpeningMarkupBuilder $formOpeningMarkupBuilderService = null;
     private ?FormOptionalContextFieldsBuilder $formOptionalContextFieldsBuilderService = null;
+    private ?FormSubmissionFieldsBuilder $formSubmissionFieldsBuilderService = null;
     private ?AdditionalHiddenFieldsBuilder $additionalHiddenFieldsBuilderService = null;
     private ?PaymentProviderDetector $paymentProviderDetectorService = null;
     private ?ContentBuilderFileValueParser $contentBuilderFileValueParserService = null;
@@ -347,6 +348,11 @@ final class RenderingEngine
     private function formOptionalContextFieldsBuilder(): FormOptionalContextFieldsBuilder
     {
         return $this->formOptionalContextFieldsBuilderService ??= new FormOptionalContextFieldsBuilder();
+    }
+
+    private function formSubmissionFieldsBuilder(): FormSubmissionFieldsBuilder
+    {
+        return $this->formSubmissionFieldsBuilderService ??= new FormSubmissionFieldsBuilder();
     }
 
     private function additionalHiddenFieldsBuilder(): AdditionalHiddenFieldsBuilder
@@ -1522,8 +1528,11 @@ final class RenderingEngine
                     'ff_record_id' => $this->processor->record_id,
                     'ff_module_id' => $this->processor->app->getInput()->getInt('ff_module_id', 0),
                 ], indentc(1));
-                echo indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities((string) $this->processor->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
+                echo $this->formSubmissionFieldsBuilder()->build(
+                    (int) $this->processor->form,
+                    indentc(1),
+                    nl()
+                ) .
                     $this->formTokenFieldBuilder()->build(
                         \Joomla\CMS\HTML\HTMLHelper::_('form.token'),
                         indentc(1),
@@ -1561,10 +1570,12 @@ final class RenderingEngine
                 break;
 
             case _FF_RUNMODE_BACKEND:
-                echo indentc(1) . '<input type="hidden" name="option" value="com_breezingformsng"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="act" value="run"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities((string) $this->processor->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
+                echo $this->formSubmissionFieldsBuilder()->build(
+                    (int) $this->processor->form,
+                    indentc(1),
+                    nl(),
+                    true
+                ) .
                     $this->formTokenFieldBuilder()->build(
                         \Joomla\CMS\HTML\HTMLHelper::_('form.token'),
                         indentc(1),
@@ -1609,10 +1620,13 @@ final class RenderingEngine
 
             default: // _FF_RUNMODE_PREVIEW:
                 if ($this->processor->inframe) {
-                    echo indentc(1) . '<input type="hidden" name="option" value="com_breezingformsng"/>' . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_frame" value="1"/>' . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities((string) $this->processor->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
+                    echo $this->formSubmissionFieldsBuilder()->build(
+                        (int) $this->processor->form,
+                        indentc(1),
+                        nl(),
+                        false,
+                        true
+                    ) .
                     $this->formTokenFieldBuilder()->build(
                         \Joomla\CMS\HTML\HTMLHelper::_('form.token'),
                         indentc(1),

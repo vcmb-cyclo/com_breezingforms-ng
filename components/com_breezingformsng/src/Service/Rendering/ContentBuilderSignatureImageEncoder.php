@@ -21,7 +21,7 @@ final class ContentBuilderSignatureImageEncoder
 {
     public function encode(string $path): string
     {
-        if (!is_file($path)) {
+        if (!is_file($path) || !is_readable($path)) {
             return '';
         }
 

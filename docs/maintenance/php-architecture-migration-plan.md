@@ -980,6 +980,9 @@ La résolution des signatures ContentBuilder est désormais limitée à des
 fichiers réguliers nommés dans le répertoire prévu; le cas de traversal est
 couvert par le test du support fichiers.
 
+L'encodeur d'image de signature vérifie également la lisibilité du fichier et
+est couvert par des tests d'encodage et d'absence de fichier.
+
 `UploadStorage` vérifie désormais directement le résultat de `chmod`, sans
 masquer les erreurs système, et conserve les statuts de stockage testés.
 

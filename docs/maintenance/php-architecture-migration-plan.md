@@ -839,6 +839,13 @@ pour les scripts PHP stockés, mais ne contient plus l’implémentation de
 `microtime()` ; le calcul et ses appelants internes sont regroupés dans le
 pipeline de soumission.
 
+Le gestionnaire d'erreurs global `_ff_errorHandler()` est maintenant réduit à
+son rôle d'adaptateur pour `set_error_handler()`. La construction du diagnostic,
+la résolution des liens vers le formulaire ou le script concerné et la mise à
+jour de la trace sont regroupées dans `ErrorHandlerRuntime`. Les niveaux de
+dépréciation ignorés, le court-circuit pendant l'arrêt du processeur et le
+format du message sont couverts par `ErrorHandlerRuntimeTest`.
+
 Les deux gardes locales `if (!$halt)` de `SubmissionEngine` ont ensuite été
 retirées : `$halt` était initialisé à `false` et ses seules affectations à
 `true` précédaient immédiatement `exit`. Le contrôle CAPTCHA, les pièces de

@@ -23,6 +23,7 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\FormPathResolver;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RequestMetadataResolver;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampFactory;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\CodeToolsRuntime;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\ErrorHandlerRuntime;
 use Vcmb\Component\BreezingformsNG\Site\Service\Scripting\ScriptingEngine;
 use Vcmb\Component\BreezingformsNG\Site\Service\Export\ExportEngine;
 use Vcmb\Component\BreezingformsNG\Site\Service\Integration\RecaptchaVerifier;
@@ -273,156 +274,16 @@ function _ff_traceExit($line, $retval = null)
 function _ff_errorHandler($errno, $errstr, $errfile, $errline)
 {
     global $ff_processor, $ff_mossite;
-    $database = $ff_processor->database;
-
-    if (isset($ff_processor->dying) && $ff_processor->dying)
+    if (!$ff_processor instanceof HTML_facileFormsProcessor) {
         return;
-
-    $msg = "\n<strong>*** " . htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_PROCESS_EXCAUGHT'), ENT_QUOTES) . " ***</strong>\n" .
-        htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_PROCESS_PHPLEVEL') . ' ', ENT_QUOTES);
-    $fail = false;
-    if (!defined('E_DEPRECATED')) {
-        define('E_DEPRECATED', 8192);
     }
-    switch ($errno) {
-        case E_WARNING:
-            $msg .= "E_WARNING";
-            break;
-        case E_NOTICE:
-            $msg .= "E_NOTICE";
-            break;
-        case E_USER_ERROR:
-            $msg .= "E_USER_ERROR";
-            $fail = true;
-            break;
-        case E_USER_WARNING:
-            $msg .= "E_USER_WARNING";
-            break;
-        case E_USER_NOTICE:
-            $msg .= "E_USER_NOTICE";
-            break;
-        case E_DEPRECATED:
-            $msg .= "E_DEPRECATED";
-            break;
-        case 2048:
-            return;
-        case 16384: // JLanguage deprecation error
-            return;
-        default:
-            $msg .= $errno;
-            $fail = true;
-    } // switch
-    $msg .= htmlspecialchars(
-        "\n" . Text::_('COM_BREEZINGFORMSNG_PROCESS_PHPFILE') . " $errfile\n" .
-        Text::_('COM_BREEZINGFORMSNG_PROCESS_PHPLINE') . " $errline\n",
-        ENT_QUOTES
+
+    (new ErrorHandlerRuntime($ff_processor, (string) $ff_mossite))->handle(
+        (int) $errno,
+        (string) $errstr,
+        (string) $errfile,
+        (int) $errline
     );
-
-    $n = 0;
-    if (isset($ff_processor)) {
-        $n = (is_countable($ff_processor->traceStack)) ? count($ff_processor->traceStack) : 1;
-    }
-
-    if ($n) {
-        $info = $ff_processor->traceStack[$n - 1];
-        $name = htmlspecialchars($info[2] . ' ' . Text::_('COM_BREEZINGFORMSNG_PROCESS_ATLINE') . ' ' . $info[3], ENT_QUOTES);
-        $type = $info[4];
-        $id = $info[5];
-        $pane = $info[6];
-        if ($type && $id && $ff_processor->runmode != _FF_RUNMODE_FRONTEND) {
-            $url = $ff_mossite . '/administrator/index.php?option=com_breezingformsng&format=html&tmpl=component';
-            $what = $id;
-            switch ($type) {
-                case 'f':
-                    $url .= '&task=quickmode.display' .
-                        '&form=' . $ff_processor->form;
-                    if ($ff_processor->formrow->package != '')
-                        $url .= '&pkg=' . urlencode($ff_processor->formrow->package);
-                    if ($pane > 0)
-                        $url .= '&tabpane=' . $pane;
-                    $what = 'form ' . $ff_processor->formrow->name;
-                    break;
-                case 'e':
-                    $page = 1;
-                    foreach ($ff_processor->rows as $row)
-                        if ($row->id == $id) {
-                            $page = $row->page;
-                            $what = $row->name;
-                            break;
-                        } // if
-                    $what = 'element ' . $what;
-                    $url .= '&task=quickmode.display' .
-                        '&form=' . $ff_processor->form .
-                        '&page=' . $page;
-                    if ($ff_processor->formrow->package != '')
-                        $url .= '&pkg=' . urlencode($ff_processor->formrow->package);
-                    if ($pane > 0)
-                        $url .= '&tabpane=' . $pane;
-                    break;
-                case 'p':
-                    $package = '';
-                    $piecesQuery = $database->getQuery(true)
-                        ->select(['name', 'package'])
-                        ->from('#__facileforms_pieces')
-                        ->where($database->quoteName('id') . ' = :id')
-                        ->bind(':id', $id, ParameterType::INTEGER);
-                    $database->setQuery($piecesQuery);
-                    $rows = $database->loadObjectList();
-                    if (count($rows)) {
-                        $package = $rows[0]->package;
-                        $what = $rows[0]->name;
-                    }
-                    $what = 'piece ' . $what;
-                    $url .= '&task=pieces.edit' .
-                        '&ids[]=' . $id;
-                    if ($package != '')
-                        $url .= '&pkg=' . urlencode($package);
-                    break;
-                case 's':
-                    $package = '';
-                    $scriptsQuery = $database->getQuery(true)
-                        ->select(['name', 'package'])
-                        ->from('#__facileforms_scripts')
-                        ->where($database->quoteName('id') . ' = :id')
-                        ->bind(':id', $id, ParameterType::INTEGER);
-                    $database->setQuery($scriptsQuery);
-                    $rows = $database->loadObjectList();
-                    if (count($rows)) {
-                        $package = $rows[0]->package;
-                        $what = $rows[0]->name;
-                    }
-                    $what = 'script ' . $what;
-                    $url .= '&task=scripts.edit' .
-                        '&ids[]=' . $id;
-                    if ($package != '')
-                        $url .= '&pkg=' . urlencode($package);
-                    break;
-                default:
-                    $url = null;
-            } // switch
-            if ($url)
-                $name = '<a href="#" ' .
-                    'onMouseOver="window.status=\'Open ' . $what . '\';return true;" ' .
-                    'onMouseOut="window.status=\'\';return true;" ' .
-                    'onClick="ff_redirectParent(\'' . htmlspecialchars($url, ENT_QUOTES) . '\');return true;"' .
-                    '>' . $name . '</a>';
-        } // if
-        $msg .= htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_PROCESS_LASTPOS'), ENT_QUOTES) . ' ' . $name . "\n";
-    } // if
-    $msg .= htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_PROCESS_ERRMSG') . " $errstr\n\n", ENT_QUOTES);
-    if ($fail) {
-        if (isset($ff_processor)) {
-            $ff_processor->traceBuffer .= $msg;
-            $ff_processor->suicide();
-        }
-    } else
-        if (isset($ff_processor)) {
-            if (($ff_processor->traceMode & _FF_TRACEMODE_DISABLE) == 0) {
-                $ff_processor->traceBuffer .= $msg;
-                if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
-                    $ff_processor->dumpTrace();
-            }
-        } // if
 }
 
 // _ff_errorHandler

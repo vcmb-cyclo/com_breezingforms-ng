@@ -92,6 +92,27 @@ final class CallbackExportUploadPermissionTest extends TestCase
         }
     }
 
+    public function testUploadStorageReportsMoverFailure(): void
+    {
+        $directory = sys_get_temp_dir() . '/bfng-upload-' . bin2hex(random_bytes(4));
+        self::assertTrue(mkdir($directory));
+
+        try {
+            $storage = new UploadStorage(
+                new ImageResizer(),
+                static fn (string $source, string $destination): bool => false
+            );
+
+            $result = $storage->store('/tmp/upload.tmp', $directory, 'submission.txt', false, null, false);
+
+            self::assertFalse($result->isSuccessful());
+            self::assertSame(UploadError::MoveFailed, $result->error);
+            self::assertFileDoesNotExist($directory . '/submission.txt');
+        } finally {
+            @rmdir($directory);
+        }
+    }
+
     public function testUploadStoragePreservesExistingFileWithUniqueDestination(): void
     {
         $directory = sys_get_temp_dir() . '/bfng-upload-' . bin2hex(random_bytes(4));

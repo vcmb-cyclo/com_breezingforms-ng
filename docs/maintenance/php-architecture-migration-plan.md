@@ -1896,6 +1896,10 @@ La branche URL de \`UploadStorage\` est maintenant couverte en complément des
 chemins serveur existants : elle vérifie la séparation entre URL publique et
 chemin disque, avec un répertoire contrôlé et nettoyé par le test.
 
+L'échec du déplacement dans \`UploadStorage\` est également caractérisé :
+aucun fichier n'est laissé dans la destination et l'erreur
+\`MoveFailed\` est retournée au runtime.
+
 Le \`UploadPathResolver\` est caractérisé sur le remplacement de tokens de
 destination et sur un masque de fichier alimenté par une valeur de formulaire,
 avec nettoyage HTML et sécurisation du nom final. Les doubles filesystem et

@@ -1829,78 +1829,78 @@ noms ignorés et les valeurs contenant plusieurs signes `=`. Le comportement
 historique de la préparation des paramètres runtime est ainsi verrouillé avant
 toute évolution de son appelant.
 
-Le service pur \`TraceModeFormatter\` est également caractérisé directement :
+Le service pur `TraceModeFormatter` est également caractérisé directement :
 les modes non entiers, la désactivation, les variantes de transport, les
 priorités, la portée et les combinaisons de sujets sont couvertes sans
 dépendance au processeur historique.
 
-Les services \`SubmissionTimestampFactory\` et
-\`SubmissionTimestampFormatter\` disposent maintenant de tests directs sur le
+Les services `SubmissionTimestampFactory` et
+`SubmissionTimestampFormatter` disposent maintenant de tests directs sur le
 format SQL, le nommage de fichier et les formats personnalisés. Leurs doubles
 de date restent confinés aux tests purs, sans élargir le bootstrap Joomla.
 
-Les résolveurs \`FormPathResolver\` et \`FormDisplayContextResolver\` sont
+Les résolveurs `FormPathResolver` et `FormDisplayContextResolver` sont
 désormais caractérisés directement. Les tests verrouillent l'expansion
 progressive des tokens de chemins, les variantes frontend/backend/preview,
-l'identifiant de formulaire, la grille d'aperçu et la règle \`canRun\`.
+l'identifiant de formulaire, la grille d'aperçu et la règle `canRun`.
 
-Le \`RequestMetadataResolver\` est maintenant couvert avec un double Browser
+Le `RequestMetadataResolver` est maintenant couvert avec un double Browser
 local : adresse visible ou masquée, récupération des informations navigateur,
 désactivation de la résolution fournisseur et repli pour une adresse invalide.
 La résolution DNS n'est pas déclenchée par les tests, ce qui rend le filet
 déterministe.
 
-La frontière \`RuntimeAssetLoader\` est caractérisée avec les doubles Joomla
+La frontière `RuntimeAssetLoader` est caractérisée avec les doubles Joomla
 existants : normalisation d'un chemin sous-répertoire, enregistrement
 idempotent des scripts, génération de noms dépendant des attributs et
 enregistrement des feuilles de style hors du chemin racine.
 
-Le \`RuntimeContextInitializer\` est maintenant couvert sur la normalisation
+Le `RuntimeContextInitializer` est maintenant couvert sur la normalisation
 des URLs explicites, la reconstruction d'une URL HTTPS derrière proxy avec
 port non standard, et la collecte sélective des paramètres de contenu. Le
 double d'application partagé expose désormais uniquement les primitives
 Input/Server nécessaires à ce harnais.
 
-La même couverture verrouille désormais la branche \`livesite = 0\`, la racine
-Joomla par défaut et le jeu de paramètres dédié à \`com_contacts\`.
+La même couverture verrouille désormais la branche `livesite = 0`, la racine
+Joomla par défaut et le jeu de paramètres dédié à `com_contacts`.
 
-Le jeu de paramètres \`com_weblinks\` est également verrouillé : seuls
-\`option\`, \`Itemid\` et \`catid\` sont collectés pour ce contexte.
+Le jeu de paramètres `com_weblinks` est également verrouillé : seuls
+`option`, `Itemid` et `catid` sont collectés pour ce contexte.
 
-Les délégations modernisées de \`CodeToolsRuntime\` sont caractérisées
+Les délégations modernisées de `CodeToolsRuntime` sont caractérisées
 directement : nettoyage et détection de code, export JavaScript, résolution
 des classes et formatage du mode de trace. Le parsing/eval historique reste
 séparé, avec son propre besoin de caractérisation plus large.
 
 Le harnais couvre maintenant aussi les branches de garde de
-\`prepareEvalCode\`, l'application des tags de remplacement lorsque la trace
+`prepareEvalCode`, l'application des tags de remplacement lorsque la trace
 est désactivée, et les points d'instrumentation produits par
-\`patchCode\` pour une fonction et son retour. Ces tests précèdent toute
+`patchCode` pour une fonction et son retour. Ces tests précèdent toute
 extraction supplémentaire de ce code historique.
 
-Les primitives lexicales \`findToken\` et \`findRealToken\` sont également
+Les primitives lexicales `findToken` et `findRealToken` sont également
 caractérisées sur l'avancement des offsets, les tokens de structure, les
 commentaires de ligne et le suivi des numéros de ligne.
 
-Les directives \`+trace\` de \`prepareEvalCode\` sont couvertes sur leurs
-parcours normal et \`disable\`. Le test verrouille aussi le comportement
-historique observé : sans \`first\`, le mot-clé \`disable\` de la directive
+Les directives `+trace` de `prepareEvalCode` sont couvertes sur leurs
+parcours normal et `disable`. Le test verrouille aussi le comportement
+historique observé : sans `first`, le mot-clé `disable` de la directive
 n'empêche pas l'instrumentation du code.
 
-La façade \`UploadRuntime\` dispose maintenant d'une couverture directe de ses
+La façade `UploadRuntime` dispose maintenant d'une couverture directe de ses
 délégations sans upload réel : parsing des tailles, détection d'une image
-absente et recherche récursive d'un élément QuickMode. Le double \`Input\`
+absente et recherche récursive d'un élément QuickMode. Le double `Input`
 reste limité au test du constructeur.
 
-La branche URL de \`UploadStorage\` est maintenant couverte en complément des
+La branche URL de `UploadStorage` est maintenant couverte en complément des
 chemins serveur existants : elle vérifie la séparation entre URL publique et
 chemin disque, avec un répertoire contrôlé et nettoyé par le test.
 
-L'échec du déplacement dans \`UploadStorage\` est également caractérisé :
+L'échec du déplacement dans `UploadStorage` est également caractérisé :
 aucun fichier n'est laissé dans la destination et l'erreur
-\`MoveFailed\` est retournée au runtime.
+`MoveFailed` est retournée au runtime.
 
-Le \`UploadPathResolver\` est caractérisé sur le remplacement de tokens de
+Le `UploadPathResolver` est caractérisé sur le remplacement de tokens de
 destination et sur un masque de fichier alimenté par une valeur de formulaire,
 avec nettoyage HTML et sécurisation du nom final. Les doubles filesystem et
 Input restent confinés au test.

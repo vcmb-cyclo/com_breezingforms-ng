@@ -253,15 +253,13 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
             RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/remodal/remodal.css');
             RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/remodal/remodal-default-theme.css');
             RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/remodal/remodal.min.js');
-            $this->p->app->getDocument()->getWebAssetManager()->addInlineScript("\n" . '
-                   function bf_remodal_close(){
-                        if(typeof crbc_cart_url != "undefined"){
-                            location.href = crbc_cart_url;
-                        }else{
-                            location.href = ' . json_encode(Uri::getInstance()->toString()) . ';
-                        }
-                   }
-                   ' . "\n");
+            $this->p->app->getDocument()->getWebAssetManager()->addInlineScript(
+                "\n"
+                . QuickModeRemodalCloseScriptBuilder::build(
+                    (string) json_encode(Uri::getInstance()->toString()),
+                    "\n"
+                )
+            );
         }
 
         RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/ladda/ladda-themeless.min.css');

@@ -86,8 +86,8 @@ overflow:hidden;width: 100%;
 /* ##### hr ##### */
 
 #bfQuickModeWrapper hr {
-	color:#ccc;
-	background-color:#ccc;
+	color: var(--bfng-border, #ccc);
+	background-color: var(--bfng-border, #ccc);
 	height:1px;
 	border:none;
 	margin: 10px 0 10px 0;
@@ -119,20 +119,21 @@ overflow:hidden;width: 100%;
 #bfQuickModeWrapper input[type="password"]:not(#bfOptionsFieldsWrap *),
 #bfQuickModeWrapper textarea:not(#bfOptionsFieldsWrap *),
 #bfQuickModeWrapper select:not(#bfOptionsFieldsWrap *) {
-    border: 1px solid #bbb;
+    border: 1px solid var(--bfng-border-strong, #bbb);
     padding: 2px;
     line-height: normal;
-    background: #f8f8f8;
+    background: var(--bfng-surface, #f8f8f8);
+    color: var(--bfng-text, inherit);
     font-size: 100%;
     width: 50%;
 }
 
 #bfQuickModeWrapper textarea:hover, #bfQuickModeWrapper input[type='text']:hover, #bfQuickModeWrapper input[type='password']:hover, #bfQuickModeWrapper select:hover {
-    border-color: #92c1ff;
+    border-color: var(--bfng-accent-500, #92c1ff);
 }
 
 #bfQuickModeWrapper textarea:focus, #bfQuickModeWrapper input[type='text']:focus, #bfQuickModeWrapper input[type='password']:focus, #bfQuickModeWrapper select:focus {
-    border-color: #0071bc; outline: 2px solid #92c1ff;
+    border-color: var(--bfng-accent-600, #0071bc); outline: 2px solid var(--bfng-accent-100, #92c1ff);
 }
 
 #bfQuickModeWrapper input[type='button'], #bfQuickModeWrapper input[type='submit'], #bfQuickModeWrapper input[type='checkbox'], #bfQuickModeWrapper input[type='image'], #bfQuickModeWrapper input[type='radio'], #bfQuickModeWrapper input[type='reset'], #bfQuickModeWrapper select, #bfQuickModeWrapper button {

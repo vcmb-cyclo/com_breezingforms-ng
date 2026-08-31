@@ -663,6 +663,8 @@ d'être — décision : suppression complète plutôt que refactorisation.
 ### Périmètre supprimé
 
 - `bf_is_mobile()` (détection User-Agent, `helpers.php`).
+- `libraries/crosstec/constants.php` et son chargement : les constantes Mambo
+  (`_ISO`, `_VALID_MOS`, `_MOS_*`) étaient orphelines dans le code Joomla 6.
 - `MobileRenderer` (renderer QuickMode dédié, 1463 lignes) et sa façade de
   compatibilité `BFQuickModeMobile` (`class BFQuickModeMobile extends
   MobileRenderer {}`), ainsi que son chargement dans

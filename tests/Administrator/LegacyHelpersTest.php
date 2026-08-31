@@ -49,4 +49,12 @@ final class LegacyHelpersTest extends TestCase
         self::assertStringNotContainsString('->AddAddress(', $helpers . $sofort . $submission);
         self::assertStringNotContainsString('->Send()', $helpers . $sofort . $submission);
     }
+
+    public function testJoomla6BootstrapDoesNotLoadObsoleteMamboConstants(): void
+    {
+        $bootstrap = file_get_contents(__DIR__ . '/../../components/com_breezingformsng/breezingformsng.php');
+
+        self::assertIsString($bootstrap);
+        self::assertStringNotContainsString('libraries/crosstec/constants.php', $bootstrap);
+    }
 }

@@ -1482,6 +1482,10 @@ Le même harnais couvre désormais l'abandon après les callbacks de formulaire,
 en vérifiant l'ordre des callbacks `init` et `submitted` et l'absence des
 sections d'éléments et de Query List (`5a50a93fd`).
 
+La branche Query List est également caractérisée au-delà de ses points
+d'abandon internes : la fonction `ff_dispQueryPage` est enregistrée dans la
+bibliothèque avec son état de page et sa navigation (`a743e9c67`).
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

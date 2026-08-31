@@ -28,6 +28,7 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RuntimeAssetLoader;
 class MobileRenderer
 {
     use HiddenFieldTrait;
+    use CalendarOptionsTrait;
 
     public $forceMobileUrl = '';
     /**
@@ -203,31 +204,6 @@ class MobileRenderer
                            */
 
         return (new QuickModeToggleFieldsParser())->parse((string) $code);
-    }
-
-    private function bfCalendarIsTruthy($mdata, $key)
-    {
-        return $this->quickModeCalendarOptionsBuilder()->isTruthy($mdata, $key);
-    }
-
-    private function bfCalendarShowTimeEnabled($mdata)
-    {
-        return $this->quickModeCalendarOptionsBuilder()->showTimeEnabled($mdata);
-    }
-
-    private function bfCalendarToPickadateFormat($format)
-    {
-        return $this->quickModeCalendarOptionsBuilder()->toPickadateFormat($format);
-    }
-
-    private function bfCalendarToPickadateFirstDay($firstDay)
-    {
-        return $this->quickModeCalendarOptionsBuilder()->toPickadateFirstDay($firstDay);
-    }
-
-    private function bfCalendarSelectYears($mdata)
-    {
-        return $this->quickModeCalendarOptionsBuilder()->selectYears($mdata);
     }
 
     public function headers()

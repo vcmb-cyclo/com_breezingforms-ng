@@ -31,6 +31,7 @@ use Joomla\CMS\Editor\Editor;
 class ClassicRenderer
 {
     use HiddenFieldTrait;
+    use CalendarOptionsTrait;
 
     /**
      * @var HTML_facileFormsProcessor
@@ -1725,31 +1726,6 @@ float:left;
         }
         echo '<noscript>' . Text::_('COM_BREEZINGFORMSNG_JAVASCRIPT_REQUIRED') . '</noscript>' . "\n";
         $this->p->app->getDocument()->getWebAssetManager()->addInlineScript('//-->');
-    }
-
-    private function bfCalendarIsTruthy($mdata, $key)
-    {
-        return $this->quickModeCalendarOptionsBuilder()->isTruthy($mdata, $key);
-    }
-
-    private function bfCalendarShowTimeEnabled($mdata)
-    {
-        return $this->quickModeCalendarOptionsBuilder()->showTimeEnabled($mdata);
-    }
-
-    private function bfCalendarToPickadateFormat($format)
-    {
-        return $this->quickModeCalendarOptionsBuilder()->toPickadateFormat($format);
-    }
-
-    private function bfCalendarToPickadateFirstDay($firstDay)
-    {
-        return $this->quickModeCalendarOptionsBuilder()->toPickadateFirstDay($firstDay);
-    }
-
-    private function bfCalendarSelectYears($mdata)
-    {
-        return $this->quickModeCalendarOptionsBuilder()->selectYears($mdata);
     }
 
     public function parseToggleFields($code)

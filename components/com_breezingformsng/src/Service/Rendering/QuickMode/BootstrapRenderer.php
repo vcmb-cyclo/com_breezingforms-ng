@@ -859,11 +859,7 @@ class BootstrapRenderer
                                                                             }
                                                                         }
                                                                 });
-                                                                uploader.bind('UploadProgress', function(up, file) {
-                                                                    if(typeof JQuery('#'+file.id+'queue').get(0) != 'undefined'){
-                                                                        JQuery('#'+file.id+'queue').get(0).getElementsByTagName('b')[0].innerHTML = file.percent + '% <div style=\"height: 5px;width: ' + (file.percent*1.5) + 'px;background-color: #9de24f;\"></div>';
-                                                                    }
-                                                                });
+" . QuickModeUploadProgressScriptBuilder::build(chr(10)) . "
                                                                 uploader.bind('FileUploaded', function(up, file, response) {
                                                                     if(response.response!=''){
                                                                         if(response.response !== null){

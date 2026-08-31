@@ -55,10 +55,7 @@ if ($this->formId === 0 || $this->templateCode === '') {
             useErrorAlerts: false,
             useDefaultErrors: true,
             useBalloonErrors: false,
-            joomlaHint: false,
-            mobileEnabled: false,
-            forceMobile: false,
-            forceMobileUrl: "index.php"
+            joomlaHint: false
         },
         state: "open",
         data: { title: "' . $formNameJs . '", icon: "' . $iconBase . 'icon_form.png" },

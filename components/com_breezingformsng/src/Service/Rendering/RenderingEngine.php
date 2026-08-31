@@ -45,7 +45,6 @@ use CB\Component\Contentbuilderng\Administrator\Helper\RuntimeContextHelper;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\TokenizedDirectoryResolver;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\BootstrapRenderer;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\ClassicRenderer;
-use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\MobileRenderer;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\OnePageRenderer;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RuntimeAssetLoader;
 
@@ -85,7 +84,6 @@ final class RenderingEngine
     private ?FormClosingMarkupBuilder $formClosingMarkupBuilderService = null;
     private ?FormOpeningMarkupBuilder $formOpeningMarkupBuilderService = null;
     private ?FormOptionalContextFieldsBuilder $formOptionalContextFieldsBuilderService = null;
-    private ?MobileChoiceMarkupBuilder $mobileChoiceMarkupBuilderService = null;
     private ?CaptchaWrapperMarkupBuilder $captchaWrapperMarkupBuilderService = null;
     private ?QuickModeFormTagBuilder $quickModeFormTagBuilderService = null;
     private ?FileExtensionsCheckBuilder $fileExtensionsCheckBuilderService = null;
@@ -349,11 +347,6 @@ final class RenderingEngine
     }
 
 
-    private function mobileChoiceMarkupBuilder(): MobileChoiceMarkupBuilder
-    {
-        return $this->mobileChoiceMarkupBuilderService ??= new MobileChoiceMarkupBuilder();
-    }
-
     private function captchaWrapperMarkupBuilder(): CaptchaWrapperMarkupBuilder
     {
         return $this->captchaWrapperMarkupBuilderService ??= new CaptchaWrapperMarkupBuilder();
@@ -580,28 +573,16 @@ final class RenderingEngine
             return;
         }
 
-        $is_mobile_type = '';
         $rootMdata = [];
 
         if (trim($this->processor->formrow->template_code_processed) == 'QuickMode') {
 
-            $this->syncMobileSessionPreference();
-
             require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
 
             $rootMdata = $this->loadQuickModeMetadata();
-            $is_device = $this->applyMobileMode($rootMdata);
 
-            $is_mobile_type = $this->mobileChoiceType($is_device, $rootMdata);
-
-            if (!$this->processor->isMobile || ($this->processor->isMobile && $this->processor->app->getInput()->getString('ff_task', '') == 'submit')) {
-
-                // nothing
-            } else {
-
-                if ($this->processor->isMobile) {
-                    $quickMode = $this->createMobileRenderer($rootMdata);
-                }
+            if (isset($rootMdata['themebootstrapThemeEngine']) && $rootMdata['themebootstrapThemeEngine'] == 'bootstrap') {
+                $this->processor->legacy_wrap = false;
             }
         }
 
@@ -1407,19 +1388,8 @@ final class RenderingEngine
             } // for
         } else if (trim($this->processor->formrow->template_code_processed) == 'QuickMode') {
 
-            if ($this->processor->isMobile) {
-
-                // nothing
-            } else {
-                //if(true){
-
-                $quickMode = $this->createQuickModeRenderer($rootMdata);
-                $this->processor->quickmode = $quickMode;
-            }
-
-            if ($is_mobile_type == 'choose') {
-                $this->renderMobileChoice();
-            }
+            $quickMode = $this->createQuickModeRenderer($rootMdata);
+            $this->processor->quickmode = $quickMode;
 
             $quickMode->render();
         }
@@ -1637,66 +1607,6 @@ final class RenderingEngine
     }
 
     /**
-     * Create and configure the renderer used for a mobile QuickMode request.
-     *
-     * @param array<string, mixed> $rootMdata
-     */
-    private function createMobileRenderer(array $rootMdata): MobileRenderer
-    {
-        $quickMode = new MobileRenderer($this->processor);
-
-        if (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile']) {
-            $quickMode->forceMobileUrl = isset($rootMdata['forceMobileUrl']) ? $rootMdata['forceMobileUrl'] : 'index.php';
-        }
-
-        return $quickMode;
-    }
-
-    private function renderMobileChoice(): void
-    {
-        $currentUrl = Uri::getInstance()->toString();
-        $returnUrl = $currentUrl;
-        $returnUrl = (strstr($returnUrl, '?non_mobile=1') !== false ? str_replace('?non_mobile=1', '', $returnUrl) : str_replace('&non_mobile=1', '', $returnUrl));
-        $returnUrl = $returnUrl . (strstr($returnUrl, '?') !== false ? '&' : '?') . 'mobile=1';
-        echo $this->mobileChoiceMarkupBuilder()->build(
-            $returnUrl,
-            Text::_('COM_BREEZINGFORMSNG_MOBILE_VERSION'),
-            nl()
-        );
-    }
-
-    private function syncMobileSessionPreference(): void
-    {
-        if ($this->processor->app->getInput()->getBool('non_mobile', false)) {
-            $this->processor->app->getSession()->clear('com_breezingformsng.mobile');
-        } elseif ($this->processor->app->getInput()->getBool('mobile', false)) {
-            $this->processor->app->getSession()->set('com_breezingformsng.mobile', true);
-        }
-    }
-
-    /**
-     * Apply the mobile mode selected by the request and template settings.
-     *
-     * @param array<string, mixed> $rootMdata
-     */
-    private function applyMobileMode(array $rootMdata): bool
-    {
-        if ($this->processor->app->getInput()->getString('ff_applic', '') != 'mod_facileforms' && $this->processor->app->getInput()->getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
-            $this->processor->isMobile = isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile'] ? true : (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $this->processor->app->getSession()->get('com_breezingformsng.mobile', false) ? true : false);
-
-            return true;
-        }
-
-        $this->processor->isMobile = false;
-
-        if (isset($rootMdata['themebootstrapThemeEngine']) && $rootMdata['themebootstrapThemeEngine'] == 'bootstrap') {
-            $this->processor->legacy_wrap = false;
-        }
-
-        return false;
-    }
-
-    /**
      * Decode the QuickMode template metadata used by the rendering stages.
      *
      * @return array<string, mixed>
@@ -1706,20 +1616,6 @@ final class RenderingEngine
         $dataObject = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
 
         return $dataObject['properties'];
-    }
-
-    /**
-     * Determine whether the visitor should be offered the mobile version.
-     *
-     * @param array<string, mixed> $rootMdata
-     */
-    private function mobileChoiceType(bool $isDevice, array $rootMdata): string
-    {
-        if ($isDevice && isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && !$rootMdata['forceMobile']) {
-            return 'choose';
-        }
-
-        return '';
     }
 
     /**

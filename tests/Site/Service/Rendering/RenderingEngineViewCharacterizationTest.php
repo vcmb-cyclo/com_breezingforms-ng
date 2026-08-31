@@ -204,7 +204,7 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
 
                     public function getString(string $name, string $default = ''): string
                     {
-                        return $name === 'ff_applic' ? 'mod_facileforms' : $default;
+                        return $default;
                     }
 
                     public function getInt(string $name, int $default = 0): int
@@ -231,8 +231,6 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
             'template_code_processed' => 'QuickMode',
             'template_code' => base64_encode(json_encode([
                 'properties' => [
-                    'mobileEnabled' => false,
-                    'forceMobile' => false,
                     'themebootstrapThemeEngine' => 'bootstrap',
                 ],
             ], JSON_THROW_ON_ERROR)),
@@ -322,28 +320,6 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertSame([], $linked);
     }
 
-    public function testMobileChoiceRemovesDesktopOverrideAndAddsMobileFlag(): void
-    {
-        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
-        Uri::$currentUrl = 'https://example.test/form?foo=bar&non_mobile=1';
-
-        ob_start();
-        try {
-            (new ReflectionClass($engine))->getMethod('renderMobileChoice')->invoke($engine);
-            $html = ob_get_contents();
-        } finally {
-            ob_end_clean();
-            Uri::$currentUrl = 'http://example.test/form';
-        }
-
-        self::assertStringContainsString(
-            (string) json_encode('https://example.test/form?foo=bar&mobile=1'),
-            $html
-        );
-        self::assertStringNotContainsString('non_mobile=1', $html);
-        self::assertStringContainsString('COM_BREEZINGFORMSNG_MOBILE_VERSION', $html);
-    }
-
     public function testCaptchaDefaultsUseFileExtensionCheckBeforeSubmit(): void
     {
         $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
@@ -352,99 +328,6 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
 
         self::assertSame('"COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG"', $error);
         self::assertSame('function bfCheckCaptcha(){if(checkFileExtensions())ff_submitForm2();}', $callback);
-    }
-
-    public function testMobileChoiceTypeOnlyAppliesToOptionalMobileMode(): void
-    {
-        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
-        $method = (new ReflectionClass($engine))->getMethod('mobileChoiceType');
-
-        self::assertSame('choose', $method->invoke($engine, true, [
-            'mobileEnabled' => true,
-            'forceMobile' => false,
-        ]));
-        self::assertSame('', $method->invoke($engine, false, [
-            'mobileEnabled' => true,
-            'forceMobile' => false,
-        ]));
-        self::assertSame('', $method->invoke($engine, true, [
-            'mobileEnabled' => true,
-            'forceMobile' => true,
-        ]));
-    }
-
-    public function testApplyMobileModeActivatesForcedMobileAndDisablesDesktopWrapper(): void
-    {
-        require_once JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/functions/helpers.php';
-
-        $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
-        $processor->app = new class {
-            public function getInput(): object
-            {
-                return new class {
-                    public function getString(string $name, string $default = ''): string
-                    {
-                        return $default;
-                    }
-
-                    public function getInt(string $name, int $default = 0): int
-                    {
-                        return $default;
-                    }
-                };
-            }
-
-            public function getSession(): object
-            {
-                return new class {
-                    public bool $mobilePreference = true;
-
-                    public function get(string $name, mixed $default = null): mixed
-                    {
-                        return $name === 'com_breezingformsng.mobile' ? $this->mobilePreference : $default;
-                    }
-                };
-            }
-        };
-        $processor->legacy_wrap = true;
-        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
-        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
-        $method = (new ReflectionClass($engine))->getMethod('applyMobileMode');
-
-        $previousUserAgent = $_SERVER['HTTP_USER_AGENT'] ?? null;
-        $_SERVER['HTTP_USER_AGENT'] = 'Mozilla/5.0 (Linux; Android 14; Mobile)';
-        try {
-            self::assertTrue($method->invoke($engine, [
-                'mobileEnabled' => true,
-                'forceMobile' => true,
-            ]));
-            self::assertTrue($processor->isMobile);
-            self::assertTrue($processor->legacy_wrap);
-
-            self::assertTrue($method->invoke($engine, [
-                'mobileEnabled' => false,
-                'forceMobile' => false,
-            ]));
-            self::assertFalse($processor->isMobile);
-
-            self::assertTrue($method->invoke($engine, [
-                'mobileEnabled' => true,
-                'forceMobile' => false,
-            ]));
-            self::assertTrue($processor->isMobile);
-        } finally {
-            if ($previousUserAgent === null) {
-                unset($_SERVER['HTTP_USER_AGENT']);
-            } else {
-                $_SERVER['HTTP_USER_AGENT'] = $previousUserAgent;
-            }
-        }
-
-        self::assertFalse($method->invoke($engine, [
-            'themebootstrapThemeEngine' => 'bootstrap',
-        ]));
-        self::assertFalse($processor->isMobile);
-        self::assertFalse($processor->legacy_wrap);
     }
 
     public function testQuickModeMetadataLoadsPropertiesFromEncodedTemplate(): void
@@ -499,70 +382,6 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         $processor->buryAfterFirstCallback = true;
         self::assertTrue($method->invokeArgs($engine, [&$library, &$linked]));
         self::assertSame(['ff_contact_init'], $processor->callbackNames);
-    }
-
-    public function testMobileSessionPreferenceClearsDesktopOverrideBeforeSettingMobile(): void
-    {
-        $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();
-        $input = new class {
-            /** @var array<string, bool> */
-            public array $values = [];
-
-            public function getBool(string $name, bool $default = false): bool
-            {
-                return $this->values[$name] ?? $default;
-            }
-        };
-        $session = new class {
-            /** @var list<string> */
-            public array $actions = [];
-
-            public function clear(string $name): void
-            {
-                $this->actions[] = 'clear:' . $name;
-            }
-
-            public function set(string $name, mixed $value): void
-            {
-                $this->actions[] = 'set:' . $name . ':' . (int) $value;
-            }
-        };
-        $processor->app = new class($input, $session) {
-            public function __construct(private object $input, private object $session)
-            {
-            }
-
-            public function getInput(): object
-            {
-                return $this->input;
-            }
-
-            public function getSession(): object
-            {
-                return $this->session;
-            }
-        };
-        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
-        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
-        $method = (new ReflectionClass($engine))->getMethod('syncMobileSessionPreference');
-
-        $input->values = ['non_mobile' => true, 'mobile' => true];
-        $method->invoke($engine);
-        self::assertSame(['clear:com_breezingformsng.mobile'], $session->actions);
-
-        $input->values = ['mobile' => true];
-        $method->invoke($engine);
-        self::assertSame([
-            'clear:com_breezingformsng.mobile',
-            'set:com_breezingformsng.mobile:1',
-        ], $session->actions);
-
-        $input->values = [];
-        $method->invoke($engine);
-        self::assertSame([
-            'clear:com_breezingformsng.mobile',
-            'set:com_breezingformsng.mobile:1',
-        ], $session->actions);
     }
 
     public function testInitialOnloadInitializesFormPageGridAndHeight(): void
@@ -1187,15 +1006,10 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
     {
         $processor = (new ReflectionClass(RenderingEngineProcessorDouble::class))->newInstanceWithoutConstructor();
         $processor->app = new CMSApplication();
-        // Short-circuits applyMobileMode()'s device check (ff_applic ===
-        // 'mod_facileforms') so it never has to call the real bf_is_mobile().
-        $processor->app->getInput()->values['ff_applic'] = 'mod_facileforms';
         $processor->formrow = (object) [
             'template_code_processed' => 'QuickMode',
             'template_code' => base64_encode(json_encode([
                 'properties' => [
-                    'mobileEnabled' => false,
-                    'forceMobile' => false,
                     'themebootstrapThemeEngine' => 'bootstrap',
                 ],
             ], JSON_THROW_ON_ERROR)),

@@ -18,14 +18,9 @@
    concatenation, presumably to dodge an over-eager hosting malware
    scanner); it is always the constant string "base64" regardless of
    which element renders it, so it's hardcoded directly here rather than
-   threaded through as a parameter. Shared by all 4 renderers -
+   threaded through as a parameter. Shared by all renderers -
    Classic/Bootstrap/OnePage all had this exact logic including the
-   "if (canvas == null) return;" guard; MobileRenderer's per-element
-   copy was missing that guard (a latent null-dereference risk if the
-   canvas were ever absent, never actually observable on the success
-   path since the element always renders its own canvas), so this
-   shared version's guard now also protects Mobile - a safety-only
-   difference from Mobile's prior behaviour, not a functional one. */
+   "if (canvas == null) return;" guard. */
 var bfSignaturePads = {};
 var bfSignatureCanvases = {};
 

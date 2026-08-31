@@ -183,30 +183,6 @@ use Joomla\CMS\Language\Text;
                                             </legend>
                                             <div class="bfPropertyWrap">
                                                 <label class="bfPropertyLabel hasTooltip"
-                                                    title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_MOBILE_FORMS')); ?>"
-                                                    for="bfElementAdvancedMobileEnabled">
-                                                    <?php echo Text::_('COM_BREEZINGFORMSNG_MOBILE_ENABLED'); ?>
-                                                </label>
-                                                <input type="checkbox" value="" id="bfElementAdvancedMobileEnabled" />
-                                            </div>
-                                            <div class="bfPropertyWrap">
-                                                <label class="bfPropertyLabel hasTooltip"
-                                                    title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_MOBILE_FORMS_FORCE')); ?>"
-                                                    for="bfElementAdvancedForceMobile">
-                                                    <?php echo Text::_('COM_BREEZINGFORMSNG_FORCE_MOBILE'); ?>
-                                                </label>
-                                                <input type="checkbox" value="" id="bfElementAdvancedForceMobile" />
-                                            </div>
-                                            <div class="bfPropertyWrap">
-                                                <label class="bfPropertyLabel hasTooltip"
-                                                    title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_MOBILE_FORMS_URL')); ?>"
-                                                    for="bfElementAdvancedForceMobileUrl">
-                                                    <?php echo Text::_('COM_BREEZINGFORMSNG_FORCE_MOBILE_URL'); ?>
-                                                </label>
-                                                <input type="text" value="" id="bfElementAdvancedForceMobileUrl" />
-                                            </div>
-                                            <div class="bfPropertyWrap">
-                                                <label class="bfPropertyLabel hasTooltip"
                                                     title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_HINT_JOOMLA')); ?>"
                                                     for="bfElementAdvancedJoomlaHint">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_JOOMLA_HINT'); ?>

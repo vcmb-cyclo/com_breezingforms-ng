@@ -623,6 +623,82 @@ traçabilité. Les classes qu'ils nomment sont désormais des méthodes de
 `HiddenFormFieldsBuilder` ou `LegacyScriptTagWrapperBuilder` (voir 8.1/8.2
 ci-dessus pour la correspondance).
 
+## Phase 9 — Suppression du rendu mobile historique
+
+Ajoutée le 2026-08-31. La détection de terminal mobile (`bf_is_mobile()`) et
+le renderer QuickMode dédié qu'elle déclenchait dataient de l'époque
+pré-responsive du projet (~2010-2014) : la regex de détection ciblait des
+plateformes toutes abandonnées depuis 3 à plus de 15 ans (BlackBerry OS,
+Windows Phone, Symbian, WebOS, Firefox Mobile/Fennec, et un bloc de repli au
+format `detectmobilebrowsers.com` reconnaissant des modèles de téléphones
+WAP des années 2000). Le projet utilisant Bootstrap 5 (responsive) sur
+l'ensemble de ses thèmes, cette voie de rendu séparée n'a plus de raison
+d'être — décision : suppression complète plutôt que refactorisation.
+
+### Périmètre supprimé
+
+- `bf_is_mobile()` (détection User-Agent, `helpers.php`).
+- `MobileRenderer` (renderer QuickMode dédié, 1463 lignes) et sa façade de
+  compatibilité `BFQuickModeMobile` (`class BFQuickModeMobile extends
+  MobileRenderer {}`), ainsi que son chargement dans
+  `breezingformsng.php`.
+- `MobileChoiceMarkupBuilder` (lien « voir la version mobile ») et son seul
+  appelant, `RenderingEngine::renderMobileChoice()`.
+- Les méthodes orphelines de `RenderingEngine` :
+  `createMobileRenderer()`, `syncMobileSessionPreference()`,
+  `applyMobileMode()`, `mobileChoiceType()`.
+- Le bloc de détection mort dans `SubmissionEngine` (`$dataObject`,
+  `$rootMdata`, `$is_device` n'étaient lus nulle part ailleurs).
+- Les propriétés `isMobile` du `processor_facade` (deux déclarations
+  distinctes) et la classe `bfMobile` inutilisée du même fichier.
+- Les 3 champs d'administration (`mobileEnabled`, `forceMobile`,
+  `forceMobileUrl`) dans le formulaire QuickMode par défaut, le panneau
+  « Avancé » (`advanced_form.php`) et leur synchronisation JS
+  (`quickmode-app-properties.js`).
+- 5 fichiers JS site dédiés au thème mobile
+  (`quickmode-*-mobile.js`), devenus orphelins après la suppression de
+  `MobileRenderer`.
+- Les clés de traduction `COM_BREEZINGFORMSNG_MOBILE_ENABLED`,
+  `COM_BREEZINGFORMSNG_FORCE_MOBILE`, `COM_BREEZINGFORMSNG_FORCE_MOBILE_URL`,
+  `COM_BREEZINGFORMSNG_QM_MOBILE_FORMS`,
+  `COM_BREEZINGFORMSNG_QM_MOBILE_FORMS_FORCE`,
+  `COM_BREEZINGFORMSNG_QM_MOBILE_FORMS_URL` et
+  `COM_BREEZINGFORMSNG_MOBILE_VERSION` (devenue orpheline avec
+  `renderMobileChoice()`), dans les 8 langues.
+- Les tests de caractérisation dédiés
+  (`MobileRendererCharacterizationTest`, `MobileChoiceMarkupBuilderTest`) et
+  les 4 méthodes de test de `RenderingEngineViewCharacterizationTest`
+  couvrant les branches mobiles désormais supprimées ; mise à jour de
+  `PublicFacadeApiTest` (retrait des attentes sur `BFQuickModeMobile`).
+
+### Effet de bord conservé : `legacy_wrap`
+
+`applyMobileMode()` portait un effet de bord sans rapport avec la détection
+mobile : `$processor->legacy_wrap = false` pour les thèmes Bootstrap
+(bascule entre le balisage historique en `<table>` et le balisage en `<div>`
+moderne, lu par `RenderingEngine` et `FormClosingMarkupBuilder`). Cet effet
+n'était appliqué que dans la branche *sans* détection mobile — un
+oubli probable de l'implémentation d'origine. Il est conservé, extrait en
+bloc autonome dans `view()`, et s'applique désormais **sans condition** pour
+tout thème Bootstrap, ce qui corrige implicitement ce défaut latent.
+
+### Risque connu — façade `BFQuickModeMobile`
+
+`BFQuickModeMobile` était documentée comme façade de compatibilité
+ascendante pour du PHP potentiellement stocké en base
+(`facileforms_pieces.code`, `forms.piece*code`) référençant la classe par
+son nom. Sa suppression ne peut pas être validée par grep sur le dépôt — un
+tel code vivrait uniquement en base de données. Risque accepté sur demande
+explicite de l'utilisateur (« supprimer tout cela »), à surveiller si un
+formulaire existant en production référence cette classe.
+
+### Vérification
+
+Suite complète verte (403 tests, 0 échec), PHPStan niveau 2 propre, `php -l`
+sur tous les fichiers modifiés, vérification live du panneau QuickMode
+« Avancé » (absence des 3 champs mobiles, `joomlaHint` intact,
+zéro erreur console/réseau), build + validation du package.
+
 ## Travail en parallèle
 
 | Couloir | Fichiers principaux | Peut avancer avec |

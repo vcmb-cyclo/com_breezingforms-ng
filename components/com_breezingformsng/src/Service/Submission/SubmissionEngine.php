@@ -653,19 +653,6 @@ final class SubmissionEngine
 
         if (!$halt) {
 
-            require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
-
-            $dataObject = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
-            $rootMdata = $dataObject['properties'];
-
-            if ($this->processor->app->getInput()->getString('ff_applic', '') != 'mod_facileforms' && $this->processor->app->getInput()->getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
-                $is_device = true;
-                $this->processor->isMobile = isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile'] ? true : (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $this->processor->app->getSession()->get('com_breezingformsng.mobile', false) ? true : false);
-            } else
-                $this->processor->isMobile = false;
-
-
-
             for ($i = 0; $i < $this->processor->rowcount; $i++) {
                 $row = $this->processor->rows[$i];
                 if ($row->type == "Captcha") {

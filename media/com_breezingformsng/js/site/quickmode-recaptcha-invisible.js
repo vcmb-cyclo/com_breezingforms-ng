@@ -5,12 +5,7 @@
    (it used an inline anonymous callback instead of the named
    recaptchaCheckedCallback the other two themes define) - a real,
    pre-existing behavioral difference, preserved here via
-   `resetFlagOnCallback` rather than silently unified. MobileRenderer is
-   not covered by this file: it builds the captcha containers dynamically
-   via jQuery instead of echoing static markup, hides the field's wrapper,
-   omits the expired-callback, and hardcodes badge "inline" - different
-   enough to warrant its own file (quickmode-recaptcha-invisible-mobile.js)
-   rather than a forced merge. */
+   `resetFlagOnCallback` rather than silently unified. */
 function bfInitInvisibleReCaptcha(options) {
 	window.bfInvisibleRecaptcha = true;
 

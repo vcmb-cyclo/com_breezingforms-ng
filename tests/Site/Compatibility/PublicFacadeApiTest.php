@@ -59,20 +59,6 @@ final class PublicFacadeApiTest extends TestCase
             'components/com_breezingformsng/src/Service/Rendering/QuickMode/BootstrapRenderer.php',
             ['getEditorContent', 'parseToggleFields', 'render', 'process'],
         ];
-        yield 'BFQuickModeMobile' => [
-            'components/com_breezingformsng/src/Service/Rendering/QuickMode/MobileRenderer.php',
-            [
-                'parseToggleFields',
-                'headers',
-                'addScript',
-                'addStyleSheet',
-                'addScriptDeclaration',
-                'addStyleDeclaration',
-                'render',
-                'process',
-                'calendar',
-            ],
-        ];
         yield 'BFQuickModeOnePage' => [
             'components/com_breezingformsng/src/Service/Rendering/QuickMode/OnePageRenderer.php',
             ['getEditorContent', 'process', 'render', 'parseToggleFields'],
@@ -108,7 +94,6 @@ final class PublicFacadeApiTest extends TestCase
     {
         yield 'classic' => ['BFQuickMode', 'ClassicRenderer'];
         yield 'bootstrap' => ['BFQuickModeBootstrap', 'BootstrapRenderer'];
-        yield 'mobile' => ['BFQuickModeMobile', 'MobileRenderer'];
         yield 'one page' => ['BFQuickModeOnePage', 'OnePageRenderer'];
     }
 
@@ -126,7 +111,7 @@ final class PublicFacadeApiTest extends TestCase
     {
         $source = $this->read('components/com_breezingformsng/breezingformsng.php');
 
-        foreach (['BFQuickMode', 'BFQuickModeBootstrap', 'BFQuickModeMobile', 'BFQuickModeOnePage'] as $facade) {
+        foreach (['BFQuickMode', 'BFQuickModeBootstrap', 'BFQuickModeOnePage'] as $facade) {
             self::assertStringContainsString("/{$facade}.php'", $source);
         }
     }

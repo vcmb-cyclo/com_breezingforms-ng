@@ -49,11 +49,6 @@ use CB\Component\Contentbuilderng\Administrator\Service\ArticleService;
 use CB\Component\Contentbuilderng\Administrator\Service\ListSupportService;
 use CB\Component\Contentbuilderng\Administrator\Service\PermissionService;
 
-class bfMobile
-{
-    public $isMobile = false;
-}
-
 $ff_processor = null;
 
 define('_FF_PACKBREAKAFTER', 250);
@@ -547,7 +542,6 @@ class HTML_facileFormsProcessor
     public $sendNotificationAfterPayment = false;
     public $opt_token = "9562384751";
     public $draggableDivIds = array();
-    public $isMobile = false;
     public $quickmode = null;
     public $legacy_wrap = true;
     public $app;

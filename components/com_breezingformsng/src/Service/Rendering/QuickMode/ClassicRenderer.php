@@ -1310,11 +1310,19 @@ float:left;
             'bfSignatureInit(' . json_encode((int) $mdata['dbId']) . ');'
         );
 
-        echo '<div class="bfSignature" id="bfSignature' . $mdata['dbId'] . '"><div class="bfSignatureCanvasBorder"><canvas></canvas></div>' . "\n";
-        echo '<button class="btn btn-primary" onclick="bfSignatureReset(' . json_encode((int) $mdata['dbId']) . ');" class="bfSignatureResetButton button"><span>' . Text::_('COM_BREEZINGFORMSNG_SIGNATURE_RESET_BUTTON') . '</span></button>' . "\n";
-        echo '<span class=\'bfSignature' . $mdata['bfName'] . '\'></span>';
-        echo '</div>';
-        echo '<input class="ff_elem" type="hidden" name="ff_nm_' . $mdata['bfName'] . '[]" value="" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+        echo QuickModeSignatureMarkupBuilder::build(
+            (int) $mdata['dbId'],
+            (string) $mdata['bfName'],
+            'class="btn btn-primary" onclick="bfSignatureReset(' . json_encode((int) $mdata['dbId'])
+                . ');" class="bfSignatureResetButton button"',
+            Text::_('COM_BREEZINGFORMSNG_SIGNATURE_RESET_BUTTON'),
+            true
+        );
+        echo QuickModeHiddenFieldBuilder::build([
+            'bfName' => $mdata['bfName'],
+            'value' => '',
+            'dbId' => $mdata['dbId'],
+        ]);
     }
 
     private function renderStripeField(array $mdata, string $tabIndex, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void

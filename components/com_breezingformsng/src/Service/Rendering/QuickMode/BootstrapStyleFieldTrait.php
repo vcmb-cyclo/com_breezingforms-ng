@@ -705,18 +705,23 @@ trait BootstrapStyleFieldTrait
         echo $label;
         echo '<span class="' . $this->bsClass('nonform-control') . '">';
 
-        echo '<div class="bfSignature" id="bfSignature' . $mdata['dbId']
-            . '"><div class="bfSignatureCanvasBorder"><canvas></canvas></div>' . "\n";
-        echo '<button onclick="bfSignatureReset(' . json_encode((int) $mdata['dbId'])
-            . ');" class="bfSignatureResetButton button ' . $this->bsClass('btn') . ' '
-            . $this->bsClass('btn-primary') . '"><span>'
-            . Text::_('COM_BREEZINGFORMSNG_SIGNATURE_RESET_BUTTON') . '</span></button>' . "\n";
-        echo '</div>';
+        echo QuickModeSignatureMarkupBuilder::build(
+            (int) $mdata['dbId'],
+            (string) $mdata['bfName'],
+            'onclick="bfSignatureReset(' . json_encode((int) $mdata['dbId'])
+                . ');" class="bfSignatureResetButton button ' . $this->bsClass('btn') . ' '
+                . $this->bsClass('btn-primary') . '"',
+            Text::_('COM_BREEZINGFORMSNG_SIGNATURE_RESET_BUTTON'),
+            false
+        );
         echo '</span>';
         echo '</div>';
         echo '</div>';
-        echo '<input class="ff_elem" type="hidden" name="ff_nm_' . $mdata['bfName']
-            . '[]" value="" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+        echo QuickModeHiddenFieldBuilder::build([
+            'bfName' => $mdata['bfName'],
+            'value' => '',
+            'dbId' => $mdata['dbId'],
+        ]);
     }
 
     /**

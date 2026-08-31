@@ -108,10 +108,10 @@
 | ContentBuilder — valeurs éditables | Générateurs d’hydratation par famille créés, couverts et branchés dans `view()` | Commits `f685ff5e`, `c2ae9a76`, `084fc749`, `e8d531cd`, `152def4c` |
 | ContentBuilder — champs non éditables | Générateur indépendant créé, couvert et branché dans `view()` | Commits `8bfd520e`, `21a0a812` |
 | ContentBuilder — résolution des signatures | Résolution, lecture et encodage des fichiers isolés et testés | Commits `b31b5c47`, `e9386794` |
-| ContentBuilder — orchestration des permissions | Création, édition/nouveau et accès `fullarticle` délégués à `ContentBuilderPermissionChecker`, avec adaptateur et contrat local testés | Lot courant |
+| ContentBuilder — orchestration des permissions | Création, édition/nouveau et accès `fullarticle` délégués à `ContentBuilderPermissionChecker`, avec adaptateur et contrat local testés | Commits `c367b9505`, `f3b75cd74` |
 | ContentBuilder — chargement d’enregistrement | Calcul des scopes propriétaire/langue et contrôle 404 délégués à `ContentBuilderRecordLoader`, avec variantes frontend/admin et nouveau testées | Commit `c6e5855ec` |
-| ContentBuilder — loaders runtime | Le smoke Joomla insère puis relit une association publiée avec les loaders BFNG via l’API Database réelle, avant nettoyage de la fixture | Commit du lot d’intégration |
-| ContentBuilder — source/enregistrement runtime | Le smoke résout une source BreezingForms réelle via `FormSourceFactory` et exerce `ContentBuilderRecordLoader` sur le parcours nouveau, avec nettoyage de la fixture | Lot courant |
+| ContentBuilder — loaders runtime | Le smoke Joomla insère puis relit une association publiée avec les loaders BFNG via l’API Database réelle, avant nettoyage de la fixture | Commit `3e22ac75d` |
+| ContentBuilder — source/enregistrement runtime | Le smoke résout une source BreezingForms réelle via `FormSourceFactory` et exerce `ContentBuilderRecordLoader` sur le parcours nouveau, avec nettoyage de la fixture | Validé par le smoke Joomla |
 | PHPCS | Actif sur les services modernes, les builders ContentBuilder et `HiddenFieldTrait` | `phpcs.xml.dist`, commit `2e58c4bb` |
 | PHPStan | Niveau 2 sur le composant, avec baseline | `phpstan.neon.dist`, 193 entrées dans la baseline |
 
@@ -1357,15 +1357,14 @@ pour les tableaux d'octets, et le retrait des magic quotes est un no-op puisque
 ce mécanisme n'existe plus. Ces contrats sont couverts par
 `LegacyHelpersTest`.
 
-Dans `cbCheckPermissions()`, une instance unique de `PermissionService` est
-désormais réutilisée pour la paire `setPermissions()`/`checkPermissions()` et
-pour l'autorisation `fullarticle`. L'objet Input n'est capturé qu'après la
-détection de ContentBuilderNG, ce qui conserve le retour neutre lorsque le
-runtime externe est absent. Le contrat d'autorisation reste inchangé ; la
-branche d'intégration complète demeure à valider avec ContentBuilderNG
-installé. Un test structurel verrouille en outre l'absence de recréation du
-service pour chaque opération de permission. L'entrée PHPStan correspondante a
-été ramenée de six à deux occurrences après cette réduction.
+Dans `cbCheckPermissions()`, l'orchestration des droits est désormais confiée
+à `ContentBuilderPermissionChecker`, qui réutilise le même service pour
+`checkPermissions()` et l'autorisation `fullarticle`. L'objet Input n'est
+capturé qu'après la détection de ContentBuilderNG, ce qui conserve le retour
+neutre lorsque le runtime externe est absent. Le smoke Joomla couvre désormais
+la résolution d'une source BreezingForms et le chargement d'un nouvel
+enregistrement ; une configuration ContentBuilder ACL réelle reste nécessaire
+pour valider de bout en bout les permissions d'un enregistrement.
 
 Les appels de messagerie restants utilisent désormais l'API Joomla 6
 (`addRecipient`, `addAttachment`, `isHtml` et `send`) dans la façade helpers,

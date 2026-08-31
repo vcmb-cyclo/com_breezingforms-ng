@@ -571,6 +571,10 @@ Les builders mutualisés de champs cachés et d’habillage des scripts historiq
 PHPCS après un nettoyage syntaxique limité ; leurs tests unitaires existants
 conservent la caractérisation des fragments générés.
 
+`FileExtensionsCheckBuilder` est désormais inclus dans PHPCS après découpage
+aux seuls points de concaténation PHP ; son test direct conserve la couverture
+du comptage des uploads et des variantes de validation JavaScript.
+
 Le premier nettoyage ciblé de cette baseline PHPCS est réalisé dans
 `QuickModeSelectBuilder`, `QuickModeCaptchaMarkupBuilder` et
 `QuickModeUploadOptionsBuilder` (`eaf8b2d1`) : leurs sorties sont inchangées et

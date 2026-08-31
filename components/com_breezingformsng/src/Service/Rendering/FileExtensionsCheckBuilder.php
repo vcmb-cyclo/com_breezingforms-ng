@@ -41,9 +41,13 @@ final class FileExtensionsCheckBuilder
 
             foreach ($extensions as $extension) {
                 $script .= '
-							if(!ff_elem' . $id . 'Exts && document.getElementById("ff_elem' . $id . '").value.toLowerCase().lastIndexOf(".' . strtolower(trim($extension)) . '") != -1){
+								if(!ff_elem' . $id
+                    . 'Exts && document.getElementById("ff_elem' . $id
+                    . '").value.toLowerCase().lastIndexOf(".' . strtolower(trim($extension)) . '") != -1){
 								ff_elem' . $id . 'Exts = true;
-							}else if(!ff_elem' . $id . 'Exts && document.getElementById("ff_elem' . $id . '").value == ""){
+								}else if(!ff_elem' . $id
+                    . 'Exts && document.getElementById("ff_elem' . $id
+                    . '").value == ""){
 								ff_elem' . $id . 'Exts = true;
 							}';
             }
@@ -59,7 +63,8 @@ final class FileExtensionsCheckBuilder
                                                 if(document.getElementById("bfSubmitButton")){
                                                     document.getElementById("bfSubmitButton").disabled = false;
                                                 }
-                                                if(typeof JQuery != "undefined"){JQuery(".bfCustomSubmitButton").prop("disabled", false);}
+                                                if(typeof JQuery != "undefined"){'
+                . 'JQuery(".bfCustomSubmitButton").prop("disabled", false);}
 						return false;
 					}
 					';

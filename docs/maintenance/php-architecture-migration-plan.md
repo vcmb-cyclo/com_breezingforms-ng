@@ -1244,7 +1244,8 @@ détection de ContentBuilderNG, ce qui conserve le retour neutre lorsque le
 runtime externe est absent. Le contrat d'autorisation reste inchangé ; la
 branche d'intégration complète demeure à valider avec ContentBuilderNG
 installé. Un test structurel verrouille en outre l'absence de recréation du
-service pour chaque opération de permission.
+service pour chaque opération de permission. L'entrée PHPStan correspondante a
+été ramenée de six à deux occurrences après cette réduction.
 
 Les appels de messagerie restants utilisent désormais l'API Joomla 6
 (`addRecipient`, `addAttachment`, `isHtml` et `send`) dans la façade helpers,

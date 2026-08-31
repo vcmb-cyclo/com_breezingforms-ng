@@ -26,6 +26,7 @@ final class PostRenderScriptBuilderTest extends TestCase
         self::assertStringContainsString('if(typeof bfLoadEditable != "undefined")', $script);
         self::assertStringContainsString('bfLoadEditable();', $script);
         self::assertStringContainsString('clearInterval(waitForToggleFields);', $script);
+        self::assertSame(1, substr_count($script, 'typeof bfToggleFieldsLoaded != "undefined"'));
     }
 
     public function testBuildSupportsContentBuilderFunctions(): void

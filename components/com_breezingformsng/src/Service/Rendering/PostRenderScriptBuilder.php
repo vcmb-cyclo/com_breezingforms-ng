@@ -27,7 +27,7 @@ final class PostRenderScriptBuilder
         return '<script type="text/javascript"><!--' . "\n"
             . 'if(typeof ' . $functionName . ' != "undefined") { ' . "\n"
             . '    if(typeof JQuery != "undefined" && typeof bfToggleFieldsLoaded != "undefined" '
-            . '&& typeof bfToggleFieldsLoaded != "undefined"){' . "\n"
+            . '){' . "\n"
             . '        JQuery(document).ready(function(){' . "\n"
             . '            let waitForToggleFields = setInterval(function(){' . "\n"
             . '                if(bfToggleFieldsLoaded && bfToggleFieldsLoaded){' . "\n"

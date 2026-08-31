@@ -30,4 +30,15 @@ final class JoomlaInstallSmokeScriptTest extends TestCase
         self::assertStringContainsString('docker exec -e HTTP_HOST=localhost', $source);
         self::assertStringContainsString('Factory::$application = $app;', $source);
     }
+
+    public function testContentBuilderSmokeExercisesExistingFilesAndSignatures(): void
+    {
+        $source = file_get_contents(__DIR__ . '/../../scripts/joomla-install-smoke.sh');
+
+        self::assertIsString($source);
+        self::assertStringContainsString('ContentBuilderEditableRecordScriptBuilder.php', $source);
+        self::assertStringContainsString('ff_elem701', $source);
+        self::assertStringContainsString('data:image', $source);
+        self::assertStringContainsString('unlink($signaturePath);', $source);
+    }
 }

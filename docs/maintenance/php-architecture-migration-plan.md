@@ -1174,7 +1174,9 @@ Le smoke Joomla 6 avec ContentBuilderNG 6.1.14 valide maintenant en runtime
 les loaders d'association, de données et d'enregistrement ContentBuilder
 contre la base Joomla réelle. Le harnais initialise explicitement le contexte
 web Joomla 6 et charge le contexte runtime ContentBuilder avant les loaders ;
-les parcours complets de fichiers et de signatures restent à éprouver.
+les branches d'upload de fichiers existants et de restauration de signatures
+exercent également les classes de rendu avec de vrais fichiers temporaires,
+supprimés dans un bloc `finally`.
 
 Lots récemment terminés : tests d'intégration des variantes Query List et du
 point d'arrêt `bury()` dans la première boucle (`7a19ffeb`), contrôles de

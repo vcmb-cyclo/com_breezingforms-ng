@@ -173,6 +173,16 @@ if [[ -n "${contentbuilder_archive}" ]]; then
         require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFormAssociationLoader.php";
         require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFormDataLoader.php";
         require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderRecordLoader.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderChoiceHydrationScriptBuilder.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderEditableRecordScriptBuilder.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFileHydrationScriptBuilder.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFileSupportBuilder.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFileUploadScriptBuilder.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFlashUploadValidationBuilder.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderSelectHydrationScriptBuilder.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderSignatureImageEncoder.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderSignatureScriptBuilder.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderValueHydrationScriptBuilder.php";
         require "/var/www/html/components/com_breezingformsng/src/Support/processor_facade.php";
 
         $db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
@@ -240,6 +250,52 @@ if [[ -n "${contentbuilder_archive}" ]]; then
                 "record not found"
             ) !== []) {
                 throw new \RuntimeException("ContentBuilder record loader returned an unexpected new-record payload");
+            }
+
+            $signatureDirectory = "/var/www/html/media/breezingforms/signatures";
+            if (!is_dir($signatureDirectory) && !mkdir($signatureDirectory, 0775, true) && !is_dir($signatureDirectory)) {
+                throw new \RuntimeException("Unable to create the ContentBuilder signature directory");
+            }
+            $signatureFileName = "bfng-smoke-" . getmypid() . ".png";
+            $signaturePath = $signatureDirectory . "/" . $signatureFileName;
+            file_put_contents($signaturePath, "BFNG smoke signature");
+
+            try {
+                $fileRecord = (object) [
+                    "recElementId" => 701,
+                    "recName" => "documents",
+                    "recType" => "File Upload",
+                    "recValue" => "existing.pdf\r\nsecond.jpg",
+                ];
+                $signatureRecord = (object) [
+                    "recElementId" => 702,
+                    "recName" => "signature",
+                    "recType" => "Signature",
+                    "recValue" => $signatureFileName,
+                ];
+                $editableBuilder = new \Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderEditableRecordScriptBuilder(
+                    static fn (string $value): string => $value,
+                    static fn (string $value, int $width, string $break, bool $cut): string => wordwrap($value, $width, $break, $cut)
+                );
+                $rendered = $editableBuilder->build(
+                    [$fileRecord, $signatureRecord],
+                    [],
+                    true,
+                    7,
+                    $signatureDirectory
+                );
+                if (!str_contains($rendered["contentBuilderScript"], "cbFlashElemCnt[\"ff_elem701\"] = 2;")) {
+                    throw new \RuntimeException("ContentBuilder file upload count was not rendered");
+                }
+                if (!str_contains($rendered["javascript"], "existing.pdf")
+                    || !str_contains($rendered["javascript"], "data:image")
+                    || !str_contains($rendered["javascript"], base64_encode("BFNG smoke signature"))) {
+                    throw new \RuntimeException("ContentBuilder file or signature hydration was not rendered");
+                }
+            } finally {
+                if (is_file($signaturePath)) {
+                    unlink($signaturePath);
+                }
             }
         } finally {
             $db->setQuery($db->getQuery(true)

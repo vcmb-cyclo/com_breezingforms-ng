@@ -1503,6 +1503,10 @@ La sélection du renderer QuickMode par les métadonnées est maintenant
 caractérisée pour Classic, Bootstrap et OnePage, avec des métadonnées de
 constructeur explicites dans le harnais (`912e7ed47`).
 
+La garde du script post-rendu ne répète plus le test de disponibilité de
+`bfToggleFieldsLoaded`; un test vérifie qu'elle ne contient qu'une occurrence
+(`dd1eee60b`).
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

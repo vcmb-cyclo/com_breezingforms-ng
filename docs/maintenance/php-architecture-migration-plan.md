@@ -1839,6 +1839,11 @@ Les services \`SubmissionTimestampFactory\` et
 format SQL, le nommage de fichier et les formats personnalisés. Leurs doubles
 de date restent confinés aux tests purs, sans élargir le bootstrap Joomla.
 
+Les résolveurs \`FormPathResolver\` et \`FormDisplayContextResolver\` sont
+désormais caractérisés directement. Les tests verrouillent l'expansion
+progressive des tokens de chemins, les variantes frontend/backend/preview,
+l'identifiant de formulaire, la grille d'aperçu et la règle \`canRun\`.
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

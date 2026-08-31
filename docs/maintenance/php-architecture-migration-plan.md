@@ -1087,6 +1087,10 @@ Le contrôle partagé `bfTextfield`/`bfNumberInput` est commité dans
 commun aux wrappers Bootstrap/OnePage l'utilise désormais aussi via
 `f3d04e55`, sans perte de classes, icônes ni attributs de thème. Les autres
 familles de champs restent à migrer par ordre de risque.
+La décision de type, les traductions, les longueurs et les bornes sont
+désormais regroupées dans `QuickModeTextFieldStrategy` (`059885a45`) et
+utilisées par les quatre renderers ; les enveloppes et effets annexes restent
+propres à chaque thème.
 
 Le contrôle `bfTextarea` est désormais extrait dans
 `QuickModeTextareaBuilder` et branché dans les quatre renderers par
@@ -1095,6 +1099,10 @@ assertions`) et le service est couvert par des tests d'échappement, de
 placeholder et d'attributs structurels. Le compteur de longueur est désormais
 couvert par `QuickModeMaxLengthCounterBuilder` (`bdb7d910`) ; ses événements
 restent volontairement dans les renderers jusqu'à caractérisation complète.
+La logique commune de textarea brut (traductions, dimensions et callback de
+longueur) est également centralisée dans `QuickModeTextareaStrategy`
+(`d57debb07`), tandis que l'intégration de l'éditeur HTML reste dans les
+renderers.
 
 Les lots 3 à 5 peuvent être préparés en parallèle du lot 6, à condition que le
 branchement dans `RenderingEngine.php` soit coordonné.
@@ -1127,6 +1135,10 @@ Le contrôle `bfCheckbox` est désormais extrait dans
 d'événements et états de lecture seule sont couvertes ; les champs cachés
 associés à `mailbackAccept` restent dans chaque renderer car ils appartiennent
 au comportement d'enveloppe du champ.
+La préparation commune du contrôle (valeur, état checked et désactivation
+readonly) est maintenant portée par `QuickModeCheckboxStrategy`
+(`40bf6269d`) ; les wrappers et les champs mailback restent propres aux
+renderers.
 
 Le contrôle `bfSelect` est désormais extrait dans `QuickModeSelectBuilder` et
 branché dans les quatre renderers par `8a891fb5`. La stratégie couvre les

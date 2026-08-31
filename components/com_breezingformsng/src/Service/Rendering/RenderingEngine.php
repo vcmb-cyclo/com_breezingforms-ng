@@ -89,6 +89,7 @@ final class RenderingEngine
     private ?FormOptionalContextFieldsBuilder $formOptionalContextFieldsBuilderService = null;
     private ?FormSubmissionFieldsBuilder $formSubmissionFieldsBuilderService = null;
     private ?MobileChoiceMarkupBuilder $mobileChoiceMarkupBuilderService = null;
+    private ?CaptchaWrapperMarkupBuilder $captchaWrapperMarkupBuilderService = null;
     private ?AdditionalHiddenFieldsBuilder $additionalHiddenFieldsBuilderService = null;
     private ?PaymentProviderDetector $paymentProviderDetectorService = null;
     private ?ContentBuilderFileValueParser $contentBuilderFileValueParserService = null;
@@ -359,6 +360,11 @@ final class RenderingEngine
     private function mobileChoiceMarkupBuilder(): MobileChoiceMarkupBuilder
     {
         return $this->mobileChoiceMarkupBuilderService ??= new MobileChoiceMarkupBuilder();
+    }
+
+    private function captchaWrapperMarkupBuilder(): CaptchaWrapperMarkupBuilder
+    {
+        return $this->captchaWrapperMarkupBuilderService ??= new CaptchaWrapperMarkupBuilder();
     }
 
     private function additionalHiddenFieldsBuilder(): AdditionalHiddenFieldsBuilder
@@ -1832,7 +1838,7 @@ final class RenderingEngine
         $this->processor->queryRows = [];
 
         if (trim($this->processor->formrow->template_code_processed) == 'QuickMode' && $this->processor->legacy_wrap) {
-            echo '<table style="display:none;width:100%;" id="bfReCaptchaWrap"><tr><td><div id="bfReCaptchaDiv"></div></td></tr></table>';
+            echo $this->captchaWrapperMarkupBuilder()->build(true, '');
         }
 
         echo $this->formOpeningMarkupBuilder()->build(

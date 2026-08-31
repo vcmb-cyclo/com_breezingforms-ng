@@ -10,6 +10,9 @@
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
+/** @var \Vcmb\Component\BreezingformsNG\Administrator\View\About\HtmlView $this */
+/** @var \Vcmb\Component\BreezingformsNG\Administrator\View\About\HtmlView $this */
+
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Uri\Uri;

@@ -7,6 +7,7 @@
 
 \defined('_JEXEC') or die;
 
+/** @var \Vcmb\Component\BreezingformsNG\Administrator\View\About\HtmlView $this */
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 

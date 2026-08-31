@@ -20,9 +20,9 @@ use Vcmb\Component\BreezingformsNG\Administrator\View\BreezingformsNG\HtmlView a
 
 class HtmlView extends BaseHtmlView
 {
-    protected array $plugins = [];
-    protected array $logReport = [];
-    protected array $auditReport = [];
+    public array $plugins = [];
+    public array $logReport = [];
+    public array $auditReport = [];
 
     public function display($tpl = null)
     {

@@ -7,6 +7,7 @@
 
 \defined('_JEXEC') or die;
 
+/** @var \Vcmb\Component\BreezingformsNG\Administrator\View\Scripts\HtmlView $this */
 use Vcmb\Component\BreezingformsNG\Administrator\View\Scripts\Renderer;
 
 Renderer::listitems(

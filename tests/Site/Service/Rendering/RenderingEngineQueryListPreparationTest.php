@@ -18,6 +18,8 @@ use HTML_facileFormsProcessor;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\RenderingEngine;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QueryListRowPreparationService;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QueryListRowStateBuilder;
 
 if (!defined('JPATH_ADMINISTRATOR')) {
     define('JPATH_ADMINISTRATOR', __DIR__ . '/../../../../administrator');
@@ -70,6 +72,29 @@ final class QueryListProcessorDouble extends HTML_facileFormsProcessor
 
 final class RenderingEngineQueryListPreparationTest extends TestCase
 {
+    public function testServiceReturnsPreparedStateWithoutOwningProcessorStorage(): void
+    {
+        $processor = new QueryListProcessorDouble();
+        $processor->resultRows = [['alpha', 2]];
+        $prepared = (new QueryListRowPreparationService($processor, new QueryListRowStateBuilder()))->prepare(
+            (object) [
+                'id' => 41,
+                'flag1' => 1,
+                'flag2' => 2,
+                'height' => 25,
+                'data1' => implode("\n", ['', '', '', '', '', '', '', '', '4']),
+                'data3' => "Visible&first&&&&&&1\nHidden&second&&&&&&0",
+            ],
+            "\n"
+        );
+
+        self::assertSame('ff_41', $prepared['key']);
+        self::assertSame(2, $prepared['checkbox']);
+        self::assertCount(2, $prepared['columns']);
+        self::assertSame([['alpha', 2]], $prepared['rows']);
+        self::assertStringContainsString('ff_queryPagenav[41] = 4;', $prepared['script']);
+    }
+
     public function testQueryListPreparationExportsColumnsPaginationAndRows(): void
     {
         $processor = new QueryListProcessorDouble();

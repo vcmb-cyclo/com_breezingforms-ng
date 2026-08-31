@@ -105,6 +105,7 @@ final class RenderingEngine
     private ?ContentBuilderEditableRecordScriptBuilder $contentBuilderEditableRecordScriptBuilderService = null;
     private ?QuickModeRendererFactory $quickModeRendererFactoryService = null;
     private ?FormOnloadScriptBuilder $formOnloadScriptBuilderService = null;
+    private ?QueryListRowPreparationService $queryListRowPreparationService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -472,6 +473,14 @@ final class RenderingEngine
     private function formOnloadScriptBuilder(): FormOnloadScriptBuilder
     {
         return $this->formOnloadScriptBuilderService ??= new FormOnloadScriptBuilder();
+    }
+
+    private function queryListRowPreparationService(): QueryListRowPreparationService
+    {
+        return $this->queryListRowPreparationService ??= new QueryListRowPreparationService(
+            $this->processor,
+            $this->queryListRowStateBuilder()
+        );
     }
 
     public function cbCheckPermissions(): array
@@ -1601,49 +1610,10 @@ final class RenderingEngine
             $queryCheckboxCount++;
         }
 
-        $key = 'ff_' . $row->id;
-        $this->processor->queryCols[$key] = [];
-        $columns = &$this->processor->queryCols[$key];
-
-        if ($this->processor->trim($row->data3)) {
-            foreach (explode("\n", $row->data3) as $definition) {
-                if ($definition === '') {
-                    continue;
-                }
-
-                $column = new QueryColumn();
-                $column->unpack($definition);
-                $this->processor->compileQueryCol($row, $column);
-                $columns[] = $column;
-            }
-        }
-
-        $checkbox = $row->flag2 ?: 0;
-        $header = $row->flag1 ? 1 : 0;
-        $pageNavigation = 1;
-        $settings = explode("\n", $row->data1);
-
-        if (count($settings) > 8 && $this->processor->trim($settings[8])) {
-            $pageNavigation = $settings[8];
-        }
-
-        $this->processor->queryRows[$key] = [];
-        $this->processor->execQuery($row, $this->processor->queryRows[$key], $columns);
-        $queryCode .= $this->queryListRowStateBuilder()->build(
-            (int) $row->id,
-            (int) $row->height,
-            (int) $checkbox,
-            $header,
-            (int) $pageNavigation,
-            array_map(
-                static fn (object $column): int => $column->thspan > 0 ? 1 : 0,
-                $columns
-            ),
-            $this->processor->expJsValue($this->processor->queryRows[$key]),
-            nl()
-        );
-
-        unset($columns);
+        $prepared = $this->queryListRowPreparationService()->prepare($row, nl());
+        $this->processor->queryCols[$prepared['key']] = $prepared['columns'];
+        $this->processor->queryRows[$prepared['key']] = $prepared['rows'];
+        $queryCode .= $prepared['script'];
     }
 
     /**

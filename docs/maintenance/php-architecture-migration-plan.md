@@ -1106,6 +1106,12 @@ construites par `QueryListRowStateBuilder`. La préparation conserve dans
 tandis que la génération de `ff_queryCurrPage`, `ff_queryCols` et
 `ff_queryRows` est pure et couverte par un test de sortie exacte.
 
+La préparation complète d'une ligne est désormais portée par
+`QueryListRowPreparationService` : compilation des définitions de colonnes,
+exécution de la requête et production de l'état JavaScript sont regroupées
+dans un service testable. `RenderingEngine` ne conserve que le compteur de
+checkboxes, le stockage dans l'état du processeur et l'assemblage du script.
+
 L'enveloppe du script global de validation est désormais construite par
 `FormValidationScriptWrapperBuilder` (`9b92acb55`). Les contrôles de fichiers
 et de CAPTCHA restent générés par leurs services respectifs, tandis que les

@@ -1550,6 +1550,12 @@ validation, contrôles de suppression et désactivation) ainsi que la résolutio
 et l’encodage d’une signature existante (`7fe0e95a9`). La validation avec le
 runtime ContentBuilder installé reste un contrôle d’intégration séparé.
 
+Le périmètre PHPCS inclut désormais l’orchestrateur ContentBuilder et les
+quatre builders QuickMode ajoutés récemment. Les références vers six builders
+supprimés ont été retirées de `phpcs.xml.dist`, et le dernier warning de
+longueur de `QuickModeCheckboxBuilder` a été éliminé sans changement de sortie
+(`380d7bd7c`). Le ruleset complet passe maintenant sans erreur ni warning.
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

@@ -54,6 +54,7 @@
 | QuickMode — widget de progression | Markup et script `bfUpdateProgress()` partagés entre Bootstrap et OnePage, avec variante page Thank You couverte | Commit `5cb2da294` |
 | QuickMode — configuration runtime des erreurs | Déclaration `bfUseErrorAlerts`/`bfShowDefaultErrors`/`bfErrorPageScoped` partagée, avec portée de page explicite | Commit `45fc45988` |
 | QuickMode OnePage — fermeture Thank You | Redirection `bf_remodal_close()` extraite dans un builder pur, avec panier et URL formulaire conservés | Commit `ca2b8f42d` |
+| QuickMode OnePage — soumission AJAX | Callback `bf_ajax_submit()` extrait dans un builder pur, avec échec, succès direct et page Thank You couverts | Commit `01ab2d4bd` |
 | QuickMode — expression éditeur | Construction de l’expression JavaScript de lecture des éditeurs mutualisée entre Bootstrap et OnePage, API publique conservée | Commit `43592c8bd` |
 | QuickMode — mapping Bootstrap | Mapping Bootstrap 5 des classes mutualisé entre Bootstrap et OnePage, résolution publique `bsClass()` conservée | Commit `658078588` |
 | Finalisation — champs de soumission | Champs cachés communs frontend/backend/preview extraits avec conservation des différences `act`/`ff_frame` | Commit `be602b94f` |
@@ -445,7 +446,9 @@ propres à chaque thème.
    (`4d706e95`). Les actions de navigation et de soumission sont maintenant
    mutualisées via `QuickModePagingActionBuilder` (`10d7dc6a`, `04e09cf6`) et
    `QuickModeSubmitActionBuilder` (`4dd3e3dd`). Les scripts de validation
-   complets restent à traiter.
+   complets restent à traiter ; le callback AJAX OnePage est maintenant isolé
+   dans `QuickModeAjaxSubmitScriptBuilder`, avec ses branches succès/échec
+   caractérisées.
 
 Pour chaque type :
 
@@ -879,6 +882,13 @@ La fermeture du modal Thank You est désormais construite par
 `QuickModeRemodalCloseScriptBuilder` (`ca2b8f42`). La priorité donnée à
 `crbc_cart_url`, puis le retour vers l'URL courante du formulaire, restent
 inchangés et sont couverts par un test dédié.
+
+La soumission AJAX OnePage est désormais construite par
+`QuickModeAjaxSubmitScriptBuilder`. L'envoi sérialisé, le verrouillage visuel
+des pages, la gestion d'échec, la redirection panier/URL courante et les deux
+branches de succès (page Thank You ou redirection directe) sont couverts par
+un test de sortie ; l'orchestrateur conserve le choix de la page Thank You et
+l'injection des messages et de l'URL Joomla.
 
 La baseline PHPCS est maintenant sans erreur sur les services modernes, les
 quatre renderers QuickMode et leurs traits (`e25d501f`, `14985d4d`, `288b42a4`,

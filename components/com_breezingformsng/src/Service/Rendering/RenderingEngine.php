@@ -103,6 +103,7 @@ final class RenderingEngine
     private ?ContentBuilderSelectHydrationScriptBuilder $contentBuilderSelectHydrationScriptBuilderService = null;
     private ?ContentBuilderFileHydrationScriptBuilder $contentBuilderFileHydrationScriptBuilderService = null;
     private ?ContentBuilderEditableRecordScriptBuilder $contentBuilderEditableRecordScriptBuilderService = null;
+    private ?ContentBuilderNonEditableFieldsResolver $contentBuilderNonEditableFieldsResolverService = null;
     private ?QuickModeRendererFactory $quickModeRendererFactoryService = null;
     private ?FormOnloadScriptBuilder $formOnloadScriptBuilderService = null;
     private ?QueryListRowPreparationService $queryListRowPreparationService = null;
@@ -506,6 +507,14 @@ final class RenderingEngine
         );
     }
 
+    private function contentBuilderNonEditableFieldsResolver(): ContentBuilderNonEditableFieldsResolver
+    {
+        return $this->contentBuilderNonEditableFieldsResolverService ??= new ContentBuilderNonEditableFieldsResolver(
+            static fn(int $contentBuilderId): array => ListSupportService::createFromRuntimeContext()
+                ->getListNonEditableElements($contentBuilderId)
+        );
+    }
+
     private function quickModeRendererFactory(): QuickModeRendererFactory
     {
         return $this->quickModeRendererFactoryService ??= new QuickModeRendererFactory();
@@ -842,8 +851,8 @@ final class RenderingEngine
         // CONTENTBUILDER BEGIN
 
         if ($cbRecord !== null) {
-            $cbNonEditableFields = ListSupportService::createFromRuntimeContext()->getListNonEditableElements(
-                $cbResult['data']['id']
+            $cbNonEditableFields = $this->contentBuilderNonEditableFieldsResolver()->resolve(
+                (int) $cbResult['data']['id']
             );
             $scripts = $this->contentBuilderEditableRecordScriptBuilder()->build(
                 $cbRecord,
@@ -859,9 +868,11 @@ final class RenderingEngine
             );
         }
 
-        $cbNonEditableFields = array();
+            $cbNonEditableFields = array();
         if ($cbForm !== null) {
-            $cbNonEditableFields = ListSupportService::createFromRuntimeContext()->getListNonEditableElements($cbResult['data']['id']);
+            $cbNonEditableFields = $this->contentBuilderNonEditableFieldsResolver()->resolve(
+                (int) $cbResult['data']['id']
+            );
             if (count($cbNonEditableFields)) {
                 $this->processor->app->getDocument()->getWebAssetManager()->addInlineScript('<!--' . nl() . 'var bfDeactivateField = new Array();' . nl() . '//-->');
                 echo $this->legacyScriptTagWrapperBuilder()->contentBuilderReadonly(

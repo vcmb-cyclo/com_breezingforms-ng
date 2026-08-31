@@ -277,6 +277,11 @@ harnais Joomla/ContentBuilder permettant de tester les dépendances runtime.
 runtime des identifiants reste dans `view()` jusqu'à la disponibilité d'un
 harnais ContentBuilder d'intégration.
 
+La récupération est désormais encapsulée par
+`ContentBuilderNonEditableFieldsResolver`, testée avec un loader injectable et
+utilisée par les deux parcours de `view()` ; sa validation complète reste à
+caractériser dans un runtime Joomla/ContentBuilder.
+
 - [x] Extraire le script de désactivation et de masquage des contrôles.
 - [x] Couvrir les champs avec contrôle visible, sans contrôle visible et les
   groupes de contrôles.

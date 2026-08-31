@@ -617,12 +617,13 @@ final class RenderingEngine
             if ($this->processor->app->getInput()->getInt('cb_form_id', 0)) {
 
                 // test the permissions of given record
+                $permissionService = PermissionService::createFromRuntimeContext();
                 if ($this->processor->app->getInput()->getInt('cb_record_id', 0)) {
-                    (PermissionService::createFromRuntimeContext())->setPermissions($this->processor->app->getInput()->getInt('cb_form_id', 0), $this->processor->app->getInput()->getInt('cb_record_id', 0), $cbFrontend ? '_fe' : '');
-                    (PermissionService::createFromRuntimeContext())->checkPermissions('edit', Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_EDIT_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
+                    $permissionService->setPermissions($this->processor->app->getInput()->getInt('cb_form_id', 0), $this->processor->app->getInput()->getInt('cb_record_id', 0), $cbFrontend ? '_fe' : '');
+                    $permissionService->checkPermissions('edit', Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_EDIT_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
                 } else {
-                    (PermissionService::createFromRuntimeContext())->setPermissions($this->processor->app->getInput()->getInt('cb_form_id', 0), 0, $cbFrontend ? '_fe' : '');
-                    (PermissionService::createFromRuntimeContext())->checkPermissions('new', Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_NEW_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
+                    $permissionService->setPermissions($this->processor->app->getInput()->getInt('cb_form_id', 0), 0, $cbFrontend ? '_fe' : '');
+                    $permissionService->checkPermissions('new', Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_NEW_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
                 }
 
                 $cbFormId = $this->processor->app->getInput()->getInt('cb_form_id', 0);
@@ -635,7 +636,6 @@ final class RenderingEngine
                 $db->setQuery($query);
                 $cbData = $db->loadAssoc();
                 if (is_array($cbData)) {
-                    $permissionService = PermissionService::createFromRuntimeContext();
                     $cbFull = $cbFrontend ? $permissionService->authorizeFe('fullarticle') : $permissionService->authorize('fullarticle');
                     $cbForm = FormSourceFactory::getForm('com_breezingformsng', $cbData['reference_id']);
                     $cbRecord = $cbForm->getRecord($this->processor->app->getInput()->getInt('cb_record_id', 0), $cbData['published_only'], $cbFrontend ? ($cbData['own_only_fe'] ? $this->processor->app->getIdentity()->get('id', 0) : -1) : ($cbData['own_only'] ? $this->processor->app->getIdentity()->get('id', 0) : -1), $cbFrontend ? $cbData['show_all_languages_fe'] : true);

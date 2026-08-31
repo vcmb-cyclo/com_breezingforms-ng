@@ -70,7 +70,7 @@
 | Finalisation — wrapper ReCaptcha | Markup du wrapper ReCaptcha historique extrait, activé uniquement pour l’enveloppe legacy et couvert | Commit `092a2a9fa` |
 | QuickMode — URLs ReCaptcha | URLs Google visible/invisible mutualisées dans `QuickModeReCaptchaInitScriptBuilder` et réutilisées par Classic, Bootstrap et OnePage, avec snapshots conservés | Commit `4952cfb94` |
 | QuickMode — configuration ReCaptcha | Normalisation des configurations visible/invisible mutualisée dans `QuickModeReCaptchaInitScriptBuilder`, sans modifier les paramètres propres aux trois renderers | Commit `56879a38f` |
-| QuickMode — rendu ReCaptcha | Markup, configuration et chargement des assets ReCaptcha mutualisés dans `QuickModeReCaptchaFieldBuilder`, avec enveloppes de thème conservées dans les trois renderers | Lot committé |
+| QuickMode — rendu ReCaptcha | Markup, configuration et chargement des assets ReCaptcha mutualisés dans `QuickModeReCaptchaFieldBuilder`, avec enveloppes de thème conservées dans les trois renderers | Commit `49a6a5ca7` |
 | Finalisation — balise form QuickMode | Assemblage de la balise `<form>` extrait, calcul d’URL conservé dans l’orchestrateur et classe historique préservée | Commit `4f5b8559d` |
 | ContentBuilder — wrapper readonly | Enveloppe du script des champs non éditables extraite et couverte, avec marqueurs historiques conservés | Commit `3e1723d15` |
 | Finalisation — wrapper enregistrement éditable | Chargement JavaScript de l’enregistrement éditable extrait dans un builder, avec nettoyage historique de `seccode` couvert | Commit `f3b6f8d97` |
@@ -114,7 +114,7 @@
 | ContentBuilder — loaders runtime | Le smoke Joomla insère puis relit une association publiée avec les loaders BFNG via l’API Database réelle, avant nettoyage de la fixture | Commit `3e22ac75d` |
 | ContentBuilder — source/enregistrement runtime | Le smoke résout une source BreezingForms réelle via `FormSourceFactory` et exerce `ContentBuilderRecordLoader` sur le parcours nouveau, avec nettoyage de la fixture | Validé par le smoke Joomla |
 | PHPCS | Actif sur les services modernes, les builders ContentBuilder et `HiddenFieldTrait` | `phpcs.xml.dist`, commit `2e58c4bb` |
-| PHPStan | Niveau 2 sur le composant, avec baseline | `phpstan.neon.dist`, 118 entrées dans la baseline |
+| PHPStan | Niveau 2 sur le composant, avec baseline | `phpstan.neon.dist`, 11 entrées dans la baseline |
 
 ## Phase 1 — Terminer la préparation des éléments classiques
 
@@ -648,7 +648,7 @@ warning ; PHPCS et PHPStan restent également verts.
 
 ### 6.2 Réduire la baseline PHPStan
 
-- Classer les 118 entrées actuelles par fichier et par catégorie.
+- Classer les 11 entrées actuelles par fichier et par catégorie.
 - Corriger d'abord les erreurs dans les services extraits et les nouveaux DTO.
 - Distinguer les défauts des stubs Joomla des erreurs réelles du composant.
 - Ne jamais ajouter une entrée de baseline pour un nouveau code.
@@ -1144,9 +1144,9 @@ aucune référence obsolète (`01d17251a`).
 
 Suite complète verte, PHPStan niveau 2 propre, build + validation du
 package. Correctifs CSS vérifiés en direct (avant/après). Baseline PHPStan à
-118 entrées (contre 251 au dernier relevé historique de ce document), après
-suppression des entrées résiduelles liées au rendu mobile et aux trois
-renderers QuickMode (`f57d08761` et le lot courant).
+11 entrées (contre 251 au dernier relevé historique de ce document), après
+suppression des entrées résiduelles liées au rendu mobile, aux trois renderers
+QuickMode et au mailer (`f57d08761`, `ed2abded1` et `9aa2c6409`).
 
 ## Travail en parallèle
 

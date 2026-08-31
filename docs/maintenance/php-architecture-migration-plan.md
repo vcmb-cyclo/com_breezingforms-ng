@@ -52,6 +52,7 @@
 | QuickMode OnePage — restauration soumission | Callback `bf_restore_submitbutton` extrait dans un builder pur, avec clonage, remplacement et rebinding Ladda couverts | Commit `bfe93521e` |
 | QuickMode — markup d’erreur Bootstrap | Conteneur `bfErrorMessage` partagé entre Bootstrap et OnePage, avec classes de thème injectées et sortie couverte | Commit `9d5a288c2` |
 | QuickMode — widget de progression | Markup et script `bfUpdateProgress()` partagés entre Bootstrap et OnePage, avec variante page Thank You couverte | Commit `5cb2da294` |
+| QuickMode — configuration runtime des erreurs | Déclaration `bfUseErrorAlerts`/`bfShowDefaultErrors`/`bfErrorPageScoped` partagée, avec portée de page explicite | Commit `45fc45988` |
 | QuickMode — expression éditeur | Construction de l’expression JavaScript de lecture des éditeurs mutualisée entre Bootstrap et OnePage, API publique conservée | Commit `43592c8bd` |
 | QuickMode — mapping Bootstrap | Mapping Bootstrap 5 des classes mutualisé entre Bootstrap et OnePage, résolution publique `bsClass()` conservée | Commit `658078588` |
 | Finalisation — champs de soumission | Champs cachés communs frontend/backend/preview extraits avec conservation des différences `act`/`ff_frame` | Commit `be602b94f` |
@@ -866,6 +867,12 @@ Le widget de progression est désormais construit par
 OnePage. Le calcul de progression, la remise à zéro et l'exclusion éventuelle
 de la page Thank You sont testés sans déplacer la gestion des assets hors des
 renderers.
+
+La déclaration runtime des erreurs est désormais construite par
+`QuickModeErrorRuntimeConfigBuilder` (`45fc45988`). Bootstrap et OnePage
+partagent les trois variables de configuration, tandis que la portée des
+erreurs reste explicitement paramétrée (`false` pour Bootstrap, `true` pour
+OnePage) et testée.
 
 La baseline PHPCS est maintenant sans erreur sur les services modernes, les
 quatre renderers QuickMode et leurs traits (`e25d501f`, `14985d4d`, `288b42a4`,

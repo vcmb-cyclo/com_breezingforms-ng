@@ -152,6 +152,49 @@ if [[ -n "${contentbuilder_archive}" ]]; then
         echo "ContentBuilder NG forms table was not installed correctly." >&2
         exit 1
     fi
+
+    # Exercise the packaged BFNG ContentBuilder SQL loaders against the real
+    # Joomla database API. The temporary row is removed before the smoke test
+    # continues, so this does not alter the installed test fixture.
+    docker exec "${web_container}" php -r '
+        define("_JEXEC", 1);
+        require "/var/www/html/includes/defines.php";
+        require "/var/www/html/includes/framework.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFormAssociationLoader.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFormDataLoader.php";
+
+        $db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+        $referenceId = 987654;
+        $query = $db->getQuery(true)
+            ->insert($db->quoteName("#__contentbuilderng_forms"))
+            ->columns($db->quoteName(["type", "reference_id", "name", "published"]))
+            ->values(implode(",", [
+                $db->quote("com_breezingformsng"),
+                $referenceId,
+                $db->quote("BFNG smoke association"),
+                1,
+            ]));
+        $db->setQuery($query);
+        $db->execute();
+        $formId = (int) $db->insertid();
+
+        try {
+            $associationLoader = new \Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderFormAssociationLoader($db);
+            $dataLoader = new \Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderFormDataLoader($db);
+            if (!in_array($formId, $associationLoader->load($referenceId), true)) {
+                throw new \RuntimeException("ContentBuilder association loader returned no inserted form");
+            }
+            $data = $dataLoader->load($formId);
+            if (!is_array($data) || (int) ($data["reference_id"] ?? 0) !== $referenceId) {
+                throw new \RuntimeException("ContentBuilder form data loader returned unexpected data");
+            }
+        } finally {
+            $db->setQuery($db->getQuery(true)
+                ->delete($db->quoteName("#__contentbuilderng_forms"))
+                ->where($db->quoteName("id") . " = " . $formId));
+            $db->execute();
+        }
+    '
 fi
 
 plugin_count="$(

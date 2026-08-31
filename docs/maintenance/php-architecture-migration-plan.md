@@ -108,6 +108,7 @@
 | ContentBuilder — résolution des signatures | Résolution, lecture et encodage des fichiers isolés et testés | Commits `b31b5c47`, `e9386794` |
 | ContentBuilder — orchestration des permissions | Création, édition/nouveau et accès `fullarticle` délégués à `ContentBuilderPermissionChecker`, avec adaptateur et contrat local testés | Lot courant |
 | ContentBuilder — chargement d’enregistrement | Calcul des scopes propriétaire/langue et contrôle 404 délégués à `ContentBuilderRecordLoader`, avec variantes frontend/admin et nouveau testées | Commit `c6e5855ec` |
+| ContentBuilder — loaders runtime | Le smoke Joomla insère puis relit une association publiée avec les loaders BFNG via l’API Database réelle, avant nettoyage de la fixture | Commit du lot d’intégration |
 | PHPCS | Actif sur les services modernes, les builders ContentBuilder et `HiddenFieldTrait` | `phpcs.xml.dist`, commit `2e58c4bb` |
 | PHPStan | Niveau 2 sur le composant, avec baseline | `phpstan.neon.dist`, 193 entrées dans la baseline |
 

@@ -1581,6 +1581,12 @@ le test de caractérisation de `view()` utilise la factory (`1c9e497ab`).
 La factory est également incluse dans le périmètre PHPCS ; le ruleset complet
 reste vert après son ajout (`7434564bc`).
 
+Les deux scripts `onload` de formulaire sont maintenant produits par
+`FormOnloadScriptBuilder`. Le builder couvre l'initialisation initiale, les
+hooks de hauteur/grille, le callback après soumission et l'omission complète
+quand aucun hook n'est requis ; `RenderingEngine` conserve la résolution des
+callbacks et leur enregistrement via `linkcode` (`FormOnloadScriptBuilder`).
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

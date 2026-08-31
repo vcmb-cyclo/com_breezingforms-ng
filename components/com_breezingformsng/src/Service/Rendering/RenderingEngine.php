@@ -104,6 +104,7 @@ final class RenderingEngine
     private ?ContentBuilderFileHydrationScriptBuilder $contentBuilderFileHydrationScriptBuilderService = null;
     private ?ContentBuilderEditableRecordScriptBuilder $contentBuilderEditableRecordScriptBuilderService = null;
     private ?QuickModeRendererFactory $quickModeRendererFactoryService = null;
+    private ?FormOnloadScriptBuilder $formOnloadScriptBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -466,6 +467,11 @@ final class RenderingEngine
     private function quickModeRendererFactory(): QuickModeRendererFactory
     {
         return $this->quickModeRendererFactoryService ??= new QuickModeRendererFactory();
+    }
+
+    private function formOnloadScriptBuilder(): FormOnloadScriptBuilder
+    {
+        return $this->formOnloadScriptBuilderService ??= new FormOnloadScriptBuilder();
     }
 
     public function cbCheckPermissions(): array
@@ -1426,18 +1432,12 @@ final class RenderingEngine
      */
     private function linkInitialOnload(array &$library, array &$linked): void
     {
-        $code = "onload = function()" . nl() .
-            "{" . nl() .
-            "    ff_initialize('formentry');" . nl() .
-            "    ff_initialize('pageentry');" . nl();
-        if ($this->processor->formrow->heightmode) {
-            $code .= "    ff_resizepage(" . $this->processor->formrow->heightmode . ", " . $this->processor->formrow->height . ");" . nl();
-        }
-        if ($this->processor->showgrid) {
-            $code .= "    ff_showgrid();" . nl();
-        }
-        $code .= "    if (ff_processor && ff_processor.traceBuffer) ff_traceWindow();" . nl() .
-            "} // onload";
+        $code = $this->formOnloadScriptBuilder()->initial(
+            $this->processor->formrow->heightmode,
+            $this->processor->formrow->height,
+            (bool) $this->processor->showgrid,
+            nl()
+        );
         $this->processor->linkcode('onload', $library, $linked, $code);
     }
 
@@ -1577,26 +1577,18 @@ final class RenderingEngine
                 break;
         }
 
-        if ($functionName == '' && !$this->processor->formrow->heightmode && !$this->processor->showgrid) {
+        $code = $this->formOnloadScriptBuilder()->submitted(
+            (string) $functionName,
+            $this->processor->formrow->heightmode,
+            $this->processor->formrow->height,
+            (bool) $this->processor->showgrid,
+            $this->processor->status,
+            (string) $this->processor->message,
+            nl()
+        );
+        if ($code === null) {
             return;
         }
-
-        $code = "onload = function()" . nl() .
-            "{" . nl();
-        if ($this->processor->formrow->heightmode) {
-            $code .= "    ff_resizepage(" . $this->processor->formrow->heightmode . ", " . $this->processor->formrow->height . ");" . nl();
-        }
-        if ($this->processor->showgrid) {
-            $code .= "    ff_showgrid();" . nl();
-        }
-        if ($functionName != '') {
-            $jsonReturn = json_encode($this->processor->message, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS);
-            if (trim($jsonReturn) === '') {
-                $jsonReturn = '""';
-            }
-            $code .= "    " . $functionName . "(" . $this->processor->status . "," . $jsonReturn . ");" . nl();
-        }
-        $code .= '} // onload';
         $this->processor->linkcode('onload', $library, $linked, $code);
     }
 

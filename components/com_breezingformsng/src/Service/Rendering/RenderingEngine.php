@@ -1632,31 +1632,7 @@ final class RenderingEngine
      */
     private function registerIconBorderScripts(array &$library, array &$linked): bool
     {
-        $this->processor->linkcode(
-            'ff_hideIconBorder',
-            $library,
-            $linked,
-            'function ff_hideIconBorder(element)' . nl() .
-            '{' . nl() .
-            '    element.style.border = "none";' . nl() .
-            '} // ff_hideIconBorder'
-        );
-
-        if ($this->processor->bury()) {
-            return true;
-        }
-
-        $this->processor->linkcode(
-            'ff_dispIconBorder',
-            $library,
-            $linked,
-            'function ff_dispIconBorder(element)' . nl() .
-            '{' . nl() .
-            '    element.style.border = "1px outset";' . nl() .
-            '} // ff_dispIconBorder'
-        );
-
-        return $this->processor->bury();
+        return $this->callbackRegistrationService()->registerIconBorders($library, $linked, nl());
     }
 
     /**

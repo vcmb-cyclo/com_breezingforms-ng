@@ -94,4 +94,37 @@ final class CallbackRegistrationService
 
         return false;
     }
+
+    /**
+     * @param array<int|string, mixed> $library
+     * @param array<int|string, mixed> $linked
+     */
+    public function registerIconBorders(array &$library, array &$linked, string $newline): bool
+    {
+        $this->processor->linkcode(
+            'ff_hideIconBorder',
+            $library,
+            $linked,
+            'function ff_hideIconBorder(element)' . $newline .
+            '{' . $newline .
+            '    element.style.border = "none";' . $newline .
+            '} // ff_hideIconBorder'
+        );
+
+        if ($this->processor->bury()) {
+            return true;
+        }
+
+        $this->processor->linkcode(
+            'ff_dispIconBorder',
+            $library,
+            $linked,
+            'function ff_dispIconBorder(element)' . $newline .
+            '{' . $newline .
+            '    element.style.border = "1px outset";' . $newline .
+            '} // ff_dispIconBorder'
+        );
+
+        return $this->processor->bury();
+    }
 }

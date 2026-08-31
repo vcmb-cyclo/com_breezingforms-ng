@@ -1121,7 +1121,9 @@ L'enregistrement des callbacks de formulaire et d'élément est maintenant
 mutualisé dans `CallbackRegistrationService`. L'ordre `init`/`action`/
 `validate`, les points d'arrêt `bury()` et la fermeture historique du buffer
 après validation restent inchangés et sont couverts par le harnais de
-caractérisation et un test direct du service.
+caractérisation et un test direct du service. Les deux callbacks de bordure
+d'icône sont également enregistrés par ce service, avec leurs deux points
+d'arrêt historiques conservés.
 
 L'enveloppe du script global de validation est désormais construite par
 `FormValidationScriptWrapperBuilder` (`9b92acb55`). Les contrôles de fichiers

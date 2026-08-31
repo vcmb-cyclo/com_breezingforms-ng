@@ -41,7 +41,6 @@ class ClassicRenderer
     private $rootMdata = array();
     private $fading = true;
     private $fadingClass = '';
-    private $fadingCall = '';
     private $useErrorAlerts = false;
     private $useDefaultErrors = false;
     private $useBalloonErrors = false;
@@ -56,12 +55,9 @@ class ClassicRenderer
     private $htmltextareasDbIds = array();
     private $language_tag = '';
     private $hasResponsiveDatePicker = false;
-    private ?QuickModeInputBuilder $quickModeInputBuilderService = null;
     private ?QuickModeTextFieldStrategy $quickModeTextFieldStrategyService = null;
     private ?QuickModeTextareaStrategy $quickModeTextareaStrategyService = null;
     private ?QuickModeCheckboxStrategy $quickModeCheckboxStrategyService = null;
-    private ?QuickModeTextareaBuilder $quickModeTextareaBuilderService = null;
-    private ?QuickModeCheckboxBuilder $quickModeCheckboxBuilderService = null;
     private ?QuickModeSelectBuilder $quickModeSelectBuilderService = null;
     private ?QuickModeMaxLengthCounterBuilder $quickModeMaxLengthCounterBuilderService = null;
     private ?ClassicChoiceGroupBuilder $classicChoiceGroupBuilderService = null;
@@ -75,15 +71,9 @@ class ClassicRenderer
     private ?QuickModeUploadOptionsBuilder $quickModeUploadOptionsBuilderService = null;
     private ?QuickModePagingActionBuilder $quickModePagingActionBuilderService = null;
     private ?QuickModeSubmitActionBuilder $quickModeSubmitActionBuilderService = null;
-    private ?QuickModeCalendarOptionsBuilder $quickModeCalendarOptionsBuilderService = null;
     private ?QuickModeHtmlTextareaScriptBuilder $quickModeHtmlTextareaScriptBuilderService = null;
     private ?QuickModeReCaptchaFieldBuilder $quickModeReCaptchaFieldBuilderService = null;
     private ?QuickModeDeactivationScriptBuilder $quickModeDeactivationScriptBuilderService = null;
-
-    private function quickModeCalendarOptionsBuilder(): QuickModeCalendarOptionsBuilder
-    {
-        return $this->quickModeCalendarOptionsBuilderService ??= new QuickModeCalendarOptionsBuilder();
-    }
 
     private function quickModeDeactivationScriptBuilder(): QuickModeDeactivationScriptBuilder
     {
@@ -192,7 +182,6 @@ float:left;
             }
             if ($this->fading) {
                 $this->fadingClass = ' bfFadingClass';
-                $this->fadingCall = 'bfFade();';
                 RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-fade.js');
             }
 
@@ -211,21 +200,6 @@ float:left;
         if ($this->rootMdata['theme'] != 'none' && is_file(JPATH_SITE . '/media/breezingforms/themes/' . $this->rootMdata['theme'] . '/theme.css')) {
             RuntimeAssetLoader::style($this->p->app, Uri::root(true) . '/media/breezingforms/themes/' . $this->rootMdata['theme'] . '/theme.css');
         }
-    }
-
-    private function quickModeInputBuilder(): QuickModeInputBuilder
-    {
-        return $this->quickModeInputBuilderService ??= new QuickModeInputBuilder();
-    }
-
-    private function quickModeTextareaBuilder(): QuickModeTextareaBuilder
-    {
-        return $this->quickModeTextareaBuilderService ??= new QuickModeTextareaBuilder();
-    }
-
-    private function quickModeCheckboxBuilder(): QuickModeCheckboxBuilder
-    {
-        return $this->quickModeCheckboxBuilderService ??= new QuickModeCheckboxBuilder();
     }
 
     private function quickModeSelectBuilder(): QuickModeSelectBuilder

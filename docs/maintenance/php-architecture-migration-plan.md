@@ -841,6 +841,24 @@ Consolide `CaptchaEndpointBuilder` et `CaptchaValidationDefaultsBuilder` dans
 supprimé en phase 10 ; il n'a donc pas été recréé dans ce regroupement. Les
 endpoints frontend/administrateur et les valeurs de validation sont testés.
 
+### 8.6 Nettoyage des adaptateurs orphelins
+
+L'audit PHPStan niveau 4 a confirmé que plusieurs propriétés et getters privés
+étaient devenus inutiles après les extractions précédentes. Le lot supprime
+dans les trois renderers QuickMode les écritures mortes de `fadingCall`, les
+propriétés `uploadImagePath` non lues de Bootstrap/OnePage, ainsi que les
+adaptateurs privés non appelés pour les builders d'input, textarea, checkbox
+et options de calendrier. `ClassicRenderer` conserve son
+`uploadImagePath`, qui reste lu lors de la construction du bouton d'upload.
+
+Les getters et propriétés devenus orphelins de `RenderingEngine` pour les
+builders de scripts, d'hydratation, de fichiers et de signature sont également
+supprimés ; leurs implémentations restent utilisées par
+`ContentBuilderEditableRecordScriptBuilder`. Les tests de caractérisation des
+trois renderers et de `RenderingEngine::view()` passent toujours (119 tests,
+339 assertions). L'audit PHPStan niveau 4 passe de 89 à 63 diagnostics, les
+autres diagnostics étant hors de ce nettoyage ciblé.
+
 ### Méthode de vérification
 
 Chaque corps de méthode a été comparé octet pour octet à la classe d'origine

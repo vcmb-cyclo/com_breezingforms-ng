@@ -42,7 +42,6 @@ class BootstrapRenderer
     private $rootMdata = array();
     private $fading = true;
     private $fadingClass = '';
-    private $fadingCall = '';
     private $useErrorAlerts = false;
     private $useDefaultErrors = false;
     private $useBalloonErrors = false;
@@ -52,18 +51,14 @@ class BootstrapRenderer
     private $hasFlashUpload = false;
     private $flashUploadTicket = '';
     private $cancelImagePath = '';
-    private $uploadImagePath = '';
     private $htmltextareas = array();
     private $htmltextareasDbIds = array();
     private $language_tag = '';
     private $hasResponsiveDatePicker = false;
     private $bsClasses = array();
-    private ?QuickModeInputBuilder $quickModeInputBuilderService = null;
     private ?QuickModeTextFieldStrategy $quickModeTextFieldStrategyService = null;
     private ?QuickModeTextareaStrategy $quickModeTextareaStrategyService = null;
     private ?QuickModeCheckboxStrategy $quickModeCheckboxStrategyService = null;
-    private ?QuickModeTextareaBuilder $quickModeTextareaBuilderService = null;
-    private ?QuickModeCheckboxBuilder $quickModeCheckboxBuilderService = null;
     private ?QuickModeSelectBuilder $quickModeSelectBuilderService = null;
     private ?QuickModeMaxLengthCounterBuilder $quickModeMaxLengthCounterBuilderService = null;
     private ?QuickModeGroupOptionBuilder $quickModeGroupOptionBuilderService = null;
@@ -77,15 +72,9 @@ class BootstrapRenderer
     private ?QuickModeUploadOptionsBuilder $quickModeUploadOptionsBuilderService = null;
     private ?QuickModePagingActionBuilder $quickModePagingActionBuilderService = null;
     private ?QuickModeSubmitActionBuilder $quickModeSubmitActionBuilderService = null;
-    private ?QuickModeCalendarOptionsBuilder $quickModeCalendarOptionsBuilderService = null;
     private ?QuickModeHtmlTextareaScriptBuilder $quickModeHtmlTextareaScriptBuilderService = null;
     private ?QuickModeReCaptchaFieldBuilder $quickModeReCaptchaFieldBuilderService = null;
     private ?QuickModeDeactivationScriptBuilder $quickModeDeactivationScriptBuilderService = null;
-
-    private function quickModeCalendarOptionsBuilder(): QuickModeCalendarOptionsBuilder
-    {
-        return $this->quickModeCalendarOptionsBuilderService ??= new QuickModeCalendarOptionsBuilder();
-    }
 
     private function quickModeDeactivationScriptBuilder(): QuickModeDeactivationScriptBuilder
     {
@@ -108,11 +97,6 @@ class BootstrapRenderer
         return $this->bsClasses[5][$key];
     }
 
-    private function quickModeInputBuilder(): QuickModeInputBuilder
-    {
-        return $this->quickModeInputBuilderService ??= new QuickModeInputBuilder();
-    }
-
     private function quickModeTextFieldStrategy(): QuickModeTextFieldStrategy
     {
         return $this->quickModeTextFieldStrategyService ??= new QuickModeTextFieldStrategy();
@@ -126,16 +110,6 @@ class BootstrapRenderer
     private function quickModeCheckboxStrategy(): QuickModeCheckboxStrategy
     {
         return $this->quickModeCheckboxStrategyService ??= new QuickModeCheckboxStrategy();
-    }
-
-    private function quickModeTextareaBuilder(): QuickModeTextareaBuilder
-    {
-        return $this->quickModeTextareaBuilderService ??= new QuickModeTextareaBuilder();
-    }
-
-    private function quickModeCheckboxBuilder(): QuickModeCheckboxBuilder
-    {
-        return $this->quickModeCheckboxBuilderService ??= new QuickModeCheckboxBuilder();
     }
 
     private function quickModeSelectBuilder(): QuickModeSelectBuilder
@@ -243,12 +217,10 @@ class BootstrapRenderer
         $this->flashUploadTicket = md5(strtotime('now') . mt_rand(0, mt_getrandmax()));
 
         $this->cancelImagePath = Uri::root(true) . '/components/com_breezingformsng/themes/quickmode-bootstrap' . '5' . '/cancel.png';
-        $this->uploadImagePath = Uri::root(true) . '/components/com_breezingformsng/themes/quickmode-bootstrap' . '5' . '/upload.png';
         if (isset($this->rootMdata['themebootstrap']) && is_file(JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/images/cancel.png')) {
             $this->cancelImagePath = Uri::root(true) . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/images/cancel.png';
         }
         if (isset($this->rootMdata['themebootstrap']) && is_file(JPATH_SITE . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/images/upload.png')) {
-            $this->uploadImagePath = Uri::root(true) . '/media/breezingforms/themes-bootstrap' . '5' . '/' . $this->rootMdata['themebootstrap'] . '/images/upload.png';
         }
     }
 
@@ -1107,7 +1079,6 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
             }
             if ($this->fading) {
                 $this->fadingClass = ' bfFadingClass';
-                $this->fadingCall = 'bfFade();';
                 RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-fade.js');
             }
 

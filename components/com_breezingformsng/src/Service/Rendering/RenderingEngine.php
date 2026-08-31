@@ -74,8 +74,6 @@ final class RenderingEngine
     private ?HiddenFormFieldsBuilder $hiddenFormFieldsBuilderService = null;
     private ?LegacyScriptTagWrapperBuilder $legacyScriptTagWrapperBuilderService = null;
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
-    private ?ContentBuilderSignatureScriptBuilder $contentBuilderSignatureScriptBuilderService = null;
-    private ?ContentBuilderFileUploadScriptBuilder $contentBuilderFileUploadScriptBuilderService = null;
     private ?EditableRecordLoader $editableRecordLoaderService = null;
     private ?PostRenderScriptBuilder $postRenderScriptBuilderService = null;
     private ?ContentBuilderTechnicalFieldsBuilder $contentBuilderTechnicalFieldsBuilderService = null;
@@ -92,18 +90,11 @@ final class RenderingEngine
     private ?QueryListStateLibraryBuilder $queryListStateLibraryBuilderService = null;
     private ?QueryListRowStateBuilder $queryListRowStateBuilderService = null;
     private ?PaymentProviderDetector $paymentProviderDetectorService = null;
-    private ?ContentBuilderFileSupportBuilder $contentBuilderFileSupportBuilderService = null;
-    private ?ContentBuilderFlashUploadValidationBuilder $contentBuilderFlashUploadValidationBuilderService = null;
-    private ?ContentBuilderSignatureImageEncoder $contentBuilderSignatureImageEncoderService = null;
     private ?CaptchaSupportBuilder $captchaSupportBuilderService = null;
     private ?CaptchaValidationRowSelector $captchaValidationRowSelectorService = null;
     private ?CaptchaLegacyValidationScriptBuilder $captchaLegacyValidationScriptBuilderService = null;
     private ?CaptchaReCaptchaValidationScriptBuilder $captchaReCaptchaValidationScriptBuilderService = null;
     private ?CaptchaValidationScriptBuilder $captchaValidationScriptBuilderService = null;
-    private ?ContentBuilderValueHydrationScriptBuilder $contentBuilderValueHydrationScriptBuilderService = null;
-    private ?ContentBuilderChoiceHydrationScriptBuilder $contentBuilderChoiceHydrationScriptBuilderService = null;
-    private ?ContentBuilderSelectHydrationScriptBuilder $contentBuilderSelectHydrationScriptBuilderService = null;
-    private ?ContentBuilderFileHydrationScriptBuilder $contentBuilderFileHydrationScriptBuilderService = null;
     private ?ContentBuilderEditableRecordScriptBuilder $contentBuilderEditableRecordScriptBuilderService = null;
     private ?ContentBuilderNonEditableFieldsResolver $contentBuilderNonEditableFieldsResolverService = null;
     private ?ContentBuilderFormAssociationLoader $contentBuilderFormAssociationLoaderService = null;
@@ -314,16 +305,6 @@ final class RenderingEngine
         return $this->contentBuilderReadonlyScriptBuilderService ??= new ContentBuilderReadonlyScriptBuilder();
     }
 
-    private function contentBuilderSignatureScriptBuilder(): ContentBuilderSignatureScriptBuilder
-    {
-        return $this->contentBuilderSignatureScriptBuilderService ??= new ContentBuilderSignatureScriptBuilder();
-    }
-
-    private function contentBuilderFileUploadScriptBuilder(): ContentBuilderFileUploadScriptBuilder
-    {
-        return $this->contentBuilderFileUploadScriptBuilderService ??= new ContentBuilderFileUploadScriptBuilder();
-    }
-
     private function editableRecordLoader(): EditableRecordLoader
     {
         return $this->editableRecordLoaderService ??= new EditableRecordLoader($this->processor->database);
@@ -446,22 +427,6 @@ final class RenderingEngine
         return $this->paymentProviderDetectorService ??= new PaymentProviderDetector();
     }
 
-    private function contentBuilderFileSupportBuilder(): ContentBuilderFileSupportBuilder
-    {
-        return $this->contentBuilderFileSupportBuilderService ??= new ContentBuilderFileSupportBuilder();
-    }
-
-    private function contentBuilderFlashUploadValidationBuilder(): ContentBuilderFlashUploadValidationBuilder
-    {
-        return $this->contentBuilderFlashUploadValidationBuilderService ??= new ContentBuilderFlashUploadValidationBuilder();
-    }
-
-
-    private function contentBuilderSignatureImageEncoder(): ContentBuilderSignatureImageEncoder
-    {
-        return $this->contentBuilderSignatureImageEncoderService ??= new ContentBuilderSignatureImageEncoder();
-    }
-
     private function captchaSupportBuilder(): CaptchaSupportBuilder
     {
         return $this->captchaSupportBuilderService ??= new CaptchaSupportBuilder();
@@ -491,27 +456,6 @@ final class RenderingEngine
             $this->captchaLegacyValidationScriptBuilder(),
             $this->captchaReCaptchaValidationScriptBuilder()
         );
-    }
-
-    private function contentBuilderValueHydrationScriptBuilder(): ContentBuilderValueHydrationScriptBuilder
-    {
-        return $this->contentBuilderValueHydrationScriptBuilderService ??= new ContentBuilderValueHydrationScriptBuilder();
-    }
-
-    private function contentBuilderChoiceHydrationScriptBuilder(): ContentBuilderChoiceHydrationScriptBuilder
-    {
-        return $this->contentBuilderChoiceHydrationScriptBuilderService ??= new ContentBuilderChoiceHydrationScriptBuilder();
-    }
-
-    private function contentBuilderSelectHydrationScriptBuilder(): ContentBuilderSelectHydrationScriptBuilder
-    {
-        return $this->contentBuilderSelectHydrationScriptBuilderService ??= new ContentBuilderSelectHydrationScriptBuilder();
-    }
-
-
-    private function contentBuilderFileHydrationScriptBuilder(): ContentBuilderFileHydrationScriptBuilder
-    {
-        return $this->contentBuilderFileHydrationScriptBuilderService ??= new ContentBuilderFileHydrationScriptBuilder();
     }
 
     private function contentBuilderEditableRecordScriptBuilder(): ContentBuilderEditableRecordScriptBuilder

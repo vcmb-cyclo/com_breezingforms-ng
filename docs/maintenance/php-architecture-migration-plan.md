@@ -580,6 +580,10 @@ factorisation locale des sélecteurs d’options JavaScript et découpage des
 concaténations longues ; ses cinq tests couvrent les familles de contrôles,
 les valeurs vides et l’encodage des valeurs réinjectées.
 
+Le resolver isolé `MailTemplateResolver`, déjà couvert par son test unitaire,
+rejoint également le périmètre PHPCS ; cette extension contrôle une dépendance
+de notification extraite sans ouvrir la façade historique complète.
+
 Le premier nettoyage ciblé de cette baseline PHPCS est réalisé dans
 `QuickModeSelectBuilder`, `QuickModeCaptchaMarkupBuilder` et
 `QuickModeUploadOptionsBuilder` (`eaf8b2d1`) : leurs sorties sont inchangées et

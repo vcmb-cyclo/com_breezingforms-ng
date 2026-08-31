@@ -121,6 +121,7 @@
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeHtmlTextareaScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeReCaptchaInitScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeUploadBasePathBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Notification/MailTemplateResolver.php</file>
     <file>components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php</file>
 
     <exclude-pattern>*/vendor/*</exclude-pattern>

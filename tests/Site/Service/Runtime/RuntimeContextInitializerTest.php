@@ -83,6 +83,44 @@ final class RuntimeContextInitializerTest extends TestCase
         );
     }
 
+    public function testUsesJoomlaRootAndContactParameterSetByDefault(): void
+    {
+        $application = new CMSApplication();
+        $application->getInput()->values = [
+            'option' => 'com_contacts',
+            'id' => '18',
+            'Itemid' => '27',
+            'task' => 'contact.display',
+            'catid' => '4',
+            'view' => 'contact',
+            'contact_id' => '18',
+        ];
+
+        $result = (new RuntimeContextInitializer($application, $this->configuration(0)))->initialize(
+            null,
+            null,
+            null
+        );
+
+        self::assertSame(rtrim(\Joomla\CMS\Uri\Uri::root(), '/'), $result['siteUrl']);
+        self::assertSame(
+            rtrim(\Joomla\CMS\Uri\Uri::root(), '/') . '/components/com_breezingformsng',
+            $result['componentUrl']
+        );
+        self::assertSame(
+            [
+                'option' => 'com_contacts',
+                'id' => '18',
+                'Itemid' => '27',
+                'task' => 'contact.display',
+                'catid' => '4',
+                'view' => 'contact',
+                'contact_id' => '18',
+            ],
+            $result['otherParameters']
+        );
+    }
+
     private function configuration(int $liveSite): FormConfiguration
     {
         $configuration = (new ReflectionClass(FormConfiguration::class))->newInstanceWithoutConstructor();

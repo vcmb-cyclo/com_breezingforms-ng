@@ -1023,25 +1023,25 @@ tree
     background-position: 10px 14px !important;
 }
 
-.tree .ltr li a,
-.tree .rtl li a {
+.tree .ltr li a:not(.bfng-tree *),
+.tree .rtl li a:not(.bfng-tree *) {
     background-color: transparent !important;
     color: #1b6894;
     background-position: 7px 8px !important;
     padding: 8px 11px 8px 30px !important;
 }
 
-.tree .ltr li a:hover,
-.tree .rtl li a:hover {
+.tree .ltr li a:hover:not(.bfng-tree *),
+.tree .rtl li a:hover:not(.bfng-tree *) {
     background-color: #EAEAEA !important;
     color: #777;
     background-position: 7px 8px !important;
     padding: 8px 11px 8px 30px !important;
 }
 
-.tree-apple li a.clicked,
-.tree-apple li a.clicked:hover,
-.tree-apple li span.clicked {
+.tree-apple li a.clicked:not(.bfng-tree *),
+.tree-apple li a.clicked:hover:not(.bfng-tree *),
+.tree-apple li span.clicked:not(.bfng-tree *) {
     background-color: #3F51B5 !important;
     background-position: 7px 8px !important;
     border: 1px solid #3F51B5 !important;

@@ -59,5 +59,12 @@ final class SubmissionTimestampFormatterTest extends TestCase
             $formatter->format('2024-01-02 03:04:05', 'UTC')->submittedAt
         );
     }
+
+    public function testSharedAdjusterReturnsTheAdjustedDateObject(): void
+    {
+        $date = (new SubmissionTimestampAdjuster())->adjust('2024-01-02 03:04:05', 'UTC');
+
+        self::assertSame('2024-01-02 03:04:05', $date->format('Y-m-d H:i:s'));
+    }
 }
 }

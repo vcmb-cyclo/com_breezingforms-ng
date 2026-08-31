@@ -116,7 +116,7 @@ final class StripeCallback
                         ];
                         if ($this->application->getSession()->get('emailfield', '') !== '') {
                             $stripearray += ['receipt_email' => $this->application->getSession()->get('emailfield', '')];
-                            $this->application->getSession()->clear('emailfield');
+                            $this->application->getSession()->remove('emailfield');
                         }
                         //$charge = \Stripe\Charge::create( $stripearray );
                         /*
@@ -136,7 +136,7 @@ final class StripeCallback
                           ]);*/
 
 
-                        $this->application->getSession()->clear('bf_stripe_last_payment_amount' . $record_id);
+                        $this->application->getSession()->remove('bf_stripe_last_payment_amount' . $record_id);
                     } else {
 
                         $exploded = explode(':', $exists);

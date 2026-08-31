@@ -17,6 +17,7 @@ use Joomla\CMS\Uri\Uri;
 use Joomla\Database\ParameterType;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Filesystem\File;
+use Joomla\CMS\Mail\Mail;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 
 /**
@@ -235,6 +236,7 @@ final class SofortCallback
 
                             $recipients = explode('###', $input->getString('user_variable_2', ''));
                             $recipientsSize = count($recipients);
+                            /** @var Mail $mailer */
                             $mailer = $this->mailerFactory->createMailer();
                             $mailer->Subject = Text::_('COM_BREEZINGFORMSNG_YOUR_PAYMENT_AT_SU');
                             $mailer->Body = Text::_('COM_BREEZINGFORMSNG_HALLO') . "\n\n";

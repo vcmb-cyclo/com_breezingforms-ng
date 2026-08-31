@@ -66,11 +66,11 @@ final class FlashUploadCallback
             $tempFile = (string) ($uploadedFile['tmp_name'] ?? '');
             $targetPath = JPATH_SITE . '/components/com_breezingformsng/uploads/';
             if (is_dir($targetPath)) {
-                $secureTicket = $this->application->getSession()->get('secure_ticket', '', 'com_breezingformsng');
+                $secureTicket = $this->application->getSession()->get('secure_ticket', '');
                 if ($secureTicket == '') {
                     mt_srand();
                     $secureTicket = md5(strtotime('now') . mt_rand(0, mt_getrandmax()));
-                    $this->application->getSession()->set('secure_ticket', $secureTicket, 'com_breezingformsng');
+                    $this->application->getSession()->set('secure_ticket', $secureTicket);
                 }
 
                 $targetFile = str_replace('//', '/', $targetPath) . 'chunks/' . $input->getInt('offset', 0) . '_' . bf_sanitizeFilename($input->getString('name', 'unknown')) . '_' . $input->getString('itemName', '') . '_' . $input->getString('bfFlashUploadTicket', '') . '_' . $secureTicket . '_chunktmp';

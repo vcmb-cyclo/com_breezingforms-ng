@@ -169,42 +169,6 @@ parameters:
 			path: administrator/components/com_breezingformsng/tmpl/quickmode/editor.php
 
 		-
-			message: '#^Function bf_b64dec not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/Callback/FlashUploadCallback.php
-
-		-
-			message: '#^Method Joomla\\Session\\SessionInterface\:\:get\(\) invoked with 3 parameters, 1\-2 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: components/com_breezingformsng/src/Service/Callback/FlashUploadCallback.php
-
-		-
-			message: '#^Method Joomla\\Session\\SessionInterface\:\:set\(\) invoked with 3 parameters, 1\-2 required\.$#'
-			identifier: arguments.count
-			count: 1
-			path: components/com_breezingformsng/src/Service/Callback/FlashUploadCallback.php
-
-		-
-			message: '#^Access to an undefined property Joomla\\CMS\\Mail\\MailerInterface\:\:\$Body\.$#'
-			identifier: property.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/Callback/SofortCallback.php
-
-		-
-			message: '#^Access to an undefined property Joomla\\CMS\\Mail\\MailerInterface\:\:\$Subject\.$#'
-			identifier: property.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/Callback/SofortCallback.php
-
-		-
-			message: '#^Method Joomla\\Session\\SessionInterface\:\:clear\(\) invoked with 1 parameter, 0 required\.$#'
-			identifier: arguments.count
-			count: 2
-			path: components/com_breezingformsng/src/Service/Callback/StripeCallback.php
-
-		-
 			message: '#^Call to static method createFromRuntimeContext\(\) on an unknown class CB\\Component\\Contentbuilderng\\Administrator\\Service\\ListSupportService\.$#'
 			identifier: class.notFound
 			count: 1
@@ -235,34 +199,10 @@ parameters:
 			path: components/com_breezingformsng/src/Service/Integration/IntegratorRuntime.php
 
 		-
-			message: '#^Function bf_b64dec not found\.$#'
-			identifier: function.notFound
-			count: 2
-			path: components/com_breezingformsng/src/Service/Notification/NotificationEngine.php
-
-		-
-			message: '#^Function bf_b64dec not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/Rendering/QuickMode/BootstrapRenderer.php
-
-		-
 			message: '#^Call to an undefined method Joomla\\CMS\\Editor\\Editor\:\:getContent\(\)\.$#'
 			identifier: method.notFound
 			count: 1
 			path: components/com_breezingformsng/src/Service/Rendering/QuickMode/ClassicRenderer.php
-
-		-
-			message: '#^Function bf_b64dec not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/Rendering/QuickMode/ClassicRenderer.php
-
-		-
-			message: '#^Function bf_b64dec not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/Rendering/QuickMode/OnePageRenderer.php
 
 		-
 			message: '#^Call to static method contentbuilderng_wordwrap\(\) on an unknown class CB\\Component\\Contentbuilderng\\Administrator\\Helper\\ContentbuilderngHelper\.$#'
@@ -301,12 +241,6 @@ parameters:
 			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
 
 		-
-			message: '#^Function bf_b64dec not found\.$#'
-			identifier: function.notFound
-			count: 1
-			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
-
-		-
 			message: '#^Constant _FF_RUNMODE_PREVIEW not found\.$#'
 			identifier: constant.notFound
 			count: 1
@@ -334,18 +268,6 @@ parameters:
 			message: '#^Constant _FF_RUNMODE_FRONTEND not found\.$#'
 			identifier: constant.notFound
 			count: 2
-			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
-
-		-
-			message: '#^Function bf_b64dec not found\.$#'
-			identifier: function.notFound
-			count: 4
-			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
-
-		-
-			message: '#^Function bf_b64enc not found\.$#'
-			identifier: function.notFound
-			count: 3
 			path: components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php
 
 		-

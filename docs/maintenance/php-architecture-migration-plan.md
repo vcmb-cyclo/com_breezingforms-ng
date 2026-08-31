@@ -54,6 +54,7 @@
 | Finalisation — balise form QuickMode | Assemblage de la balise `<form>` extrait, calcul d’URL conservé dans l’orchestrateur et classe historique préservée | Commit `4f5b8559d` |
 | ContentBuilder — wrapper readonly | Enveloppe du script des champs non éditables extraite et couverte, avec marqueurs historiques conservés | Commit `3e1723d15` |
 | Validation — enveloppe JavaScript | Ouverture/fermeture du script global de validation extraite, contrôles extensions/CAPTCHA conservés dans l’orchestrateur | Commit `9b92acb55` |
+| Validation — extensions de fichiers | Génération du validateur JavaScript des uploads extraite dans un builder pur, avec variantes template configuré/non configuré couvertes | Commit `30dd41889` |
 | Finalisation — ouverture caractérisée | Initialisation du rendu testée avec remise à zéro des états Query List et wrapper ReCaptcha legacy | Commit `0d33f0253` |
 | `RenderingEngine::view()` — validation | Extensions de fichiers, valeurs par défaut et scripts CAPTCHA extraits et couverts | Builders de validation dédiés |
 | `RenderingEngine::view()` — CAPTCHA | Sélection `Captcha` / `ReCaptcha`, endpoints site/admin et générateurs JavaScript isolés, ordre historique préservé | Commits `4a070774`, `8e3e9a7a`, `4563ae11`, `d328c4f8`, `75c0ca2b`, `1cea0c84` |
@@ -603,6 +604,13 @@ L'enveloppe du script global de validation est désormais construite par
 `FormValidationScriptWrapperBuilder` (`9b92acb55`). Les contrôles de fichiers
 et de CAPTCHA restent générés par leurs services respectifs, tandis que les
 marqueurs du bloc JavaScript et leur ordre historique sont testés.
+
+La génération de `checkFileExtensions()` est désormais isolée dans
+`FileExtensionsCheckBuilder` (`30dd41889`). Le builder reçoit les lignes du
+formulaire, le nombre de lignes, le message déjà traduit et l'indication de
+template configuré ; il conserve donc l'orchestration Joomla dans
+`RenderingEngine` tout en testant séparément les uploads configurés et la
+sortie neutre lorsque le template n'est pas renseigné.
 
 L'initialisation de formulaire est désormais caractérisée de bout en bout au
 niveau de sa méthode dédiée par `0d33f0253` : les registres Query List sont

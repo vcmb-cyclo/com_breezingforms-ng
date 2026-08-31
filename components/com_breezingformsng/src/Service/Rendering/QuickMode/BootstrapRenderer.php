@@ -61,6 +61,7 @@ class BootstrapRenderer
     private ?QuickModeInputBuilder $quickModeInputBuilderService = null;
     private ?QuickModeTextFieldStrategy $quickModeTextFieldStrategyService = null;
     private ?QuickModeTextareaStrategy $quickModeTextareaStrategyService = null;
+    private ?QuickModeCheckboxStrategy $quickModeCheckboxStrategyService = null;
     private ?QuickModeTextareaBuilder $quickModeTextareaBuilderService = null;
     private ?QuickModeCheckboxBuilder $quickModeCheckboxBuilderService = null;
     private ?QuickModeSelectBuilder $quickModeSelectBuilderService = null;
@@ -102,6 +103,11 @@ class BootstrapRenderer
     private function quickModeTextareaStrategy(): QuickModeTextareaStrategy
     {
         return $this->quickModeTextareaStrategyService ??= new QuickModeTextareaStrategy();
+    }
+
+    private function quickModeCheckboxStrategy(): QuickModeCheckboxStrategy
+    {
+        return $this->quickModeCheckboxStrategyService ??= new QuickModeCheckboxStrategy();
     }
 
     private function quickModeTextareaBuilder(): QuickModeTextareaBuilder

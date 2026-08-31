@@ -58,6 +58,7 @@ class ClassicRenderer
     private ?QuickModeInputBuilder $quickModeInputBuilderService = null;
     private ?QuickModeTextFieldStrategy $quickModeTextFieldStrategyService = null;
     private ?QuickModeTextareaStrategy $quickModeTextareaStrategyService = null;
+    private ?QuickModeCheckboxStrategy $quickModeCheckboxStrategyService = null;
     private ?QuickModeTextareaBuilder $quickModeTextareaBuilderService = null;
     private ?QuickModeCheckboxBuilder $quickModeCheckboxBuilderService = null;
     private ?QuickModeSelectBuilder $quickModeSelectBuilderService = null;
@@ -88,6 +89,11 @@ class ClassicRenderer
     private function quickModeTextareaStrategy(): QuickModeTextareaStrategy
     {
         return $this->quickModeTextareaStrategyService ??= new QuickModeTextareaStrategy();
+    }
+
+    private function quickModeCheckboxStrategy(): QuickModeCheckboxStrategy
+    {
+        return $this->quickModeCheckboxStrategyService ??= new QuickModeCheckboxStrategy();
     }
 
     public function headers()
@@ -968,14 +974,11 @@ float:left;
 
     private function renderCheckboxField(array $mdata, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
     {
-        echo $this->quickModeCheckboxBuilder()->build(
+        echo $this->quickModeCheckboxStrategy()->build(
+            $mdata,
             'ff_elem',
-            (string) $mdata['bfName'],
-            (string) $mdata['value'],
-            (int) $mdata['dbId'],
-            (bool) $mdata['checked'],
-            $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect
-            . ($readonly ? ' disabled="disabled" ' : '')
+            $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect,
+            $readonly !== ''
         );
         if ($mdata['mailbackAccept']) {
             echo '<input type="hidden" class="ff_elem" name="mailbackConnectWith[' . $mdata['mailbackConnectWith'] . ']" value="true_' . $mdata['bfName'] . '"/>' . "\n";

@@ -53,6 +53,7 @@ class MobileRenderer
     private ?QuickModeInputBuilder $quickModeInputBuilderService = null;
     private ?QuickModeTextFieldStrategy $quickModeTextFieldStrategyService = null;
     private ?QuickModeTextareaStrategy $quickModeTextareaStrategyService = null;
+    private ?QuickModeCheckboxStrategy $quickModeCheckboxStrategyService = null;
     private ?QuickModeTextareaBuilder $quickModeTextareaBuilderService = null;
     private ?QuickModeCheckboxBuilder $quickModeCheckboxBuilderService = null;
     private ?QuickModeSelectBuilder $quickModeSelectBuilderService = null;
@@ -122,6 +123,11 @@ class MobileRenderer
     private function quickModeTextareaStrategy(): QuickModeTextareaStrategy
     {
         return $this->quickModeTextareaStrategyService ??= new QuickModeTextareaStrategy();
+    }
+
+    private function quickModeCheckboxStrategy(): QuickModeCheckboxStrategy
+    {
+        return $this->quickModeCheckboxStrategyService ??= new QuickModeCheckboxStrategy();
     }
 
     private function quickModeTextareaBuilder(): QuickModeTextareaBuilder
@@ -682,7 +688,7 @@ HTML;
                             $mdata,
                             $this->language_tag,
                             'ff_elem',
-                            $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+                            $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect,
                             ' '
                         );
                         break;
@@ -762,13 +768,11 @@ HTML;
                         break;
 
                     case 'bfCheckbox':
-                        echo $this->quickModeCheckboxBuilder()->build(
+                        echo $this->quickModeCheckboxStrategy()->build(
+                            $mdata,
                             'ff_elem',
-                            (string) $mdata['bfName'],
-                            (string) $mdata['value'],
-                            (int) $mdata['dbId'],
-                            (bool) $mdata['checked'],
-                            $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly
+                            $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+                            $readonly !== ''
                         );
                         if ($mdata['mailbackAccept']) {
                             echo '<input type="hidden" class="ff_elem" name="mailbackConnectWith[' . $mdata['mailbackConnectWith'] . ']" value="true_' . $mdata['bfName'] . '"/>' . "\n";

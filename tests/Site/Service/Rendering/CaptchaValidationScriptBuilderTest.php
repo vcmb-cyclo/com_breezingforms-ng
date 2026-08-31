@@ -11,6 +11,8 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\CaptchaSupportBuilder;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\CaptchaValidationRowSelector;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\CaptchaValidationScriptBuilder;
 
+require_once __DIR__ . '/QuickMode/joomla-route-stub.php';
+
 final class CaptchaValidationScriptBuilderTest extends TestCase
 {
     public function testUsesDefaultCallbackWhenTheFormHasNoCaptcha(): void

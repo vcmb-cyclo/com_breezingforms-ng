@@ -267,6 +267,8 @@ appels sont orchestrés par `CaptchaValidationScriptBuilder`, avec tests
 du callback par défaut, du CAPTCHA legacy et du ReCaptcha ; les
 variantes et leurs interpolations sont couvertes par les tests unitaires et le
 test de caractérisation de `RenderingEngineViewCharacterizationTest`.
+Un test d’architecture vérifie en outre que le JavaScript de validation ne
+réintègre pas `RenderingEngine`.
 La phase 2.3 est donc couverte pour les scripts de signature et de contrôles
 de fichiers ; l'intégration complète ContentBuilder reste conditionnée à un
 harnais Joomla/ContentBuilder permettant de tester les dépendances runtime.

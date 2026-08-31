@@ -90,6 +90,7 @@ final class RenderingEngine
     private ?FormSubmissionFieldsBuilder $formSubmissionFieldsBuilderService = null;
     private ?MobileChoiceMarkupBuilder $mobileChoiceMarkupBuilderService = null;
     private ?CaptchaWrapperMarkupBuilder $captchaWrapperMarkupBuilderService = null;
+    private ?QuickModeFormTagBuilder $quickModeFormTagBuilderService = null;
     private ?AdditionalHiddenFieldsBuilder $additionalHiddenFieldsBuilderService = null;
     private ?PaymentProviderDetector $paymentProviderDetectorService = null;
     private ?ContentBuilderFileValueParser $contentBuilderFileValueParserService = null;
@@ -365,6 +366,11 @@ final class RenderingEngine
     private function captchaWrapperMarkupBuilder(): CaptchaWrapperMarkupBuilder
     {
         return $this->captchaWrapperMarkupBuilderService ??= new CaptchaWrapperMarkupBuilder();
+    }
+
+    private function quickModeFormTagBuilder(): QuickModeFormTagBuilder
+    {
+        return $this->quickModeFormTagBuilderService ??= new QuickModeFormTagBuilder();
     }
 
     private function additionalHiddenFieldsBuilder(): AdditionalHiddenFieldsBuilder
@@ -822,14 +828,14 @@ final class RenderingEngine
             $current_url = Uri::getInstance()->toString();
 
             $url = ($this->processor->inframe) ? $ff_mossite . '/index.php?format=html&tmpl=component' : (($this->processor->runmode == _FF_RUNMODE_FRONTEND) ? $current_url : 'index.php?format=html' . ($this->processor->app->getInput()->getCmd('tmpl', '') ? '&tmpl=' . $this->processor->app->getInput()->getCmd('tmpl', '') : $current_url));
-            $params = ' action="' . $url . '"' .
-                ' method="post"' .
-                ' name="' . $this->processor->form_id . '"' .
-                ' id="' . $this->processor->form_id . '"' .
-                ' enctype="multipart/form-data"';
-            if ($this->processor->formrow->class2 != '')
-                $params .= ' class="' . $this->processor->getClassName($this->processor->formrow->class2) . '"';
-            echo '<form data-ajax="false" ' . $params . ' accept-charset="utf-8" onsubmit="return false;" class="bfQuickMode">' . nl();
+            echo $this->quickModeFormTagBuilder()->build(
+                $url,
+                (string) $this->processor->form_id,
+                $this->processor->formrow->class2 != ''
+                    ? $this->processor->getClassName($this->processor->formrow->class2)
+                    : '',
+                nl()
+            );
         } // if
 
         $js = '';

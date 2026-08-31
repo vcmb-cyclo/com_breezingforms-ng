@@ -1673,9 +1673,7 @@ final class RenderingEngine
      */
     private function registerStaticTextScanCallback(object $row, array &$library, array &$linked): void
     {
-        if ($row->type == 'Static Text/HTML') {
-            $this->processor->linkcode('#scanonly', $library, $linked, $row->data1);
-        }
+        $this->callbackRegistrationService()->registerStaticTextScan($row, $library, $linked);
     }
 
     /**

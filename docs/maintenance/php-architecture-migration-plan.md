@@ -1123,7 +1123,8 @@ mutualisé dans `CallbackRegistrationService`. L'ordre `init`/`action`/
 après validation restent inchangés et sont couverts par le harnais de
 caractérisation et un test direct du service. Les deux callbacks de bordure
 d'icône sont également enregistrés par ce service, avec leurs deux points
-d'arrêt historiques conservés.
+d'arrêt historiques conservés. Le callback de scan `#scanonly` des éléments
+`Static Text/HTML` y est également centralisé, avec sa garde de type.
 
 L'enveloppe du script global de validation est désormais construite par
 `FormValidationScriptWrapperBuilder` (`9b92acb55`). Les contrôles de fichiers

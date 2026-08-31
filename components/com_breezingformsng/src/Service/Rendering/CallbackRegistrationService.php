@@ -127,4 +127,15 @@ final class CallbackRegistrationService
 
         return $this->processor->bury();
     }
+
+    /**
+     * @param array<int|string, mixed> $library
+     * @param array<int|string, mixed> $linked
+     */
+    public function registerStaticTextScan(object $element, array &$library, array &$linked): void
+    {
+        if ($element->type === 'Static Text/HTML') {
+            $this->processor->linkcode('#scanonly', $library, $linked, $element->data1);
+        }
+    }
 }

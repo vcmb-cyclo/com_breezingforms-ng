@@ -105,6 +105,7 @@ final class RenderingEngine
     private ?ContentBuilderChoiceHydrationScriptBuilder $contentBuilderChoiceHydrationScriptBuilderService = null;
     private ?ContentBuilderSelectHydrationScriptBuilder $contentBuilderSelectHydrationScriptBuilderService = null;
     private ?ContentBuilderFileHydrationScriptBuilder $contentBuilderFileHydrationScriptBuilderService = null;
+    private ?ContentBuilderEditableRecordScriptBuilder $contentBuilderEditableRecordScriptBuilderService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -455,6 +456,15 @@ final class RenderingEngine
         return $this->contentBuilderFileHydrationScriptBuilderService ??= new ContentBuilderFileHydrationScriptBuilder();
     }
 
+    private function contentBuilderEditableRecordScriptBuilder(): ContentBuilderEditableRecordScriptBuilder
+    {
+        return $this->contentBuilderEditableRecordScriptBuilderService ??= new ContentBuilderEditableRecordScriptBuilder(
+            fn(string $value): string => (string) InputFilter::getInstance([], [], 1, 1)->clean($value, 'html'),
+            fn(string $value, int $width, string $break, bool $cut): string =>
+                ContentbuilderngHelper::contentbuilderng_wordwrap($value, $width, $break, $cut)
+        );
+    }
+
     public function cbCheckPermissions(): array
     {
         // CONTENTBUILDER BEGIN
@@ -766,136 +776,20 @@ final class RenderingEngine
         // CONTENTBUILDER BEGIN
 
         if ($cbRecord !== null) {
-
-            $cbNonEditableFields = ListSupportService::createFromRuntimeContext()->getListNonEditableElements($cbResult['data']['id']);
-            $cbFlashUploadValidationOverride = '';
-            foreach ($cbRecord as $cbEntry) {
-                if (!in_array($cbEntry->recElementId, $cbNonEditableFields)) {
-
-                    //$cbEntry->recValue = $this->processor->removeDangerousHtml($cbEntry->recValue);
-
-                    /*
-                      $input = $this->processor->app->getInput();
-                      $input->set('cbCleanVar', $cbEntry->recValue);
-                      $cbEntry->recValue = $input->getHtml('cbCleanVar'); */
-
-                    $cbEntry->recValue = InputFilter::getInstance([], [], 1, 1)->clean((string) $cbEntry->recValue, 'html');
-
-                    switch ($cbEntry->recType) {
-                        case 'File Upload':
-                            if (trim($this->processor->formrow->template_code_processed) == 'QuickMode') {
-
-                                if ($cbFlashUploadValidationOverride == '') {
-                                    $cbJs .= $this->contentBuilderFlashUploadValidationBuilder()->build();
-                                    $cbFlashUploadValidationOverride = '1';
-                                }
-
-                                $fileValue = $this->contentBuilderFileSupportBuilder()->parseValue((string) $cbEntry->recValue);
-                                $cbFiles = $fileValue['files'];
-                                $cnt = $fileValue['count'];
-                                $cbJs .= '
-                                    cbFlashElemCnt["ff_elem' . $cbEntry->recElementId . '"] = ' . $cnt . ';
-                                ';
-                                $displayNames = [];
-                                foreach ($cbFiles as $cbFile) {
-                                    if (trim($cbFile)) {
-                                        $displayName = $this->contentBuilderFileSupportBuilder()->displayName(
-                                            ContentbuilderngHelper::contentbuilderng_wordwrap($cbFile, 150, '<br>', true)
-                                        );
-                                        $displayNames[] = $displayName;
-                                    }
-                                }
-                                $uploadControls = $this->contentBuilderFileUploadScriptBuilder()->build(
-                                    (int) $cbEntry->recElementId,
-                                    (string) $cbEntry->recName,
-                                    $cnt,
-                                    $displayNames
-                                );
-                                $cbOut = $uploadControls['html'];
-                                $js .= $uploadControls['deactivation'];
-                                $js .= $this->contentBuilderFileHydrationScriptBuilder()->build(
-                                    (int) $cbEntry->recElementId,
-                                    $cbOut
-                                );
-                            }
-                            break;
-                        case 'Signature':
-
-                            $sig_path = JPATH_SITE . '/media/breezingforms/signatures/';
-
-                        $signaturePath = $this->contentBuilderFileSupportBuilder()->resolveSignature(
-                                $sig_path,
-                                (string) $cbEntry->recValue
-                            );
-
-                            if ($signaturePath !== null) {
-
-                                $sig_encoded = $this->contentBuilderSignatureImageEncoder()->encode($signaturePath);
-
-                                $js .= $this->contentBuilderSignatureScriptBuilder()->build(
-                                    (string) $cbEntry->recName,
-                                    (int) $cbEntry->recElementId,
-                                    (string) $sig_encoded
-                                );
-                            }
-                            break;
-                        case 'Textarea':
-                        case 'Text':
-                        case 'Number Input':
-                        case 'Hidden Input':
-                        case 'Calendar':
-
-                            /*
-                              if($cbEntry->recType == 'Textarea'){
-
-                              $dataObject = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
-                              $qmelement = $this->processor->findQuickModeElement($dataObject, $cbEntry->recName);
-
-                              if(isset($cbEntry->recValue) && $qmelement !== null && isset($qmelement['properties']['is_html']) && $qmelement['properties']['is_html']) {
-
-                              $cbEntry->recValue = $this->processor->removeDangerousHtml($cbEntry->recValue);
-                              }
-                              } */
-
-                            $js .= $this->contentBuilderValueHydrationScriptBuilder()->build(
-                                (string) $cbEntry->recType,
-                                (string) $cbEntry->recName,
-                                (int) $cbEntry->recElementId,
-                                $cbEntry->recValue
-                            );
-                            break;
-                        case 'Checkbox':
-                        case 'Checkbox Group':
-                            $js .= $this->contentBuilderChoiceHydrationScriptBuilder()->build(
-                                'checkbox',
-                                (string) $cbEntry->recName,
-                                (int) $this->processor->form,
-                                (string) $cbEntry->recValue
-                            );
-                            break;
-                        case 'Radio Button':
-                        case 'Radio Group':
-                            $js .= $this->contentBuilderChoiceHydrationScriptBuilder()->build(
-                                'radio',
-                                (string) $cbEntry->recName,
-                                (int) $this->processor->form,
-                                (string) $cbEntry->recValue
-                            );
-                            break;
-                        case 'Select List':
-                            $js .= $this->contentBuilderSelectHydrationScriptBuilder()->build(
-                                (int) $cbEntry->recElementId,
-                                (string) $cbEntry->recValue
-                            );
-                            break;
-                    }
-                }
-            }
-
+            $cbNonEditableFields = ListSupportService::createFromRuntimeContext()->getListNonEditableElements(
+                $cbResult['data']['id']
+            );
+            $scripts = $this->contentBuilderEditableRecordScriptBuilder()->build(
+                $cbRecord,
+                $cbNonEditableFields,
+                trim((string) $this->processor->formrow->template_code_processed) === 'QuickMode',
+                (int) $this->processor->form,
+                JPATH_SITE . '/media/breezingforms/signatures/'
+            );
             echo $this->legacyScriptTagWrapperBuilder()->contentBuilderEditable(
                 (int) $this->processor->form,
-                $cbJs,
-                $js
+                $scripts['contentBuilderScript'],
+                $scripts['javascript']
             );
         }
 

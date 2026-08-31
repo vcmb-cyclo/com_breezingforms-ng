@@ -91,6 +91,7 @@ final class RenderingEngine
     private ?MobileChoiceMarkupBuilder $mobileChoiceMarkupBuilderService = null;
     private ?CaptchaWrapperMarkupBuilder $captchaWrapperMarkupBuilderService = null;
     private ?QuickModeFormTagBuilder $quickModeFormTagBuilderService = null;
+    private ?ContentBuilderReadonlyScriptWrapperBuilder $contentBuilderReadonlyScriptWrapperBuilderService = null;
     private ?AdditionalHiddenFieldsBuilder $additionalHiddenFieldsBuilderService = null;
     private ?PaymentProviderDetector $paymentProviderDetectorService = null;
     private ?ContentBuilderFileValueParser $contentBuilderFileValueParserService = null;
@@ -371,6 +372,11 @@ final class RenderingEngine
     private function quickModeFormTagBuilder(): QuickModeFormTagBuilder
     {
         return $this->quickModeFormTagBuilderService ??= new QuickModeFormTagBuilder();
+    }
+
+    private function contentBuilderReadonlyScriptWrapperBuilder(): ContentBuilderReadonlyScriptWrapperBuilder
+    {
+        return $this->contentBuilderReadonlyScriptWrapperBuilderService ??= new ContentBuilderReadonlyScriptWrapperBuilder();
     }
 
     private function additionalHiddenFieldsBuilder(): AdditionalHiddenFieldsBuilder
@@ -1021,11 +1027,10 @@ final class RenderingEngine
             $cbNonEditableFields = ListSupportService::createFromRuntimeContext()->getListNonEditableElements($cbResult['data']['id']);
             if (count($cbNonEditableFields)) {
                 $this->processor->app->getDocument()->getWebAssetManager()->addInlineScript('<!--' . nl() . 'var bfDeactivateField = new Array();' . nl() . '//-->');
-                echo '<script type="text/javascript">' . nl();
-                echo '<!--' . nl();
-                echo $this->contentBuilderReadonlyScriptBuilder()->build($cbNonEditableFields);
-                echo '//-->' . nl();
-                echo '</script>' . nl();
+                echo $this->contentBuilderReadonlyScriptWrapperBuilder()->build(
+                    $this->contentBuilderReadonlyScriptBuilder()->build($cbNonEditableFields),
+                    nl()
+                );
             }
         }
 

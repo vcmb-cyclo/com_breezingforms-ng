@@ -792,6 +792,11 @@ supprimée : elle n'avait plus d'appelant depuis l'extraction de
 `CaptchaSupportBuilderTest`, tandis que `RenderingEngine::view()` conserve ses
 caractérisations d'intégration ; le niveau 4 descend à 20 diagnostics.
 
+Dans `CodeToolsRuntime::findRealToken()`, l'état des commentaires de bloc est
+corrigé : l'ouverture active désormais `blockcmt` et le token `*/` le clôture.
+Le parseur ne traite plus les accolades et mots-clés situés dans un commentaire
+comme du code ; ce comportement est couvert par `CodeToolsRuntimeTest`.
+
 Dans la finalisation ContentBuilder de `SubmissionEngine`, la condition
 interne sur `cbRecordId` est supprimée puisque la garde englobante le rend déjà
 vrai. La redirection `return` et les contrôles `force_login`/`force_url` restent

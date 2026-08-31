@@ -154,6 +154,18 @@ final class CodeToolsRuntimeTest extends TestCase
         self::assertSame(2, $line);
     }
 
+    public function testFindRealTokenSkipsBlockCommentsBeforeParsingCode(): void
+    {
+        $runtime = new CodeToolsRuntime($this->processor());
+        $code = '/* ignored { return; */ function answer();';
+        $position = 0;
+        $offset = -1;
+        $line = 1;
+
+        self::assertSame('function', $runtime->findRealToken($code, $position, $offset, $line));
+        self::assertSame('(', $runtime->findRealToken($code, $position, $offset, $line));
+    }
+
     private function processor(int $template = 0, string $suffix = ''): HTML_facileFormsProcessor
     {
         $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();

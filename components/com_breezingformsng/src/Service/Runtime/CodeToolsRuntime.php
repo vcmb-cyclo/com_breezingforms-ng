@@ -204,7 +204,11 @@ final class CodeToolsRuntime
                     break;
                 case '/*':
                     if (!$linecmt && !$quote)
-                        $longcmt = true;
+                        $blockcmt = true;
+                    break;
+                case '*/':
+                    if ($blockcmt)
+                        $blockcmt = false;
                     break;
                 case '"':
                 case "'":

@@ -87,6 +87,8 @@ class PdfDocument extends \TCPDF
         $pdf = $this;
 
         $active_found = '';
+        $font_loaded = false;
+        $ttf_name = '';
 
         if( is_dir(JPATH_SITE.'/media/breezingforms/pdftpl/fonts/') ){
 
@@ -146,6 +148,8 @@ class PdfDocument extends \TCPDF
         $pdf = $this;
 
         $active_found = '';
+        $font_loaded = false;
+        $ttf_name = '';
 
         if( is_dir(JPATH_SITE.'/media/breezingforms/pdftpl/fonts/') ){
 

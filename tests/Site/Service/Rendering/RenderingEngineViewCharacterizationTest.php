@@ -1487,6 +1487,8 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         $processor->app->getInput()->set('cb_form_id', 88);
         $processor->app->getInput()->set('cb_record_id', 144);
         $processor->app->getInput()->set('cbIsNew', true);
+        $processor->app->getInput()->set('return', 'https://example.test/thanks');
+        $processor->app->getInput()->set('tmpl', 'component');
 
         $html = $this->captureCaptchaScript($processor);
 
@@ -1494,6 +1496,8 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertStringContainsString('name="cb_form_id" value="88"', $html);
         self::assertStringContainsString('name="cb_record_id" value="144"', $html);
         self::assertStringContainsString('name="cbIsNew" value="1"', $html);
+        self::assertStringContainsString('name="return" value="https://example.test/thanks"', $html);
+        self::assertStringContainsString('name="tmpl" value="component"', $html);
         self::assertStringNotContainsString('<piece>', $html);
     }
 

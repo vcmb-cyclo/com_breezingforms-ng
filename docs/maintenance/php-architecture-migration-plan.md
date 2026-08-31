@@ -159,7 +159,8 @@ pour les champs simples, checkbox/radio, listes, valeurs vides et types
 inconnus. Son enveloppe de chargement et le nettoyage historique de
 `ff_nm_seccode[]` sont maintenant isolés dans
 `EditableRecordScriptWrapperBuilder` (`f3b6f8d97`) ; le nettoyage
-`InputFilter` reste explicitement dans `view()`.
+`InputFilter` est injecté dans le builder sous forme de closure, sans mutation
+des entrées.
 
 - La recherche du dernier enregistrement, les requêtes
   `#__facileforms_records`/`#__facileforms_subrecords` et le résultat typé sont

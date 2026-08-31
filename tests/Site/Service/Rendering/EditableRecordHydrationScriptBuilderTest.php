@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Rendering;
 
 use PHPUnit\Framework\TestCase;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderValueScriptBuilder;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\EditableRecordHydrationScriptBuilder;
 
 final class EditableRecordHydrationScriptBuilderTest extends TestCase
@@ -45,5 +46,19 @@ final class EditableRecordHydrationScriptBuilderTest extends TestCase
         ], 9);
 
         self::assertSame('', $script);
+    }
+
+    public function testCleansValuesWithoutMutatingInputEntries(): void
+    {
+        $entry = (object) ['type' => 'Text', 'name' => 'title', 'element' => 11, 'value' => '  Hello  '];
+        $builder = new EditableRecordHydrationScriptBuilder(
+            new ContentBuilderValueScriptBuilder(),
+            static fn(string $value): string => trim($value)
+        );
+
+        $script = $builder->build([$entry], 9);
+
+        self::assertStringContainsString('Hello', $script);
+        self::assertSame('  Hello  ', $entry->value);
     }
 }

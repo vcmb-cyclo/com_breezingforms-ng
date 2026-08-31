@@ -14,16 +14,20 @@ declare(strict_types=1);
 
 namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering;
 
+use Closure;
+
 /**
  * Builds the JavaScript that restores an editable BreezingForms record.
  *
- * Entry values are expected to have been cleaned by the caller. This service
- * only assembles the historical control updates and has no Joomla dependency.
+ * The optional cleaner allows the caller to provide its runtime-specific
+ * sanitization without making this service depend on Joomla.
  */
 final class EditableRecordHydrationScriptBuilder
 {
-    public function __construct(private readonly ContentBuilderValueScriptBuilder $valueScriptBuilder = new ContentBuilderValueScriptBuilder())
-    {
+    public function __construct(
+        private readonly ContentBuilderValueScriptBuilder $valueScriptBuilder = new ContentBuilderValueScriptBuilder(),
+        private readonly ?Closure $cleanValue = null
+    ) {
     }
 
     /**
@@ -38,6 +42,9 @@ final class EditableRecordHydrationScriptBuilder
             $name = (string) $entry->name;
             $elementId = (int) $entry->element;
             $value = (string) $entry->value;
+            if ($this->cleanValue !== null) {
+                $value = ($this->cleanValue)($value);
+            }
 
             switch ($type) {
                 case 'Textarea':

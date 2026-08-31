@@ -286,8 +286,10 @@ final class RenderingEngine
 
     private function editableRecordHydrationScriptBuilder(): EditableRecordHydrationScriptBuilder
     {
-        return $this->editableRecordHydrationScriptBuilderService ??=
-            new EditableRecordHydrationScriptBuilder($this->contentBuilderValueScriptBuilder());
+        return $this->editableRecordHydrationScriptBuilderService ??= new EditableRecordHydrationScriptBuilder(
+            $this->contentBuilderValueScriptBuilder(),
+            fn(string $value): string => (string) InputFilter::getInstance([], [], 1, 1)->clean($value, 'html')
+        );
     }
 
     private function hiddenFormFieldsBuilder(): HiddenFormFieldsBuilder
@@ -805,18 +807,6 @@ final class RenderingEngine
             if ($editableRecord !== null) {
                 $this->processor->record_id = $editableRecord->id;
                 $recordEntries = $editableRecord->entries;
-                foreach ($recordEntries as $recordEntry) {
-
-                    //$recordEntry->value = $this->processor->removeDangerousHtml($recordEntry->value);
-
-                    /*
-                      $input = $this->processor->app->getInput();
-                      $input->set('cbCleanVar', $recordEntry->value);
-                      $recordEntry->value = $input->getHtml('cbCleanVar'); */
-
-                    $recordEntry->value = InputFilter::getInstance([], [], 1, 1)->clean((string) $recordEntry->value, 'html');
-
-                }
 
                 $js = $this->editableRecordHydrationScriptBuilder()->build($recordEntries, (int) $this->processor->form);
 

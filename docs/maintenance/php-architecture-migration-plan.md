@@ -1855,6 +1855,12 @@ existants : normalisation d'un chemin sous-répertoire, enregistrement
 idempotent des scripts, génération de noms dépendant des attributs et
 enregistrement des feuilles de style hors du chemin racine.
 
+Le \`RuntimeContextInitializer\` est maintenant couvert sur la normalisation
+des URLs explicites, la reconstruction d'une URL HTTPS derrière proxy avec
+port non standard, et la collecte sélective des paramètres de contenu. Le
+double d'application partagé expose désormais uniquement les primitives
+Input/Server nécessaires à ce harnais.
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

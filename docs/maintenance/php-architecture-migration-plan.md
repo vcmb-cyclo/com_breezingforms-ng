@@ -1861,6 +1861,11 @@ port non standard, et la collecte sélective des paramètres de contenu. Le
 double d'application partagé expose désormais uniquement les primitives
 Input/Server nécessaires à ce harnais.
 
+Les délégations modernisées de \`CodeToolsRuntime\` sont caractérisées
+directement : nettoyage et détection de code, export JavaScript, résolution
+des classes et formatage du mode de trace. Le parsing/eval historique reste
+séparé, avec son propre besoin de caractérisation plus large.
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

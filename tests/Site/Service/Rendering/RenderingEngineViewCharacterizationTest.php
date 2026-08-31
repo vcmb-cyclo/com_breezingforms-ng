@@ -1466,6 +1466,8 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertStringContainsString('name="cbIsNew" value="1"', $html);
         self::assertStringContainsString('name="return" value="https://example.test/thanks"', $html);
         self::assertStringContainsString('name="tmpl" value="component"', $html);
+        self::assertStringNotContainsString('name="ff_runmode"', $html);
+        self::assertStringNotContainsString('name="ff_frame"', $html);
         self::assertStringNotContainsString('<piece>', $html);
     }
 
@@ -1501,6 +1503,7 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
             $html
         );
         self::assertStringContainsString('name="tmpl" value="component"', $html);
+        self::assertStringNotContainsString('name="ff_frame"', $html);
         self::assertStringNotContainsString('<piece>', $html);
     }
 
@@ -1535,6 +1538,35 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertStringContainsString('name="ff_frame" value="1"', $html);
         self::assertStringContainsString('name="return" value="index.php?preview=1"', $html);
         self::assertStringContainsString('name="tmpl" value="component"', $html);
+    }
+
+    public function testViewOmitsPreviewHiddenFieldsOutsideAnIframe(): void
+    {
+        $processor = $this->makeProcessorReadyForCaptchaScript([]);
+        $processor->formrow->name = 'preview';
+        $processor->formrow->piece2cond = 0;
+        $processor->formrow->script1cond = 0;
+        $processor->formrow->script1id = 0;
+        $processor->formrow->script1code = '';
+        $processor->formrow->script2cond = 0;
+        $processor->formrow->script2id = 0;
+        $processor->formrow->script2code = '';
+        $processor->formrow->class2 = '';
+        $processor->form_id = 7;
+        $processor->target = 0;
+        $processor->align = 0;
+        $processor->top = 0;
+        $processor->runmode = 2;
+        $processor->inframe = 0;
+        $processor->traceMode = 0;
+        $processor->buryOnCallNumber = null;
+        $GLOBALS['ff_otherparams'] = [];
+
+        $html = $this->captureCaptchaScript($processor);
+
+        self::assertStringContainsString('</div><!-- form end -->', $html);
+        self::assertStringNotContainsString('name="ff_runmode"', $html);
+        self::assertStringNotContainsString('name="ff_frame"', $html);
     }
 
     public function testViewSelectsQuickModeRendererFromTemplateMetadata(): void

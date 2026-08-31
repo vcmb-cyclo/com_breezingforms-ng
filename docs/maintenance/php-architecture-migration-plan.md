@@ -875,6 +875,12 @@ Le contenu des infobulles QuickMode est désormais résolu par
 entre Classic et Bootstrap/OnePage lorsque plusieurs marqueurs sont présents.
 Les tests dédiés verrouillent ces cas avant toute évolution future du markup.
 
+Le harnais de caractérisation de `RenderingEngine::view()` couvre maintenant
+également la finalisation preview hors iframe, en plus des parcours frontend,
+backend et preview dans iframe. Les assertions vérifient la présence et
+l'absence des champs `ff_runmode` et `ff_frame` selon le mode, sans changer la
+sortie produite.
+
 Les deux gardes locales `if (!$halt)` de `SubmissionEngine` ont ensuite été
 retirées : `$halt` était initialisé à `false` et ses seules affectations à
 `true` précédaient immédiatement `exit`. Le contrôle CAPTCHA, les pièces de

@@ -17,6 +17,30 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode;
 /** Builds the shared visible ReCaptcha initialization script. */
 final class QuickModeReCaptchaInitScriptBuilder
 {
+    /** @param array<string, mixed> $field */
+    public function visibleConfiguration(array $field, bool $resetOnRerender): array
+    {
+        return [
+            'sitekey' => $field['pubkey'],
+            'theme' => trim((string) $field['theme']) === '' ? 'light' : trim((string) $field['theme']),
+            'size' => ($field['size'] ?? '') !== '' ? $field['size'] : 'normal',
+            'resetOnRerender' => $resetOnRerender,
+        ];
+    }
+
+    /** @param array<string, mixed> $field */
+    public function invisibleConfiguration(array $field, bool $hasFlashUpload, bool $resetFlagOnCallback): array
+    {
+        $badge = str_replace('invisible_', '', trim((string) $field['theme']));
+
+        return [
+            'sitekey' => $field['pubkey'],
+            'badge' => $badge === 'red' ? '' : $badge,
+            'hasFlashUpload' => $hasFlashUpload,
+            'resetFlagOnCallback' => $resetFlagOnCallback,
+        ];
+    }
+
     public function visibleApiUrl(string $languageTag): string
     {
         $language = explode('-', $languageTag)[0];

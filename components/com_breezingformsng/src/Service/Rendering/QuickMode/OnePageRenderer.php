@@ -983,12 +983,9 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                                                         </div>
                                                         <div class="g-recaptcha" data-sitekey="' . $mdata['pubkey'] . '"></div>
                                                     </div>
-                                                    ' . $this->quickModeReCaptchaInitScriptBuilder()->visible([
-                                    'sitekey' => $mdata['pubkey'],
-                                    'theme' => trim($mdata['theme']) == '' ? 'light' : trim($mdata['theme']),
-                                    'size' => $size,
-                                    'resetOnRerender' => false,
-                                ]);
+                                                    ' . $this->quickModeReCaptchaInitScriptBuilder()->visible(
+                                    $this->quickModeReCaptchaInitScriptBuilder()->visibleConfiguration($mdata, false)
+                                );
                             } elseif (isset($mdata['invisibleCaptcha']) && $mdata['invisibleCaptcha']) {
                                 $badge = str_replace('invisible_', '', trim($mdata['theme']));
 
@@ -1012,12 +1009,9 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
 
                                 RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-recaptcha-invisible.js');
 
-                                echo '<script data-usercentrics="reCAPTCHA" type="text/javascript">bfInitInvisibleReCaptcha(' . $this->quickModeReCaptchaInitScriptBuilder()->encode([
-                                    'sitekey' => $mdata['pubkey'],
-                                    'badge' => $badge == 'red' ? '' : $badge,
-                                    'hasFlashUpload' => $this->hasFlashUpload,
-                                    'resetFlagOnCallback' => false,
-                                ]) . ');</script>
+                                echo '<script data-usercentrics="reCAPTCHA" type="text/javascript">bfInitInvisibleReCaptcha(' . $this->quickModeReCaptchaInitScriptBuilder()->encode(
+                                    $this->quickModeReCaptchaInitScriptBuilder()->invisibleConfiguration($mdata, $this->hasFlashUpload, false)
+                                ) . ');</script>
                                                   <script data-usercentrics="reCAPTCHA" src="' . $this->quickModeReCaptchaInitScriptBuilder()->invisibleApiUrl() . '" async defer></script>
                                                   ';
                             }

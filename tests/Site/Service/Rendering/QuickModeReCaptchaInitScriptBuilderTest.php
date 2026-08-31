@@ -9,6 +9,32 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\QuickModeReC
 
 final class QuickModeReCaptchaInitScriptBuilderTest extends TestCase
 {
+    public function testNormalizesVisibleConfigurationDefaults(): void
+    {
+        self::assertSame([
+            'sitekey' => 'public-key',
+            'theme' => 'light',
+            'size' => 'normal',
+            'resetOnRerender' => false,
+        ], (new QuickModeReCaptchaInitScriptBuilder())->visibleConfiguration([
+            'pubkey' => 'public-key',
+            'theme' => ' ',
+        ], false));
+    }
+
+    public function testNormalizesInvisibleConfigurationBadgeAndFlags(): void
+    {
+        self::assertSame([
+            'sitekey' => 'public-key',
+            'badge' => '',
+            'hasFlashUpload' => true,
+            'resetFlagOnCallback' => true,
+        ], (new QuickModeReCaptchaInitScriptBuilder())->invisibleConfiguration([
+            'pubkey' => 'public-key',
+            'theme' => 'invisible_red',
+        ], true, true));
+    }
+
     public function testBuildsTheVisibleGoogleApiUrlForTheActiveLanguage(): void
     {
         $builder = new QuickModeReCaptchaInitScriptBuilder();

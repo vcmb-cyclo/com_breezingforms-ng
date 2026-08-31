@@ -46,6 +46,7 @@
 | QuickMode — règles de bascule | Parsing `toggleFields` mutualisé entre les quatre renderers, avec API publique conservée et valeurs multi-mots couvertes | Commit `37c554755` |
 | QuickMode — options calendrier | Normalisation des booléens, formats Pickadate, premier jour et années mutualisée entre les quatre renderers | Commit `a2e025609` |
 | QuickMode — expression éditeur | Construction de l’expression JavaScript de lecture des éditeurs mutualisée entre Bootstrap et OnePage, API publique conservée | Commit `43592c8bd` |
+| QuickMode — mapping Bootstrap | Mapping Bootstrap 5 des classes mutualisé entre Bootstrap et OnePage, résolution publique `bsClass()` conservée | Commit `658078588` |
 | `RenderingEngine::view()` — validation | Extensions de fichiers, valeurs par défaut et scripts CAPTCHA extraits et couverts | Builders de validation dédiés |
 | `RenderingEngine::view()` — CAPTCHA | Sélection `Captcha` / `ReCaptcha`, endpoints site/admin et générateurs JavaScript isolés, ordre historique préservé | Commits `4a070774`, `8e3e9a7a`, `4563ae11`, `d328c4f8`, `75c0ca2b`, `1cea0c84` |
 | `RenderingEngine::view()` — Query List | Préparation extraite et variantes par défaut/checkbox/résultat vide couvertes | Commits `4070ec0f`, `b358e7e9` |
@@ -637,6 +638,11 @@ La construction de l'expression JavaScript d'accès aux éditeurs est désormais
 confiée à `QuickModeEditorValueBuilder` (`43592c8bd`). Bootstrap et OnePage
 conservent leurs méthodes publiques `getEditorContent()` comme délégations,
 avec la sortie historique couverte par un test unitaire.
+
+Le mapping Bootstrap 5 commun à Bootstrap et OnePage est désormais fourni par
+`QuickModeBootstrapClassMapBuilder` (`658078588`). La méthode publique
+`bsClass()` reste dans chaque renderer et les 54 associations historiques
+restent couvertes par un test de mapping.
 
 Le contrôle `bfCheckbox` est désormais extrait dans
 `QuickModeCheckboxBuilder` et branché dans les quatre renderers par

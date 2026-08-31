@@ -75,6 +75,7 @@ class ClassicRenderer
     private ?QuickModePagingActionBuilder $quickModePagingActionBuilderService = null;
     private ?QuickModeSubmitActionBuilder $quickModeSubmitActionBuilderService = null;
     private ?QuickModeCalendarOptionsBuilder $quickModeCalendarOptionsBuilderService = null;
+    private ?QuickModeHtmlTextareaScriptBuilder $quickModeHtmlTextareaScriptBuilderService = null;
     private ?QuickModeDeactivationScriptBuilder $quickModeDeactivationScriptBuilderService = null;
 
     private function quickModeCalendarOptionsBuilder(): QuickModeCalendarOptionsBuilder
@@ -85,6 +86,11 @@ class ClassicRenderer
     private function quickModeDeactivationScriptBuilder(): QuickModeDeactivationScriptBuilder
     {
         return $this->quickModeDeactivationScriptBuilderService ??= new QuickModeDeactivationScriptBuilder();
+    }
+
+    private function quickModeHtmlTextareaScriptBuilder(): QuickModeHtmlTextareaScriptBuilder
+    {
+        return $this->quickModeHtmlTextareaScriptBuilderService ??= new QuickModeHtmlTextareaScriptBuilder();
     }
 
     private function quickModeTextFieldStrategy(): QuickModeTextFieldStrategy
@@ -1537,9 +1543,10 @@ float:left;
             );
             foreach ($this->htmltextareas as $htmltextarea) {
                 $editorContent = rtrim(trim($editor->getContent($htmltextarea)), ';');
-                echo '<script type="text/javascript">bfRegisterHtmlTextarea('
-                    . json_encode($htmltextarea) . ', function () { return '
-                    . json_encode($editorContent) . '; });</script>';
+                echo $this->quickModeHtmlTextareaScriptBuilder()->build(
+                    $htmltextarea,
+                    (string) json_encode($editorContent)
+                );
             }
         }
 

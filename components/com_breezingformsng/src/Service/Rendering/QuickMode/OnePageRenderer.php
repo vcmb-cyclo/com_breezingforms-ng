@@ -76,6 +76,7 @@ class OnePageRenderer
     private ?QuickModePagingActionBuilder $quickModePagingActionBuilderService = null;
     private ?QuickModeSubmitActionBuilder $quickModeSubmitActionBuilderService = null;
     private ?QuickModeCalendarOptionsBuilder $quickModeCalendarOptionsBuilderService = null;
+    private ?QuickModeHtmlTextareaScriptBuilder $quickModeHtmlTextareaScriptBuilderService = null;
     private ?QuickModeDeactivationScriptBuilder $quickModeDeactivationScriptBuilderService = null;
 
     private function quickModeCalendarOptionsBuilder(): QuickModeCalendarOptionsBuilder
@@ -86,6 +87,11 @@ class OnePageRenderer
     private function quickModeDeactivationScriptBuilder(): QuickModeDeactivationScriptBuilder
     {
         return $this->quickModeDeactivationScriptBuilderService ??= new QuickModeDeactivationScriptBuilder();
+    }
+
+    private function quickModeHtmlTextareaScriptBuilder(): QuickModeHtmlTextareaScriptBuilder
+    {
+        return $this->quickModeHtmlTextareaScriptBuilderService ??= new QuickModeHtmlTextareaScriptBuilder();
     }
 
     public function bsClass($key)
@@ -1236,9 +1242,10 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
             for ($i = 0; $i < $area_count; $i++) {
                 $htmltextarea = $this->htmltextareas[$i];
                 $dbId = $this->htmltextareasDbIds[$i];
-                echo '<script type="text/javascript">bfRegisterHtmlTextarea('
-                    . json_encode($htmltextarea) . ', function () { return '
-                    . $this->getEditorContent($dbId) . '; });</script>';
+                echo $this->quickModeHtmlTextareaScriptBuilder()->build(
+                    $htmltextarea,
+                    $this->getEditorContent($dbId)
+                );
             }
         }
 

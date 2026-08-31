@@ -1607,6 +1607,11 @@ un test dédié. Le même `QuickModeDeactivationScriptBuilder` centralise
 également le script `bfRegisterDeactivatedField` des trois renderers, sans
 modifier leurs conditions d'activation.
 
+L'enveloppe de registration `bfRegisterHtmlTextarea` est désormais partagée
+par Classic, Bootstrap et OnePage via `QuickModeHtmlTextareaScriptBuilder`.
+La récupération du contenu de l'éditeur reste propre à chaque renderer ; le
+builder accepte donc explicitement l'expression déjà préparée.
+
 La factory est également incluse dans le périmètre PHPCS ; le ruleset complet
 reste vert après son ajout (`7434564bc`).
 

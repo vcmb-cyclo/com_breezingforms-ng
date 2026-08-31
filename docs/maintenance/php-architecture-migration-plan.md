@@ -552,6 +552,10 @@ Les contrôles Classic de choix, bouton régulier, upload et bouton graphique
 sont maintenant suivis par PHPCS après découpage syntaxique neutre de leurs
 chaînes longues ; leurs tests directs restent le filet de caractérisation.
 
+Le builder Classic CAPTCHA rejoint également le périmètre après découpage
+neutre de ses chaînes d'attributs et de script de rechargement ; son test
+direct conserve la couverture des dimensions et de l'endpoint historique.
+
 Le premier nettoyage ciblé de cette baseline PHPCS est réalisé dans
 `QuickModeSelectBuilder`, `QuickModeCaptchaMarkupBuilder` et
 `QuickModeUploadOptionsBuilder` (`eaf8b2d1`) : leurs sorties sont inchangées et

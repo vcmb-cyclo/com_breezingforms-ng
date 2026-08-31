@@ -25,6 +25,7 @@
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicRegularButtonBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicFileUploadBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicGraphicButtonBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ClassicCaptchaBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicTextInputBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicTextareaBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicSelectBuilder.php</file>

@@ -1545,6 +1545,11 @@ champs non éditables et reçoit les opérations dépendantes du runtime via des
 closures typées. `RenderingEngine::view()` ne conserve plus que l’orchestration
 et l’enveloppe historique (`09cf02975`).
 
+Le harnais unitaire couvre également les branches QuickMode d’upload (compteur,
+validation, contrôles de suppression et désactivation) ainsi que la résolution
+et l’encodage d’une signature existante (`7fe0e95a9`). La validation avec le
+runtime ContentBuilder installé reste un contrôle d’intégration séparé.
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

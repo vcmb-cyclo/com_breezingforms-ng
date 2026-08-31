@@ -128,6 +128,7 @@ class HtmlView extends BaseHtmlView
         );
         $wa = $doc->getWebAssetManager();
         $wa->useStyle('com_breezingformsng.tokens');
+        $wa->useStyle('com_breezingformsng.bfng-admin');
         $wa->useStyle('com_breezingformsng.quickmode-style');
         $wa->useStyle('com_breezingformsng.jtree-style');
         $wa->useStyle('com_breezingformsng.admin-style');

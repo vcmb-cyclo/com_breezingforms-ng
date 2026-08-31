@@ -42,4 +42,12 @@ final class QuickModeUploadThumbnailScriptBuilderTest extends TestCase
         self::assertStringContainsString('function bfUploadImageThumb(file) {|', $script);
         self::assertStringContainsString('bfFallbackThumb();|', $script);
     }
+
+    public function testEscapesBaseUrlInsideJavaScriptString(): void
+    {
+        $script = QuickModeUploadThumbnailScriptBuilder::build("/base/';alert(1);//</script>", "\n");
+
+        self::assertStringNotContainsString("resolveUrl('/base/';alert(1);//</script>", $script);
+        self::assertStringContainsString('resolveUrl(\'/base/\\u0027;alert(1);//\\u003C/script\\u003E', $script);
+    }
 }

@@ -1844,6 +1844,12 @@ désormais caractérisés directement. Les tests verrouillent l'expansion
 progressive des tokens de chemins, les variantes frontend/backend/preview,
 l'identifiant de formulaire, la grille d'aperçu et la règle \`canRun\`.
 
+Le \`RequestMetadataResolver\` est maintenant couvert avec un double Browser
+local : adresse visible ou masquée, récupération des informations navigateur,
+désactivation de la résolution fournisseur et repli pour une adresse invalide.
+La résolution DNS n'est pas déclenchée par les tests, ce qui rend le filet
+déterministe.
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

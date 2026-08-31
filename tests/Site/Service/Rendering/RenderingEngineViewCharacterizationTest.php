@@ -267,6 +267,25 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertSame('f', $processor->executedPieces[0]['type']);
     }
 
+    public function testViewAbortsAfterFormCallbacksBeforeElementSections(): void
+    {
+        $processor = $this->makeProcessorReadyForCaptchaScript([]);
+        $processor->formrow->name = 'contact';
+        $processor->formrow->script1cond = 0;
+        $processor->formrow->script1id = 0;
+        $processor->formrow->script1code = 'init';
+        $processor->formrow->script2cond = 0;
+        $processor->formrow->script2id = 0;
+        $processor->formrow->script2code = 'submitted';
+        $processor->buryOnCallNumber = 4;
+
+        $html = $this->captureCaptchaScript($processor);
+
+        self::assertSame(['ff_contact_init', 'ff_contact_submitted'], $processor->callbackNames);
+        self::assertStringNotContainsString('function ff_dispQueryPage', $html);
+        self::assertStringNotContainsString('formValidationClose', $html);
+    }
+
     public function testPermissionsReturnNeutralContextWhenContentBuilderIsUnavailable(): void
     {
         $processor = (new ReflectionClass(HTML_facileFormsProcessor::class))->newInstanceWithoutConstructor();

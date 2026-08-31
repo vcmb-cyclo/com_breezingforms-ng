@@ -751,7 +751,10 @@ templates About : les tests de type redondants, accès nullsafe impossibles et
 catch d'exception jamais levée sont supprimés. Les chemins JSON QuickMode
 valides et invalides sont couverts par `QuickmodeHtmlTest`. Le niveau 4 passe
 de 53 à 52 diagnostics après ce lot ; la baseline niveau 2 reste à 11
-entrées.
+entrées. Le même audit a ensuite supprimé l'état `formId` jamais relu de
+`IntegratorRuntime` et le factory privé `SubmissionEngine::getEvent()` jamais
+appelé ; le niveau 4 est ainsi ramené à 50 diagnostics sans ajouter de
+suppression artificielle dans la baseline.
 
 ## Phase 7 — Réduire les façades historiques
 

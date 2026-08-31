@@ -35,15 +35,12 @@ class IntegratorRuntime
 
     private $rules = array();
 
-    private $formId = -1;
-
     private $data = array();
 
     public function __construct(int $formId, DatabaseInterface $database)
     {
         $this->db = $database;
         $this->rules = $this->getRules($formId);
-        $this->formId = $formId;
     }
 
     public function getRules($formId)

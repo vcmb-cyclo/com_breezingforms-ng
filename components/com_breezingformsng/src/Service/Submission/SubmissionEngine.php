@@ -23,7 +23,6 @@ use Joomla\CMS\Filter\InputFilter;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 use Joomla\Event\Event;
-use Joomla\Event\EventInterface;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Filesystem\Folder;
 use Joomla\Filesystem\File;
@@ -1678,12 +1677,6 @@ transition: box-shadow .15s linear;
     private function uploadTimestampFormatter(): SubmissionTimestampFormatter
     {
         return $this->uploadTimestampFormatterService ??= new SubmissionTimestampFormatter();
-    }
-
-    private function getEvent(string $name): EventInterface
-    {
-
-        return new Event($name);
     }
 
     function removeDangerousHtml($value)

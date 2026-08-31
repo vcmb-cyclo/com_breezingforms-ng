@@ -23,8 +23,11 @@ final class QuickModeGroupOptionBuilder
         bool $checked,
         string $attributes = ''
     ): string {
-        return '<input ' . ($checked ? 'checked="checked" ' : '') . ' class="' . $class . '" '
-            . $attributes . 'type="' . $type . '" name="ff_nm_' . $fieldName . '[]" value="'
-            . htmlentities(trim($value), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $elementId . '"/>';
+        return '<input ' . ($checked ? 'checked="checked" ' : '') . ' class="'
+            . htmlspecialchars($class, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '" '
+            . $attributes . 'type="' . htmlspecialchars($type, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')
+            . '" name="ff_nm_' . htmlspecialchars($fieldName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '[]" value="'
+            . htmlentities(trim($value), ENT_QUOTES, 'UTF-8') . '" id="ff_elem'
+            . htmlspecialchars($elementId, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '"/>';
     }
 }

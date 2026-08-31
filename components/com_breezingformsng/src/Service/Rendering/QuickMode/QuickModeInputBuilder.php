@@ -29,13 +29,16 @@ final class QuickModeInputBuilder
         string $placeholder = '',
         string $suffix = ''
     ): string {
+        $escapedClass = htmlspecialchars($class, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $escapedType = htmlspecialchars($type, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $escapedFieldName = htmlspecialchars($fieldName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $placeholderAttribute = $placeholder !== ''
             ? 'placeholder="' . htmlentities($placeholder, ENT_QUOTES, 'UTF-8') . '" '
             : '';
 
         return '<input ' . $placeholderAttribute
-            . 'class="' . $class . '" ' . $attributes
-            . 'type="' . $type . '" name="ff_nm_' . $fieldName . '[]"'
+            . 'class="' . $escapedClass . '" ' . $attributes
+            . 'type="' . $escapedType . '" name="ff_nm_' . $escapedFieldName . '[]"'
             . ' value="' . htmlentities(trim($value), ENT_QUOTES, 'UTF-8') . '"'
             . ' id="ff_elem' . $elementId . '"' . $suffix . '/>' . "\n";
     }

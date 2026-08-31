@@ -37,4 +37,18 @@ final class QuickModeCheckboxBuilderTest extends TestCase
             $builder->build('ff_elem', 'optin', 'yes', 13, false)
         );
     }
+
+    public function testEscapesClassAndFieldName(): void
+    {
+        $html = (new QuickModeCheckboxBuilder())->build(
+            'ff_elem" onfocus="alert(1)',
+            'field" onfocus="alert(2)',
+            'value',
+            12,
+            false
+        );
+
+        self::assertStringContainsString('ff_elem&quot; onfocus=&quot;alert(1)', $html);
+        self::assertStringContainsString('ff_nm_field&quot; onfocus=&quot;alert(2)[]', $html);
+    }
 }

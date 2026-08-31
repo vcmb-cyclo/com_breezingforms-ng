@@ -54,4 +54,19 @@ final class QuickModeInputBuilderTest extends TestCase
         self::assertStringContainsString('type="range"', $html);
         self::assertStringContainsString('id="ff_elem13" step="1" max="120" min="0"', $html);
     }
+
+    public function testEscapesInputAttributeValues(): void
+    {
+        $html = (new QuickModeInputBuilder())->build(
+            'ff_elem" onfocus="alert(1)',
+            'text" onfocus="alert(2)',
+            'field" onfocus="alert(3)',
+            'value',
+            12
+        );
+
+        self::assertStringContainsString('ff_elem&quot; onfocus=&quot;alert(1)', $html);
+        self::assertStringContainsString('type="text&quot; onfocus=&quot;alert(2)', $html);
+        self::assertStringContainsString('ff_nm_field&quot; onfocus=&quot;alert(3)[]', $html);
+    }
 }

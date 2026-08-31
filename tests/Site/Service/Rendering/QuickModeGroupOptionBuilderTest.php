@@ -32,4 +32,21 @@ final class QuickModeGroupOptionBuilderTest extends TestCase
             (new QuickModeGroupOptionBuilder())->build('checkbox', 'ff_elem form-check-input', 'terms', 'A & B', '18', false)
         );
     }
+
+    public function testEscapesClassTypeFieldNameAndElementId(): void
+    {
+        $html = (new QuickModeGroupOptionBuilder())->build(
+            'radio" onfocus="alert(1)',
+            'ff_elem" onfocus="alert(2)',
+            'field" onfocus="alert(3)',
+            'value',
+            '18" onfocus="alert(4)',
+            false
+        );
+
+        self::assertStringContainsString('type="radio&quot; onfocus=&quot;alert(1)', $html);
+        self::assertStringContainsString('ff_elem&quot; onfocus=&quot;alert(2)', $html);
+        self::assertStringContainsString('ff_nm_field&quot; onfocus=&quot;alert(3)[]', $html);
+        self::assertStringContainsString('ff_elem18&quot; onfocus=&quot;alert(4)', $html);
+    }
 }

@@ -22,10 +22,10 @@ final class QuickModeCheckboxBuilder
         bool $checked,
         string $attributes = ''
     ): string {
-        return '<input class="' . $class . '" '
+        return '<input class="' . htmlspecialchars($class, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '" '
             . ($checked ? 'checked="checked" ' : '')
             . $attributes
-            . 'type="checkbox" name="ff_nm_' . $fieldName . '[]" value="'
+            . 'type="checkbox" name="ff_nm_' . htmlspecialchars($fieldName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '[]" value="'
             . htmlentities(trim($value), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $elementId . '"/>' . "\n";
     }
 }

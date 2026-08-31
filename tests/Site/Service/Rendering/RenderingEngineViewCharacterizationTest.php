@@ -10,6 +10,7 @@ use Joomla\CMS\Uri\Uri;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\FileExtensionsCheckBuilder;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\RenderingEngine;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\TokenizedDirectoryResolver;
 
@@ -281,11 +282,12 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
             (object) ['type' => 'File Upload', 'data2' => '', 'id' => 22, 'page' => 1],
         ];
 
-        $engine = (new ReflectionClass(RenderingEngine::class))->newInstanceWithoutConstructor();
-        (new ReflectionClass($engine))->getProperty('processor')->setValue($engine, $processor);
-
-        $method = (new ReflectionClass($engine))->getMethod('buildFileExtensionsCheck');
-        [$script, $count] = $method->invoke($engine);
+        [$script, $count] = (new FileExtensionsCheckBuilder())->build(
+            $processor->rows,
+            $processor->rowcount,
+            '"Extension not allowed"',
+            true
+        );
 
         self::assertSame(1, $count);
         self::assertStringContainsString('ff_elem21Exts', $script);
@@ -295,7 +297,12 @@ final class RenderingEngineViewCharacterizationTest extends TestCase
         self::assertStringNotContainsString('ff_elem22Exts', $script);
 
         $processor->formrow->template_code = '';
-        [$emptyTemplateScript, $emptyTemplateCount] = $method->invoke($engine);
+        [$emptyTemplateScript, $emptyTemplateCount] = (new FileExtensionsCheckBuilder())->build(
+            $processor->rows,
+            $processor->rowcount,
+            '"Extension not allowed"',
+            false
+        );
 
         self::assertSame(0, $emptyTemplateCount);
         self::assertStringContainsString('return true;', $emptyTemplateScript);

@@ -56,6 +56,7 @@
 | QuickMode OnePage — fermeture Thank You | Redirection `bf_remodal_close()` extraite dans un builder pur, avec panier et URL formulaire conservés | Commit `ca2b8f42d` |
 | QuickMode OnePage — soumission AJAX | Callback `bf_ajax_submit()` extrait dans un builder pur, avec échec, succès direct et page Thank You couverts | Commit `01ab2d4bd` |
 | QuickMode — miniature upload | Callback `bfUploadImageThumb()` partagé entre les quatre renderers, avec chemin Moxie et repli FileReader couverts | Commit `704ccbea2` |
+| QuickMode — progression upload | Callback plupload `UploadProgress` partagé entre les quatre renderers, avec mise à jour de la barre et du pourcentage couverte | Commit `1e28a79b2` |
 | QuickMode — expression éditeur | Construction de l’expression JavaScript de lecture des éditeurs mutualisée entre Bootstrap et OnePage, API publique conservée | Commit `43592c8bd` |
 | QuickMode — mapping Bootstrap | Mapping Bootstrap 5 des classes mutualisé entre Bootstrap et OnePage, résolution publique `bsClass()` conservée | Commit `658078588` |
 | Finalisation — champs de soumission | Champs cachés communs frontend/backend/preview extraits avec conservation des différences `act`/`ff_frame` | Commit `be602b94f` |
@@ -847,6 +848,12 @@ renderers. Le chemin Moxie, la destruction après intégration, la détection de
 extensions image et le repli `FileReader` sont couverts par un test dédié ;
 les différences de markup et la configuration plupload restent dans chaque
 renderer.
+
+Le callback plupload `UploadProgress` est désormais généré par
+`QuickModeUploadProgressScriptBuilder` (`1e28a79b2`) pour les quatre renderers.
+La mise à jour du pourcentage et de la barre visuelle reste inchangée et est
+couverte par un test de sortie ; les callbacks d’ajout, d’erreur et de fin
+d’upload restent à traiter par sous-lots.
 
 Les quatre renderers ne possèdent plus chacun leurs cinq adaptateurs privés de
 calendrier : `CalendarOptionsTrait` (`05090635f`) délègue les booléens, le

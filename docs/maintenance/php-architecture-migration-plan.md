@@ -54,6 +54,7 @@
 | Finalisation — balise form QuickMode | Assemblage de la balise `<form>` extrait, calcul d’URL conservé dans l’orchestrateur et classe historique préservée | Commit `4f5b8559d` |
 | ContentBuilder — wrapper readonly | Enveloppe du script des champs non éditables extraite et couverte, avec marqueurs historiques conservés | Commit `3e1723d15` |
 | Validation — enveloppe JavaScript | Ouverture/fermeture du script global de validation extraite, contrôles extensions/CAPTCHA conservés dans l’orchestrateur | Commit `9b92acb55` |
+| Finalisation — ouverture caractérisée | Initialisation du rendu testée avec remise à zéro des états Query List et wrapper ReCaptcha legacy | Commit `0d33f0253` |
 | `RenderingEngine::view()` — validation | Extensions de fichiers, valeurs par défaut et scripts CAPTCHA extraits et couverts | Builders de validation dédiés |
 | `RenderingEngine::view()` — CAPTCHA | Sélection `Captcha` / `ReCaptcha`, endpoints site/admin et générateurs JavaScript isolés, ordre historique préservé | Commits `4a070774`, `8e3e9a7a`, `4563ae11`, `d328c4f8`, `75c0ca2b`, `1cea0c84` |
 | `RenderingEngine::view()` — Query List | Préparation extraite et variantes par défaut/checkbox/résultat vide couvertes | Commits `4070ec0f`, `b358e7e9` |
@@ -602,6 +603,11 @@ L'enveloppe du script global de validation est désormais construite par
 `FormValidationScriptWrapperBuilder` (`9b92acb55`). Les contrôles de fichiers
 et de CAPTCHA restent générés par leurs services respectifs, tandis que les
 marqueurs du bloc JavaScript et leur ordre historique sont testés.
+
+L'initialisation de formulaire est désormais caractérisée de bout en bout au
+niveau de sa méthode dédiée par `0d33f0253` : les registres Query List sont
+réinitialisés, le wrapper ReCaptcha legacy est présent uniquement dans ce
+mode et l'ouverture du formulaire conserve son identifiant.
 
 Les sorties anticipées de `RenderingEngine::view()` après activation du buffer
 et du gestionnaire d'erreurs nettoient désormais leur propre état via

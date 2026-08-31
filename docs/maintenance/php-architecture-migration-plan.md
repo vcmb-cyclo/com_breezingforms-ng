@@ -50,6 +50,7 @@
 | Finalisation — champs de soumission | Champs cachés communs frontend/backend/preview extraits avec conservation des différences `act`/`ff_frame` | Commit `be602b94f` |
 | Finalisation — caractérisation des modes | Sorties exactes des champs de soumission frontend, backend et preview verrouillées par tests | Commit `dc73ec0fc` |
 | Finalisation — choix mobile | Construction du script et du markup de choix mobile extraite, calcul de l’URL conservé dans l’orchestrateur | Commit `39a4c1da0` |
+| Finalisation — wrapper ReCaptcha | Markup du wrapper ReCaptcha historique extrait, activé uniquement pour l’enveloppe legacy et couvert | Commit `092a2a9fa` |
 | `RenderingEngine::view()` — validation | Extensions de fichiers, valeurs par défaut et scripts CAPTCHA extraits et couverts | Builders de validation dédiés |
 | `RenderingEngine::view()` — CAPTCHA | Sélection `Captcha` / `ReCaptcha`, endpoints site/admin et générateurs JavaScript isolés, ordre historique préservé | Commits `4a070774`, `8e3e9a7a`, `4563ae11`, `d328c4f8`, `75c0ca2b`, `1cea0c84` |
 | `RenderingEngine::view()` — Query List | Préparation extraite et variantes par défaut/checkbox/résultat vide couvertes | Commits `4070ec0f`, `b358e7e9` |
@@ -577,6 +578,11 @@ Le markup du choix mobile est désormais construit par
 `MobileChoiceMarkupBuilder` (`39a4c1da0`). Le calcul de l'URL et la
 normalisation des paramètres restent dans `RenderingEngine`, tandis que la
 sortie JavaScript/HTML historique est couverte par un test dédié.
+
+Le wrapper caché `bfReCaptchaWrap` est désormais construit par
+`CaptchaWrapperMarkupBuilder` (`092a2a9fa`). Il reste limité au mode
+`legacy_wrap`, et l'absence de saut de ligne historique est explicitement
+préservée.
 
 Les sorties anticipées de `RenderingEngine::view()` après activation du buffer
 et du gestionnaire d'erreurs nettoient désormais leur propre état via

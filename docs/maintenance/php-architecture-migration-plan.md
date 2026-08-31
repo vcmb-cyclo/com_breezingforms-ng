@@ -575,6 +575,11 @@ conservent la caractérisation des fragments générés.
 aux seuls points de concaténation PHP ; son test direct conserve la couverture
 du comptage des uploads et des variantes de validation JavaScript.
 
+`EditableRecordHydrationScriptBuilder` rejoint également le périmètre après
+factorisation locale des sélecteurs d’options JavaScript et découpage des
+concaténations longues ; ses cinq tests couvrent les familles de contrôles,
+les valeurs vides et l’encodage des valeurs réinjectées.
+
 Le premier nettoyage ciblé de cette baseline PHPCS est réalisé dans
 `QuickModeSelectBuilder`, `QuickModeCaptchaMarkupBuilder` et
 `QuickModeUploadOptionsBuilder` (`eaf8b2d1`) : leurs sorties sont inchangées et

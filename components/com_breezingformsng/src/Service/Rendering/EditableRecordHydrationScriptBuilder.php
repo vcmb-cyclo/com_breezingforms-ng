@@ -61,7 +61,10 @@ final class EditableRecordHydrationScriptBuilder
                     break;
                 case 'Checkbox':
                     if ($value !== '') {
-                        $script .= 'if(document.getElementById("ff_elem' . $elementId . '") && !JQuery(document.getElementById("ff_elem' . $elementId . '")).attr("checked"))JQuery(document.getElementById("ff_elem' . $elementId . '")).click();' . "\n";
+                        $script .= 'if(document.getElementById("ff_elem' . $elementId
+                            . '") && !JQuery(document.getElementById("ff_elem' . $elementId
+                            . '")).attr("checked"))JQuery(document.getElementById("ff_elem' . $elementId
+                            . '")).click();' . "\n";
                     }
                     break;
                 case 'Checkbox Group':
@@ -86,8 +89,11 @@ final class EditableRecordHydrationScriptBuilder
 
         return '
 							for(var i = 0;i < document.ff_form' . $formId . '.elements.length;i++){
-					if(document.ff_form' . $formId . '.elements[i].type == "' . $type . '" && document.ff_form' . $formId . '.elements[i].name == ' . $escapedName . ' && document.ff_form' . $formId . '.elements[i].value == ' . $this->encodeJavaScriptValue($value) . '){
-									if(typeof JQuery != "undefined" && !JQuery(document.ff_form' . $formId . '.elements[i]).attr("checked")){
+						if(document.ff_form' . $formId . '.elements[i].type == "' . $type
+            . '" && document.ff_form' . $formId . '.elements[i].name == ' . $escapedName
+            . ' && document.ff_form' . $formId . '.elements[i].value == ' . $this->encodeJavaScriptValue($value) . '){
+										if(typeof JQuery != "undefined" && !JQuery(document.ff_form' . $formId
+                . '.elements[i]).attr("checked")){
 									    JQuery(document.ff_form' . $formId . '.elements[i]).click();
 									}
 								}
@@ -96,10 +102,15 @@ final class EditableRecordHydrationScriptBuilder
 
     private function buildSelectScript(int $elementId, string $value): string
     {
-        return 'for(var i = 0; i < document.getElementById("ff_elem' . $elementId . '").options.length; i++){
-					if(document.getElementById("ff_elem' . $elementId . '").options[i].value == ' . $this->encodeJavaScriptValue($value) . '){
-									if(typeof JQuery != "undefined" && !JQuery(document.getElementById("ff_elem' . $elementId . '").options[i]).attr("selected")){
-									    JQuery(document.getElementById("ff_elem' . $elementId . '").options[i]).attr("selected", true).trigger("change");
+        $elementSelector = 'document.getElementById("ff_elem' . $elementId . '")';
+        $optionSelector = $elementSelector . '.options[i]';
+        $jqueryOption = 'JQuery(' . $optionSelector . ')';
+        $encodedValue = $this->encodeJavaScriptValue($value);
+
+        return 'for(var i = 0; i < ' . $elementSelector . '.options.length; i++){
+					if(' . $optionSelector . '.value == ' . $encodedValue . '){
+									if(typeof JQuery != "undefined" && !' . $jqueryOption . '.attr("selected")){
+									    ' . $jqueryOption . '.attr("selected", true).trigger("change");
 									}
 								}
 				}' . "\n";

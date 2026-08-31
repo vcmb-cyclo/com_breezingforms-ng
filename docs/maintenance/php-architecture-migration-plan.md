@@ -1473,6 +1473,11 @@ Les sources et textes alternatifs sont échappés et testés, tandis que les
 callbacks de paiement et les valeurs historiques restent propres à chaque
 renderer (`1cd836395`).
 
+Le harnais de `RenderingEngine::view()` couvre désormais explicitement la
+sortie anticipée déclenchée par une pièce « before form » qui demande
+`bury`, et vérifie que les sections de validation suivantes ne sont pas
+émises (`0a2ce63d5`).
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

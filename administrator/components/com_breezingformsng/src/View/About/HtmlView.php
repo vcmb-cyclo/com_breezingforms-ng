@@ -49,7 +49,7 @@ class HtmlView extends BaseHtmlView
             $actionsDropdown = $toolbar->dropdownButton('about-actions-group');
             $actionsDropdown->text(Text::_('COM_BREEZINGFORMSNG_TOOLBAR_ACTIONS'));
             $actionsDropdown->toggleSplit(false);
-            $actionsDropdown->icon('fa fa-wrench');
+            $actionsDropdown->icon('fa-solid fa-wrench');
             $actionsDropdown->buttonClass('btn btn-action');
             $actionsDropdown->listCheck(false);
 
@@ -57,37 +57,37 @@ class HtmlView extends BaseHtmlView
             $actionsChildToolbar->standardButton('about_audit')
                 ->task('about.runAudit')
                 ->text('COM_BREEZINGFORMSNG_ABOUT_AUDIT')
-                ->icon('fa fa-stethoscope')
+                ->icon('fa-solid fa-stethoscope')
                 ->listCheck(false);
 
             $actionsChildToolbar->standardButton('about_migrate_packed_data')
                 ->task('about.startRepairWorkflow')
                 ->text('COM_BREEZINGFORMSNG_ABOUT_MIGRATE_PACKED_DATA')
-                ->icon('fa fa-refresh')
+                ->icon('fa-solid fa-arrows-rotate')
                 ->listCheck(false);
 
             $actionsChildToolbar->standardButton('about_export_configuration')
                 ->task('about.exportConfiguration')
                 ->text('COM_BREEZINGFORMSNG_ABOUT_EXPORT_CONFIGURATION')
-                ->icon('fa fa-download')
+                ->icon('fa-solid fa-download')
                 ->listCheck(false);
 
             $actionsChildToolbar->standardButton('about_import_configuration')
                 ->task('about.importConfiguration')
                 ->text('COM_BREEZINGFORMSNG_ABOUT_IMPORT_CONFIGURATION')
-                ->icon('fa fa-upload')
+                ->icon('fa-solid fa-upload')
                 ->listCheck(false);
 
             $toolbar->standardButton('about_show_log')
                 ->task('about.showLog')
                 ->text('COM_BREEZINGFORMSNG_ABOUT_SHOW_LOG')
-                ->icon('fa fa-file-text-o')
+                ->icon('fa-solid fa-file-lines')
                 ->listCheck(false);
 
             $toolbar->linkButton('about_extensions')
                 ->url(Route::_('index.php?option=com_breezingformsng&task=about.display&view=about&layout=extensions', false))
                 ->text('COM_BREEZINGFORMSNG_ABOUT_EXTENSIONS')
-                ->icon('fa fa-plug');
+                ->icon('fa-solid fa-plug');
         }
 
         ToolbarHelper::preferences('com_breezingformsng');

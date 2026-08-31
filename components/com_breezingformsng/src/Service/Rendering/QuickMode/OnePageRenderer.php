@@ -273,7 +273,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
             RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/remodal/remodal.min.js');
             $this->p->app->getDocument()->getWebAssetManager()->addInlineScript(
                 "\n"
-                . QuickModeRemodalCloseScriptBuilder::build(
+                . (new QuickModeOnePageCallbackScriptBuilder())->closeRemodal(
                     (string) json_encode(Uri::getInstance()->toString()),
                     "\n"
                 )
@@ -314,7 +314,7 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                             "\n"
                         ) . '
 
-                        ' . (new QuickModeSubmitButtonRestoreBuilder())->build("\n") . '
+                        ' . (new QuickModeOnePageCallbackScriptBuilder())->restoreSubmitButton("\n") . '
 
                         ' . (new QuickModeSubmitValidationBuilder())->build("\n") . '
 

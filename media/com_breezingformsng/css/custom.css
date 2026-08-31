@@ -208,8 +208,8 @@ a[onclick^="addOption"]:focus {
 custom radio and checkbox style
 */
 
-main input[type="checkbox"]:not(old):not(#bfOptionsFieldsWrap *),
-main input[type="radio"]:not(old):not(#bfOptionsFieldsWrap *) {
+main input[type="checkbox"]:not(old):not(#bfOptionsFieldsWrap *):not(.bfPropertyWrap *),
+main input[type="radio"]:not(old):not(#bfOptionsFieldsWrap *):not(.bfPropertyWrap *) {
     width: 2em !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -219,17 +219,20 @@ main input[type="radio"]:not(old):not(#bfOptionsFieldsWrap *) {
 }
 
 /* The custom skin above expects an immediate <label><span> sibling to draw the
-   visible control; the QuickMode editor's own Yes/No property toggles don't
-   follow that markup, so they'd otherwise render fully invisible (opacity: 0
-   with nothing drawn in its place). Exempt them. #bfOptionsFieldsWrap (the
-   QuickMode "Options" tab, embedding forms/edit.php's own Bootstrap
-   .form-check radios/checkboxes - docs/maintenance/quickmode-options-tab-plan.md)
-   is excluded from the rule above entirely, so its normal Bootstrap sizing
-   applies too, not just visibility. */
-.bfPropertyWrap input[type="checkbox"],
-.bfPropertyWrap input[type="radio"] {
-    opacity: 1 !important;
-}
+   visible control; the QuickMode editor's own Yes/No property toggles (raw
+   <input/> Text pairs inside .bfPropertyWrap, e.g. the "Choisir un moteur de
+   thèmes" and "Bootstrap Mode/Label Top/Hero Unit/..." radios in
+   advanced_form.php) don't follow that markup, so they'd otherwise render
+   fully invisible (opacity: 0 with nothing drawn in its place). Both
+   #bfOptionsFieldsWrap (the QuickMode "Options" tab, embedding
+   forms/edit.php's own Bootstrap .form-check radios/checkboxes - see
+   docs/maintenance/quickmode-options-tab-plan.md) and .bfPropertyWrap are
+   excluded from the rule above entirely, so their normal native/Bootstrap
+   sizing applies too, not just visibility - a separate
+   `.bfPropertyWrap input { opacity: 1 !important }` override used to attempt
+   this instead, but lost to the rule above on specificity (the ID selector
+   inside :not(#bfOptionsFieldsWrap *) outweighs a class selector), leaving
+   every .bfPropertyWrap radio/checkbox invisible. */
 
 .bfPropertyWrap .form-switch {
     padding-left: 0;

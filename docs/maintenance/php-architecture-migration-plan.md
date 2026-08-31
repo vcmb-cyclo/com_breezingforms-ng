@@ -1486,6 +1486,11 @@ La branche Query List est également caractérisée au-delà de ses points
 d'abandon internes : la fonction `ff_dispQueryPage` est enregistrée dans la
 bibliothèque avec son état de page et sa navigation (`a743e9c67`).
 
+Le harnais atteint maintenant la finalisation complète de `view()` sur un
+formulaire QuickMode vide : ouverture et fermeture du formulaire, champs de
+contexte, validation et nettoyage du buffer sont couverts sans dépendance
+Joomla externe (`502998adb`).
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

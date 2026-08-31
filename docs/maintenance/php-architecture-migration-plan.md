@@ -1516,6 +1516,11 @@ identifiants hostiles (`92f6e3e59`).
 la même règle aux classes et noms de champs partagés par les renderers, avec
 tests d'injection et snapshots inchangés (`b80711c89`).
 
+Le markup `bfHidden` partagé par les renderers Classic, Bootstrap et OnePage
+est maintenant produit par `QuickModeHiddenFieldBuilder`, appelé par le trait
+commun. La sortie historique est caractérisée et les attributs nom/id sont
+échappés dans le builder pur (`d4756b71c`).
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

@@ -1314,6 +1314,11 @@ renderers Classic, Bootstrap et OnePage. Les différences d'URL SEF sont
 injectées explicitement ; les callbacks et les enveloppes visuelles restent
 propres à chaque renderer.
 
+Les callbacks contigus d'entrée de file (`FilesAdded` initial et ajout des
+fichiers) sont désormais composés par
+`QuickModeUploadEntryCallbacksBuilder`; les variantes Bootstrap et Classic sont
+couvertes par des tests dédiés.
+
 Le corps commun du callback `FilesAdded` est désormais fourni par
 `QuickModeUploadFileAddedHandlerBuilder` (`941f1ed6d`). La boucle de validation,
 la création de la file d'attente et l'annulation sont ainsi mutualisées ; les

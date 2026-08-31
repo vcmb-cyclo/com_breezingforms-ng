@@ -791,17 +791,16 @@ class BootstrapRenderer
     chr(10),
     (string) ($base . ($this->p->app->getConfig()->get('sef') && !$this->p->app->getConfig()->get('sef_rewrite') ? 'index.php/' : '') . ($this->p->app->getInput()->getCmd('lang', '') && $this->p->app->getConfig()->get('sef') ? ($this->p->app->getConfig()->get('sef_rewrite') ? 'index.php' : '') : 'index.php'))
 ) . "
-" . QuickModeUploadQueueEntryScriptBuilder::build(chr(10), true) . "
-" . QuickModeUploadFileAddedHandlerBuilder::build(
+" . QuickModeUploadEntryCallbacksBuilder::build(
     (int) $mdata['dbId'],
     (string) $this->cancelImagePath,
+    true,
     true,
     (string) $multiSelection,
     (int) $uploadOptions['maxBytes'],
     (string) $exts,
     (string) json_encode(' ' . Text::_('COM_BREEZINGFORMSNG_FLASH_UPLOADER_TOO_LARGE')),
-    (string) json_encode(' ' . Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED')),
-    chr(10)
+    (string) json_encode(' ' . Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED'))
 ) . "
                                                                         // disable the button if no multi upload
                                                                         if( " . $multiSelection . " == false ){

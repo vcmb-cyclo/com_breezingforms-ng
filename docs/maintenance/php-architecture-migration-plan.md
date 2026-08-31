@@ -972,6 +972,10 @@ La lecture du répertoire de polices PDF est mutualisée par
 enregistrements. La sélection des fichiers réguliers lisibles et le répertoire
 absent sont couverts par des tests unitaires.
 
+La résolution des modèles d'e-mail principaux et de mailback est mutualisée
+par `MailTemplateResolver`, avec priorité au modèle HTML puis texte du
+formulaire avant les modèles par défaut ; ces variantes sont testées.
+
 Les paramètres additionnels `ff_otherparams` du mode frontend sont désormais
 générés par `AdditionalHiddenFieldsBuilder` via `bb469b88`, avec ordre,
 encodage URL et échappement HTML couverts. La détection des providers de

@@ -58,6 +58,7 @@ class OnePageRenderer
     private $bsClasses = array();
     private ?QuickModeInputBuilder $quickModeInputBuilderService = null;
     private ?QuickModeTextFieldStrategy $quickModeTextFieldStrategyService = null;
+    private ?QuickModeTextareaStrategy $quickModeTextareaStrategyService = null;
     private ?QuickModeTextareaBuilder $quickModeTextareaBuilderService = null;
     private ?QuickModeCheckboxBuilder $quickModeCheckboxBuilderService = null;
     private ?QuickModeSelectBuilder $quickModeSelectBuilderService = null;
@@ -94,6 +95,11 @@ class OnePageRenderer
     private function quickModeTextFieldStrategy(): QuickModeTextFieldStrategy
     {
         return $this->quickModeTextFieldStrategyService ??= new QuickModeTextFieldStrategy();
+    }
+
+    private function quickModeTextareaStrategy(): QuickModeTextareaStrategy
+    {
+        return $this->quickModeTextareaStrategyService ??= new QuickModeTextareaStrategy();
     }
 
     private function quickModeTextareaBuilder(): QuickModeTextareaBuilder
@@ -792,14 +798,13 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                             echo '</div>';
                             echo '<style type="text/css">.toggle-editor{display: none;}</style>';
                         } else {
-                            echo $this->quickModeTextareaBuilder()->build(
+                            echo $this->quickModeTextareaStrategy()->build(
+                                $mdata,
+                                $this->language_tag,
                                 $this->bsClass('form-control') . ' ff_elem inputbox',
-                                (string) $mdata['bfName'],
-                                (string) $mdata['value'],
-                                (int) $mdata['dbId'],
-                                $onkeyup . $size . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
-                                (string) ($mdata['placeholder'] ?? ''),
+                                $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
                                 ' '
+                                , true
                             );
                         }
                         echo '</div>';

@@ -57,6 +57,7 @@ class ClassicRenderer
     private $hasResponsiveDatePicker = false;
     private ?QuickModeInputBuilder $quickModeInputBuilderService = null;
     private ?QuickModeTextFieldStrategy $quickModeTextFieldStrategyService = null;
+    private ?QuickModeTextareaStrategy $quickModeTextareaStrategyService = null;
     private ?QuickModeTextareaBuilder $quickModeTextareaBuilderService = null;
     private ?QuickModeCheckboxBuilder $quickModeCheckboxBuilderService = null;
     private ?QuickModeSelectBuilder $quickModeSelectBuilderService = null;
@@ -82,6 +83,11 @@ class ClassicRenderer
     private function quickModeTextFieldStrategy(): QuickModeTextFieldStrategy
     {
         return $this->quickModeTextFieldStrategyService ??= new QuickModeTextFieldStrategy();
+    }
+
+    private function quickModeTextareaStrategy(): QuickModeTextareaStrategy
+    {
+        return $this->quickModeTextareaStrategyService ??= new QuickModeTextareaStrategy();
     }
 
     public function headers()
@@ -833,23 +839,6 @@ float:left;
 
     private function renderTextareaField(array $mdata, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
     {
-        $width = '';
-        if ($mdata['width'] != '') {
-            $width = 'width:' . htmlentities(strip_tags($mdata['width'])) . ';';
-        }
-        $height = '';
-        if ($mdata['height'] != '') {
-            $height = 'height:' . htmlentities(strip_tags($mdata['height'])) . ';';
-        }
-        $size = '';
-        if ($height != '' || $width != '') {
-            $size = 'style="' . $width . $height . '" ';
-        }
-        $onkeyup = '';
-        if (isset($mdata['maxlength']) && $mdata['maxlength'] > 0) {
-            $onkeyup = 'onkeyup="bfCheckMaxlength(' . intval($mdata['dbId']) . ', ' . intval($mdata['maxlength']) . ', ' . (isset($mdata['showMaxlengthCounter']) && $mdata['showMaxlengthCounter'] ? 'true' : 'false') . ')" ';
-        }
-
         /* translatables */
         if (isset($mdata['placeholder_translation' . $this->language_tag]) && $mdata['placeholder_translation' . $this->language_tag] != '') {
             $mdata['placeholder'] = $mdata['placeholder_translation' . $this->language_tag];
@@ -867,13 +856,11 @@ float:left;
             echo '<style type="text/css">.toggle-editor{display: none;}</style>';
             echo '</div>';
         } else {
-            echo $this->quickModeTextareaBuilder()->build(
+            echo $this->quickModeTextareaStrategy()->build(
+                $mdata,
+                $this->language_tag,
                 'ff_elem',
-                (string) $mdata['bfName'],
-                (string) $mdata['value'],
-                (int) $mdata['dbId'],
-                $onkeyup . $size . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
-                (string) ($mdata['placeholder'] ?? ''),
+                $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
                 'cols="20" rows="5" '
             );
         }

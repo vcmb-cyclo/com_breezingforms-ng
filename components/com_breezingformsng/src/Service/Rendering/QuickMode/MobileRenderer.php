@@ -52,6 +52,7 @@ class MobileRenderer
     private $hasResponsiveDatePicker = false;
     private ?QuickModeInputBuilder $quickModeInputBuilderService = null;
     private ?QuickModeTextFieldStrategy $quickModeTextFieldStrategyService = null;
+    private ?QuickModeTextareaStrategy $quickModeTextareaStrategyService = null;
     private ?QuickModeTextareaBuilder $quickModeTextareaBuilderService = null;
     private ?QuickModeCheckboxBuilder $quickModeCheckboxBuilderService = null;
     private ?QuickModeSelectBuilder $quickModeSelectBuilderService = null;
@@ -116,6 +117,11 @@ class MobileRenderer
     private function quickModeTextFieldStrategy(): QuickModeTextFieldStrategy
     {
         return $this->quickModeTextFieldStrategyService ??= new QuickModeTextFieldStrategy();
+    }
+
+    private function quickModeTextareaStrategy(): QuickModeTextareaStrategy
+    {
+        return $this->quickModeTextareaStrategyService ??= new QuickModeTextareaStrategy();
     }
 
     private function quickModeTextareaBuilder(): QuickModeTextareaBuilder
@@ -672,13 +678,11 @@ HTML;
                             $mdata['value'] = $mdata['value_translation' . $this->language_tag];
                         }
                         /* translatables end */
-                        echo $this->quickModeTextareaBuilder()->build(
+                        echo $this->quickModeTextareaStrategy()->build(
+                            $mdata,
+                            $this->language_tag,
                             'ff_elem',
-                            (string) $mdata['bfName'],
-                            (string) $mdata['value'],
-                            (int) $mdata['dbId'],
-                            $onkeyup . $size . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
-                            (string) ($mdata['placeholder'] ?? ''),
+                            $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
                             ' '
                         );
                         break;

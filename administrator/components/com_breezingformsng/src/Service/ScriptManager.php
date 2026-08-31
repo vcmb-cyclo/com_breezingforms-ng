@@ -141,6 +141,7 @@ class ScriptManager
 		} catch (RuntimeException $e) {
 			$this->app->enqueueMessage($e->getMessage(), 'error');
 			$this->app->redirect("index.php?option=$option&view=scripts&pkg=$pkg");
+			return;
 		}
 
 		if ($total) {

@@ -999,6 +999,9 @@ La gestion des buffers de sortie et la lecture de `max_execution_time` dans
 `SubmissionEngine` n'utilisent plus de suppression d'erreur; les niveaux de
 buffer sont contrôlés avant fermeture.
 
+`ImageResizer` rejette désormais explicitement les chemins absents ou non
+lisibles avant d'interroger EXIF/GD, sans suppression d'erreur sur ces lectures.
+
 Les tests d'existence des assets statiques des trois renderers QuickMode
 utilisent désormais `is_file()` sans masquage d'erreur; leurs sorties restent
 couvertes par les tests de caractérisation des renderers.

@@ -18,11 +18,15 @@ final class ImageResizer
 {
     public function imageType(string $filename): int|false
     {
-        if (\function_exists('exif_imagetype')) {
-            return @exif_imagetype($filename);
+        if (!is_file($filename) || !is_readable($filename)) {
+            return false;
         }
 
-        $image = @getimagesize($filename);
+        if (\function_exists('exif_imagetype')) {
+            return exif_imagetype($filename);
+        }
+
+        $image = getimagesize($filename);
 
         return $image === false ? false : $image[2];
     }
@@ -34,7 +38,11 @@ final class ImageResizer
         ?string $backgroundColor = '#ffffff',
         string $type = ''
     ): void {
-        $image = @getimagesize($path);
+        if (!is_file($path) || !is_readable($path)) {
+            return;
+        }
+
+        $image = getimagesize($path);
 
         if ($image === false || !$this->hasEnoughMemory($image)) {
             return;

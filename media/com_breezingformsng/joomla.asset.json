@@ -264,6 +264,13 @@
     },
 
     {
+      "name": "com_breezingformsng.tokens",
+      "type": "style",
+      "uri": "media/com_breezingformsng/css/bfng-tokens.css",
+      "version": "auto"
+    },
+
+    {
       "name": "com_breezingformsng.admin-style",
       "type": "style",
       "uri": "media/com_breezingformsng/css/admin.css",

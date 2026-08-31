@@ -1,0 +1,91 @@
+/**
+ * BreezingForms NG - design tokens (charte graphique v1.0)
+ *
+ * Foundation only: custom-property tokens under .bfng, light + dark. No
+ * component rules here - see docs/charte-graphique-breezingformsng.md,
+ * section 08. This file is loaded additively alongside admin.css/
+ * custom.css; nothing in the current markup references .bfng or --bfng-*
+ * yet, so loading it changes no existing visual output.
+ *
+ * @package BreezingFormsNG
+ * @copyright Copyright (C) 2024-2026 by XDA+GIL
+ * @license GNU General Public License version 2 or later; see LICENSE.txt
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ **/
+
+.bfng {
+  /* surfaces - inherited from the template, Atum-calibrated fallbacks */
+  --bfng-bg:              var(--bs-body-bg, #f4f6f8);
+  --bfng-surface:         var(--card-bg, #fff);
+  --bfng-surface-2:       var(--bs-tertiary-bg, #eef1f5);
+  --bfng-surface-3:       #e4e8ee;
+  --bfng-border:          var(--border-color, #dfe3e7);
+  --bfng-border-strong:   #c3cad3;
+
+  /* text */
+  --bfng-text:            var(--bs-body-color, #1f2933);
+  --bfng-text-2:          #4b5763;
+  --bfng-text-muted:      var(--bs-secondary-color, #7b8794);
+
+  /* accent - a single hue */
+  --bfng-accent-500:      var(--template-link-color, #2f70b9);
+  --bfng-accent-600:      #275f9e;
+  --bfng-accent-700:      #1d4a7c;
+  --bfng-accent-100:      color-mix(in oklab, var(--bfng-accent-500) 14%, #fff);
+  --bfng-accent-50:       color-mix(in oklab, var(--bfng-accent-500) 7%,  #fff);
+
+  /* semantic states */
+  --bfng-success: #1f7a52;  --bfng-warning: #96650f;  --bfng-danger: #a8332c;
+
+  /* element families */
+  --bfng-kind-struct: var(--bfng-accent-500);  --bfng-kind-input: #147d78;
+  --bfng-kind-logic:  #6b4fa1;                 --bfng-kind-static: #7b8794;
+
+  /* geometry */
+  --bfng-space-1: 2px;   --bfng-space-2: 4px;   --bfng-space-3: 6px;   --bfng-space-4: 8px;
+  --bfng-space-5: 12px;  --bfng-space-6: 16px;  --bfng-space-7: 24px;  --bfng-space-8: 32px;
+  --bfng-control-h: 30px;   --bfng-control-h-sm: 26px;
+  --bfng-row-h: 34px;       --bfng-tree-row-h: 26px;   --bfng-tree-indent: 16px;
+  --bfng-radius: 4px;       --bfng-radius-sm: 3px;     --bfng-radius-lg: 6px;
+
+  /* type */
+  --bfng-font-ui:   var(--bs-body-font-family, system-ui, sans-serif);
+  --bfng-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --bfng-fs-xs: 11px; --bfng-fs-sm: 12px; --bfng-fs-base: 13px;
+  --bfng-fs-md: 14px; --bfng-fs-lg: 16px; --bfng-fs-xl: 20px;
+
+  /* elevation, focus, time */
+  --bfng-shadow-1: 0 1px 2px rgb(16 24 40 / 6%);
+  --bfng-shadow-2: 0 6px 16px rgb(16 24 40 / 10%);
+  --bfng-shadow-3: 0 16px 40px rgb(16 24 40 / 18%);
+  --bfng-focus-ring: 0 0 0 3px color-mix(in oklab, var(--bfng-accent-500) 32%, transparent);
+  --bfng-t: 120ms ease;
+
+  color: var(--bfng-text);
+  font-family: var(--bfng-font-ui);
+  font-size: var(--bfng-fs-base);
+}
+
+[data-bs-theme="dark"] .bfng,
+.bfng[data-bs-theme="dark"] {
+  --bfng-bg: #131720;              --bfng-surface: #1a1f29;
+  --bfng-surface-2: #212834;       --bfng-surface-3: #2a323f;
+  --bfng-border: #333c4a;          --bfng-border-strong: #46515f;
+  --bfng-text: #e7ebf0;            --bfng-text-2: #b6c0cc;   --bfng-text-muted: #8892a0;
+  --bfng-accent-500: #6ea8e2;      --bfng-accent-600: #8bbdea;  --bfng-accent-700: #a9cff2;
+  --bfng-accent-100: color-mix(in oklab, var(--bfng-accent-500) 20%, transparent);
+  --bfng-accent-50:  color-mix(in oklab, var(--bfng-accent-500) 12%, transparent);
+  --bfng-success: #4fb888;         --bfng-warning: #dba449;   --bfng-danger: #e0736a;
+  --bfng-kind-input: #4bb5ae;      --bfng-kind-logic: #a58ede;  --bfng-kind-static: #9aa5b4;
+  --bfng-shadow-1: 0 1px 2px rgb(0 0 0 / 40%);
+  --bfng-shadow-2: 0 6px 16px rgb(0 0 0 / 48%);
+  --bfng-shadow-3: 0 16px 40px rgb(0 0 0 / 56%);
+}
+
+/* single focus treatment, never the default blue ring */
+.bfng :is(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--bfng-accent-500);
+  outline-offset: 1px;
+  box-shadow: var(--bfng-focus-ring);
+}

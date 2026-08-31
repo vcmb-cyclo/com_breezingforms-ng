@@ -267,7 +267,7 @@ final class QuickmodeHtml
         }
         ?>
         <div style="display:none;visibility:hidden;" id="bfSaveQueue"></div>
-        <div id="bfQuickModeWrapper" class="bfClearfix">
+        <div id="bfQuickModeWrapper" class="bfClearfix bfng">
 
             <div id="bfQuickModeLeft" class="bfClearfix">
 

@@ -25,16 +25,17 @@ $formSelection = Factory::getApplication()->getInput()->getInt('form_selection',
     </div>
     <div class="card-body">
       <dl class="row mb-0">
-        <dt class="col-sm-3"><?= Text::_('COM_BREEZINGFORMSNG_ID'); ?></dt>
-        <dd class="col-sm-9"><?= (int) $record->id; ?></dd>
-        <dt class="col-sm-3"><?= Text::_('COM_BREEZINGFORMSNG_SUBMITTED'); ?></dt>
-        <dd class="col-sm-9"><?= $submitted; ?></dd>
-        <dt class="col-sm-3"><?= Text::_('COM_BREEZINGFORMSNG_FORM'); ?></dt>
-        <dd class="col-sm-9"><?= htmlspecialchars((string) ($record->form_title ?? '')); ?></dd>
-        <dt class="col-sm-3"><?= Text::_('COM_BREEZINGFORMSNG_USER'); ?></dt>
-        <dd class="col-sm-9"><?= htmlspecialchars((string) ($record->user_full_name ?: $record->username)); ?></dd>
-        <dt class="col-sm-3"><?= Text::_('COM_BREEZINGFORMSNG_IP'); ?></dt>
-        <dd class="col-sm-9"><?= htmlspecialchars((string) ($record->ip ?? '')); ?></dd>
+        <dt class="col-sm-2"><?= Text::_('COM_BREEZINGFORMSNG_ID'); ?></dt>
+        <dd class="col-sm-4"><?= (int) $record->id; ?></dd>
+        <dt class="col-sm-2"><?= Text::_('COM_BREEZINGFORMSNG_FORM'); ?></dt>
+        <dd class="col-sm-4"><?= htmlspecialchars((string) ($record->form_title ?? '')); ?></dd>
+
+        <dt class="col-sm-1"><?= Text::_('COM_BREEZINGFORMSNG_SUBMITTED'); ?></dt>
+        <dd class="col-sm-3"><?= $submitted; ?></dd>
+        <dt class="col-sm-1"><?= Text::_('COM_BREEZINGFORMSNG_USER'); ?></dt>
+        <dd class="col-sm-3"><?= htmlspecialchars((string) ($record->user_full_name ?: $record->username)); ?></dd>
+        <dt class="col-sm-1"><?= Text::_('COM_BREEZINGFORMSNG_IP'); ?></dt>
+        <dd class="col-sm-3"><?= htmlspecialchars((string) ($record->ip ?? '')); ?></dd>
       </dl>
     </div>
   </div>
@@ -68,6 +69,26 @@ $formSelection = Factory::getApplication()->getInput()->getInt('form_selection',
   <input type="hidden" name="form_selection" value="<?= $formSelection; ?>">
   <?= HTMLHelper::_('form.token'); ?>
 </form>
+
+<nav class="d-flex justify-content-between mt-3" aria-label="<?= Text::_('JLIB_HTML_PAGINATION'); ?>">
+  <?php if ($this->prevRecordId !== null): ?>
+    <a class="btn btn-secondary"
+       href="index.php?option=com_breezingformsng&amp;view=records&amp;layout=edit&amp;record_id=<?= $this->prevRecordId; ?>&amp;form_selection=<?= $formSelection; ?>">
+      &laquo; <?= Text::_('JPREVIOUS'); ?>
+    </a>
+  <?php else: ?>
+    <span class="btn btn-secondary disabled">&laquo; <?= Text::_('JPREVIOUS'); ?></span>
+  <?php endif; ?>
+
+  <?php if ($this->nextRecordId !== null): ?>
+    <a class="btn btn-secondary"
+       href="index.php?option=com_breezingformsng&amp;view=records&amp;layout=edit&amp;record_id=<?= $this->nextRecordId; ?>&amp;form_selection=<?= $formSelection; ?>">
+      <?= Text::_('JNEXT'); ?> &raquo;
+    </a>
+  <?php else: ?>
+    <span class="btn btn-secondary disabled"><?= Text::_('JNEXT'); ?> &raquo;</span>
+  <?php endif; ?>
+</nav>
 
 <?php
 // Web assets for this view are registered in Records\HtmlView::prepareEditToolbar() —

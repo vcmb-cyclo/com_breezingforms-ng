@@ -37,6 +37,8 @@ class HtmlView extends BaseHtmlView
     // edit
     public ?\stdClass $record = null;
     public array $recordRows = [];
+    public ?int $prevRecordId = null;
+    public ?int $nextRecordId = null;
 
     private string $layout = 'default';
 
@@ -177,6 +179,10 @@ class HtmlView extends BaseHtmlView
             (int) $this->record->form,
             (string) $this->record->name
         );
+
+        $formId = (int) $this->record->form;
+        $this->prevRecordId = $model->getAdjacentRecordId($recordId, $formId, 'prev');
+        $this->nextRecordId = $model->getAdjacentRecordId($recordId, $formId, 'next');
     }
 
     private function prepareListToolbar(): void

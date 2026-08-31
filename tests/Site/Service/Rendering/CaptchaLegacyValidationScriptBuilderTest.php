@@ -43,4 +43,19 @@ final class CaptchaLegacyValidationScriptBuilderTest extends TestCase
             $script
         );
     }
+
+    public function testEscapesEndpointsInsideJavaScriptStrings(): void
+    {
+        $script = (new CaptchaLegacyValidationScriptBuilder())->build(
+            '"CAPTCHA"',
+            "/captcha';alert(1);//</script>",
+            '/check?value=";alert(2);//',
+            3
+        );
+
+        self::assertStringNotContainsString("src = '/captcha';alert(1);//</script>'", $script);
+        self::assertStringNotContainsString('sndReq("get","/check?value=";alert(2);//"+', $script);
+        self::assertStringContainsString("\\u0027;alert(1);//\\u003C/script", $script);
+        self::assertStringContainsString('value=\\u0022;alert(2);//', $script);
+    }
 }

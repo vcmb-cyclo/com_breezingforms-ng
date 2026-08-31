@@ -34,4 +34,16 @@ final class CaptchaReCaptchaValidationScriptBuilderTest extends TestCase
         self::assertStringContainsString('grecaptcha.execute();', $script);
         self::assertStringContainsString('bfShowErrors("CAPTCHA");', $script);
     }
+
+    public function testEscapesEndpointInsideAjaxUrlString(): void
+    {
+        $script = (new CaptchaReCaptchaValidationScriptBuilder())->build(
+            '"CAPTCHA"',
+            '/index.php?value=";alert(1);//</script>',
+            5
+        );
+
+        self::assertStringNotContainsString('url: "/index.php?value=";alert(1);//</script>"', $script);
+        self::assertStringContainsString('value=\\u0022;alert(1);//\\u003C/script', $script);
+    }
 }

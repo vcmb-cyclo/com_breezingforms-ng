@@ -21,6 +21,9 @@ final class CaptchaLegacyValidationScriptBuilder
 {
     public function build(string $captchaError, string $imageEndpoint, string $checkEndpoint, int $page): string
     {
+        $imageEndpoint = self::escapeJavaScriptStringContent($imageEndpoint);
+        $checkEndpoint = self::escapeJavaScriptStringContent($checkEndpoint);
+
         // phpcs:disable Generic.Files.LineLength.TooLong -- Preserve legacy JavaScript lines verbatim.
         return strtr(
             <<<'JS'
@@ -123,5 +126,15 @@ JS,
             ]
         );
         // phpcs:enable Generic.Files.LineLength.TooLong
+    }
+
+    private static function escapeJavaScriptStringContent(string $value): string
+    {
+        $json = json_encode(
+            $value,
+            JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT
+        );
+
+        return substr($json, 1, -1);
     }
 }

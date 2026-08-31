@@ -23,6 +23,8 @@ final class CaptchaReCaptchaValidationScriptBuilder
 {
     public function build(string $captchaError, string $recaptchaEndpoint, int $page): string
     {
+        $recaptchaEndpoint = self::escapeJavaScriptStringContent(Route::_($recaptchaEndpoint));
+
         // phpcs:disable Generic.Files.LineLength.TooLong -- Preserve legacy JavaScript lines verbatim.
         return 'var bfReCaptchaLoaded = true;
                                     function bfCheckCaptcha(){
@@ -43,7 +45,7 @@ final class CaptchaReCaptchaValidationScriptBuilder
                                                         responseField = JQuery("input#recaptcha_response_field").val();
                                                         var html = JQuery.ajax({
                                                         type: "POST",
-                                                        url: "' . Route::_($recaptchaEndpoint) . '",
+                                                        url: "' . $recaptchaEndpoint . '",
                                                         data: "recaptcha_challenge_field=" + challengeField + "&recaptcha_response_field=" + responseField,
                                                         async: false
                                                         }).responseText;
@@ -132,5 +134,15 @@ final class CaptchaReCaptchaValidationScriptBuilder
 					}
 						}';
         // phpcs:enable Generic.Files.LineLength.TooLong
+    }
+
+    private static function escapeJavaScriptStringContent(string $value): string
+    {
+        $json = json_encode(
+            $value,
+            JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT
+        );
+
+        return substr($json, 1, -1);
     }
 }

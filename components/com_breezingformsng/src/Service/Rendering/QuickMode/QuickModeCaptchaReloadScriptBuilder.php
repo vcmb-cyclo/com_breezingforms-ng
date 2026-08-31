@@ -16,9 +16,18 @@ final class QuickModeCaptchaReloadScriptBuilder
 {
     public function build(string $captchaUrl): string
     {
+        $captchaUrlLiteral = $this->buildJavaScriptStringLiteral($captchaUrl . '&bfMathRandom=');
+
         return "document.getElementById('bfCaptchaEntry').value='';"
             . "document.getElementById('bfCaptchaEntry').focus();"
-            . "document.getElementById('ff_capimgValue').src = '" . $captchaUrl
-            . "&bfMathRandom=' + Math.random(); return false";
+            . "document.getElementById('ff_capimgValue').src = " . $captchaUrlLiteral
+            . " + Math.random(); return false";
+    }
+
+    private function buildJavaScriptStringLiteral(string $value): string
+    {
+        $json = json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES);
+
+        return "'" . str_replace("'", "\\'", substr($json, 1, -1)) . "'";
     }
 }

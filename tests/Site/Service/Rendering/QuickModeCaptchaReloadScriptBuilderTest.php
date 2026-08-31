@@ -26,4 +26,12 @@ final class QuickModeCaptchaReloadScriptBuilderTest extends TestCase
             (new QuickModeCaptchaReloadScriptBuilder())->build('/captcha')
         );
     }
+
+    public function testEscapesCaptchaUrlForJavaScript(): void
+    {
+        $script = (new QuickModeCaptchaReloadScriptBuilder())->build("/captcha';alert(1);//");
+
+        self::assertStringNotContainsString("'/captcha';alert(1);//&bfMathRandom='", $script);
+        self::assertStringContainsString("'/captcha\\';alert(1);//&bfMathRandom='", $script);
+    }
 }

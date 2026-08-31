@@ -36,4 +36,15 @@ final class ContentBuilderSignatureScriptBuilderTest extends TestCase
         self::assertStringContainsString('if(false)', $script);
         self::assertStringNotContainsString('.fromDataURL("data:image/png;base64,")', $script);
     }
+
+    public function testKeepsRecordNameInsideTheJavaScriptSelectorLiteral(): void
+    {
+        $script = (new ContentBuilderSignatureScriptBuilder())->build('signature"]);alert(1);//', 18, 'image');
+
+        self::assertStringNotContainsString(
+            'JQuery("[name=\"ff_nm_signature"]);alert(1);//[]"]',
+            $script
+        );
+        self::assertStringContainsString('ff_nm_signature\\"]);alert(1);', $script);
+    }
 }

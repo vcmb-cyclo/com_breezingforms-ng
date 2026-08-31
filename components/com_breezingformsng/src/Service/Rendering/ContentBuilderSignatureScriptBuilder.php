@@ -25,12 +25,16 @@ final class ContentBuilderSignatureScriptBuilder
     public function build(string $recordName, int $elementId, string $encodedImage): string
     {
         $dataUrl = 'data:image/png;base64,' . $encodedImage;
+        $fieldSelector = json_encode(
+            '[name="ff_nm_' . $recordName . '[]"]',
+            JSON_THROW_ON_ERROR
+        );
 
         return 'JQuery(document).ready(function(){'
             . 'if(typeof bf_signaturePad' . $elementId . ' != "undefined"){'
             . 'if(' . (strlen($encodedImage) > 0 ? 'true' : 'false') . '){'
-            . 'JQuery("[name=\"ff_nm_' . $recordName . '[]\"]").val(' . json_encode($dataUrl) . ')' . "\n"
-            . 'bf_signaturePad' . $elementId . '.fromDataURL(' . json_encode($dataUrl) . ');'
+            . 'JQuery(' . $fieldSelector . ').val(' . json_encode($dataUrl, JSON_THROW_ON_ERROR) . ')' . "\n"
+            . 'bf_signaturePad' . $elementId . '.fromDataURL(' . json_encode($dataUrl, JSON_THROW_ON_ERROR) . ');'
             . '}'
             . '}'
             . '});';

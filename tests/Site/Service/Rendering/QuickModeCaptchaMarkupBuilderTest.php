@@ -32,4 +32,25 @@ final class QuickModeCaptchaMarkupBuilderTest extends TestCase
             (new QuickModeCaptchaMarkupBuilder())->buildResponseInput(' style="width:200px;"', 'ff_elem')
         );
     }
+
+    public function testEscapesImageAttributeValues(): void
+    {
+        $markup = (new QuickModeCaptchaMarkupBuilder())->buildImage(
+            '',
+            'captcha" onerror="alert(1)',
+            'captcha" onerror="alert(1)',
+            '/captcha" onerror="alert(1)'
+        );
+
+        self::assertStringNotContainsString('onerror="alert(1)', $markup);
+        self::assertStringContainsString('captcha&quot; onerror=&quot;alert(1)', $markup);
+    }
+
+    public function testEscapesResponseInputClass(): void
+    {
+        $markup = (new QuickModeCaptchaMarkupBuilder())->buildResponseInput('', 'captcha" onfocus="alert(1)');
+
+        self::assertStringNotContainsString('onfocus="alert(1)', $markup);
+        self::assertStringContainsString('captcha&quot; onfocus=&quot;alert(1)', $markup);
+    }
 }

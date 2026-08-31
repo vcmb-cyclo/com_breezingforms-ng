@@ -272,13 +272,13 @@ final class QuickmodeHtml
             <div id="bfQuickModeLeft" class="bfClearfix">
 
                 <form id="newStuffBar" onsubmit="return false;">
-                    <button class="bfng-btn" id="bfNewPageButton">
+                    <button class="bfng-btn bfng-btn--primary" id="bfNewPageButton">
                         <?php echo Text::_('COM_BREEZINGFORMSNG_NEW_PAGE'); ?>
                     </button>
-                    <button class="bfng-btn" id="bfNewSectionButton">
+                    <button class="bfng-btn bfng-btn--primary" id="bfNewSectionButton">
                         <?php echo Text::_('COM_BREEZINGFORMSNG_NEW_SECTION'); ?>
                     </button>
-                    <button class="bfng-btn" id="bfNewElementButton">
+                    <button class="bfng-btn bfng-btn--primary" id="bfNewElementButton">
                         <?php echo Text::_('COM_BREEZINGFORMSNG_NEW_ELEMENT'); ?>
                     </button>
                 </form>

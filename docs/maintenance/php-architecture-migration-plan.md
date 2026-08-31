@@ -823,6 +823,9 @@ La vérification serveur ReCaptcha est maintenant injectée dans
 `SubmissionEngine` via `RecaptchaVerifier`. L'orchestrateur ne connaît plus
 que le contrat booléen du service ; l'URL Google, le transport HTTP et le
 parsing JSON restent confinés au fichier dédié et à `RecaptchaVerifierTest`.
+Le service vérifie désormais le statut HTTP avant le décodage et transforme
+également une réponse JSON invalide en échec booléen ; le contrat ne laisse
+plus remonter une erreur de parsing provenant du endpoint externe.
 
 Les deux gardes locales `if (!$halt)` de `SubmissionEngine` ont ensuite été
 retirées : `$halt` était initialisé à `false` et ses seules affectations à

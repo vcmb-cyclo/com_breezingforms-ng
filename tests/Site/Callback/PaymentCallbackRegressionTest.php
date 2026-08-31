@@ -85,6 +85,15 @@ final class PaymentCallbackRegressionTest extends TestCase
         }
     }
 
+    public function testEngineDispatcherSharesPaymentDownloadPolicyWithCallbacks(): void
+    {
+        $source = $this->read('components/com_breezingformsng/src/Service/EngineDispatcher.php');
+
+        self::assertStringContainsString('PaymentDownloadPolicy $paymentDownloadPolicy', $source);
+        self::assertSame(1, substr_count($source, '$this->paymentDownloadPolicy ='));
+        self::assertSame(10, substr_count($source, '$this->paymentDownloadPolicy'));
+    }
+
     private function read(string $path): string
     {
         $source = file_get_contents(self::ROOT . '/' . $path);

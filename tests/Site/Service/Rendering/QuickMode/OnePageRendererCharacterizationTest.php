@@ -263,6 +263,23 @@ final class OnePageRendererCharacterizationTest extends TestCase
         self::assertStringContainsString('"sitekey":"6Lc-test-pubkey"', $html);
     }
 
+    public function testInvisibleReCaptchaElement(): void
+    {
+        $html = $this->renderElement('bfReCaptcha', [
+            'dbId' => 59,
+            'hideLabel' => true,
+            'pubkey' => '6Lc-test-pubkey',
+            'invisibleCaptcha' => true,
+            'theme' => 'invisible_inline',
+        ], '_invisible');
+
+        self::assertStringContainsString('bfInvisibleReCaptchaContainer', $html);
+        self::assertStringContainsString(
+            'bfInitInvisibleReCaptcha({"sitekey":"6Lc-test-pubkey","badge":"inline","hasFlashUpload":false,"resetFlagOnCallback":false});',
+            $html
+        );
+    }
+
     public function testCalendarElement(): void
     {
         $html = $this->renderElement('bfCalendar', [
@@ -478,7 +495,7 @@ final class OnePageRendererCharacterizationTest extends TestCase
     /**
      * @param array<string, mixed> $overrides
      */
-    private function renderElement(string $bfType, array $overrides): string
+    private function renderElement(string $bfType, array $overrides, string $snapshotSuffix = ''): string
     {
         $renderer = $this->makeRenderer();
 
@@ -517,7 +534,7 @@ final class OnePageRendererCharacterizationTest extends TestCase
         }
 
         self::assertIsString($html);
-        $this->assertMatchesSnapshot('onepage_' . $bfType . '.html', $html);
+        $this->assertMatchesSnapshot('onepage_' . $bfType . $snapshotSuffix . '.html', $html);
 
         return $html;
     }

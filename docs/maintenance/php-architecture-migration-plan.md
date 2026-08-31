@@ -1935,12 +1935,13 @@ par Classic, Bootstrap et OnePage via `QuickModeHtmlTextareaScriptBuilder`.
 La récupération du contenu de l'éditeur reste propre à chaque renderer ; le
 builder accepte donc explicitement l'expression déjà préparée.
 
-L'invocation JavaScript de ReCaptcha visible est désormais construite par
-`QuickModeReCaptchaInitScriptBuilder` dans les trois renderers. Les wrappers
-HTML, le chargement Google et les valeurs propres au thème restent dans les
-renderers ; seule l'enveloppe de configuration JSON est mutualisée. Son
-encodage est également réutilisé pour la configuration ReCaptcha invisible
-(`c7774e024`).
+L'invocation JavaScript de ReCaptcha et son markup visible/invisible sont
+désormais construits par `QuickModeReCaptchaFieldBuilder`, qui réutilise
+`QuickModeReCaptchaInitScriptBuilder` dans les trois renderers. Le chargement
+des assets est centralisé via `RuntimeAssetLoader`, tandis que les enveloppes
+Bootstrap/OnePage et Classic et leurs paramètres de réinitialisation restent
+explicitement injectés par les renderers. Les snapshots des trois parcours et
+les branches visible/invisible sont conservés.
 
 La factory est également incluse dans le périmètre PHPCS ; le ruleset complet
 reste vert après son ajout (`7434564bc`).

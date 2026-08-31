@@ -427,6 +427,21 @@ final class ClassicRendererCharacterizationTest extends TestCase
         $this->assertMatchesSnapshot('classic_bfReCaptcha.html', $html);
     }
 
+    public function testInvisibleReCaptchaElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfReCaptcha', [
+            'dbId' => 59,
+            'hideLabel' => true,
+            'pubkey' => '6Lc-test-pubkey',
+            'invisibleCaptcha' => true,
+            'theme' => 'invisible_inline',
+        ]));
+
+        $this->assertMatchesSnapshot('classic_bfReCaptcha_invisible.html', $html);
+    }
+
     public function testCalendarElement(): void
     {
         $renderer = $this->makeRenderer();

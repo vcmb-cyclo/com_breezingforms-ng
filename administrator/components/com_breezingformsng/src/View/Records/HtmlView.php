@@ -15,6 +15,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Factory\MVCFactoryServiceInterface;
+use Joomla\CMS\Toolbar\Button\DropdownButton;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\RecordModel;
@@ -191,10 +192,15 @@ class HtmlView extends BaseHtmlView
         $document = $this->getDocument();
         $toolbar = $document->getToolbar();
 
-        $exportDropdown = $toolbar
-            ->dropdownButton('export-options')
+        $exportDropdown = $toolbar->dropdownButton('export-options');
+
+        if (!$exportDropdown instanceof DropdownButton) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        $exportDropdown->toggleSplit(false);
+        $exportDropdown
             ->text(Text::_('COM_BREEZINGFORMSNG_EXPORT_DOWNLOAD'))
-            ->toggleSplit(false)
             ->icon('icon-download')
             ->buttonClass('btn btn-action');
         $child = $exportDropdown->getChildToolbar();
@@ -204,10 +210,15 @@ class HtmlView extends BaseHtmlView
 
         ToolbarHelper::custom('records.csvImport', 'upload', 'upload', Text::_('COM_BREEZINGFORMSNG_BTN_IMPORT_CSV'), false);
 
-        $markDropdown = $toolbar
-            ->dropdownButton('mark-options')
+        $markDropdown = $toolbar->dropdownButton('mark-options');
+
+        if (!$markDropdown instanceof DropdownButton) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        $markDropdown->toggleSplit(false);
+        $markDropdown
             ->text(Text::_('COM_BREEZINGFORMSNG_TOOLBAR_MARK'))
-            ->toggleSplit(false)
             ->icon('icon-check')
             ->buttonClass('btn btn-action');
         $markChild = $markDropdown->getChildToolbar();

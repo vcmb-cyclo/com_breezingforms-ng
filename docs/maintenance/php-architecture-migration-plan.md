@@ -782,7 +782,9 @@ Les cinq accès nullsafe suivis d'une coalescence dans `ScriptingEngine` sont
 également simplifiés : l'opérateur `??` protège déjà l'accès à la propriété
 dans ce contexte. Les chemins de génération des callbacks restent couverts
 par les caractérisations `RenderingEngine::view()` ; le niveau 4 descend à 26
-diagnostics.
+diagnostics. Dans `SubmissionEngine`, les listes de valeurs et le marqueur de
+chemin relatif sont ensuite utilisés selon leurs contrats déjà établis, sans
+tests de type ou de booléen redondants ; le niveau 4 descend à 21 diagnostics.
 
 ## Phase 7 — Réduire les façades historiques
 

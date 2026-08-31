@@ -345,7 +345,7 @@ final class SubmissionEngine
                                     // CONTENTBUILDER: to keep the relative path with prefix
                                     $savedata_path = $serverPath;
                                     foreach ($this->processor->findtags as $tag) {
-                                        if (strtolower($tag) == '{cbsite}' && isset($is_relative[$serverPath]) && $is_relative[$serverPath]) {
+                                        if (strtolower($tag) == '{cbsite}' && isset($is_relative[$serverPath])) {
                                             $savedata_path = Path::clean(str_replace(array(JPATH_SITE, JPATH_SITE), array('{cbsite}', '{CBSite}'), $savedata_path));
                                         }
                                     }
@@ -564,11 +564,11 @@ final class SubmissionEngine
                                     }
 
                                     if ($useNewValues) {
-                                        $values = is_array($newValues) ? implode(', ', $newValues) : '';
-                                        $sfvalues = is_array($sfnewValues) ? implode(';', $sfnewValues) : '';
+                                        $values = implode(', ', $newValues);
+                                        $sfvalues = implode(';', $sfnewValues);
                                     } else {
-                                        $values = is_array($values) ? implode(', ', $values) : '';
-                                        $sfvalues = is_array($sfvalues) ? implode(';', $sfvalues) : '';
+                                        $values = implode(', ', $values);
+                                        $sfvalues = implode(';', $sfvalues);
                                     }
                                 }
 

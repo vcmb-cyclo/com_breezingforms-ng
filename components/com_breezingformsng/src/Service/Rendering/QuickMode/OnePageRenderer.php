@@ -1363,23 +1363,11 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
     {
 
         if (isset($this->rootMdata['themebootstrapUseProgress']) && $this->rootMdata['themebootstrapUseProgress']) {
-            echo '<div class="' . $this->bsClass('progress') . '"><div id="bfProgressBar" class="' . $this->bsClass('bar') . '"></div></div>
-                        <script type="text/javascript">
-                        <!--
-                        function bfUpdateProgress(){
-                            if(ff_currentpage > 1){
-                                var pages = JQuery(".bfPage").size()' . ($this->rootMdata['lastPageThankYou'] ? '-1' : '') . ';
-                                var result = Math.round(((ff_currentpage-1) / pages)*100);
-                                JQuery("#bfProgressBar").css("width",result+"%");
-                            }else{
-                                JQuery("#bfProgressBar").css("width","0%");
-                            }
-                        }
-                        JQuery(document).ready(function(){
-                            setInterval("bfUpdateProgress()", 500);
-                        });
-                        -->
-                        </script>';
+            echo QuickModeProgressMarkupBuilder::build(
+                $this->bsClass('progress'),
+                $this->bsClass('bar'),
+                (bool) $this->rootMdata['lastPageThankYou']
+            );
         }
 
         $this->process($this->dataObject);

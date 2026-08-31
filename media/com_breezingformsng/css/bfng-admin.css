@@ -146,7 +146,15 @@
 }
 
 .bfng-tabs { border-bottom: 1px solid var(--bfng-border); gap: var(--bfng-space-4); }
-.bfng-tabs .nav-link {
+/* #menutab prefix: Bootstrap's own .nav-tabs .nav-link.active rule has
+   the same class-only specificity as a bare .bfng-tabs .nav-link.active
+   would, and sets color/background from --bs-emphasis-color/--bs-body-bg
+   - whichever of the two same-specificity rules loads later in the
+   cascade wins per property, which isn't guaranteed here (Atum's
+   template CSS vs this component's own asset). The extra #menutab
+   ancestor id makes ours win unconditionally instead of depending on
+   asset load order. */
+#menutab .bfng-tabs .nav-link {
   background: var(--bfng-surface-2);
   border: 1px solid var(--bfng-border);
   border-bottom: none;
@@ -156,8 +164,8 @@
   font-size: var(--bfng-fs-sm);
   padding: calc(var(--bfng-space-3) - 1px) var(--bfng-space-5) var(--bfng-space-3);
 }
-.bfng-tabs .nav-link:hover { background: var(--bfng-surface-3); color: var(--bfng-text); }
-.bfng-tabs .nav-link.active {
+#menutab .bfng-tabs .nav-link:hover { background: var(--bfng-surface-3); color: var(--bfng-text); }
+#menutab .bfng-tabs .nav-link.active {
   background: var(--bfng-surface);
   color: var(--bfng-accent-700);
   border-color: var(--bfng-border);

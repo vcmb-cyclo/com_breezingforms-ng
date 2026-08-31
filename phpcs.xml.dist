@@ -35,6 +35,28 @@
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeCheckboxBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeCheckboxStrategy.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeToggleFieldsParser.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeAjaxSubmitScriptBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeBootstrapClassMapBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeCalendarOptionsBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeEditorValueBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeErrorMessageMarkupBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeErrorRuntimeConfigBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeNextPageValidationBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeOnePageCallbackScriptBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModePaymentImageBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModePreviousPageValidationBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeProgressMarkupBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeSubmitValidationBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeUploadCancelScriptBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeUploadCompletedScriptBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeUploadConfigurationBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeUploadEntryCallbacksBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeUploadFileAddedHandlerBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeUploadProgressScriptBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeUploadQueueEntryScriptBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeUploadQueueItemMarkupBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeUploadThumbnailScriptBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeUploadValidationScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeSelectBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeMaxLengthCounterBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeGroupOptionBuilder.php</file>

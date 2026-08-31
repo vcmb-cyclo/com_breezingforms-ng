@@ -13,7 +13,11 @@ final class QuickModePaymentImageBuilder
             return '';
         }
 
-        return 'src="' . htmlspecialchars($image, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')
-            . '"' . ($alt !== '' ? ' alt="' . htmlspecialchars($alt, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '"' : '') . ' ';
+        $altAttribute = $alt !== ''
+            ? ' alt="' . htmlspecialchars($alt, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '"'
+            : '';
+
+        return 'src="' . htmlspecialchars($image, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '"'
+            . $altAttribute . ' ';
     }
 }

@@ -523,6 +523,11 @@ Le parseur pur `QuickModeToggleFieldsParser`, déjà couvert par son test direct
 rejoint également ce périmètre PHPCS afin que la mutualisation des règles de
 bascule soit contrôlée au même niveau que les stratégies de champs.
 
+Les autres builders QuickMode purs déjà couverts par des tests directs sont
+également ajoutés au ruleset : soumission, calendrier, messages, progression
+et callbacks d'upload. `QuickModePaymentImageBuilder` a reçu uniquement une
+mise en forme de son attribut optionnel ; sa sortie reste inchangée.
+
 Le premier nettoyage ciblé de cette baseline PHPCS est réalisé dans
 `QuickModeSelectBuilder`, `QuickModeCaptchaMarkupBuilder` et
 `QuickModeUploadOptionsBuilder` (`eaf8b2d1`) : leurs sorties sont inchangées et

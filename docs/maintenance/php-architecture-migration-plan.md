@@ -48,6 +48,7 @@
 | QuickMode — adaptateurs calendrier | Cinq adaptateurs privés de calendrier mutualisés dans un trait commun aux quatre renderers | Commit `05090635f` |
 | QuickMode OnePage — validation précédente | Callback `bf_validate_prevpage` extrait dans un builder pur, avec branches d’erreur et commentaire historique couverts | Commit `f19eb5f89` |
 | QuickMode OnePage — validation suivante | Callback `bf_validate_nextpage` extrait dans un builder pur, avec erreur, focus, Ladda et activation de la page couverts | Commit `114dd4d17` |
+| QuickMode OnePage — validation soumission | Callback `bf_validate_submit` extrait dans un builder pur, avec erreurs, focus, restauration du bouton et soumission couverts | Commit `280fccd6e` |
 | QuickMode — expression éditeur | Construction de l’expression JavaScript de lecture des éditeurs mutualisée entre Bootstrap et OnePage, API publique conservée | Commit `43592c8bd` |
 | QuickMode — mapping Bootstrap | Mapping Bootstrap 5 des classes mutualisé entre Bootstrap et OnePage, résolution publique `bsClass()` conservée | Commit `658078588` |
 | Finalisation — champs de soumission | Champs cachés communs frontend/backend/preview extraits avec conservation des différences `act`/`ff_frame` | Commit `be602b94f` |
@@ -842,8 +843,13 @@ le commentaire historique conservé sont couverts par un test de sortie.
 Le callback `bf_validate_nextpage` est désormais construit par
 `QuickModeNextPageValidationBuilder` (`114dd4d17`). La validation de la page
 courante, la gestion des erreurs, l'arrêt de Ladda et l'activation de la page
-suivante sont couverts par un test dédié ; le callback de soumission reste à
-extraire.
+suivante sont couverts par un test dédié.
+
+Le callback `bf_validate_submit` est désormais construit par
+`QuickModeSubmitValidationBuilder` (`280fccd6e`). Les chemins d'erreur et de
+succès, le focus, la restauration du bouton et l'appel à `ff_submitForm()`
+sont couverts par un test dédié ; les responsabilités de restauration du
+bouton restent dans le renderer car elles dépendent de son état JavaScript.
 
 La baseline PHPCS est maintenant sans erreur sur les services modernes, les
 quatre renderers QuickMode et leurs traits (`e25d501f`, `14985d4d`, `288b42a4`,

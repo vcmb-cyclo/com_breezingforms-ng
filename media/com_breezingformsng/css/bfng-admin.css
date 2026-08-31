@@ -31,6 +31,24 @@
 
 #newStuffBar { display: flex; flex-wrap: wrap; gap: var(--bfng-space-4); }
 
+/* .bfng-tree: cosmetic layer only, over jTree's own tree_component.css.
+   jTree owns collapse/expand via .tree li.open/.closed toggling display
+   on the nested <ul> - none of that is touched here, only color/spacing
+   on <li>/<a>, so folding stays exactly as jTree implements it. */
+.bfng-tree .tree li a,
+.bfng-tree .tree li span {
+  height: var(--bfng-tree-row-h);
+  line-height: var(--bfng-tree-row-h);
+  border-radius: var(--bfng-radius-sm);
+  color: var(--bfng-text);
+}
+.bfng-tree .tree li a:hover { background: var(--bfng-surface-3); }
+.bfng-tree .tree li a.clicked {
+  background: var(--bfng-accent-50);
+  color: var(--bfng-accent-700);
+  font-weight: 600;
+}
+
 /* .bfng-field: label column + control(s), see charte section 05.
    Deliberately not a CSS grid: property wraps in the existing templates
    sometimes hold more than one control after the label (e.g. a Yes/No

@@ -287,7 +287,7 @@ final class QuickmodeHtml
                 </form>
                 <input id="scrollElementList" type="checkbox"><label for="scrollElementList"
                     class="scrollElementListLabel">Scroll element list</label>
-                <div id="bfElementExplorer"></div>
+                <div id="bfElementExplorer" class="bfng-tree"></div>
 
             </div> <!-- ##### bfQuickModeLeft end ##### -->
 

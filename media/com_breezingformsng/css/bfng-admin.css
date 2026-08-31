@@ -39,7 +39,11 @@
   position: relative;
   padding-right: calc(var(--bfng-control-h) + var(--bfng-space-3));
 }
-.bfng-tree-toolbar__settings {
+/* .bfng-tree-toolbar .bfng-tree-toolbar__settings (not just the bare
+   class): Bootstrap's own .dropdown rule also sets position (relative),
+   at the same one-class specificity - whichever stylesheet loads last
+   would otherwise win. The two-class selector outranks it unconditionally. */
+.bfng-tree-toolbar .bfng-tree-toolbar__settings {
   position: absolute;
   top: 0;
   right: 0;

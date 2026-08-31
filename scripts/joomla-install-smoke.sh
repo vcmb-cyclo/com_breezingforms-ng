@@ -113,7 +113,7 @@ docker exec -e HTTP_HOST=localhost "${web_container}" php /var/www/html/cli/joom
     --no-interaction
 
 table_prefix="$(
-    docker exec "${web_container}" php -r '
+    docker exec -e HTTP_HOST=localhost "${web_container}" php -r '
         require "/var/www/html/configuration.php";
         $config = new JConfig();
         echo $config->dbprefix;
@@ -160,6 +160,16 @@ if [[ -n "${contentbuilder_archive}" ]]; then
         define("_JEXEC", 1);
         require "/var/www/html/includes/defines.php";
         require "/var/www/html/includes/framework.php";
+        $container = \Joomla\CMS\Factory::getContainer();
+        $container->alias("session.web", "session.web.site")
+            ->alias("session", "session.web.site")
+            ->alias("JSession", "session.web.site")
+            ->alias(\Joomla\CMS\Session\Session::class, "session.web.site")
+            ->alias(\Joomla\Session\Session::class, "session.web.site")
+            ->alias(\Joomla\Session\SessionInterface::class, "session.web.site");
+        $app = $container->get(\Joomla\CMS\Application\SiteApplication::class);
+        \Joomla\CMS\Factory::$application = $app;
+        require "/var/www/html/administrator/components/com_contentbuilderng/src/Helper/RuntimeContextHelper.php";
         require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFormAssociationLoader.php";
         require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFormDataLoader.php";
         require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderRecordLoader.php";

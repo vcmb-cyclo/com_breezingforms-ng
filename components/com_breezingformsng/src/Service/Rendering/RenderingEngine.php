@@ -74,6 +74,7 @@ final class RenderingEngine
     private ?ClassicQueryListMarkupBuilder $classicQueryListMarkupBuilderService = null;
     private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
     private ?EditableRecordHydrationScriptBuilder $editableRecordHydrationScriptBuilderService = null;
+    private ?EditableRecordScriptWrapperBuilder $editableRecordScriptWrapperBuilderService = null;
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
     private ?ContentBuilderSignatureScriptBuilder $contentBuilderSignatureScriptBuilderService = null;
     private ?ContentBuilderFileUploadScriptBuilder $contentBuilderFileUploadScriptBuilderService = null;
@@ -289,6 +290,11 @@ final class RenderingEngine
     {
         return $this->editableRecordHydrationScriptBuilderService ??=
             new EditableRecordHydrationScriptBuilder($this->contentBuilderValueScriptBuilder());
+    }
+
+    private function editableRecordScriptWrapperBuilder(): EditableRecordScriptWrapperBuilder
+    {
+        return $this->editableRecordScriptWrapperBuilderService ??= new EditableRecordScriptWrapperBuilder();
     }
 
     private function contentBuilderReadonlyScriptBuilder(): ContentBuilderReadonlyScriptBuilder
@@ -886,21 +892,11 @@ final class RenderingEngine
 
                 $js = $this->editableRecordHydrationScriptBuilder()->build($recordEntries, (int) $this->processor->form);
 
-                echo '
-				<script type="text/javascript">
-                                <!--' . nl() . '
-                                function bfLoadEditable(){
-                                    ' . $js . '
-                                    // legacy seccode removal
-                                    for(var i = 0;i < document.ff_form' . $this->processor->form . '.elements.length;i++){
-                                            if(document.ff_form' . $this->processor->form . '.elements[i].name == "ff_nm_seccode[]"){
-                                                    document.ff_form' . $this->processor->form . '.elements[i].value = "";
-                                            }
-                                    }
-                                }
-                                ' . nl() . '//-->
-				</script>
-				' . nl();
+                echo $this->editableRecordScriptWrapperBuilder()->build(
+                    (int) $this->processor->form,
+                    $js,
+                    nl()
+                );
             }
         }
 

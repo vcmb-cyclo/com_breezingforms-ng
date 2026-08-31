@@ -532,7 +532,11 @@ var toggleFieldsArray = ' . $this->toggleFields . ';
                 }
 
                 if (!$this->useErrorAlerts) {
-                    echo '<div class="bfErrorMessage ' . $this->bsClass('alert') . ' ' . $this->bsClass('alert-error') . '" style="display:none"></div>' . "\n";
+                    echo QuickModeErrorMessageMarkupBuilder::build(
+                        $this->bsClass('alert'),
+                        $this->bsClass('alert-error'),
+                        "\n"
+                    );
                 }
             } elseif ($mdata['type'] == 'section') {
                 if (isset($dataObject['properties']['name']) && isset($mdata['off']) && $mdata['off']) {

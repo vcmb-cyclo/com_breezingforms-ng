@@ -40,9 +40,11 @@ final class ClassicChoiceBuilder
         }
         $attributes .= $eventAttributes;
 
-        return $indent . '<div id="ff_div' . $elementId . '" style="' . $wrapperStyle . '"' . $wrapperClass . '>' . $newline
+        return $indent . '<div id="ff_div' . $elementId . '" style="' . $wrapperStyle
+            . '"' . $wrapperClass . '>' . $newline
             . $indent . $indent . '<input id="ff_elem' . $elementId . '" type="' . $type . '" name="ff_nm_' . $name
-            . '[]" value="' . $value . '"' . $attributes . $controlClass . '/><label id="ff_lbl' . $elementId . '" for="ff_elem'
+            . '[]" value="' . $value . '"' . $attributes . $controlClass . '/><label id="ff_lbl' . $elementId
+            . '" for="ff_elem'
             . $elementId . '"> ' . $label . '</label>' . $newline
             . $indent . '</div>' . $newline;
     }

@@ -34,7 +34,8 @@ final class ClassicRegularButtonBuilder
         $attributes = $disabled ? ' disabled="disabled"' : '';
         $attributes .= $eventAttributes;
 
-        return $indent . '<div id="ff_div' . $elementId . '" style="' . $wrapperStyle . '"' . $wrapperClass . '>' . $newline
+        return $indent . '<div id="ff_div' . $elementId . '" style="' . $wrapperStyle
+            . '"' . $wrapperClass . '>' . $newline
             . $indent . $indent . '<input id="ff_elem' . $elementId . '" type="button" name="ff_nm_' . $name
             . '" value="' . $label . '"' . $attributes . $controlClass . '/>' . $newline
             . $indent . '</div>' . $newline;

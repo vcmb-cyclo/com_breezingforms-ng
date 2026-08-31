@@ -48,8 +48,11 @@ final class ClassicFileUploadBuilder
         }
         $attributes .= $eventAttributes;
 
-        return $indent . '<div id="ff_div' . $elementId . '" style="' . $wrapperStyle . '"' . $wrapperClass . '>' . $newline
-            . $indent . $indent . '<input id="ff_elem' . $elementId . '"' . $attributes . ' type="file" name="ff_nm_' . $name
-            . '[]"' . $controlClass . '/>' . $newline . $indent . '</div>' . $newline;
+        return $indent . '<div id="ff_div' . $elementId . '" style="' . $wrapperStyle
+            . '"' . $wrapperClass . '>' . $newline
+            . $indent . $indent . '<input id="ff_elem' . $elementId . '"' . $attributes . ' type="file" name="ff_nm_'
+            . $name
+            . '[]"' . $controlClass . '/>' . $newline
+            . $indent . '</div>' . $newline;
     }
 }

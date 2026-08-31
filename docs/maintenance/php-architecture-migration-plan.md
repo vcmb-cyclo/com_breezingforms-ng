@@ -548,6 +548,10 @@ Les contrôles Classic de saisie (`TextInput`, `Textarea` et `Select`) sont
 également passés sous PHPCS après le découpage neutre d'une ligne trop longue
 dans chaque builder ; leurs tests directs couvrent toujours leurs sorties.
 
+Les contrôles Classic de choix, bouton régulier, upload et bouton graphique
+sont maintenant suivis par PHPCS après découpage syntaxique neutre de leurs
+chaînes longues ; leurs tests directs restent le filet de caractérisation.
+
 Le premier nettoyage ciblé de cette baseline PHPCS est réalisé dans
 `QuickModeSelectBuilder`, `QuickModeCaptchaMarkupBuilder` et
 `QuickModeUploadOptionsBuilder` (`eaf8b2d1`) : leurs sorties sont inchangées et

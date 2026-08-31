@@ -46,7 +46,8 @@ final class ClassicGraphicButtonBuilder
         }
         $image = '<img id="ff_img' . $elementId . '" src="' . $source . '" alt="' . $label . '" border="0" '
             . $dimensions . '/>';
-        $emptyImage = '<img id="ff_img' . $elementId . '" src="' . $source . '" alt="" border="0" ' . $dimensions . '/>';
+        $emptyImage = '<img id="ff_img' . $elementId . '" src="' . $source
+            . '" alt="" border="0" ' . $dimensions . '/>';
 
         $content = match ($layout) {
             1 => $indent . $indent . $indent . '<table cellpadding="0" cellspacing="6" border="0">' . $newline
@@ -81,7 +82,8 @@ final class ClassicGraphicButtonBuilder
                     . $indent . $indent . $indent . '</table>' . $newline,
         };
 
-        return $indent . '<div id="ff_div' . $elementId . '" style="' . $wrapperStyle . '"' . $wrapperClass . '>' . $newline
+        return $indent . '<div id="ff_div' . $elementId . '" style="' . $wrapperStyle
+            . '"' . $wrapperClass . '>' . $newline
             . $indent . $indent . '<button id="ff_elem' . $elementId . '" type="button" name="ff_nm_' . $name
             . '" value="' . $label . '"' . $buttonAttributes . $controlClass . '>' . $newline
             . $content . $indent . $indent . '</button>' . $newline

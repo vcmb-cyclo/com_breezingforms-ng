@@ -1507,6 +1507,11 @@ La garde du script post-rendu ne répète plus le test de disponibilité de
 `bfToggleFieldsLoaded`; un test vérifie qu'elle ne contient qu'une occurrence
 (`dd1eee60b`).
 
+Les builders partagés `QuickModeInputBuilder`, `QuickModeCheckboxBuilder` et
+`QuickModeGroupOptionBuilder` échappent désormais toutes leurs valeurs
+d'attributs dynamiques, avec couverture des classes, types, noms et
+identifiants hostiles (`92f6e3e59`).
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

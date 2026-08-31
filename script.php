@@ -1972,7 +1972,7 @@ class com_breezingformsngInstallerScript
         if ($extensionId > 0) {
             $installer = new Installer();
             $installer->setDatabase($db);
-            $installer->uninstall('plugin', $extensionId, 1);
+            $installer->uninstall('plugin', $extensionId);
             $this->log('Obsolete sysbreezingforms plugin removed.');
         }
     }
@@ -2334,7 +2334,7 @@ class com_breezingformsngInstallerScript
                     $db->setQuery('SELECT `extension_id` FROM #__extensions WHERE `type` = "plugin" AND `element` = "' . $plugin . '" AND `folder` = "' . $folder . '"');
                     $id = $db->loadResult();
                     if ($id) {
-                        $installer->uninstall('plugin', $id, 1);
+                        $installer->uninstall('plugin', $id);
                     }
                 }
             }

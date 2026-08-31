@@ -707,9 +707,3 @@ parameters:
 			identifier: constant.notFound
 			count: 1
 			path: components/com_breezingformsng/src/Support/processor_facade.php
-
-		-
-			message: '#^Method Joomla\\CMS\\Installer\\Installer\:\:uninstall\(\) invoked with 3 parameters, 2 required\.$#'
-			identifier: arguments.count
-			count: 2
-			path: script.php

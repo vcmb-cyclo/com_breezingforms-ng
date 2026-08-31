@@ -1355,7 +1355,7 @@ Le calcul du chemin de base de l'uploader, y compris la suppression du segment
 `administrator` dans l'URI backend historique, est désormais centralisé dans
 `QuickModeUploadBasePathBuilder`. Les cas frontend, backend et chemin non
 concerné sont couverts par un test dédié ; la construction du markup et la
-configuration plupload restent propres à chaque renderer.
+configuration plupload restent propres à chaque renderer (`8745eb8f2`).
 
 Les callbacks contigus d'entrée de file (`FilesAdded` initial et ajout des
 fichiers) sont désormais composés par
@@ -1621,7 +1621,9 @@ builder accepte donc explicitement l'expression déjà préparée.
 L'invocation JavaScript de ReCaptcha visible est désormais construite par
 `QuickModeReCaptchaInitScriptBuilder` dans les trois renderers. Les wrappers
 HTML, le chargement Google et les valeurs propres au thème restent dans les
-renderers ; seule l'enveloppe de configuration JSON est mutualisée.
+renderers ; seule l'enveloppe de configuration JSON est mutualisée. Son
+encodage est également réutilisé pour la configuration ReCaptcha invisible
+(`c7774e024`).
 
 La factory est également incluse dans le périmètre PHPCS ; le ruleset complet
 reste vert après son ajout (`7434564bc`).

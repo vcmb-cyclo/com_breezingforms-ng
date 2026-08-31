@@ -1901,6 +1901,10 @@ destination et sur un masque de fichier alimenté par une valeur de formulaire,
 avec nettoyage HTML et sécurisation du nom final. Les doubles filesystem et
 Input restent confinés au test.
 
+Le parcours complet de \`TokenizedDirectoryResolver\` est maintenant
+caractérisé sur les tokens de champ, le nettoyage de valeur et la création du
+répertoire calculé, avec nettoyage du dossier temporaire en fin de test.
+
 Les trois corrections de fuseau horaire du runtime sont maintenant mutualisées
 par SubmissionTimestampAdjuster, utilisé par SubmissionTimestampFormatter,
 UploadPathResolver et TokenizedDirectoryResolver. Les constructeurs existants

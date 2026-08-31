@@ -61,6 +61,16 @@ namespace Joomla\Filesystem {
             }
         }
     }
+
+    if (!class_exists(Folder::class)) {
+        final class Folder
+        {
+            public static function create(string $path): bool
+            {
+                return is_dir($path) || mkdir($path, 0777, true);
+            }
+        }
+    }
 }
 
 namespace Joomla\Input {
@@ -89,6 +99,7 @@ namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Upload {
 
 use Joomla\Input\Input;
 use PHPUnit\Framework\TestCase;
+use Vcmb\Component\BreezingformsNG\Site\Service\Upload\TokenizedDirectoryResolver;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\UploadPathResolver;
 
 final class UploadPathResolverTest extends TestCase
@@ -136,6 +147,33 @@ final class UploadPathResolverTest extends TestCase
         self::assertSame('/uploads', $result['directory']);
         self::assertSame('A_B_photo.pdf', $result['filename']);
         self::assertSame('/uploads/A_B_photo.pdf', $result['path']);
+    }
+
+    public function testResolvesTokenizedDirectoryAndCreatesIt(): void
+    {
+        $baseDirectory = sys_get_temp_dir() . '/bfng-tokenized-' . bin2hex(random_bytes(4));
+        $input = new Input();
+        $input->post->values['ff_nm_Category'] = ['A <b>B</b>'];
+
+        try {
+            $result = (new TokenizedDirectoryResolver($input))->resolve(
+                $baseDirectory . '/{field:category}/{category:value}|download',
+                [(object) ['name' => 'Category']],
+                'Attachment',
+                [],
+                [],
+                ['id' => 12, 'username' => 'xavier', 'name' => 'Xavier'],
+                '2024-01-02 03:04:05',
+                'UTC'
+            );
+
+            self::assertSame($baseDirectory . '/category/A_B/download', $result);
+            self::assertDirectoryExists($baseDirectory . '/category/A_B');
+        } finally {
+            rmdir($baseDirectory . '/category/A_B');
+            rmdir($baseDirectory . '/category');
+            rmdir($baseDirectory);
+        }
     }
 }
 }

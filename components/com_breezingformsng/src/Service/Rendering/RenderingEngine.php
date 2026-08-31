@@ -331,6 +331,21 @@ final class RenderingEngine
         return $this->contentBuilderTechnicalFieldsBuilderService ??= new ContentBuilderTechnicalFieldsBuilder();
     }
 
+    private function buildContentBuilderTechnicalFields(): string
+    {
+        $input = $this->processor->app->getInput();
+        $formId = $input->getInt('cb_form_id', 0);
+
+        return $formId
+            ? $this->contentBuilderTechnicalFieldsBuilder()->build(
+                '',
+                $formId,
+                $input->getInt('cb_record_id', 0),
+                $input->getBool('cbIsNew', false)
+            )
+            : '';
+    }
+
 
 
 
@@ -1353,9 +1368,7 @@ final class RenderingEngine
                     'ff_module_id' => $input->getInt('ff_module_id', 0),
                 ];
                 $routing = $this->hiddenFormFieldsBuilder()->routing($input->getString('return', ''), $input->getString('tmpl', ''), nl());
-                $technical = $input->getInt('cb_form_id', 0)
-                    ? $this->contentBuilderTechnicalFieldsBuilder()->build('', $input->getInt('cb_form_id', 0), $input->getInt('cb_record_id', 0), $input->getBool('cbIsNew', false))
-                    : '';
+                $technical = $this->buildContentBuilderTechnicalFields();
                 echo $this->formModeFinalizationBuilder()->frontend(
                     $this->hiddenFormFieldsBuilder()->context($context, indentc(1)),
                     $this->hiddenFormFieldsBuilder()->submission((int) $this->processor->form, indentc(1), nl()),
@@ -1378,9 +1391,7 @@ final class RenderingEngine
                     'ff_runmode' => $this->processor->runmode,
                 ];
                 $routing = $this->hiddenFormFieldsBuilder()->routing($input->getString('return', ''), $input->getString('tmpl', ''), nl());
-                $technical = $input->getInt('cb_form_id', 0)
-                    ? $this->contentBuilderTechnicalFieldsBuilder()->build('', $input->getInt('cb_form_id', 0), $input->getInt('cb_record_id', 0), $input->getBool('cbIsNew', false))
-                    : '';
+                $technical = $this->buildContentBuilderTechnicalFields();
                 echo $this->formModeFinalizationBuilder()->backend(
                     $this->hiddenFormFieldsBuilder()->submission((int) $this->processor->form, indentc(1), nl(), true),
                     $this->hiddenFormFieldsBuilder()->token(\Joomla\CMS\HTML\HTMLHelper::_('form.token'), indentc(1), nl()),
@@ -1405,9 +1416,7 @@ final class RenderingEngine
                     'ff_runmode' => $this->processor->runmode,
                 ];
                 $routing = $this->hiddenFormFieldsBuilder()->routing($input->getString('return', ''), $input->getString('tmpl', ''), nl());
-                $technical = $input->getInt('cb_form_id', 0)
-                    ? $this->contentBuilderTechnicalFieldsBuilder()->build('', $input->getInt('cb_form_id', 0), $input->getInt('cb_record_id', 0), $input->getBool('cbIsNew', false))
-                    : '';
+                $technical = $this->buildContentBuilderTechnicalFields();
                 echo $this->formModeFinalizationBuilder()->preview(
                     true,
                     $this->hiddenFormFieldsBuilder()->submission((int) $this->processor->form, indentc(1), nl(), false, true),

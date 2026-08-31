@@ -1173,6 +1173,12 @@ frontend, backend et preview. Les décisions Joomla et la génération des
 fragments restent dans `RenderingEngine`, tandis que les variantes d'ordre
 et l'absence de sortie preview hors iframe sont couvertes par des tests.
 
+La construction répétée des champs techniques ContentBuilder est désormais
+réduite à `buildContentBuilderTechnicalFields()` dans `RenderingEngine` ; les
+trois modes continuent de choisir leur ordre et leurs marqueurs via
+`FormModeFinalizationBuilder`, tandis que le test de caractérisation de
+`view()` couvre les sorties frontend, backend et preview.
+
 La façade `helpers.php` ne dépend plus des fonctions supprimées ou obsolètes
 de PHP 8.3 pour `bf_isUTF8()` et `bf_stripslashes_deep()`. La validation UTF-8
 utilise désormais `preg_match('//u', ...)`, la détection de BOM est explicite

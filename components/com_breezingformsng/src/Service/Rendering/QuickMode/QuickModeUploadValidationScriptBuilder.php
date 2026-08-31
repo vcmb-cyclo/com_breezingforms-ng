@@ -25,13 +25,17 @@ final class QuickModeUploadValidationScriptBuilder
         string $extensionMessage,
         string $newline,
     ): string {
+        $extensionsLiteral = self::buildJavaScriptStringLiteral(strtolower($extensions));
+        $tooLargeMessageLiteral = json_encode($tooLargeMessage, JSON_THROW_ON_ERROR);
+        $extensionMessageLiteral = json_encode($extensionMessage, JSON_THROW_ON_ERROR);
+
         return '                                                                                var thebytes = ' . $maxBytes . ";" . $newline .
             '                                                                                if(thebytes > 0 && typeof files[i].size != \'undefined\' && files[i].size > thebytes){' . $newline .
-            '                                                                                     alert(' . $tooLargeMessage . ');' . $newline .
+            '                                                                                     alert(' . $tooLargeMessageLiteral . ');' . $newline .
             '                                                                                     error = true;' . $newline .
             '                                                                                }' . $newline .
             "                                                                                var ext = files[i].name.replace(/[/\\?%*:|\"<>]/g, '').split('.').pop().toLowerCase();" . $newline .
-            '                                                                                var exts = \'' . strtolower($extensions) . '\'.split(\',\');' . $newline .
+            '                                                                                var exts = ' . $extensionsLiteral . '.split(\',\');' . $newline .
             '                                                                                var found = 0;' . $newline .
             '                                                                                for (var x in exts){' . $newline .
             '                                                                                    if(exts[x] == ext){' . $newline .
@@ -39,7 +43,7 @@ final class QuickModeUploadValidationScriptBuilder
             '                                                                                    }' . $newline .
             '                                                                                }' . $newline .
             '                                                                                if(found == 0){' . $newline .
-            '                                                                                    alert(' . $extensionMessage . ');' . $newline .
+            '                                                                                    alert(' . $extensionMessageLiteral . ');' . $newline .
             '                                                                                    error = true;' . $newline .
             '                                                                                }' . $newline .
             '                                                                                if(error){' . $newline .
@@ -49,6 +53,16 @@ final class QuickModeUploadValidationScriptBuilder
             '                                                                                    bfFlashUploadersLength++;' . $newline .
             '                                                                                }' . $newline .
             '                                                                                bfUploadImageThumb(files[i]);';
+    }
+
+    private static function buildJavaScriptStringLiteral(string $value): string
+    {
+        $json = json_encode(
+            $value,
+            JSON_THROW_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+        );
+
+        return "'" . substr($json, 1, -1) . "'";
     }
 }
 // phpcs:enable Generic.Files.LineLength

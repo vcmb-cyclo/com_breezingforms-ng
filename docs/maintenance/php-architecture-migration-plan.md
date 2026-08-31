@@ -908,6 +908,45 @@ chevauchement confirmé avant correctif, cercle et texte correctement
 séparés après déploiement du CSS corrigé. Suite complète verte (399 tests,
 aucun fichier PHP touché), build + validation du package.
 
+## Phase 15 — Nettoyage CSS mort et audit des clés Joomla obsolètes
+
+Ajoutée le 2026-08-31, à la suite de la phase 14.
+
+### Skin radio/checkbox mort
+
+En corrigeant le chevauchement de la phase 14, constat que le skin CSS
+personnalisé pour radios/checkboxes de `custom.css` attend un balisage
+`<label><span></span>Texte</label>` que **plus aucun fichier PHP ni JS du
+dépôt ne génère** (vérifié : recherche exhaustive, zéro correspondance).
+Laissé en place, il ne servait plus qu'à casser des cases/radios natives
+n'ayant jamais suivi cette convention — 3ᵉ bug de ce type identifié dans la
+session (chevauchement Options, radios du sélecteur de moteur de thème,
+case « Scroll element list »). Le bloc entier (~100 lignes) est supprimé
+plutôt que patché une exemption de plus ; chaque case/radio s'affiche
+désormais comme un contrôle natif (`9e990f442`).
+
+### Audit des clés de langue Joomla core
+
+Recherche systématique de tout appel `Text::_()/sprintf()/plural()` vers
+une clé `JXXX` (24 clés uniques référencées dans tout le composant),
+confrontées au fichier `en-GB.ini` core réel de Joomla 6 dans le
+conteneur. 3 obsolètes trouvées et corrigées :
+
+- `JORDER` → `JFIELD_ORDERING_LABEL`
+- `JPAGINATION` → `JLIB_HTML_PAGINATION`
+- `JLIB_APPLICATION_DELETE_SUCCESS` (n'existe plus comme clé générique
+  core) → nouvelle clé projet `COM_BREEZINGFORMSNG_DELETE_SUCCESS`,
+  traduite dans les 8 langues
+
+Les 21 autres clés `JXXX` du composant résolvent correctement — plus
+aucune référence obsolète (`01d17251a`).
+
+### Vérification
+
+Suite complète verte, PHPStan niveau 2 propre, build + validation du
+package. Correctifs CSS vérifiés en direct (avant/après). Baseline
+PHPStan à 197 entrées (contre 251 au dernier relevé de ce document).
+
 ## Travail en parallèle
 
 | Couloir | Fichiers principaux | Peut avancer avec |

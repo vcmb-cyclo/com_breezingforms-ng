@@ -63,7 +63,7 @@ class ClassicRenderer
     private ?QuickModeCheckboxBuilder $quickModeCheckboxBuilderService = null;
     private ?QuickModeSelectBuilder $quickModeSelectBuilderService = null;
     private ?QuickModeMaxLengthCounterBuilder $quickModeMaxLengthCounterBuilderService = null;
-    private ?QuickModeGroupOptionBuilder $quickModeGroupOptionBuilderService = null;
+    private ?ClassicChoiceGroupBuilder $classicChoiceGroupBuilderService = null;
     private ?QuickModeSubmitButtonBuilder $quickModeSubmitButtonBuilderService = null;
     private ?QuickModeCalendarButtonBuilder $quickModeCalendarButtonBuilderService = null;
     private ?QuickModeCalendarInputBuilder $quickModeCalendarInputBuilderService = null;
@@ -232,9 +232,11 @@ float:left;
         return $this->quickModeMaxLengthCounterBuilderService ??= new QuickModeMaxLengthCounterBuilder();
     }
 
-    private function quickModeGroupOptionBuilder(): QuickModeGroupOptionBuilder
+    private function classicChoiceGroupBuilder(): ClassicChoiceGroupBuilder
     {
-        return $this->quickModeGroupOptionBuilderService ??= new QuickModeGroupOptionBuilder();
+        return $this->classicChoiceGroupBuilderService ??= new ClassicChoiceGroupBuilder(
+            new QuickModeGroupOptionBuilder()
+        );
     }
 
     private function quickModeSubmitButtonBuilder(): QuickModeSubmitButtonBuilder
@@ -897,47 +899,17 @@ float:left;
             $mdata['group'] = $mdata['group_translation' . $this->language_tag];
         }
         /* translatables end */
-        if ($mdata['group'] != '') {
-            $wrapOpen = '';
-            $wrapClose = '';
-            if (!$mdata['wrap']) {
-                $wrapOpen = '<span class="bfElementGroupNoWrap" id="bfElementGroupNoWrap' . $mdata['dbId'] . '">' . "\n";
-                $wrapClose = '</span>' . "\n";
-            } else {
-                $wrapOpen = '<span class="bfElementGroup" id="bfElementGroup' . $mdata['dbId'] . '">' . "\n";
-                $wrapClose = '</span>' . "\n";
-            }
-            $mdata['group'] = str_replace("\r", '', $mdata['group']);
-            $gEx = explode("\n", $mdata['group']);
-            $lines = count($gEx);
-            echo $wrapOpen;
-            for ($i = 0; $i < $lines; $i++) {
-                $idExt = $i != 0 ? '_' . $i : '';
-                $iEx = explode(";", $gEx[$i]);
-                $iCnt = count($iEx);
-                if ($iCnt == 3) {
-                    $lblRight = '<label class="bfGroupLabel" id="bfGroupLabel' . $mdata['dbId'] . $idExt . '" for="ff_elem' . $mdata['dbId'] . $idExt . '">' . trim($iEx[1]) . '</label>';
-                    $lblLeft = '';
-                    if ($mdata['labelPosition'] == 'right') {
-                        $lblLeft = $lblRight;
-                        $lblRight = '';
-                    }
-                    echo $lblLeft . $this->quickModeGroupOptionBuilder()->build(
-                        'radio',
-                        'ff_elem',
-                        (string) $mdata['bfName'],
-                        (string) $iEx[2],
-                        (string) $mdata['dbId'] . $idExt,
-                        $iEx[0] == 1,
-                        $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . ($readonly ? ' disabled="disabled" ' : '')
-                    ) . $lblRight . "\n";
-                    if ($mdata['wrap']) {
-                        echo '<br/>' . "\n";
-                    }
-                }
-            }
-            echo $wrapClose;
-        }
+        echo $this->classicChoiceGroupBuilder()->build(
+            'radio',
+            (int) $mdata['dbId'],
+            (string) $mdata['bfName'],
+            (string) $mdata['group'],
+            (bool) $mdata['wrap'],
+            (string) $mdata['labelPosition'],
+            $tabIndex,
+            $onclick . $onblur . $onchange . $onfocus . $onselect,
+            $readonly !== ''
+        );
     }
 
     private function renderCheckboxGroupField(array $mdata, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
@@ -947,48 +919,19 @@ float:left;
             $mdata['group'] = $mdata['group_translation' . $this->language_tag];
         }
         /* translatables end */
-        if ($mdata['group'] != '') {
-            $wrapOpen = '';
-            $wrapClose = '';
-            if (!$mdata['wrap']) {
-                $wrapOpen = '<span class="bfElementGroupNoWrap" id="bfElementGroupNoWrap' . $mdata['dbId'] . '">' . "\n";
-                $wrapClose = '</span>' . "\n";
-            } else {
-                $wrapOpen = '<span class="bfElementGroup" id="bfElementGroup' . $mdata['dbId'] . '">' . "\n";
-                $wrapClose = '</span>' . "\n";
-            }
-            $mdata['group'] = str_replace("\r", '', $mdata['group']);
-            $gEx = explode("\n", $mdata['group']);
-            $lines = count($gEx);
-            echo $wrapOpen;
-            for ($i = 0; $i < $lines; $i++) {
-                $idExt = $i != 0 ? '_' . $i : '';
-                $iEx = explode(";", $gEx[$i]);
-                $iCnt = count($iEx);
-                if ($iCnt == 3) {
-                    $lblRight = '<label class="bfGroupLabel" id="bfGroupLabel' . $mdata['dbId'] . $idExt . '" for="ff_elem' . $mdata['dbId'] . $idExt . '">' . trim($iEx[1]) . '</label>';
-                    $lblLeft = '';
-                    if ($mdata['labelPosition'] == 'right') {
-                        $lblLeft = $lblRight;
-                        $lblRight = '';
-                    }
-                    echo $lblLeft . $this->quickModeGroupOptionBuilder()->build(
-                        'checkbox',
-                        'ff_elem',
-                        (string) $mdata['bfName'],
-                        (string) $iEx[2],
-                        (string) $mdata['dbId'] . $idExt,
-                        $iEx[0] == 1,
-                        $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . ($readonly ? ' disabled="disabled" ' : '')
-                    ) . $lblRight . "\n";
-                    if ($mdata['wrap']) {
-                        echo '<br/>' . "\n";
-                    }
-                }
-            }
-            echo $wrapClose;
-        }
+        echo $this->classicChoiceGroupBuilder()->build(
+            'checkbox',
+            (int) $mdata['dbId'],
+            (string) $mdata['bfName'],
+            (string) $mdata['group'],
+            (bool) $mdata['wrap'],
+            (string) $mdata['labelPosition'],
+            $tabIndex,
+            $onclick . $onblur . $onchange . $onfocus . $onselect,
+            $readonly !== ''
+        );
     }
+
 
     private function renderCheckboxField(array $mdata, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
     {

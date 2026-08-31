@@ -1066,6 +1066,12 @@ Règles de coordination :
 5. Réduction progressive des avertissements PHPCS et PHPStan après chaque
    extraction fonctionnelle.
 
+Le rendu Classic des groupes radio et checkbox est désormais mutualisé dans
+`ClassicChoiceGroupBuilder` (`478e1c24a`), avec couverture dédiée des wrappers,
+labels, états checked/disabled, lignes invalides et mode sans retour à la ligne.
+Les traductions du groupe et les différences d'enveloppe restent dans
+`ClassicRenderer`.
+
 Lots récemment terminés : tests d'intégration des variantes Query List et du
 point d'arrêt `bury()` dans la première boucle (`7a19ffeb`), contrôles de
 fichiers ContentBuilder (`2c72231e`) et loader d'enregistrement éditable

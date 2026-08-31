@@ -78,10 +78,7 @@ final class SubmissionEngine
         if (count($this->processor->rows)) {
             $time_passed = 0;
             $start_time = $this->processor->measureTime();
-            $max_exec_time = 15;
-            if (function_exists('ini_get')) {
-                $max_exec_time = @ini_get('max_execution_time');
-            }
+            $max_exec_time = ini_get('max_execution_time');
             $max_time = !empty($max_exec_time) ? intval($max_exec_time) / 2 : 15;
             foreach ($this->processor->rows as $row) {
                 if (!in_array($row->name, $names)) {
@@ -1525,8 +1522,8 @@ transition: box-shadow .15s linear;
 
             if (!defined('VMBFCF_RUNNING')) {
                 $ob = 0;
-                while (@ob_get_level() > 0 && $ob <= 32) {
-                    @ob_end_clean();
+                while (ob_get_level() > 0 && $ob <= 32) {
+                    ob_end_clean();
                     $ob++;
                 }
                 ob_start();
@@ -1643,8 +1640,8 @@ transition: box-shadow .15s linear;
             } // if
 
             if (!defined('VMBFCF_RUNNING')) {
-                $c = @ob_get_contents();
-                @ob_end_clean();
+                $c = ob_get_contents();
+                ob_end_clean();
                 echo $c;
 
                 echo '</body>

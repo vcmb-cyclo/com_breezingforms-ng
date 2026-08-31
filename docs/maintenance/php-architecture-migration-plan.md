@@ -995,6 +995,10 @@ gardes de matching dupliquées ont été supprimées.
 PNG et les trois géométries de redimensionnement, en complément des tests de
 taille mémoire et de capacité déjà présents.
 
+La gestion des buffers de sortie et la lecture de `max_execution_time` dans
+`SubmissionEngine` n'utilisent plus de suppression d'erreur; les niveaux de
+buffer sont contrôlés avant fermeture.
+
 Les tests d'existence des assets statiques des trois renderers QuickMode
 utilisent désormais `is_file()` sans masquage d'erreur; leurs sorties restent
 couvertes par les tests de caractérisation des renderers.

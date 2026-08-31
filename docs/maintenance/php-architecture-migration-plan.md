@@ -49,6 +49,7 @@
 | QuickMode OnePage — validation précédente | Callback `bf_validate_prevpage` extrait dans un builder pur, avec branches d’erreur et commentaire historique couverts | Commit `f19eb5f89` |
 | QuickMode OnePage — validation suivante | Callback `bf_validate_nextpage` extrait dans un builder pur, avec erreur, focus, Ladda et activation de la page couverts | Commit `114dd4d17` |
 | QuickMode OnePage — validation soumission | Callback `bf_validate_submit` extrait dans un builder pur, avec erreurs, focus, restauration du bouton et soumission couverts | Commit `280fccd6e` |
+| QuickMode OnePage — restauration soumission | Callback `bf_restore_submitbutton` extrait dans un builder pur, avec clonage, remplacement et rebinding Ladda couverts | Commit `bfe93521e` |
 | QuickMode — expression éditeur | Construction de l’expression JavaScript de lecture des éditeurs mutualisée entre Bootstrap et OnePage, API publique conservée | Commit `43592c8bd` |
 | QuickMode — mapping Bootstrap | Mapping Bootstrap 5 des classes mutualisé entre Bootstrap et OnePage, résolution publique `bsClass()` conservée | Commit `658078588` |
 | Finalisation — champs de soumission | Champs cachés communs frontend/backend/preview extraits avec conservation des différences `act`/`ff_frame` | Commit `be602b94f` |
@@ -849,7 +850,8 @@ Le callback `bf_validate_submit` est désormais construit par
 `QuickModeSubmitValidationBuilder` (`280fccd6e`). Les chemins d'erreur et de
 succès, le focus, la restauration du bouton et l'appel à `ff_submitForm()`
 sont couverts par un test dédié ; les responsabilités de restauration du
-bouton restent dans le renderer car elles dépendent de son état JavaScript.
+bouton sont désormais isolées dans `QuickModeSubmitButtonRestoreBuilder`
+(`bfe93521e`) ; elles conservent leurs dépendances JavaScript historiques.
 
 La baseline PHPCS est maintenant sans erreur sur les services modernes, les
 quatre renderers QuickMode et leurs traits (`e25d501f`, `14985d4d`, `288b42a4`,

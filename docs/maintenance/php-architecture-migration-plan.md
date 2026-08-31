@@ -1564,6 +1564,10 @@ installation, réinstallation de mise à jour, enregistrement des extensions,
 création des tables, réponse frontend HTTP 200 et génération d’une image
 CAPTCHA Securimage sont validés.
 
+Le package a ensuite été reconstruit depuis les fichiers versionnés ; sa liste
+contient les nouveaux services QuickMode et ContentBuilder, et le même smoke
+test a de nouveau réussi sur cette archive reconstruite.
+
 1. Test PHPUnit ciblé du service ou du renderer modifié.
 2. `php -l` sur chaque fichier PHP modifié.
 3. Suite PHPUnit complète.

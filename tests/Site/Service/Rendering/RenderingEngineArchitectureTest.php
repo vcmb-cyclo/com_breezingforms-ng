@@ -24,6 +24,8 @@ final class RenderingEngineArchitectureTest extends TestCase
         self::assertSame(0, substr_count($method, 'PermissionService::createFromRuntimeContext()'));
         self::assertStringContainsString('contentBuilderPermissionChecker()->assertCanCreate(', $method);
         self::assertStringContainsString('contentBuilderPermissionChecker()->assertCanEditOrCreate(', $method);
+        self::assertStringContainsString('contentBuilderRecordLoader()->load(', $method);
+        self::assertStringNotContainsString('->getRecord(', $method);
     }
 
     public function testCaptchaValidationIsDelegatedToDedicatedBuilders(): void

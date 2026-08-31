@@ -681,7 +681,7 @@ parameters:
 		-
 			message: '#^Call to static method getForm\(\) on an unknown class CB\\Component\\Contentbuilderng\\Administrator\\Helper\\FormSourceFactory\.$#'
 			identifier: class.notFound
-			count: 1
+			count: 2
 			path: components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php
 
 		-

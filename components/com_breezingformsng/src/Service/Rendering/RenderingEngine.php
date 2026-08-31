@@ -34,6 +34,7 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Log\Log;
 use Exception;
+use Closure;
 use Vcmb\Component\BreezingformsNG\Site\Table\QueryColumn;
 use HTML_facileFormsProcessor;
 use CB\Component\Contentbuilderng\Administrator\Helper\ContentbuilderngHelper;
@@ -108,6 +109,7 @@ final class RenderingEngine
     private ?ContentBuilderFormAssociationLoader $contentBuilderFormAssociationLoaderService = null;
     private ?ContentBuilderFormDataLoader $contentBuilderFormDataLoaderService = null;
     private ?ContentBuilderPermissionChecker $contentBuilderPermissionCheckerService = null;
+    private ?ContentBuilderRecordLoader $contentBuilderRecordLoaderService = null;
     private ?QuickModeRendererFactory $quickModeRendererFactoryService = null;
     private ?FormOnloadScriptBuilder $formOnloadScriptBuilderService = null;
     private ?QueryListRowPreparationService $queryListRowPreparationService = null;
@@ -552,6 +554,17 @@ final class RenderingEngine
         );
     }
 
+    private function contentBuilderRecordLoader(): ContentBuilderRecordLoader
+    {
+        return $this->contentBuilderRecordLoaderService ??= new ContentBuilderRecordLoader(
+            static function (string $referenceId, int $recordId, bool $publishedOnly, int $ownerId, bool $showAllLanguages): array {
+                $form = FormSourceFactory::getForm('com_breezingformsng', $referenceId);
+
+                return (array) $form->getRecord($recordId, $publishedOnly, $ownerId, $showAllLanguages);
+            }
+        );
+    }
+
     private function quickModeRendererFactory(): QuickModeRendererFactory
     {
         return $this->quickModeRendererFactoryService ??= new QuickModeRendererFactory();
@@ -657,11 +670,14 @@ final class RenderingEngine
                 if (is_array($cbData)) {
                     $cbFull = $this->contentBuilderPermissionChecker()->canViewFullArticle($permissionService, $cbFrontend);
                     $cbForm = FormSourceFactory::getForm('com_breezingformsng', $cbData['reference_id']);
-                    $cbRecord = $cbForm->getRecord($input->getInt('cb_record_id', 0), $cbData['published_only'], $cbFrontend ? ($cbData['own_only_fe'] ? $this->processor->app->getIdentity()->get('id', 0) : -1) : ($cbData['own_only'] ? $this->processor->app->getIdentity()->get('id', 0) : -1), $cbFrontend ? $cbData['show_all_languages_fe'] : true);
-
-                    if (!count($cbRecord) && !$input->getBool('cbIsNew', false)) {
-                        throw new Exception(Text::_('COM_CONTENTBUILDERNG_RECORD_NOT_FOUND'), 404);
-                    }
+                    $cbRecord = $this->contentBuilderRecordLoader()->load(
+                        $cbData,
+                        $input->getInt('cb_record_id', 0),
+                        $cbFrontend,
+                        (int) $this->processor->app->getIdentity()->get('id', 0),
+                        $input->getBool('cbIsNew', false),
+                        Text::_('COM_CONTENTBUILDERNG_RECORD_NOT_FOUND')
+                    );
                 }
             }
         }

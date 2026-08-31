@@ -92,10 +92,8 @@ final class RenderingEngine
     private ?QueryListPaginationTailBuilder $queryListPaginationTailBuilderService = null;
     private ?QueryListStateLibraryBuilder $queryListStateLibraryBuilderService = null;
     private ?PaymentProviderDetector $paymentProviderDetectorService = null;
-    private ?ContentBuilderFileValueParser $contentBuilderFileValueParserService = null;
-    private ?ContentBuilderFileDisplayNameBuilder $contentBuilderFileDisplayNameBuilderService = null;
+    private ?ContentBuilderFileSupportBuilder $contentBuilderFileSupportBuilderService = null;
     private ?ContentBuilderFlashUploadValidationBuilder $contentBuilderFlashUploadValidationBuilderService = null;
-    private ?ContentBuilderSignatureFileResolver $contentBuilderSignatureFileResolverService = null;
     private ?ContentBuilderSignatureImageEncoder $contentBuilderSignatureImageEncoderService = null;
     private ?CaptchaEndpointBuilder $captchaEndpointBuilderService = null;
     private ?CaptchaValidationRowSelector $captchaValidationRowSelectorService = null;
@@ -388,14 +386,9 @@ final class RenderingEngine
         return $this->paymentProviderDetectorService ??= new PaymentProviderDetector();
     }
 
-    private function contentBuilderFileValueParser(): ContentBuilderFileValueParser
+    private function contentBuilderFileSupportBuilder(): ContentBuilderFileSupportBuilder
     {
-        return $this->contentBuilderFileValueParserService ??= new ContentBuilderFileValueParser();
-    }
-
-    private function contentBuilderFileDisplayNameBuilder(): ContentBuilderFileDisplayNameBuilder
-    {
-        return $this->contentBuilderFileDisplayNameBuilderService ??= new ContentBuilderFileDisplayNameBuilder();
+        return $this->contentBuilderFileSupportBuilderService ??= new ContentBuilderFileSupportBuilder();
     }
 
     private function contentBuilderFlashUploadValidationBuilder(): ContentBuilderFlashUploadValidationBuilder
@@ -403,10 +396,6 @@ final class RenderingEngine
         return $this->contentBuilderFlashUploadValidationBuilderService ??= new ContentBuilderFlashUploadValidationBuilder();
     }
 
-    private function contentBuilderSignatureFileResolver(): ContentBuilderSignatureFileResolver
-    {
-        return $this->contentBuilderSignatureFileResolverService ??= new ContentBuilderSignatureFileResolver();
-    }
 
     private function contentBuilderSignatureImageEncoder(): ContentBuilderSignatureImageEncoder
     {
@@ -799,7 +788,7 @@ final class RenderingEngine
                                     $cbFlashUploadValidationOverride = '1';
                                 }
 
-                                $fileValue = $this->contentBuilderFileValueParser()->parse((string) $cbEntry->recValue);
+                                $fileValue = $this->contentBuilderFileSupportBuilder()->parseValue((string) $cbEntry->recValue);
                                 $cbFiles = $fileValue['files'];
                                 $cnt = $fileValue['count'];
                                 $cbJs .= '
@@ -808,7 +797,7 @@ final class RenderingEngine
                                 $displayNames = [];
                                 foreach ($cbFiles as $cbFile) {
                                     if (trim($cbFile)) {
-                                        $displayName = $this->contentBuilderFileDisplayNameBuilder()->build(
+                                        $displayName = $this->contentBuilderFileSupportBuilder()->displayName(
                                             ContentbuilderngHelper::contentbuilderng_wordwrap($cbFile, 150, '<br>', true)
                                         );
                                         $displayNames[] = $displayName;
@@ -832,7 +821,7 @@ final class RenderingEngine
 
                             $sig_path = JPATH_SITE . '/media/breezingforms/signatures/';
 
-                            $signaturePath = $this->contentBuilderSignatureFileResolver()->resolve(
+                        $signaturePath = $this->contentBuilderFileSupportBuilder()->resolveSignature(
                                 $sig_path,
                                 (string) $cbEntry->recValue
                             );

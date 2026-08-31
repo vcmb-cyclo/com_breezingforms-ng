@@ -463,15 +463,15 @@ function bf_sendNotificationByPaymentCache($formId, $recordId, $type = 'admin')
  *
  * @return boolean
  */
-function bf_isUTF8($string)
+function bf_isUTF8(mixed $string): bool
 {
 	if (is_array($string)) {
 		$enc = implode('', $string);
 
-		return @!((ord($enc[0]) != 239) && (ord($enc[1]) != 187) && (ord($enc[2]) != 191));
-	} else {
-		return(utf8_encode(utf8_decode($string)) == $string);
+		return str_starts_with($enc, "\xEF\xBB\xBF");
 	}
+
+	return is_string($string) && preg_match('//u', $string) === 1;
 }
 
 /**
@@ -481,14 +481,8 @@ function bf_isUTF8($string)
  *
  * @return string cleaned
  */
-function bf_stripslashes_deep($value)
+function bf_stripslashes_deep(mixed $value): mixed
 {
-	if (function_exists('get_magic_quotes_gpc') && @get_magic_quotes_gpc()) {
-		$value = is_array($value) ?
-			array_map('bf_stripslashes_deep', $value) :
-			stripslashes($value);
-	}
-
 	return $value;
 }
 

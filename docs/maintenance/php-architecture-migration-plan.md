@@ -53,6 +53,7 @@
 | Finalisation — wrapper ReCaptcha | Markup du wrapper ReCaptcha historique extrait, activé uniquement pour l’enveloppe legacy et couvert | Commit `092a2a9fa` |
 | Finalisation — balise form QuickMode | Assemblage de la balise `<form>` extrait, calcul d’URL conservé dans l’orchestrateur et classe historique préservée | Commit `4f5b8559d` |
 | ContentBuilder — wrapper readonly | Enveloppe du script des champs non éditables extraite et couverte, avec marqueurs historiques conservés | Commit `3e1723d15` |
+| Finalisation — wrapper enregistrement éditable | Chargement JavaScript de l’enregistrement éditable extrait dans un builder, avec nettoyage historique de `seccode` couvert | Commit `f3b6f8d97` |
 | Validation — enveloppe JavaScript | Ouverture/fermeture du script global de validation extraite, contrôles extensions/CAPTCHA conservés dans l’orchestrateur | Commit `9b92acb55` |
 | Validation — extensions de fichiers | Génération du validateur JavaScript des uploads extraite dans un builder pur, avec variantes template configuré/non configuré couvertes | Commit `30dd41889` |
 | Finalisation — ouverture caractérisée | Initialisation du rendu testée avec remise à zéro des états Query List et wrapper ReCaptcha legacy | Commit `0d33f0253` |
@@ -599,6 +600,12 @@ L'enveloppe du script ContentBuilder des champs non éditables est désormais
 construite par `ContentBuilderReadonlyScriptWrapperBuilder` (`3e1723d15`).
 L'enregistrement de l'asset et la génération du contenu restent séparés, et
 les marqueurs HTML historiques sont couverts par un test de sortie exacte.
+
+Le wrapper `bfLoadEditable` est désormais construit par
+`EditableRecordScriptWrapperBuilder` (`f3b6f8d97`). Le moteur conserve le
+nettoyage des valeurs et la génération du contenu d'hydratation, tandis que
+le chargement JavaScript, l'identifiant du formulaire et l'effacement
+historique de `ff_nm_seccode[]` sont isolés et testés.
 
 L'enveloppe du script global de validation est désormais construite par
 `FormValidationScriptWrapperBuilder` (`9b92acb55`). Les contrôles de fichiers

@@ -85,15 +85,15 @@ $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key)
     <thead>
       <tr>
         <th class="w-1 text-center"><input type="checkbox" class="form-check-input" onclick="Joomla.checkAll(this)" title="<?= Text::_('JGLOBAL_CHECK_ALL'); ?>"></th>
-        <th><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_ID', 'records.id', $listDirn, $listOrder); ?></th>
-        <th><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_FORM', 'forms.title', $listDirn, $listOrder); ?></th>
-        <th><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_IP', 'records.ip', $listDirn, $listOrder); ?></th>
-        <th><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_USER', 'records.username', $listDirn, $listOrder); ?></th>
-        <th class="text-center"><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_VIEWED', 'records.viewed', $listDirn, $listOrder); ?></th>
-        <th class="text-center"><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_EXPORTED', 'records.exported', $listDirn, $listOrder); ?></th>
-        <th class="text-center"><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_ARCHIVED', 'records.archived', $listDirn, $listOrder); ?></th>
-        <th><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_SUBMITTED', 'records.submitted', $listDirn, $listOrder); ?></th>
-        <th><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_FORMS_MODIFIED', 'records.modified', $listDirn, $listOrder); ?></th>
+        <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_ID_DESC'); ?>"><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_ID', 'records.id', $listDirn, $listOrder); ?></th>
+        <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_RECORDS_FORM_DESC'); ?>"><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_FORM', 'forms.title', $listDirn, $listOrder); ?></th>
+        <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_IP_DESC'); ?>"><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_IP', 'records.ip', $listDirn, $listOrder); ?></th>
+        <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_USER_DESC'); ?>"><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_USER', 'records.username', $listDirn, $listOrder); ?></th>
+        <th class="text-center" title="<?= $headerTitle('COM_BREEZINGFORMSNG_VIEWED_DESC'); ?>"><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_VIEWED', 'records.viewed', $listDirn, $listOrder); ?></th>
+        <th class="text-center" title="<?= $headerTitle('COM_BREEZINGFORMSNG_EXPORTED_DESC'); ?>"><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_EXPORTED', 'records.exported', $listDirn, $listOrder); ?></th>
+        <th class="text-center" title="<?= $headerTitle('COM_BREEZINGFORMSNG_ARCHIVED_DESC'); ?>"><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_ARCHIVED', 'records.archived', $listDirn, $listOrder); ?></th>
+        <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_SUBMITTED_DESC'); ?>"><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_SUBMITTED', 'records.submitted', $listDirn, $listOrder); ?></th>
+        <th title="<?= $headerTitle('COM_BREEZINGFORMSNG_MODIFIED_DESC'); ?>"><?= HTMLHelper::_('searchtools.sort', 'COM_BREEZINGFORMSNG_FORMS_MODIFIED', 'records.modified', $listDirn, $listOrder); ?></th>
       </tr>
     </thead>
     <tbody>

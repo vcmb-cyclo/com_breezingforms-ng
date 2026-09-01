@@ -20,6 +20,30 @@ final class EngineDispatcherContainerTest extends TestCase
         self::assertStringContainsString('DatabaseInterface::class', $source);
         self::assertStringContainsString('MailerFactoryInterface::class', $source);
         self::assertStringContainsString('CacheControllerFactoryInterface::class', $source);
+        self::assertStringContainsString('FormRenderer::class', $source);
+        self::assertStringContainsString('CaptchaCallback::class', $source);
+        self::assertStringContainsString('PayPalCallback::class', $source);
+        self::assertStringContainsString('StripeCallback::class', $source);
+        self::assertStringContainsString('SofortCallback::class', $source);
+        self::assertStringContainsString('FlashUploadCallback::class', $source);
+        self::assertStringContainsString('OptCallback::class', $source);
+        self::assertStringContainsString('RequestParameterParser::class', $source);
+        self::assertStringContainsString('PaymentDownloadPolicy::class', $source);
+        self::assertStringContainsString('RedirectHelper::class', $source);
+        self::assertStringContainsString('FlashUploadSizeValidator::class', $source);
+
+        $dispatcher = file_get_contents(
+            __DIR__ . '/../../../components/com_breezingformsng/src/Service/EngineDispatcher.php'
+        );
+
+        self::assertIsString($dispatcher);
+        self::assertStringNotContainsString('(new FormRenderer(', $dispatcher);
+        self::assertStringNotContainsString('(new CaptchaCallback(', $dispatcher);
+        self::assertStringNotContainsString('(new PayPalCallback(', $dispatcher);
+        self::assertStringNotContainsString('(new StripeCallback(', $dispatcher);
+        self::assertStringNotContainsString('(new SofortCallback(', $dispatcher);
+        self::assertStringNotContainsString('(new FlashUploadCallback(', $dispatcher);
+        self::assertStringNotContainsString('(new OptCallback(', $dispatcher);
     }
 
     public function testFrontendBootstrapResolvesDispatcherFromTheContainer(): void

@@ -90,13 +90,16 @@ final class PaymentCallbackRegressionTest extends TestCase
         self::assertStringContainsString('$this->downloadPolicy->canDownload(', $service);
     }
 
-    public function testEngineDispatcherSharesPaymentDownloadPolicyWithCallbacks(): void
+    public function testProviderSharesPaymentDownloadPolicyWithPaymentCallbacks(): void
     {
-        $source = $this->read('components/com_breezingformsng/src/Service/EngineDispatcher.php');
+        $source = $this->read('administrator/components/com_breezingformsng/services/provider.php');
 
-        self::assertStringContainsString('PaymentDownloadPolicy $paymentDownloadPolicy', $source);
-        self::assertSame(1, substr_count($source, '$this->paymentDownloadPolicy ='));
-        self::assertSame(10, substr_count($source, '$this->paymentDownloadPolicy'));
+        self::assertStringContainsString('PaymentDownloadPolicy::class', $source);
+        self::assertSame(3, substr_count($source, '$container->get(PaymentDownloadPolicy::class)'));
+
+        $dispatcher = $this->read('components/com_breezingformsng/src/Service/EngineDispatcher.php');
+
+        self::assertStringNotContainsString('$this->paymentDownloadPolicy', $dispatcher);
     }
 
     public function testStripeSubmissionIteratesEveryTemplateArea(): void

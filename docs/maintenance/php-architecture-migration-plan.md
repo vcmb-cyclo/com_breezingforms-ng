@@ -119,6 +119,7 @@
 | Soumission — orchestration des moteurs | Le pipeline reçoit directement `ScriptingEngine`, `ExportEngine` et `NotificationEngine` pour les pièces, exports et notifications | Phase 24, `SubmissionEngineArchitectureTest` |
 | QuickMode — hydratation des valeurs enregistrées | La recherche de lignes, l’exécution de `data1/data2`, les traductions et l’état checkbox sont mutualisés pour les trois renderers actifs | Phase 25, `QuickModeSubmittedValueHydratorTest` |
 | Bootstrap Joomla — dispatcher et autoload Composer | `EngineDispatcher` est enregistré dans le provider Joomla 6, le front controller le résout par conteneur, et le smoke/package validator vérifient l’autoload installé de Securimage/TCPDF | Phase 26, `EngineDispatcherContainerTest` et `JoomlaInstallSmokeScriptTest` |
+| Bootstrap Joomla — graphe interne du dispatcher | Le renderer, les callbacks et leurs services partagés sont enregistrés dans le provider puis injectés dans `EngineDispatcher`, sans constructions manuelles dans le dispatcher | Phase 27, `EngineDispatcherContainerTest` |
 | PHPCS | Actif sur les services modernes, les builders ContentBuilder, Classic et `HiddenFieldTrait` | `phpcs.xml.dist`, 155 fichiers configurés |
 | PHPStan | Niveau 4 validé sur le composant, sans diagnostic résiduel | `phpstan.neon.dist`, baseline vide |
 | Navigation des enregistrements admin | Les liens précédent/suivant réutilisent le formulaire, la recherche et le tri de la liste courante ; l'état est conservé pendant l'édition | `RecordsModel::getAdjacentRecordId()`, `tests/Administrator/RecordsNavigationTest.php` |
@@ -1658,6 +1659,28 @@ Le graphe interne construit par `EngineDispatcher` (callbacks, renderer et
 services spécialisés) reste le prochain périmètre d'injection ; cette phase
 ne change pas ses contrats ni son ordre d'initialisation.
 
+## Phase 27 — Injecter le graphe interne du dispatcher
+
+Ajoutée le 2026-09-01 après la Phase 26. Le provider enregistrait le point
+d'entrée `EngineDispatcher`, mais celui-ci construisait encore lui-même le
+renderer et chaque callback, ainsi que leurs dépendances partagées.
+
+### Périmètre
+
+- `FormRenderer`, les sept callbacks, `RequestParameterParser`,
+  `PaymentDownloadPolicy`, `RedirectHelper` et `FlashUploadSizeValidator` sont
+  enregistrés dans `services/provider.php`.
+- `EngineDispatcher` reçoit ces services par constructeur et conserve l'ordre
+  historique des branches de rendu et de callback.
+- Aucune méthode publique de la façade ni aucun contrat de callback n'est
+  modifié.
+
+### Filet de sécurité et vérification
+
+`EngineDispatcherContainerTest` vérifie le graphe enregistré et l'absence des
+constructions manuelles dans le dispatcher. Les tests de callbacks existants
+restent indépendants et continuent de couvrir leurs contrats propres.
+
 ## Travail en parallèle
 
 | Couloir | Fichiers principaux | Peut avancer avec |
@@ -1716,10 +1739,12 @@ Règles de coordination :
     du dispatcher et ajouter un test de résolution par le conteneur.~~
     Terminé par la Phase 26. Le graphe interne du dispatcher reste à injecter
     progressivement, après caractérisation de ses contrats.
-11. Caractériser puis injecter le graphe interne d'`EngineDispatcher` par
+11. ~~Caractériser puis injecter le graphe interne d'`EngineDispatcher` par
     parcours fonctionnel (callbacks, rendu, soumission et runtime), sans
     modifier les contrats publics de la façade ni refactoriser plusieurs
-    frontières dans un même lot.
+    frontières dans un même lot.~~
+    Terminé par la Phase 27. Les frontières internes des callbacks restent
+    des lots séparés si une caractérisation supplémentaire est nécessaire.
 
 Le rendu Classic des groupes radio et checkbox est désormais mutualisé dans
 `ClassicChoiceGroupBuilder` (`478e1c24a`), avec couverture dédiée des wrappers,

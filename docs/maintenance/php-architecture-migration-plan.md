@@ -1032,16 +1032,6 @@ leurs tests ont été supprimés après fusion des cas de test dans trois fichie
 de test consolidés. Suite complète verte, PHPStan propre et PHPCS vert sur les
 nouveaux services.
 
-### Note sur les mentions historiques
-
-Les phases 1 à 6 ci-dessus continuent de citer les 10 anciennes classes par
-leur nom (avec leur hash de commit) : ce sont des enregistrements
-historiques du travail effectué à l'époque, exacts au moment où ils ont été
-écrits — ils n'ont pas été réécrits rétroactivement pour ne pas fausser la
-traçabilité. Les classes qu'ils nomment sont désormais des méthodes de
-`HiddenFormFieldsBuilder` ou `LegacyScriptTagWrapperBuilder` (voir 8.1/8.2
-ci-dessus pour la correspondance).
-
 ## Phase 9 — Suppression du rendu mobile historique
 
 Ajoutée le 2026-08-31. La détection de terminal mobile (`bf_is_mobile()`) et

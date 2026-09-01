@@ -40,6 +40,7 @@ final class EngineDispatcherContainerTest extends TestCase
             '$container->share(' . "\n            PaymentDownloadService::class",
             $source
         );
+        self::assertStringContainsString('PaymentFormLoader::class', $source);
         self::assertStringContainsString(
             '$container->share(' . "\n            RedirectHelper::class",
             $source

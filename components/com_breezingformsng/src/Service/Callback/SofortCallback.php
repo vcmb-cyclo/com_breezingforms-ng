@@ -29,6 +29,8 @@ final class SofortCallback
     public function __construct(
         private readonly CMSApplication $application,
         private readonly DatabaseInterface $database,
+        private readonly PaymentFormLoader $paymentFormLoader,
+        private readonly PaymentRecordService $paymentRecordService,
         private readonly RedirectHelper $redirectHelper,
         private readonly MailerFactoryInterface $mailerFactory,
         private readonly PaymentDownloadService $paymentDownloadService,
@@ -55,23 +57,19 @@ final class SofortCallback
 
 
             $formIdInt = (int) $formId;
-            $formQuery = $db->getQuery(true)
-                ->select('*')
-                ->from($db->quoteName('#__facileforms_forms'))
-                ->where($db->quoteName('id') . ' = :formIdInt')
-                ->bind(':formIdInt', $formIdInt, ParameterType::INTEGER);
-            $db->setQuery($formQuery);
-            $list = $db->loadObjectList();
-            if (count($list) == 0) {
+            $form = $this->paymentFormLoader->load($formIdInt);
+            if ($form === null) {
                 $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
                 $this->application->close();
+
+                return;
             }
 
-            $form = $list[0];
-
-            $areas = json_decode($form->template_areas, true);
-            if (!is_array($areas)) {
+            $areas = $this->paymentFormLoader->decodeAreas($form);
+            if ($areas === null) {
                 $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_SU_DATA'));
+
+                return;
             }
 
             foreach ($areas as $area) {
@@ -136,22 +134,18 @@ final class SofortCallback
 
 
     $formIdInt = (int) $formId;
-    $formQuery = $db->getQuery(true)
-        ->select('*')
-        ->from($db->quoteName('#__facileforms_forms'))
-        ->where($db->quoteName('id') . ' = :formIdInt')
-        ->bind(':formIdInt', $formIdInt, ParameterType::INTEGER);
-    $db->setQuery($formQuery);
-    $list = $db->loadObjectList();
-    if (count($list) == 0) {
+    $form = $this->paymentFormLoader->load($formIdInt);
+    if ($form === null) {
         $this->application->close();
+
+        return;
     }
 
-    $form = $list[0];
-
-    $areas = json_decode($form->template_areas, true);
-    if (!is_array($areas)) {
+    $areas = $this->paymentFormLoader->decodeAreas($form);
+    if ($areas === null) {
         $this->application->close();
+
+        return;
     }
 
     foreach ($areas as $area) {
@@ -198,38 +192,21 @@ final class SofortCallback
                 $hash = sha1($data_implode);
 
                 $recordIdInt = (int) $recordId;
-                $txidQuery = $db->getQuery(true)
-                    ->select('*')
-                    ->from($db->quoteName('#__facileforms_records'))
-                    ->where($db->quoteName('id') . ' = :recordIdInt')
-                    ->where($db->quoteName('paypal_tx_id') . " = ''")
-                    ->setLimit(1)
-                    ->bind(':recordIdInt', $recordIdInt, ParameterType::INTEGER);
-                $db->setQuery($txidQuery);
-                $txid = $db->loadObjectList();
+                $record = $this->paymentRecordService->findUnpaid($recordIdInt);
 
                 if ($hash == $input->getString('hash', '')) {
 
-                    if (count($txid) != 0) {
-
-                        if ($txid[0]->paypal_tx_id == '') {
+                    if ($record !== null) {
 
                             $sofortRecordId = (int) $recordId;
                             $sofortTxId = 'Sofortüberweisung: ' . $input->getString('transaction', '');
                             $sofortPaymentDate = date('Y-m-d H:i:s', strtotime($input->getString('created', '')));
-                            $updateQuery = $db->getQuery(true)
-                                ->update($db->quoteName('#__facileforms_records'))
-                                ->set($db->quoteName('paypal_tx_id') . ' = :sofortTxId')
-                                ->set($db->quoteName('paypal_payment_date') . ' = :sofortPaymentDate')
-                                ->set($db->quoteName('paypal_testaccount') . ' = 0')
-                                ->set($db->quoteName('paypal_download_tries') . ' = 0')
-                                ->where($db->quoteName('id') . ' = :sofortRecordId')
-                                ->bind(':sofortTxId', $sofortTxId, ParameterType::STRING)
-                                ->bind(':sofortPaymentDate', $sofortPaymentDate, ParameterType::STRING)
-                                ->bind(':sofortRecordId', $sofortRecordId, ParameterType::INTEGER);
-                            $db->setQuery($updateQuery);
-
-                            $db->execute();
+                            $this->paymentRecordService->storeTransaction(
+                                $sofortRecordId,
+                                $sofortTxId,
+                                $sofortPaymentDate,
+                                0
+                            );
 
                             $recipients = explode('###', $input->getString('user_variable_2', ''));
                             $recipientsSize = count($recipients);
@@ -283,7 +260,6 @@ final class SofortCallback
                                 bf_sendNotificationByPaymentCache($formId, $recordId, 'admin');
                                 bf_sendNotificationByPaymentCache($formId, $recordId, 'mailback');
                             }
-                        }
                     }
                 }
 

@@ -13,7 +13,6 @@ use Joomla\CMS\Application\CMSApplication;
 use Vcmb\Component\BreezingformsNG\Site\Service\Support\RedirectHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
-use Joomla\Database\ParameterType;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Http\Http;
 
@@ -26,6 +25,8 @@ final class PayPalCallback
     public function __construct(
         private readonly CMSApplication $application,
         private readonly DatabaseInterface $database,
+        private readonly PaymentFormLoader $paymentFormLoader,
+        private readonly PaymentRecordService $paymentRecordService,
         private readonly RedirectHelper $redirectHelper,
         private readonly PaymentDownloadService $paymentDownloadService,
         private readonly Http $http,
@@ -34,30 +35,21 @@ final class PayPalCallback
 
     public function confirmIpn(): void
     {
-        $db = $this->database;
-
-
-
     $input = $this->application->getInput();
-    $formId = $input->getInt('form_id', -1);
-    $query = $db->getQuery(true)
-        ->select('*')
-        ->from($db->quoteName('#__facileforms_forms'))
-        ->where($db->quoteName('id') . ' = :formId')
-        ->bind(':formId', $formId, ParameterType::INTEGER);
-    $db->setQuery($query);
-    $list = $db->loadObjectList();
-    if (count($list) == 0) {
+    $form = $this->paymentFormLoader->load($input->getInt('form_id', -1));
+    if ($form === null) {
         $this->application->setHeader('status', 200, true);
         $this->application->close();
+
+        return;
     }
 
-    $form = $list[0];
-
-    $areas = json_decode($form->template_areas, true);
-    if (!is_array($areas)) {
+    $areas = $this->paymentFormLoader->decodeAreas($form);
+    if ($areas === null) {
         $this->application->setHeader('status', 200, true);
         $this->application->close();
+
+        return;
     }
 
     foreach ($areas as $area) {
@@ -91,36 +83,19 @@ final class PayPalCallback
                 if ($verification === 'VERIFIED') {
 
                     $recordId = $input->getInt('record_id', -1);
-                    $recordQuery = $db->getQuery(true)
-                        ->select('*')
-                        ->from($db->quoteName('#__facileforms_records'))
-                        ->where($db->quoteName('id') . ' = :recordId')
-                        ->setLimit(1)
-                        ->bind(':recordId', $recordId, ParameterType::INTEGER);
-                    $db->setQuery($recordQuery);
-                    $txid = $db->loadObjectList();
+                    $record = $this->paymentRecordService->find($recordId);
 
-                    if (count($txid) != 0) {
-
-                        if ($txid[0]->paypal_tx_id == '') {
+                    if ($record !== null && $record->paypal_tx_id === '') {
 
                             $paypalTxId = 'PayPal: ' . $tx_token . ' (VALID)';
                             $paymentDate = date('Y-m-d H:i:s');
                             $testaccount = $options['testaccount'] ? 1 : 0;
-                            $updateQuery = $db->getQuery(true)
-                                ->update($db->quoteName('#__facileforms_records'))
-                                ->set($db->quoteName('paypal_tx_id') . ' = :paypalTxId')
-                                ->set($db->quoteName('paypal_payment_date') . ' = :paymentDate')
-                                ->set($db->quoteName('paypal_testaccount') . ' = :testaccount')
-                                ->set($db->quoteName('paypal_download_tries') . ' = 0')
-                                ->where($db->quoteName('id') . ' = :recordId')
-                                ->bind(':paypalTxId', $paypalTxId, ParameterType::STRING)
-                                ->bind(':paymentDate', $paymentDate, ParameterType::STRING)
-                                ->bind(':testaccount', $testaccount, ParameterType::INTEGER)
-                                ->bind(':recordId', $recordId, ParameterType::INTEGER);
-                            $db->setQuery($updateQuery);
-
-                            $db->execute();
+                            $this->paymentRecordService->storeTransaction(
+                                $recordId,
+                                $paypalTxId,
+                                $paymentDate,
+                                $testaccount
+                            );
 
                             // trigger a script after succeeded payment?
                             if (file_exists(JPATH_SITE . '/bf_paypalipn_success.php')) {
@@ -134,44 +109,22 @@ final class PayPalCallback
                             }
                         }
 
-                        $this->application->setHeader('status', 200, true);
-                    }
-
-                    $this->application->setHeader('status', 200, true);
                 } else if ($verification === 'INVALID') {
 
                     $recordId = $input->getInt('record_id', -1);
-                    $recordQuery = $db->getQuery(true)
-                        ->select('*')
-                        ->from($db->quoteName('#__facileforms_records'))
-                        ->where($db->quoteName('id') . ' = :recordId')
-                        ->setLimit(1)
-                        ->bind(':recordId', $recordId, ParameterType::INTEGER);
-                    $db->setQuery($recordQuery);
-                    $txid = $db->loadObjectList();
-
-                    if (count($txid) != 0) {
+                    if ($this->paymentRecordService->find($recordId) !== null) {
 
                         $paypalTxId = 'PayPal: ' . $tx_token . ' (INVALID)';
                         $paymentDate = date('Y-m-d H:i:s');
                         $testaccount = $options['testaccount'] ? 1 : 0;
-                        $updateQuery = $db->getQuery(true)
-                            ->update($db->quoteName('#__facileforms_records'))
-                            ->set($db->quoteName('paypal_tx_id') . ' = :paypalTxId')
-                            ->set($db->quoteName('paypal_payment_date') . ' = :paymentDate')
-                            ->set($db->quoteName('paypal_testaccount') . ' = :testaccount')
-                            ->set($db->quoteName('paypal_download_tries') . ' = 0')
-                            ->where($db->quoteName('id') . ' = :recordId')
-                            ->bind(':paypalTxId', $paypalTxId, ParameterType::STRING)
-                            ->bind(':paymentDate', $paymentDate, ParameterType::STRING)
-                            ->bind(':testaccount', $testaccount, ParameterType::INTEGER)
-                            ->bind(':recordId', $recordId, ParameterType::INTEGER);
-                        $db->setQuery($updateQuery);
-
-                        $db->execute();
+                        $this->paymentRecordService->storeTransaction(
+                            $recordId,
+                            $paypalTxId,
+                            $paymentDate,
+                            $testaccount
+                        );
                     }
 
-                    $this->application->setHeader('status', 200, true);
                 }
 
                 $this->application->setHeader('status', 200, true);
@@ -180,34 +133,26 @@ final class PayPalCallback
             }
         }
     }
+
     }
 
     public function confirm(): void
     {
-        $db = $this->database;
-
-
-
     $input = $this->application->getInput();
-    $formId = $input->getInt('form_id', -1);
-    $query = $db->getQuery(true)
-        ->select('*')
-        ->from($db->quoteName('#__facileforms_forms'))
-        ->where($db->quoteName('id') . ' = :formId')
-        ->bind(':formId', $formId, ParameterType::INTEGER);
-    $db->setQuery($query);
-    $list = $db->loadObjectList();
-    if (count($list) == 0) {
+    $form = $this->paymentFormLoader->load($input->getInt('form_id', -1));
+    if ($form === null) {
         $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
         $this->application->close();
+
+        return;
     }
 
-    $form = $list[0];
-
-    $areas = json_decode($form->template_areas, true);
-    if (!is_array($areas)) {
+    $areas = $this->paymentFormLoader->decodeAreas($form);
+    if ($areas === null) {
         $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYPAL_DATA'));
         $this->application->close();
+
+        return;
     }
 
     foreach ($areas as $area) {
@@ -254,36 +199,23 @@ final class PayPalCallback
                     } else {
 
                         $recordId = $input->getInt('record_id', -1);
-                        $recordQuery = $db->getQuery(true)
-                            ->select('*')
-                            ->from($db->quoteName('#__facileforms_records'))
-                            ->where($db->quoteName('id') . ' = :recordId')
-                            ->setLimit(1)
-                            ->bind(':recordId', $recordId, ParameterType::INTEGER);
-                        $db->setQuery($recordQuery);
-                        $txid = $db->loadObjectList();
+                        $record = $this->paymentRecordService->find($recordId);
 
-                        if (count($txid) != 0) {
-
-                            if ($txid[0]->paypal_tx_id == '') {
+                        if ($record === null) {
+                            $success = false;
+                            $msg = Text::_('COM_BREEZINGFORMSNG_PAYMENT_RECORD_NOT_FOUND');
+                            require_once (JPATH_SITE . '/components/com_breezingformsng/downloadtpl/error.php');
+                        } elseif ($record->paypal_tx_id === '') {
 
                                 $paypalTxId = 'PayPal: ' . $tx_token;
                                 $paymentDate = date('Y-m-d H:i:s', strtotime($keyarray["payment_date"]));
                                 $testaccount = $options['testaccount'] ? 1 : 0;
-                                $updateQuery = $db->getQuery(true)
-                                    ->update($db->quoteName('#__facileforms_records'))
-                                    ->set($db->quoteName('paypal_tx_id') . ' = :paypalTxId')
-                                    ->set($db->quoteName('paypal_payment_date') . ' = :paymentDate')
-                                    ->set($db->quoteName('paypal_testaccount') . ' = :testaccount')
-                                    ->set($db->quoteName('paypal_download_tries') . ' = 0')
-                                    ->where($db->quoteName('id') . ' = :recordId')
-                                    ->bind(':paypalTxId', $paypalTxId, ParameterType::STRING)
-                                    ->bind(':paymentDate', $paymentDate, ParameterType::STRING)
-                                    ->bind(':testaccount', $testaccount, ParameterType::INTEGER)
-                                    ->bind(':recordId', $recordId, ParameterType::INTEGER);
-                                $db->setQuery($updateQuery);
-
-                                $db->execute();
+                                $this->paymentRecordService->storeTransaction(
+                                    $recordId,
+                                    $paypalTxId,
+                                    $paymentDate,
+                                    $testaccount
+                                );
 
                                 // trigger a script after succeeded payment?
                                 if (file_exists(JPATH_SITE . '/bf_paypal_success.php')) {
@@ -333,12 +265,7 @@ final class PayPalCallback
                                     }
                                 }
                             }
-                        } else {
-                            $success = false;
-                            $msg = Text::_('COM_BREEZINGFORMSNG_PAYMENT_RECORD_NOT_FOUND');
-                            require_once (JPATH_SITE . '/components/com_breezingformsng/downloadtpl/error.php');
                         }
-                    }
                 } else if (strcmp($lines[0], "FAIL") == 0) {
                     $success = false;
                     $msg = Text::_('COM_BREEZINGFORMSNG_PAYMENT_VERIFICATION_FAILED');
@@ -353,6 +280,7 @@ final class PayPalCallback
             }
         }
     }
+
     }
 
     public function download(): void

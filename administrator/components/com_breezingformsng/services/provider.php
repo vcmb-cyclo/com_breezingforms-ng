@@ -29,6 +29,8 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Callback\OptCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\PayPalCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\PaymentDownloadPolicy;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\PaymentDownloadService;
+use Vcmb\Component\BreezingformsNG\Site\Service\Callback\PaymentFormLoader;
+use Vcmb\Component\BreezingformsNG\Site\Service\Callback\PaymentRecordService;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\SofortCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\StripeCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\EngineDispatcher;
@@ -60,11 +62,27 @@ return new class implements ServiceProviderInterface
         );
 
         $container->share(
+            PaymentRecordService::class,
+            static function (Container $container): PaymentRecordService {
+                return new PaymentRecordService($container->get(DatabaseInterface::class));
+            },
+        );
+
+        $container->share(
+            PaymentFormLoader::class,
+            static function (Container $container): PaymentFormLoader {
+                return new PaymentFormLoader($container->get(DatabaseInterface::class));
+            },
+        );
+
+        $container->share(
             PaymentDownloadService::class,
             static function (Container $container) use ($application): PaymentDownloadService {
                 return new PaymentDownloadService(
                     $application,
                     $container->get(DatabaseInterface::class),
+                    $container->get(PaymentFormLoader::class),
+                    $container->get(PaymentRecordService::class),
                     $container->get(RedirectHelper::class),
                     $container->get(PaymentDownloadPolicy::class),
                 );
@@ -115,6 +133,8 @@ return new class implements ServiceProviderInterface
                 return new PayPalCallback(
                     $application,
                     $container->get(DatabaseInterface::class),
+                    $container->get(PaymentFormLoader::class),
+                    $container->get(PaymentRecordService::class),
                     $container->get(RedirectHelper::class),
                     $container->get(PaymentDownloadService::class),
                     (new HttpFactory())->getHttp(),
@@ -128,6 +148,8 @@ return new class implements ServiceProviderInterface
                 return new StripeCallback(
                     $application,
                     $container->get(DatabaseInterface::class),
+                    $container->get(PaymentFormLoader::class),
+                    $container->get(PaymentRecordService::class),
                     $container->get(RedirectHelper::class),
                     $container->get(PaymentDownloadService::class),
                 );
@@ -140,6 +162,7 @@ return new class implements ServiceProviderInterface
                 return new SofortCallback(
                     $application,
                     $container->get(DatabaseInterface::class),
+                    $container->get(PaymentFormLoader::class),
                     $container->get(RedirectHelper::class),
                     $container->get(MailerFactoryInterface::class),
                     $container->get(PaymentDownloadService::class),

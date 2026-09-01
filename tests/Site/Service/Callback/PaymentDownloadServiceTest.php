@@ -14,6 +14,7 @@ use Joomla\Database\ParameterType;
 use PHPUnit\Framework\TestCase;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\PaymentDownloadPolicy;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\PaymentDownloadService;
+use Vcmb\Component\BreezingformsNG\Site\Service\Callback\PaymentFormLoader;
 use Vcmb\Component\BreezingformsNG\Site\Service\Support\RedirectHelper;
 
 if (!interface_exists(DatabaseInterface::class)) {
@@ -124,6 +125,7 @@ final class PaymentDownloadServiceTest extends TestCase
         return new PaymentDownloadService(
             $application,
             $database,
+            new PaymentFormLoader($database),
             new RedirectHelper($application),
             new PaymentDownloadPolicy()
         );

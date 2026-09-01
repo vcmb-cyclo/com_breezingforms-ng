@@ -1,6 +1,8 @@
 // Generated from quickmode.html.php — DO NOT EDIT MANUALLY
 // Requires: BFQMConfig (inline), BFQMElements (quickmode-elements.js)
 /* global BFQMConfig, BFQMElements, JQuery, Joomla, bootstrap */
+import { JoomlaEditor } from 'editor-api';
+
 (function () {
     'use strict';
 
@@ -821,14 +823,14 @@
                         "        default:;\n" +
                         "    } // switch\n" +
                         "} // ff_" + name + "_init\n";
-                    oldcode = Joomla.editors.instances["bfInitCode"].getValue();
+                    oldcode = JoomlaEditor.get('bfInitCode').getValue();
                     if (oldcode != '')
-                        Joomla.editors.instances["bfInitCode"].setValue(
+                        JoomlaEditor.get('bfInitCode').setValue(
                             code +
                             "\n// -------------- " + BFQMConfig.labels['COM_BREEZINGFORMSNG_ELEMENTS_OLDBELOW'] + " --------------\n\n" +
                             oldcode);
                     else
-                        Joomla.editors.instances["bfInitCode"].setValue(code);
+                        JoomlaEditor.get('bfInitCode').setValue(code);
                 }
             } // createInitCode
 
@@ -853,14 +855,14 @@
                         "    } // if\n" +
                         "    return '';\n" +
                         "} // ff_" + name + "_validation\n";
-                    oldcode = Joomla.editors.instances["bfValidationCode"].getValue();
+                    oldcode = JoomlaEditor.get('bfValidationCode').getValue();
                     if (oldcode != '')
-                        Joomla.editors.instances["bfValidationCode"].setValue(
+                        JoomlaEditor.get('bfValidationCode').setValue(
                             code +
                             "\n// -------------- " + BFQMConfig.labels['COM_BREEZINGFORMSNG_ELEMENTS_OLDBELOW'] + " --------------\n\n" +
                             oldcode);
                     else
-                        Joomla.editors.instances["bfValidationCode"].setValue(code);
+                        JoomlaEditor.get('bfValidationCode').setValue(code);
                 }
             } // createValidationCode
 
@@ -909,14 +911,14 @@
                         "    } // switch\n" +
                         "} // ff_" + name + "_action\n";
 
-                    oldcode = Joomla.editors.instances["bfActionCode"].getValue();
+                    oldcode = JoomlaEditor.get('bfActionCode').getValue();
                     if (oldcode != '')
-                        Joomla.editors.instances["bfActionCode"].setValue(
+                        JoomlaEditor.get('bfActionCode').setValue(
                             code +
                             "\n// -------------- " + BFQMConfig.labels['COM_BREEZINGFORMSNG_ELEMENTS_OLDBELOW'] + " --------------\n\n" +
                             oldcode);
                     else
-                        Joomla.editors.instances["bfActionCode"].setValue(code);
+                        JoomlaEditor.get('bfActionCode').setValue(code);
                 }
             } // createActionCode
 
@@ -933,11 +935,13 @@
             // No-ops immediately if the Options tab was never rendered
             // (formId === 0, nothing to save there yet).
             function syncOptionsEditors($wrap) {
-                var instances = (window.Joomla && Joomla.editors && Joomla.editors.instances) || {};
-
                 $wrap.find('textarea').each(function () {
                     var field = this;
-                    var editor = instances[field.id] || instances[field.name];
+                    var editor = JoomlaEditor.get(field.id);
+
+                    if (!editor && field.name) {
+                        editor = JoomlaEditor.get(field.name);
+                    }
 
                     if (editor && typeof editor.getValue === 'function') {
                         field.value = editor.getValue();
@@ -1188,7 +1192,6 @@
                     if (!actionCodeVisible && jQuery('#bfActionScriptCustom').is(':visible')) {
                         actionCodeVisible = true;
                         // XDA-GIL - 20240112 - refresh seems to not exit with CodeMirror v6.  
-                        //Joomla.editors.instances["bfActionCode"].refresh();
                     } else if (initCodeVisible && jQuery('#bfActionScriptCustom').is(':hidden')) {
                         actionCodeVisible = false;
                     }
@@ -1196,7 +1199,6 @@
                     if (!initCodeVisible && jQuery('#bfInitScriptCustom').is(':visible')) {
                         initCodeVisible = true;
                         // XDA-GIL - 20240112 - refresh seems to not exit with CodeMirror v6.  
-                        //Joomla.editors.instances["bfInitCode"].refresh();
                     } else if (initCodeVisible && jQuery('#bfInitScriptCustom').is(':hidden')) {
                         initCodeVisible = false;
                     }
@@ -1204,7 +1206,6 @@
                     if (!validationCodeVisible && jQuery('#bfValidationScriptCustom').is(':visible')) {
                         validationCodeVisible = true;
                         // XDA-GIL - 20240112 - refresh seems to not exit with CodeMirror v6.  
-                        //Joomla.editors.instances["bfValidationCode"].refresh();
                     } else if (validationCodeVisible && jQuery('#bfValidationScriptCustom').is(':hidden')) {
                         validationCodeVisible = false;
                     }

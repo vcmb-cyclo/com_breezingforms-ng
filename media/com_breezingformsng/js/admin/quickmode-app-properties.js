@@ -1,4 +1,6 @@
 /* Extracted from quickmode-app.js — QuickMode element property save/populate handlers. */
+import { JoomlaEditor } from 'editor-api';
+
 /* global BFQMConfig, JQuery, jQuery, Joomla */
 (function () {
     'use strict';
@@ -1434,7 +1436,7 @@
 
         appScope.saveValidation = function (mdata, item) {
             mdata.validationId = JQuery('#bfValidationScriptSelection').val();
-            mdata.validationCode = Joomla.editors.instances["bfValidationCode"].getValue();
+            mdata.validationCode = JoomlaEditor.get('bfValidationCode').getValue();
             mdata.validationMessage = JQuery('#bfValidationMessage').val();
             mdata['validationMessage_translation'+BFQMConfig.lang] = JQuery('#bfValidationMessageTrans').val();
 
@@ -1470,7 +1472,7 @@
             }
 
             mdata.initId = JQuery('#bfInitScriptSelection').val();
-            mdata.initCode = Joomla.editors.instances["bfInitCode"].getValue();
+            mdata.initCode = JoomlaEditor.get('bfInitCode').getValue();
 
             if (JQuery('#bfInitTypeLibrary').get(0).checked) {
                 mdata.initCondition = 1;
@@ -1493,7 +1495,7 @@
         appScope.saveAction = function (mdata, item) {
 
             mdata.actionId = JQuery('#bfActionsScriptSelection').val();
-            mdata.actionCode = Joomla.editors.instances["bfActionCode"].getValue();
+            mdata.actionCode = JoomlaEditor.get('bfActionCode').getValue();
 
             if (JQuery('#bfActionTypeLibrary').get(0).checked) {
                 mdata.actionCondition = 1;
@@ -1759,7 +1761,7 @@
                 JQuery('#bfValidationMessage').val(mdata.validationMessage);
                 JQuery('#bfValidationMessageTrans').val(typeof mdata['validationMessage_translation'+BFQMConfig.lang] != "undefined" ? mdata['validationMessage_translation'+BFQMConfig.lang] : "");
 
-                Joomla.editors.instances["bfValidationCode"].setValue(mdata.validationCode);
+                JoomlaEditor.get('bfValidationCode').setValue(mdata.validationCode);
 
                 switch (mdata.validationCondition) {
                     case 1:
@@ -1820,7 +1822,7 @@
                     JQuery('#bfInitPageEntry').get(0).checked = false;
                 }
 
-                Joomla.editors.instances["bfInitCode"].setValue(mdata.initCode);
+                JoomlaEditor.get('bfInitCode').setValue(mdata.initCode);
 
                 switch (mdata.initCondition) {
                     case 1:
@@ -1914,7 +1916,7 @@
                     JQuery('#bfActionSelect').get(0).checked = false;
                 }
 
-                Joomla.editors.instances["bfActionCode"].setValue(mdata.actionCode);
+                JoomlaEditor.get('bfActionCode').setValue(mdata.actionCode);
 
                 switch (mdata.actionCondition) {
                     case 1:

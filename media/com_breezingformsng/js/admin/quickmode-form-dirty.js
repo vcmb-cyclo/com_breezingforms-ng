@@ -16,6 +16,8 @@
  * @license GNU General Public License version 2 or later; see LICENSE.txt
  */
 
+import { JoomlaEditor } from 'editor-api';
+
 document.addEventListener('DOMContentLoaded', function () {
     var form = document.forms.bfForm;
     var badge = document.getElementById('bfUnsavedBadge');
@@ -25,14 +27,23 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function editorValues() {
-        var instances = (window.Joomla && Joomla.editors && Joomla.editors.instances) || {};
+        return Array.from(form.querySelectorAll('textarea[id]')).sort(function (first, second) {
+            return first.id.localeCompare(second.id);
+        }).map(function (field) {
+            var name = field.id;
+            var editor = JoomlaEditor.get(name);
 
-        return Object.keys(instances).sort().map(function (name) {
+            if (!editor || typeof editor.getValue !== 'function') {
+                return null;
+            }
+
             try {
-                return name + '=' + instances[name].getValue();
+                return name + '=' + editor.getValue();
             } catch (e) {
                 return name + '=';
             }
+        }).filter(function (value) {
+            return value !== null;
         }).join(' ');
     }
 
@@ -72,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function () {
     form.addEventListener('change', sync);
     window.addEventListener('load', sync);
 
-    // Neither CodeMirror (via Joomla.editors.instances) nor tree structure
+    // Neither CodeMirror (via JoomlaEditor) nor tree structure
     // edits (app.dataObject, mutated directly by quickmode-app.js's
     // create/move/delete handlers) fire native input/change events on
     // bfForm - poll instead, matching the 500ms interval already used

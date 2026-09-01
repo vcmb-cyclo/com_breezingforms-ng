@@ -23,7 +23,8 @@ final class QuickmodeOptionsEditorSyncTest extends TestCase
         self::assertIsInt($moveFields);
         self::assertLessThan($moveFields, $syncCall);
         self::assertStringContainsString("\$wrap.find('textarea').each", $source);
-        self::assertStringContainsString('instances[field.id] || instances[field.name]', $source);
+        self::assertStringContainsString("var editor = JoomlaEditor.get(field.id);", $source);
+        self::assertStringContainsString("editor = JoomlaEditor.get(field.name);", $source);
         self::assertStringContainsString('field.value = editor.getValue();', $source);
     }
 }

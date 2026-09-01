@@ -58,7 +58,8 @@
       "name": "com_breezingformsng.quickmode-app-properties",
       "type": "script",
       "uri": "media/com_breezingformsng/js/admin/quickmode-app-properties.js",
-      "dependencies": ["com_breezingformsng.quickmode-compat"],
+      "dependencies": ["com_breezingformsng.quickmode-compat", "editor-api"],
+      "attributes": {"type": "module"},
       "version": "auto"
     },
 
@@ -74,8 +75,10 @@
         "bootstrap.tab",
         "com_breezingformsng.base64",
         "com_breezingformsng.center",
-        "com_breezingformsng.scroll"
+        "com_breezingformsng.scroll",
+        "editor-api"
       ],
+      "attributes": {"type": "module"},
       "version": "auto"
     },
 
@@ -91,8 +94,8 @@
       "name": "com_breezingformsng.quickmode-form-dirty",
       "type": "script",
       "uri": "media/com_breezingformsng/js/admin/quickmode-form-dirty.js",
-      "dependencies": ["com_breezingformsng.quickmode-app"],
-      "attributes": {"defer": true},
+      "dependencies": ["com_breezingformsng.quickmode-app", "editor-api"],
+      "attributes": {"type": "module"},
       "version": "auto"
     },
 

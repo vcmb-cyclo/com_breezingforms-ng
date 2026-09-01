@@ -40,6 +40,7 @@ class HtmlView extends BaseHtmlView
         $wa = $document->getWebAssetManager();
         $wa->getRegistry()->addExtensionRegistryFile('com_breezingformsng');
         $wa->useStyle('com_breezingformsng.about-style');
+        $wa->useScript('com_breezingformsng.about');
         $layout = $this->getLayout();
 
         /** @var Toolbar $toolbar */
@@ -56,7 +57,7 @@ class HtmlView extends BaseHtmlView
             $actionsChildToolbar = $actionsDropdown->getChildToolbar();
             $actionsChildToolbar->standardButton('about_audit')
                 ->task('about.runAudit')
-                ->text('COM_BREEZINGFORMSNG_ABOUT_AUDIT')
+                ->text('COM_BREEZINGFORMSNG_ABOUT_RUN_AUDIT')
                 ->icon('fa-solid fa-stethoscope')
                 ->listCheck(false);
 

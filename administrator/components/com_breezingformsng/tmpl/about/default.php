@@ -18,6 +18,7 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Database\DatabaseInterface;
 use Joomla\CMS\Language\Text;
+use Vcmb\Component\BreezingformsNG\Administrator\Service\DatabaseRepairService;
 
 if (!function_exists('bf_about_read_json_file')) {
     function bf_about_read_json_file($path)
@@ -622,9 +623,37 @@ $aboutDescription = str_replace(
                 <?php if ($auditDuplicateIndexes !== array()) : ?>
                     <div class="bf-audit-section-block mb-3">
                         <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_INDEXES'); ?></h4>
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                            <label class="form-check mb-0">
+                                <input
+                                    type="checkbox"
+                                    class="form-check-input"
+                                    data-bf-select-all="duplicate-indexes"
+                                    aria-label="<?php echo htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_INDEX_SELECT_ALL'), ENT_QUOTES, 'UTF-8'); ?>"
+                                >
+                                <span class="form-check-label"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_INDEX_SELECT_ALL'); ?></span>
+                            </label>
+                            <button
+                                type="submit"
+                                class="btn btn-sm btn-warning"
+                                onclick="document.getElementById('bf-about-task').value='about.repairDuplicateIndexes';document.getElementById('bf-duplicate-index-group').value='';"
+                                title="<?php echo htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_INDEX_REPAIR_SELECTED_TIP'), ENT_QUOTES, 'UTF-8'); ?>"
+                            >
+                                <span class="fa-solid fa-wrench me-1" aria-hidden="true"></span><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_INDEX_REPAIR_SELECTED'); ?>
+                            </button>
+                        </div>
                         <ul class="mb-0">
-                            <?php foreach ($auditDuplicateIndexes as $issue) : ?>
+                            <?php foreach ($auditDuplicateIndexes as $index => $issue) : ?>
+                                <?php $duplicateIndexToken = DatabaseRepairService::getDuplicateIndexSelectionToken((array) $issue); ?>
                                 <li>
+                                    <input
+                                        type="checkbox"
+                                        class="form-check-input me-1"
+                                        data-bf-select-item="duplicate-indexes"
+                                        name="duplicate_index_groups[]"
+                                        value="<?php echo htmlspecialchars($duplicateIndexToken, ENT_QUOTES, 'UTF-8'); ?>"
+                                        aria-label="<?php echo htmlspecialchars(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_INDEX_SELECT_ONE', (int) $index + 1), ENT_QUOTES, 'UTF-8'); ?>"
+                                    >
                                     <code><?php echo htmlspecialchars((string) ($issue['table'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code>:
                                     <?php echo htmlspecialchars(implode(', ', (array) ($issue['indexes'] ?? array())), ENT_QUOTES, 'UTF-8'); ?>
                                     <?php if (($issue['keep'] ?? '') !== '' && (array) ($issue['drop'] ?? array()) !== array()) : ?>
@@ -635,6 +664,13 @@ $aboutDescription = str_replace(
                                             htmlspecialchars(implode(', ', (array) $issue['drop']), ENT_QUOTES, 'UTF-8')
                                         ); ?>
                                     <?php endif; ?>
+                                    <button
+                                        type="submit"
+                                        class="btn btn-sm btn-warning ms-2"
+                                        onclick="document.getElementById('bf-about-task').value='about.repairDuplicateIndexes';document.getElementById('bf-duplicate-index-group').value='<?php echo $duplicateIndexToken; ?>';"
+                                        title="<?php echo htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_INDEX_REPAIR_TIP'), ENT_QUOTES, 'UTF-8'); ?>"
+                                        aria-label="<?php echo htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_INDEX_REPAIR'), ENT_QUOTES, 'UTF-8'); ?>"
+                                    ><span class="fa-solid fa-wrench" aria-hidden="true"></span></button>
                                 </li>
                             <?php endforeach; ?>
                         </ul>
@@ -813,8 +849,9 @@ $aboutDescription = str_replace(
     </div>
 
     <input type="hidden" name="option" value="com_breezingformsng" />
-    <input type="hidden" name="task" value="about.display" />
+    <input type="hidden" name="task" id="bf-about-task" value="about.display" />
     <input type="hidden" name="view" value="about" />
     <input type="hidden" name="duplicate_form_id" id="bf-duplicate-form-id" value="" />
+    <input type="hidden" name="duplicate_index_group" id="bf-duplicate-index-group" value="" />
     <?php echo HTMLHelper::_('form.token'); ?>
 </form>

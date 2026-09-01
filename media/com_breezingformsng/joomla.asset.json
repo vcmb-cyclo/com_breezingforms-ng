@@ -184,6 +184,14 @@
     },
 
     {
+      "name": "com_breezingformsng.about",
+      "type": "script",
+      "uri": "media/com_breezingformsng/js/admin/about.js",
+      "dependencies": ["core"],
+      "version": "auto"
+    },
+
+    {
       "name": "com_breezingformsng.admin-form",
       "type": "script",
       "uri": "com_breezingformsng/js/admin/admin-form.js",

@@ -16,6 +16,7 @@ use Joomla\CMS\MVC\Controller\BaseController;
 use Joomla\CMS\Router\Route;
 use Joomla\Database\DatabaseInterface;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\DatabaseAuditService;
+use Vcmb\Component\BreezingformsNG\Administrator\Service\DatabaseRepairService;
 
 /** @property CMSApplication $app */
 class AboutController extends BaseController
@@ -137,6 +138,53 @@ class AboutController extends BaseController
         }
 
         $this->setRedirect(Route::_('index.php?option=com_breezingformsng&task=about.display&view=about', false));
+    }
+
+    public function repairDuplicateIndexes(): void
+    {
+        $this->checkToken();
+
+        try {
+            $this->getAuthorizedApplication();
+            $singleToken = trim((string) $this->input->post->getString('duplicate_index_group', ''));
+            $selectedTokens = $singleToken !== ''
+                ? [$singleToken]
+                : array_values(array_filter(
+                    array_map(
+                        static fn($value): string => trim((string) $value),
+                        (array) $this->input->post->get('duplicate_index_groups', [], 'array')
+                    ),
+                    static fn(string $value): bool => $value !== ''
+                ));
+
+            if ($selectedTokens === []) {
+                throw new \RuntimeException(Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_INDEX_NO_SELECTION'));
+            }
+
+            $summary = $this->getRepairService()->repairDuplicateIndexes($selectedTokens);
+
+            if ((int) ($summary['selected_groups'] ?? 0) === 0) {
+                throw new \RuntimeException(Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_INDEX_NO_SELECTION'));
+            }
+
+            $this->app->setUserState('com_breezingformsng.about.audit', $this->getAuditService()->run());
+            $failedIndexes = (int) ($summary['failed_indexes'] ?? 0);
+            $message = Text::sprintf(
+                'COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_INDEX_REPAIR_SUMMARY',
+                (int) ($summary['selected_groups'] ?? 0),
+                (int) ($summary['repaired_groups'] ?? 0),
+                (int) ($summary['removed_indexes'] ?? 0),
+                $failedIndexes
+            );
+            $this->setMessage($message, $failedIndexes > 0 ? 'warning' : 'message');
+        } catch (\Throwable $exception) {
+            $this->setMessage(
+                Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_INDEX_REPAIR_FAILED', $exception->getMessage()),
+                'error'
+            );
+        }
+
+        $this->setRedirect(Route::_('index.php?option=com_breezingformsng&task=about.display&view=about#bf-audit-section', false));
     }
 
     public function deleteDuplicateForm(): void
@@ -288,6 +336,14 @@ class AboutController extends BaseController
     {
         return new DatabaseAuditService(
             $database ?? $this->getDatabase(),
+            (string) $this->app->get('tmp_path', JPATH_ROOT . '/tmp')
+        );
+    }
+
+    private function getRepairService(): DatabaseRepairService
+    {
+        return new DatabaseRepairService(
+            $this->getDatabase(),
             (string) $this->app->get('tmp_path', JPATH_ROOT . '/tmp')
         );
     }

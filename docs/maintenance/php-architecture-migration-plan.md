@@ -121,6 +121,8 @@
 | Bootstrap Joomla — dispatcher et autoload Composer | `EngineDispatcher` est enregistré dans le provider Joomla 6, le front controller le résout par conteneur, et le smoke/package validator vérifient l’autoload installé de Securimage/TCPDF | Phase 26, `EngineDispatcherContainerTest` et `JoomlaInstallSmokeScriptTest` |
 | Bootstrap Joomla — graphe interne du dispatcher | Le renderer, les callbacks et leurs services partagés sont enregistrés dans le provider puis injectés dans `EngineDispatcher`, sans constructions manuelles dans le dispatcher | Phase 27, `EngineDispatcherContainerTest` |
 | Paiements — téléchargement des fichiers payants | `PaymentDownloadService` et sa politique sont enregistrés dans le conteneur puis partagés par les callbacks PayPal, Stripe et Sofort, sans construction locale | Phase 28, `PaymentCallbackRegressionTest` |
+| Nettoyage — fichiers temporaires et cache de paiement | Le parcours commun de purge est regroupé dans `UploadFileCleaner`, injecté dans `FormRenderer`, avec les deux règles de nommage historiques conservées | Phase 29, `UploadFileCleanerTest` |
+| QuickMode — consolidation des builders mono-appelant | Les attributs d’image paiement, le markup checkbox et les deux fragments internes `FilesAdded` sont repliés dans leurs appelants ; le composeur upload partagé est conservé | Phase 30, tests QuickMode fusionnés |
 | PHPCS | Actif sur les services modernes, les builders ContentBuilder, Classic et `HiddenFieldTrait` | `phpcs.xml.dist`, 155 fichiers configurés |
 | PHPStan | Niveau 4 validé sur le composant, sans diagnostic résiduel | `phpstan.neon.dist`, baseline vide |
 | Navigation des enregistrements admin | Les liens précédent/suivant réutilisent le formulaire, la recherche et le tri de la liste courante ; l'état est conservé pendant l'édition | `RecordsModel::getAdjacentRecordId()`, `tests/Administrator/RecordsNavigationTest.php` |
@@ -1704,6 +1706,50 @@ le partage du service depuis le provider et la conservation de la politique
 de quota. Les tests ciblés des téléchargements et du callback PayPal couvrent
 les contrats d'exécution concernés.
 
+## Phase 29 — Regrouper le nettoyage des fichiers dans un service unique
+
+Ajoutée le 2026-09-01 après la Phase 28. `PaymentCacheCleaner` et
+`TemporaryUploadFileCleaner` parcouraient les répertoires et supprimaient les
+fichiers avec le même algorithme, alors qu'ils n'avaient qu'un seul appelant
+de production : `FormRenderer`.
+
+### Périmètre
+
+- `UploadFileCleaner` regroupe le parcours commun et expose deux opérations
+  explicites pour les uploads temporaires et le cache de paiement.
+- Les règles historiques de nommage, les suffixes et l'expiration de 24 heures
+  restent distincts et sont conservés.
+- Le service unique est enregistré dans le provider Joomla 6 puis injecté
+  dans `FormRenderer`; les deux anciennes classes disparaissent.
+
+### Filet de sécurité et vérification
+
+`UploadFileCleanerTest` couvre les noms valides et invalides, les suffixes
+Flash/chunked et les limites d'expiration. Le provider et le rendu continuent
+à être vérifiés par la suite complète PHPUnit, PHPStan et PHPCS.
+
+## Phase 30 — Consolider les builders QuickMode mono-appelant
+
+Ajoutée le 2026-09-01 après la Phase 29. Plusieurs builders QuickMode ne
+possédaient qu'un appelant et n'exprimaient pas une frontière réutilisable.
+
+### Périmètre
+
+- Les attributs d'image de paiement sont une méthode privée de
+  `QuickModePaymentButtonBuilder`.
+- Le markup checkbox est une méthode privée de
+  `QuickModeCheckboxStrategy`.
+- Les deux fragments internes de la callback upload sont des méthodes
+  privées de `QuickModeUploadEntryCallbacksBuilder`.
+- `QuickModeUploadEntryCallbacksBuilder` reste une classe partagée par les
+  trois renderers ; aucune duplication n'est recréée.
+
+### Filet de sécurité et vérification
+
+Les tests des builders supprimés sont fusionnés dans les tests des appelants.
+Les snapshots de paiement, checkbox et upload restent inchangés. Les fichiers
+retirés ne figurent plus dans le périmètre PHPCS.
+
 ## Travail en parallèle
 
 | Couloir | Fichiers principaux | Peut avancer avec |
@@ -1813,16 +1859,17 @@ est désormais construit par `FormOpeningMarkupBuilder` via `e77be68a`, avec
 ses deux variantes couvertes par des tests unitaires.
 
 La purge des fichiers temporaires Flash et chunked est désormais mutualisée
-par `TemporaryUploadFileCleaner` dans `FormRenderer`. Les suffixes, le critère
-de nommage historique et l'expiration sont couverts par des tests unitaires.
+par `UploadFileCleaner` dans `FormRenderer`. Les suffixes, le critère de
+nommage historique et l'expiration sont couverts par un test unitaire commun.
 
 Le scan des thèmes de `QuickmodeModel` utilise désormais `DirectoryIterator`,
 avec les répertoires techniques explicitement exclus et les cas de répertoire
 absent couverts par un test unitaire.
 
 Le nettoyage du cache de paiement est désormais porté par
-`PaymentCacheCleaner`, en conservant son critère distinct de nommage à quatre
-segments et son expiration à 24 heures ; ses cas limites sont testés.
+`UploadFileCleaner`, en conservant son critère distinct de nommage à quatre
+segments et son expiration à 24 heures ; ses cas limites sont testés dans le
+même service que la purge des fichiers temporaires.
 
 La lecture du répertoire de polices PDF est mutualisée par
 `PdfFontDirectoryScanner` entre le document PDF, l'export et l'export des

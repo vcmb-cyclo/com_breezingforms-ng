@@ -31,6 +31,7 @@ final class EngineDispatcherContainerTest extends TestCase
         self::assertStringContainsString('PaymentDownloadPolicy::class', $source);
         self::assertStringContainsString('RedirectHelper::class', $source);
         self::assertStringContainsString('FlashUploadSizeValidator::class', $source);
+        self::assertStringContainsString('UploadFileCleaner::class', $source);
 
         $dispatcher = file_get_contents(
             __DIR__ . '/../../../components/com_breezingformsng/src/Service/EngineDispatcher.php'

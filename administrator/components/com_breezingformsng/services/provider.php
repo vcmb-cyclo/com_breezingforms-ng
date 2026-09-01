@@ -35,6 +35,7 @@ use Vcmb\Component\BreezingformsNG\Site\Service\FormRenderer;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RequestParameterParser;
 use Vcmb\Component\BreezingformsNG\Site\Service\Support\RedirectHelper;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\FlashUploadSizeValidator;
+use Vcmb\Component\BreezingformsNG\Site\Service\Upload\UploadFileCleaner;
 
 return new class implements ServiceProviderInterface
 {
@@ -82,6 +83,11 @@ return new class implements ServiceProviderInterface
         );
 
         $container->set(
+            UploadFileCleaner::class,
+            static fn(): UploadFileCleaner => new UploadFileCleaner(),
+        );
+
+        $container->set(
             FormRenderer::class,
             static function (Container $container) use ($application): FormRenderer {
                 return new FormRenderer(
@@ -90,6 +96,7 @@ return new class implements ServiceProviderInterface
                     $container->get(MailerFactoryInterface::class),
                     $container->get(CacheControllerFactoryInterface::class),
                     $container->get(RequestParameterParser::class),
+                    $container->get(UploadFileCleaner::class),
                 );
             }
         );

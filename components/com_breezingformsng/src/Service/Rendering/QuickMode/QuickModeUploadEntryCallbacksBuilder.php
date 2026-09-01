@@ -19,9 +19,9 @@ final class QuickModeUploadEntryCallbacksBuilder
         string $extensionMessage,
         string $newline = "\n"
     ): string {
-        return QuickModeUploadQueueEntryScriptBuilder::build($newline, $hasBlankLine)
+        return self::queueEntryScript($newline, $hasBlankLine)
             . $newline
-            . QuickModeUploadFileAddedHandlerBuilder::build(
+            . self::fileAddedHandler(
                 $elementId,
                 $cancelImagePath,
                 $bootstrapMarkup,
@@ -33,4 +33,57 @@ final class QuickModeUploadEntryCallbacksBuilder
                 $newline
             );
     }
+
+    // phpcs:disable Generic.Files.LineLength
+    private static function queueEntryScript(string $newline, bool $hasBlankLine): string
+    {
+        $optionalBlankLine = $hasBlankLine ? $newline : '';
+
+        return "                                                                uploader.bind('FilesAdded', function(up, files) {" . $newline . $optionalBlankLine .
+            '                                                                        for (var i in files) {' . $newline .
+            "                                                                                if(typeof files[i].id != 'undefined' && files[i].id != null){" . $newline .
+            "                                                                                    var fsize = '';" . $newline .
+            "                                                                                    if(typeof files[i].size != 'undefined'){" . $newline .
+            "                                                                                        fsize = '(' + plupload.formatSize(files[i].size) + ') ';" . $newline .
+            '                                                                                    }' . $newline .
+            "                                                                                    if(typeof bfUploadFileAdded == 'function'){" . $newline .
+            '                                                                                        bfUploadFileAdded(files[i]);' . $newline .
+            "                                                                                    }" . $newline .
+            "                                                                                    JQuery('#bfFileQueue').append( '<div id=\"' + files[i].id + 'queue\">' + (iOS ? '' : files[i].name.replace(/[/\\?%*:|\"<>]/g, '')) + ' '+fsize+'<b></b></div>' );" . $newline .
+            '                                                                                }' . $newline .
+            '                                                                        }';
+    }
+
+    private static function fileAddedHandler(
+        int $elementId,
+        string $cancelImagePath,
+        bool $bootstrapMarkup,
+        string $multiSelection,
+        int $maxBytes,
+        string $extensions,
+        string $tooLargeMessage,
+        string $extensionMessage,
+        string $newline
+    ): string {
+        return '                                                                        for (var i in files) {' . $newline .
+            "                                                                            if(typeof files[i].id != 'undefined' && files[i].id != null){" . $newline .
+            "                                                                                var error = false;" . $newline .
+            "                                                                                var fsize = '';" . $newline .
+            "                                                                                if(typeof files[i].size != 'undefined'){" . $newline .
+            "                                                                                    fsize = '(' + plupload.formatSize(files[i].size) + ') ';" . $newline .
+            '                                                                                }' . $newline .
+            QuickModeUploadQueueItemMarkupBuilder::build($elementId, $cancelImagePath, $bootstrapMarkup, false) . $newline .
+            QuickModeUploadCancelScriptBuilder::build($multiSelection, $elementId, $bootstrapMarkup, $newline) .
+            $newline .
+            QuickModeUploadValidationScriptBuilder::build(
+                $maxBytes,
+                strtolower($extensions),
+                $tooLargeMessage,
+                $extensionMessage,
+                $newline
+            ) . $newline .
+            '                                                                            }' . $newline .
+            '                                                                        }';
+    }
+    // phpcs:enable Generic.Files.LineLength
 }

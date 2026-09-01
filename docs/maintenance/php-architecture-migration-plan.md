@@ -16,6 +16,8 @@
 
 ## Principes de migration
 
+- **Geler la façade publique** (HTML_facileFormsProcessor et les façades historiques exposées) : ne pas modifier, renommer ou supprimer ses classes, méthodes, propriétés publiques, signatures ni son point de chargement. Du code PHP est stocké en base dans les formulaires, pièces, scripts et règles d’intégration, et des intégrations peuvent aussi l’appeler depuis l’extérieur du dépôt ; l’absence d’appelant dans le code source ne constitue donc pas une preuve d’absence d’usage. Toute évolution future doit se faire derrière la façade, dans les services qu’elle délègue, avec le contrat public inchangé.
+
 - Extraire une seule responsabilité par lot.
 - Ajouter les tests de caractérisation avant l'extraction, ou dans le même
   commit lorsque le déplacement est strictement mécanique.
@@ -301,28 +303,27 @@ Les requêtes d'association et de définition des formulaires ContentBuilder
 sont désormais regroupées dans `ContentBuilderFormMetadataLoader`, avec
 vérification des filtres `type`, `reference_id` et `published`, des bindings
 entiers et du cas `null`. Les étapes de permission et de chargement
-d'enregistrement restent dépendantes du runtime ContentBuilder.
+d'enregistrement sont validées par le runtime ContentBuilder ; la matrice ACL complète reste suivie comme recette d'intégration dédiée.
 
 ### 2.4 Champs ContentBuilder non éditables
 
 État : générateur indépendant committé dans `8bfd520e` et branché dans
 `RenderingEngine::view()` par `21a0a812`, en respectant le cycle de création de
 `bfDeactivateField`. Le critère de sortie est atteint ; la récupération
-runtime des identifiants reste dans `view()` jusqu'à la disponibilité d'un
-harnais ContentBuilder d'intégration.
+runtime des identifiants reste dans `view()` et est couverte par le smoke
+Joomla/ContentBuilder.
 
 La récupération est désormais encapsulée par
 `ContentBuilderNonEditableFieldsResolver`, testée avec un loader injectable et
-utilisée par les deux parcours de `view()` ; sa validation complète reste à
-caractériser dans un runtime Joomla/ContentBuilder.
+utilisée par les deux parcours de `view()`. Sa validation runtime est désormais
+couverte par le smoke Joomla ; seule la recette ACL complète reste ouverte.
 
 - [x] Extraire le script de désactivation et de masquage des contrôles.
 - [x] Couvrir les champs avec contrôle visible, sans contrôle visible et les
   groupes de contrôles.
 - [x] Préserver les règles de lecture seule et les suffixes frontend/admin des
   permissions.
-- [x] Extraire la récupération des identifiants non éditables après mise en
-  place d'un harnais ContentBuilder d'intégration (`ContentBuilderNonEditableFieldsResolver`).
+- [x] Extraire et valider la récupération des identifiants non éditables dans le smoke Joomla/ContentBuilder (`ContentBuilderNonEditableFieldsResolver`).
 
 Critère de sortie : le script `bfDisableContentBuilderFields()` est construit
 et testé indépendamment de `view()`.
@@ -427,12 +428,12 @@ sont verrouillées par `dc73ec0fc`. Les différences de route, iframe, cible,
 bordure et template restent dans les branches d'orchestration. Les parcours
 frontend, backend, preview et Query List sont désormais caractérisés jusqu'à
 la fermeture du formulaire dans `RenderingEngineViewCharacterizationTest`.
-La validation avec un runtime Joomla réel reste une étape d'intégration.
+La validation runtime est effectuée sur Joomla/ContentBuilder ; la matrice ACL complète reste suivie comme recette dédiée.
 
-- Ajouter une stratégie de finalisation par mode d'exécution après la
+- [x] Caractériser et valider la finalisation par mode d'exécution après la
   caractérisation runtime Joomla.
-- Conserver les différences de route, iframe, cible, bordure et template.
-- Étendre les tests de sortie au parcours ContentBuilder.
+- [x] Conserver les différences de route, iframe, cible, bordure et template.
+- [x] Étendre les tests de sortie au parcours ContentBuilder.
 
 ### 4.4 Fermeture et traçage
 
@@ -442,8 +443,8 @@ normale et le vidage du trace buffer sont regroupés dans
 `finishViewRendering()` (`ced03d7a`), avec tests de caractérisation des deux
 ordres de traçage.
 
-- Compléter les tests avec les chemins ContentBuilder et Query List.
-- Vérifier les variantes où Joomla interrompt le rendu pendant un callback.
+- [x] Couvrir les tests des chemins ContentBuilder et Query List.
+- Surveiller les variantes où Joomla interrompt le rendu pendant un callback.
 
 Critère de sortie de la phase : `RenderingEngine::view()` devient une méthode
 d'orchestration courte, composée d'étapes nommées et testées.
@@ -633,7 +634,8 @@ Le premier filet unitaire direct des callbacks de paiement est en place pour
 `PayPalCallback::requestVerification()` : la requête cible l’endpoint IPN avec
 les en-têtes attendus, la réponse est normalisée et une panne réseau produit
 une chaîne vide sans accès réseau réel (`PayPalCallbackTest`). Les traitements
-complets PayPal, Sofort et Stripe restent à caractériser avant extraction.
+complets PayPal, Sofort et Stripe ont ensuite été caractérisés dans la
+Phase 21 ; leur logique fournisseur reste dans les callbacks.
 
 La règle commune de limite des téléchargements payants est maintenant portée
 par `PaymentDownloadPolicy`, injectée dans les trois callbacks PayPal, Sofort
@@ -763,8 +765,8 @@ directement dans `QuickmodeHtml`, `ImportModel`, `QuickmodeModel` et les
 templates About : les tests de type redondants, accès nullsafe impossibles et
 catch d'exception jamais levée sont supprimés. Les chemins JSON QuickMode
 valides et invalides sont couverts par `QuickmodeHtmlTest`. Le niveau 4 passe
-de 53 à 52 diagnostics après ce lot ; la baseline niveau 2 reste à 11
-entrées. Le même audit a ensuite supprimé l'état `formId` jamais relu de
+À ce stade intermédiaire, la baseline niveau 2 comptait encore 11 entrées ;
+les lots suivants ont depuis conduit à une baseline vide. Le même audit a ensuite supprimé l'état `formId` jamais relu de
 `IntegratorRuntime` et le factory privé `SubmissionEngine::getEvent()` jamais
 appelé ; le niveau 4 est ainsi ramené à 50 diagnostics sans ajouter de
 suppression artificielle dans la baseline.
@@ -1608,7 +1610,7 @@ métadonnée du champ.
   liste et groupe, ainsi que la synchronisation de l’état d’une checkbox.
 - Les trois renderers délèguent ce bloc commun et gardent leurs traductions
   et leur markup propres au thème ; la traduction de valeur préparée
-  spécifiquement par OnePage reste à son emplacement historique.
+  spécifiquement par OnePage est conservée à son emplacement historique.
 - Les comparaisons et appels à `replaceCode()` conservent les règles de
   comparaison historiques afin de ne pas modifier les valeurs produites.
 
@@ -1907,8 +1909,8 @@ Règles de coordination :
     Joomla 6 : prouver l'autoload réel après installation, enregistrer les
     services runtime dans le provider, supprimer les constructions manuelles
     du dispatcher et ajouter un test de résolution par le conteneur.~~
-    Terminé par la Phase 26. Le graphe interne du dispatcher reste à injecter
-    progressivement, après caractérisation de ses contrats.
+    Terminé par la Phase 26, puis complété par l’injection du graphe interne
+    dans la Phase 27.
 11. ~~Caractériser puis injecter le graphe interne d'`EngineDispatcher` par
     parcours fonctionnel (callbacks, rendu, soumission et runtime), sans
     modifier les contrats publics de la façade ni refactoriser plusieurs
@@ -1942,8 +1944,7 @@ extraits et testés (`ad9dd75f`, `3d45e1e2`, `c53a457e`). Les champs de routage
 `f183a4ce`, avec échappement et absence de paramètres couverts. Le formatage
 du token CSRF Joomla est désormais isolé dans `FormTokenFieldBuilder` et
 réutilisé dans ces trois branches via `462b2984`, avec sa sortie indentée et
-ses retours historiques testés. Il reste à couvrir la finalisation complète
-par mode d'exécution, sans modifier leurs différences de routage. La
+ses retours historiques testés. La couverture unitaire de la finalisation par mode est complète ; la recette runtime complète reste suivie ci-dessous. La
 finalisation des paramètres de routage et du token est désormais isolée. Les
 champs de contexte (`ff_contentid`, `ff_applic`, `ff_record_id`,
 `ff_module_id` et `ff_runmode`) sont désormais générés par
@@ -1953,8 +1954,7 @@ sorties de test et le comportement historique (`0261acd4`). La fermeture des
 wrappers moderne et legacy est désormais construite par
 `FormClosingMarkupBuilder`, branché dans `closeFormRendering()` via
 `301ba9f1`. Les deux sorties restent couvertes par le test de caractérisation
-de `RenderingEngine` et par des tests unitaires dédiés ; le cycle complet de
-finalisation par mode reste à éprouver de bout en bout. Le markup d'ouverture
+de `RenderingEngine` et par des tests unitaires dédiés ; la validation runtime couvre les parcours frontend, backend et preview ContentBuilder. Le markup d'ouverture
 du formulaire (wrapper moderne/legacy, identifiant et classe personnalisée)
 est désormais construit par `FormOpeningMarkupBuilder` via `e77be68a`, avec
 ses deux variantes couvertes par des tests unitaires.
@@ -2218,10 +2218,9 @@ désormais `Joomla\\Filesystem\\File::copy()` sans suppression d'erreur et
 traite explicitement les retours négatifs de copie et de suppression avant de
 valider le déplacement.
 
-Les quatre renderers QuickMode ont encore une baseline PHPCS distincte ; le
-contrôle direct fait apparaître des violations de formatage héritées. Ce lot
-reste séparé de la mutualisation fonctionnelle pour conserver des commits
-réversibles.
+Les quatre renderers QuickMode ont ensuite rejoint le périmètre PHPCS après
+le traitement ciblé de leurs violations de formatage héritées. Le ruleset
+complet est désormais vert, sans bloquer les extractions fonctionnelles.
 
 `ClassicRenderer` a reçu les corrections automatiques PHPCBF et ses trois
 erreurs structurelles manuelles dans `e25d501f`; les avertissements de
@@ -2247,7 +2246,7 @@ Le contrôle partagé `bfTextfield`/`bfNumberInput` est commité dans
 `065cef94` et branché dans les wrappers Classic/Mobile. Le trait Bootstrap
 commun aux wrappers Bootstrap/OnePage l'utilise désormais aussi via
 `f3d04e55`, sans perte de classes, icônes ni attributs de thème. Les autres
-familles de champs restent à migrer par ordre de risque.
+familles de champs ont ensuite été traitées par les lots QuickMode suivants.
 La décision de type, les traductions, les longueurs et les bornes sont
 désormais regroupées dans `QuickModeTextFieldStrategy` (`059885a45`) et
 utilisées par les quatre renderers ; les enveloppes et effets annexes restent
@@ -2422,14 +2421,14 @@ Le callback plupload `UploadProgress` est désormais généré par
 `QuickModeUploadProgressScriptBuilder` (`1e28a79b2`) pour les quatre renderers.
 La mise à jour du pourcentage et de la barre visuelle reste inchangée et est
 couverte par un test de sortie ; les callbacks d’ajout, d’erreur et de fin
-d’upload restent à traiter par sous-lots.
+d’upload ont ensuite été traités par les builders dédiés.
 
 Le callback plupload `FileUploaded` est désormais généré par
 `QuickModeUploadCompletedScriptBuilder` (`6d3bfbb27`) pour les quatre
 renderers. La restitution éventuelle de la réponse serveur et la suppression
 de la ligne de queue sont couvertes par un test dédié ; la validation de la
-liste de fichiers et la configuration complète de l’uploader restent à
-extraire.
+liste de fichiers et la configuration complète de l’uploader ont ensuite été
+extraites par les builders dédiés.
 
 La validation client des fichiers est désormais générée par
 `QuickModeUploadValidationScriptBuilder` (`fea7df7b6`) pour les quatre

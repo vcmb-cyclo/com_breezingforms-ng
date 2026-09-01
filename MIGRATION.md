@@ -588,6 +588,8 @@ du renderer mobile historique sont maintenus dans le plan d’architecture.
 
 ### Rappels permanents
 
+- **Façade gelée** : ne pas toucher à la façade publique ni à son contrat (HTML_facileFormsProcessor et façades historiques exposées). Du code PHP est stocké en base dans les formulaires, pièces, scripts et intégrations, et des appelants peuvent se trouver à l’extérieur du dépôt ; un grep du code source ne permet donc pas d’en dresser l’inventaire complet. Toute nouvelle évolution doit rester derrière la façade, dans les services délégués.
+
 - Ne pas supprimer les façades encore appelées par du PHP stocké en base. Les classes de compatibilité vivent dans `administrator/components/com_breezingformsng/plugins/bfcompat/src/Compat/`; les façades Classic, Bootstrap et OnePage restent dans `libraries/crosstec/classes/`.
 - Avant de retirer une classe, vérifier ses chargements explicites et son éventuelle présence dans `script.php::removeObsoleteComponentFiles()`.
 - Déployer les fichiers de langue aux **deux** emplacements (`administrator/components/…/language/` et `administrator/language/`) puis vider `administrator/cache/language/`.

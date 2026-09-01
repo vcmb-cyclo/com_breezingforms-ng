@@ -115,6 +115,7 @@
 | ContentBuilder — loaders runtime | Le smoke Joomla insère puis relit une association publiée avec les loaders BFNG via l’API Database réelle, avant nettoyage de la fixture | Commit `3e22ac75d` |
 | ContentBuilder — source/enregistrement runtime | Le smoke résout une source BreezingForms réelle via `FormSourceFactory` et exerce `ContentBuilderRecordLoader` sur le parcours nouveau, avec nettoyage de la fixture | Validé par le smoke Joomla |
 | Notifications — exports et envoi de mails | `NotificationEngine` reçoit directement `ExportEngine`; exports, mails et traductions ne repassent plus par la façade | Phase 22, `NotificationEngineArchitectureTest` |
+| Soumission — opérations internes et uploads | Le pipeline utilise directement ses opérations de collecte/enregistrement et `UploadRuntime`, sans round-trip par la façade | Phase 23, `SubmissionEngineArchitectureTest` |
 | PHPCS | Actif sur les services modernes, les builders ContentBuilder, Classic et `HiddenFieldTrait` | `phpcs.xml.dist`, 154 fichiers configurés |
 | PHPStan | Niveau 4 validé sur le composant, sans diagnostic résiduel | `phpstan.neon.dist`, baseline vide |
 | Navigation des enregistrements admin | Les liens précédent/suivant réutilisent le formulaire, la recherche et le tri de la liste courante ; l'état est conservé pendant l'édition | `RecordsModel::getAdjacentRecordId()`, `tests/Administrator/RecordsNavigationTest.php` |
@@ -1535,6 +1536,34 @@ les délégations d'export et de mail, l'absence des appels croisés concernés
 et le branchement de l'instance partagée dans la façade.
 
 La suite complète passe avec 654 tests et 2 075 assertions. PHPCS passe sur
+154 fichiers configurés, PHPStan niveau 4 ne signale aucune erreur, les
+fichiers ajoutés et modifiés passent `php -l` et `git diff --check` est vert.
+
+## Phase 23 — Fermer les appels récursifs du pipeline de soumission
+
+Ajoutée le 2026-09-01 après l'audit des appelants de la façade. Le pipeline
+de `SubmissionEngine` repassait par `HTML_facileFormsProcessor` pour appeler
+ses propres opérations de collecte et d'enregistrement d'upload, ainsi que
+deux opérations déjà disponibles dans `UploadRuntime`.
+
+### Périmètre
+
+- La collecte des données utilise directement `SubmissionEngine::collectSubmitdata()`.
+- L'enregistrement des fichiers utilise directement
+  `SubmissionEngine::saveUpload()` et conserve le même traitement des
+  erreurs et des chemins.
+- Le redimensionnement des images et la recherche d'élément QuickMode
+  utilisent directement l'instance `UploadRuntime` du moteur.
+- Les appels publics de la façade restent inchangés pour les parcours
+  externes ; seul le round-trip interne du pipeline est supprimé.
+
+### Filet de sécurité et vérification
+
+`SubmissionEngineArchitectureTest` vérifie l'utilisation des opérations
+locales et des méthodes directes d'`UploadRuntime`, ainsi que l'absence des
+anciens appels croisés concernés.
+
+La suite complète passe avec 656 tests et 2 085 assertions. PHPCS passe sur
 154 fichiers configurés, PHPStan niveau 4 ne signale aucune erreur, les
 fichiers ajoutés et modifiés passent `php -l` et `git diff --check` est vert.
 

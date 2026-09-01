@@ -102,4 +102,30 @@ final class SubmissionEngineArchitectureTest extends TestCase
         self::assertStringContainsString('return $this->submissionEngine()->measureTime();', $facadeSource);
         self::assertStringNotContainsString('microtime()', $facadeSource);
     }
+
+    public function testSubmissionPipelineUsesItsOwnUploadAndCollectionOperations(): void
+    {
+        $source = file_get_contents(
+            __DIR__ . '/../../../../components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php'
+        );
+
+        self::assertIsString($source);
+        self::assertStringContainsString('$this->saveUpload(', $source);
+        self::assertStringContainsString('$this->collectSubmitdata(', $source);
+        self::assertStringNotContainsString('$this->processor->saveUpload(', $source);
+        self::assertStringNotContainsString('$this->processor->collectSubmitdata(', $source);
+    }
+
+    public function testSubmissionUploadPipelineUsesUploadRuntimeDirectly(): void
+    {
+        $source = file_get_contents(
+            __DIR__ . '/../../../../components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php'
+        );
+
+        self::assertIsString($source);
+        self::assertStringContainsString('$this->uploadRuntime()->resizeFile(', $source);
+        self::assertStringContainsString('$this->uploadRuntime()->findQuickModeElement(', $source);
+        self::assertStringNotContainsString('$this->processor->resizeFile(', $source);
+        self::assertStringNotContainsString('$this->processor->findQuickModeElement(', $source);
+    }
 }

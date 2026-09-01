@@ -218,7 +218,7 @@ final class SubmissionEngine
                                         $rowpath1 = $this->processor->cbCreatePathByTokens($rowpath1, $this->processor->rows, $row->name);
                                         //}
 
-                                        $pathInfo = $this->processor->saveUpload($tmp_name[$i], bf_sanitizeFilename($name[$i]), $rowpath1, $row->flag1, $useUrl, $useUrlDownloadDirectory, $resize_target_width, $resize_target_height, $resize_type, $resize_bgcolor, $row->name);
+                                        $pathInfo = $this->saveUpload($tmp_name[$i], bf_sanitizeFilename($name[$i]), $rowpath1, $row->flag1, $useUrl, $useUrlDownloadDirectory, $resize_target_width, $resize_target_height, $resize_type, $resize_bgcolor, $row->name);
                                         $path = $pathInfo['default'];
                                         $serverPath = $pathInfo['server'];
                                         if ($this->processor->status != _FF_STATUS_OK)
@@ -379,7 +379,7 @@ final class SubmissionEngine
                                                                 // resize if image
                                                                 // last param = crop or simple. Nothing for exact.
                                                                 if (intval($resize_target_height) > 0 && intval($resize_target_width) > 0) {
-                                                                    $this->processor->resizeFile($serverPath, intval($resize_target_width), intval($resize_target_height), $resize_bgcolor, $resize_type);
+                                                                    $this->uploadRuntime()->resizeFile($serverPath, intval($resize_target_width), intval($resize_target_height), $resize_bgcolor, $resize_type);
                                                                 }
 
                                                                 // CONTENTBUILDER
@@ -498,7 +498,7 @@ final class SubmissionEngine
 
                                     if (trim($this->processor->formrow->template_code_processed) == 'QuickMode') {
                                         $dataObject = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
-                                        $qmelement = $this->processor->findQuickModeElement($dataObject, $row->name);
+                                        $qmelement = $this->uploadRuntime()->findQuickModeElement($dataObject, $row->name);
 
                                         if ($qmelement !== null && isset($qmelement['properties']['is_html']) && $qmelement['properties']['is_html']) {
                                             $rawValues = $this->processor->app->getInput()->post->get("ff_nm_" . $row->name, [''], 'raw');
@@ -714,7 +714,7 @@ final class SubmissionEngine
         $this->processor->sendNotificationAfterPayment = false;
 
         // handle Begin Submit piece
-        $this->processor->collectSubmitdata($cbResult);
+        $this->collectSubmitdata($cbResult);
 
             for ($i = 0; $i < $this->processor->rowcount; $i++) {
                 $row = $this->processor->rows[$i];

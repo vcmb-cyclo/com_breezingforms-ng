@@ -59,10 +59,7 @@
     <file>components/com_breezingformsng/src/Service/Rendering/FormPieceExecutionService.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/SubmittedCallbackNameResolver.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/PaymentProviderDetector.php</file>
-    <file>components/com_breezingformsng/src/Service/Rendering/QueryListNavigationBuilder.php</file>
-    <file>components/com_breezingformsng/src/Service/Rendering/QueryListPaginationTailBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QueryListRowStateBuilder.php</file>
-    <file>components/com_breezingformsng/src/Service/Rendering/QueryListRowsRefreshBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QueryListSelectAllScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QueryListStateLibraryBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickModeFormTagBuilder.php</file>

@@ -65,9 +65,6 @@ final class RenderingEngine
     private ?QuickModeFormTagBuilder $quickModeFormTagBuilderService = null;
     private ?FileExtensionsCheckBuilder $fileExtensionsCheckBuilderService = null;
     private ?QueryListSelectAllScriptBuilder $queryListSelectAllScriptBuilderService = null;
-    private ?QueryListNavigationBuilder $queryListNavigationBuilderService = null;
-    private ?QueryListRowsRefreshBuilder $queryListRowsRefreshBuilderService = null;
-    private ?QueryListPaginationTailBuilder $queryListPaginationTailBuilderService = null;
     private ?QueryListStateLibraryBuilder $queryListStateLibraryBuilderService = null;
     private ?QueryListRowStateBuilder $queryListRowStateBuilderService = null;
     private ?PaymentProviderDetector $paymentProviderDetectorService = null;
@@ -281,21 +278,6 @@ final class RenderingEngine
         return $this->queryListSelectAllScriptBuilderService ??= new QueryListSelectAllScriptBuilder();
     }
 
-    private function queryListNavigationBuilder(): QueryListNavigationBuilder
-    {
-        return $this->queryListNavigationBuilderService ??= new QueryListNavigationBuilder();
-    }
-
-    private function queryListRowsRefreshBuilder(): QueryListRowsRefreshBuilder
-    {
-        return $this->queryListRowsRefreshBuilderService ??= new QueryListRowsRefreshBuilder();
-    }
-
-    private function queryListPaginationTailBuilder(): QueryListPaginationTailBuilder
-    {
-        return $this->queryListPaginationTailBuilderService ??= new QueryListPaginationTailBuilder();
-    }
-
     private function queryListStateLibraryBuilder(): QueryListStateLibraryBuilder
     {
         return $this->queryListStateLibraryBuilderService ??= new QueryListStateLibraryBuilder();
@@ -414,11 +396,7 @@ final class RenderingEngine
 
     private function queryListPageScriptBuilder(): QueryListPageScriptBuilder
     {
-        return $this->queryListPageScriptBuilderService ??= new QueryListPageScriptBuilder(
-            $this->queryListRowsRefreshBuilder(),
-            $this->queryListNavigationBuilder(),
-            $this->queryListPaginationTailBuilder()
-        );
+        return $this->queryListPageScriptBuilderService ??= new QueryListPageScriptBuilder();
     }
 
     private function callbackRegistrationService(): CallbackRegistrationService

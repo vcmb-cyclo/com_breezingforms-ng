@@ -117,7 +117,8 @@
 | Notifications — exports et envoi de mails | `NotificationEngine` reçoit directement `ExportEngine`; exports, mails et traductions ne repassent plus par la façade | Phase 22, `NotificationEngineArchitectureTest` |
 | Soumission — opérations internes et uploads | Le pipeline utilise directement ses opérations de collecte/enregistrement et `UploadRuntime`, sans round-trip par la façade | Phase 23, `SubmissionEngineArchitectureTest` |
 | Soumission — orchestration des moteurs | Le pipeline reçoit directement `ScriptingEngine`, `ExportEngine` et `NotificationEngine` pour les pièces, exports et notifications | Phase 24, `SubmissionEngineArchitectureTest` |
-| PHPCS | Actif sur les services modernes, les builders ContentBuilder, Classic et `HiddenFieldTrait` | `phpcs.xml.dist`, 154 fichiers configurés |
+| QuickMode — hydratation des valeurs enregistrées | La recherche de lignes, l’exécution de `data1/data2`, les traductions et l’état checkbox sont mutualisés pour les trois renderers actifs | Phase 25, `QuickModeSubmittedValueHydratorTest` |
+| PHPCS | Actif sur les services modernes, les builders ContentBuilder, Classic et `HiddenFieldTrait` | `phpcs.xml.dist`, 155 fichiers configurés |
 | PHPStan | Niveau 4 validé sur le composant, sans diagnostic résiduel | `phpstan.neon.dist`, baseline vide |
 | Navigation des enregistrements admin | Les liens précédent/suivant réutilisent le formulaire, la recherche et le tri de la liste courante ; l'état est conservé pendant l'édition | `RecordsModel::getAdjacentRecordId()`, `tests/Administrator/RecordsNavigationTest.php` |
 
@@ -1596,12 +1597,42 @@ anciens appels directs au processeur pour ces méthodes.
 La suite complète passe avec 658 tests et 2 113 assertions. PHPCS passe sur
 154 fichiers configurés et PHPStan niveau 4 ne signale aucune erreur.
 
+## Phase 25 — Mutualiser l’hydratation des valeurs QuickMode
+
+Ajoutée le 2026-09-01 après comparaison des trois renderers QuickMode actifs.
+`ClassicRenderer`, `BootstrapRenderer` et `OnePageRenderer` reproduisaient
+le même parcours de recherche d’une ligne enregistrée et d’hydratation de la
+métadonnée du champ.
+
+### Périmètre
+
+- `QuickModeSubmittedValueHydrator` centralise la recherche par nom de champ,
+  l’exécution des expressions `data1`/`data2`, les traductions de valeur,
+  liste et groupe, ainsi que la synchronisation de l’état d’une checkbox.
+- Les trois renderers délèguent ce bloc commun et gardent leurs traductions
+  et leur markup propres au thème ; la traduction de valeur préparée
+  spécifiquement par OnePage reste à son emplacement historique.
+- Les comparaisons et appels à `replaceCode()` conservent les règles de
+  comparaison historiques afin de ne pas modifier les valeurs produites.
+
+### Filet de sécurité et vérification
+
+`QuickModeSubmittedValueHydratorTest` couvre les valeurs scalaires, les
+listes/groupes, les traductions, l’état checkbox et l’absence de ligne
+correspondante. Il vérifie aussi que chacun des trois renderers délègue au
+service partagé. Les caractérisations Classic, Bootstrap et OnePage restent
+vertes.
+
+La suite complète passe avec 662 tests et 2 129 assertions. PHPCS passe sur
+155 fichiers configurés, PHPStan niveau 4 ne signale aucune erreur, les
+fichiers ajoutés et modifiés passent `php -l` et `git diff --check` est vert.
+
 ## Travail en parallèle
 
 | Couloir | Fichiers principaux | Peut avancer avec |
 |---|---|---|
 | A — `RenderingEngine` | `RenderingEngine.php`, tests de caractérisation de `view()` | Couloirs B et C |
-| B — Stratégies QuickMode | `QuickMode/`, snapshots des quatre renderers | Couloirs A et C |
+| B — Stratégies QuickMode | `QuickMode/`, snapshots des trois renderers actifs | Couloirs A et C |
 | C — Qualité | `phpcs.xml.dist`, baseline PHPStan, groupes de services déjà extraits | Couloirs A et B |
 | D — ContentBuilder | Nouveaux services et tests ContentBuilder | Couloir B, mais coordination requise avec A pour le branchement dans `view()` |
 
@@ -1642,14 +1673,18 @@ Règles de coordination :
    appelants réels, puis injecter directement le moteur d'export et couvrir
    les délégations.~~
    Terminé par la Phase 22.
-8. Caractériser le prochain parcours fonctionnel de la façade (soumission,
-   scripting, export ou upload) avec ses appelants réels, puis extraire un
-   service transversal complet seulement si la frontière couvre plusieurs
-   opérations liées et dispose d'un test de comportement. Le couplage interne
-   du moteur scripting est réduit par la Phase 20 ; les autres parcours
-   restent à caractériser avant extraction. Le parcours partagé des
-   téléchargements payants est extrait et couvert par la Phase 21 ; le
-   parcours notifications/export est maintenant couvert par la Phase 22.
+8. ~~Fermer les appels récursifs de soumission et injecter les moteurs de
+   scripting, export et notification dans son orchestration.~~
+   Terminé par les Phases 23 et 24.
+9. ~~Comparer les trois renderers QuickMode actifs et mutualiser uniquement
+   l'hydratation réellement commune des valeurs enregistrées.~~
+   Terminé par la Phase 25.
+10. Sécuriser le bootstrap Composer et enregistrer le graphe des services
+    Joomla 6 : prouver l'autoload réel après installation, enregistrer les
+    services runtime dans le provider, supprimer les constructions manuelles
+    du dispatcher et ajouter un test de résolution par le conteneur. Ce lot
+    précède l'extraction d'un contexte d'exécution typé partagé par les
+    moteurs, qui devra être caractérisée séparément.
 
 Le rendu Classic des groupes radio et checkbox est désormais mutualisé dans
 `ClassicChoiceGroupBuilder` (`478e1c24a`), avec couverture dédiée des wrappers,

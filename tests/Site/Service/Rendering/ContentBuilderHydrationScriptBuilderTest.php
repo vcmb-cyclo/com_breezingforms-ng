@@ -7,9 +7,9 @@ namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Rendering;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use stdClass;
-use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderEditableRecordScriptBuilder;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderHydrationScriptBuilder;
 
-final class ContentBuilderEditableRecordScriptBuilderTest extends TestCase
+final class ContentBuilderHydrationScriptBuilderTest extends TestCase
 {
     public function testBuildsHydrationForEditableValueFamilies(): void
     {
@@ -25,7 +25,7 @@ final class ContentBuilderEditableRecordScriptBuilderTest extends TestCase
         $checkbox->recType = 'Checkbox';
         $checkbox->recValue = 'yes';
 
-        $result = $this->builder()->build(
+        $result = $this->builder()->buildEditable(
             [$text, $checkbox],
             [],
             false,
@@ -41,13 +41,13 @@ final class ContentBuilderEditableRecordScriptBuilderTest extends TestCase
     public function testDoesNotMutateRecordValuesWhileCleaningThem(): void
     {
         $record = $this->record(23, 'title', 'Text', '  Hello  ');
-        $builder = new ContentBuilderEditableRecordScriptBuilder(
+        $builder = new ContentBuilderHydrationScriptBuilder(
             static fn(string $value): string => trim($value),
             static fn(string $value, int $width, string $break, bool $cut): string =>
                 wordwrap($value, $width, $break, $cut)
         );
 
-        $result = $builder->build([$record], [], false, 7, sys_get_temp_dir());
+        $result = $builder->buildEditable([$record], [], false, 7, sys_get_temp_dir());
 
         self::assertStringContainsString('Hello', $result['javascript']);
         self::assertSame('  Hello  ', $record->recValue);
@@ -67,7 +67,7 @@ final class ContentBuilderEditableRecordScriptBuilderTest extends TestCase
         $hidden->recType = 'Text';
         $hidden->recValue = 'ignored';
 
-        $result = $this->builder()->build(
+        $result = $this->builder()->buildEditable(
             [$file, $hidden],
             [32],
             false,
@@ -87,7 +87,7 @@ final class ContentBuilderEditableRecordScriptBuilderTest extends TestCase
         $file->recType = 'File Upload';
         $file->recValue = "document.pdf\nsecond.jpg";
 
-        $result = $this->builder()->build(
+        $result = $this->builder()->buildEditable(
             [$file],
             [],
             true,
@@ -97,6 +97,14 @@ final class ContentBuilderEditableRecordScriptBuilderTest extends TestCase
 
         self::assertSame(1, substr_count($result['contentBuilderScript'], 'function ff_flashupload_not_empty'));
         self::assertStringContainsString('cbFlashElemCnt["ff_elem31"] = 2;', $result['contentBuilderScript']);
+        self::assertStringContainsString(
+            'cbFlashElemCnt["ff_elem31"] = 2;' . "\n                                ",
+            $result['contentBuilderScript']
+        );
+        self::assertStringNotContainsString(
+            'cbFlashElemCnt["ff_elem31"] = 2;\\n',
+            $result['contentBuilderScript']
+        );
         self::assertStringContainsString('cb_delete_31[0]', $result['javascript']);
         self::assertStringContainsString('cb_delete_31[1]', $result['javascript']);
         self::assertStringContainsString('bfDeactivateField["ff_nm_document[]"]', $result['javascript']);
@@ -110,7 +118,7 @@ final class ContentBuilderEditableRecordScriptBuilderTest extends TestCase
         $signature->recType = 'Signature';
         $signature->recValue = basename(__FILE__);
 
-        $result = $this->builder()->build(
+        $result = $this->builder()->buildEditable(
             [$signature],
             [],
             true,
@@ -128,7 +136,7 @@ final class ContentBuilderEditableRecordScriptBuilderTest extends TestCase
         $missing = $this->record(42, 'missing_signature', 'Signature', 'missing.png');
         $outside = $this->record(43, 'outside_signature', 'Signature', '../' . basename(__FILE__));
 
-        $result = $this->builder()->build(
+        $result = $this->builder()->buildEditable(
             [$missing, $outside],
             [],
             true,
@@ -146,7 +154,7 @@ final class ContentBuilderEditableRecordScriptBuilderTest extends TestCase
         $select = $this->record(52, 'country', 'Select List', 'France');
         $calendar = $this->record(53, 'birthdate', 'Calendar', '2026-08-31');
 
-        $result = $this->builder()->build(
+        $result = $this->builder()->buildEditable(
             [$radio, $select, $calendar],
             [],
             true,
@@ -162,7 +170,7 @@ final class ContentBuilderEditableRecordScriptBuilderTest extends TestCase
     #[DataProvider('simpleValueTypes')]
     public function testBuildsHydrationForEachRemainingSimpleValueType(string $type, string $name): void
     {
-        $result = $this->builder()->build(
+        $result = $this->builder()->buildEditable(
             [$this->record(61, $name, $type, 'value')],
             [],
             false,
@@ -188,7 +196,7 @@ final class ContentBuilderEditableRecordScriptBuilderTest extends TestCase
 
     public function testIgnoresUnsupportedRecordTypes(): void
     {
-        $result = $this->builder()->build(
+        $result = $this->builder()->buildEditable(
             [$this->record(62, 'unknown', 'Unsupported', 'value')],
             [],
             true,
@@ -210,9 +218,120 @@ final class ContentBuilderEditableRecordScriptBuilderTest extends TestCase
         return $record;
     }
 
-    private function builder(): ContentBuilderEditableRecordScriptBuilder
+    public function testBuildsReadonlyFieldDeactivationScript(): void
     {
-        return new ContentBuilderEditableRecordScriptBuilder(
+        self::assertSame('', $this->builder()->buildReadonly([]));
+
+        $script = $this->builder()->buildReadonly([21, 22]);
+
+        self::assertStringContainsString('function bfContentBuilderFieldHasVisibleControl(fieldId){', $script);
+        self::assertStringContainsString('function bfDisableContentBuilderFields(){', $script);
+        self::assertStringContainsString('document.getElementById("ff_elem21")', $script);
+        self::assertStringContainsString('document.getElementById("ff_elem22")', $script);
+        self::assertSame(4, substr_count($script, 'bfDeactivateField[bfCbName]=true;'));
+        self::assertStringContainsString('bfCbElements[i].disabled = true;', $script);
+        self::assertStringContainsString('bfContentBuilderFieldHasVisibleControl("21")', $script);
+        self::assertStringContainsString('bfContentBuilderFieldHasVisibleControl("22")', $script);
+    }
+
+    public function testBuildsQuickModeValidationCallback(): void
+    {
+        $record = $this->record(71, 'document', 'File Upload', 'document.pdf');
+
+        $result = $this->builder()->buildEditable([$record], [], true, 7, sys_get_temp_dir());
+
+        self::assertStringContainsString('function ff_flashupload_not_empty(element, message)', $result['contentBuilderScript']);
+        self::assertStringContainsString('cbFlashElemCnt[element.id]', $result['contentBuilderScript']);
+        self::assertStringContainsString('ff_validationFocus(element.name);', $result['contentBuilderScript']);
+    }
+
+    public function testBuildsFileControlsAndDeactivationForEachStoredFile(): void
+    {
+        $record = $this->record(72, 'documents', 'File Upload', "first.pdf\nsecond.pdf");
+
+        $result = $this->builder()->buildEditable([$record], [], true, 7, sys_get_temp_dir());
+
+        self::assertSame(4, substr_count($result['javascript'], 'type=\\"checkbox\\"'));
+        self::assertStringContainsString('cb_delete_72[0]', $result['javascript']);
+        self::assertStringContainsString('cb_delete_72[1]', $result['javascript']);
+        self::assertStringContainsString('bfDeactivateField["ff_nm_documents[]"]', $result['javascript']);
+    }
+
+    public function testBuildsFileHydrationForTheAvailableQueues(): void
+    {
+        $record = $this->record(73, 'documents', 'File Upload', 'file.pdf');
+
+        $result = $this->builder()->buildEditable([$record], [], true, 7, sys_get_temp_dir());
+
+        self::assertStringContainsString('bfFlashFileQueue73', $result['javascript']);
+        self::assertStringContainsString('#ff_elem73_files', $result['javascript']);
+        self::assertStringContainsString('JQuery("#bfFlashFileQueue73").after(mydiv);', $result['javascript']);
+    }
+
+    public function testBuildsEscapedSignatureHydration(): void
+    {
+        $record = $this->record(74, 'signature', 'Signature', basename(__FILE__));
+
+        $result = $this->builder()->buildEditable([$record], [], true, 7, __DIR__);
+
+        self::assertStringContainsString('bf_signaturePad74', $result['javascript']);
+        self::assertStringContainsString('data:image', $result['javascript']);
+        self::assertStringContainsString('base64,', $result['javascript']);
+    }
+
+    public function testBuildsSimpleValueAndCalendarHydration(): void
+    {
+        $result = $this->builder()->buildEditable(
+            [
+                $this->record(75, 'title', 'Text', 'A "quoted" value'),
+                $this->record(76, 'date', 'Calendar', '2026-08-30'),
+            ],
+            [],
+            false,
+            7,
+            sys_get_temp_dir()
+        );
+
+        self::assertStringContainsString('JQuery("[name=\\"ff_nm_title[]\\"]").val("A \\"quoted\\" value")', $result['javascript']);
+        self::assertStringStartsNotWith('setTimeout(function(){', $result['javascript']);
+        self::assertStringContainsString('setTimeout(function(){', $result['javascript']);
+        self::assertStringContainsString('}, 100);', $result['javascript']);
+    }
+
+    public function testBuildsChoiceHydrationForMultipleValuesAndEscapesThem(): void
+    {
+        $result = $this->builder()->buildEditable(
+            [$this->record(77, 'topics', 'Checkbox', 'Cycling, A"B')],
+            [],
+            false,
+            7,
+            sys_get_temp_dir()
+        );
+
+        self::assertSame(2, substr_count($result['javascript'], 'document.ff_form7.elements.length'));
+        self::assertStringContainsString('value == "A\\"B"', $result['javascript']);
+        self::assertStringContainsString('.click();', $result['javascript']);
+    }
+
+    public function testBuildsSelectHydrationForMultipleValues(): void
+    {
+        $result = $this->builder()->buildEditable(
+            [$this->record(78, 'country', 'Select List', 'one, two')],
+            [],
+            false,
+            7,
+            sys_get_temp_dir()
+        );
+
+        self::assertSame(2, substr_count($result['javascript'], 'value == "'));
+        self::assertStringContainsString('value == "one"', $result['javascript']);
+        self::assertStringContainsString('value == "two"', $result['javascript']);
+        self::assertStringContainsString('.attr("selected", true).trigger("change")', $result['javascript']);
+    }
+
+    private function builder(): ContentBuilderHydrationScriptBuilder
+    {
+        return new ContentBuilderHydrationScriptBuilder(
             static fn(string $value): string => $value,
             static fn(string $value, int $width, string $break, bool $cut): string =>
                 wordwrap($value, $width, $break, $cut)

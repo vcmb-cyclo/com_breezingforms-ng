@@ -128,4 +128,58 @@ final class SubmissionEngineArchitectureTest extends TestCase
         self::assertStringNotContainsString('$this->processor->resizeFile(', $source);
         self::assertStringNotContainsString('$this->processor->findQuickModeElement(', $source);
     }
+
+    public function testSubmissionOrchestrationUsesInjectedServiceEngines(): void
+    {
+        $source = file_get_contents(
+            __DIR__ . '/../../../../components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php'
+        );
+
+        self::assertIsString($source);
+        foreach (['ScriptingEngine', 'ExportEngine', 'NotificationEngine'] as $service) {
+            self::assertStringContainsString('private readonly ' . $service . ' $', $source);
+        }
+
+        foreach ([
+            '$this->scriptingEngine->execPiece(',
+            '$this->exportEngine->logToDatabase(',
+            '$this->exportEngine->exppdf(',
+            '$this->exportEngine->expcsv(',
+            '$this->exportEngine->expxml(',
+            '$this->exportEngine->random_str(',
+            '$this->notificationEngine->sendEmailNotification(',
+            '$this->notificationEngine->sendMailbackNotification(',
+            '$this->notificationEngine->sendMailChimpNotification(',
+            '$this->notificationEngine->sendSalesforceNotification(',
+        ] as $call) {
+            self::assertStringContainsString($call, $source);
+        }
+
+        foreach ([
+            'execPiece',
+            'logToDatabase',
+            'exppdf',
+            'expcsv',
+            'expxml',
+            'random_str',
+            'sendEmailNotification',
+            'sendMailbackNotification',
+            'sendMailChimpNotification',
+            'sendSalesforceNotification',
+        ] as $method) {
+            self::assertStringNotContainsString('$this->processor->' . $method . '(', $source);
+        }
+    }
+
+    public function testFacadeInjectsSharedEnginesIntoSubmissionOrchestration(): void
+    {
+        $source = file_get_contents(
+            __DIR__ . '/../../../../components/com_breezingformsng/src/Support/processor_facade.php'
+        );
+
+        self::assertIsString($source);
+        self::assertStringContainsString('$this->scriptingEngine(),', $source);
+        self::assertStringContainsString('$this->exportEngine(),', $source);
+        self::assertStringContainsString('$this->notificationEngine()', $source);
+    }
 }

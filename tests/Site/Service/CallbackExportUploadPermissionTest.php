@@ -243,14 +243,22 @@ final class CallbackExportUploadPermissionTest extends TestCase
         foreach (['StripeCallback', 'PayPalCallback', 'SofortCallback'] as $callback) {
             $source = $this->read("components/com_breezingformsng/src/Service/Callback/{$callback}.php");
 
-            self::assertStringContainsString('->bind(', $source, $callback);
             self::assertStringContainsString('getInput()', $source, $callback);
         }
 
-        foreach (
-            ['AboutController.php', 'DisplayController.php', 'ScriptsController.php', 'PiecesController.php']
-            as $controller
-        ) {
+        foreach (['PaymentFormLoader.php', 'PaymentRecordService.php'] as $service) {
+            $source = $this->read("components/com_breezingformsng/src/Service/Callback/{$service}");
+
+            self::assertStringContainsString('->bind(', $source, $service);
+        }
+
+        $controllers = [
+            'AboutController.php',
+            'DisplayController.php',
+            'ScriptsController.php',
+            'PiecesController.php',
+        ];
+        foreach ($controllers as $controller) {
             $source = $this->read("administrator/components/com_breezingformsng/src/Controller/{$controller}");
 
             self::assertStringContainsString("authorise('core.manage', 'com_breezingformsng')", $source, $controller);

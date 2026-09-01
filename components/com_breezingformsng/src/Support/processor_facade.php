@@ -296,7 +296,10 @@ class HTML_facileFormsProcessor
         return $this->submissionEngineService ??= new SubmissionEngine(
             $this,
             $this->mailerFactory,
-            new RecaptchaVerifier()
+            new RecaptchaVerifier(),
+            $this->scriptingEngine(),
+            $this->exportEngine(),
+            $this->notificationEngine()
         );
     }
 

@@ -23,8 +23,7 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RuntimeAssetLoader;
 use Joomla\Database\ParameterType;
 use Joomla\Database\DatabaseInterface;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RequestParameterParser;
-use Vcmb\Component\BreezingformsNG\Site\Service\Upload\PaymentCacheCleaner;
-use Vcmb\Component\BreezingformsNG\Site\Service\Upload\TemporaryUploadFileCleaner;
+use Vcmb\Component\BreezingformsNG\Site\Service\Upload\UploadFileCleaner;
 
 /**
  * Renders a form (ff_task=view) or processes a submission (ff_task=submit)
@@ -32,15 +31,13 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Upload\TemporaryUploadFileCleane
  */
 final class FormRenderer
 {
-    private ?TemporaryUploadFileCleaner $temporaryUploadFileCleanerService = null;
-    private ?PaymentCacheCleaner $paymentCacheCleanerService = null;
-
     public function __construct(
         private readonly CMSApplication $application,
         private readonly DatabaseInterface $database,
         private readonly MailerFactoryInterface $mailerFactory,
         private readonly CacheControllerFactoryInterface $cacheControllerFactory,
         private readonly RequestParameterParser $requestParameterParser,
+        private readonly UploadFileCleaner $uploadFileCleaner,
     ) {
     }
 
@@ -469,15 +466,15 @@ $ff_request = array();
             if ($left > 3)
                 $align = $left;
             // remove temporary flash and chunked upload files if any
-            $this->temporaryUploadFileCleaner()->purge(
+            $this->uploadFileCleaner->purgeTemporaryUploads(
                 JPATH_SITE . '/components/com_breezingformsng/uploads/',
                 '_flashtmp'
             );
-            $this->temporaryUploadFileCleaner()->purge(
+            $this->uploadFileCleaner->purgeTemporaryUploads(
                 JPATH_SITE . '/components/com_breezingformsng/uploads/chunks',
                 '_chunktmp'
             );
-            $this->paymentCacheCleaner()->purge(
+            $this->uploadFileCleaner->purgePaymentCache(
                 JPATH_SITE . '/media/breezingforms/payment_cache/'
             );
 
@@ -627,13 +624,4 @@ $ff_request = array();
     } // if
     }
 
-    private function temporaryUploadFileCleaner(): TemporaryUploadFileCleaner
-    {
-        return $this->temporaryUploadFileCleanerService ??= new TemporaryUploadFileCleaner();
-    }
-
-    private function paymentCacheCleaner(): PaymentCacheCleaner
-    {
-        return $this->paymentCacheCleanerService ??= new PaymentCacheCleaner();
-    }
 }

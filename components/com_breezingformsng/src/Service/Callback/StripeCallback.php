@@ -23,15 +23,14 @@ use Joomla\Filesystem\File;
  */
 final class StripeCallback
 {
-    private readonly PaymentDownloadPolicy $downloadPolicy;
-
     public function __construct(
         private readonly CMSApplication $application,
         private readonly DatabaseInterface $database,
+        private readonly PaymentFormLoader $paymentFormLoader,
+        private readonly PaymentRecordService $paymentRecordService,
         private readonly RedirectHelper $redirectHelper,
-        ?PaymentDownloadPolicy $downloadPolicy = null,
+        private readonly PaymentDownloadService $paymentDownloadService,
     ) {
-        $this->downloadPolicy = $downloadPolicy ?? new PaymentDownloadPolicy();
     }
 
     public function confirm(): void
@@ -41,27 +40,20 @@ final class StripeCallback
 
 
     $input = $this->application->getInput();
-    $formId = $input->getInt('form_id', -1);
-    $query = $db->getQuery(true)
-        ->select('*')
-        ->from($db->quoteName('#__facileforms_forms'))
-        ->where($db->quoteName('id') . ' = :formId')
-        ->bind(':formId', $formId, ParameterType::INTEGER);
-    $db->setQuery($query);
-    $list = $db->loadObjectList();
-
-    if (count($list) == 0) {
+    $form = $this->paymentFormLoader->load($input->getInt('form_id', -1));
+    if ($form === null) {
         $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
         $this->application->close();
+
+        return;
     }
 
-    $form = $list[0];
-
-    $areas = json_decode($form->template_areas, true);
-
-    if (!is_array($areas)) {
+    $areas = $this->paymentFormLoader->decodeAreas($form);
+    if ($areas === null) {
         $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_STRIPE_DATA'));
         $this->application->close();
+
+        return;
     }
 
     $tx_token = $input->getString('token', '');
@@ -154,7 +146,7 @@ final class StripeCallback
 
                         $msg = Text::_("COM_BREEZINGFORMSNG_STRIPE_DECLINED");
 
-                        require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
+                        require_once (JPATH_SITE . '/components/com_breezingformsng/downloadtpl/error.php');
                     } else {
                         /** get payment intend id and creation time */
                         $stripe_pi_id = $session->payment_intent; //payment intent id from last session also replacing tx_token/charge->id with paymentIntents->id
@@ -171,20 +163,12 @@ final class StripeCallback
                         $stripeTxId = 'Stripe: ' . strip_tags($stripe_pi_id);
                         $stripePaymentDate = date('Y-m-d H:i:s', $stripe_pi_create);
                         $stripeTestaccount = !$stripe_pi->livemode ? 1 : 0;
-                        $updateQuery = $db->getQuery(true)
-                            ->update($db->quoteName('#__facileforms_records'))
-                            ->set($db->quoteName('paypal_tx_id') . ' = :stripeTxId')
-                            ->set($db->quoteName('paypal_payment_date') . ' = :stripePaymentDate')
-                            ->set($db->quoteName('paypal_testaccount') . ' = :stripeTestaccount')
-                            ->set($db->quoteName('paypal_download_tries') . ' = 0')
-                            ->where($db->quoteName('id') . ' = :stripeRecordId')
-                            ->bind(':stripeTxId', $stripeTxId, ParameterType::STRING)
-                            ->bind(':stripePaymentDate', $stripePaymentDate, ParameterType::STRING)
-                            ->bind(':stripeTestaccount', $stripeTestaccount, ParameterType::INTEGER)
-                            ->bind(':stripeRecordId', $stripeRecordId, ParameterType::INTEGER);
-                        $db->setQuery($updateQuery);
-
-                        $db->execute();
+                        $this->paymentRecordService->storeTransaction(
+                            $stripeRecordId,
+                            $stripeTxId,
+                            $stripePaymentDate,
+                            $stripeTestaccount
+                        );
 
                         // trigger a script after succeeded payment?
                         if (file_exists(JPATH_SITE . '/bf_stripe_success.php')) {
@@ -202,7 +186,7 @@ final class StripeCallback
                             $record_id = $input->getInt('record_id', -1);
                             $tries = $options['downloadTries'];
                             $form_id = $input->getInt('form_id', -1);
-                            require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/stripe_download.php');
+                            require_once (JPATH_SITE . '/components/com_breezingformsng/downloadtpl/stripe_download.php');
                         } else {
 
                             if ($options['thankYouPage'] != '') {
@@ -215,7 +199,7 @@ final class StripeCallback
                 } catch (\Stripe\Exception\CardException $e) {
 
                     $msg = Text::_("COM_BREEZINGFORMSNG_STRIPE_DECLINED");
-                    require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
+                    require_once (JPATH_SITE . '/components/com_breezingformsng/downloadtpl/error.php');
                 }
 
                 break;
@@ -226,12 +210,7 @@ final class StripeCallback
 
     public function download(): void
     {
-        (new PaymentDownloadService(
-            $this->application,
-            $this->database,
-            $this->redirectHelper,
-            $this->downloadPolicy
-        ))->download(
+        $this->paymentDownloadService->download(
             'bfStripe',
             'COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYMENT_DATA',
             'token',

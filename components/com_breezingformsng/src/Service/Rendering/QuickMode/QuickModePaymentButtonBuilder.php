@@ -27,7 +27,7 @@ final class QuickModePaymentButtonBuilder
         $value = $image === ''
             ? 'value="' . htmlspecialchars($buttonValue, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '" '
             : '';
-        $source = QuickModePaymentImageBuilder::build($image, $imageAlt);
+        $source = self::paymentImageAttributes($image, $imageAlt);
         $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'' . $provider . '\';';
         if ($actionClick) {
             $onclick .= $actionFunctionName . '(this,\'click\');';
@@ -40,5 +40,19 @@ final class QuickModePaymentButtonBuilder
             . $onblur . $onchange . $onfocus . $onselect . $readonly
             . 'type="' . $escapedType . '" name="ff_nm_' . $escapedFieldName . '[]"'
             . ' id="ff_elem' . $elementId . '"/>' . "\n";
+    }
+
+    private static function paymentImageAttributes(string $image, string $alt = ''): string
+    {
+        if ($image === '') {
+            return '';
+        }
+
+        $altAttribute = $alt !== ''
+            ? ' alt="' . htmlspecialchars($alt, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '"'
+            : '';
+
+        return 'src="' . htmlspecialchars($image, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '"'
+            . $altAttribute . ' ';
     }
 }

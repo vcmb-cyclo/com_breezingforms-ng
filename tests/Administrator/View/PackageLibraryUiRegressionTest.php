@@ -79,6 +79,20 @@ final class PackageLibraryUiRegressionTest extends TestCase
         self::assertStringContainsString("'a.title' => 'a.title'", $source);
     }
 
+    public function testPieceAndScriptModelsShareListPreparationInPackageModel(): void
+    {
+        $packageModel = $this->read('administrator/components/com_breezingformsng/src/Model/PackageModel.php');
+        $pieceModel = $this->read('administrator/components/com_breezingformsng/src/Model/PieceModel.php');
+        $scriptModel = $this->read('administrator/components/com_breezingformsng/src/Model/ScriptModel.php');
+
+        self::assertStringContainsString('public function prepareList(', $packageModel);
+        self::assertStringContainsString('abstract protected function getSessionPrefix(): string;', $packageModel);
+        self::assertStringContainsString("return 'pieces';", $pieceModel);
+        self::assertStringContainsString("return 'scripts';", $scriptModel);
+        self::assertStringNotContainsString('public function prepareList(', $pieceModel);
+        self::assertStringNotContainsString('public function prepareList(', $scriptModel);
+    }
+
     public function testSortInitialisationSupportsLateAssetLoading(): void
     {
         $source = $this->read('media/com_breezingformsng/js/admin/admin-sort.js');

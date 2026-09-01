@@ -39,7 +39,10 @@ use Joomla\CMS\Mail\Mail;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 use Vcmb\Component\BreezingformsNG\Site\Service\Integration\DropboxUploader;
 use Vcmb\Component\BreezingformsNG\Site\Service\Integration\RecaptchaVerifier;
+use Vcmb\Component\BreezingformsNG\Site\Service\Export\ExportEngine;
+use Vcmb\Component\BreezingformsNG\Site\Service\Notification\NotificationEngine;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampFormatter;
+use Vcmb\Component\BreezingformsNG\Site\Service\Scripting\ScriptingEngine;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\FlashUploadFileMatcher;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\UploadError;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\UploadRuntime;
@@ -65,6 +68,9 @@ final class SubmissionEngine
         private readonly HTML_facileFormsProcessor $processor,
         private readonly MailerFactoryInterface $mailerFactory,
         private readonly RecaptchaVerifier $recaptchaVerifier,
+        private readonly ScriptingEngine $scriptingEngine,
+        private readonly ExportEngine $exportEngine,
+        private readonly NotificationEngine $notificationEngine,
     ) {
     }
 
@@ -798,7 +804,7 @@ final class SubmissionEngine
                     $this->processor->database->setQuery($query);
                     $rows = $this->processor->database->loadObjectList();
                     if (count($rows))
-                        echo $this->processor->execPiece(
+                        echo $this->scriptingEngine->execPiece(
                             $rows[0]->code,
                             Text::_('COM_BREEZINGFORMSNG_PROCESS_BSPIECE') . " " . $rows[0]->name,
                             'p',
@@ -807,7 +813,7 @@ final class SubmissionEngine
                         );
                     break;
                 case 2: // custom code
-                    echo $this->processor->execPiece(
+                    echo $this->scriptingEngine->execPiece(
                         $this->processor->formrow->piece3code,
                         Text::_('COM_BREEZINGFORMSNG_PROCESS_BSPIECEC'),
                         'f',
@@ -827,14 +833,14 @@ final class SubmissionEngine
                 } else {
                     if ($this->processor->status == _FF_STATUS_OK) {
                         if ($this->processor->formrow->dblog > 0)
-                            $cbRecordId = $this->processor->logToDatabase($cbResult);
+                            $cbRecordId = $this->exportEngine->logToDatabase($cbResult);
 
                         if ($this->processor->status == _FF_STATUS_OK) {
                             if ($this->processor->formrow->emailntf > 0 && ($cbEmailNotifications || $cbEmailUpdateNotifications)) { // CONTENTBUILDER
-                                $this->processor->sendEmailNotification();
+                                $this->notificationEngine->sendEmailNotification();
                             }
                             if ($this->processor->formrow->mb_emailntf > 0 && ($cbEmailNotifications || $cbEmailUpdateNotifications)) { // CONTENTBUILDER
-                                $this->processor->sendMailbackNotification();
+                                $this->notificationEngine->sendMailbackNotification();
                             }
 
                             // DROPBOX request v2 API and PDF,CSV, XML upload
@@ -846,13 +852,13 @@ final class SubmissionEngine
                                             $dropbox_file = '';
                                             switch ($dropbox_type) {
                                                 case 'pdf':
-                                                    $dropbox_file = $this->processor->exppdf();
+                                                    $dropbox_file = $this->exportEngine->exppdf();
                                                     break;
                                                 case 'csv':
-                                                    $dropbox_file = $this->processor->expcsv();
+                                                    $dropbox_file = $this->exportEngine->expcsv();
                                                     break;
                                                 case 'xml':
-                                                    $dropbox_file = $this->processor->expxml();
+                                                    $dropbox_file = $this->exportEngine->expxml();
                                                     break;
                                             }
                                             if ($dropbox_file != '') {
@@ -866,8 +872,8 @@ final class SubmissionEngine
                             }
 
 
-                            $this->processor->sendMailChimpNotification();
-                            $this->processor->sendSalesforceNotification();
+                            $this->notificationEngine->sendMailChimpNotification();
+                            $this->notificationEngine->sendSalesforceNotification();
 
                             PluginHelper::importPlugin('breezingforms_addons');
                             $dispatcher = $this->processor->app->getDispatcher();
@@ -937,7 +943,7 @@ final class SubmissionEngine
                         );
 
                         $lastID = $this->processor->record_id;
-                        $token = $this->processor->random_str(20);
+                        $token = $this->exportEngine->random_str(20);
                         $optToken = bf_b64enc($token);
                         $updateQuery = $this->processor->database->getQuery(true)
                             ->update($this->processor->database->quoteName('#__facileforms_records'))
@@ -990,7 +996,7 @@ final class SubmissionEngine
                     $this->processor->database->setQuery($query);
                     $rows = $this->processor->database->loadObjectList();
                     if (count($rows))
-                        echo $this->processor->execPiece(
+                        echo $this->scriptingEngine->execPiece(
                             $rows[0]->code,
                             Text::_('COM_BREEZINGFORMSNG_PROCESS_ESPIECE') . " " . $rows[0]->name,
                             'p',
@@ -999,7 +1005,7 @@ final class SubmissionEngine
                         );
                     break;
                 case 2: // custom code
-                    echo $this->processor->execPiece(
+                    echo $this->scriptingEngine->execPiece(
                         $this->processor->formrow->piece4code,
                         Text::_('COM_BREEZINGFORMSNG_PROCESS_ESPIECEC'),
                         'f',

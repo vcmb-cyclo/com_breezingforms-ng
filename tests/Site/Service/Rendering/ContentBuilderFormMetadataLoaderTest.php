@@ -6,7 +6,7 @@ namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Rendering;
 
 use Joomla\Database\DatabaseInterface;
 use PHPUnit\Framework\TestCase;
-use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderFormAssociationLoader;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderFormMetadataLoader;
 
 if (!interface_exists(DatabaseInterface::class)) {
     eval('namespace Joomla\\Database; interface DatabaseInterface {}');
@@ -16,14 +16,13 @@ if (!class_exists('Joomla\\Database\\ParameterType')) {
     eval('namespace Joomla\\Database; final class ParameterType { public const INTEGER = 1; }');
 }
 
-final class ContentBuilderFormAssociationLoaderTest extends TestCase
+final class ContentBuilderFormMetadataLoaderTest extends TestCase
 {
     public function testLoadsOnlyPublishedBreezingFormsAssociations(): void
     {
-        $database = new ContentBuilderAssociationDatabaseDouble([41, 42]);
+        $database = new ContentBuilderMetadataDatabaseDouble([41, 42], null);
 
-        self::assertSame([41, 42], (new ContentBuilderFormAssociationLoader($database))->load(7));
-        self::assertCount(1, $database->queries);
+        self::assertSame([41, 42], (new ContentBuilderFormMetadataLoader($database))->loadAssociatedFormIds(7));
         self::assertSame(
             [
                 "type = 'com_breezingformsng'",
@@ -37,26 +36,46 @@ final class ContentBuilderFormAssociationLoaderTest extends TestCase
 
     public function testReturnsAnEmptyListWhenNoAssociationExists(): void
     {
-        $database = new ContentBuilderAssociationDatabaseDouble([]);
+        $database = new ContentBuilderMetadataDatabaseDouble([], null);
 
-        self::assertSame([], (new ContentBuilderFormAssociationLoader($database))->load(7));
+        self::assertSame([], (new ContentBuilderFormMetadataLoader($database))->loadAssociatedFormIds(7));
+    }
+
+    public function testLoadsThePublishedFormDefinitionWithAnIntegerBinding(): void
+    {
+        $database = new ContentBuilderMetadataDatabaseDouble(null, [
+            'reference_id' => 19,
+            'published_only' => 1,
+        ]);
+
+        self::assertSame(
+            ['reference_id' => 19, 'published_only' => 1],
+            (new ContentBuilderFormMetadataLoader($database))->loadForm(23)
+        );
+        self::assertSame(['id = :cbFormId', 'published = 1'], $database->query->where);
+        self::assertSame([[':cbFormId', 23, 1]], $database->query->bindings);
+    }
+
+    public function testReturnsNullWhenTheFormIsNotFoundOrNotPublished(): void
+    {
+        $database = new ContentBuilderMetadataDatabaseDouble(null, null);
+
+        self::assertNull((new ContentBuilderFormMetadataLoader($database))->loadForm(23));
     }
 }
 
-final class ContentBuilderAssociationDatabaseDouble implements DatabaseInterface
+final class ContentBuilderMetadataDatabaseDouble implements DatabaseInterface
 {
-    /** @var list<object> */
-    public array $queries = [];
-    public ContentBuilderAssociationQueryDouble $query;
+    public ContentBuilderMetadataQueryDouble $query;
 
-    /** @param array<int, mixed> $associations */
-    public function __construct(private readonly array $associations)
+    /** @param array<int, mixed>|null $associations @param array<string, mixed>|null $data */
+    public function __construct(private readonly ?array $associations, private readonly ?array $data)
     {
     }
 
     public function getQuery(bool $new = false): object
     {
-        return $this->query = new ContentBuilderAssociationQueryDouble();
+        return $this->query = new ContentBuilderMetadataQueryDouble();
     }
 
     public function quoteName(string|array $name): string|array
@@ -71,17 +90,22 @@ final class ContentBuilderAssociationDatabaseDouble implements DatabaseInterface
 
     public function setQuery(object $query, int $offset = 0, int $limit = 0): void
     {
-        $this->queries[] = $query;
     }
 
     /** @return array<int, mixed> */
     public function loadColumn(): array
     {
-        return $this->associations;
+        return $this->associations ?? [];
+    }
+
+    /** @return array<string, mixed>|null */
+    public function loadAssoc(): ?array
+    {
+        return $this->data;
     }
 }
 
-final class ContentBuilderAssociationQueryDouble
+final class ContentBuilderMetadataQueryDouble
 {
     /** @var list<string> */
     public array $where = [];

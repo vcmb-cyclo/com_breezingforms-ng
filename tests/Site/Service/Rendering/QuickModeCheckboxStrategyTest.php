@@ -46,4 +46,30 @@ final class QuickModeCheckboxStrategyTest extends TestCase
 
         self::assertStringContainsString('disabled="disabled"', $html);
     }
+
+    public function testBuildsUncheckedCheckboxWithoutOptionalAttributes(): void
+    {
+        $html = (new QuickModeCheckboxStrategy())->build([
+            'bfName' => 'optin',
+            'value' => 'yes',
+            'dbId' => 13,
+        ], 'ff_elem', '');
+
+        self::assertSame(
+            '<input class="ff_elem" type="checkbox" name="ff_nm_optin[]" value="yes" id="ff_elem13"/>' . "\n",
+            $html
+        );
+    }
+
+    public function testEscapesCheckboxClassAndFieldName(): void
+    {
+        $html = (new QuickModeCheckboxStrategy())->build([
+            'bfName' => 'field" onfocus="alert(2)',
+            'value' => 'value',
+            'dbId' => 12,
+        ], 'ff_elem" onfocus="alert(1)', '');
+
+        self::assertStringContainsString('ff_elem&quot; onfocus=&quot;alert(1)', $html);
+        self::assertStringContainsString('ff_nm_field&quot; onfocus=&quot;alert(2)[]', $html);
+    }
 }

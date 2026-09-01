@@ -177,19 +177,11 @@ if [[ -n "${contentbuilder_archive}" ]]; then
         $app = $container->get(\Joomla\CMS\Application\SiteApplication::class);
         \Joomla\CMS\Factory::$application = $app;
         require "/var/www/html/administrator/components/com_contentbuilderng/src/Helper/RuntimeContextHelper.php";
-        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFormAssociationLoader.php";
-        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFormDataLoader.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFormMetadataLoader.php";
         require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderRecordLoader.php";
-        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderChoiceHydrationScriptBuilder.php";
-        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderEditableRecordScriptBuilder.php";
-        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFileHydrationScriptBuilder.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderHydrationScriptBuilder.php";
         require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFileSupportBuilder.php";
-        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFileUploadScriptBuilder.php";
-        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFlashUploadValidationBuilder.php";
-        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderSelectHydrationScriptBuilder.php";
         require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderSignatureImageEncoder.php";
-        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderSignatureScriptBuilder.php";
-        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderValueHydrationScriptBuilder.php";
         require "/var/www/html/components/com_breezingformsng/src/Support/processor_facade.php";
 
         $db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
@@ -221,12 +213,11 @@ if [[ -n "${contentbuilder_archive}" ]]; then
         $sourceId = (int) $db->insertid();
 
         try {
-            $associationLoader = new \Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderFormAssociationLoader($db);
-            $dataLoader = new \Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderFormDataLoader($db);
-            if (!in_array($formId, $associationLoader->load($referenceId), true)) {
+            $metadataLoader = new \Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderFormMetadataLoader($db);
+            if (!in_array($formId, $metadataLoader->loadAssociatedFormIds($referenceId), true)) {
                 throw new \RuntimeException("ContentBuilder association loader returned no inserted form");
             }
-            $data = $dataLoader->load($formId);
+            $data = $metadataLoader->loadForm($formId);
             if (!is_array($data) || (int) ($data["reference_id"] ?? 0) !== $referenceId) {
                 throw new \RuntimeException("ContentBuilder form data loader returned unexpected data");
             }
@@ -280,11 +271,11 @@ if [[ -n "${contentbuilder_archive}" ]]; then
                     "recType" => "Signature",
                     "recValue" => $signatureFileName,
                 ];
-                $editableBuilder = new \Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderEditableRecordScriptBuilder(
+                $hydrationBuilder = new \Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderHydrationScriptBuilder(
                     static fn (string $value): string => $value,
                     static fn (string $value, int $width, string $break, bool $cut): string => wordwrap($value, $width, $break, $cut)
                 );
-                $rendered = $editableBuilder->build(
+                $rendered = $hydrationBuilder->buildEditable(
                     [$fileRecord, $signatureRecord],
                     [],
                     true,
@@ -378,11 +369,21 @@ if [[ "${frontend_status}" != "200" ]]; then
     exit 1
 fi
 
-# Generate an image with the bundled CAPTCHA runtime. This catches missing
-# Securimage support files and PHP/GD incompatibilities after library updates.
+# Exercise the installed Composer autoloader through the component's loader.
+# This catches packages that are present in source but missing from a clean
+# Joomla installation, including Securimage and TCPDF.
 docker exec "${web_container}" php -r '
     define("_JEXEC", 1);
-    require "/var/www/html/administrator/components/com_breezingformsng/vendor/bgli100/securimage/securimage.php";
+    define("JPATH_ADMINISTRATOR", "/var/www/html/administrator");
+    require "/var/www/html/administrator/components/com_breezingformsng/src/Helper/VendorHelper.php";
+    \Vcmb\Component\BreezingformsNG\Administrator\Helper\VendorHelper::load();
+    if (!class_exists("Securimage") || !class_exists("TCPDF")) {
+        exit(1);
+    }
+    require "/var/www/html/administrator/components/com_breezingformsng/src/Service/PdfDocument.php";
+    if (!class_exists("\\Vcmb\\Component\\BreezingformsNG\\Administrator\\Service\\PdfDocument")) {
+        exit(1);
+    }
     $captcha = new Securimage(["no_exit" => true, "send_headers" => false]);
     ob_start();
     $captcha->show();

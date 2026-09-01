@@ -28,7 +28,7 @@ final class QuickModeCheckboxStrategy
         string $attributes,
         bool $readonly = false
     ): string {
-        return (new QuickModeCheckboxBuilder())->build(
+        return self::checkboxMarkup(
             $class,
             (string) $field['bfName'],
             (string) ($field['value'] ?? ''),
@@ -36,5 +36,22 @@ final class QuickModeCheckboxStrategy
             (bool) ($field['checked'] ?? false),
             $attributes . ($readonly ? ' disabled="disabled" ' : '')
         );
+    }
+
+    private static function checkboxMarkup(
+        string $class,
+        string $fieldName,
+        string $value,
+        int $elementId,
+        bool $checked,
+        string $attributes
+    ): string {
+        $escapedFieldName = htmlspecialchars($fieldName, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+        return '<input class="' . htmlspecialchars($class, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '" '
+            . ($checked ? 'checked="checked" ' : '')
+            . $attributes
+            . 'type="checkbox" name="ff_nm_' . $escapedFieldName . '[]" value="'
+            . htmlentities(trim($value), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $elementId . '"/>' . "\n";
     }
 }

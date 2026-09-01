@@ -2,19 +2,19 @@
 
 name: joomla-translations
 description: >
-Use this skill whenever creating, editing, or reviewing any user-facing
-string in a Joomla 6 extension: component, module, plugin or template.
-This includes administrator field labels and descriptions, form and XML
-labels, toolbar buttons, error and success messages, tooltips, strings
-exposed to JavaScript through Text::script(), and email templates.
-Trigger this skill whenever editing a language .ini file, adding or changing
-a Text::_(), Text::sprintf() or Text::plural() call, modifying a <field>
-label, description or hint in an XML manifest or form, or handling any
-translation request. Always update en-GB, fr-FR, de-DE, es-ES, hu-HU,
-it-IT, nl-NL and tr-TR together. Keep the semantic content strictly aligned
-across all eight languages and apply the linguistic, grammatical and
-typographical conventions of each locale.
------------------------------------------
+  Use this skill whenever creating, editing, or reviewing any user-facing
+  string in a Joomla 6 extension: component, module, plugin or template.
+  This includes administrator field labels and descriptions, form and XML
+  labels, toolbar buttons, error and success messages, tooltips, strings
+  exposed to JavaScript through Text::script(), and email templates.
+  Trigger this skill whenever editing a language .ini file, adding or changing
+  a Text::_(), Text::sprintf() or Text::plural() call, modifying an XML field
+  label, description or hint in an XML manifest or form, or handling any
+  translation request. Always update en-GB, fr-FR, de-DE, es-ES, hu-HU,
+  it-IT, nl-NL and tr-TR together. Keep the semantic content strictly aligned
+  across all eight languages and apply the linguistic, grammatical and
+  typographical conventions of each locale.
+---
 
 # Traductions Joomla 6
 

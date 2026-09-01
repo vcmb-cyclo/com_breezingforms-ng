@@ -72,7 +72,7 @@ final class BFText
 	 * @param string
 	 * @return string
 	 */
-	public static function _($name)
+	public static function _(string $name): string
 	{
 		$bftext = BFText::getInstance();
 		if (!$bftext->language->hasKey($name)) {

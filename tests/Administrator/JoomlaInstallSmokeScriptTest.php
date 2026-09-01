@@ -15,7 +15,7 @@ final class JoomlaInstallSmokeScriptTest extends TestCase
         self::assertIsString($source);
 
         $runtimeContextPosition = strpos($source, 'src/Helper/RuntimeContextHelper.php');
-        $associationLoaderPosition = strpos($source, 'ContentBuilderFormAssociationLoader.php');
+        $associationLoaderPosition = strpos($source, 'ContentBuilderFormMetadataLoader.php');
 
         self::assertIsInt($runtimeContextPosition);
         self::assertIsInt($associationLoaderPosition);
@@ -36,9 +36,20 @@ final class JoomlaInstallSmokeScriptTest extends TestCase
         $source = file_get_contents(__DIR__ . '/../../scripts/joomla-install-smoke.sh');
 
         self::assertIsString($source);
-        self::assertStringContainsString('ContentBuilderEditableRecordScriptBuilder.php', $source);
+        self::assertStringContainsString('ContentBuilderHydrationScriptBuilder.php', $source);
         self::assertStringContainsString('ff_elem701', $source);
         self::assertStringContainsString('data:image', $source);
         self::assertStringContainsString('unlink($signaturePath);', $source);
+    }
+
+    public function testSmokeUsesTheInstalledComposerAutoloaderForCaptchaAndPdf(): void
+    {
+        $source = file_get_contents(__DIR__ . '/../../scripts/joomla-install-smoke.sh');
+
+        self::assertIsString($source);
+        self::assertStringContainsString('src/Helper/VendorHelper.php', $source);
+        self::assertStringContainsString('VendorHelper::load();', $source);
+        self::assertStringContainsString('class_exists("TCPDF")', $source);
+        self::assertStringContainsString('src/Service/PdfDocument.php', $source);
     }
 }

@@ -61,4 +61,52 @@ final class QuickModePaymentButtonBuilderTest extends TestCase
         );
         self::assertStringNotContainsString('<script>', $markup);
     }
+
+    public function testOmitsPaymentImageAttributesWhenNoImageIsConfigured(): void
+    {
+        $markup = QuickModePaymentButtonBuilder::build(
+            'PayPal',
+            'payment',
+            55,
+            '',
+            'PayPal',
+            'PayPal',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            false,
+            ''
+        );
+
+        self::assertStringNotContainsString('src=', $markup);
+        self::assertStringNotContainsString('alt=', $markup);
+    }
+
+    public function testEscapesPaymentImageAttributes(): void
+    {
+        $markup = QuickModePaymentButtonBuilder::build(
+            'PayPal',
+            'payment',
+            55,
+            '/pay" onerror="alert(1)',
+            'PayPal',
+            'Pay" onerror="alert(2)',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            false,
+            ''
+        );
+
+        self::assertStringContainsString(
+            'src="/pay&quot; onerror=&quot;alert(1)" alt="Pay&quot; onerror=&quot;alert(2)" ',
+            $markup
+        );
+    }
 }

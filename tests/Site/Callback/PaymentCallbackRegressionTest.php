@@ -21,14 +21,15 @@ final class PaymentCallbackRegressionTest extends TestCase
         yield 'Sofort' => ['SofortCallback'];
     }
 
-    #[DataProvider('callbackProvider')]
-    public function testCallbacksUseJoomlaQueryBuilderAndBoundParameters(string $callback): void
+    public function testPaymentServicesUseJoomlaQueryBuilderAndBoundParameters(): void
     {
-        $source = $this->read("components/com_breezingformsng/src/Service/Callback/{$callback}.php");
+        foreach (['PaymentFormLoader', 'PaymentRecordService'] as $service) {
+            $source = $this->read("components/com_breezingformsng/src/Service/Callback/{$service}.php");
 
-        self::assertStringContainsString('->getQuery(true)', $source);
-        self::assertStringContainsString('->quoteName(', $source);
-        self::assertStringContainsString('->bind(', $source);
+            self::assertStringContainsString('->getQuery(true)', $source, $service);
+            self::assertStringContainsString('->quoteName(', $source, $service);
+            self::assertStringContainsString('->bind(', $source, $service);
+        }
     }
 
     #[DataProvider('callbackProvider')]
@@ -76,7 +77,8 @@ final class PaymentCallbackRegressionTest extends TestCase
         foreach (['StripeCallback', 'PayPalCallback', 'SofortCallback'] as $callback) {
             $source = $this->read("components/com_breezingformsng/src/Service/Callback/{$callback}.php");
 
-            self::assertStringContainsString('new PaymentDownloadService(', $source, $callback);
+            self::assertStringContainsString('PaymentDownloadService $paymentDownloadService', $source, $callback);
+            self::assertStringNotContainsString('new PaymentDownloadService(', $source, $callback);
             self::assertStringContainsString('->download(', $source, $callback);
             self::assertStringNotContainsString(
                 'paypal_download_tries < $options[\'downloadTries\']',
@@ -90,13 +92,41 @@ final class PaymentCallbackRegressionTest extends TestCase
         self::assertStringContainsString('$this->downloadPolicy->canDownload(', $service);
     }
 
-    public function testEngineDispatcherSharesPaymentDownloadPolicyWithCallbacks(): void
+    public function testProviderSharesPaymentDownloadPolicyWithPaymentCallbacks(): void
     {
-        $source = $this->read('components/com_breezingformsng/src/Service/EngineDispatcher.php');
+        $source = $this->read('administrator/components/com_breezingformsng/services/provider.php');
 
-        self::assertStringContainsString('PaymentDownloadPolicy $paymentDownloadPolicy', $source);
-        self::assertSame(1, substr_count($source, '$this->paymentDownloadPolicy ='));
-        self::assertSame(10, substr_count($source, '$this->paymentDownloadPolicy'));
+        self::assertStringContainsString('PaymentDownloadPolicy::class', $source);
+        self::assertStringContainsString('PaymentDownloadService::class', $source);
+        self::assertStringContainsString('PaymentRecordService::class', $source);
+        self::assertSame(1, substr_count($source, '$container->get(PaymentDownloadPolicy::class)'));
+        self::assertSame(3, substr_count($source, '$container->get(PaymentDownloadService::class)'));
+        self::assertSame(3, substr_count($source, '$container->get(PaymentRecordService::class)'));
+
+        $dispatcher = $this->read('components/com_breezingformsng/src/Service/EngineDispatcher.php');
+
+        self::assertStringNotContainsString('$this->paymentDownloadPolicy', $dispatcher);
+    }
+
+    public function testPaymentCallbacksDelegateFormLoadingToTheSharedLoader(): void
+    {
+        foreach (['StripeCallback', 'PayPalCallback', 'SofortCallback'] as $callback) {
+            $source = $this->read("components/com_breezingformsng/src/Service/Callback/{$callback}.php");
+
+            self::assertStringContainsString('PaymentFormLoader $paymentFormLoader', $source, $callback);
+            self::assertStringContainsString('$this->paymentFormLoader->load(', $source, $callback);
+            self::assertStringContainsString('$this->paymentFormLoader->decodeAreas(', $source, $callback);
+            self::assertStringNotContainsString(
+                "->from(\$db->quoteName('#__facileforms_forms'))",
+                $source,
+                $callback
+            );
+            self::assertStringNotContainsString(
+                '->update($db->quoteName(\'#__facileforms_records\'))',
+                $source,
+                $callback
+            );
+        }
     }
 
     public function testStripeSubmissionIteratesEveryTemplateArea(): void

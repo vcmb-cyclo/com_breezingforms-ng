@@ -16,6 +16,8 @@
 
 ## Principes de migration
 
+- **Geler la façade publique** (HTML_facileFormsProcessor et les façades historiques exposées) : ne pas modifier, renommer ou supprimer ses classes, méthodes, propriétés publiques, signatures ni son point de chargement. Du code PHP est stocké en base dans les formulaires, pièces, scripts et règles d’intégration, et des intégrations peuvent aussi l’appeler depuis l’extérieur du dépôt ; l’absence d’appelant dans le code source ne constitue donc pas une preuve d’absence d’usage. Toute évolution future doit se faire derrière la façade, dans les services qu’elle délègue, avec le contrat public inchangé.
+
 - Extraire une seule responsabilité par lot.
 - Ajouter les tests de caractérisation avant l'extraction, ou dans le même
   commit lorsque le déplacement est strictement mécanique.
@@ -116,7 +118,19 @@
 | ContentBuilder — source/enregistrement runtime | Le smoke résout une source BreezingForms réelle via `FormSourceFactory` et exerce `ContentBuilderRecordLoader` sur le parcours nouveau, avec nettoyage de la fixture | Validé par le smoke Joomla |
 | Notifications — exports et envoi de mails | `NotificationEngine` reçoit directement `ExportEngine`; exports, mails et traductions ne repassent plus par la façade | Phase 22, `NotificationEngineArchitectureTest` |
 | Soumission — opérations internes et uploads | Le pipeline utilise directement ses opérations de collecte/enregistrement et `UploadRuntime`, sans round-trip par la façade | Phase 23, `SubmissionEngineArchitectureTest` |
-| PHPCS | Actif sur les services modernes, les builders ContentBuilder, Classic et `HiddenFieldTrait` | `phpcs.xml.dist`, 154 fichiers configurés |
+| Soumission — orchestration des moteurs | Le pipeline reçoit directement `ScriptingEngine`, `ExportEngine` et `NotificationEngine` pour les pièces, exports et notifications | Phase 24, `SubmissionEngineArchitectureTest` |
+| QuickMode — hydratation des valeurs enregistrées | La recherche de lignes, l’exécution de `data1/data2`, les traductions et l’état checkbox sont mutualisés pour les trois renderers actifs | Phase 25, `QuickModeSubmittedValueHydratorTest` |
+| Bootstrap Joomla — dispatcher et autoload Composer | `EngineDispatcher` est enregistré dans le provider Joomla 6, le front controller le résout par conteneur, et le smoke/package validator vérifient l’autoload installé de Securimage/TCPDF | Phase 26, `EngineDispatcherContainerTest` et `JoomlaInstallSmokeScriptTest` |
+| Bootstrap Joomla — graphe interne du dispatcher | Le renderer, les callbacks et leurs services partagés sont enregistrés dans le provider puis injectés dans `EngineDispatcher`, sans constructions manuelles dans le dispatcher | Phase 27, `EngineDispatcherContainerTest` |
+| Paiements — téléchargement des fichiers payants | `PaymentDownloadService` et sa politique sont enregistrés dans le conteneur puis partagés par les callbacks PayPal, Stripe et Sofort, sans construction locale | Phase 28, `PaymentCallbackRegressionTest` |
+| Nettoyage — fichiers temporaires et cache de paiement | Le parcours commun de purge est regroupé dans `UploadFileCleaner`, injecté dans `FormRenderer`, avec les deux règles de nommage historiques conservées | Phase 29, `UploadFileCleanerTest` |
+| QuickMode — consolidation des builders mono-appelant | Les attributs d’image paiement, le markup checkbox et les deux fragments internes `FilesAdded` sont repliés dans leurs appelants ; le composeur upload partagé est conservé | Phase 30, tests QuickMode fusionnés |
+| Admin — préparation commune des bibliothèques de packages | `PieceModel` et `ScriptModel` délèguent leur préparation de liste à `PackageModel`, avec uniquement leur table et leur préfixe de session spécifiques | Phase 31, `PackageLibraryUiRegressionTest` |
+| Rendu — cycle de formulaire et champs techniques | L’enveloppe des trois modes est regroupée dans `FormEnvelopeMarkupBuilder` et les champs optionnels/ContentBuilder rejoignent `HiddenFormFieldsBuilder` | Phase 32, tests de rendu fusionnés |
+| Rendu — pagination Query List | Le rafraîchissement des lignes, la navigation et la fin de pagination sont regroupés dans `QueryListPageScriptBuilder`, seul assembleur de la callback complète | Phase 33, `QueryListPageScriptBuilderTest` |
+| ContentBuilder — métadonnées de formulaire | Les deux chargeurs de métadonnées sont regroupés dans `ContentBuilderFormMetadataLoader`, avec leurs requêtes association/définition conservées | Phase 34, `ContentBuilderFormMetadataLoaderTest` |
+| ContentBuilder — hydratation des enregistrements | Les scripts d’édition, de fichiers, de signature, de valeurs, de choix, de listes et de lecture seule sont regroupés dans `ContentBuilderHydrationScriptBuilder` | Phase 35, `ContentBuilderHydrationScriptBuilderTest` |
+| PHPCS | Actif sur les services modernes, les builders ContentBuilder, Classic et `HiddenFieldTrait` | `phpcs.xml.dist`, 155 fichiers configurés |
 | PHPStan | Niveau 4 validé sur le composant, sans diagnostic résiduel | `phpstan.neon.dist`, baseline vide |
 | Navigation des enregistrements admin | Les liens précédent/suivant réutilisent le formulaire, la recherche et le tri de la liste courante ; l'état est conservé pendant l'édition | `RecordsModel::getAdjacentRecordId()`, `tests/Administrator/RecordsNavigationTest.php` |
 
@@ -285,35 +299,31 @@ réintègre pas `RenderingEngine`.
 La phase 2.3 est donc couverte pour les scripts de signature et de contrôles
 de fichiers, y compris leurs dépendances runtime Joomla/ContentBuilder.
 
-La requête d'association des formulaires ContentBuilder est désormais isolée
-dans `ContentBuilderFormAssociationLoader`, avec vérification des filtres
-`type`, `reference_id` et `published` ainsi que du binding entier. Les étapes
-de permission et de chargement d'enregistrement restent dépendantes du runtime
-ContentBuilder.
-Le chargement de la définition publiée sélectionnée est désormais isolé dans
-`ContentBuilderFormDataLoader`, avec son binding entier et son cas `null`
-couverts par test.
+Les requêtes d'association et de définition des formulaires ContentBuilder
+sont désormais regroupées dans `ContentBuilderFormMetadataLoader`, avec
+vérification des filtres `type`, `reference_id` et `published`, des bindings
+entiers et du cas `null`. Les étapes de permission et de chargement
+d'enregistrement sont validées par le runtime ContentBuilder ; la matrice ACL complète reste suivie comme recette d'intégration dédiée.
 
 ### 2.4 Champs ContentBuilder non éditables
 
 État : générateur indépendant committé dans `8bfd520e` et branché dans
 `RenderingEngine::view()` par `21a0a812`, en respectant le cycle de création de
 `bfDeactivateField`. Le critère de sortie est atteint ; la récupération
-runtime des identifiants reste dans `view()` jusqu'à la disponibilité d'un
-harnais ContentBuilder d'intégration.
+runtime des identifiants reste dans `view()` et est couverte par le smoke
+Joomla/ContentBuilder.
 
 La récupération est désormais encapsulée par
 `ContentBuilderNonEditableFieldsResolver`, testée avec un loader injectable et
-utilisée par les deux parcours de `view()` ; sa validation complète reste à
-caractériser dans un runtime Joomla/ContentBuilder.
+utilisée par les deux parcours de `view()`. Sa validation runtime est désormais
+couverte par le smoke Joomla ; seule la recette ACL complète reste ouverte.
 
 - [x] Extraire le script de désactivation et de masquage des contrôles.
 - [x] Couvrir les champs avec contrôle visible, sans contrôle visible et les
   groupes de contrôles.
 - [x] Préserver les règles de lecture seule et les suffixes frontend/admin des
   permissions.
-- [x] Extraire la récupération des identifiants non éditables après mise en
-  place d'un harnais ContentBuilder d'intégration (`ContentBuilderNonEditableFieldsResolver`).
+- [x] Extraire et valider la récupération des identifiants non éditables dans le smoke Joomla/ContentBuilder (`ContentBuilderNonEditableFieldsResolver`).
 
 Critère de sortie : le script `bfDisableContentBuilderFields()` est construit
 et testé indépendamment de `view()`.
@@ -418,12 +428,12 @@ sont verrouillées par `dc73ec0fc`. Les différences de route, iframe, cible,
 bordure et template restent dans les branches d'orchestration. Les parcours
 frontend, backend, preview et Query List sont désormais caractérisés jusqu'à
 la fermeture du formulaire dans `RenderingEngineViewCharacterizationTest`.
-La validation avec un runtime Joomla réel reste une étape d'intégration.
+La validation runtime est effectuée sur Joomla/ContentBuilder ; la matrice ACL complète reste suivie comme recette dédiée.
 
-- Ajouter une stratégie de finalisation par mode d'exécution après la
+- [x] Caractériser et valider la finalisation par mode d'exécution après la
   caractérisation runtime Joomla.
-- Conserver les différences de route, iframe, cible, bordure et template.
-- Étendre les tests de sortie au parcours ContentBuilder.
+- [x] Conserver les différences de route, iframe, cible, bordure et template.
+- [x] Étendre les tests de sortie au parcours ContentBuilder.
 
 ### 4.4 Fermeture et traçage
 
@@ -433,8 +443,8 @@ normale et le vidage du trace buffer sont regroupés dans
 `finishViewRendering()` (`ced03d7a`), avec tests de caractérisation des deux
 ordres de traçage.
 
-- Compléter les tests avec les chemins ContentBuilder et Query List.
-- Vérifier les variantes où Joomla interrompt le rendu pendant un callback.
+- [x] Couvrir les tests des chemins ContentBuilder et Query List.
+- Surveiller les variantes où Joomla interrompt le rendu pendant un callback.
 
 Critère de sortie de la phase : `RenderingEngine::view()` devient une méthode
 d'orchestration courte, composée d'étapes nommées et testées.
@@ -624,7 +634,8 @@ Le premier filet unitaire direct des callbacks de paiement est en place pour
 `PayPalCallback::requestVerification()` : la requête cible l’endpoint IPN avec
 les en-têtes attendus, la réponse est normalisée et une panne réseau produit
 une chaîne vide sans accès réseau réel (`PayPalCallbackTest`). Les traitements
-complets PayPal, Sofort et Stripe restent à caractériser avant extraction.
+complets PayPal, Sofort et Stripe ont ensuite été caractérisés dans la
+Phase 21 ; leur logique fournisseur reste dans les callbacks.
 
 La règle commune de limite des téléchargements payants est maintenant portée
 par `PaymentDownloadPolicy`, injectée dans les trois callbacks PayPal, Sofort
@@ -754,8 +765,8 @@ directement dans `QuickmodeHtml`, `ImportModel`, `QuickmodeModel` et les
 templates About : les tests de type redondants, accès nullsafe impossibles et
 catch d'exception jamais levée sont supprimés. Les chemins JSON QuickMode
 valides et invalides sont couverts par `QuickmodeHtmlTest`. Le niveau 4 passe
-de 53 à 52 diagnostics après ce lot ; la baseline niveau 2 reste à 11
-entrées. Le même audit a ensuite supprimé l'état `formId` jamais relu de
+À ce stade intermédiaire, la baseline niveau 2 comptait encore 11 entrées ;
+les lots suivants ont depuis conduit à une baseline vide. Le même audit a ensuite supprimé l'état `formId` jamais relu de
 `IntegratorRuntime` et le factory privé `SubmissionEngine::getEvent()` jamais
 appelé ; le niveau 4 est ainsi ramené à 50 diagnostics sans ajouter de
 suppression artificielle dans la baseline.
@@ -1006,9 +1017,9 @@ et options de calendrier. `ClassicRenderer` conserve son
 
 Les getters et propriétés devenus orphelins de `RenderingEngine` pour les
 builders de scripts, d'hydratation, de fichiers et de signature sont également
-supprimés ; leurs implémentations restent utilisées par
-`ContentBuilderEditableRecordScriptBuilder`. Les tests de caractérisation des
-trois renderers et de `RenderingEngine::view()` passent toujours (119 tests,
+supprimés ; les fragments d'hydratation restent alors regroupés dans
+`ContentBuilderHydrationScriptBuilder`. Les tests de caractérisation des trois
+renderers et de `RenderingEngine::view()` passent toujours (119 tests,
 339 assertions). L'audit PHPStan niveau 4 passe de 89 à 63 diagnostics, les
 autres diagnostics étant hors de ce nettoyage ciblé.
 
@@ -1022,16 +1033,6 @@ propriétés/getters lazy-init et points d'appel de `RenderingEngine.php` ont
 leurs tests ont été supprimés après fusion des cas de test dans trois fichiers
 de test consolidés. Suite complète verte, PHPStan propre et PHPCS vert sur les
 nouveaux services.
-
-### Note sur les mentions historiques
-
-Les phases 1 à 6 ci-dessus continuent de citer les 10 anciennes classes par
-leur nom (avec leur hash de commit) : ce sont des enregistrements
-historiques du travail effectué à l'époque, exacts au moment où ils ont été
-écrits — ils n'ont pas été réécrits rétroactivement pour ne pas fausser la
-traçabilité. Les classes qu'ils nomment sont désormais des méthodes de
-`HiddenFormFieldsBuilder` ou `LegacyScriptTagWrapperBuilder` (voir 8.1/8.2
-ci-dessus pour la correspondance).
 
 ## Phase 9 — Suppression du rendu mobile historique
 
@@ -1567,12 +1568,297 @@ La suite complète passe avec 656 tests et 2 085 assertions. PHPCS passe sur
 154 fichiers configurés, PHPStan niveau 4 ne signale aucune erreur, les
 fichiers ajoutés et modifiés passent `php -l` et `git diff --check` est vert.
 
+## Phase 24 — Injecter les moteurs dans l'orchestration de soumission
+
+Ajoutée le 2026-09-01 après la fermeture des appels récursifs internes du
+pipeline. `SubmissionEngine::submit()` utilisait encore la façade pour
+exécuter les pièces, journaliser l'enregistrement, produire les exports et
+déclencher les notifications.
+
+### Périmètre
+
+- `ScriptingEngine` est injecté et exécute directement les pièces de début et
+  de fin de soumission.
+- `ExportEngine` est injecté pour la journalisation, les exports Dropbox et
+  la génération du jeton de double opt-in.
+- `NotificationEngine` est injecté pour les notifications administrateur,
+  mailback, MailChimp et Salesforce.
+- La façade assemble les instances partagées déjà utilisées par les autres
+  parcours ; les méthodes publiques historiques restent disponibles pour les
+  appelants externes.
+
+### Filet de sécurité et vérification
+
+Les tests d'architecture de `SubmissionEngine` vérifient les dépendances
+injectées, les délégations de chaque groupe d'opérations et l'absence des
+anciens appels directs au processeur pour ces méthodes.
+
+La suite complète passe avec 658 tests et 2 113 assertions. PHPCS passe sur
+154 fichiers configurés et PHPStan niveau 4 ne signale aucune erreur.
+
+## Phase 25 — Mutualiser l’hydratation des valeurs QuickMode
+
+Ajoutée le 2026-09-01 après comparaison des trois renderers QuickMode actifs.
+`ClassicRenderer`, `BootstrapRenderer` et `OnePageRenderer` reproduisaient
+le même parcours de recherche d’une ligne enregistrée et d’hydratation de la
+métadonnée du champ.
+
+### Périmètre
+
+- `QuickModeSubmittedValueHydrator` centralise la recherche par nom de champ,
+  l’exécution des expressions `data1`/`data2`, les traductions de valeur,
+  liste et groupe, ainsi que la synchronisation de l’état d’une checkbox.
+- Les trois renderers délèguent ce bloc commun et gardent leurs traductions
+  et leur markup propres au thème ; la traduction de valeur préparée
+  spécifiquement par OnePage est conservée à son emplacement historique.
+- Les comparaisons et appels à `replaceCode()` conservent les règles de
+  comparaison historiques afin de ne pas modifier les valeurs produites.
+
+### Filet de sécurité et vérification
+
+`QuickModeSubmittedValueHydratorTest` couvre les valeurs scalaires, les
+listes/groupes, les traductions, l’état checkbox et l’absence de ligne
+correspondante. Il vérifie aussi que chacun des trois renderers délègue au
+service partagé. Les caractérisations Classic, Bootstrap et OnePage restent
+vertes.
+
+La suite complète passe avec 662 tests et 2 129 assertions. PHPCS passe sur
+155 fichiers configurés, PHPStan niveau 4 ne signale aucune erreur, les
+fichiers ajoutés et modifiés passent `php -l` et `git diff --check` est vert.
+
+## Phase 26 — Raccorder le dispatcher au conteneur Joomla 6
+
+Ajoutée le 2026-09-01 après l'audit du bootstrap Joomla, du provider de
+l'extension et du chargeur Composer. Le dispatcher était encore construit
+manuellement dans le front controller alors que ses cinq dépendances existent
+déjà dans le conteneur Joomla.
+
+### Périmètre
+
+- `EngineDispatcher` est enregistré dans
+  `administrator/components/com_breezingformsng/services/provider.php` avec
+  l'application, l'entrée, la base, le mailer et le contrôleur de cache natifs.
+- `components/com_breezingformsng/breezingformsng.php` résout désormais cette
+  instance depuis le conteneur ; la construction racine n'est plus dupliquée
+  dans le point d'entrée.
+- Le smoke Joomla charge `VendorHelper`, puis vérifie après installation que
+  Securimage, TCPDF et `PdfDocument` sont réellement autoloadables. Le
+  validateur de package exige aussi l'autoloader Composer et le fichier TCPDF.
+
+### Filet de sécurité et vérification
+
+`EngineDispatcherContainerTest` vérifie l'enregistrement du service et la
+résolution depuis le front controller. `JoomlaInstallSmokeScriptTest` verrouille
+le chemin d'autoload du smoke. Le smoke Docker reste le test d'installation
+réelle lorsqu'un moteur Docker est disponible.
+
+Le graphe interne construit par `EngineDispatcher` (callbacks, renderer et
+services spécialisés) reste le prochain périmètre d'injection ; cette phase
+ne change pas ses contrats ni son ordre d'initialisation.
+
+## Phase 27 — Injecter le graphe interne du dispatcher
+
+Ajoutée le 2026-09-01 après la Phase 26. Le provider enregistrait le point
+d'entrée `EngineDispatcher`, mais celui-ci construisait encore lui-même le
+renderer et chaque callback, ainsi que leurs dépendances partagées.
+
+### Périmètre
+
+- `FormRenderer`, les sept callbacks, `RequestParameterParser`,
+  `PaymentDownloadPolicy`, `RedirectHelper` et `FlashUploadSizeValidator` sont
+  enregistrés dans `services/provider.php`.
+- `EngineDispatcher` reçoit ces services par constructeur et conserve l'ordre
+  historique des branches de rendu et de callback.
+- Aucune méthode publique de la façade ni aucun contrat de callback n'est
+  modifié.
+
+### Filet de sécurité et vérification
+
+`EngineDispatcherContainerTest` vérifie le graphe enregistré et l'absence des
+constructions manuelles dans le dispatcher. Les tests de callbacks existants
+restent indépendants et continuent de couvrir leurs contrats propres.
+
+## Phase 28 — Injecter le parcours partagé de téléchargement des paiements
+
+Ajoutée le 2026-09-01 après la Phase 27. Les callbacks PayPal, Stripe et
+Sofort déléguaient encore chacun la construction de `PaymentDownloadService`,
+ce qui recréait le service partagé à chaque appel.
+
+### Périmètre
+
+- `PaymentDownloadService` est enregistré dans le provider Joomla 6 avec sa
+  `PaymentDownloadPolicy` et ses dépendances communes.
+- Les callbacks PayPal, Stripe et Sofort reçoivent le service par
+  constructeur et lui délèguent leur parcours de téléchargement.
+- Les contrats et paramètres propres à chaque moyen de paiement restent
+  inchangés ; aucun changement de sortie ou de règle de quota n'est introduit.
+
+### Filet de sécurité et vérification
+
+`PaymentCallbackRegressionTest` vérifie l'absence de constructions locales,
+le partage du service depuis le provider et la conservation de la politique
+de quota. Les tests ciblés des téléchargements et du callback PayPal couvrent
+les contrats d'exécution concernés.
+
+## Phase 29 — Regrouper le nettoyage des fichiers dans un service unique
+
+Ajoutée le 2026-09-01 après la Phase 28. `PaymentCacheCleaner` et
+`TemporaryUploadFileCleaner` parcouraient les répertoires et supprimaient les
+fichiers avec le même algorithme, alors qu'ils n'avaient qu'un seul appelant
+de production : `FormRenderer`.
+
+### Périmètre
+
+- `UploadFileCleaner` regroupe le parcours commun et expose deux opérations
+  explicites pour les uploads temporaires et le cache de paiement.
+- Les règles historiques de nommage, les suffixes et l'expiration de 24 heures
+  restent distincts et sont conservés.
+- Le service unique est enregistré dans le provider Joomla 6 puis injecté
+  dans `FormRenderer`; les deux anciennes classes disparaissent.
+
+### Filet de sécurité et vérification
+
+`UploadFileCleanerTest` couvre les noms valides et invalides, les suffixes
+Flash/chunked et les limites d'expiration. Le provider et le rendu continuent
+à être vérifiés par la suite complète PHPUnit, PHPStan et PHPCS.
+
+## Phase 30 — Consolider les builders QuickMode mono-appelant
+
+Ajoutée le 2026-09-01 après la Phase 29. Plusieurs builders QuickMode ne
+possédaient qu'un appelant et n'exprimaient pas une frontière réutilisable.
+
+### Périmètre
+
+- Les attributs d'image de paiement sont une méthode privée de
+  `QuickModePaymentButtonBuilder`.
+- Le markup checkbox est une méthode privée de
+  `QuickModeCheckboxStrategy`.
+- Les deux fragments internes de la callback upload sont des méthodes
+  privées de `QuickModeUploadEntryCallbacksBuilder`.
+- `QuickModeUploadEntryCallbacksBuilder` reste une classe partagée par les
+  trois renderers ; aucune duplication n'est recréée.
+
+### Filet de sécurité et vérification
+
+Les tests des builders supprimés sont fusionnés dans les tests des appelants.
+Les snapshots de paiement, checkbox et upload restent inchangés. Les fichiers
+retirés ne figurent plus dans le périmètre PHPCS.
+
+## Phase 31 — Factoriser la préparation des modèles de packages Admin
+
+Ajoutée le 2026-09-01 après la Phase 30. `PieceModel` et `ScriptModel`
+contenaient la même préparation de liste ; leurs seules différences étaient la
+table et le préfixe de session.
+
+### Périmètre
+
+- `PackageModel` porte désormais la préparation commune de la liste, des
+  filtres, du tri, de la pagination et de l'état de session.
+- `PieceModel` et `ScriptModel` conservent uniquement leurs paramètres propres
+  via deux hooks protégés.
+- Les contrôleurs et les vues restent distincts, car leurs différences ne
+  relèvent pas du même contrat MVC.
+
+### Filet de sécurité et vérification
+
+`PackageLibraryUiRegressionTest` vérifie le partage de la préparation et la
+conservation des préfixes `pieces` et `scripts`. Les tâches, assets et vues
+Admin restent couverts par les tests de régression existants.
+
+## Phase 32 — Regrouper l’enveloppe du formulaire et ses champs techniques
+
+Ajoutée le 2026-09-01 après la Phase 31. L’ouverture, la fermeture et la
+finalisation des modes du formulaire étaient réparties dans trois builders,
+et deux builders de champs cachés n’avaient qu’un appelant commun.
+
+### Périmètre
+
+- `FormEnvelopeMarkupBuilder` regroupe l’ouverture, la fermeture et les
+  assemblages frontend, backend et preview.
+- `HiddenFormFieldsBuilder` absorbe les champs de contexte optionnels et les
+  marqueurs techniques ContentBuilder.
+- `RenderingEngine` conserve les décisions liées au contexte Joomla et
+  l’ordre historique des fragments, tout en utilisant ces deux points
+  d’entrée fonctionnels.
+
+### Filet de sécurité et vérification
+
+Les tests d’enveloppe et de champs cachés sont regroupés autour des deux
+builders conservés. Les sorties exactes des trois modes, l’absence de preview
+hors iframe et l’indentation des champs techniques restent couvertes.
+
+## Phase 33 — Regrouper la pagination Query List dans son assembleur
+
+Ajoutée le 2026-09-01 après la Phase 32. Les trois fragments de la callback
+JavaScript de pagination n’avaient qu’un appelant immédiat commun :
+`QueryListPageScriptBuilder`.
+
+### Périmètre
+
+- `QueryListPageScriptBuilder` porte désormais le rafraîchissement des lignes,
+  la navigation et les statements optionnels de fin de pagination.
+- L’ordre historique de `ff_dispQueryPage()`, les bornes de page et les
+  variantes checkbox/iframe restent inchangés.
+- Les services d’état Query List et de préparation des lignes restent séparés,
+  car ils ont des responsabilités et des appelants distincts.
+
+### Filet de sécurité et vérification
+
+Les tests des trois fragments sont fusionnés dans
+`QueryListPageScriptBuilderTest`, qui vérifie l’ordre d’assemblage, les liens
+de navigation, le rafraîchissement des lignes et les options de fin.
+
+## Phase 34 — Regrouper les chargeurs de métadonnées ContentBuilder
+
+Ajoutée le 2026-09-01 après la Phase 33. Les chargeurs d’associations et de
+définition ContentBuilder utilisaient la même base de données et la même table,
+avec un seul appelant commun dans `cbCheckPermissions()`.
+
+### Périmètre
+
+- `ContentBuilderFormMetadataLoader` regroupe les deux requêtes de métadonnées
+  dans des méthodes explicites : association publiée et définition publiée.
+- Les filtres, bindings entiers et types de retour restent distincts.
+- `ContentBuilderRecordLoader` reste séparé, car il porte le chargement d’un
+  enregistrement et non celui des métadonnées de formulaire.
+
+### Filet de sécurité et vérification
+
+`ContentBuilderFormMetadataLoaderTest` couvre les résultats vide/non vide, les
+filtres de publication et les bindings des deux requêtes.
+
+## Phase 35 — Regrouper l’hydratation ContentBuilder
+
+Ajoutée le 2026-09-01 après la Phase 34. Les scripts d’hydratation et de
+désactivation ContentBuilder étaient répartis dans huit builders, alors que
+leurs sorties appartiennent au même parcours de rendu et que les fragments
+avaient un appelant commun dans `RenderingEngine` ou dans l’orchestrateur des
+enregistrements.
+
+### Périmètre
+
+- `ContentBuilderHydrationScriptBuilder` porte les parcours `buildEditable()`
+  et `buildReadonly()`, ainsi que les fragments de validation Flash, contrôles
+  de fichiers, hydratation de fichiers, signatures, valeurs, choix et listes.
+- `ContentBuilderFileSupportBuilder` et
+  `ContentBuilderSignatureImageEncoder` restent séparés : ils sont des
+  utilitaires utilisés au-delà d’un fragment unique.
+- `RenderingEngine` conserve un seul service lazy et l’ordre historique des
+  scripts générés.
+
+### Filet de sécurité et vérification
+
+Les tests des huit anciens builders sont fusionnés dans
+`ContentBuilderHydrationScriptBuilderTest`. Ils couvrent les sorties
+JavaScript historiques, les valeurs multiples, l’échappement, les signatures,
+les files d’upload QuickMode et la désactivation des champs non éditables.
+
 ## Travail en parallèle
 
 | Couloir | Fichiers principaux | Peut avancer avec |
 |---|---|---|
 | A — `RenderingEngine` | `RenderingEngine.php`, tests de caractérisation de `view()` | Couloirs B et C |
-| B — Stratégies QuickMode | `QuickMode/`, snapshots des quatre renderers | Couloirs A et C |
+| B — Stratégies QuickMode | `QuickMode/`, snapshots des trois renderers actifs | Couloirs A et C |
 | C — Qualité | `phpcs.xml.dist`, baseline PHPStan, groupes de services déjà extraits | Couloirs A et B |
 | D — ContentBuilder | Nouveaux services et tests ContentBuilder | Couloir B, mais coordination requise avec A pour le branchement dans `view()` |
 
@@ -1613,14 +1899,24 @@ Règles de coordination :
    appelants réels, puis injecter directement le moteur d'export et couvrir
    les délégations.~~
    Terminé par la Phase 22.
-8. Caractériser le prochain parcours fonctionnel de la façade (soumission,
-   scripting, export ou upload) avec ses appelants réels, puis extraire un
-   service transversal complet seulement si la frontière couvre plusieurs
-   opérations liées et dispose d'un test de comportement. Le couplage interne
-   du moteur scripting est réduit par la Phase 20 ; les autres parcours
-   restent à caractériser avant extraction. Le parcours partagé des
-   téléchargements payants est extrait et couvert par la Phase 21 ; le
-   parcours notifications/export est maintenant couvert par la Phase 22.
+8. ~~Fermer les appels récursifs de soumission et injecter les moteurs de
+   scripting, export et notification dans son orchestration.~~
+   Terminé par les Phases 23 et 24.
+9. ~~Comparer les trois renderers QuickMode actifs et mutualiser uniquement
+   l'hydratation réellement commune des valeurs enregistrées.~~
+   Terminé par la Phase 25.
+10. ~~Sécuriser le bootstrap Composer et enregistrer le graphe des services
+    Joomla 6 : prouver l'autoload réel après installation, enregistrer les
+    services runtime dans le provider, supprimer les constructions manuelles
+    du dispatcher et ajouter un test de résolution par le conteneur.~~
+    Terminé par la Phase 26, puis complété par l’injection du graphe interne
+    dans la Phase 27.
+11. ~~Caractériser puis injecter le graphe interne d'`EngineDispatcher` par
+    parcours fonctionnel (callbacks, rendu, soumission et runtime), sans
+    modifier les contrats publics de la façade ni refactoriser plusieurs
+    frontières dans un même lot.~~
+    Terminé par la Phase 27. Les frontières internes des callbacks restent
+    des lots séparés si une caractérisation supplémentaire est nécessaire.
 
 Le rendu Classic des groupes radio et checkbox est désormais mutualisé dans
 `ClassicChoiceGroupBuilder` (`478e1c24a`), avec couverture dédiée des wrappers,
@@ -1648,8 +1944,7 @@ extraits et testés (`ad9dd75f`, `3d45e1e2`, `c53a457e`). Les champs de routage
 `f183a4ce`, avec échappement et absence de paramètres couverts. Le formatage
 du token CSRF Joomla est désormais isolé dans `FormTokenFieldBuilder` et
 réutilisé dans ces trois branches via `462b2984`, avec sa sortie indentée et
-ses retours historiques testés. Il reste à couvrir la finalisation complète
-par mode d'exécution, sans modifier leurs différences de routage. La
+ses retours historiques testés. La couverture unitaire de la finalisation par mode est complète ; la recette runtime complète reste suivie ci-dessous. La
 finalisation des paramètres de routage et du token est désormais isolée. Les
 champs de contexte (`ff_contentid`, `ff_applic`, `ff_record_id`,
 `ff_module_id` et `ff_runmode`) sont désormais générés par
@@ -1659,23 +1954,23 @@ sorties de test et le comportement historique (`0261acd4`). La fermeture des
 wrappers moderne et legacy est désormais construite par
 `FormClosingMarkupBuilder`, branché dans `closeFormRendering()` via
 `301ba9f1`. Les deux sorties restent couvertes par le test de caractérisation
-de `RenderingEngine` et par des tests unitaires dédiés ; le cycle complet de
-finalisation par mode reste à éprouver de bout en bout. Le markup d'ouverture
+de `RenderingEngine` et par des tests unitaires dédiés ; la validation runtime couvre les parcours frontend, backend et preview ContentBuilder. Le markup d'ouverture
 du formulaire (wrapper moderne/legacy, identifiant et classe personnalisée)
 est désormais construit par `FormOpeningMarkupBuilder` via `e77be68a`, avec
 ses deux variantes couvertes par des tests unitaires.
 
 La purge des fichiers temporaires Flash et chunked est désormais mutualisée
-par `TemporaryUploadFileCleaner` dans `FormRenderer`. Les suffixes, le critère
-de nommage historique et l'expiration sont couverts par des tests unitaires.
+par `UploadFileCleaner` dans `FormRenderer`. Les suffixes, le critère de
+nommage historique et l'expiration sont couverts par un test unitaire commun.
 
 Le scan des thèmes de `QuickmodeModel` utilise désormais `DirectoryIterator`,
 avec les répertoires techniques explicitement exclus et les cas de répertoire
 absent couverts par un test unitaire.
 
 Le nettoyage du cache de paiement est désormais porté par
-`PaymentCacheCleaner`, en conservant son critère distinct de nommage à quatre
-segments et son expiration à 24 heures ; ses cas limites sont testés.
+`UploadFileCleaner`, en conservant son critère distinct de nommage à quatre
+segments et son expiration à 24 heures ; ses cas limites sont testés dans le
+même service que la purge des fichiers temporaires.
 
 La lecture du répertoire de polices PDF est mutualisée par
 `PdfFontDirectoryScanner` entre le document PDF, l'export et l'export des
@@ -1923,10 +2218,9 @@ désormais `Joomla\\Filesystem\\File::copy()` sans suppression d'erreur et
 traite explicitement les retours négatifs de copie et de suppression avant de
 valider le déplacement.
 
-Les quatre renderers QuickMode ont encore une baseline PHPCS distincte ; le
-contrôle direct fait apparaître des violations de formatage héritées. Ce lot
-reste séparé de la mutualisation fonctionnelle pour conserver des commits
-réversibles.
+Les quatre renderers QuickMode ont ensuite rejoint le périmètre PHPCS après
+le traitement ciblé de leurs violations de formatage héritées. Le ruleset
+complet est désormais vert, sans bloquer les extractions fonctionnelles.
 
 `ClassicRenderer` a reçu les corrections automatiques PHPCBF et ses trois
 erreurs structurelles manuelles dans `e25d501f`; les avertissements de
@@ -1952,7 +2246,7 @@ Le contrôle partagé `bfTextfield`/`bfNumberInput` est commité dans
 `065cef94` et branché dans les wrappers Classic/Mobile. Le trait Bootstrap
 commun aux wrappers Bootstrap/OnePage l'utilise désormais aussi via
 `f3d04e55`, sans perte de classes, icônes ni attributs de thème. Les autres
-familles de champs restent à migrer par ordre de risque.
+familles de champs ont ensuite été traitées par les lots QuickMode suivants.
 La décision de type, les traductions, les longueurs et les bornes sont
 désormais regroupées dans `QuickModeTextFieldStrategy` (`059885a45`) et
 utilisées par les quatre renderers ; les enveloppes et effets annexes restent
@@ -2127,14 +2421,14 @@ Le callback plupload `UploadProgress` est désormais généré par
 `QuickModeUploadProgressScriptBuilder` (`1e28a79b2`) pour les quatre renderers.
 La mise à jour du pourcentage et de la barre visuelle reste inchangée et est
 couverte par un test de sortie ; les callbacks d’ajout, d’erreur et de fin
-d’upload restent à traiter par sous-lots.
+d’upload ont ensuite été traités par les builders dédiés.
 
 Le callback plupload `FileUploaded` est désormais généré par
 `QuickModeUploadCompletedScriptBuilder` (`6d3bfbb27`) pour les quatre
 renderers. La restitution éventuelle de la réponse serveur et la suppression
 de la ligne de queue sont couvertes par un test dédié ; la validation de la
-liste de fichiers et la configuration complète de l’uploader restent à
-extraire.
+liste de fichiers et la configuration complète de l’uploader ont ensuite été
+extraites par les builders dédiés.
 
 La validation client des fichiers est désormais générée par
 `QuickModeUploadValidationScriptBuilder` (`fea7df7b6`) pour les quatre
@@ -2346,7 +2640,7 @@ supprimés ont été retirées de `phpcs.xml.dist`, et le dernier warning de
 longueur de `QuickModeCheckboxBuilder` a été éliminé sans changement de sortie
 (`380d7bd7c`). Le ruleset complet passe maintenant sans erreur ni warning.
 
-Le smoke test Joomla 6 du package `6.1.0-RC04` a été exécuté avec succès :
+Le smoke test Joomla 6 du package `6.1.0-RC05` a été exécuté avec succès :
 installation, réinstallation de mise à jour, enregistrement des extensions,
 création des tables, réponse frontend HTTP 200 et génération d’une image
 CAPTCHA Securimage sont validés.

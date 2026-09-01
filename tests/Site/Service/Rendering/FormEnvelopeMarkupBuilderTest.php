@@ -1,0 +1,49 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Rendering;
+
+use PHPUnit\Framework\TestCase;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\FormEnvelopeMarkupBuilder;
+
+final class FormEnvelopeMarkupBuilderTest extends TestCase
+{
+    public function testBuildsOpeningWrapperWithOptionalClass(): void
+    {
+        $builder = new FormEnvelopeMarkupBuilder();
+
+        self::assertSame('<div id="ff_formdiv12" class="bfFormDiv custom-form">', $builder->opening('12', 'custom-form'));
+        self::assertSame('<div id="ff_formdiv12" class="bfFormDiv">', $builder->opening('12', ''));
+    }
+
+    public function testBuildsClosingWrapper(): void
+    {
+        self::assertSame("</div><!-- form end -->\n", (new FormEnvelopeMarkupBuilder())->closing("\n"));
+    }
+
+    public function testPreservesFrontendAndBackendFieldOrder(): void
+    {
+        $builder = new FormEnvelopeMarkupBuilder();
+
+        self::assertSame(
+            "contextsubmissiontokenoptionaladditionaltechnicalrouting</form>\n",
+            $builder->frontend('context', 'submission', 'token', 'optional', 'additional', 'technical', 'routing', "\n")
+        );
+        self::assertSame(
+            "submissiontokencontextoptionaltechnicalrouting</form>\n",
+            $builder->backend('submission', 'token', 'context', 'optional', 'technical', 'routing', "\n")
+        );
+    }
+
+    public function testPreviewReturnsNothingOutsideAnIframe(): void
+    {
+        $builder = new FormEnvelopeMarkupBuilder();
+
+        self::assertSame('', $builder->preview(false, 'submission', 'token', 'context', 'optional', 'technical', 'routing', "\n"));
+        self::assertSame(
+            "submissiontokencontextoptionaltechnicalrouting</form>\n",
+            $builder->preview(true, 'submission', 'token', 'context', 'optional', 'technical', 'routing', "\n")
+        );
+    }
+}

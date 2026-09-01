@@ -1,0 +1,56 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Callback;
+
+use PHPUnit\Framework\TestCase;
+
+final class RelocatedRuntimeTemplateTest extends TestCase
+{
+    public function testPaymentCallbacksUsePackagedDownloadTemplates(): void
+    {
+        foreach ([
+            'PayPalCallback.php',
+            'StripeCallback.php',
+            'SofortCallback.php',
+        ] as $callback) {
+            $source = file_get_contents(
+                __DIR__ . '/../../../../components/com_breezingformsng/src/Service/Callback/' . $callback
+            );
+
+            self::assertIsString($source);
+            self::assertStringNotContainsString('/media/breezingforms/downloadtpl/', $source);
+            self::assertStringContainsString('/components/com_breezingformsng/downloadtpl/', $source);
+        }
+    }
+
+    public function testPdfAttachmentExportFallsBackToThePackagedTemplate(): void
+    {
+        $source = file_get_contents(
+            __DIR__ . '/../../../../components/com_breezingformsng/src/Service/Export/ExportEngine.php'
+        );
+
+        self::assertIsString($source);
+        self::assertStringNotContainsString("/media/breezingforms/pdftpl/pdf_attachment.php", $source);
+        self::assertStringContainsString(
+            "JPATH_ADMINISTRATOR . '/components/com_breezingformsng/pdftpl/pdf_attachment.php'",
+            $source
+        );
+        self::assertStringContainsString('require($file);', $source);
+    }
+
+    public function testAdminPdfExportDoesNotUseTheRemovedGlobalTemplate(): void
+    {
+        $source = file_get_contents(
+            __DIR__ . '/../../../../administrator/components/com_breezingformsng/src/Controller/RecordsController.php'
+        );
+
+        self::assertIsString($source);
+        self::assertStringNotContainsString("/media/breezingforms/pdftpl/export_pdf.php", $source);
+        self::assertStringContainsString(
+            "JPATH_ADMINISTRATOR . '/components/com_breezingformsng/pdftpl/export_pdf.php'",
+            $source
+        );
+    }
+}

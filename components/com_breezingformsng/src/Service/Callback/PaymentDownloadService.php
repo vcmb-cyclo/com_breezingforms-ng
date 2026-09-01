@@ -26,6 +26,7 @@ final class PaymentDownloadService
     public function __construct(
         private readonly CMSApplication $application,
         private readonly DatabaseInterface $database,
+        private readonly PaymentFormLoader $paymentFormLoader,
         private readonly RedirectHelper $redirectHelper,
         private readonly PaymentDownloadPolicy $downloadPolicy
     ) {
@@ -40,24 +41,16 @@ final class PaymentDownloadService
     ): void {
         $input = $this->application->getInput();
         $formId = $input->getInt('form', -1);
-        $formQuery = $this->database->getQuery(true)
-            ->select('*')
-            ->from($this->database->quoteName('#__facileforms_forms'))
-            ->where($this->database->quoteName('id') . ' = :formId')
-            ->bind(':formId', $formId, ParameterType::INTEGER);
-        $this->database->setQuery($formQuery);
-
-        $forms = $this->database->loadObjectList();
-        if ($forms === []) {
+        $form = $this->paymentFormLoader->load($formId);
+        if ($form === null) {
             $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
             $this->application->close();
 
             return;
         }
 
-        $form = $forms[0];
-        $areas = json_decode((string) $form->template_areas, true);
-        if (!is_array($areas)) {
+        $areas = $this->paymentFormLoader->decodeAreas($form);
+        if ($areas === null) {
             $this->redirectHelper->to(Uri::root(), Text::_($paymentDataMessageKey));
 
             return;

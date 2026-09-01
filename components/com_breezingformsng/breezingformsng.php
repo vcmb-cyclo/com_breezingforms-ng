@@ -18,7 +18,6 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 use Joomla\CMS\Factory;
 use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use Joomla\Database\DatabaseInterface;
-use Joomla\CMS\Mail\MailerFactoryInterface;
 use Vcmb\Component\BreezingformsNG\Site\Service\EngineDispatcher;
 use Vcmb\Component\BreezingformsNG\Site\Configuration\FormConfiguration;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RuntimeContextInitializer;
@@ -53,7 +52,6 @@ $mainframe->getLanguage()->load('com_breezingformsng');
 
 $container = Factory::getContainer();
 $cacheControllerFactory = $container->get(CacheControllerFactoryInterface::class);
-$mailerFactory = $container->get(MailerFactoryInterface::class);
 $cache = $cacheControllerFactory->createCacheController('callback');
 $cache->setCaching(false);
 
@@ -112,7 +110,7 @@ $bfEngineContext = [
 ];
 
 $input = $mainframe->getInput();
-(new EngineDispatcher($input, $mainframe, $database, $mailerFactory, $cacheControllerFactory))
+$container->get(EngineDispatcher::class)
     ->dispatch($bfEngineContext, (string) $ff_applic);
 
 if ($input->getBool('raw', false)) {

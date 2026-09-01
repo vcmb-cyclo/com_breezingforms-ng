@@ -18,6 +18,13 @@
 - Keep changes minimal and targeted.
 - Stop after completing the requested task.
 
+## Agent workflow
+- Default to a multi-agent workflow: when a task splits into independent, non-overlapping units, parallelize it across subagents — at least 4 running concurrently whenever the task has that many independent units to give them.
+- Good candidates: auditing or reading multiple unrelated files/areas, applying the same well-defined fix across several independent modules, one worker per language batch on a translation pass, researching several separate questions, running independent verification passes (tests, linters, screenshots) once edits land.
+- Keep subagents scoped to read-only investigation, or to edits touching disjoint files with no shared state. Never split work that needs one coherent, evolving decision across files — a single git commit, a design choice that must stay consistent as it's made (e.g. this project's `--bfng-*` design-token rollout), a refactor with cross-file dependencies, or anything that depends on the outcome of the immediately preceding step.
+- When a task is inherently ordered or single-file, stay sequential — parallelizing it adds coordination overhead with no benefit, and risks inconsistent decisions across the split.
+- After subagents return, merge their output yourself, then verify (tests, PHPStan, PHPCS) and commit as one coherent change — don't let subagents commit independently.
+
 ## Joomla
 - Prefer native Joomla 6 admin patterns before custom markup, CSS, or JavaScript.
 - Keep custom CSS and JavaScript minimal.

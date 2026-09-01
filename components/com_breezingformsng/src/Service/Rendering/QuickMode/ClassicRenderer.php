@@ -579,51 +579,7 @@ float:left;
                     $tabIndex = 'tabindex="' . intval($mdata['tabIndex']) . '" ';
                 }
 
-                for ($i = 0; $i < $this->p->rowcount; $i++) {
-                    $row = $this->p->rows[$i];
-                    if ($mdata['bfName'] == $row->name) {
-                        if (
-                            ( isset($mdata['value']) || isset($mdata['list']) || isset($mdata['group'])) &&
-                            (
-                                $mdata['bfType'] == 'bfTextfield' ||
-                                $mdata['bfType'] == 'bfTextarea' ||
-                                $mdata['bfType'] == 'bfCheckbox' ||
-                                $mdata['bfType'] == 'bfCheckboxGroup' ||
-                                $mdata['bfType'] == 'bfSubmitButton' ||
-                                $mdata['bfType'] == 'bfHidden' ||
-                                $mdata['bfType'] == 'bfCalendar' ||
-                                $mdata['bfType'] == 'bfNumberInput' ||
-                                $mdata['bfType'] == 'bfCalendarResponsive' ||
-                                $mdata['bfType'] == 'bfSelect' ||
-                                $mdata['bfType'] == 'bfRadioGroup'
-                            )
-                        ) {
-                            if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
-                                $mdata['value_translation' . $this->language_tag] = $this->p->replaceCode($mdata['value_translation' . $this->language_tag], "data1 of " . $mdata['bfName'], 'e', $mdata['dbId'], 0);
-                            }
-
-                            if (isset($mdata['group_translation' . $this->language_tag]) && $mdata['group_translation' . $this->language_tag] != '') {
-                                $mdata['group_translation' . $this->language_tag] = $this->p->replaceCode($mdata['group_translation' . $this->language_tag], "data2 of " . $mdata['bfName'], 'e', $mdata['dbId'], 0);
-                            }
-
-                            if (isset($mdata['list_translation' . $this->language_tag]) && $mdata['list_translation' . $this->language_tag] != '') {
-                                $mdata['list_translation' . $this->language_tag] = $this->p->replaceCode($mdata['list_translation' . $this->language_tag], "data2 of " . $mdata['bfName'], 'e', $mdata['dbId'], 0);
-                            }
-
-                            if ($mdata['bfType'] == 'bfSelect') {
-                                $mdata['list'] = $this->p->replaceCode($row->data2, "data2 of " . $mdata['bfName'], 'e', $mdata['dbId'], 0);
-                            } elseif ($mdata['bfType'] == 'bfCheckboxGroup' || $mdata['bfType'] == 'bfRadioGroup') {
-                                $mdata['group'] = $this->p->replaceCode($row->data2, "data2 of " . $mdata['bfName'], 'e', $mdata['dbId'], 0);
-                            } else {
-                                $mdata['value'] = $this->p->replaceCode($row->data1, "data1 of " . $mdata['bfName'], 'e', $mdata['dbId'], 0);
-                            }
-                        }
-                        if (isset($mdata['checked']) && $mdata['bfType'] == 'bfCheckbox') {
-                            $mdata['checked'] = $row->flag1 == 1 ? true : false;
-                        }
-                        break;
-                    }
-                }
+                $mdata = QuickModeSubmittedValueHydrator::hydrate($this->p, $mdata, $this->language_tag);
 
                 $flashUploader = '';
 

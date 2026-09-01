@@ -338,7 +338,7 @@ class HTML_facileFormsProcessor
 
     private function notificationEngine(): NotificationEngine
     {
-        return $this->notificationEngineService ??= new NotificationEngine($this);
+        return $this->notificationEngineService ??= new NotificationEngine($this, $this->exportEngine());
     }
 
     /** @phpstan-impure */

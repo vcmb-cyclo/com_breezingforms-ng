@@ -32,6 +32,7 @@ use Joomla\CMS\Environment\Browser;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Log\Log;
+use Vcmb\Component\BreezingformsNG\Site\Service\Export\ExportEngine;
 use Vcmb\Component\BreezingformsNG\Site\Service\Integration\MailchimpClient;
 use Vcmb\Component\BreezingformsNG\Site\Service\Integration\SalesforceClient;
 use Vcmb\Component\BreezingformsNG\Site\Service\QuickMode\TranslationResolver;
@@ -51,7 +52,10 @@ final class NotificationEngine
     private ?SubmissionTimestampFormatter $notificationTimestampFormatterService = null;
     private ?MailTemplateResolver $mailTemplateResolverService = null;
 
-    public function __construct(private readonly HTML_facileFormsProcessor $processor)
+    public function __construct(
+        private readonly HTML_facileFormsProcessor $processor,
+        private readonly ExportEngine $exportEngine
+    )
     {
     }
 
@@ -392,15 +396,15 @@ final class NotificationEngine
 
         $attachment = NULL;
         if ($this->processor->formrow->emailxml > 0 && $this->processor->formrow->emailxml < 3) {
-            $attachment = $this->processor->expxml();
+            $attachment = $this->exportEngine->expxml();
             if ($this->processor->status != _FF_STATUS_OK)
                 return;
         } else if ($this->processor->formrow->emailxml == 3) {
-            $attachment = $this->processor->expcsv();
+            $attachment = $this->exportEngine->expcsv();
             if ($this->processor->status != _FF_STATUS_OK)
                 return;
         } else if ($this->processor->formrow->emailxml == 4) {
-            $attachment = $this->processor->exppdf();
+            $attachment = $this->exportEngine->exppdf();
             if ($this->processor->status != _FF_STATUS_OK)
                 return;
         }
@@ -574,7 +578,7 @@ final class NotificationEngine
 
         if (!$this->processor->sendNotificationAfterPayment) {
             for ($i = 0; $i < $recipientsSize; $i++) {
-                $this->processor->sendMail($from, $fromname, $recipients[$i], $subject, $body, $attachment, $isHtml, null, null, $alt_sender);
+                $this->exportEngine->sendMail($from, $fromname, $recipients[$i], $subject, $body, $attachment, $isHtml, null, null, $alt_sender);
             }
         } else {
 
@@ -919,7 +923,7 @@ final class NotificationEngine
 
                 $PROCESS_FORMTITLE = Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMTITLE');
 
-                $form_title_translated = $this->processor->getFormTitleTranslated();
+                $form_title_translated = $this->getFormTitleTranslated();
                 $TITLE = $form_title_translated != '' ? $form_title_translated : $this->processor->formrow->title;
 
                 $PROCESS_FORMNAME = Text::_('COM_BREEZINGFORMSNG_PROCESS_FORMNAME');
@@ -960,7 +964,7 @@ final class NotificationEngine
                     foreach ($this->processor->maildata as $DATA) {
                         if (!in_array($DATA[_FF_DATA_NAME], $filter)) {
                             $trans_title = '';
-                            $this->processor->getFieldTranslated('label', $DATA[_FF_DATA_NAME], $trans_title);
+                            $this->getFieldTranslated('label', $DATA[_FF_DATA_NAME], $trans_title);
                             $subject = str_replace('{' . $DATA[_FF_DATA_NAME] . ':label}', $trans_title != '' ? $trans_title : strip_tags($DATA[_FF_DATA_TITLE]), $subject);
                             $subject = str_replace('{' . $DATA[_FF_DATA_NAME] . ':title}', $trans_title != '' ? $trans_title : strip_tags($DATA[_FF_DATA_TITLE]), $subject);
                             $subject = str_replace('{' . $DATA[_FF_DATA_NAME] . ':value}', $DATA[_FF_DATA_VALUE], $subject);
@@ -986,7 +990,7 @@ final class NotificationEngine
                 if ($this->processor->record_id != '')
                     $body .= Text::_('COM_BREEZINGFORMSNG_PROCESS_RECORDSAVEDID') . " " . $this->processor->record_id . nl() . nl();
 
-                $form_title_translated = $this->processor->getFormTitleTranslated();
+                $form_title_translated = $this->getFormTitleTranslated();
 
                 $submitted = $this->formattedNotificationTimestamp();
 
@@ -1004,7 +1008,7 @@ final class NotificationEngine
                 if (count($this->processor->maildata)) {
                     foreach ($this->processor->maildata as $data) {
                         $trans_title = '';
-                        $this->processor->getFieldTranslated('label', $data[_FF_DATA_NAME], $trans_title);
+                        $this->getFieldTranslated('label', $data[_FF_DATA_NAME], $trans_title);
                         $subject = str_replace('{' . $data[_FF_DATA_NAME] . ':label}', $trans_title != '' ? $trans_title : strip_tags($data[_FF_DATA_TITLE]), $subject);
                         $subject = str_replace('{' . $data[_FF_DATA_NAME] . ':title}', $trans_title != '' ? $trans_title : strip_tags($data[_FF_DATA_TITLE]), $subject);
                         $subject = str_replace('{' . $data[_FF_DATA_NAME] . ':value}', $data[_FF_DATA_VALUE], $subject);
@@ -1031,7 +1035,7 @@ final class NotificationEngine
 
             $FORM = (string) $this->processor->form;
 
-            $form_title_translated = $this->processor->getFormTitleTranslated();
+            $form_title_translated = $this->getFormTitleTranslated();
 
             $TITLE = $form_title_translated != '' ? $form_title_translated : $this->processor->formrow->title;
             $FORMNAME = $this->processor->formrow->name;
@@ -1112,7 +1116,7 @@ final class NotificationEngine
                 foreach ($this->processor->maildata as $data) {
 
                     $trans_title = '';
-                    $this->processor->getFieldTranslated('label', $data[_FF_DATA_NAME], $trans_title);
+                    $this->getFieldTranslated('label', $data[_FF_DATA_NAME], $trans_title);
                     $subject = str_replace('{' . $data[_FF_DATA_NAME] . ':label}', $trans_title != '' ? $trans_title : strip_tags($data[_FF_DATA_TITLE]), $subject);
                     $subject = str_replace('{' . $data[_FF_DATA_NAME] . ':title}', $trans_title != '' ? $trans_title : strip_tags($data[_FF_DATA_TITLE]), $subject);
                     $subject = str_replace('{' . $data[_FF_DATA_NAME] . ':value}', $data[_FF_DATA_VALUE], $subject);
@@ -1145,15 +1149,15 @@ final class NotificationEngine
 
         $attachment = NULL;
         if ($this->processor->formrow->mb_emailxml > 0 && $this->processor->formrow->mb_emailxml < 3) {
-            $attachment = $this->processor->expxml($filter, true, true);
+            $attachment = $this->exportEngine->expxml($filter, true, true);
             if ($this->processor->status != _FF_STATUS_OK)
                 return;
         } else if ($this->processor->formrow->mb_emailxml == 3) {
-            $attachment = $this->processor->expcsv($filter, true);
+            $attachment = $this->exportEngine->expcsv($filter, true);
             if ($this->processor->status != _FF_STATUS_OK)
                 return;
         } else if ($this->processor->formrow->mb_emailxml == 4) {
-            $attachment = $this->processor->exppdf($filter, true, true);
+            $attachment = $this->exportEngine->exppdf($filter, true, true);
             if ($this->processor->status != _FF_STATUS_OK)
                 return;
         }
@@ -1179,7 +1183,7 @@ final class NotificationEngine
                     $attachment = $signatures;
                 }
 
-                $this->processor->sendMail($from, $fromname, $recipients[$i], $subject, $body, $attachment, $isHtml, null, null, $alt_sender);
+                $this->exportEngine->sendMail($from, $fromname, $recipients[$i], $subject, $body, $attachment, $isHtml, null, null, $alt_sender);
             }
         } else {
 
@@ -1358,7 +1362,7 @@ final class NotificationEngine
                     if ($this->processor->formrow->mailchimp_send_errors) {
                         $from = $this->processor->formrow->alt_mailfrom != '' ? $this->processor->formrow->alt_mailfrom : $this->processor->app->get('mailfrom');
                         $fromname = $this->processor->formrow->alt_fromname != '' ? $this->processor->formrow->alt_fromname : $this->processor->app->get('fromname');
-                        $this->processor->sendMail($from, $fromname, $from, 'MailChimp API Error', 'Could not send data to MailChimp for email: ' . $email . "\n\nReason: " . $exception->getMessage());
+                        $this->exportEngine->sendMail($from, $fromname, $from, 'MailChimp API Error', 'Could not send data to MailChimp for email: ' . $email . "\n\nReason: " . $exception->getMessage());
                     }
                 }
             }

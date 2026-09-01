@@ -114,7 +114,8 @@
 | ContentBuilder — chargement d’enregistrement | Calcul des scopes propriétaire/langue et contrôle 404 délégués à `ContentBuilderRecordLoader`, avec variantes frontend/admin et nouveau testées | Commit `c6e5855ec` |
 | ContentBuilder — loaders runtime | Le smoke Joomla insère puis relit une association publiée avec les loaders BFNG via l’API Database réelle, avant nettoyage de la fixture | Commit `3e22ac75d` |
 | ContentBuilder — source/enregistrement runtime | Le smoke résout une source BreezingForms réelle via `FormSourceFactory` et exerce `ContentBuilderRecordLoader` sur le parcours nouveau, avec nettoyage de la fixture | Validé par le smoke Joomla |
-| PHPCS | Actif sur les services modernes, les builders ContentBuilder, Classic et `HiddenFieldTrait` | `phpcs.xml.dist`, 151 fichiers configurés |
+| Notifications — exports et envoi de mails | `NotificationEngine` reçoit directement `ExportEngine`; exports, mails et traductions ne repassent plus par la façade | Phase 22, `NotificationEngineArchitectureTest` |
+| PHPCS | Actif sur les services modernes, les builders ContentBuilder, Classic et `HiddenFieldTrait` | `phpcs.xml.dist`, 154 fichiers configurés |
 | PHPStan | Niveau 4 validé sur le composant, sans diagnostic résiduel | `phpstan.neon.dist`, baseline vide |
 | Navigation des enregistrements admin | Les liens précédent/suivant réutilisent le formulaire, la recherche et le tri de la liste courante ; l'état est conservé pendant l'édition | `RecordsModel::getAdjacentRecordId()`, `tests/Administrator/RecordsNavigationTest.php` |
 
@@ -1507,6 +1508,36 @@ La suite complète passe avec 651 tests et 2 058 assertions. PHPCS passe sur
 154 fichiers configurés, PHPStan niveau 4 ne signale aucune erreur, les
 callbacks passent `php -l` et `git diff --check` est vert.
 
+## Phase 22 — Raccorder directement notifications et exports
+
+Ajoutée le 2026-09-01 après caractérisation des appelants restants de la
+façade. `NotificationEngine` repassait encore par
+`HTML_facileFormsProcessor` pour exporter les données, envoyer les mails et
+résoudre ses propres traductions.
+
+### Périmètre
+
+- `ExportEngine` est injecté explicitement dans `NotificationEngine` par la
+  façade, qui partage l'instance déjà construite pour le parcours d'export.
+- Les exports XML, CSV et PDF ainsi que l'envoi des notifications utilisent
+  directement `ExportEngine`, sans détour par les méthodes publiques de la
+  façade.
+- Les traductions de titre de formulaire et de libellé de champ restent dans
+  `NotificationEngine`, qui appelle ses propres méthodes au lieu de
+  réentrer dans le processeur historique.
+- Aucun changement n'est apporté aux méthodes publiques de la façade : les
+  appelants externes conservent leur contrat Joomla/PHP 8.3.
+
+### Filet de sécurité et vérification
+
+`NotificationEngineArchitectureTest` vérifie l'injection d'`ExportEngine`,
+les délégations d'export et de mail, l'absence des appels croisés concernés
+et le branchement de l'instance partagée dans la façade.
+
+La suite complète passe avec 654 tests et 2 075 assertions. PHPCS passe sur
+154 fichiers configurés, PHPStan niveau 4 ne signale aucune erreur, les
+fichiers ajoutés et modifiés passent `php -l` et `git diff --check` est vert.
+
 ## Travail en parallèle
 
 | Couloir | Fichiers principaux | Peut avancer avec |
@@ -1549,13 +1580,18 @@ Règles de coordination :
    L'initialisation du contexte runtime est extraite et couverte par la
    Phase 19 ; les méthodes publiques restantes doivent maintenant être
    regroupées par parcours fonctionnel avant toute nouvelle réduction.
-7. Caractériser le prochain parcours fonctionnel de la façade (soumission,
+7. ~~Caractériser le parcours notifications/export de la façade avec ses
+   appelants réels, puis injecter directement le moteur d'export et couvrir
+   les délégations.~~
+   Terminé par la Phase 22.
+8. Caractériser le prochain parcours fonctionnel de la façade (soumission,
    scripting, export ou upload) avec ses appelants réels, puis extraire un
    service transversal complet seulement si la frontière couvre plusieurs
    opérations liées et dispose d'un test de comportement. Le couplage interne
    du moteur scripting est réduit par la Phase 20 ; les autres parcours
    restent à caractériser avant extraction. Le parcours partagé des
-   téléchargements payants est extrait et couvert par la Phase 21.
+   téléchargements payants est extrait et couvert par la Phase 21 ; le
+   parcours notifications/export est maintenant couvert par la Phase 22.
 
 Le rendu Classic des groupes radio et checkbox est désormais mutualisé dans
 `ClassicChoiceGroupBuilder` (`478e1c24a`), avec couverture dédiée des wrappers,

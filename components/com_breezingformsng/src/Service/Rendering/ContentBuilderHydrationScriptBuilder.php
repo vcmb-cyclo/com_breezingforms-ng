@@ -30,6 +30,7 @@ final class ContentBuilderHydrationScriptBuilder
         $contentBuilderScript = '';
         $javascript = '';
         $flashUploadValidationAdded = false;
+        $fileSupport = new ContentBuilderFileSupportBuilder();
 
         foreach ($records as $entry) {
             if (in_array($entry->recElementId, $nonEditableFields)) {
@@ -49,7 +50,6 @@ final class ContentBuilderHydrationScriptBuilder
                         $flashUploadValidationAdded = true;
                     }
 
-                    $fileSupport = new ContentBuilderFileSupportBuilder();
                     $fileValue = $fileSupport->parseValue($recordValue);
                     $count = $fileValue['count'];
                     $contentBuilderScript .= '\n'
@@ -77,7 +77,7 @@ final class ContentBuilderHydrationScriptBuilder
                     break;
 
                 case 'Signature':
-                    $signaturePath = (new ContentBuilderFileSupportBuilder())->resolveSignature(
+                    $signaturePath = $fileSupport->resolveSignature(
                         $signatureDirectory,
                         $recordValue
                     );

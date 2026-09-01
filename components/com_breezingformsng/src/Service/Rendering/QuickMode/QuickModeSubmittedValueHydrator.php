@@ -21,7 +21,7 @@ final class QuickModeSubmittedValueHydrator
      *
      * @return array<string, mixed>
      */
-    public function hydrate(
+    public static function hydrate(
         HTML_facileFormsProcessor $processor,
         array $metadata,
         string $languageTag

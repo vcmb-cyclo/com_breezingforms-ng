@@ -609,7 +609,7 @@ class BootstrapRenderer
                     $tabIndex = 'tabindex="' . intval($mdata['tabIndex']) . '" ';
                 }
 
-                $mdata = (new QuickModeSubmittedValueHydrator())->hydrate($this->p, $mdata, $this->language_tag);
+                $mdata = QuickModeSubmittedValueHydrator::hydrate($this->p, $mdata, $this->language_tag);
 
                 switch ($mdata['bfType']) {
                     case 'bfNumberInput':

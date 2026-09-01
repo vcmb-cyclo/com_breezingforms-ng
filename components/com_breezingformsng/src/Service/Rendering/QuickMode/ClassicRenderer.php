@@ -579,7 +579,7 @@ float:left;
                     $tabIndex = 'tabindex="' . intval($mdata['tabIndex']) . '" ';
                 }
 
-                $mdata = (new QuickModeSubmittedValueHydrator())->hydrate($this->p, $mdata, $this->language_tag);
+                $mdata = QuickModeSubmittedValueHydrator::hydrate($this->p, $mdata, $this->language_tag);
 
                 $flashUploader = '';
 

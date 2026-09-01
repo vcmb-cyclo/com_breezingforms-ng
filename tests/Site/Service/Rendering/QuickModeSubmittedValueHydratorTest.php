@@ -45,7 +45,7 @@ final class QuickModeSubmittedValueHydratorTest extends TestCase
             ],
         ]);
 
-        $result = (new QuickModeSubmittedValueHydrator())->hydrate(
+        $result = QuickModeSubmittedValueHydrator::hydrate(
             $processor,
             [
                 'bfName' => 'title',
@@ -72,12 +72,12 @@ final class QuickModeSubmittedValueHydratorTest extends TestCase
             ],
         ]);
 
-        $select = (new QuickModeSubmittedValueHydrator())->hydrate(
+        $select = QuickModeSubmittedValueHydrator::hydrate(
             $processor,
             ['bfName' => 'country', 'bfType' => 'bfSelect', 'dbId' => 13, 'list' => 'default'],
             ''
         );
-        $group = (new QuickModeSubmittedValueHydrator())->hydrate(
+        $group = QuickModeSubmittedValueHydrator::hydrate(
             $processor,
             ['bfName' => 'country', 'bfType' => 'bfRadioGroup', 'dbId' => 14, 'group' => 'default'],
             ''
@@ -98,12 +98,12 @@ final class QuickModeSubmittedValueHydratorTest extends TestCase
             ],
         ]);
 
-        $checked = (new QuickModeSubmittedValueHydrator())->hydrate(
+        $checked = QuickModeSubmittedValueHydrator::hydrate(
             $processor,
             ['bfName' => 'terms', 'bfType' => 'bfCheckbox', 'dbId' => 15, 'value' => 'no', 'checked' => false],
             ''
         );
-        $unknown = (new QuickModeSubmittedValueHydrator())->hydrate(
+        $unknown = QuickModeSubmittedValueHydrator::hydrate(
             $processor,
             ['bfName' => 'missing', 'bfType' => 'bfTextfield', 'dbId' => 16, 'value' => 'default'],
             ''
@@ -123,7 +123,7 @@ final class QuickModeSubmittedValueHydratorTest extends TestCase
 
             self::assertIsString($source);
             self::assertStringContainsString(
-                '$mdata = (new QuickModeSubmittedValueHydrator())->hydrate(',
+                '$mdata = QuickModeSubmittedValueHydrator::hydrate(',
                 $source
             );
             self::assertStringNotContainsString(

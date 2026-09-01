@@ -660,8 +660,6 @@ final class ExportEngine
                 $mb_file = JPATH_SITE . '/media/breezingforms/pdftpl/pdf_mailback_attachment.php';
                 if (file_exists($mb_file)) {
                     $file = $mb_file;
-                } else {
-                    $file = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/pdftpl/pdf_attachment.php';
                 }
             }
         }

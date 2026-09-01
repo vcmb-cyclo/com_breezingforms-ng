@@ -18,6 +18,8 @@ use Joomla\Database\ParameterType;
 
 class RecordModel extends BaseDatabaseModel
 {
+    private const BULK_ID_BATCH_SIZE = 500;
+
     public function getDatabaseConnection(): DatabaseInterface
     {
         return $this->getDatabase();
@@ -500,17 +502,49 @@ class RecordModel extends BaseDatabaseModel
 
     public function getSubrecords(int $recordId): array
     {
+        return $this->getSubrecordsByRecordIds([$recordId])[$recordId] ?? [];
+    }
+
+    /**
+     * Load subrecords for a bounded set of records in one query.
+     *
+     * @param list<int> $recordIds
+     * @return array<int, list<object>>
+     */
+    public function getSubrecordsByRecordIds(array $recordIds): array
+    {
+        $recordIds = array_values(array_filter(
+            array_map('intval', $recordIds),
+            static fn (int $recordId): bool => $recordId > 0
+        ));
+
+        if ($recordIds === []) {
+            return [];
+        }
+
         $db = $this->getDatabase();
         $query = $db->getQuery(true)
-            ->select('DISTINCT ' . $db->quoteName('subs') . '.*')
+            ->select($db->quoteName('subs') . '.*')
             ->from($db->quoteName('#__facileforms_subrecords', 'subs'))
-            ->from($db->quoteName('#__facileforms_elements', 'els'))
-            ->where('els.id = subs.element')
-            ->where('subs.record = :recordId')
-            ->order('els.ordering')
-            ->bind(':recordId', $recordId, ParameterType::INTEGER);
+            ->join(
+                'INNER',
+                $db->quoteName('#__facileforms_elements', 'els')
+                . ' ON ' . $db->quoteName('els.id') . ' = ' . $db->quoteName('subs.element')
+            )
+            ->whereIn($db->quoteName('subs.record'), $recordIds, ParameterType::INTEGER)
+            ->order([
+                $db->quoteName('subs.record'),
+                $db->quoteName('els.ordering'),
+                $db->quoteName('subs.id'),
+            ]);
         $db->setQuery($query);
-        return $db->loadObjectList();
+        $subrecordsByRecord = [];
+
+        foreach ($db->loadObjectList() as $subrecord) {
+            $subrecordsByRecord[(int) $subrecord->record][] = $subrecord;
+        }
+
+        return $subrecordsByRecord;
     }
 
     public function markExported(array $ids): void
@@ -520,10 +554,13 @@ class RecordModel extends BaseDatabaseModel
             return;
         }
         $db = $this->getDatabase();
-        $query = $db->getQuery(true)
-            ->update($db->quoteName('#__facileforms_records'))
-            ->set($db->quoteName('exported') . ' = 1')
-            ->whereIn($db->quoteName('id'), $ids, ParameterType::INTEGER);
-        $db->setQuery($query)->execute();
+
+        foreach (array_chunk($ids, self::BULK_ID_BATCH_SIZE) as $idBatch) {
+            $query = $db->getQuery(true)
+                ->update($db->quoteName('#__facileforms_records'))
+                ->set($db->quoteName('exported') . ' = 1')
+                ->whereIn($db->quoteName('id'), $idBatch, ParameterType::INTEGER);
+            $db->setQuery($query)->execute();
+        }
     }
 }

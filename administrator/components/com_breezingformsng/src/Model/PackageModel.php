@@ -237,7 +237,17 @@ abstract class PackageModel extends ListModel
     {
         $db = $this->getDatabase();
         $query = $db->getQuery(true)
-            ->select('a.*')
+            ->select([
+                $db->quoteName('a.id'),
+                $db->quoteName('a.package'),
+                $db->quoteName('a.title'),
+                $db->quoteName('a.name'),
+                $db->quoteName('a.type'),
+                $db->quoteName('a.description'),
+                $db->quoteName('a.created'),
+                $db->quoteName('a.modified'),
+                $db->quoteName('a.published'),
+            ])
             ->from($db->quoteName($this->getTableName(), 'a'));
 
         $this->applyListFilters($query);

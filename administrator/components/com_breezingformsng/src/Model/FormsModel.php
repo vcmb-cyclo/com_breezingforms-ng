@@ -57,7 +57,15 @@ class FormsModel extends BaseDatabaseModel
         $dirSql  = strtoupper($dir) === 'DESC' ? 'DESC' : 'ASC';
 
         $q = $db->getQuery(true)
-            ->select('*')
+            ->select([
+                $db->quoteName('id'),
+                $db->quoteName('title'),
+                $db->quoteName('name'),
+                $db->quoteName('pages'),
+                $db->quoteName('published'),
+                $db->quoteName('ordering'),
+                $db->quoteName('modified'),
+            ])
             ->from($db->quoteName('#__facileforms_forms'));
 
         $this->applyFilters($q, $db, $pkg, $search, $filterState);

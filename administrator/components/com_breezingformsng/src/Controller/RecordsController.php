@@ -25,6 +25,8 @@ use Vcmb\Component\BreezingformsNG\Administrator\Service\PdfFontDirectoryScanner
 /** @property CMSApplication $app */
 class RecordsController extends BaseController
 {
+    private const EXPORT_SUBRECORD_BATCH_SIZE = 200;
+
     public function display($cachable = false, $urlparams = [])
     {
         $this->app->getInput()->set('view', 'records');
@@ -319,45 +321,50 @@ class RecordsController extends BaseController
 
         $updIds = [];
         $body = '';
-        foreach ($recs as $rec) {
-            $updIds[] = (int) $rec->id;
-            $date = new \Joomla\CMS\Date\Date($rec->submitted, $tz);
-            $offset = $date->getOffsetFromGMT();
-            if ($offset > 0) {
-                $date->add(new \DateInterval('PT' . $offset . 'S'));
-            } elseif ($offset < 0) {
-                $date->sub(new \DateInterval('PT' . abs($offset) . 'S'));
-            }
+        foreach (array_chunk($recs, self::EXPORT_SUBRECORD_BATCH_SIZE) as $recordBatch) {
+            $subrecordsByRecord = $model->getSubrecordsByRecordIds(
+                array_map(static fn (object $record): int => (int) $record->id, $recordBatch)
+            );
 
-            $subs = $model->getSubrecords((int) $rec->id);
-            $subValues = [];
-            foreach ($subs as $sub) {
-                $k = md5(strip_tags((string) $sub->name));
-                $subValues[$k][] = (string) $sub->value;
-            }
+            foreach ($recordBatch as $rec) {
+                $updIds[] = (int) $rec->id;
+                $date = new \Joomla\CMS\Date\Date($rec->submitted, $tz);
+                $offset = $date->getOffsetFromGMT();
+                if ($offset > 0) {
+                    $date->add(new \DateInterval('PT' . $offset . 'S'));
+                } elseif ($offset < 0) {
+                    $date->sub(new \DateInterval('PT' . abs($offset) . 'S'));
+                }
 
-            $cells = [
-                $rec->id,
-                $date->format('Y-m-d H:i:s', true),
-                $rec->user_id,
-                $rec->username,
-                $rec->user_full_name,
-                $rec->title,
-                $rec->ip,
-                $rec->browser,
-                $rec->opsys,
-                $rec->paypal_tx_id,
-                $rec->paypal_payment_date,
-                $rec->paypal_testaccount,
-                $rec->paypal_download_tries,
-                $rec->opted ?? '',
-            ];
-            $row = implode($delimiter, array_map($q, $cells));
-            foreach ($headKeys as $key => $name) {
-                $val = isset($subValues[$key]) ? implode('|', $subValues[$key]) : '';
-                $row .= $delimiter . $q($val);
+                $subValues = [];
+                foreach ($subrecordsByRecord[(int) $rec->id] ?? [] as $sub) {
+                    $k = md5(strip_tags((string) $sub->name));
+                    $subValues[$k][] = (string) $sub->value;
+                }
+
+                $cells = [
+                    $rec->id,
+                    $date->format('Y-m-d H:i:s', true),
+                    $rec->user_id,
+                    $rec->username,
+                    $rec->user_full_name,
+                    $rec->title,
+                    $rec->ip,
+                    $rec->browser,
+                    $rec->opsys,
+                    $rec->paypal_tx_id,
+                    $rec->paypal_payment_date,
+                    $rec->paypal_testaccount,
+                    $rec->paypal_download_tries,
+                    $rec->opted ?? '',
+                ];
+                $row = implode($delimiter, array_map($q, $cells));
+                foreach ($headKeys as $key => $name) {
+                    $val = isset($subValues[$key]) ? implode('|', $subValues[$key]) : '';
+                    $row .= $delimiter . $q($val);
+                }
+                $body .= $row . "\n";
             }
-            $body .= $row . "\n";
         }
 
         if ($updIds) {
@@ -412,51 +419,57 @@ class RecordsController extends BaseController
             . $ind(1) . '<exportdate>' . $datestamp->format('Y-m-d H:i:s', true) . '</exportdate>' . "\n";
 
         $updIds = [];
-        foreach ($recs as $rec) {
-            $updIds[] = (int) $rec->id;
-            $date = new \Joomla\CMS\Date\Date($rec->submitted, $tz);
-            $offset = $date->getOffsetFromGMT();
-            if ($offset > 0) {
-                $date->add(new \DateInterval('PT' . $offset . 'S'));
-            } elseif ($offset < 0) {
-                $date->sub(new \DateInterval('PT' . abs($offset) . 'S'));
-            }
+        foreach (array_chunk($recs, self::EXPORT_SUBRECORD_BATCH_SIZE) as $recordBatch) {
+            $subrecordsByRecord = $model->getSubrecordsByRecordIds(
+                array_map(static fn (object $record): int => (int) $record->id, $recordBatch)
+            );
 
-            $xml .= $ind(1) . '<record id="' . (int) $rec->id . '">' . "\n"
-                . $ind(2) . '<submitted>' . $date->format('Y-m-d H:i:s', true) . '</submitted>' . "\n"
-                . $ind(2) . '<user_id>' . (int) $rec->user_id . '</user_id>' . "\n"
-                . $ind(2) . '<username>' . htmlspecialchars((string) $rec->username) . '</username>' . "\n"
-                . $ind(2) . '<user_full_name>' . htmlspecialchars((string) $rec->user_full_name) . '</user_full_name>' . "\n"
-                . $ind(2) . '<form>' . (int) $rec->form . '</form>' . "\n"
-                . $ind(2) . '<title>' . htmlspecialchars((string) $rec->title) . '</title>' . "\n"
-                . $ind(2) . '<name>' . htmlspecialchars((string) $rec->name) . '</name>' . "\n"
-                . $ind(2) . '<ip>' . htmlspecialchars((string) $rec->ip) . '</ip>' . "\n"
-                . $ind(2) . '<browser>' . htmlspecialchars((string) $rec->browser) . '</browser>' . "\n"
-                . $ind(2) . '<opsys>' . htmlspecialchars((string) $rec->opsys) . '</opsys>' . "\n"
-                . $ind(2) . '<provider>' . htmlspecialchars((string) ($rec->provider ?? '')) . '</provider>' . "\n"
-                . $ind(2) . '<viewed>' . (int) $rec->viewed . '</viewed>' . "\n"
-                . $ind(2) . '<exported>' . (int) $rec->exported . '</exported>' . "\n"
-                . $ind(2) . '<archived>' . (int) $rec->archived . '</archived>' . "\n"
-                . $ind(2) . '<pptxid>' . htmlspecialchars((string) $rec->paypal_tx_id) . '</pptxid>' . "\n"
-                . $ind(2) . '<pppdate>' . htmlspecialchars((string) $rec->paypal_payment_date) . '</pppdate>' . "\n"
-                . $ind(2) . '<pptestacc>' . (int) $rec->paypal_testaccount . '</pptestacc>' . "\n"
-                . $ind(2) . '<ppdltries>' . (int) $rec->paypal_download_tries . '</ppdltries>' . "\n"
-                . $ind(2) . '<opted>' . (int) ($rec->opted ?? 0) . '</opted>' . "\n";
-
-            foreach ($model->getSubrecords((int) $rec->id) as $sub) {
-                $value = (string) $sub->value;
-                if ($sub->type === 'File Upload' && stripos($value, '{cbsite}') !== false) {
-                    $value = str_ireplace('{cbsite}', JPATH_SITE, $value);
+            foreach ($recordBatch as $rec) {
+                $updIds[] = (int) $rec->id;
+                $date = new \Joomla\CMS\Date\Date($rec->submitted, $tz);
+                $offset = $date->getOffsetFromGMT();
+                if ($offset > 0) {
+                    $date->add(new \DateInterval('PT' . $offset . 'S'));
+                } elseif ($offset < 0) {
+                    $date->sub(new \DateInterval('PT' . abs($offset) . 'S'));
                 }
-                $xml .= $ind(2) . '<subrecord id="' . (int) $sub->id . '">' . "\n"
-                    . $ind(3) . '<element>' . (int) $sub->element . '</element>' . "\n"
-                    . $ind(3) . '<name>' . htmlspecialchars((string) $sub->name) . '</name>' . "\n"
-                    . $ind(3) . '<title>' . htmlspecialchars((string) $sub->title) . '</title>' . "\n"
-                    . $ind(3) . '<type>' . htmlspecialchars((string) $sub->type) . '</type>' . "\n"
-                    . $ind(3) . '<value>' . htmlspecialchars($value) . '</value>' . "\n"
-                    . $ind(2) . '</subrecord>' . "\n";
+
+                $xml .= $ind(1) . '<record id="' . (int) $rec->id . '">' . "\n"
+                    . $ind(2) . '<submitted>' . $date->format('Y-m-d H:i:s', true) . '</submitted>' . "\n"
+                    . $ind(2) . '<user_id>' . (int) $rec->user_id . '</user_id>' . "\n"
+                    . $ind(2) . '<username>' . htmlspecialchars((string) $rec->username) . '</username>' . "\n"
+                    . $ind(2) . '<user_full_name>' . htmlspecialchars((string) $rec->user_full_name) . '</user_full_name>' . "\n"
+                    . $ind(2) . '<form>' . (int) $rec->form . '</form>' . "\n"
+                    . $ind(2) . '<title>' . htmlspecialchars((string) $rec->title) . '</title>' . "\n"
+                    . $ind(2) . '<name>' . htmlspecialchars((string) $rec->name) . '</name>' . "\n"
+                    . $ind(2) . '<ip>' . htmlspecialchars((string) $rec->ip) . '</ip>' . "\n"
+                    . $ind(2) . '<browser>' . htmlspecialchars((string) $rec->browser) . '</browser>' . "\n"
+                    . $ind(2) . '<opsys>' . htmlspecialchars((string) $rec->opsys) . '</opsys>' . "\n"
+                    . $ind(2) . '<provider>' . htmlspecialchars((string) ($rec->provider ?? '')) . '</provider>' . "\n"
+                    . $ind(2) . '<viewed>' . (int) $rec->viewed . '</viewed>' . "\n"
+                    . $ind(2) . '<exported>' . (int) $rec->exported . '</exported>' . "\n"
+                    . $ind(2) . '<archived>' . (int) $rec->archived . '</archived>' . "\n"
+                    . $ind(2) . '<pptxid>' . htmlspecialchars((string) $rec->paypal_tx_id) . '</pptxid>' . "\n"
+                    . $ind(2) . '<pppdate>' . htmlspecialchars((string) $rec->paypal_payment_date) . '</pppdate>' . "\n"
+                    . $ind(2) . '<pptestacc>' . (int) $rec->paypal_testaccount . '</pptestacc>' . "\n"
+                    . $ind(2) . '<ppdltries>' . (int) $rec->paypal_download_tries . '</ppdltries>' . "\n"
+                    . $ind(2) . '<opted>' . (int) ($rec->opted ?? 0) . '</opted>' . "\n";
+
+                foreach ($subrecordsByRecord[(int) $rec->id] ?? [] as $sub) {
+                    $value = (string) $sub->value;
+                    if ($sub->type === 'File Upload' && stripos($value, '{cbsite}') !== false) {
+                        $value = str_ireplace('{cbsite}', JPATH_SITE, $value);
+                    }
+                    $xml .= $ind(2) . '<subrecord id="' . (int) $sub->id . '">' . "\n"
+                        . $ind(3) . '<element>' . (int) $sub->element . '</element>' . "\n"
+                        . $ind(3) . '<name>' . htmlspecialchars((string) $sub->name) . '</name>' . "\n"
+                        . $ind(3) . '<title>' . htmlspecialchars((string) $sub->title) . '</title>' . "\n"
+                        . $ind(3) . '<type>' . htmlspecialchars((string) $sub->type) . '</type>' . "\n"
+                        . $ind(3) . '<value>' . htmlspecialchars($value) . '</value>' . "\n"
+                        . $ind(2) . '</subrecord>' . "\n";
+                }
+                $xml .= $ind(1) . '</record>' . "\n";
             }
-            $xml .= $ind(1) . '</record>' . "\n";
         }
         $xml .= '</FacileFormsExport>' . "\n";
 

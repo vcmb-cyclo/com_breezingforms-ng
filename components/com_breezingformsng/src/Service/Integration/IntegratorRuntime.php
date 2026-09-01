@@ -31,6 +31,9 @@ class IntegratorRuntime
 {
     private ?StoredPhpExecutor $codeExecutorService = null;
 
+    /** @var array<int, list<object>> */
+    private array $itemsByRule = [];
+
     private DatabaseInterface $db;
 
     private $rules = array();
@@ -80,6 +83,12 @@ class IntegratorRuntime
 
     public function getItems($ruleId)
     {
+        $ruleId = (int) $ruleId;
+
+        if (array_key_exists($ruleId, $this->itemsByRule)) {
+            return $this->itemsByRule[$ruleId];
+        }
+
         $db = $this->db;
         $query = $db->createQuery()
             ->select([
@@ -102,7 +111,7 @@ class IntegratorRuntime
             $out[$i] = $item;
             $i++;
         }
-        return $out;
+        return $this->itemsByRule[$ruleId] = $out;
     }
 
     public function getCriteria($ruleId)

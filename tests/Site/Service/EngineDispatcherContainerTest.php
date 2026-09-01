@@ -87,11 +87,16 @@ final class EngineDispatcherContainerTest extends TestCase
         );
 
         self::assertIsString($source);
-        self::assertStringContainsString(
-            "->getContainer()\n    ->get(EngineDispatcher::class)",
-            $source
-        );
+        self::assertStringContainsString('->getEngineDispatcher()', $source);
         self::assertStringContainsString("\$mainframe->bootComponent('com_breezingformsng')", $source);
         self::assertStringNotContainsString('new EngineDispatcher(', $source);
+
+        $extension = file_get_contents(
+            __DIR__ . '/../../../administrator/components/com_breezingformsng/src/Extension/BreezingFormsNGComponent.php'
+        );
+
+        self::assertIsString($extension);
+        self::assertStringContainsString('BootableExtensionInterface', $extension);
+        self::assertStringContainsString('$container->get(EngineDispatcher::class)', $extension);
     }
 }

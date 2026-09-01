@@ -18,7 +18,7 @@ defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 use Joomla\CMS\Factory;
 use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use Joomla\Database\DatabaseInterface;
-use Vcmb\Component\BreezingformsNG\Site\Service\EngineDispatcher;
+use Vcmb\Component\BreezingformsNG\Administrator\Extension\BreezingFormsNGComponent;
 use Vcmb\Component\BreezingformsNG\Site\Configuration\FormConfiguration;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RuntimeContextInitializer;
 
@@ -110,9 +110,9 @@ $bfEngineContext = [
 ];
 
 $input = $mainframe->getInput();
-$mainframe->bootComponent('com_breezingformsng')
-    ->getContainer()
-    ->get(EngineDispatcher::class)
+$component = $mainframe->bootComponent('com_breezingformsng');
+/** @var BreezingFormsNGComponent $component */
+$component->getEngineDispatcher()
     ->dispatch($bfEngineContext, (string) $ff_applic);
 
 if ($input->getBool('raw', false)) {

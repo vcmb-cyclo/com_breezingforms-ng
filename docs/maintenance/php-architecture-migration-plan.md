@@ -126,6 +126,7 @@
 | Admin — préparation commune des bibliothèques de packages | `PieceModel` et `ScriptModel` délèguent leur préparation de liste à `PackageModel`, avec uniquement leur table et leur préfixe de session spécifiques | Phase 31, `PackageLibraryUiRegressionTest` |
 | Rendu — cycle de formulaire et champs techniques | L’enveloppe des trois modes est regroupée dans `FormEnvelopeMarkupBuilder` et les champs optionnels/ContentBuilder rejoignent `HiddenFormFieldsBuilder` | Phase 32, tests de rendu fusionnés |
 | Rendu — pagination Query List | Le rafraîchissement des lignes, la navigation et la fin de pagination sont regroupés dans `QueryListPageScriptBuilder`, seul assembleur de la callback complète | Phase 33, `QueryListPageScriptBuilderTest` |
+| ContentBuilder — métadonnées de formulaire | Les deux chargeurs de métadonnées sont regroupés dans `ContentBuilderFormMetadataLoader`, avec leurs requêtes association/définition conservées | Phase 34, `ContentBuilderFormMetadataLoaderTest` |
 | PHPCS | Actif sur les services modernes, les builders ContentBuilder, Classic et `HiddenFieldTrait` | `phpcs.xml.dist`, 155 fichiers configurés |
 | PHPStan | Niveau 4 validé sur le composant, sans diagnostic résiduel | `phpstan.neon.dist`, baseline vide |
 | Navigation des enregistrements admin | Les liens précédent/suivant réutilisent le formulaire, la recherche et le tri de la liste courante ; l'état est conservé pendant l'édition | `RecordsModel::getAdjacentRecordId()`, `tests/Administrator/RecordsNavigationTest.php` |
@@ -295,14 +296,11 @@ réintègre pas `RenderingEngine`.
 La phase 2.3 est donc couverte pour les scripts de signature et de contrôles
 de fichiers, y compris leurs dépendances runtime Joomla/ContentBuilder.
 
-La requête d'association des formulaires ContentBuilder est désormais isolée
-dans `ContentBuilderFormAssociationLoader`, avec vérification des filtres
-`type`, `reference_id` et `published` ainsi que du binding entier. Les étapes
-de permission et de chargement d'enregistrement restent dépendantes du runtime
-ContentBuilder.
-Le chargement de la définition publiée sélectionnée est désormais isolé dans
-`ContentBuilderFormDataLoader`, avec son binding entier et son cas `null`
-couverts par test.
+Les requêtes d'association et de définition des formulaires ContentBuilder
+sont désormais regroupées dans `ContentBuilderFormMetadataLoader`, avec
+vérification des filtres `type`, `reference_id` et `published`, des bindings
+entiers et du cas `null`. Les étapes de permission et de chargement
+d'enregistrement restent dépendantes du runtime ContentBuilder.
 
 ### 2.4 Champs ContentBuilder non éditables
 
@@ -1816,6 +1814,25 @@ JavaScript de pagination n’avaient qu’un appelant immédiat commun :
 Les tests des trois fragments sont fusionnés dans
 `QueryListPageScriptBuilderTest`, qui vérifie l’ordre d’assemblage, les liens
 de navigation, le rafraîchissement des lignes et les options de fin.
+
+## Phase 34 — Regrouper les chargeurs de métadonnées ContentBuilder
+
+Ajoutée le 2026-09-01 après la Phase 33. Les chargeurs d’associations et de
+définition ContentBuilder utilisaient la même base de données et la même table,
+avec un seul appelant commun dans `cbCheckPermissions()`.
+
+### Périmètre
+
+- `ContentBuilderFormMetadataLoader` regroupe les deux requêtes de métadonnées
+  dans des méthodes explicites : association publiée et définition publiée.
+- Les filtres, bindings entiers et types de retour restent distincts.
+- `ContentBuilderRecordLoader` reste séparé, car il porte le chargement d’un
+  enregistrement et non celui des métadonnées de formulaire.
+
+### Filet de sécurité et vérification
+
+`ContentBuilderFormMetadataLoaderTest` couvre les résultats vide/non vide, les
+filtres de publication et les bindings des deux requêtes.
 
 ## Travail en parallèle
 

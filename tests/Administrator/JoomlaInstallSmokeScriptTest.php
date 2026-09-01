@@ -15,7 +15,7 @@ final class JoomlaInstallSmokeScriptTest extends TestCase
         self::assertIsString($source);
 
         $runtimeContextPosition = strpos($source, 'src/Helper/RuntimeContextHelper.php');
-        $associationLoaderPosition = strpos($source, 'ContentBuilderFormAssociationLoader.php');
+        $associationLoaderPosition = strpos($source, 'ContentBuilderFormMetadataLoader.php');
 
         self::assertIsInt($runtimeContextPosition);
         self::assertIsInt($associationLoaderPosition);

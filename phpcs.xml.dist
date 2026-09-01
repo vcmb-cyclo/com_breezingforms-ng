@@ -51,6 +51,7 @@
     <file>components/com_breezingformsng/src/Service/Rendering/PostRenderScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderFlashUploadValidationBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderEditableRecordScriptBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderFormMetadataLoader.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickModeRendererFactory.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/FormOnloadScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QueryListRowPreparationService.php</file>

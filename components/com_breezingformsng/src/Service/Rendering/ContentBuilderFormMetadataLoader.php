@@ -7,15 +7,15 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 
-/** Loads the published ContentBuilder forms associated with a BF form. */
-final class ContentBuilderFormAssociationLoader
+/** Loads the associated and selected ContentBuilder form metadata. */
+final class ContentBuilderFormMetadataLoader
 {
     public function __construct(private readonly DatabaseInterface $database)
     {
     }
 
     /** @return array<int, mixed> */
-    public function load(int $breezingFormsFormId): array
+    public function loadAssociatedFormIds(int $breezingFormsFormId): array
     {
         $query = $this->database->getQuery(true)
             ->select($this->database->quoteName('id'))
@@ -27,5 +27,20 @@ final class ContentBuilderFormAssociationLoader
         $this->database->setQuery($query);
 
         return (array) $this->database->loadColumn();
+    }
+
+    /** @return array<string, mixed>|null */
+    public function loadForm(int $contentBuilderFormId): ?array
+    {
+        $query = $this->database->getQuery(true)
+            ->select('*')
+            ->from($this->database->quoteName('#__contentbuilderng_forms'))
+            ->where($this->database->quoteName('id') . ' = :cbFormId')
+            ->where($this->database->quoteName('published') . ' = 1')
+            ->bind(':cbFormId', $contentBuilderFormId, ParameterType::INTEGER);
+        $this->database->setQuery($query);
+        $data = $this->database->loadAssoc();
+
+        return is_array($data) ? $data : null;
     }
 }

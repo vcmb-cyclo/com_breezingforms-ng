@@ -75,8 +75,7 @@ final class RenderingEngine
     private ?CaptchaValidationScriptBuilder $captchaValidationScriptBuilderService = null;
     private ?ContentBuilderEditableRecordScriptBuilder $contentBuilderEditableRecordScriptBuilderService = null;
     private ?ContentBuilderNonEditableFieldsResolver $contentBuilderNonEditableFieldsResolverService = null;
-    private ?ContentBuilderFormAssociationLoader $contentBuilderFormAssociationLoaderService = null;
-    private ?ContentBuilderFormDataLoader $contentBuilderFormDataLoaderService = null;
+    private ?ContentBuilderFormMetadataLoader $contentBuilderFormMetadataLoaderService = null;
     private ?ContentBuilderPermissionChecker $contentBuilderPermissionCheckerService = null;
     private ?ContentBuilderRecordLoader $contentBuilderRecordLoaderService = null;
     private ?QuickModeRendererFactory $quickModeRendererFactoryService = null;
@@ -342,16 +341,9 @@ final class RenderingEngine
         );
     }
 
-    private function contentBuilderFormAssociationLoader(): ContentBuilderFormAssociationLoader
+    private function contentBuilderFormMetadataLoader(): ContentBuilderFormMetadataLoader
     {
-        return $this->contentBuilderFormAssociationLoaderService ??= new ContentBuilderFormAssociationLoader(
-            $this->processor->database
-        );
-    }
-
-    private function contentBuilderFormDataLoader(): ContentBuilderFormDataLoader
-    {
-        return $this->contentBuilderFormDataLoaderService ??= new ContentBuilderFormDataLoader(
+        return $this->contentBuilderFormMetadataLoaderService ??= new ContentBuilderFormMetadataLoader(
             $this->processor->database
         );
     }
@@ -443,7 +435,7 @@ final class RenderingEngine
             }
 
             $db = $this->processor->database;
-            $cbForms = $this->contentBuilderFormAssociationLoader()->load((int) $this->processor->form);
+            $cbForms = $this->contentBuilderFormMetadataLoader()->loadAssociatedFormIds((int) $this->processor->form);
 
             // if no BF form is associated with contentbuilder, we don't need no further checks
             if (!count($cbForms)) {
@@ -473,7 +465,7 @@ final class RenderingEngine
                 );
 
                 $cbFormId = $input->getInt('cb_form_id', 0);
-                $cbData = $this->contentBuilderFormDataLoader()->load($cbFormId);
+                $cbData = $this->contentBuilderFormMetadataLoader()->loadForm($cbFormId);
                 if (is_array($cbData)) {
                     $cbFull = $this->contentBuilderPermissionChecker()->canViewFullArticle($permissionService, $cbFrontend);
                     $cbForm = FormSourceFactory::getForm('com_breezingformsng', $cbData['reference_id']);

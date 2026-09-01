@@ -177,8 +177,7 @@ if [[ -n "${contentbuilder_archive}" ]]; then
         $app = $container->get(\Joomla\CMS\Application\SiteApplication::class);
         \Joomla\CMS\Factory::$application = $app;
         require "/var/www/html/administrator/components/com_contentbuilderng/src/Helper/RuntimeContextHelper.php";
-        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFormAssociationLoader.php";
-        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFormDataLoader.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFormMetadataLoader.php";
         require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderRecordLoader.php";
         require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderChoiceHydrationScriptBuilder.php";
         require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderEditableRecordScriptBuilder.php";
@@ -221,12 +220,11 @@ if [[ -n "${contentbuilder_archive}" ]]; then
         $sourceId = (int) $db->insertid();
 
         try {
-            $associationLoader = new \Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderFormAssociationLoader($db);
-            $dataLoader = new \Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderFormDataLoader($db);
-            if (!in_array($formId, $associationLoader->load($referenceId), true)) {
+            $metadataLoader = new \Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderFormMetadataLoader($db);
+            if (!in_array($formId, $metadataLoader->loadAssociatedFormIds($referenceId), true)) {
                 throw new \RuntimeException("ContentBuilder association loader returned no inserted form");
             }
-            $data = $dataLoader->load($formId);
+            $data = $metadataLoader->loadForm($formId);
             if (!is_array($data) || (int) ($data["reference_id"] ?? 0) !== $referenceId) {
                 throw new \RuntimeException("ContentBuilder form data loader returned unexpected data");
             }

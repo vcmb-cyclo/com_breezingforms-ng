@@ -1,8 +1,15 @@
 {
   "name": "com-breezingformsng-ci",
+  "version": "1.0.0",
   "private": true,
+  "description": "CI tooling for BreezingForms NG",
   "scripts": {
-    "lint:css": "stylelint \"media/com_breezingformsng/css/**/*.css\""
+    "lint": "npm run lint:css",
+    "lint:css": "stylelint \"media/com_breezingformsng/css/**/*.css\"",
+    "lint:css:fix": "stylelint \"media/com_breezingformsng/css/**/*.css\" --fix"
+  },
+  "engines": {
+    "node": ">=20.19.0"
   },
   "devDependencies": {
     "stylelint": "17.14.1",

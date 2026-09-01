@@ -1417,6 +1417,37 @@ La suite complète passe avec 643 tests et 2 012 assertions. PHPCS passe sur
 151 fichiers configurés, PHPStan niveau 4 ne signale aucune erreur, les deux
 fichiers de production passent `php -l` et `git diff --check` est vert.
 
+## Phase 19 — Initialisation du contexte runtime du processeur
+
+Ajoutée le 2026-09-01 après l'audit de la façade publique
+`HTML_facileFormsProcessor`. Le constructeur concentrait encore la collecte
+des métadonnées HTTP, l'horodatage de soumission, la résolution du contexte
+d'affichage et l'expansion des chemins de formulaire, alors que ces opérations
+étaient déjà portées individuellement par des services runtime testés.
+
+### Périmètre
+
+- `ProcessorRuntimeContextInitializer` orchestre ces quatre responsabilités
+  transversales sans créer un service par propriété de la façade.
+- `ProcessorRuntimeContext` regroupe leur résultat typé : métadonnées de
+  requête, date de soumission, contexte d'affichage et chemins/tokens.
+- Le chargement SQL de `FormTable` et des éléments publiés reste dans la
+  façade et dans `FormElementLoader`, leurs frontières étant déjà établies et
+  testées.
+- La façade conserve ses propriétés publiques historiques et ne change pas
+  les valeurs exposées au reste du composant ou aux callbacks.
+
+### Filet de sécurité et vérification
+
+`ProcessorRuntimeContextInitializerTest` couvre l'assemblage frontend avec
+expansion des chemins, ainsi que l'aperçu avec grille et IP masquée. Le test
+vérifie aussi que la façade délègue cette composition et ne conserve plus les
+conditions de configuration ni les appels directs aux résolveurs.
+
+La suite complète passe avec 646 tests et 2 030 assertions. PHPCS passe sur
+153 fichiers configurés, PHPStan niveau 4 ne signale aucune erreur, les
+fichiers ajoutés et modifiés passent `php -l` et `git diff --check` est vert.
+
 ## Travail en parallèle
 
 | Couloir | Fichiers principaux | Peut avancer avec |
@@ -1452,10 +1483,17 @@ Règles de coordination :
 5. ~~Réduction progressive des avertissements PHPCS et PHPStan après chaque
    extraction fonctionnelle.~~
    Le périmètre PHPCS configuré est vert et PHPStan niveau 4 est sans erreur.
-6. Auditer la façade publique `HTML_facileFormsProcessor` et ses appelants
+6. ~~Auditer la façade publique `HTML_facileFormsProcessor` et ses appelants
    avant toute nouvelle extraction : caractériser les méthodes encore
    appelées par le PHP stocké, puis sélectionner un lot runtime transversal
-   qui ne duplique pas les frontières déjà établies.
+   qui ne duplique pas les frontières déjà établies.~~
+   L'initialisation du contexte runtime est extraite et couverte par la
+   Phase 19 ; les méthodes publiques restantes doivent maintenant être
+   regroupées par parcours fonctionnel avant toute nouvelle réduction.
+7. Caractériser le prochain parcours fonctionnel de la façade (soumission,
+   scripting, export ou upload) avec ses appelants réels, puis extraire un
+   service transversal complet seulement si la frontière couvre plusieurs
+   opérations liées et dispose d'un test de comportement.
 
 Le rendu Classic des groupes radio et checkbox est désormais mutualisé dans
 `ClassicChoiceGroupBuilder` (`478e1c24a`), avec couverture dédiée des wrappers,

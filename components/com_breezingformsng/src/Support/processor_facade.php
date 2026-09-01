@@ -15,15 +15,15 @@ use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 use Joomla\Database\DatabaseInterface;
-use Joomla\CMS\Language\Text;
 use Joomla\CMS\Environment\Browser;
-use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\FormDisplayContextResolver;
-use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\FormPathResolver;
-use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RequestMetadataResolver;
-use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampFactory;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\CodeToolsRuntime;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\ErrorHandlerRuntime;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\FormElementLoader;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\FormDisplayContextResolver;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\FormPathResolver;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\ProcessorRuntimeContextInitializer;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RequestMetadataResolver;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampFactory;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\TraceRuntime;
 use Vcmb\Component\BreezingformsNG\Site\Service\Scripting\ScriptingEngine;
 use Vcmb\Component\BreezingformsNG\Site\Service\Export\ExportEngine;
@@ -678,33 +678,6 @@ class HTML_facileFormsProcessor
         $this->editable_override = $editable_override;
         $this->app = $application;
 
-        $requestMetadata = (new RequestMetadataResolver(Browser::getInstance()))->resolve(
-            $this->app->getInput()->server->getString('REMOTE_ADDR', ''),
-            (string) $ff_config->disable_ip === '1',
-            (int) $ff_config->getprovider !== 0,
-            Text::_('COM_BREEZINGFORMSNG_PROCESS_UNKNOWN')
-        );
-        $this->ip = $requestMetadata->ip;
-        $this->agent = $requestMetadata->agent;
-        $this->browser = $requestMetadata->browser;
-        $this->opsys = $requestMetadata->platform;
-        $this->provider = $requestMetadata->provider;
-
-
-        $this->submitted = (new SubmissionTimestampFactory())->create((string) $this->app->get('offset'));
-
-        /*
-          $format = Text::_('DATE_FORMAT_LC2');
-          if ( !$format ) {
-          $this->submitted = date('Y-m-d H:i:s');
-          }else{
-          $config = Factory::getApplication()->getConfig();
-          $offset = $config->getValue('config.offset');
-          $instance = new \Joomla\CMS\Date\Date(date('Y-m-d H:i:s'));
-          $instance->setOffset($offset);
-          $this->submitted = $instance->toFormat($format);
-          } */
-
         $this->formrow = new FormTable($this->database);
         $this->formrow->load($form);
 
@@ -713,40 +686,40 @@ class HTML_facileFormsProcessor
             $this->rows = (new FormElementLoader($this->database))->loadPublished($formId);
             $this->rowcount = count($this->rows);
         } // if
-        $displayContext = (new FormDisplayContextResolver())->resolve(
+        $this->mospath = $ff_mospath;
+        $this->mossite = $ff_mossite;
+        $runtimeContext = (new ProcessorRuntimeContextInitializer(
+            new RequestMetadataResolver(Browser::getInstance()),
+            new FormDisplayContextResolver(),
+            new FormPathResolver(),
+            new SubmissionTimestampFactory()
+        ))->initialize(
+            $this->app,
+            $ff_config,
+            $this->formrow,
             (int) $runmode,
             (bool) $this->inframe,
             (int) $form,
-            (int) $this->formrow->runmode,
-            (bool) $this->formrow->published,
-            (int) $this->formrow->prevmode,
-            (int) $ff_config->gridshow === 1,
-            (int) $ff_config->gridsize,
-            (string) $ff_mossite
-        );
-        $this->inline = $displayContext->inline;
-        $this->template = $displayContext->template;
-        $this->form_id = $displayContext->formId;
-        $this->homepage = $displayContext->homepage;
-        $this->mospath = $ff_mospath;
-        $this->mossite = $ff_mossite;
-        $formPaths = (new FormPathResolver())->resolve(
             (int) $this->page,
-            (int) $this->formrow->pages,
-            (string) $this->formrow->name,
-            (string) $this->formrow->title,
-            (string) $this->homepage,
             (string) $this->mospath,
-            (string) $this->mossite,
-            (string) $ff_config->images,
-            (string) $ff_config->uploads
+            (string) $this->mossite
         );
-        $this->findtags = $formPaths->tokens;
-        $this->replacetags = $formPaths->values;
-        $this->images = $formPaths->images;
-        $this->uploads = $formPaths->uploads;
-        $this->showgrid = $displayContext->showGrid;
-        $this->okrun = $displayContext->canRun;
+        $this->ip = $runtimeContext->requestMetadata->ip;
+        $this->agent = $runtimeContext->requestMetadata->agent;
+        $this->browser = $runtimeContext->requestMetadata->browser;
+        $this->opsys = $runtimeContext->requestMetadata->platform;
+        $this->provider = $runtimeContext->requestMetadata->provider;
+        $this->submitted = $runtimeContext->submitted;
+        $this->inline = $runtimeContext->display->inline;
+        $this->template = $runtimeContext->display->template;
+        $this->form_id = $runtimeContext->display->formId;
+        $this->homepage = $runtimeContext->display->homepage;
+        $this->findtags = $runtimeContext->paths->tokens;
+        $this->replacetags = $runtimeContext->paths->values;
+        $this->images = $runtimeContext->paths->images;
+        $this->uploads = $runtimeContext->paths->uploads;
+        $this->showgrid = $runtimeContext->display->showGrid;
+        $this->okrun = $runtimeContext->display->canRun;
         $this->traceMode = _FF_TRACEMODE_FIRST;
         $this->traceStack = array();
         $this->traceBuffer = null;

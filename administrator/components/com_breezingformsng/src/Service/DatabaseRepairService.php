@@ -11,6 +11,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Service;
 \defined('_JEXEC') or die;
 
 use Joomla\Database\DatabaseInterface;
+use Joomla\Filesystem\Folder;
 
 final class DatabaseRepairService
 {
@@ -109,6 +110,49 @@ final class DatabaseRepairService
             'repaired_groups' => $repairedGroups,
             'removed_indexes' => $removedIndexes,
             'failed_indexes' => $failedIndexes,
+            'errors' => $errors,
+        ];
+    }
+
+    /**
+     * Delete only stale installer directories selected from a fresh audit.
+     *
+     * @return array{selected_dirs:int, deleted_dirs:int, failed_dirs:int, errors:array<int,string>}
+     */
+    public function deleteStaleInstallerTemp(array $selectedPaths): array
+    {
+        $selectedPaths = array_values(array_unique(array_filter(
+            array_map(static fn($value): string => trim((string) $value), $selectedPaths),
+            static fn(string $value): bool => $value !== ''
+        )));
+        $report = (new DatabaseAuditService($this->db, $this->temporaryPath))->run();
+        $stalePaths = array_values(array_filter(
+            array_map(
+                static fn($value): string => realpath((string) $value) ?: '',
+                (array) ($report['stale_installer_temp_dirs'] ?? [])
+            ),
+            static fn(string $value): bool => $value !== ''
+        ));
+        $selectedDirs = array_values(array_intersect($selectedPaths, $stalePaths));
+        $errors = [];
+        $deletedDirs = 0;
+
+        foreach ($selectedDirs as $path) {
+            try {
+                if (!is_dir($path) || !Folder::delete($path)) {
+                    throw new \RuntimeException('The directory could not be removed.');
+                }
+
+                $deletedDirs++;
+            } catch (\Throwable $exception) {
+                $errors[] = $path . ': ' . $exception->getMessage();
+            }
+        }
+
+        return [
+            'selected_dirs' => count($selectedDirs),
+            'deleted_dirs' => $deletedDirs,
+            'failed_dirs' => count($errors),
             'errors' => $errors,
         ];
     }

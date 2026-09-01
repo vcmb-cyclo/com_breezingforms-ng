@@ -127,7 +127,13 @@ class AboutController extends BaseController
             $summary = (array) ($report['summary'] ?? []);
             $this->app->setUserState('com_breezingformsng.about.audit', $report);
 
-            if ((int) ($summary['issues_total'] ?? 0) === 0) {
+            if ((int) ($summary['audit_errors'] ?? 0) > 0) {
+                $this->setMessage(Text::sprintf(
+                    'COM_BREEZINGFORMSNG_ABOUT_AUDIT_SUMMARY_ERRORS',
+                    (int) ($summary['audit_errors'] ?? 0),
+                    (int) ($summary['issues_total'] ?? 0)
+                ), 'warning');
+            } elseif ((int) ($summary['issues_total'] ?? 0) === 0) {
                 $this->setMessage(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_SUMMARY_CLEAN', $summary['scanned_tables'], $summary['total_rows']), 'message');
             } else {
                 $this->setMessage(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_SUMMARY_ISSUES', $summary['issues_total'], $summary['scanned_tables']), 'warning');
@@ -180,6 +186,51 @@ class AboutController extends BaseController
         } catch (\Throwable $exception) {
             $this->setMessage(
                 Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_DUPLICATE_INDEX_REPAIR_FAILED', $exception->getMessage()),
+                'error'
+            );
+        }
+
+        $this->setRedirect(Route::_('index.php?option=com_breezingformsng&task=about.display&view=about#bf-audit-section', false));
+    }
+
+    public function deleteStaleInstallerTemp(): void
+    {
+        $this->checkToken();
+
+        try {
+            $this->getAuthorizedApplication();
+            $singlePath = trim((string) $this->input->post->getString('stale_installer_temp_dir', ''));
+            $selectedPaths = $singlePath !== ''
+                ? [$singlePath]
+                : array_values(array_filter(
+                    array_map(
+                        static fn($value): string => trim((string) $value),
+                        (array) $this->input->post->get('stale_installer_temp_dirs', [], 'array')
+                    ),
+                    static fn(string $value): bool => $value !== ''
+                ));
+
+            if ($selectedPaths === []) {
+                throw new \RuntimeException(Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_STALE_INSTALLER_TEMP_NO_SELECTION'));
+            }
+
+            $summary = $this->getRepairService()->deleteStaleInstallerTemp($selectedPaths);
+
+            if ((int) ($summary['selected_dirs'] ?? 0) === 0) {
+                throw new \RuntimeException(Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_STALE_INSTALLER_TEMP_NO_SELECTION'));
+            }
+
+            $this->app->setUserState('com_breezingformsng.about.audit', $this->getAuditService()->run());
+            $failedDirs = (int) ($summary['failed_dirs'] ?? 0);
+            $this->setMessage(Text::sprintf(
+                'COM_BREEZINGFORMSNG_ABOUT_AUDIT_STALE_INSTALLER_TEMP_REPAIR_SUMMARY',
+                (int) ($summary['selected_dirs'] ?? 0),
+                (int) ($summary['deleted_dirs'] ?? 0),
+                $failedDirs
+            ), $failedDirs > 0 ? 'warning' : 'message');
+        } catch (\Throwable $exception) {
+            $this->setMessage(
+                Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_STALE_INSTALLER_TEMP_REPAIR_FAILED', $exception->getMessage()),
                 'error'
             );
         }

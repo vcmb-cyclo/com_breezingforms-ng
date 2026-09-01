@@ -314,6 +314,7 @@ $auditMenuIssues = (array) ($auditReport['menu_issues'] ?? array());
 $auditDuplicateForms = (array) ($auditReport['duplicate_forms'] ?? array());
 $auditExtensionDuplicates = (array) ($auditReport['extension_duplicates'] ?? array());
 $auditExtensionLegacy = (array) ($auditReport['extension_legacy'] ?? array());
+$auditErrors = (array) ($auditReport['errors'] ?? array());
 $auditOrphanChecks = array_values(array_filter(
     (array) ($auditReport['orphan_checks'] ?? array()),
     static fn(array $check): bool => (int) ($check['count'] ?? 0) > 0
@@ -417,13 +418,28 @@ $aboutDescription = str_replace(
                     </span>
                 </div>
 
-                <?php if ((int) ($auditSummary['issues_total'] ?? 0) === 0) : ?>
+                <?php if ((int) ($auditSummary['audit_errors'] ?? 0) > 0) : ?>
+                    <div class="alert alert-danger bf-audit-error-alert">
+                        <?php echo Text::plural('COM_BREEZINGFORMSNG_ABOUT_AUDIT_REPORT_ERRORS', (int) ($auditSummary['audit_errors'] ?? 0)); ?>
+                    </div>
+                <?php elseif ((int) ($auditSummary['issues_total'] ?? 0) === 0) : ?>
                     <div class="alert alert-success bf-audit-ok-alert">
                         <?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_REPORT_CLEAN'); ?>
                     </div>
                 <?php else : ?>
                     <div class="alert alert-warning bf-audit-warning-alert">
                         <?php echo Text::plural('COM_BREEZINGFORMSNG_ABOUT_AUDIT_REPORT_ISSUES', (int) ($auditSummary['issues_total'] ?? 0)); ?>
+                    </div>
+                <?php endif; ?>
+
+                <?php if ($auditErrors !== array()) : ?>
+                    <div class="bf-audit-section-block mb-3 border-danger">
+                        <h4 class="h6 text-danger"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_ERRORS'); ?></h4>
+                        <ul class="mb-0">
+                            <?php foreach ($auditErrors as $error) : ?>
+                                <li><code><?php echo htmlspecialchars((string) $error, ENT_QUOTES, 'UTF-8'); ?></code></li>
+                            <?php endforeach; ?>
+                        </ul>
                     </div>
                 <?php endif; ?>
 
@@ -472,9 +488,47 @@ $aboutDescription = str_replace(
                 <?php if ($auditStaleInstallerTempDirs !== array()) : ?>
                     <div class="bf-audit-section-block mb-3">
                         <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_STALE_INSTALLER_TEMP'); ?></h4>
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+                            <label class="form-check mb-0">
+                                <input
+                                    type="checkbox"
+                                    class="form-check-input"
+                                    data-bf-select-all="stale-installer-temp"
+                                    aria-label="<?php echo htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_STALE_INSTALLER_TEMP_SELECT_ALL'), ENT_QUOTES, 'UTF-8'); ?>"
+                                >
+                                <span class="form-check-label"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_STALE_INSTALLER_TEMP_SELECT_ALL'); ?></span>
+                            </label>
+                            <button
+                                type="submit"
+                                class="btn btn-sm btn-warning"
+                                onclick="document.getElementById('bf-about-task').value='about.deleteStaleInstallerTemp';"
+                                title="<?php echo htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_STALE_INSTALLER_TEMP_REPAIR_SELECTED_TIP'), ENT_QUOTES, 'UTF-8'); ?>"
+                            >
+                                <span class="icon-trash me-1" aria-hidden="true"></span><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_STALE_INSTALLER_TEMP_REPAIR_SELECTED'); ?>
+                            </button>
+                        </div>
                         <ul class="mb-0">
-                            <?php foreach ($auditStaleInstallerTempDirs as $dir) : ?>
-                                <li><code><?php echo htmlspecialchars((string) $dir, ENT_QUOTES, 'UTF-8'); ?></code></li>
+                            <?php foreach ($auditStaleInstallerTempDirs as $index => $dir) : ?>
+                                <li>
+                                    <input
+                                        type="checkbox"
+                                        class="form-check-input me-1"
+                                        data-bf-select-item="stale-installer-temp"
+                                        name="stale_installer_temp_dirs[]"
+                                        value="<?php echo htmlspecialchars((string) $dir, ENT_QUOTES, 'UTF-8'); ?>"
+                                        aria-label="<?php echo htmlspecialchars(Text::sprintf('COM_BREEZINGFORMSNG_ABOUT_AUDIT_STALE_INSTALLER_TEMP_SELECT_ONE', (int) $index + 1), ENT_QUOTES, 'UTF-8'); ?>"
+                                    >
+                                    <code><?php echo htmlspecialchars((string) $dir, ENT_QUOTES, 'UTF-8'); ?></code>
+                                    <button
+                                        type="submit"
+                                        class="btn btn-sm btn-warning ms-2"
+                                        name="stale_installer_temp_dir"
+                                        value="<?php echo htmlspecialchars((string) $dir, ENT_QUOTES, 'UTF-8'); ?>"
+                                        onclick="document.getElementById('bf-about-task').value='about.deleteStaleInstallerTemp';"
+                                        title="<?php echo htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_STALE_INSTALLER_TEMP_REPAIR_TIP'), ENT_QUOTES, 'UTF-8'); ?>"
+                                        aria-label="<?php echo htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_STALE_INSTALLER_TEMP_REPAIR'), ENT_QUOTES, 'UTF-8'); ?>"
+                                    ><span class="icon-trash" aria-hidden="true"></span></button>
+                                </li>
                             <?php endforeach; ?>
                         </ul>
                     </div>
@@ -598,10 +652,10 @@ $aboutDescription = str_replace(
                         <h4 class="h6"><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_COLUMN_COLLATIONS'); ?></h4>
                         <div class="table-responsive">
                             <table class="table table-sm align-middle mb-0">
-                                <thead><tr><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_TABLE'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_COLUMN'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_CURRENT'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_EXPECTED'); ?></th></tr></thead>
+                                <thead><tr><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_TABLE'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_COLUMN'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_CHARSET'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_COLLATION'); ?></th><th><?php echo Text::_('COM_BREEZINGFORMSNG_ABOUT_AUDIT_EXPECTED'); ?></th></tr></thead>
                                 <tbody>
                                 <?php foreach ($auditColumnCollationIssues as $issue) : ?>
-                                    <tr class="table-warning"><td><code><?php echo htmlspecialchars((string) ($issue['table'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code></td><td><code><?php echo htmlspecialchars((string) ($issue['column'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code></td><td><?php echo htmlspecialchars((string) ($issue['collation'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td><td><?php echo htmlspecialchars((string) ($issue['expected'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td></tr>
+                                    <tr class="table-warning"><td><code><?php echo htmlspecialchars((string) ($issue['table'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code></td><td><code><?php echo htmlspecialchars((string) ($issue['column'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></code></td><td><?php echo htmlspecialchars((string) ($issue['charset'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td><td><?php echo htmlspecialchars((string) ($issue['collation'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td><td><?php echo htmlspecialchars((string) ($issue['expected_charset'] ?? '') . ' / ' . (string) ($issue['expected'] ?? ''), ENT_QUOTES, 'UTF-8'); ?></td></tr>
                                 <?php endforeach; ?>
                                 </tbody>
                             </table>

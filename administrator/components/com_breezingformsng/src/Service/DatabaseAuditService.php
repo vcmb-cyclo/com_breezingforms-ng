@@ -15,6 +15,8 @@ use Joomla\Database\DatabaseInterface;
 
 final class DatabaseAuditService
 {
+    private const TARGET_CHARSET = 'utf8mb4';
+
     private const EXPECTED_TABLES = [
         'facileforms_config',
         'facileforms_packages',
@@ -36,6 +38,9 @@ final class DatabaseAuditService
 
     private ?string $resolvedTargetCollation = null;
 
+    /** @var array<int, string> */
+    private array $errors = [];
+
     public function __construct(
         private readonly DatabaseInterface $db,
         private readonly string $temporaryPath
@@ -44,6 +49,7 @@ final class DatabaseAuditService
 
     public function run(): array
     {
+        $this->errors = [];
         $targetCollation = $this->resolveTargetCollation();
         $tableList = $this->db->getTableList();
         $tables = [];
@@ -64,7 +70,12 @@ final class DatabaseAuditService
                 continue;
             }
 
-            $status = $this->getTableStatus($physicalTable);
+            try {
+                $status = $this->getTableStatus($physicalTable);
+            } catch (\Throwable $exception) {
+                $this->addError('Unable to inspect table ' . $alias . ': ' . $exception->getMessage());
+                continue;
+            }
             $rows = (int) ($status['TABLE_ROWS'] ?? 0);
             $collation = (string) ($status['TABLE_COLLATION'] ?? '');
             $dataBytes = (int) ($status['DATA_LENGTH'] ?? 0);
@@ -114,6 +125,7 @@ final class DatabaseAuditService
 
         return [
             'generated_at' => (new Date())->toSql(),
+            'target_charset' => self::TARGET_CHARSET,
             'target_collation' => $targetCollation,
             'tables' => $tables,
             'missing_tables' => $missingTables,
@@ -129,6 +141,7 @@ final class DatabaseAuditService
             'extension_duplicates' => $extensionIssues['duplicates'],
             'extension_legacy' => $extensionIssues['legacy'],
             'duplicate_forms' => $duplicateForms,
+            'errors' => array_values(array_unique($this->errors)),
             'summary' => [
                 'expected_tables' => count(self::EXPECTED_TABLES),
                 'scanned_tables' => count($tables),
@@ -148,6 +161,7 @@ final class DatabaseAuditService
                 'extension_duplicates' => count($extensionIssues['duplicates']),
                 'extension_legacy' => count($extensionIssues['legacy']),
                 'duplicate_forms' => count($duplicateForms),
+                'audit_errors' => count(array_unique($this->errors)),
                 'issues_total' => $issuesTotal,
             ],
         ];
@@ -199,24 +213,36 @@ final class DatabaseAuditService
      */
     private function findColumnCollationIssues(string $physicalTable, string $alias, string $targetCollation): array
     {
-        $query = $this->db->getQuery(true)
-            ->select(['COLUMN_NAME', 'COLLATION_NAME'])
-            ->from($this->db->quoteName('information_schema.COLUMNS'))
-            ->where('TABLE_SCHEMA = DATABASE()')
-            ->where($this->db->quoteName('TABLE_NAME') . ' = :table')
-            ->where($this->db->quoteName('COLLATION_NAME') . ' IS NOT NULL')
-            ->bind(':table', $physicalTable);
-        $this->db->setQuery($query);
-        $columns = $this->db->loadAssocList() ?: [];
+        try {
+            $query = $this->db->getQuery(true)
+                ->select(['COLUMN_NAME', 'CHARACTER_SET_NAME', 'COLLATION_NAME'])
+                ->from($this->db->quoteName('information_schema.COLUMNS'))
+                ->where('TABLE_SCHEMA = DATABASE()')
+                ->where($this->db->quoteName('TABLE_NAME') . ' = :table')
+                ->where($this->db->quoteName('COLLATION_NAME') . ' IS NOT NULL')
+                ->bind(':table', $physicalTable);
+            $this->db->setQuery($query);
+            $columns = $this->db->loadAssocList() ?: [];
+        } catch (\Throwable $exception) {
+            $this->addError('Unable to inspect column encoding for ' . $alias . ': ' . $exception->getMessage());
+
+            return [];
+        }
 
         $issues = [];
         foreach ($columns as $column) {
+            $charset = (string) ($column['CHARACTER_SET_NAME'] ?? '');
             $collation = (string) ($column['COLLATION_NAME'] ?? '');
-            if ($collation !== '' && strcasecmp($collation, $targetCollation) !== 0) {
+            if (
+                ($charset !== '' && strcasecmp($charset, self::TARGET_CHARSET) !== 0)
+                || ($collation !== '' && strcasecmp($collation, $targetCollation) !== 0)
+            ) {
                 $issues[] = [
                     'table' => $alias,
                     'column' => (string) ($column['COLUMN_NAME'] ?? ''),
+                    'charset' => $charset,
                     'collation' => $collation,
+                    'expected_charset' => self::TARGET_CHARSET,
                     'expected' => $targetCollation,
                 ];
             }
@@ -255,8 +281,14 @@ final class DatabaseAuditService
 
     private function findDuplicateIndexes(string $physicalTable, string $alias): array
     {
-        $this->db->setQuery('SHOW INDEX FROM ' . $this->db->quoteName($physicalTable));
-        $rows = $this->db->loadAssocList() ?: [];
+        try {
+            $this->db->setQuery('SHOW INDEX FROM ' . $this->db->quoteName($physicalTable));
+            $rows = $this->db->loadAssocList() ?: [];
+        } catch (\Throwable $exception) {
+            $this->addError('Unable to inspect indexes for ' . $alias . ': ' . $exception->getMessage());
+
+            return [];
+        }
         $indexes = [];
 
         foreach ($rows as $row) {
@@ -333,8 +365,12 @@ final class DatabaseAuditService
             $sql = 'SELECT COUNT(*) FROM ' . $this->db->quoteName('#__' . $child) . ' AS child'
                 . ' LEFT JOIN ' . $this->db->quoteName('#__' . $parent) . ' AS parent ON ' . $join
                 . ' WHERE parent.id IS NULL';
-            $this->db->setQuery($sql);
-            $result[] = ['id' => $id, 'count' => (int) $this->db->loadResult()];
+            try {
+                $this->db->setQuery($sql);
+                $result[] = ['id' => $id, 'count' => (int) $this->db->loadResult()];
+            } catch (\Throwable $exception) {
+                $this->addError('Unable to inspect orphan references for ' . $id . ': ' . $exception->getMessage());
+            }
         }
 
         return $result;
@@ -405,30 +441,46 @@ final class DatabaseAuditService
 
     /**
      * Leftover administrator/components/com_breezingformsng-named temp
-     * folders under Joomla's configured tmp_path, from an install/update
-     * that was interrupted before cleanup.
+     * folders under Joomla's configured tmp_path or PHP's system temp path,
+     * from an install/update that was interrupted before cleanup.
      */
     private function findStaleInstallerTempDirectories(): array
     {
-        $tmpPath = $this->temporaryPath;
-
-        if (!is_dir($tmpPath)) {
-            return [];
-        }
-
-        $matches = glob($tmpPath . '/install_*', GLOB_ONLYDIR) ?: [];
         $stale = [];
+        $roots = array_values(array_unique([$this->temporaryPath, sys_get_temp_dir()]));
 
-        foreach ($matches as $match) {
-            // Joomla names these folders with a random suffix, not the
-            // extension name, so check the extracted contents instead of
-            // the folder name itself.
-            $manifestMatches = glob($match . '/*com_breezingformsng*.xml') ?: [];
-            if ($manifestMatches === []) {
+        foreach ($roots as $root) {
+            $tmpRoot = realpath($root);
+
+            if ($tmpRoot === false || !is_dir($tmpRoot)) {
                 continue;
             }
 
-            $stale[] = str_replace(JPATH_ROOT, '', $match);
+            $matches = glob($tmpRoot . '/install_*', GLOB_ONLYDIR) ?: [];
+
+            foreach ($matches as $match) {
+                $realMatch = realpath($match);
+
+                if (
+                    $realMatch === false
+                    || dirname($realMatch) !== rtrim($tmpRoot, DIRECTORY_SEPARATOR)
+                    || !is_dir($realMatch)
+                    || filemtime($realMatch) === false
+                    || filemtime($realMatch) > time() - 3600
+                ) {
+                    continue;
+                }
+
+                // Joomla names these folders with a random suffix, not the
+                // extension name, so check the extracted contents instead of
+                // the folder name itself.
+                $manifestMatches = glob($realMatch . '/*com_breezingformsng*.xml') ?: [];
+                if ($manifestMatches === []) {
+                    continue;
+                }
+
+                $stale[] = $realMatch;
+            }
         }
 
         sort($stale, SORT_NATURAL | SORT_FLAG_CASE);
@@ -462,7 +514,8 @@ final class DatabaseAuditService
                 ->from($this->db->quoteName('#__facileforms_forms'));
             $this->db->setQuery($query);
             $formRows = $this->db->loadAssocList() ?: [];
-        } catch (\Throwable) {
+        } catch (\Throwable $exception) {
+            $this->addError('Unable to inspect BreezingForms menu items: ' . $exception->getMessage());
             return [];
         }
 
@@ -536,7 +589,8 @@ final class DatabaseAuditService
                 ->order($this->db->quoteName('extension_id') . ' ASC');
             $this->db->setQuery($query);
             $rows = $this->db->loadAssocList() ?: [];
-        } catch (\Throwable) {
+        } catch (\Throwable $exception) {
+            $this->addError('Unable to inspect BreezingForms extension registrations: ' . $exception->getMessage());
             return ['duplicates' => [], 'legacy' => []];
         }
 
@@ -604,7 +658,8 @@ final class DatabaseAuditService
                 ->order($this->db->quoteName('f.id') . ' ASC');
             $this->db->setQuery($query);
             $rows = $this->db->loadAssocList() ?: [];
-        } catch (\Throwable) {
+        } catch (\Throwable $exception) {
+            $this->addError('Unable to inspect duplicate forms: ' . $exception->getMessage());
             return [];
         }
 
@@ -642,5 +697,14 @@ final class DatabaseAuditService
         }
 
         return $duplicates;
+    }
+
+    private function addError(string $message): void
+    {
+        $message = trim($message);
+
+        if ($message !== '') {
+            $this->errors[] = $message;
+        }
     }
 }

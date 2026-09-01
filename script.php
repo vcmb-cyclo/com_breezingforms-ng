@@ -1886,6 +1886,7 @@ class com_breezingformsngInstallerScript
             JPATH_ADMINISTRATOR . '/components/com_breezingforms',
             JPATH_SITE . '/components/com_breezingforms',
             JPATH_SITE . '/media/com_breezingforms',
+            JPATH_ROOT . '/api/components/com_breezingforms',
         ];
 
         foreach ($directories as $directory) {

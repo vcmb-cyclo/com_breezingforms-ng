@@ -58,10 +58,8 @@ $cache = $cacheControllerFactory->createCacheController('callback');
 $cache->setCaching(false);
 
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
-require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/constants.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickMode.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickModeBootstrap.php');
-require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickModeMobile.php');
 require_once (JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/classes/BFQuickModeOnePage.php');
 
 // declare global variables

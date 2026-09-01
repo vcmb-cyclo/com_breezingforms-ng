@@ -1,0 +1,91 @@
+<?php
+
+/**
+ * BreezingForms NG - A Joomla Forms Application
+ *
+ * @package BreezingFormsNG
+ * @copyright Copyright (C) 2024-2026 by XDA+GIL
+ * @license GNU General Public License version 2 or later; see LICENSE.txt
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ **/
+
+declare(strict_types=1);
+
+namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Rendering;
+
+use PHPUnit\Framework\TestCase;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderValueScriptBuilder;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\EditableRecordHydrationScriptBuilder;
+
+final class EditableRecordHydrationScriptBuilderTest extends TestCase
+{
+    public function testBuildsAllEditableRecordControlFamilies(): void
+    {
+        $script = (new EditableRecordHydrationScriptBuilder())->build([
+            (object) ['type' => 'Text', 'name' => 'title', 'element' => 11, 'value' => 'Hello'],
+            (object) ['type' => 'Checkbox', 'name' => 'flag', 'element' => 12, 'value' => 'yes'],
+            (object) ['type' => 'Checkbox Group', 'name' => 'colors', 'element' => 13, 'value' => 'red & blue'],
+            (object) ['type' => 'Radio Group', 'name' => 'size', 'element' => 14, 'value' => 'L'],
+            (object) ['type' => 'Select List', 'name' => 'country', 'element' => 15, 'value' => 'FR'],
+        ], 9);
+
+        self::assertStringContainsString('ff_nm_title[]', $script);
+        self::assertStringContainsString('ff_elem12', $script);
+        self::assertStringContainsString('type == "checkbox"', $script);
+        self::assertStringContainsString('type == "radio"', $script);
+        self::assertStringContainsString('options[i].value == "FR"', $script);
+        self::assertStringContainsString('"red \\u0026 blue"', $script);
+    }
+
+    public function testSkipsEmptySingleCheckboxAndUnknownEntries(): void
+    {
+        $script = (new EditableRecordHydrationScriptBuilder())->build([
+            (object) ['type' => 'Checkbox', 'name' => 'flag', 'element' => 12, 'value' => ''],
+            (object) ['type' => 'Unsupported', 'name' => 'ignored', 'element' => 13, 'value' => 'value'],
+        ], 9);
+
+        self::assertSame('', $script);
+    }
+
+    public function testCleansValuesWithoutMutatingInputEntries(): void
+    {
+        $entry = (object) ['type' => 'Text', 'name' => 'title', 'element' => 11, 'value' => '  Hello  '];
+        $builder = new EditableRecordHydrationScriptBuilder(
+            new ContentBuilderValueScriptBuilder(),
+            static fn(string $value): string => trim($value)
+        );
+
+        $script = $builder->build([$entry], 9);
+
+        self::assertStringContainsString('Hello', $script);
+        self::assertSame('  Hello  ', $entry->value);
+    }
+
+    public function testEscapesScriptTerminatorsInChoiceAndSelectValues(): void
+    {
+        $value = '</script><script>alert(1)</script>';
+        $script = (new EditableRecordHydrationScriptBuilder())->build([
+            (object) ['type' => 'Checkbox Group', 'name' => 'unsafe', 'element' => 21, 'value' => $value],
+            (object) ['type' => 'Select List', 'name' => 'unsafe-select', 'element' => 22, 'value' => $value],
+        ], 9);
+
+        self::assertStringNotContainsString('</script>', $script);
+        self::assertStringContainsString('\\u003C\\/script\\u003E', $script);
+    }
+
+    public function testEscapesChoiceFieldNames(): void
+    {
+        $script = (new EditableRecordHydrationScriptBuilder())->build([
+            (object) [
+                'type' => 'Radio Group',
+                'name' => 'choice";alert(1);//',
+                'element' => 23,
+                'value' => 'yes',
+            ],
+        ], 9);
+
+        self::assertStringContainsString('ff_nm_choice\\u0022;alert(1);\\/\\/', $script);
+        self::assertStringNotContainsString('name == "ff_nm_choice";alert(1);//', $script);
+    }
+}

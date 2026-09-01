@@ -19,7 +19,7 @@ final class DropboxUploader
 
     public function __construct(?Http $http = null)
     {
-        $this->http = $http ?? HttpFactory::getHttp();
+        $this->http = $http ?? (new HttpFactory())->getHttp();
     }
 
     public function upload(string $accessToken, string $remotePath, string $localFile): void
@@ -48,8 +48,8 @@ final class DropboxUploader
             ]
         );
 
-        if ($result->code < 200 || $result->code >= 300) {
-            throw new RuntimeException('Dropbox API error: ' . (string) $result->body);
+        if ($result->getStatusCode() < 200 || $result->getStatusCode() >= 300) {
+            throw new RuntimeException('Dropbox API error: ' . (string) $result->getBody());
         }
     }
 }

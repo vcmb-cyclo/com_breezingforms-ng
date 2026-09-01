@@ -21,7 +21,7 @@ final class SalesforceClient
 
     public function __construct(?Http $http = null)
     {
-        $this->http = $http ?? HttpFactory::getHttp();
+        $this->http = $http ?? (new HttpFactory())->getHttp();
     }
 
     public function createRecord(string $username, string $passwordAndToken, string $objectType, array $fields): string
@@ -31,12 +31,13 @@ final class SalesforceClient
             $baseUrl . '/sobjects/' . rawurlencode($objectType) . '/describe',
             $headers
         );
+        $describeBody = (string) $describe->getBody();
 
-        if ($describe->code !== 200) {
-            throw new RuntimeException('Salesforce object description failed: ' . (string) $describe->body);
+        if ($describe->getStatusCode() !== 200) {
+            throw new RuntimeException('Salesforce object description failed: ' . $describeBody);
         }
 
-        $description = json_decode((string) $describe->body, true, 512, JSON_THROW_ON_ERROR);
+        $description = json_decode($describeBody, true, 512, JSON_THROW_ON_ERROR);
         $types = [];
         foreach ($description['fields'] ?? [] as $field) {
             $types[(string) ($field['name'] ?? '')] = (string) ($field['type'] ?? '');
@@ -57,10 +58,11 @@ final class SalesforceClient
             json_encode($fields, JSON_THROW_ON_ERROR),
             $headers
         );
-        $result = json_decode((string) $created->body, true, 512, JSON_THROW_ON_ERROR);
+        $createdBody = (string) $created->getBody();
+        $result = json_decode($createdBody, true, 512, JSON_THROW_ON_ERROR);
 
-        if ($created->code !== 201 || ($result['success'] ?? false) !== true) {
-            throw new RuntimeException('Salesforce record creation failed: ' . (string) $created->body);
+        if ($created->getStatusCode() !== 201 || ($result['success'] ?? false) !== true) {
+            throw new RuntimeException('Salesforce record creation failed: ' . $createdBody);
         }
 
         return (string) ($result['id'] ?? '');
@@ -80,11 +82,13 @@ final class SalesforceClient
             ['Content-Type' => 'text/xml; charset=UTF-8', 'SOAPAction' => 'login']
         );
 
-        if ($response->code !== 200) {
-            throw new RuntimeException('Salesforce login failed: ' . (string) $response->body);
+        $responseBody = (string) $response->getBody();
+
+        if ($response->getStatusCode() !== 200) {
+            throw new RuntimeException('Salesforce login failed: ' . $responseBody);
         }
 
-        $xml = simplexml_load_string((string) $response->body, \SimpleXMLElement::class, LIBXML_NONET);
+        $xml = simplexml_load_string($responseBody, \SimpleXMLElement::class, LIBXML_NONET);
         if ($xml === false) {
             throw new RuntimeException('Invalid Salesforce login response.');
         }

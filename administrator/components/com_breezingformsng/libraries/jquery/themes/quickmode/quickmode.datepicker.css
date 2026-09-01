@@ -208,7 +208,6 @@ img.ui-datepicker-trigger {
 	display/**/: block !important;
 	position: absolute !important;
 	z-index: -1 !important;
-	filter: mask() !important;
 	top: -4px !important;
 	left: -4px !important;
 	width: 193px !important;

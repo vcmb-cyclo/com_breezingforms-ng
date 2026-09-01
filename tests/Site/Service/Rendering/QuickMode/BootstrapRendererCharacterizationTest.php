@@ -37,16 +37,52 @@ require_once __DIR__ . '/joomla-cmsapplication-stub.php';
  */
 final class BootstrapRendererCharacterizationTest extends TestCase
 {
+    public function testPageNavigationRendersSharedPreviousAndNextActions(): void
+    {
+        $renderer = $this->makeRenderer();
+        $this->setPrivate($renderer, 'rootMdata', [
+            'useErrorAlerts' => true,
+            'lastPageThankYou' => false,
+            'pagingInclude' => true,
+            'pagingPrevLabel' => 'Previous',
+            'pagingNextLabel' => 'Next',
+            'submitInclude' => false,
+            'cancelInclude' => false,
+        ]);
+        $this->setPrivate($renderer, 'dataObject', ['children' => [[], [], []]]);
+
+        ob_start();
+        try {
+            $node = [
+                'attributes' => ['id' => 'page2'],
+                'properties' => ['type' => 'page', 'pageNumber' => 2, 'pageIntro' => ''],
+            ];
+            $renderer->process($node);
+            $html = ob_get_contents();
+        } finally {
+            ob_end_clean();
+        }
+
+        self::assertStringContainsString('bfPrevButton', (string) $html);
+        self::assertStringContainsString("ff_validate_prevpage(this, 'click');", (string) $html);
+        self::assertStringContainsString('bfNextButton', (string) $html);
+        self::assertStringContainsString("ff_validate_nextpage(this, 'click');", (string) $html);
+    }
+
     private const SNAPSHOT_DIR = __DIR__ . '/__snapshots__';
 
     /** @var array<string, string> */
     private const BS_CLASSES = [
         'controls' => '',
+        'alert' => 'alert',
+        'alert-error' => 'alert-error',
         'form-inline' => 'bf-form-inline',
         'control-group' => 'mb-3',
         'control-label' => 'form-label',
         'form-control' => 'form-control',
         'form-group' => 'bf-form-group mb-3',
+        'form-actions' => 'form-actions',
+        'form-actions-buttons' => 'form-actions-buttons',
         'icon-question-sign' => 'fas fa-question-circle',
         'icon-asterisk' => 'fas fa-asterisk',
         'nonform-control' => 'nonform-control',
@@ -68,6 +104,8 @@ final class BootstrapRendererCharacterizationTest extends TestCase
         'well' => 'card',
         'well-small' => 'card-body',
         'icon-calendar' => 'fas fa-calendar',
+        'float-start' => 'float-start',
+        'float-end' => 'float-end',
     ];
 
     public function testTextfieldElement(): void
@@ -275,6 +313,21 @@ final class BootstrapRendererCharacterizationTest extends TestCase
         ]));
 
         $this->assertMatchesSnapshot('bootstrap_bfReCaptcha.html', $html);
+    }
+
+    public function testInvisibleReCaptchaElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfReCaptcha', [
+            'dbId' => 59,
+            'hideLabel' => true,
+            'pubkey' => '6Lc-test-pubkey',
+            'invisibleCaptcha' => true,
+            'theme' => 'invisible_inline',
+        ]));
+
+        $this->assertMatchesSnapshot('bootstrap_bfReCaptcha_invisible.html', $html);
     }
 
     public function testCalendarElement(): void

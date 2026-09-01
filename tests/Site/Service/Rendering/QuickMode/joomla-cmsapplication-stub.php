@@ -32,6 +32,7 @@ namespace Joomla\CMS\Application {
 
             private ?FakeWebAssetManager $webAssetManager = null;
             private ?FakeInput $input = null;
+            private ?FakeSession $session = null;
 
             public function isClient(string $client): bool
             {
@@ -61,6 +62,11 @@ namespace Joomla\CMS\Application {
             public function getInput(): FakeInput
             {
                 return $this->input ??= new FakeInput();
+            }
+
+            public function getSession(): FakeSession
+            {
+                return $this->session ??= new FakeSession();
             }
 
             public function setTitle(string $title): void
@@ -180,6 +186,17 @@ namespace Joomla\CMS\Application {
         {
             /** @var array<string, mixed> */
             public array $values = [];
+            public FakeServer $server;
+
+            public function __construct()
+            {
+                $this->server = new FakeServer();
+            }
+
+            public function get(string $name, mixed $default = null, string $filter = 'cmd'): mixed
+            {
+                return $this->values[$name] ?? $default;
+            }
 
             public function getInt(string $name, int $default = 0): int
             {
@@ -194,6 +211,62 @@ namespace Joomla\CMS\Application {
             public function getCmd(string $name, string $default = ''): string
             {
                 return (string) ($this->values[$name] ?? $default);
+            }
+
+            public function getWord(string $name, string $default = ''): string
+            {
+                return (string) ($this->values[$name] ?? $default);
+            }
+
+            public function getBool(string $name, bool $default = false): bool
+            {
+                return (bool) ($this->values[$name] ?? $default);
+            }
+
+            public function set(string $name, mixed $value): void
+            {
+                $this->values[$name] = $value;
+            }
+        }
+    }
+
+    if (!class_exists(FakeServer::class, false)) {
+        final class FakeServer
+        {
+            /** @var array<string, mixed> */
+            public array $values = [];
+
+            public function getString(string $name, string $default = ''): string
+            {
+                return (string) ($this->values[$name] ?? $default);
+            }
+
+            public function getInt(string $name, int $default = 0): int
+            {
+                return (int) ($this->values[$name] ?? $default);
+            }
+        }
+    }
+
+    if (!class_exists(FakeSession::class, false)) {
+        final class FakeSession
+        {
+            /** @var array<string, mixed> */
+            public array $values = [];
+
+            public function get(string $name, mixed $default = null): mixed
+            {
+                return $this->values[$name] ?? $default;
+            }
+
+            public function set(string $name, mixed $value): void
+            {
+                $this->values[$name] = $value;
+            }
+
+            public function clear(string $name): void
+            {
+                unset($this->values[$name]);
             }
         }
     }

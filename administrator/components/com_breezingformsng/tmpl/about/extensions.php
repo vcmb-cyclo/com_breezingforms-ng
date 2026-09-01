@@ -7,10 +7,11 @@
 
 \defined('_JEXEC') or die;
 
+/** @var \Vcmb\Component\BreezingformsNG\Administrator\View\About\HtmlView $this */
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
 
-$plugins = is_array($this->plugins ?? null) ? $this->plugins : [];
+$plugins = $this->plugins;
 ?>
 <div class="card">
     <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-2">

@@ -115,6 +115,49 @@ final class ClassicRendererCharacterizationTest extends TestCase
         self::assertStringContainsString('class="editlinktip hasTooltip"', $html);
     }
 
+    public function testPageNavigationRendersPreviousNextAndCancelActions(): void
+    {
+        $renderer = $this->makeRenderer();
+        $this->setPrivate($renderer, 'rootMdata', [
+            'joomlaHint' => false,
+            'useErrorAlerts' => true,
+            'lastPageThankYou' => false,
+            'pagingInclude' => true,
+            'pagingPrevLabel' => 'Previous',
+            'pagingNextLabel' => 'Next',
+            'submitInclude' => false,
+            'cancelInclude' => true,
+            'cancelLabel' => 'Cancel',
+        ]);
+        $this->setPrivate($renderer, 'dataObject', ['children' => [[], [], []]]);
+
+        $html = $this->render($renderer, [
+            'attributes' => ['id' => 'page2'],
+            'properties' => [
+                'type' => 'page',
+                'pageNumber' => 2,
+                'pageIntro' => '',
+            ],
+        ]);
+
+        self::assertStringContainsString('class="btn btn-primary bfPrevButton', $html);
+        self::assertStringContainsString("ff_validate_prevpage(this, 'click');", $html);
+        self::assertStringContainsString('class="btn btn-primary bfNextButton', $html);
+        self::assertStringContainsString("ff_validate_nextpage(this, 'click');", $html);
+
+        $lastPageHtml = $this->render($renderer, [
+            'attributes' => ['id' => 'page3'],
+            'properties' => [
+                'type' => 'page',
+                'pageNumber' => 3,
+                'pageIntro' => '',
+            ],
+        ]);
+
+        self::assertStringContainsString('class="btn btn-primary bfCancelButton', $lastPageHtml);
+        self::assertStringContainsString("ff_resetForm(this, 'click');", $lastPageHtml);
+    }
+
     public function testTextareaElement(): void
     {
         $renderer = $this->makeRenderer();
@@ -382,6 +425,21 @@ final class ClassicRendererCharacterizationTest extends TestCase
         ]));
 
         $this->assertMatchesSnapshot('classic_bfReCaptcha.html', $html);
+    }
+
+    public function testInvisibleReCaptchaElement(): void
+    {
+        $renderer = $this->makeRenderer();
+
+        $html = $this->render($renderer, $this->elementNode('bfReCaptcha', [
+            'dbId' => 59,
+            'hideLabel' => true,
+            'pubkey' => '6Lc-test-pubkey',
+            'invisibleCaptcha' => true,
+            'theme' => 'invisible_inline',
+        ]));
+
+        $this->assertMatchesSnapshot('classic_bfReCaptcha_invisible.html', $html);
     }
 
     public function testCalendarElement(): void

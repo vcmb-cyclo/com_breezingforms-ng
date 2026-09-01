@@ -9,11 +9,15 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\CMS\MVC\Factory\MVCFactoryServiceInterface;
+use Vcmb\Component\BreezingformsNG\Administrator\Model\PackageModel;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\PieceModel;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\ScriptModel;
 
+/** @property CMSApplication $app */
 class DisplayController extends BaseController
 {
     public function display($cachable = false, $urlparams = [])
@@ -126,10 +130,18 @@ class DisplayController extends BaseController
         }
 
         if ($package !== '') {
-            $model = $this->app
-                ->bootComponent('com_breezingformsng')
-                ->getMVCFactory()
+            $component = $this->app->bootComponent('com_breezingformsng');
+
+            if (!$component instanceof MVCFactoryServiceInterface) {
+                throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+            }
+
+            $model = $component->getMVCFactory()
                 ->createModel($view === 'pieces' ? 'Piece' : 'Script', 'Administrator', ['ignore_request' => true]);
+
+            if (!$model instanceof PackageModel) {
+                throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+            }
 
             if (
                 ($view === 'pieces' && !$model instanceof PieceModel)

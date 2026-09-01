@@ -9,6 +9,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
@@ -18,6 +19,7 @@ use Joomla\Database\DatabaseInterface;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\PieceManager;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\PieceModel;
 
+/** @property CMSApplication $app */
 class PiecesController extends BaseController
 {
     public function add(): void

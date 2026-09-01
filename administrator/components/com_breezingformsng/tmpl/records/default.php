@@ -7,6 +7,7 @@
 
 \defined('_JEXEC') or die;
 
+/** @var \Vcmb\Component\BreezingformsNG\Administrator\View\Records\HtmlView $this */
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
@@ -30,6 +31,25 @@ $pageUrl = function (int $start) use ($listOrder, $listDirn, $formSelection, $se
         . '&form_selection=' . $formSelection
         . ($searchTerm !== '' ? '&searchterm=' . rawurlencode($searchTerm) : '')
         . '&limitstart=' . $start;
+};
+
+$editUrl = static function (int $recordId) use ($listOrder, $listDirn, $formSelection, $searchTerm, $limit, $limitStart): string {
+    $query = [
+        'option'            => 'com_breezingformsng',
+        'view'              => 'records',
+        'layout'            => 'edit',
+        'record_id'         => $recordId,
+        'form_selection'    => $formSelection,
+        'filter_order'      => $listOrder,
+        'filter_order_Dir'  => $listDirn,
+        'limit'             => $limit,
+        'limitstart'        => $limitStart,
+    ];
+    if ($searchTerm !== '') {
+        $query['searchterm'] = $searchTerm;
+    }
+
+    return 'index.php?' . http_build_query($query, '', '&', PHP_QUERY_RFC3986);
 };
 
 $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key), ENT_QUOTES, 'UTF-8');
@@ -86,7 +106,7 @@ $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key)
             <td class="text-center"><?= HTMLHelper::_('grid.id', $i, $recId); ?></td>
             <td><?= $recId; ?></td>
             <td>
-              <a href="index.php?option=com_breezingformsng&view=records&layout=edit&record_id=<?= $recId; ?>&form_selection=<?= $this->formSelection; ?>" title="<?= $headerTitle('JACTION_EDIT'); ?>">
+              <a href="<?= htmlspecialchars($editUrl($recId), ENT_QUOTES, 'UTF-8'); ?>" title="<?= $headerTitle('JACTION_EDIT'); ?>">
                 <?= htmlspecialchars((string) $rec['form_title']); ?>
               </a>
             </td>
@@ -116,7 +136,7 @@ $headerTitle = static fn (string $key): string => htmlspecialchars(Text::_($key)
   </table>
 
   <?php if ($totalPages > 1): ?>
-  <nav aria-label="<?= Text::_('JPAGINATION'); ?>">
+  <nav aria-label="<?= Text::_('JLIB_HTML_PAGINATION'); ?>">
     <ul class="pagination justify-content-center">
       <?php if ($currentPage > 0): ?>
         <li class="page-item"><a class="page-link" href="<?= $pageUrl(0); ?>">&laquo;</a></li>

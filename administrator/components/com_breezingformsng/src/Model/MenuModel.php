@@ -404,7 +404,7 @@ class MenuModel extends BaseDatabaseModel
             foreach ($existingIds as $existingId) {
                 $table = $menusFactory->createTable('Menu', 'Administrator');
 
-                if (!$table || !$table->delete($existingId, true)) {
+                if (!$table instanceof \Joomla\CMS\Table\Menu || !$table->delete($existingId, true)) {
                     throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
                 }
             }
@@ -418,7 +418,7 @@ class MenuModel extends BaseDatabaseModel
                 $alias = OutputFilter::stringURLSafe($title) . '-' . (int) $item->id;
                 $table = $menusFactory->createTable('Menu', 'Administrator');
 
-                if (!$table) {
+                if (!$table instanceof \Joomla\CMS\Table\Menu) {
                     throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
                 }
 

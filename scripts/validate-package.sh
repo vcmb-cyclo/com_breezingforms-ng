@@ -87,4 +87,16 @@ if ! unzip -p "${archive}" com_breezingformsng.xml \
     exit 1
 fi
 
+if ! unzip -p "${archive}" com_breezingformsng.xml \
+    | grep -Fq '<media folder="media">'; then
+    echo "BreezingForms themes media directory is not declared in the manifest." >&2
+    exit 1
+fi
+
+if ! unzip -p "${archive}" com_breezingformsng.xml \
+    | grep -Fq '<folder>breezingforms/themes</folder>'; then
+    echo "BreezingForms themes folder is not declared in the manifest." >&2
+    exit 1
+fi
+
 echo "Package validation passed: ${archive}"

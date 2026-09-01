@@ -1,0 +1,107 @@
+<?php
+
+/**
+ * BreezingForms NG - A Joomla Forms Application
+ *
+ * @package BreezingFormsNG
+ * @copyright Copyright (C) 2024-2026 by XDA+GIL
+ * @license GNU General Public License version 2 or later; see LICENSE.txt
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ **/
+
+declare(strict_types=1);
+
+namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering;
+
+/**
+ * Builds the hidden `<input>` fields the rendered form needs to submit
+ * correctly - payment method, CSRF token, routing, submission mode and
+ * miscellaneous context/extra parameters. Consolidates what were six
+ * single-purpose, single-caller classes (PaymentMethodFieldBuilder,
+ * FormTokenFieldBuilder, AdditionalHiddenFieldsBuilder,
+ * FormRoutingFieldsBuilder, FormSubmissionFieldsBuilder,
+ * FormContextFieldsBuilder) - see php-architecture-migration-plan.md,
+ * "Consolider les builders de champs cachés triviaux".
+ */
+final class HiddenFormFieldsBuilder
+{
+    public function paymentMethod(string $indentation): string
+    {
+        return $indentation . '<input type="hidden" name="ff_payment_method" id="bfPaymentMethod" value=""/>' . "\n";
+    }
+
+    public function token(string $token, string $indentation, string $newline = "\r\n"): string
+    {
+        return $indentation . $token . $newline;
+    }
+
+    /**
+     * @param array<int|string, mixed> $parameters
+     */
+    public function additional(array $parameters, string $indentation, string $newline = "\r\n"): string
+    {
+        $output = '';
+
+        foreach ($parameters as $name => $value) {
+            $output .= $indentation . '<input type="hidden" name="'
+                . htmlentities((string) $name, ENT_QUOTES, 'UTF-8') . '" value="'
+                . htmlentities(urlencode((string) $value), ENT_QUOTES, 'UTF-8') . '"/>' . $newline;
+        }
+
+        return $output;
+    }
+
+    public function routing(string $return, string $template, string $newline = "\r\n"): string
+    {
+        $fields = '';
+
+        if ($return !== '') {
+            $fields .= '<input type="hidden" name="return" value="'
+                . htmlentities($return, ENT_QUOTES, 'UTF-8') . '"/>' . $newline;
+        }
+
+        if ($template === 'component') {
+            $fields .= '<input type="hidden" name="tmpl" value="component"/>' . $newline;
+        }
+
+        return $fields;
+    }
+
+    public function submission(
+        int $formId,
+        string $indent,
+        string $newline,
+        bool $backend = false,
+        bool $frame = false
+    ): string {
+        $fields = '';
+        if ($backend || $frame) {
+            $fields .= $indent . '<input type="hidden" name="option" value="com_breezingformsng"/>' . $newline;
+            $fields .= $indent . '<input type="hidden" name="' . ($backend ? 'act' : 'ff_frame')
+                . '" value="' . ($backend ? 'run' : '1') . '"/>' . $newline;
+        }
+
+        $fields .= $indent . '<input type="hidden" name="ff_form" value="'
+            . htmlentities((string) $formId, ENT_QUOTES, 'UTF-8') . '"/>' . $newline;
+        $fields .= $indent . '<input type="hidden" name="ff_task" value="submit"/>' . $newline;
+
+        return $fields;
+    }
+
+    /**
+     * @param array<string, int|string> $fields
+     */
+    public function context(array $fields, string $indentation, string $newline = "\r\n"): string
+    {
+        $output = '';
+
+        foreach ($fields as $name => $value) {
+            $output .= $indentation . '<input type="hidden" name="'
+                . htmlentities($name, ENT_QUOTES, 'UTF-8') . '" value="'
+                . htmlentities((string) $value, ENT_QUOTES, 'UTF-8') . '"/>' . $newline;
+        }
+
+        return $output;
+    }
+}

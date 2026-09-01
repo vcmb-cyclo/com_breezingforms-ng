@@ -1,12 +1,12 @@
 /* Extracted from BFQuickMode's inline process() script (Phase 9c step 2b,
    bfReCaptcha case, visible/checkbox variant). Byte-identical across
-   ClassicRenderer/BootstrapRenderer/MobileRenderer/OnePageRenderer except
-   one flag: ClassicRenderer's grecaptcha.render() call passes a second
-   `true` argument (undocumented, kept as `resetOnRerender` below since the
-   other three themes never passed it and this document has no record of
+   ClassicRenderer/BootstrapRenderer/OnePageRenderer except one flag:
+   ClassicRenderer's grecaptcha.render() call passes a second `true`
+   argument (undocumented, kept as `resetOnRerender` below since the
+   other two themes never passed it and this document has no record of
    why Classic alone does). Only the sitekey/theme/size and that flag are
    dynamic; everything else (the script-already-loaded guard) was
-   duplicated verbatim in all four files. */
+   duplicated verbatim in all three files. */
 function bfInitVisibleReCaptcha(options) {
 	var onloadBFNewRecaptchaCallback = function () {
 		var config = {

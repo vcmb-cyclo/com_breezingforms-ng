@@ -9,8 +9,10 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Forms;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\MVC\Factory\MVCFactoryServiceInterface;
 use Joomla\CMS\Pagination\Pagination;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Toolbar\ToolbarHelper;
@@ -40,11 +42,17 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
 
     public function display($tpl = null): void
     {
-        $input   = Factory::getApplication()->getInput();
+        /** @var CMSApplication $app */
+        $app     = Factory::getApplication();
+        $input   = $app->getInput();
         $layout  = $input->getCmd('layout', 'default');
-        $factory = Factory::getApplication()
-            ->bootComponent('com_breezingformsng')
-            ->getMVCFactory();
+        $component = $app->bootComponent('com_breezingformsng');
+
+        if (!$component instanceof MVCFactoryServiceInterface) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        $factory = $component->getMVCFactory();
 
         /** @var FormsModel $listModel */
         $listModel = $factory->createModel('Forms', 'Administrator', ['ignore_request' => true]);
@@ -62,7 +70,7 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
             // Submit piece pickers call bfToggle() inline via onchange to
             // swap which code editor is visible - defined here, not in the
             // list-only branch below.
-            $document = Factory::getApplication()->getDocument();
+            $document = $app->getDocument();
             $wa = $document->getWebAssetManager();
             $wa->registerAndUseStyle(
                 'com_breezingformsng.forms-edit',
@@ -84,8 +92,8 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
             $this->form = $id > 0 ? $formModel->getForm($id) : $formModel->getDefaultForm($this->pkg);
 
             if ($this->form === null) {
-                Factory::getApplication()->enqueueMessage(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'), 'error');
-                Factory::getApplication()->redirect('index.php?option=com_breezingformsng&view=forms');
+                $app->enqueueMessage(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'), 'error');
+                $app->redirect('index.php?option=com_breezingformsng&view=forms');
                 return;
             }
 
@@ -99,7 +107,7 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
             ToolbarHelper::apply('forms.save');
             ToolbarHelper::cancel('forms.cancel', $id > 0 ? 'JTOOLBAR_CLOSE' : 'JTOOLBAR_CANCEL');
         } else {
-            $document = Factory::getApplication()->getDocument();
+            $document = $app->getDocument();
             $wa       = $document->getWebAssetManager();
             $wa->useScript('com_breezingformsng.admin-sort');
             $wa->registerAndUseScript(
@@ -127,7 +135,7 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
             Text::script('JUNPUBLISHED');
             Text::script('COM_BREEZINGFORMSNG_AJAX_STATE_ERROR');
 
-            $session = Factory::getApplication()->getSession();
+            $session = $app->getSession();
             $pkgIn   = $input->getString('pkg', '__unset__');
             $this->pkg   = $this->resolvePackage($pkgIn, $listModel, $session);
 
@@ -164,8 +172,8 @@ class HtmlView extends \Vcmb\Component\BreezingformsNG\Administrator\View\Breezi
                 $this->listDirn = strtolower((string) $session->get('bf.forms_dir', 'asc'));
             }
 
-            $this->limit      = (int) Factory::getApplication()->getUserStateFromRequest(
-                'global.list.limit', 'limit', (int) Factory::getApplication()->get('list_limit'), 'int'
+            $this->limit      = (int) $app->getUserStateFromRequest(
+                'global.list.limit', 'limit', (int) $app->get('list_limit'), 'int'
             );
             $this->limitStart = $input->getInt('limitstart', 0);
             $this->total      = $listModel->getTotal($this->pkg, $this->search, $this->filterState);

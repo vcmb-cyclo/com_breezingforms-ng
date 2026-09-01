@@ -28,11 +28,6 @@
     max-width: 100%;
 }
 
-.bf-forms-edit .card-header {
-    color: #fff;
-    background-color: var(--template-link-color, #2f70b9);
-}
-
 @media (max-width: 767.98px) {
     .bf-forms-edit {
         margin: 1rem 0;

@@ -12,18 +12,18 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Upload;
 
 \defined('_JEXEC') or die;
 
-use DateInterval;
-use DateTimeZone;
-use Joomla\CMS\Date\Date;
 use Joomla\CMS\Filter\InputFilter;
 use Joomla\Filesystem\File;
 use Joomla\Filesystem\Folder;
 use Joomla\Input\Input;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampAdjuster;
 
 final class TokenizedDirectoryResolver
 {
-    public function __construct(private readonly Input $input)
-    {
+    public function __construct(
+        private readonly Input $input,
+        private readonly SubmissionTimestampAdjuster $timestampAdjuster = new SubmissionTimestampAdjuster()
+    ) {
     }
 
     /**
@@ -100,14 +100,7 @@ final class TokenizedDirectoryResolver
      */
     private function formatSubmittedAt(string $submittedAt, string $timezone): array
     {
-        $date = new Date($submittedAt, new DateTimeZone($timezone));
-        $offset = $date->getOffsetFromGMT();
-
-        if ($offset > 0) {
-            $date->add(new DateInterval('PT' . $offset . 'S'));
-        } elseif ($offset < 0) {
-            $date->sub(new DateInterval('PT' . abs($offset) . 'S'));
-        }
+        $date = $this->timestampAdjuster->adjust($submittedAt, $timezone);
 
         return [
             $date->format('Y_m_d', true),

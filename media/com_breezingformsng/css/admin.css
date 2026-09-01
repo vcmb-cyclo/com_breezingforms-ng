@@ -3,7 +3,7 @@
     color: red;
 }
 
-.bfLanguageButton{
+.bfLanguageButton:not(.bfng-seg__opt){
     display: inline-block;
     width: 40px;
     height: 30px;
@@ -16,8 +16,8 @@
     margin-bottom: 5px;
 }
 
-.bfLanguageButton.bfLanguageButtonActive{
-    background-color: red;   
+.bfLanguageButton.bfLanguageButtonActive:not(.bfng-seg__opt){
+    background-color: red;
 }
 
 #bfQuickModeWrapper, #bfQuickModeWrapper li, #bfQuickModeWrapper li a, #bfQuickModeWrapper label{
@@ -31,7 +31,7 @@
     min-width: 90% !important;
 }
 
-#bfSaveQueue{
+#bfSaveQueue:not(.bfng-message){
 	font: 11px Verdana, Geneva, sans-serif;
 	border: 2px solid #E5E5E5;
 	background-color: #F5F5F5;
@@ -47,27 +47,27 @@
 overflow:hidden;width: 100%;
 }
 
-#bfQuickModeLeft {
+#bfQuickModeLeft:not(.bfng-split__aside) {
 	float: left;
 	width: 300px;
 }
 
-#bfQuickModeRight {
+#bfQuickModeRight:not(.bfng-split__main) {
 	padding-left: 310px;
 }
 
 @media (max-width: 767px) {
-    #bfQuickModeLeft {
+    #bfQuickModeLeft:not(.bfng-split__aside) {
 	float: none;
 	width: 100%;
     }
-    
-    #bfQuickModeRight {
+
+    #bfQuickModeRight:not(.bfng-split__main) {
 	padding-left: 0;
         width: 75%;
     }
-    
-    #bfQuickModeWrapper label.bfPropertyLabel {
+
+    #bfQuickModeWrapper label.bfPropertyLabel:not(.bfng-field__label) {
         float: none !important;
         min-width: 100%;
         display:block;
@@ -86,8 +86,8 @@ overflow:hidden;width: 100%;
 /* ##### hr ##### */
 
 #bfQuickModeWrapper hr {
-	color:#ccc;
-	background-color:#ccc;
+	color: var(--bfng-border, #ccc);
+	background-color: var(--bfng-border, #ccc);
 	height:1px;
 	border:none;
 	margin: 10px 0 10px 0;
@@ -99,7 +99,7 @@ overflow:hidden;width: 100%;
 	padding: 10px;
 }
 
-#bfQuickModeWrapper label.bfPropertyLabel {
+#bfQuickModeWrapper label.bfPropertyLabel:not(.bfng-field__label) {
 	float: left;
 	min-width: 40%;
 	margin-right: 10px;
@@ -109,21 +109,31 @@ overflow:hidden;width: 100%;
 	height: 100px;
 }
 
-#bfQuickModeWrapper input[type="text"], #bfQuickModeWrapper input[type="password"], #bfQuickModeWrapper textarea, #bfQuickModeWrapper select {
-    border: 1px solid #bbb;
+/*
+ * Excludes #bfOptionsFieldsWrap: the QuickMode "Options" tab embeds the
+ * classic forms/edit.php content there (Bootstrap .form-control/.form-select),
+ * which this flat legacy look would otherwise override - see
+ * docs/maintenance/quickmode-options-tab-plan.md.
+ */
+#bfQuickModeWrapper input[type="text"]:not(#bfOptionsFieldsWrap *),
+#bfQuickModeWrapper input[type="password"]:not(#bfOptionsFieldsWrap *),
+#bfQuickModeWrapper textarea:not(#bfOptionsFieldsWrap *),
+#bfQuickModeWrapper select:not(#bfOptionsFieldsWrap *) {
+    border: 1px solid var(--bfng-border-strong, #bbb);
     padding: 2px;
     line-height: normal;
-    background: #f8f8f8;
+    background: var(--bfng-surface, #f8f8f8);
+    color: var(--bfng-text, inherit);
     font-size: 100%;
     width: 50%;
 }
 
 #bfQuickModeWrapper textarea:hover, #bfQuickModeWrapper input[type='text']:hover, #bfQuickModeWrapper input[type='password']:hover, #bfQuickModeWrapper select:hover {
-    border-color: #92c1ff;
+    border-color: var(--bfng-accent-500, #92c1ff);
 }
 
 #bfQuickModeWrapper textarea:focus, #bfQuickModeWrapper input[type='text']:focus, #bfQuickModeWrapper input[type='password']:focus, #bfQuickModeWrapper select:focus {
-    border-color: #0071bc; outline: 2px solid #92c1ff;
+    border-color: var(--bfng-accent-600, #0071bc); outline: 2px solid var(--bfng-accent-100, #92c1ff);
 }
 
 #bfQuickModeWrapper input[type='button'], #bfQuickModeWrapper input[type='submit'], #bfQuickModeWrapper input[type='checkbox'], #bfQuickModeWrapper input[type='image'], #bfQuickModeWrapper input[type='radio'], #bfQuickModeWrapper input[type='reset'], #bfQuickModeWrapper select, #bfQuickModeWrapper button {
@@ -141,7 +151,7 @@ overflow:hidden;width: 100%;
 }
 
 /* option tabs */
-#menutab .nav-tabs {
+#menutab .nav-tabs:not(.bfng-tabs) {
     height: 37px;
     border-bottom: none;
 }
@@ -152,7 +162,7 @@ overflow:hidden;width: 100%;
     }
 }
 
-#menutab .nav-link {
+#menutab .nav-tabs:not(.bfng-tabs) .nav-link {
     padding: 3px 12px !important;
     background: #0088CC !important;
     color: #fff !important;
@@ -161,25 +171,25 @@ overflow:hidden;width: 100%;
     border-radius: 0;
 }
 
-#menutab .nav-link.active {
+#menutab .nav-tabs:not(.bfng-tabs) .nav-link.active {
     background: #fff !important;
     color: #0088CC !important;
     border: 1px solid #0088CC;
     border-bottom-color: #fff;
 }
 
-.tab-items,
-.tab-element,
-.tab-form {
+.tab-items:not(.bfng-tabs *),
+.tab-element:not(.bfng-tabs *),
+.tab-form:not(.bfng-tabs *) {
     padding-right: 0 !important;
     background: none !important;
 }
 
-.bfFadingMessage{
+.bfFadingMessage:not(.bfng-message){
     margin-bottom: 10px;
 }
 
-.bfPropertyWrap, .bfPropertyWrap:active, .bfPropertyWrap:visited{
+.bfPropertyWrap:not(.bfng-field), .bfPropertyWrap:not(.bfng-field):active, .bfPropertyWrap:not(.bfng-field):visited{
     min-height: 30px;
     background-color: transparent;
     padding: 5px;
@@ -192,7 +202,7 @@ overflow:hidden;width: 100%;
     border-bottom-color: #fafafa;
 }
 
-.bfPropertyWrap:hover{
+.bfPropertyWrap:not(.bfng-field):hover{
     background-color: #FCFCFC;
     border-left-style: solid;
     border-left-width: 3px;
@@ -244,53 +254,6 @@ overflow:hidden;width: 100%;
 }
 
 
-#bfAvailableFieldsOpen{
-    padding: 10px;
-    background-color: #faa732;
-    color: #ffffff;
-    cursor: pointer;
-}
-
-#bfAvailableFields{
-    display: none;
-    max-height: 400px;
-    overflow: auto;
-    width: 500px;
-    margin-top: 10px;
-}
-
-@media (max-width: 767px) {
-    #bfAvailableFields{
-        width: 100%;
-    }
-}
-
-#bfAvailableFields table{
-    border: 0;
-}
-
-#bfAvailableFields table td {
-    padding-bottom: 10px;
-}
-
-
-.bfAvailableFields label {
-    vertical-align: text-bottom;
-    text-align: center;
-}
-
-.bfAvailableField {
-    text-align: center;
-    display: table-cell;
-    vertical-align: middle;
-    background-color: #2d89ef;
-    width: 120px;
-    color: #ffffff;
-    height: 60px;
-}
-
-
-
 /* Search */
 
 #bfSearchMenu{
@@ -332,31 +295,6 @@ overflow:hidden;width: 100%;
     border: none;
     padding: 0;
   }
-}
-
-#bfSearch{
-    display: none;
-    max-height: 400px;
-    overflow: auto;
-    width: 500px;
-    margin-top: 10px;
-}
-
-@media (max-width: 767px) {
-    #bfSearch{
-        display: none;
-        max-height: 400px;
-        overflow: auto;
-        width: 100%;
-        margin-top: 10px;
-    }
-}
-
-#bfSearchOpen{
-    padding: 10px;
-    background-color: #faa732;
-    color: #ffffff;
-    cursor: pointer;
 }
 
 #bfrecordsearch {
@@ -401,38 +339,6 @@ overflow:hidden;width: 100%;
 
 .ui-dialog{
     z-index: 200001;
-}
-
-.bfDetailsTable{
-    width: 100%;
-}
-
-.bfDetailsTable td
-{
-    padding: 5px;
-}
-
-.bfDetailsTable tr:nth-child(2n){
-    background: #F5F5F5;
-}
-
-.bfDetailsTableLabelCol{
-    width: 20%;
-    overflow: auto;
-    max-width: 100px !important;
-}
-
-.bfDetailsTableLabelCol strong{
-    color: #bbb;
-}
-
-.bfDetailsTableValueCol{
-    width: 30%;
-}
-
-.bfDetailsTableHead{
-    background: #92c1ff;
-    color: #ffffff;
 }
 
 .ct-records-cell-centered{

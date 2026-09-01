@@ -71,6 +71,44 @@ final class PaymentCallbackRegressionTest extends TestCase
         }
     }
 
+    public function testDownloadCallbacksDelegateAttemptLimitToSharedPolicy(): void
+    {
+        foreach (['StripeCallback', 'PayPalCallback', 'SofortCallback'] as $callback) {
+            $source = $this->read("components/com_breezingformsng/src/Service/Callback/{$callback}.php");
+
+            self::assertStringContainsString('$this->downloadPolicy->canDownload(', $source, $callback);
+            self::assertStringNotContainsString(
+                'paypal_download_tries < $options[\'downloadTries\']',
+                $source,
+                $callback
+            );
+        }
+    }
+
+    public function testEngineDispatcherSharesPaymentDownloadPolicyWithCallbacks(): void
+    {
+        $source = $this->read('components/com_breezingformsng/src/Service/EngineDispatcher.php');
+
+        self::assertStringContainsString('PaymentDownloadPolicy $paymentDownloadPolicy', $source);
+        self::assertSame(1, substr_count($source, '$this->paymentDownloadPolicy ='));
+        self::assertSame(10, substr_count($source, '$this->paymentDownloadPolicy'));
+    }
+
+    public function testStripeSubmissionIteratesEveryTemplateArea(): void
+    {
+        $source = $this->read('components/com_breezingformsng/src/Service/Submission/SubmissionEngine.php');
+        $stripeStart = strrpos($source, "case 'Stripe':");
+        $paypalStart = strpos($source, "case 'PayPal':", $stripeStart);
+
+        self::assertIsInt($stripeStart);
+        self::assertIsInt($paypalStart);
+        self::assertStringContainsString(
+            'foreach ($areas as $area)',
+            substr($source, $stripeStart, $paypalStart - $stripeStart)
+        );
+        self::assertStringNotContainsString('isset($stripeemail)', $source);
+    }
+
     private function read(string $path): string
     {
         $source = file_get_contents(self::ROOT . '/' . $path);

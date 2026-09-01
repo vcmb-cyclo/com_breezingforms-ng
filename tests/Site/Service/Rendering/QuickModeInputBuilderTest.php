@@ -1,0 +1,72 @@
+<?php
+
+/**
+ * BreezingForms NG - A Joomla Forms Application
+ *
+ * @package BreezingFormsNG
+ * @copyright Copyright (C) 2024-2026 by XDA+GIL
+ * @license GNU General Public License version 2 or later; see LICENSE.txt
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ **/
+
+declare(strict_types=1);
+
+namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Rendering;
+
+use PHPUnit\Framework\TestCase;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\QuickModeInputBuilder;
+
+final class QuickModeInputBuilderTest extends TestCase
+{
+    public function testBuildEscapesValueAndPlaceholderAndKeepsAttributesOrder(): void
+    {
+        $html = (new QuickModeInputBuilder())->build(
+            'ff_elem',
+            'text',
+            'name',
+            '  A&B "quoted"  ',
+            12,
+            'style="width:20em" tabindex="1" ',
+            'Enter a value'
+        );
+
+        self::assertSame(
+            '<input placeholder="Enter a value" class="ff_elem" style="width:20em" tabindex="1" '
+            . 'type="text" name="ff_nm_name[]" value="A&amp;B &quot;quoted&quot;" id="ff_elem12"/>' . "\n",
+            $html
+        );
+    }
+
+    public function testBuildSupportsTypeSpecificSuffixAttributes(): void
+    {
+        $html = (new QuickModeInputBuilder())->build(
+            'ff_elem inputbox',
+            'range',
+            'age',
+            '10',
+            13,
+            '',
+            '',
+            ' step="1" max="120" min="0"'
+        );
+
+        self::assertStringContainsString('type="range"', $html);
+        self::assertStringContainsString('id="ff_elem13" step="1" max="120" min="0"', $html);
+    }
+
+    public function testEscapesInputAttributeValues(): void
+    {
+        $html = (new QuickModeInputBuilder())->build(
+            'ff_elem" onfocus="alert(1)',
+            'text" onfocus="alert(2)',
+            'field" onfocus="alert(3)',
+            'value',
+            12
+        );
+
+        self::assertStringContainsString('ff_elem&quot; onfocus=&quot;alert(1)', $html);
+        self::assertStringContainsString('type="text&quot; onfocus=&quot;alert(2)', $html);
+        self::assertStringContainsString('ff_nm_field&quot; onfocus=&quot;alert(3)[]', $html);
+    }
+}

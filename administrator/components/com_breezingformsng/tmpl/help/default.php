@@ -7,6 +7,7 @@
 
 \defined('_JEXEC') or die;
 
+/** @var \Vcmb\Component\BreezingformsNG\Administrator\View\Help\HtmlView $this */
 use Joomla\CMS\Language\Text;
 
 $section = $this->section;

@@ -9,8 +9,10 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\CMS\MVC\Factory\MVCFactoryServiceInterface;
 use Joomla\CMS\Response\JsonResponse;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
@@ -18,7 +20,9 @@ use Joomla\Utilities\ArrayHelper;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\RecordModel;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\AjaxStateService;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\PdfDocument;
+use Vcmb\Component\BreezingformsNG\Administrator\Service\PdfFontDirectoryScanner;
 
+/** @property CMSApplication $app */
 class RecordsController extends BaseController
 {
     public function display($cachable = false, $urlparams = [])
@@ -33,7 +37,7 @@ class RecordsController extends BaseController
         $this->app->redirect(
             'index.php?option=com_breezingformsng&view=records&layout=edit'
             . '&record_id=' . $input->getInt('record_id', 0)
-            . '&form_selection=' . $input->getInt('form_selection', 0)
+            . $this->listStateQuery($input)
         );
     }
 
@@ -50,10 +54,9 @@ class RecordsController extends BaseController
         $app = $this->app;
         $input = $app->getInput();
         $recordId = $input->getInt('record_id', 0);
-        $formSelection = $input->getInt('form_selection', 0);
 
         if ($recordId > 0) {
-            $values = $input->get('element', [], 'post', 'array');
+            $values = $input->post->get('element', [], 'array');
             $this->getRecordModel()->saveRecord(
                 $recordId,
                 is_array($values) ? $values : [],
@@ -64,7 +67,7 @@ class RecordsController extends BaseController
         $app->redirect(
             'index.php?option=com_breezingformsng&view=records&layout=edit'
             . '&record_id=' . $recordId
-            . '&form_selection=' . $formSelection
+            . $this->listStateQuery($input)
         );
     }
 
@@ -74,9 +77,15 @@ class RecordsController extends BaseController
 
         $app = $this->app;
         $input = $app->getInput();
-        $ids = $input->get('cid', [], 'post', 'array');
+        $ids = $input->post->get('cid', [], 'array');
         ArrayHelper::toInteger($ids);
-        $contentFactory = $app->bootComponent('com_content')->getMVCFactory();
+        $contentComponent = $app->bootComponent('com_content');
+
+        if (!$contentComponent instanceof MVCFactoryServiceInterface) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        $contentFactory = $contentComponent->getMVCFactory();
         $this->getRecordModel()->deleteRecords($ids, $contentFactory);
         $app->redirect($this->listUrl($input));
     }
@@ -152,7 +161,7 @@ class RecordsController extends BaseController
 
         $app = $this->app;
         $input = $app->getInput();
-        $ids = $input->get('cid', [], 'post', 'array');
+        $ids = $input->post->get('cid', [], 'array');
         ArrayHelper::toInteger($ids);
         $formSelection = $input->getInt('form_selection', 0);
 
@@ -217,11 +226,7 @@ class RecordsController extends BaseController
         $activeFound = false;
         $ttfName = '';
         $fontDir = JPATH_SITE . '/media/breezingforms/pdftpl/fonts/';
-        if (is_dir($fontDir) && ($dh = @opendir($fontDir))) {
-            while (false !== ($f = @readdir($dh))) {
-                if ($f === '.' || $f === '..') {
-                    continue;
-                }
+        foreach ((new PdfFontDirectoryScanner())->scan($fontDir) as $f) {
                 $lower = strtolower($f);
                 if (str_ends_with($lower, '.php')) {
                     $parts = explode('.', $f);
@@ -237,8 +242,6 @@ class RecordsController extends BaseController
                     $pdf->SetFont($ttfName ?: implode('_', $parts));
                     $activeFound = true;
                 }
-            }
-            @closedir($dh);
         }
 
         if (!$activeFound) {
@@ -270,7 +273,7 @@ class RecordsController extends BaseController
 
         $app = $this->app;
         $input = $app->getInput();
-        $ids = $input->get('cid', [], 'post', 'array');
+        $ids = $input->post->get('cid', [], 'array');
         ArrayHelper::toInteger($ids);
         $formSelection = $input->getInt('form_selection', 0);
 
@@ -386,7 +389,7 @@ class RecordsController extends BaseController
 
         $app = $this->app;
         $input = $app->getInput();
-        $ids = $input->get('cid', [], 'post', 'array');
+        $ids = $input->post->get('cid', [], 'array');
         ArrayHelper::toInteger($ids);
         $formSelection = $input->getInt('form_selection', 0);
 
@@ -485,7 +488,7 @@ class RecordsController extends BaseController
 
         $app = $this->app;
         $input = $app->getInput();
-        $ids = $input->get('cid', [], 'post', 'array');
+        $ids = $input->post->get('cid', [], 'array');
         ArrayHelper::toInteger($ids);
         $this->getRecordModel()->setFlagsBatch($ids, $column, $value);
 
@@ -503,10 +506,19 @@ class RecordsController extends BaseController
 
     private function getRecordModel(): RecordModel
     {
-        return $this->app
-            ->bootComponent('com_breezingformsng')
-            ->getMVCFactory()
-            ->createModel('Record', 'Administrator');
+        $component = $this->app->bootComponent('com_breezingformsng');
+
+        if (!$component instanceof MVCFactoryServiceInterface) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        $model = $component->getMVCFactory()->createModel('Record', 'Administrator');
+
+        if (!$model instanceof RecordModel) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        return $model;
     }
 
     private function getTimezone(): \DateTimeZone
@@ -560,10 +572,29 @@ class RecordsController extends BaseController
 
     private function listUrl(\Joomla\Input\Input $input): string
     {
-        $formSelection = $input->getInt('form_selection', 0);
-        $searchTerm = $input->getString('searchterm', '');
-        return 'index.php?option=com_breezingformsng&view=records'
-            . ($formSelection > 0 ? '&form_selection=' . $formSelection : '')
-            . ($searchTerm !== '' ? '&searchterm=' . rawurlencode($searchTerm) : '');
+        return 'index.php?option=com_breezingformsng&view=records' . $this->listStateQuery($input);
+    }
+
+    private function listStateQuery(\Joomla\Input\Input $input): string
+    {
+        $query = '&form_selection=' . $input->getInt('form_selection', 0);
+        $searchTerm = trim((string) $input->getString('searchterm', ''));
+        $filterOrder = trim((string) $input->getString('filter_order', ''));
+        $filterDir = strtolower(trim((string) $input->getString('filter_order_Dir', '')));
+
+        if ($searchTerm !== '') {
+            $query .= '&searchterm=' . rawurlencode($searchTerm);
+        }
+        if ($filterOrder !== '') {
+            $query .= '&filter_order=' . rawurlencode($filterOrder);
+        }
+        if ($filterDir !== '') {
+            $query .= '&filter_order_Dir=' . rawurlencode($filterDir);
+        }
+
+        $query .= '&limit=' . max(1, $input->getInt('limit', 20));
+        $query .= '&limitstart=' . max(0, $input->getInt('limitstart', 0));
+
+        return $query;
     }
 }

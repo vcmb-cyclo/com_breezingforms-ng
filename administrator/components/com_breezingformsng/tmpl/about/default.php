@@ -10,6 +10,9 @@
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
+/** @var \Vcmb\Component\BreezingformsNG\Administrator\View\About\HtmlView $this */
+/** @var \Vcmb\Component\BreezingformsNG\Administrator\View\About\HtmlView $this */
+
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Uri\Uri;
@@ -228,7 +231,7 @@ if (!function_exists('bf_about_extract_version_from_file')) {
 
         foreach ($patterns as $pattern) {
             if (preg_match($pattern, $contents, $matches)) {
-                return trim((string) ($matches[1] ?? ''));
+                return trim((string) $matches[1]);
             }
         }
 
@@ -259,22 +262,22 @@ if (!function_exists('bf_about_get_javascript_libraries')) {
         );
 
         foreach ($candidates as $candidate) {
-            $scriptPath = (string) ($candidate['script_path'] ?? '');
+            $scriptPath = (string) $candidate['script_path'];
 
-            if ($scriptPath === '' || !is_file($scriptPath)) {
+            if (!is_file($scriptPath)) {
                 continue;
             }
 
             $version = bf_about_extract_version_from_file($scriptPath);
             $assets = 'JS';
-            $cssPath = (string) ($candidate['css_path'] ?? '');
+            $cssPath = (string) $candidate['css_path'];
 
             if ($cssPath !== '' && is_file($cssPath)) {
                 $assets = 'JS + CSS';
             }
 
             $libraries[] = array(
-                'name' => (string) ($candidate['name'] ?? ''),
+                'name' => (string) $candidate['name'],
                 'version' => $version !== '' ? $version : $notAvailable,
                 'assets' => $assets,
                 'source' => $bundledSource,
@@ -299,8 +302,8 @@ if (!function_exists('bf_about_get_javascript_libraries')) {
 $versionInformation = bf_about_get_version_information();
 $phpLibraries = bf_about_get_php_libraries();
 $javascriptLibraries = bf_about_get_javascript_libraries();
-$logReport = is_array($this->logReport ?? null) ? $this->logReport : array();
-$auditReport = is_array($this->auditReport ?? null) ? $this->auditReport : array();
+$logReport = $this->logReport;
+$auditReport = $this->auditReport;
 $auditSummary = (array) ($auditReport['summary'] ?? array());
 $auditTables = (array) ($auditReport['tables'] ?? array());
 $auditMissingTables = (array) ($auditReport['missing_tables'] ?? array());

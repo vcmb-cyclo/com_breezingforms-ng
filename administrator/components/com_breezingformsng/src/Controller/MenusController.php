@@ -9,11 +9,16 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\CMS\MVC\Factory\MVCFactoryServiceInterface;
 use Joomla\CMS\Router\Route;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\MenuModel;
 
+/**
+ * @property CMSApplication $app
+ */
 class MenusController extends BaseController
 {
     public function display($cachable = false, $urlparams = []): static
@@ -94,7 +99,7 @@ class MenusController extends BaseController
             $ids = (array) $input->get('cid', [], 'INT');
             if (!empty($ids)) {
                 $this->getMenuModel()->deleteItems($ids);
-                $app->enqueueMessage(Text::_('JLIB_APPLICATION_DELETE_SUCCESS'), 'message');
+                $app->enqueueMessage(Text::_('COM_BREEZINGFORMSNG_DELETE_SUCCESS'), 'message');
             }
         }
 
@@ -166,7 +171,13 @@ class MenusController extends BaseController
             $app->enqueueMessage(Text::_('JINVALID_TOKEN'), 'error');
         } else {
             try {
-                $menusFactory = $app->bootComponent('com_menus')->getMVCFactory();
+                $menusComponent = $app->bootComponent('com_menus');
+
+                if (!$menusComponent instanceof MVCFactoryServiceInterface) {
+                    throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+                }
+
+                $menusFactory = $menusComponent->getMVCFactory();
                 $this->getMenuModel()->syncToJoomlaMenu($menusFactory);
                 $app->enqueueMessage(Text::_('COM_BREEZINGFORMSNG_MENUS_SAVED'), 'message');
             } catch (\Throwable $e) {
@@ -220,10 +231,13 @@ class MenusController extends BaseController
 
     private function getMenuModel(): MenuModel
     {
-        $model = $this->app
-            ->bootComponent('com_breezingformsng')
-            ->getMVCFactory()
-            ->createModel('Menu', 'Administrator', ['ignore_request' => true]);
+        $component = $this->app->bootComponent('com_breezingformsng');
+
+        if (!$component instanceof MVCFactoryServiceInterface) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        $model = $component->getMVCFactory()->createModel('Menu', 'Administrator', ['ignore_request' => true]);
 
         if (!$model instanceof MenuModel) {
             throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));

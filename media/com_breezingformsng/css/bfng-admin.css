@@ -1,0 +1,266 @@
+/**
+ * BreezingForms NG - admin components (charte graphique v1.0)
+ *
+ * Component rules only, built on the tokens in bfng-tokens.css (loaded as
+ * a dependency - see joomla.asset.json). See
+ * docs/charte-graphique-breezingformsng.md, sections 05/08.
+ *
+ * @package BreezingFormsNG
+ * @copyright Copyright (C) 2024-2026 by XDA+GIL
+ * @license GNU General Public License version 2 or later; see LICENSE.txt
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ **/
+
+.bfng-btn {
+  display: inline-flex; align-items: center; gap: var(--bfng-space-3);
+  height: var(--bfng-control-h); padding: 0 var(--bfng-space-5);
+  border: 1px solid var(--bfng-border-strong); border-radius: var(--bfng-radius);
+  background: var(--bfng-surface); color: var(--bfng-text);
+  font: 500 var(--bfng-fs-sm)/1 var(--bfng-font-ui);
+  cursor: pointer; transition: background var(--bfng-t), border-color var(--bfng-t);
+}
+.bfng-btn:hover         { background: var(--bfng-surface-2); border-color: var(--bfng-accent-500); }
+.bfng-btn:active         { background: var(--bfng-accent-50); border-color: var(--bfng-accent-700); }
+.bfng-btn[disabled]      { opacity: .45; pointer-events: none; }
+.bfng-btn--primary       { border-color: var(--bfng-accent-500); color: var(--bfng-accent-700); font-weight: 600; }
+.bfng-btn--primary:hover { background: var(--bfng-accent-50); border-color: var(--bfng-accent-600); }
+.bfng-btn--ghost         { border-color: transparent; background: transparent; color: var(--bfng-text-2); }
+.bfng-btn--danger        { border-color: var(--bfng-danger); color: var(--bfng-danger); }
+.bfng-btn--icon          { width: var(--bfng-control-h); padding: 0; justify-content: center; }
+
+#newStuffBar { display: flex; flex-wrap: wrap; gap: var(--bfng-space-4); }
+
+/* .bfng-tree-toolbar: pins the tree-header gear button to the top-right
+   corner regardless of how many lines #newStuffBar's buttons wrap onto
+   (align-items-start on a plain flex row left it vertically centered
+   against the wrapped button stack instead of flush with the first row). */
+.bfng-tree-toolbar {
+  position: relative;
+  padding-right: calc(var(--bfng-control-h) + var(--bfng-space-3));
+}
+/* .bfng-tree-toolbar .bfng-tree-toolbar__settings (not just the bare
+   class): Bootstrap's own .dropdown rule also sets position (relative),
+   at the same one-class specificity - whichever stylesheet loads last
+   would otherwise win. The two-class selector outranks it unconditionally. */
+.bfng-tree-toolbar .bfng-tree-toolbar__settings {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+/* .bfng-message: replaces #bfSaveQueue's fixed-350px Verdana box and
+   .bfFadingMessage's Bootstrap-3-green box (charte section 07). Both
+   elements keep their historical id/class for the JS that targets them
+   (quickmode-app.js writes innerHTML / calls fadeIn()/fadeOut() on them
+   unchanged) - only the visual layer moves here. Icon is a CSS ::before
+   (FontAwesome, already loaded by Joomla) rather than the charte's
+   Lucide glyph: this session's icon decision is to stay on FontAwesome
+   rather than add a new icon-set dependency (see migration plan). */
+.bfng-message {
+  margin-top: var(--bfng-space-4);
+  padding: var(--bfng-space-3) var(--bfng-space-5);
+  border-left: 3px solid var(--bfng-accent-500);
+  background: color-mix(in oklab, var(--bfng-accent-500) 8%, var(--bfng-surface));
+  border-radius: var(--bfng-radius-sm);
+  font: normal var(--bfng-fs-sm)/1.4 var(--bfng-font-ui);
+  color: var(--bfng-text);
+  width: auto;
+  text-align: left;
+}
+.bfng-message::before {
+  font: normal normal 900 var(--bfng-fs-md)/1 "Font Awesome 6 Free";
+  margin-right: var(--bfng-space-3);
+  color: var(--bfng-accent-500);
+}
+.bfng-message--info::before    { content: "\f05a"; }
+.bfng-message--success::before { content: "\f058"; color: var(--bfng-success); }
+.bfng-message--warning::before { content: "\f071"; color: var(--bfng-warning); }
+.bfng-message--danger::before  { content: "\f057"; color: var(--bfng-danger); }
+.bfng-message--success { border-left-color: var(--bfng-success); background: color-mix(in oklab, var(--bfng-success) 8%, var(--bfng-surface)); }
+.bfng-message--warning { border-left-color: var(--bfng-warning); background: color-mix(in oklab, var(--bfng-warning) 8%, var(--bfng-surface)); }
+.bfng-message--danger  { border-left-color: var(--bfng-danger);  background: color-mix(in oklab, var(--bfng-danger) 8%, var(--bfng-surface)); }
+
+/* .bfng-split: replaces #bfQuickModeWrapper/Left/Right's float-based
+   two-column layout (charte section 07, "Supprime les float et le
+   padding-left: 310px"). Ids/existing classes are kept - custom.js
+   still prepends icons into "#bfQuickModeRight .tab-items"/".tab-element"
+   regardless of how the column is laid out - only the box model changes. */
+.bfng-split {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--bfng-space-6);
+  width: 100%;
+}
+.bfng-split__aside {
+  flex: 0 0 360px;
+  width: 360px;
+  min-width: 0;
+}
+.bfng-split__main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+@media (max-width: 767px) {
+  .bfng-split { flex-direction: column; }
+  .bfng-split__aside,
+  .bfng-split__main { flex-basis: auto; width: 100%; }
+}
+
+/* .bfng-seg / .bfng-seg__opt: replaces .bfLanguageButton's blue/red
+   (admin.css) and grey/green (custom.css, competing definition) tile
+   look (charte section 07). Stays in its current spot in the panel
+   body rather than the charte's fuller vision of moving into the
+   Joomla toolbar - that's a bigger relocation, tracked separately.
+   .bfLanguageButton/.bfLanguageButtonActive are kept as-is: no JS
+   reads them, but the active state is server-rendered via that exact
+   class name (QuickmodeHtml::showApplication()), so it stays the
+   state hook - .bfng-seg__opt is purely the visual layer. */
+.bfng-seg {
+  border-radius: var(--bfng-radius);
+}
+.bfng-seg__opt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: var(--bfng-control-h-sm);
+  padding: 0 var(--bfng-space-3);
+  border: 1px solid var(--bfng-border-strong);
+  border-radius: var(--bfng-radius-sm);
+  background: var(--bfng-surface);
+  color: var(--bfng-text-2);
+  font-size: var(--bfng-fs-xs);
+  cursor: pointer;
+  transition: background var(--bfng-t), border-color var(--bfng-t), color var(--bfng-t);
+}
+.bfng-seg__opt:hover {
+  background: var(--bfng-surface-2);
+  border-color: var(--bfng-accent-500);
+  color: var(--bfng-text);
+}
+.bfng-seg__opt.bfLanguageButtonActive {
+  background: var(--bfng-accent-500);
+  border-color: var(--bfng-accent-600);
+  color: #fff;
+}
+
+/* .bfng-badge: charte section 05 - "contour teinté, hauteur 18 px, 11 px
+   de texte, jamais un aplat saturé". #bfUnsavedBadge (QuickMode "unsaved
+   changes" indicator, toggled by quickmode-form-dirty.js) uses the
+   --unpublished variant; hidden by default via the HTML hidden attribute. */
+.bfng-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 var(--bfng-space-3);
+  border: 1px solid;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+}
+.bfng-badge--unpublished {
+  border-color: var(--bfng-warning);
+  color: var(--bfng-warning);
+  background: color-mix(in oklab, var(--bfng-warning) 8%, var(--bfng-surface));
+}
+
+/* .bfng-tree: cosmetic layer only, over jTree's own tree_component.css.
+   jTree owns collapse/expand via .tree li.open/.closed toggling display
+   on the nested <ul> - none of that is touched here, only color/spacing
+   on <li>/<a>, so folding stays exactly as jTree implements it. */
+.bfng-tree .tree li a,
+.bfng-tree .tree li span {
+  height: var(--bfng-tree-row-h);
+  line-height: var(--bfng-tree-row-h);
+  border-radius: var(--bfng-radius-sm);
+  color: var(--bfng-text);
+}
+.bfng-tree .tree li a:hover { background: var(--bfng-surface-3); }
+.bfng-tree .tree li a.clicked {
+  background: var(--bfng-accent-50);
+  color: var(--bfng-accent-700);
+  font-weight: 600;
+}
+
+.bfng-tabs { border-bottom: 1px solid var(--bfng-border); gap: var(--bfng-space-4); }
+/* #menutab prefix: Bootstrap's own .nav-tabs .nav-link.active rule has
+   the same class-only specificity as a bare .bfng-tabs .nav-link.active
+   would, and sets color/background from --bs-emphasis-color/--bs-body-bg
+   - whichever of the two same-specificity rules loads later in the
+   cascade wins per property, which isn't guaranteed here (Atum's
+   template CSS vs this component's own asset). The extra #menutab
+   ancestor id makes ours win unconditionally instead of depending on
+   asset load order. */
+#menutab .bfng-tabs .nav-link {
+  background: var(--bfng-surface-2);
+  border: 1px solid var(--bfng-border);
+  border-bottom: none;
+  border-top: 2px solid transparent;
+  border-radius: var(--bfng-radius) var(--bfng-radius) 0 0;
+  color: var(--bfng-text-2);
+  font-size: var(--bfng-fs-sm);
+  padding: calc(var(--bfng-space-3) - 1px) var(--bfng-space-5) var(--bfng-space-3);
+}
+#menutab .bfng-tabs .nav-link:hover { background: var(--bfng-surface-3); color: var(--bfng-text); }
+#menutab .bfng-tabs .nav-link.active {
+  background: var(--bfng-surface);
+  color: var(--bfng-accent-700);
+  border-color: var(--bfng-border);
+  border-top-color: var(--bfng-accent-500);
+  border-bottom: 1px solid var(--bfng-surface);
+  margin-bottom: -1px;
+  font-weight: 600;
+}
+
+/* .bfng-field: label column + control(s), see charte section 05.
+   Deliberately not a CSS grid: property wraps in the existing templates
+   sometimes hold more than one control after the label (e.g. a Yes/No
+   radio pair) - grid item auto-placement would scatter those across
+   extra rows instead of keeping them inline. inline-block degrades
+   safely regardless of how many trailing children a wrap has. */
+.bfng-field {
+  padding: var(--bfng-space-4) var(--bfng-space-5);
+  border-bottom: 1px solid var(--bfng-border);
+}
+.bfng-field:hover { background: var(--bfng-surface-2); }
+.bfng-field__label {
+  display: inline-block;
+  width: 190px;
+  vertical-align: top;
+  padding-top: var(--bfng-space-2);
+  font-size: var(--bfng-fs-sm);
+  color: var(--bfng-text-2);
+}
+.bfng-field__label + * { font-size: var(--bfng-fs-base); }
+.bfng-field select { min-width: 240px; max-width: 100%; }
+
+/* #bfOptionsFieldsWrap embeds forms/edit.php's own native Bootstrap
+   .row/.col-form-label markup (shared with the standalone Configuration
+   screen, charte section 06 ".bfng-config") - deliberately not
+   restructured into .bfng-field, only re-skinned with the same tokens
+   so it reads as part of the same system next to the Propriétés/Avancé
+   tabs either side of it. */
+#bfOptionsFieldsWrap .row.mb-3 {
+  border-bottom: 1px solid var(--bfng-border);
+  padding-bottom: var(--bfng-space-4);
+}
+#bfOptionsFieldsWrap .col-form-label {
+  color: var(--bfng-text-2);
+  font-size: var(--bfng-fs-sm);
+}
+#bfOptionsFieldsWrap .form-control,
+#bfOptionsFieldsWrap .form-select,
+#bfOptionsFieldsWrap textarea {
+  font-size: var(--bfng-fs-base);
+}
+#bfOptionsFieldsWrap .form-control:focus,
+#bfOptionsFieldsWrap .form-select:focus {
+  border-color: var(--bfng-accent-500);
+  box-shadow: var(--bfng-focus-ring);
+}
+@media (max-width: 900px) {
+  .bfng-field__label { display: block; width: auto; padding-top: 0; margin-bottom: var(--bfng-space-2); }
+}

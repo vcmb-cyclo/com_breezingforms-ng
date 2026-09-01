@@ -323,11 +323,34 @@
                         selected: 'bfQuickModeRoot',
                         callback: {
                             onselect: function (node, obj) {
+                                // Auto-commit the previously selected node's currently
+                                // displayed field values into the in-memory tree before
+                                // switching away - populateXProperties() below overwrites
+                                // those same fields from the tree, so without this any
+                                // edit not yet pushed via the (now removed) inline "save"
+                                // buttons would silently be lost on every node change.
+                                // getNodeClass() reads appScope.selectedTreeElement itself
+                                // (ignoring its argument) - calling it here, before the
+                                // reassignment below, is what makes it resolve to the
+                                // outgoing node.
+                                if (appScope.selectedTreeElement && appScope.selectedTreeElement !== node) {
+                                    switch (appScope.getNodeClass(appScope.selectedTreeElement)) {
+                                        case 'bfQuickModeRootClass':
+                                            appScope.saveFormProperties();
+                                            break;
+                                        case 'bfQuickModeSectionClass':
+                                            appScope.saveSectionProperties();
+                                            break;
+                                        case 'bfQuickModeElementClass':
+                                            appScope.saveSelectedElementProperties();
+                                            break;
+                                        case 'bfQuickModePageClass':
+                                            appScope.savePageProperties();
+                                            break;
+                                    }
+                                }
+
                                 appScope.selectedTreeElement = node;
-                                JQuery('#bfPropertySaveButton').css('display', '');
-                                JQuery('#bfPropertySaveButtonTop').css('display', '');
-                                JQuery('#bfAdvancedSaveButton').css('display', '');
-                                JQuery('#bfAdvancedSaveButtonTop').css('display', '');
                                 switch (appScope.getNodeClass(node)) {
                                     case 'bfQuickModeRootClass':
                                         appScope.toggleProperties('bfFormProperties');
@@ -523,22 +546,6 @@
                     }
                     return !error;
                 };
-
-                JQuery('#bfPropertySaveButton').click(
-                    appScope.saveButton
-                );
-
-                JQuery('#bfPropertySaveButtonTop').click(
-                    appScope.saveButton
-                );
-
-                JQuery('#bfAdvancedSaveButton').click(
-                    appScope.saveButton
-                );
-
-                JQuery('#bfAdvancedSaveButtonTop').click(
-                    appScope.saveButton
-                );
 
                 JQuery('#bfNewSectionButton').click(
                     function () {
@@ -767,6 +774,12 @@
                 }
 
                 app = new BF_QuickModeApp();
+                // Exposed read-only for quickmode-form-dirty.js's "unsaved changes"
+                // badge, which needs to detect tree structure edits (create/move/
+                // delete) alongside bfForm's own field changes - those mutate
+                // app.dataObject directly (see onmove/create/remove above),
+                // outside of any form this script's own listeners can see.
+                window.BFQMApp = app;
                 var mdata = app.getProperties(app.selectedTreeElement);
                 if (mdata) {
                     var item = app.findDataObjectItem('bfQuickModeRoot', app.dataObject);
@@ -907,6 +920,65 @@
                 }
             } // createActionCode
 
+            // Submits the "Options" tab's fields (see the comment further below,
+            // at the original click handler this replaces) into the hidden
+            // bfOptionsSaveFrame iframe rather than the main window, so the
+            // single standard toolbar Save button can persist both the
+            // QuickMode JSON tree and the Options tab without a page reload
+            // in between - callback runs once that submission has actually
+            // completed (the iframe's own "load" event, after its server
+            // redirect resolves), not merely once it was sent: navigating the
+            // main window before then would abort the iframe's in-flight
+            // request, since it is a child of the document being replaced.
+            // No-ops immediately if the Options tab was never rendered
+            // (formId === 0, nothing to save there yet).
+            function syncOptionsEditors($wrap) {
+                var instances = (window.Joomla && Joomla.editors && Joomla.editors.instances) || {};
+
+                $wrap.find('textarea').each(function () {
+                    var field = this;
+                    var editor = instances[field.id] || instances[field.name];
+
+                    if (editor && typeof editor.getValue === 'function') {
+                        field.value = editor.getValue();
+                    }
+                });
+            }
+
+            function submitOptionsTab(callback) {
+                var $wrap = JQuery('#bfOptionsFieldsWrap');
+                if ($wrap.length === 0) {
+                    callback();
+                    return;
+                }
+
+                // title/name/description are stored both in the QuickMode JSON
+                // tree (just uploaded above) and as their own SQL columns on
+                // #__facileforms_forms, which is what this Options POST writes -
+                // see QuickmodeModel::save()'s column list. The Options tab's own
+                // jf_title/jf_name/jf_description fields hold whatever they were
+                // when this tab was last rendered, which is stale the moment
+                // QuickMode's own title/name/description fields get edited in the
+                // same session; submitting them as-is would silently revert that
+                // edit. Sync from the QuickMode fields immediately before posting.
+                JQuery('#jf_title').val(JQuery('#bfFormTitle').val());
+                JQuery('#jf_name').val(JQuery('#bfFormName').val());
+                JQuery('#jf_description').val(JQuery('#bfFormDescription').val());
+                syncOptionsEditors($wrap);
+
+                var $iframe = JQuery('#bfOptionsSaveFrame');
+                $iframe.one('load', callback);
+
+                var tempForm = document.createElement('form');
+                tempForm.method = 'post';
+                tempForm.action = 'index.php?option=com_breezingformsng';
+                tempForm.target = 'bfOptionsSaveFrame';
+                tempForm.style.display = 'none';
+                document.body.appendChild(tempForm);
+                JQuery(tempForm).append($wrap.children());
+                tempForm.submit();
+            }
+
             function postTheStuff() {
                 var postData = {
                     option: 'com_breezingformsng',
@@ -928,7 +1000,12 @@
                         if (data != '' && data != 0 && !isNaN(data)) {
 
                             document.adminForm.form.value = data;
-                            location.href = "index.php?option=com_breezingformsng&task=quickmode.display&form=" + encodeURIComponent(data) + "&active_language_code=" + encodeURIComponent(document.adminForm.active_language_code.value);
+                            var activeTab = JQuery('#menutab > .tab-content > .tab-pane.active').attr('id');
+                            var returnUrl = "index.php?option=com_breezingformsng&task=quickmode.display&form=" + encodeURIComponent(data) + "&active_language_code=" + encodeURIComponent(document.adminForm.active_language_code.value)
+                                + (activeTab ? "#" + activeTab : "");
+                            submitOptionsTab(function () {
+                                location.href = returnUrl;
+                            });
 
                         } else if (JQuery.trim(data) == '') {
                             JQuery("#bfSaveQueue").get(0).innerHTML = BFQMConfig.labels['COM_BREEZINGFORMSNG_LOAD_PACKAGE'] + (chunki + 1) + BFQMConfig.labels['COM_BREEZINGFORMSNG_LOAD_PACKAGE_OF'] + (chunks.length - 1);
@@ -963,6 +1040,16 @@
             var saveButtonClicked = false;
 
             JQuery(document).ready(function () {
+
+                // After a redirect from the "Options" tab's own save (bfOptionsForm ->
+                // forms.save -> back here with #fragment-3), reopen that tab instead of
+                // the default one.
+                if (location.hash === '#fragment-3') {
+                    var optionsTabEl = document.getElementById('fragment-3-tab');
+                    if (optionsTabEl && window.bootstrap && window.bootstrap.Tab) {
+                        new bootstrap.Tab(optionsTabEl).show();
+                    }
+                }
 
                 JQuery('#adminForm').get(0).onsubmit = function () {
                     return false;

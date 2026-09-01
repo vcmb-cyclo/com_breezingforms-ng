@@ -23,20 +23,24 @@ main .alert {
 inputs
 */
 
-input[type="text"],
-input[type="password"],
-input[type="datetime"],
-input[type="datetime-local"],
-input[type="date"],
-input[type="month"],
-input[type="time"],
-input[type="week"],
-input[type="number"],
-input[type="email"],
-input[type="url"],
-input[type="search"],
-input[type="tel"],
-input[type="color"],
+/* :not(#bfOptionsFieldsWrap *) throughout this legacy input/select/label skin
+   exempts the QuickMode "Options" tab, which embeds forms/edit.php's own
+   Bootstrap .form-control/.form-select markup - see
+   docs/maintenance/quickmode-options-tab-plan.md. */
+input[type="text"]:not(#bfOptionsFieldsWrap *),
+input[type="password"]:not(#bfOptionsFieldsWrap *),
+input[type="datetime"]:not(#bfOptionsFieldsWrap *),
+input[type="datetime-local"]:not(#bfOptionsFieldsWrap *),
+input[type="date"]:not(#bfOptionsFieldsWrap *),
+input[type="month"]:not(#bfOptionsFieldsWrap *),
+input[type="time"]:not(#bfOptionsFieldsWrap *),
+input[type="week"]:not(#bfOptionsFieldsWrap *),
+input[type="number"]:not(#bfOptionsFieldsWrap *),
+input[type="email"]:not(#bfOptionsFieldsWrap *),
+input[type="url"]:not(#bfOptionsFieldsWrap *),
+input[type="search"]:not(#bfOptionsFieldsWrap *),
+input[type="tel"]:not(#bfOptionsFieldsWrap *),
+input[type="color"]:not(#bfOptionsFieldsWrap *),
 .custom-form-control {
     width: 206px;
     background-color: #fff !important;
@@ -55,18 +59,18 @@ input[type="color"],
     transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s !important;
 }
 
-main input:focus:not([type="checkbox"]):not([type="radio"]) {
+main input:focus:not([type="checkbox"]):not([type="radio"]):not(#bfOptionsFieldsWrap *) {
     background: #f8f8f8 none repeat scroll 0 0 !important;
     border-color: #3f51b5 !important;
     box-shadow: none !important;
     outline: 0 none !important;
 }
 
-main textarea {
+main textarea:not(#bfOptionsFieldsWrap *) {
     border-radius: 0 !important;
 }
 
-main textarea:focus {
+main textarea:focus:not(#bfOptionsFieldsWrap *) {
     background: #f8f8f8 none repeat scroll 0 0 !important;
     border-color: #3f51b5 !important;
     box-shadow: none !important;
@@ -74,7 +78,7 @@ main textarea:focus {
     border-radius: 0 !important;
 }
 
-main select {
+main select:not(#bfOptionsFieldsWrap *) {
     height: 35px !important;
     border: 0 !important;
     border: 1px solid #ccc !important;
@@ -90,7 +94,6 @@ main select {
     -o-appearance: none !important;
     appearance: none !important;
     -webkit-border-radius: 0 !important;
-    -moz-border-radius: 0 !important;
     border-radius: 0 !important;
     padding-right: 37px !important;
     color: #777 !important;
@@ -100,8 +103,8 @@ main select {
     cursor: pointer !important;
 }
 
-.custom-select, .form-select {
-    
+.custom-select, .form-select:not(#bfOptionsFieldsWrap *) {
+
     max-width: 75px;
 }
 
@@ -120,18 +123,18 @@ main .form-control{
     margin-left: 20px;
 }
 
-main label {
+main label:not(#bfOptionsFieldsWrap *) {
 
     color: #333;
     font-size: 13px;
     line-height: 18px;
 }
 
-main label span {
+main label span:not(#bfOptionsFieldsWrap *) {
     font-size: 1rem;
 }
 
-main select:focus {
+main select:focus:not(#bfOptionsFieldsWrap *) {
     background: #f8f8f8 url('../images/select_arrow.png') no-repeat !important;
     border-color: #3f51b5 !important;
     box-shadow: none !important;
@@ -155,13 +158,7 @@ main select option:hover {
     color: #fff !important;
 }
 
-main select::-ms-expand {
-    display: none;
-}
 
-main select.desktopDropDown::-ms-expand {
-    display: none !important;
-}
 
 main select[multiple="multiple"],
 main select[multiple="multiple"]:focus {
@@ -200,28 +197,17 @@ a[onclick^="addOption"]:focus {
 }
 
 
-/*
-custom radio and checkbox style
-*/
-
-main input[type="checkbox"]:not(old),
-main input[type="radio"]:not(old) {
-    width: 2em !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    font-size: 1em !important;
-    opacity: 0 !important;
-    cursor: pointer !important;
-}
-
-/* The custom skin above expects an immediate <label><span> sibling to draw the
-   visible control; the QuickMode editor's own Yes/No property toggles don't
-   follow that markup, so they'd otherwise render fully invisible (opacity: 0
-   with nothing drawn in its place). Exempt them. */
-.bfPropertyWrap input[type="checkbox"],
-.bfPropertyWrap input[type="radio"] {
-    opacity: 1 !important;
-}
+/* The QuickMode admin templates no longer emit the <label><span></span>Text
+   </label> markup this custom-drawn radio/checkbox skin required (verified
+   repo-wide across every admin .php and .js file - zero matches). Left in
+   place it only did harm: any plain <input type="checkbox|radio"/> Text
+   pair anywhere under <main> (e.g. the sidebar's "Scroll element list"
+   checkbox, or the "Choisir un moteur de thèmes"/Bootstrap Mode/Label Top/
+   Hero Unit toggles in advanced_form.php - see the removed
+   #bfOptionsFieldsWrap/.bfPropertyWrap exemptions this skin needed) had its
+   opacity forced to 0 with nothing drawn in its place, rendering it fully
+   invisible. Removed entirely; every checkbox/radio now renders as a plain
+   native control. */
 
 .bfPropertyWrap .form-switch {
     padding-left: 0;
@@ -229,78 +215,6 @@ main input[type="radio"]:not(old) {
 
 .bfPropertyWrap .form-switch .form-check-input {
     margin-left: 0;
-}
-
-main input[type="checkbox"]:not(old) + label,
-main input[type="radio"]:not(old) + label {
-    display: inline-block;
-    margin-left: -1.5em;
-    line-height: 1.5em;
-}
-
-main input[type="checkbox"]:not([style*="none"]) + label > span,
-main input[type="radio"]:not([style*="none"]) + label > span {
-    display: inline-block;
-    width: 0.875em;
-    height: 0.875em;
-    margin: 0.25em 0.5em 0.25em 0.25em;
-    border: 0.0625em solid rgb(192, 192, 192);
-    border: 1px solid #c0c0c0;
-    border-radius: 0;
-    background: rgb(224, 224, 224);
-    background-image: linear-gradient(rgb(240, 240, 240), rgb(224, 224, 224));
-    background-image: linear-gradient(rgb(240, 240, 240), rgb(224, 224, 224));
-    background-image: linear-gradient(rgb(240, 240, 240), rgb(224, 224, 224));
-    background-image: linear-gradient(rgb(240, 240, 240), rgb(224, 224, 224));
-    background-image: linear-gradient(rgb(240, 240, 240), rgb(224, 224, 224));
-    vertical-align: bottom;
-}
-
-main input[type="checkbox"]:not(old) + label > span {
-    background: transparent !important;
-}
-
-main input[type="radio"]:not(old) + label > span {
-    border-radius: 1em !important;
-    border: 3px solid #ddd;
-    width: 0.6em;
-    height: 0.6em;
-}
-
-main input[type="checkbox"]:not(old):checked + label > span,
-main input[type="radio"]:not(old):checked + label > span {
-    background-image: linear-gradient(rgb(224, 224, 224), rgb(240, 240, 240));
-    background-image: linear-gradient(rgb(224, 224, 224), rgb(240, 240, 240));
-    background-image: linear-gradient(rgb(224, 224, 224), rgb(240, 240, 240));
-    background-image: linear-gradient(rgb(224, 224, 224), rgb(240, 240, 240));
-    background-image: linear-gradient(rgb(224, 224, 224), rgb(240, 240, 240));
-}
-
-main input[type="checkbox"]:not(old):checked + label > span::before {
-    content: "\2713 ";
-    display: block;
-    width: 1em;
-    color: rgb(153, 204, 102);
-    font-size: 0.875em;
-    line-height: 1em;
-    text-align: center;
-    text-shadow: 0 0 0.0714em rgb(115, 153, 77);
-    font-weight: bold;
-}
-
-main input[type="radio"]:not(old):checked + label > span > span {
-    display: block;
-    height: 100%;
-    margin: 0;
-    width: 100%;
-    border: 3px solid #ddd;
-    border-radius: 1em;
-    background: rgb(118, 181, 55);
-    background-image: linear-gradient(rgb(179, 217, 140), rgb(153, 204, 102));
-    background-image: linear-gradient(rgb(179, 217, 140), rgb(153, 204, 102));
-    background-image: linear-gradient(rgb(179, 217, 140), rgb(153, 204, 102));
-    background-image: linear-gradient(rgb(179, 217, 140), rgb(153, 204, 102));
-    background-image: linear-gradient(rgb(179, 217, 140), rgb(153, 204, 102));
 }
 
 #toolbar-options{
@@ -348,22 +262,28 @@ joomla-toolbar-button {
     border-radius: 0 !important;
 }
 
-.form-control:focus,
-.has-focus .form-control {
-    background: #f8f8f8 none repeat scroll 0 0;
-    border-color: #3f51b5;
+/*
+ * Excludes #bfOptionsFieldsWrap for the same reason as admin.css's
+ * input/textarea/select rule: the QuickMode "Options" tab embeds the
+ * classic forms/edit.php content there (native Bootstrap
+ * .form-control/.form-select), which this legacy flat-focus look would
+ * otherwise override with a hardcoded light background regardless of
+ * theme - see docs/maintenance/quickmode-options-tab-plan.md.
+ * .has-focus is dead: nothing in this codebase ever sets that class.
+ */
+.form-control:focus:not(#bfOptionsFieldsWrap *) {
+    background: var(--bfng-surface, #f8f8f8) none repeat scroll 0 0;
+    border-color: var(--bfng-accent-600, #3f51b5);
     box-shadow: none;
     outline: 0 none;
 }
 
-#bfQuickModeWrapper label.bfPropertyLabel, .bfPropertyWrap, .bfActionLabel, .bfInitFormEntryLabel, .triggerScrollableLabel, .scrollElementListLabel{
+#bfQuickModeWrapper label.bfPropertyLabel:not(.bfng-field__label), .bfPropertyWrap:not(.bfng-field), .bfActionLabel, .bfInitFormEntryLabel, .triggerScrollableLabel, .scrollElementListLabel{
     font-size: 13px !important;
 }
 
 .bfPropertyWrap .btn-secondary {
     display: inline-block;
-    *display: inline;
-    *zoom: 1;
     padding: 4px 12px;
     margin-bottom: 0;
     font-size: 13px;
@@ -375,7 +295,6 @@ joomla-toolbar-button {
     color: #333;
     border: 1px solid #b3b3b3;
     -webkit-border-radius: 3px;
-    -moz-border-radius: 3px;
     border-radius: 3px;
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     margin-bottom: 10px;
@@ -662,7 +581,7 @@ main .icon-publish, main .icon-unpublish{
     color: #fff !important;
 } */
 
-.bfPropertyWrap:hover {
+.bfPropertyWrap:not(.bfng-field):hover {
     background-color: #fcfcfc;
     border-left: 3px solid #3F51B5;
 }
@@ -807,10 +726,6 @@ main .pagination ul {
 
 main .pagination ul > li > a,
 main .pagination ul > li > span {
-    -moz-border-bottom-colors: none;
-    -moz-border-left-colors: none;
-    -moz-border-right-colors: none;
-    -moz-border-top-colors: none;
     background-color: #fff;
     border-color: #ddd;
     border-image: none;
@@ -873,31 +788,31 @@ a {
 
 /* custom full-screen styles */
 
-:full-screen .main {
+:fullscreen .main {
     background-color: #ccc;
     font-size: 24px;
     width: 95%;
 }
 
-:full-screen .main {
+:fullscreen .main {
     background-color: #ccc;
     font-size: 24px;
     width: 95%;
 }
 
-:full-screen .fs {
+:fullscreen .fs {
     display: none
 }
 
-:full-screen .fs {
+:fullscreen .fs {
     display: none
 }
 
-:full-screen .rs {
+:fullscreen .rs {
     display: block
 }
 
-:full-screen .rs {
+:fullscreen .rs {
     display: block
 }
 
@@ -929,7 +844,7 @@ quick mode
     height: inherit;
 }
 
-.bfFadingMessage {
+.bfFadingMessage:not(.bfng-message) {
     margin-bottom: 10px;
     padding: 10px;
     background-color: #dff0d8;
@@ -954,11 +869,11 @@ quick mode
     box-shadow: none;
 }
 
-#bfQuickModeRight {
+#bfQuickModeRight:not(.bfng-split__main) {
     padding-left: 0; margin-left:430px;
 }
 
-#bfQuickModeLeft {
+#bfQuickModeLeft:not(.bfng-split__aside) {
     float: left;
     width: 360px;
     padding: 20px;
@@ -966,11 +881,11 @@ quick mode
     background: #FCFCFC;
 }
 
-#menutab .nav-item {
+#menutab .nav-tabs:not(.bfng-tabs) .nav-item {
     margin: 0 7px 0 0 !important;
 }
 
-#menutab .nav-link {
+#menutab .nav-tabs:not(.bfng-tabs) .nav-link {
     background: #f5f5f5;
     border: 1px solid #eaeaea;
     height: 30px;
@@ -979,14 +894,14 @@ quick mode
     color: #333333;
 }
 
-#menutab .nav-link.active {
+#menutab .nav-tabs:not(.bfng-tabs) .nav-link.active {
     background: transparent;
     border-top: 1px solid #3F51B5 !important;
     border-bottom: 1px solid #fff !important;
     color: #555 !important;
 }
 
-#menutab .nav-link:hover {
+#menutab .nav-tabs:not(.bfng-tabs) .nav-link:hover {
     background: #fff !important;
 }
 
@@ -1009,16 +924,16 @@ legend {
     color: #676767 !important;
 }
 
-#bfQuickModeWrapper label.bfPropertyLabel {
+#bfQuickModeWrapper label.bfPropertyLabel:not(.bfng-field__label) {
     float: left;
     margin-right: 10px;
     min-width: 40%;
     color: #555;
 }
 
-.bfPropertyWrap,
-.bfPropertyWrap:active,
-.bfPropertyWrap:visited {
+.bfPropertyWrap:not(.bfng-field),
+.bfPropertyWrap:not(.bfng-field):active,
+.bfPropertyWrap:not(.bfng-field):visited {
     background-color: transparent;
     border-bottom: medium none;
     border-left: 3px solid transparent;
@@ -1026,7 +941,7 @@ legend {
     padding: 10px 5px 5px;
 }
 
-.bfLanguageButton {
+.bfLanguageButton:not(.bfng-seg__opt) {
     background-color: #eaeaea;
     color: #333333;
     cursor: pointer;
@@ -1040,7 +955,7 @@ legend {
     width: 50px;
 }
 
-.bfLanguageButton.bfLanguageButtonActive {
+.bfLanguageButton.bfLanguageButtonActive:not(.bfng-seg__opt) {
     background-color: #98CB02;
     color: #fff;
 }
@@ -1094,25 +1009,25 @@ tree
     background-position: 10px 14px !important;
 }
 
-.tree .ltr li a,
-.tree .rtl li a {
+.tree .ltr li a:not(.bfng-tree *),
+.tree .rtl li a:not(.bfng-tree *) {
     background-color: transparent !important;
     color: #1b6894;
     background-position: 7px 8px !important;
     padding: 8px 11px 8px 30px !important;
 }
 
-.tree .ltr li a:hover,
-.tree .rtl li a:hover {
+.tree .ltr li a:hover:not(.bfng-tree *),
+.tree .rtl li a:hover:not(.bfng-tree *) {
     background-color: #EAEAEA !important;
     color: #777;
     background-position: 7px 8px !important;
     padding: 8px 11px 8px 30px !important;
 }
 
-.tree-apple li a.clicked,
-.tree-apple li a.clicked:hover,
-.tree-apple li span.clicked {
+.tree-apple li a.clicked:not(.bfng-tree *),
+.tree-apple li a.clicked:hover:not(.bfng-tree *),
+.tree-apple li span.clicked:not(.bfng-tree *) {
     background-color: #3F51B5 !important;
     background-position: 7px 8px !important;
     border: 1px solid #3F51B5 !important;
@@ -1142,23 +1057,6 @@ More options
     border: 1px solid #eaeaea !important;
     margin-top: 50px;
     padding: 40px 15px 15px 15px;
-}
-
-.btn-more-options {
-    background: #eaeaea none repeat scroll 0 0 !important;
-    border: 1px solid #eaeaea;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    color: #333 !important;
-    padding: 7px 15px;
-    text-shadow: none !important;
-    text-decoration: none !important;
-}
-
-.btn-more-options:hover,
-.btn-more-options:focus {
-    background: #d5d5d5 !important;
-    border: 1px solid #d5d5d5;
 }
 
 main joomla-tab[view="tabs"] ul li{
@@ -1332,16 +1230,6 @@ Manage records delete win
     .ui-button:active {
         background: #D5D5D5 !important;
     }
-    .bfAvailableField {
-        background-color: #eaeaea;
-        color: #333333;
-        display: table-cell;
-        height: 39px;
-        padding: 5px;
-        text-align: center;
-        vertical-align: middle;
-        width: 113px;
-    }
     main #bfRecordsTableContainer input[type="checkbox"]:not(old) + label, main #bfRecordsTableContainer input[type="radio"]:not(old) + label {
         margin-left: 0 !important;
         top: -9px !important;
@@ -1376,13 +1264,6 @@ Manage records delete win
     html {
         font-size: 100%;
     }
-    .bfDetailsTableLabelCol strong {
-        color: #999;
-    }
-    .bfDetailsTableHead {
-        background-color: #3F51B5;
-        color: #fff;
-    }
     /*
 Manage records select list and filter button
 */
@@ -1395,30 +1276,6 @@ Manage records select list and filter button
         padding: 5px;
         position: absolute;
         top: 0;
-    }
-    #bfSearchOpen {
-        background-color: #eaeaea;
-        color: #333333;
-        cursor: pointer;
-        padding: 9px;
-        font-weight: 400;
-    }
-    #bfSearch {
-        display: none;
-        margin-top: 0;
-        max-height: 400px;
-        overflow: auto;
-        padding: 10px;
-        width: 500px;
-        box-shadow: 0 1px 3px rgba(33, 33, 33, 0.2);
-        background: #fff;
-    }
-    #bfAvailableFieldsOpen {
-        background-color: #eaeaea;
-        color: #333333;
-        cursor: pointer;
-        padding: 9px;
-        font-weight: 400;
     }
     #bfAvailableFieldsWrapper {
         background-color: transparent;
@@ -1438,48 +1295,6 @@ main #bfAvailableFieldsWrapper input[type="checkbox"]:not(old) {
     font-size: 1em;
     opacity: 1;
 } */
-    #bfAvailableFields {
-        display: none;
-        margin-top: 10px;
-        max-height: 400px;
-        overflow: auto;
-        padding: 10px;
-        width: 500px;
-        box-shadow: 0 1px 3px rgba(33, 33, 33, 0.2);
-        background: #fff;
-    }
-    #bfSearch .bfFilterTriggerer {
-        background: #92c923 none repeat scroll 0 0 !important;
-        border: 1px solid #92c923;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-        color: #ffffff !important;
-        padding: 7px 15px;
-        text-decoration: none !important;
-        text-shadow: none !important;
-    }
-    #bfSearch .bfFilterTriggerer:hover,
-    #bfSearch .bfFilterTriggerer:focus {
-        background: #2E7D32 !important;
-        border: 1px solid #2E7D32;
-        text-decoration: none !important;
-    }
-    #bfSearch .btn-secondary {
-        background: #eaeaea none repeat scroll 0 0 !important;
-        border: 1px solid #eaeaea;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-        color: #333 !important;
-        padding: 7px 15px;
-        text-shadow: none !important;
-        text-decoration: none !important;
-    }
-    #bfSearch .btn-secondary:hover,
-    #bfSearch .btn-secondary:focus {
-        background: #d5d5d5 !important;
-        border: 1px solid #d5d5d5;
-        text-decoration: none !important;
-    }
     /******************
 Integrator
 *******************/
@@ -1656,13 +1471,13 @@ toogle sidebar and main-content
 @MEDIA
 ********************************/
     @media (max-width:1280px) {
-        #bfQuickModeLeft {
+        #bfQuickModeLeft:not(.bfng-split__aside) {
             float: left;
             width: 285px;
             margin-bottom: 25px;
             padding: 15px 0 15px 15px;
         }
-        #bfQuickModeRight {
+        #bfQuickModeRight:not(.bfng-split__main) {
             margin-left: 300px;
         }
     }
@@ -1786,10 +1601,10 @@ Mobile view
 		#bfQuickModeWrapper select {
 			width:100%;
 		}
-		#bfQuickModeLeft {
+		#bfQuickModeLeft:not(.bfng-split__aside) {
             width: 100%;
         }
-        #bfQuickModeRight {
+        #bfQuickModeRight:not(.bfng-split__main) {
             width: 100%;
             margin-left: 0;
         }
@@ -1851,14 +1666,8 @@ Mobile view
         #bfAvailableFieldsWrapper {
             left: 0;
         }
-        #bfAvailableFields {
-            width: 100%;
-        }
         #bfSearchWrapper {
             position: relative;
-        }
-        #bfSearch {
-            width: 100%;
         }
         #SelectOptionDialog {
             width: 100% !important;

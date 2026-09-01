@@ -23,7 +23,6 @@ use Joomla\CMS\Filter\InputFilter;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
 use Joomla\Event\Event;
-use Joomla\Event\EventInterface;
 use Joomla\CMS\Uri\Uri;
 use Joomla\Filesystem\Folder;
 use Joomla\Filesystem\File;
@@ -36,10 +35,14 @@ use Joomla\CMS\Environment\Browser;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Log\Log;
+use Joomla\CMS\Mail\Mail;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 use Vcmb\Component\BreezingformsNG\Site\Service\Integration\DropboxUploader;
 use Vcmb\Component\BreezingformsNG\Site\Service\Integration\RecaptchaVerifier;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampFormatter;
+use Vcmb\Component\BreezingformsNG\Site\Service\Upload\FlashUploadFileMatcher;
+use Vcmb\Component\BreezingformsNG\Site\Service\Upload\UploadError;
+use Vcmb\Component\BreezingformsNG\Site\Service\Upload\UploadRuntime;
 use Vcmb\Component\BreezingformsNG\Site\Service\Security\HtmlSanitizer;
 use Vcmb\Component\BreezingformsNG\Administrator\Helper\VendorHelper;
 use CB\Component\Contentbuilderng\Administrator\Helper\ContentbuilderngHelper;
@@ -55,11 +58,71 @@ final class SubmissionEngine
 {
     private ?SubmissionTimestampFormatter $uploadTimestampFormatterService = null;
     private ?HtmlSanitizer $htmlSanitizerService = null;
+    private ?FlashUploadFileMatcher $flashUploadFileMatcherService = null;
+    private ?UploadRuntime $uploadRuntimeService = null;
 
     public function __construct(
         private readonly HTML_facileFormsProcessor $processor,
         private readonly MailerFactoryInterface $mailerFactory,
+        private readonly RecaptchaVerifier $recaptchaVerifier,
     ) {
+    }
+
+    public function saveUpload($filename, $userfile_name, $destpath, $timestamp, $useUrl = false, $useUrlDownloadDirectory = '', $resize_target_width = 0, $resize_target_height = 0, $resize_type = '', $resize_bgcolor = '#ffffff', $field_name = '')
+    {
+        global $mosConfig_fileperms;
+
+        if ($this->processor->dying) {
+            return '';
+        }
+
+        $identity = $this->processor->app->getIdentity();
+        $filemode = isset($mosConfig_fileperms)
+            ? ($mosConfig_fileperms === '' ? null : octdec($mosConfig_fileperms))
+            : 0644;
+        $result = $this->uploadRuntime()->store(
+            (string) $filename,
+            (string) $userfile_name,
+            (string) $destpath,
+            $this->processor->findtags,
+            $this->processor->replacetags,
+            $this->processor->rows,
+            (string) $this->processor->submitted,
+            (string) $this->processor->app->get('offset'),
+            [
+                'username' => $identity->get('username'),
+                'id' => $identity->get('id'),
+                'name' => $identity->get('name'),
+            ],
+            (bool) $this->processor->app->getSession()->get('bfFileUploadOverride', true),
+            $filemode,
+            (bool) $useUrl,
+            (int) $resize_target_width,
+            (int) $resize_target_height,
+            (string) $resize_type,
+            $resize_bgcolor === null ? null : (string) $resize_bgcolor
+        );
+
+        if ($result->error !== null) {
+            $this->processor->status = _FF_STATUS_UPLOAD_FAILED;
+            $this->processor->message = Text::_(match ($result->error) {
+                UploadError::DirectoryMissing => 'COM_BREEZINGFORMSNG_PROCESS_DIRNOTEXISTS',
+                UploadError::FileExists => 'COM_BREEZINGFORMSNG_PROCESS_FILEEXISTS',
+                UploadError::MoveFailed => 'COM_BREEZINGFORMSNG_PROCESS_FILEMOVEFAILED',
+                UploadError::ChmodFailed => 'COM_BREEZINGFORMSNG_PROCESS_FILECHMODFAILED',
+            });
+
+            return '';
+        }
+
+        return ['default' => $result->path, 'server' => $result->serverPath];
+    }
+
+    public function measureTime(): float
+    {
+        $time = explode(' ', microtime());
+
+        return ((float) $time[0] + (float) $time[1]) / 1000;
     }
 
     function collectSubmitdata($cbResult = null)
@@ -75,11 +138,8 @@ final class SubmissionEngine
         $names = array();
         if (count($this->processor->rows)) {
             $time_passed = 0;
-            $start_time = $this->processor->measureTime();
-            $max_exec_time = 15;
-            if (function_exists('ini_get')) {
-                $max_exec_time = @ini_get('max_execution_time');
-            }
+            $start_time = $this->measureTime();
+            $max_exec_time = ini_get('max_execution_time');
             $max_time = !empty($max_exec_time) ? intval($max_exec_time) / 2 : 15;
             foreach ($this->processor->rows as $row) {
                 if (!in_array($row->name, $names)) {
@@ -179,7 +239,7 @@ final class SubmissionEngine
                                 mt_srand();
                                 if (isset($tickets[$this->processor->app->getInput()->getString('bfFlashUploadTicket', (string) mt_rand(0, mt_getrandmax()))])) {
                                     $sourcePath = JPATH_SITE . '/components/com_breezingformsng/uploads/';
-                                    if (@file_exists($sourcePath) && @is_readable($sourcePath) && @is_dir($sourcePath)) {
+                                    if (is_dir($sourcePath) && is_readable($sourcePath)) {
 
                                         $timezone = (string) $this->processor->app->get('offset');
                                         $date_stamp = $this->uploadTimestampFormatter()->formatPattern(
@@ -195,19 +255,17 @@ final class SubmissionEngine
 
                                         // trying glob instead of readdir()
 
-                                        foreach (glob($sourcePath . '*') as $glob_file) {
+                                        foreach ($this->flashUploadFileMatcher()->find(
+                                            $sourcePath,
+                                            $row->name,
+                                            $this->processor->app->getInput()->getString('bfFlashUploadTicket', '')
+                                        ) as $flashFile) {
+
+                                            $glob_file = $flashFile['path'];
 
                                             $file = basename($glob_file);
 
-                                            if ($file != "." && $file != "..") {
-                                                $parts = explode('_', $file);
-                                                if (count($parts) >= 5) {
-                                                    if ($parts[count($parts) - 1] == 'flashtmp') {
-
-                                                        if ($parts[count($parts) - 3] == $this->processor->app->getInput()->getString('bfFlashUploadTicket', '')) {
-
-
-                                                            if ($parts[count($parts) - 4] == $row->name) {
+                                            $parts = explode('_', $file);
 
                                                                 unset($parts[count($parts) - 1]);
                                                                 unset($parts[count($parts) - 1]);
@@ -288,14 +346,22 @@ final class SubmissionEngine
                                                                 if ($this->processor->status != _FF_STATUS_OK)
                                                                     return;
 
-                                                                if (@is_readable($sourcePath . $file) && @file_exists($baseDir) && @is_dir($baseDir)) {
-                                                                    @File::copy($sourcePath . $file, $path);
-                                                                } else {
+                                                                if (!is_readable($sourcePath . $file) || !file_exists($baseDir) || !is_dir($baseDir)) {
                                                                     $this->processor->status = _FF_STATUS_UPLOAD_FAILED;
                                                                     $this->processor->message = Text::_('COM_BREEZINGFORMSNG_PROCESS_FILEMOVEFAILED');
                                                                     return;
                                                                 }
-                                                                @File::delete($sourcePath . $file);
+
+                                                                if (!File::copy($sourcePath . $file, $path)) {
+                                                                    $this->processor->status = _FF_STATUS_UPLOAD_FAILED;
+                                                                    $this->processor->message = Text::_('COM_BREEZINGFORMSNG_PROCESS_FILEMOVEFAILED');
+                                                                    return;
+                                                                }
+                                                                if (!File::delete($sourcePath . $file)) {
+                                                                    $this->processor->status = _FF_STATUS_UPLOAD_FAILED;
+                                                                    $this->processor->message = Text::_('COM_BREEZINGFORMSNG_PROCESS_FILEMOVEFAILED');
+                                                                    return;
+                                                                }
 
                                                                 $serverPath = $path;
 
@@ -320,11 +386,6 @@ final class SubmissionEngine
                                                                 if (strpos(strtolower($row->data1), '{cbsite}') === 0) {
                                                                     $is_relative[$serverPath] = true;
                                                                 }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
                                         }
                                     }
                                 }
@@ -345,7 +406,7 @@ final class SubmissionEngine
                                     // CONTENTBUILDER: to keep the relative path with prefix
                                     $savedata_path = $serverPath;
                                     foreach ($this->processor->findtags as $tag) {
-                                        if (strtolower($tag) == '{cbsite}' && isset($is_relative[$serverPath]) && $is_relative[$serverPath]) {
+                                        if (strtolower($tag) == '{cbsite}' && isset($is_relative[$serverPath])) {
                                             $savedata_path = Path::clean(str_replace(array(JPATH_SITE, JPATH_SITE), array('{cbsite}', '{CBSite}'), $savedata_path));
                                         }
                                     }
@@ -394,7 +455,7 @@ final class SubmissionEngine
                                 $serverPaths = implode(nl(), $serverPaths);
 
                                 if ($this->processor->trim($paths)) {
-                                    $this->processor->sfadata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $paths, $serverPaths);
+                                    $this->processor->sfdata[] = array($row->id, $row->name, strip_tags($row->title), $row->type, $paths, $serverPaths);
                                 }
 
                                 if (
@@ -564,11 +625,11 @@ final class SubmissionEngine
                                     }
 
                                     if ($useNewValues) {
-                                        $values = is_array($newValues) ? implode(', ', $newValues) : '';
-                                        $sfvalues = is_array($sfnewValues) ? implode(';', $sfnewValues) : '';
+                                        $values = implode(', ', $newValues);
+                                        $sfvalues = implode(';', $sfnewValues);
                                     } else {
-                                        $values = is_array($values) ? implode(', ', $values) : '';
-                                        $sfvalues = is_array($sfvalues) ? implode(';', $sfvalues) : '';
+                                        $values = implode(', ', $values);
+                                        $sfvalues = implode(';', $sfvalues);
                                     }
                                 }
 
@@ -595,12 +656,17 @@ final class SubmissionEngine
                     } // switch
                     $names[] = $row->name;
                 } // if
-                $time_passed = $this->processor->measureTime();
+                            $time_passed = $this->measureTime();
                 if (($time_passed - $start_time) > $max_time) {
                     //break;
                 }
             } // for
         }
+    }
+
+    private function flashUploadFileMatcher(): FlashUploadFileMatcher
+    {
+        return $this->flashUploadFileMatcherService ??= new FlashUploadFileMatcher();
     }
 
     // collectSubmitdata
@@ -648,23 +714,7 @@ final class SubmissionEngine
         $this->processor->sendNotificationAfterPayment = false;
 
         // handle Begin Submit piece
-        $halt = false;
         $this->processor->collectSubmitdata($cbResult);
-
-        if (!$halt) {
-
-            require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
-
-            $dataObject = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
-            $rootMdata = $dataObject['properties'];
-
-            if ($this->processor->app->getInput()->getString('ff_applic', '') != 'mod_facileforms' && $this->processor->app->getInput()->getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
-                $is_device = true;
-                $this->processor->isMobile = isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile'] ? true : (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $this->processor->app->getSession()->get('com_breezingformsng.mobile', false) ? true : false);
-            } else
-                $this->processor->isMobile = false;
-
-
 
             for ($i = 0; $i < $this->processor->rowcount; $i++) {
                 $row = $this->processor->rows[$i];
@@ -672,7 +722,6 @@ final class SubmissionEngine
                     VendorHelper::load();
                     $securimage = new Securimage();
                     if (!$securimage->check($this->processor->app->getInput()->getString('bfCaptchaEntry', ''))) {
-                        $halt = true;
                         $this->processor->status = _FF_STATUS_CAPTCHA_FAILED;
                         exit;
                     }
@@ -688,7 +737,7 @@ final class SubmissionEngine
                                 if ($element['bfType'] == 'ReCaptcha') {
 
                                     try {
-                                        $verified = (new RecaptchaVerifier())->verify(
+                                        $verified = $this->recaptchaVerifier->verify(
                                             (string) $element['privkey'],
                                             $this->processor->app->getInput()->getString('g-recaptcha-response', ''),
                                             $this->processor->app->getInput()->server->getString('REMOTE_ADDR', '')
@@ -702,7 +751,6 @@ final class SubmissionEngine
                                         // all good
                                     } else {
 
-                                        $halt = true;
                                         $this->processor->status = _FF_STATUS_CAPTCHA_FAILED;
                                         exit;
                                     }
@@ -736,10 +784,6 @@ final class SubmissionEngine
                         }
                 }
             }
-        }
-
-        if (!$halt) {
-
             $code = '';
 
             switch ($this->processor->formrow->piece3cond) {
@@ -850,6 +894,7 @@ final class SubmissionEngine
                 $uri = Uri::getInstance();
                 $domainAddress = $uri->toString(array('scheme', 'host', 'port', 'path'));
 
+                /** @var Mail $mailer */
                 $mailer = $this->mailerFactory->createMailer();
                 $config = $this->processor->app->getConfig();
 
@@ -917,7 +962,7 @@ final class SubmissionEngine
                         $mailer->setSubject(Text::_('COM_BREEZINGFORMSNG_FORMS_DOUBLE_OPT_EMAIL_SUBJECT'));
                         $mailer->setBody($body);
                         $mailer->setSender($sender);
-                        $mailer->Send();
+                        $mailer->send();
                     }
                 }
             }
@@ -968,8 +1013,6 @@ final class SubmissionEngine
 
             if ($this->processor->bury())
                 return;
-        }
-
         switch ($this->processor->status) {
             case _FF_STATUS_OK:
                 $message = Text::_('COM_BREEZINGFORMSNG_PROCESS_SUBMITSUCCESS');
@@ -1013,9 +1056,6 @@ final class SubmissionEngine
             $head = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
 
             if (is_array($areas)) {
-                $j15 = false;
-
-
                 $paymentAction = true;
 
                 switch ($this->processor->app->getInput()->getString('ff_payment_method', '')) {
@@ -1023,7 +1063,8 @@ final class SubmissionEngine
 
                     case 'Stripe':
 
-                        foreach ($area['elements'] as $element) {
+                        foreach ($areas as $area) {
+                            foreach ($area['elements'] as $element) {
 
                             if ($element['internalType'] == 'bfStripe') {
 
@@ -1191,7 +1232,7 @@ transition: box-shadow .15s linear;
                                         description: ' . json_encode($options['itemname']) . ',
                                         currency: ' . json_encode(strtolower($options['currencyCode'])) . ',
                                         amount: ' . json_encode($options['amount']) . ',
-                                        email: ' . (isset($stripeemail) ? json_encode($stripeemail) : json_encode('')) . ',
+                                        email: ' . json_encode($stripeemail) . ',
 									    zipCode : true,
 									    billingAddress: true,
 									    closed: function () { 
@@ -1222,6 +1263,7 @@ transition: box-shadow .15s linear;
 
                                 echo $html;
                             }
+                        }
                         }
 
                         break;
@@ -1334,30 +1376,6 @@ transition: box-shadow .15s linear;
                                     if (!$this->processor->inline)
                                         $html .= "</form></body></html>";
 
-                                    // TODO: let the user decide to use modal or simple alert
-                                    if ($j15) {
-                                        $html .= '<script type="text/javascript">' . nl() .
-                                            indentc(1) . '<!--' . nl() .
-                                            indentc(2) . '
-
-										    SqueezeBox.initialize({});
-
-										    SqueezeBox.loadModal = function(modalUrl,handler,x,y) {
-										    		this.initialize();
-										      		var options = $merge(options || {}, Json.evaluate("{handler: \'" + handler + "\', size: {x: " + x +", y: " + y + "}}"));
-													this.setOptions(this.presets, options);
-													this.assignOptions();
-													this.setContent(handler,modalUrl);
-										   	};
-
-										    SqueezeBox.loadModal("' . Uri::root() . 'index.php?raw=true&option=com_breezingformsng&showPayPalConnectMsg=true","iframe",300,100);
-
-										 	
-
-										' . nl() .
-                                            indentc(1) . '// -->' . nl() .
-                                            '</script>' . nl();
-                                    }
                                     $html .= '<script type="text/javascript"><!--' . nl() . 'document.ff_submitform.submit();' . nl() . '//--></script>';
                                     echo $html;
 
@@ -1450,28 +1468,6 @@ transition: box-shadow .15s linear;
 									<!-- sofortüberweisung.de -->
 									';
 
-                                    if ($j15) {
-                                        // TODO: let the user decide to use modal or simple alert
-                                        $html .= '<script type="text/javascript">' . nl() .
-                                            indentc(1) . '<!--' . nl() .
-                                            indentc(2) . '
-
-										    SqueezeBox.initialize({});
-
-										    SqueezeBox.loadModal = function(modalUrl,handler,x,y) {
-										    		this.initialize();
-										      		var options = $merge(options || {}, Json.evaluate("{handler: \'" + handler + "\', size: {x: " + x +", y: " + y + "}}"));
-													this.setOptions(this.presets, options);
-													this.assignOptions();
-													this.setContent(handler,modalUrl);
-										   	};
-
-										    SqueezeBox.loadModal("' . Uri::root() . 'index.php?raw=true&option=com_breezingformsng&showPayPalConnectMsg=true","iframe",300,100);
-
-										' . nl() .
-                                            indentc(1) . '// -->' . nl() .
-                                            '</script>' . nl();
-                                    }
                                     $html .= '<script type="text/javascript"><!--' . nl() . 'document.ff_submitform.submit();' . nl() . '//--></script>';
 
                                     if (!$this->processor->inline)
@@ -1494,13 +1490,11 @@ transition: box-shadow .15s linear;
 
         // CONTENTBUILDER
         if ($this->processor->app->getInput()->get('cb_controller', null, 'string') != 'edit' && $cbRecordId && is_array($cbResult) && isset($cbResult['data']) && isset($cbResult['data']['id']) && $cbResult['data']['id']) {
-            if ($cbRecordId) {
-                $return = $this->processor->app->getInput()->getString('return', '');
-                if ($return) {
-                    $return = bf_b64dec($return);
-                    if (Uri::isInternal($return)) {
-                        $this->processor->app->redirect($return);
-                    }
+            $return = $this->processor->app->getInput()->getString('return', '');
+            if ($return) {
+                $return = bf_b64dec($return);
+                if (Uri::isInternal($return)) {
+                    $this->processor->app->redirect($return);
                 }
             }
 
@@ -1530,8 +1524,8 @@ transition: box-shadow .15s linear;
 
             if (!defined('VMBFCF_RUNNING')) {
                 $ob = 0;
-                while (@ob_get_level() > 0 && $ob <= 32) {
-                    @ob_end_clean();
+                while (ob_get_level() > 0 && $ob <= 32) {
+                    ob_end_clean();
                     $ob++;
                 }
                 ob_start();
@@ -1648,8 +1642,8 @@ transition: box-shadow .15s linear;
             } // if
 
             if (!defined('VMBFCF_RUNNING')) {
-                $c = @ob_get_contents();
-                @ob_end_clean();
+                $c = ob_get_contents();
+                ob_end_clean();
                 echo $c;
 
                 echo '</body>
@@ -1684,15 +1678,14 @@ transition: box-shadow .15s linear;
         return $this->uploadTimestampFormatterService ??= new SubmissionTimestampFormatter();
     }
 
-    private function getEvent(string $name): EventInterface
-    {
-
-        return new Event($name);
-    }
-
     function removeDangerousHtml($value)
     {
         return $this->htmlSanitizer()->sanitize((string) $value);
+    }
+
+    private function uploadRuntime(): UploadRuntime
+    {
+        return $this->uploadRuntimeService ??= new UploadRuntime($this->processor->app->getInput());
     }
 
     private function htmlSanitizer(): HtmlSanitizer

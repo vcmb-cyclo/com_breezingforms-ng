@@ -7,6 +7,7 @@
 
 \defined('_JEXEC') or die;
 
+/** @var \Vcmb\Component\BreezingformsNG\Administrator\View\Menus\HtmlView $this */
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
@@ -129,7 +130,9 @@ $pkg  = $this->pkg;
 </form>
 
 <?php
-$bfDocument = Factory::getApplication()->getDocument();
+/** @var \Joomla\CMS\Application\CMSApplication $app */
+$app = Factory::getApplication();
+$bfDocument = $app->getDocument();
 $bfDocument->getWebAssetManager()->useScript('com_breezingformsng.admin-form');
 $bfDocument->addScriptOptions('com_breezingformsng.admin-form', ['cancelTask' => 'menus.cancel']);
 ?>

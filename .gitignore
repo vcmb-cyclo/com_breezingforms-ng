@@ -12,6 +12,7 @@ configuration.php
 facileforms.config.php
 .htaccess
 .codex/settings.json
+.claude/settings.local.json
 
 administrator/.htaccess
 

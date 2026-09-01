@@ -7,6 +7,9 @@
 
 defined('_JEXEC') or die;
 
+/** @var int $debugMode */
+/** @var int $formId */
+/** @var int $published */
 use Joomla\CMS\Language\Text;
 ?>
 <div class="d-flex align-items-center gap-3 ms-auto">
@@ -38,7 +41,7 @@ use Joomla\CMS\Language\Text;
             data-item-form-id="<?php echo (int) $formId; ?>"
             data-state-type="debug"
             title="<?php echo $debugMode ? Text::_('COM_BREEZINGFORMSNG_DEBUG_MODE_ENABLED') : Text::_('COM_BREEZINGFORMSNG_DEBUG_MODE_DISABLED'); ?>">
-            <span class="<?php echo $debugMode ? 'fa fa-bug text-success' : 'fa fa-bug text-muted'; ?>" aria-hidden="true"></span>
+            <span class="<?php echo $debugMode ? 'fa-solid fa-bug text-success' : 'fa-solid fa-bug text-muted'; ?>" aria-hidden="true"></span>
         </a>
         <input type="checkbox" name="cid[]" id="bfdebugstate<?php echo (int) $formId; ?>" value="<?php echo (int) $formId; ?>" hidden />
     </div>

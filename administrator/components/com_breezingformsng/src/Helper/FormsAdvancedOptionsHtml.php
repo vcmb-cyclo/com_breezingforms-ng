@@ -1,0 +1,88 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * BreezingForms NG - A Joomla Forms Application
+ *
+ * @package BreezingFormsNG
+ * @copyright Copyright (C) 2024-2026 by XDA+GIL
+ * @license GNU General Public License version 2 or later; see LICENSE.txt
+ */
+
+namespace Vcmb\Component\BreezingformsNG\Administrator\Helper;
+
+\defined('_JEXEC') or die;
+
+use Joomla\CMS\Language\Text;
+
+/**
+ * The "advanced options" settings block (General/Email/Scripts/Pieces/
+ * MailChimp/Salesforce/Dropbox) shown on the classic `forms.edit&advanced=1`
+ * screen. Extracted so the same markup and logic can also be rendered as the
+ * "Options" tab inside the QuickMode editor (`task=quickmode.display`),
+ * without duplicating it.
+ */
+final class FormsAdvancedOptionsHtml
+{
+    /**
+     * @return array<string, int>
+     */
+    public static function countEntries(\stdClass $f): array
+    {
+        $countConfigured = static function (array $values): int {
+            return count(array_filter($values, static fn ($value): bool => $value !== null && $value !== '' && $value !== 0 && $value !== '0'));
+        };
+
+        return [
+            'general' => $countConfigured([$f->title ?? '', $f->name ?? '', $f->package ?? '', $f->description ?? '', $f->class1 ?? '']),
+            'email' => $countConfigured([
+                $f->emailntf ?? 0, $f->emailadr ?? '', $f->custom_mail_subject ?? '', $f->alt_mailfrom ?? '',
+                $f->alt_fromname ?? '', $f->mb_emailntf ?? 0, $f->mb_custom_mail_subject ?? '',
+                $f->mb_alt_mailfrom ?? '', $f->mb_alt_fromname ?? '',
+            ]),
+            'scripts' => (int) ((int) ($f->script1cond ?? 0) > 0) + (int) ((int) ($f->script2cond ?? 0) > 0),
+            'form-pieces' => (int) ((int) ($f->piece1cond ?? 0) > 0) + (int) ((int) ($f->piece2cond ?? 0) > 0),
+            'submit-pieces' => (int) ((int) ($f->piece3cond ?? 0) > 0) + (int) ((int) ($f->piece4cond ?? 0) > 0),
+            'mailchimp' => $countConfigured([
+                $f->mailchimp_api_key ?? '', $f->mailchimp_list_id ?? '', $f->mailchimp_email_field ?? '',
+                $f->mailchimp_checkbox_field ?? '', $f->mailchimp_unsubscribe_field ?? '',
+                $f->mailchimp_text_html_mobile_field ?? '', $f->mailchimp_mergevars ?? '',
+            ]),
+            'salesforce' => $countConfigured([
+                $f->salesforce_enabled ?? 0, $f->salesforce_token ?? '', $f->salesforce_username ?? '',
+                $f->salesforce_type ?? '', $f->salesforce_fields ?? '',
+            ]),
+            'dropbox' => $countConfigured([
+                $f->dropbox_email ?? '', $f->dropbox_password ?? '', $f->dropbox_folder ?? '',
+                $f->dropbox_submission_enabled ?? 0,
+            ]),
+        ];
+    }
+
+    /**
+     * @param array<int, \stdClass> $list
+     */
+    public static function bfSel(array $list, string $name, int $current, string $extra = ''): string
+    {
+        $out = '<select class="form-select" name="' . htmlspecialchars($name) . '" ' . $extra . '>';
+        $out .= '<option value="0">' . htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_FORMS_NONE')) . '</option>';
+        foreach ($list as $item) {
+            $sel  = (int) $item->id === (int) $current ? ' selected' : '';
+            $out .= '<option value="' . (int) $item->id . '"' . $sel . '>' . htmlspecialchars($item->text) . '</option>';
+        }
+        $out .= '</select>';
+
+        return $out;
+    }
+
+    /**
+     * @param array<string, mixed> $vars
+     */
+    public static function render(array $vars): void
+    {
+        extract($vars, EXTR_SKIP);
+
+        require JPATH_ADMINISTRATOR . '/components/com_breezingformsng/layouts/forms/advanced_options.php';
+    }
+}

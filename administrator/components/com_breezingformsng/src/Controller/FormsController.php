@@ -9,13 +9,16 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
+use Joomla\CMS\MVC\Factory\MVCFactoryServiceInterface;
 use Joomla\CMS\Response\JsonResponse;
 use Joomla\CMS\Router\Route;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\FormModel;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\AjaxStateService;
 
+/** @property CMSApplication $app */
 class FormsController extends BaseController
 {
     public function display($cachable = false, $urlparams = []): static
@@ -156,10 +159,14 @@ class FormsController extends BaseController
         try {
             $id  = $this->getFormModel()->saveForm($data);
             $pkg = (string) ($data['package'] ?? '');
+            // Set by the QuickMode "Options" tab's own form (bfOptionsForm) so
+            // the redirect lands back on that tab instead of the default one.
+            $returnTab = $input->post->getCmd('return_tab', '');
             $app->enqueueMessage(Text::_('JLIB_APPLICATION_SAVE_SUCCESS'), 'message');
             $app->redirect(Route::_(
                 'index.php?option=com_breezingformsng&task=quickmode.display&form=' . $id
-                . ($pkg !== '' ? '&pkg=' . rawurlencode($pkg) : ''),
+                . ($pkg !== '' ? '&pkg=' . rawurlencode($pkg) : '')
+                . ($returnTab === 'options' ? '#fragment-3' : ''),
                 false
             ));
         } catch (\Throwable $e) {
@@ -190,7 +197,7 @@ class FormsController extends BaseController
             $ids = $this->selectedIds($input);
             if (!empty($ids)) {
                 $this->getFormModel()->deleteItems($ids);
-                $app->enqueueMessage(Text::_('JLIB_APPLICATION_DELETE_SUCCESS'), 'message');
+                $app->enqueueMessage(Text::_('COM_BREEZINGFORMSNG_DELETE_SUCCESS'), 'message');
             }
         }
 
@@ -356,9 +363,13 @@ class FormsController extends BaseController
 
     private function getFormModel(): FormModel
     {
-        $model = $this->app
-            ->bootComponent('com_breezingformsng')
-            ->getMVCFactory()
+        $component = $this->app->bootComponent('com_breezingformsng');
+
+        if (!$component instanceof MVCFactoryServiceInterface) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        $model = $component->getMVCFactory()
             ->createModel('Form', 'Administrator', ['ignore_request' => true]);
 
         if (!$model instanceof FormModel) {

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * BreezingForms NG - A Joomla Forms Application
  *
@@ -24,6 +22,8 @@ declare(strict_types=1);
  * locals.
  */
 
+declare(strict_types=1);
+
 namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode;
 
 use Joomla\CMS\HTML\HTMLHelper;
@@ -35,13 +35,26 @@ use Joomla\CMS\Uri\Uri;
 
 trait BootstrapStyleFieldTrait
 {
+    private ?QuickModeBootstrapChoiceGroupBuilder $quickModeBootstrapChoiceGroupBuilderService = null;
+
+    private function quickModeBootstrapChoiceGroupBuilder(): QuickModeBootstrapChoiceGroupBuilder
+    {
+        return $this->quickModeBootstrapChoiceGroupBuilderService ??= new QuickModeBootstrapChoiceGroupBuilder(
+            $this->quickModeGroupOptionBuilder(),
+            fn(string $class): string => $this->bsClass($class)
+        );
+    }
+
     /**
      * @param array<string, mixed> $mdata
      */
     private function renderBootstrapStyleSummarizeField(array $mdata, string $label): void
     {
         /* translatables */
-        if (isset($mdata['emptyMessage_translation' . $this->language_tag]) && $mdata['emptyMessage_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['emptyMessage_translation' . $this->language_tag])
+            && $mdata['emptyMessage_translation' . $this->language_tag] != ''
+        ) {
             $mdata['emptyMessage'] = $mdata['emptyMessage_translation' . $this->language_tag];
         }
         /* translatables end */
@@ -49,7 +62,8 @@ trait BootstrapStyleFieldTrait
         echo '<div class="' . $this->bsClass('form-group') . ' ' . $this->bsClass('other-form-group') . '">';
         echo $label;
         echo '<span class="' . $this->bsClass('nonform-control') . '">';
-        echo '<div style="display: inline-block; vertical-align: top;" class="ff_elem bfSummarize" id="ff_elem' . $mdata['dbId'] . '"></div>' . "\n";
+        echo '<div style="display: inline-block; vertical-align: top;" class="ff_elem bfSummarize" id="ff_elem'
+            . $mdata['dbId'] . '"></div>' . "\n";
         echo '<script type="text/javascript">bfRegisterSummarize('
             . json_encode('ff_elem' . $mdata['dbId']) . ', '
             . json_encode($mdata['connectWith']) . ', '
@@ -80,18 +94,28 @@ trait BootstrapStyleFieldTrait
     private function renderBootstrapStyleCalendarField(array $mdata, string $label): void
     {
         /* translatables */
-        if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['value_translation' . $this->language_tag])
+            && $mdata['value_translation' . $this->language_tag] != ''
+        ) {
             $mdata['value'] = $mdata['value_translation' . $this->language_tag];
         }
-        if (isset($mdata['format_translation' . $this->language_tag]) && $mdata['format_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['format_translation' . $this->language_tag])
+            && $mdata['format_translation' . $this->language_tag] != ''
+        ) {
             $mdata['format'] = $mdata['format_translation' . $this->language_tag];
         }
         $icon = '';
-        if ($this->rootMdata['themebootstrapThemeEngine'] == 'bootstrap' && $this->rootMdata['themebootstrap'] == 'Azure') {
+        if (
+            $this->rootMdata['themebootstrapThemeEngine'] == 'bootstrap'
+            && $this->rootMdata['themebootstrap'] == 'Azure'
+        ) {
             if (!isset($mdata['icon']) || $mdata['icon'] == '') {
                 $icon = '<i class="fas fa-calendar iconf--fumi" aria-hidden="true"></i>';
             } else {
-                $icon = '<i class="fas ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8') . ' iconf--fumi" aria-hidden="true"></i>';
+                $icon = '<i class="fas ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8')
+                    . ' iconf--fumi" aria-hidden="true"></i>';
             }
         }
         /* translatables end */
@@ -121,12 +145,22 @@ trait BootstrapStyleFieldTrait
             'singleHeader' => $this->bfCalendarIsTruthy($mdata, 'singleHeader'),
             'todayBtn' => $this->bfCalendarIsTruthy($mdata, 'todayButton'),
             'weekNumbers' => $this->bfCalendarIsTruthy($mdata, 'weekNumbers'),
-            'minYear' => (isset($mdata['minYear']) && $mdata['minYear'] != '') ? '-' . $mdata['minYear'] : '',
-            'maxYear' => (isset($mdata['maxYear']) && $mdata['maxYear'] != '') ? '+' . $mdata['maxYear'] : '',
-            'firstDay' => (isset($mdata['firstDay']) && $mdata['firstDay'] != '') ? $mdata['firstDay'] : '7',
+            'minYear' => (isset($mdata['minYear']) && $mdata['minYear'] != '')
+                ? '-' . $mdata['minYear'] : '',
+            'maxYear' => (isset($mdata['maxYear']) && $mdata['maxYear'] != '')
+                ? '+' . $mdata['maxYear'] : '',
+            'firstDay' => (isset($mdata['firstDay']) && $mdata['firstDay'] != '')
+                ? $mdata['firstDay'] : '7',
         ];
 
-        echo HTMLHelper::_('calendar', $left, "ff_nm_" . $mdata['bfName'] . "[]", "ff_elem" . $mdata['dbId'], $mdata['format'], $calAttr);
+        echo HTMLHelper::_(
+            'calendar',
+            $left,
+            "ff_nm_" . $mdata['bfName'] . "[]",
+            "ff_elem" . $mdata['dbId'],
+            $mdata['format'],
+            $calAttr
+        );
 
         echo '</span>';
         echo '</div>';
@@ -139,18 +173,28 @@ trait BootstrapStyleFieldTrait
     private function renderBootstrapStyleCalendarResponsiveField(array $mdata, string $label): void
     {
         /* translatables */
-        if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['value_translation' . $this->language_tag])
+            && $mdata['value_translation' . $this->language_tag] != ''
+        ) {
             $mdata['value'] = $mdata['value_translation' . $this->language_tag];
         }
-        if (isset($mdata['format_translation' . $this->language_tag]) && $mdata['format_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['format_translation' . $this->language_tag])
+            && $mdata['format_translation' . $this->language_tag] != ''
+        ) {
             $mdata['format'] = $mdata['format_translation' . $this->language_tag];
         }
         $icon = '';
-        if ($this->rootMdata['themebootstrapThemeEngine'] == 'bootstrap' && $this->rootMdata['themebootstrap'] == 'Azure') {
+        if (
+            $this->rootMdata['themebootstrapThemeEngine'] == 'bootstrap'
+            && $this->rootMdata['themebootstrap'] == 'Azure'
+        ) {
             if (!isset($mdata['icon']) || $mdata['icon'] == '') {
                 $icon = '<i class="fas fa-calendar iconf--fumi" aria-hidden="true"></i>';
             } else {
-                $icon = '<i class="fas ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8') . ' iconf--fumi" aria-hidden="true"></i>';
+                $icon = '<i class="fas ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8')
+                    . ' iconf--fumi" aria-hidden="true"></i>';
             }
         }
         /* translatables end */
@@ -183,25 +227,49 @@ trait BootstrapStyleFieldTrait
         }
 
         echo '<div class="' . $this->bsClass('input-append') . '">';
-        echo '<input autocomplete="off" class="' . $this->bsClass('form-control') . ' ' . $this->bsClass('custom-form-control') . ' ff_elem" ' . $size . 'type="text" name="ff_nm_' . $mdata['bfName'] . '[]"  id="ff_elem' . $mdata['dbId'] . '" value="' . htmlentities($left, ENT_QUOTES, 'UTF-8') . '"/>' . "\n";
-        echo '<button style="cursor:pointer !important;" type="button" id="ff_elem' . $mdata['dbId'] . '_calendarButton" class="bfCalendar ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' button" value="' . htmlentities($right, ENT_QUOTES, 'UTF-8') . '"><i class="' . $this->bsClass('icon-calendar') . '"></i>' . htmlentities($right == '...' ? '' : $right, ENT_QUOTES, 'UTF-8') . '</button>' . "\n";
+        echo $this->quickModeCalendarInputBuilder()->build(
+            $this->bsClass('form-control') . ' ' . $this->bsClass('custom-form-control') . ' ff_elem',
+            (string) $mdata['bfName'],
+            (int) $mdata['dbId'],
+            (string) $left,
+            $size
+        );
+        echo $this->quickModeCalendarButtonBuilder()->build(
+            'style="cursor:pointer !important;" type="button"',
+            'ff_elem' . $mdata['dbId'] . '_calendarButton',
+            'bfCalendar ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' button',
+            (string) $right,
+            '<i class="' . $this->bsClass('icon-calendar') . '"></i>'
+                . htmlentities($right == '...' ? '' : $right, ENT_QUOTES, 'UTF-8')
+        );
         echo '</div>' . "\n";
 
         if (!$this->hasResponsiveDatePicker) {
             $this->p->app->getDocument()->getWebAssetManager()->addInlineScript(
-                'var bfPickerMinusYearIcon = ' . json_encode(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/minusyear.png') . ';'
-                . "\n" . 'var bfPickerPlusYearIcon = ' . json_encode(Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/plusyear.png') . ';'
+                'var bfPickerMinusYearIcon = ' . json_encode(
+                    Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/minusyear.png'
+                ) . ';'
+                . "\n" . 'var bfPickerPlusYearIcon = ' . json_encode(
+                    Uri::root(true) . '/components/com_breezingformsng/libraries/jquery/pickadate/plusyear.png'
+                ) . ';'
             );
-            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-legacy-style.js');
-            RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js');
+            RuntimeAssetLoader::script(
+                $this->p->app,
+                Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-legacy-style.js'
+            );
+            RuntimeAssetLoader::script(
+                $this->p->app,
+                Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-calendar-responsive-init.js'
+            );
         }
 
-        echo '<script type="text/javascript">bfInitCalendarResponsive(' . json_encode((int) $mdata['dbId']) . ', ' . json_encode([
-            'format' => $mdata['format'],
-            'selectYears' => $pickerSelectYears,
-            'firstDay' => $pickerFirstDay,
-            'hasYearScroller' => true,
-        ]) . ');</script>' . "\n";
+        echo $this->quickModeCalendarInitScriptBuilder()->buildResponsive(
+            (int) $mdata['dbId'],
+            (string) $mdata['format'],
+            (int) $pickerSelectYears,
+            (int) $pickerFirstDay,
+            true
+        );
 
         $this->hasResponsiveDatePicker = true;
 
@@ -213,45 +281,46 @@ trait BootstrapStyleFieldTrait
     /**
      * @param array<string, mixed> $mdata
      */
-    private function renderBootstrapStyleTextfieldField(array $mdata, string $label, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
-    {
-        $type = 'text';
-
-        if ($mdata['password']) {
-            $type = 'password';
-        }
-        $maxlength = '';
-        if (is_numeric($mdata['maxLength'])) {
-            $maxlength = 'maxlength="' . intval($mdata['maxLength']) . '" ';
-        }
+    private function renderBootstrapStyleTextfieldField(
+        array $mdata,
+        string $label,
+        string $tabIndex,
+        string $onclick,
+        string $onblur,
+        string $onchange,
+        string $onfocus,
+        string $onselect,
+        string $readonly
+    ): void {
         $size = '';
 
         if ($mdata['size'] != '') {
-            $size = 'style="width:' . htmlentities(strip_tags($mdata['size'])) . ' !important; min-width:' . htmlentities(strip_tags($mdata['size'])) . ' !important;" ';
+            $size = 'style="width:' . htmlentities(strip_tags($mdata['size']))
+                . ' !important; min-width:' . htmlentities(strip_tags($mdata['size'])) . ' !important;" ';
         }
         $icon = '';
-        if ($this->rootMdata['themebootstrapThemeEngine'] == 'bootstrap' && $this->rootMdata['themebootstrap'] == 'Azure') {
+        if (
+            $this->rootMdata['themebootstrapThemeEngine'] == 'bootstrap'
+            && $this->rootMdata['themebootstrap'] == 'Azure'
+        ) {
             if (!isset($mdata['icon']) || $mdata['icon'] == '') {
                 $icon = '<i class="fas fa-pencil iconf--fumi" aria-hidden="true"></i>';
             } else {
-                $icon = '<i class="fas ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8') . ' iconf--fumi" aria-hidden="true"></i>';
+                $icon = '<i class="fas ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8')
+                    . ' iconf--fumi" aria-hidden="true"></i>';
             }
         }
-        /* translatables */
-        if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
-            $mdata['value'] = $mdata['value_translation' . $this->language_tag];
-        }
-
-        if (isset($mdata['placeholder_translation' . $this->language_tag]) && $mdata['placeholder_translation' . $this->language_tag] != '') {
-            $mdata['placeholder'] = $mdata['placeholder_translation' . $this->language_tag];
-        }
-        /* translatables end */
-
         echo '<div class="' . $this->bsClass('controls') . ' ' . $this->bsClass('form-inline') . '">';
         echo '<div class="' . $this->bsClass('form-group') . '">';
         echo $label;
         echo $icon;
-        echo '<input ' . (isset($mdata['placeholder']) && $mdata['placeholder'] ? 'placeholder="' . htmlentities($mdata['placeholder'], ENT_QUOTES, 'UTF-8') . '" ' : '') . 'class="' . $this->bsClass('form-control') . ' ff_elem inputbox" ' . $size . $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+        echo $this->quickModeTextFieldStrategy()->textfield(
+            $mdata,
+            $this->language_tag,
+            $this->bsClass('form-control') . ' ff_elem inputbox',
+            $size . $tabIndex,
+            $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly
+        );
         echo '</div>';
         echo '</div>';
         if ($mdata['mailbackAsSender']) {
@@ -262,43 +331,49 @@ trait BootstrapStyleFieldTrait
     /**
      * @param array<string, mixed> $mdata
      */
-    private function renderBootstrapStyleNumberInputField(array $mdata, string $label, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
-    {
-        $type = 'number';
-
-        if ($mdata['range']) {
-            $type = 'range';
-        }
-        $maxlength = '';
-        if (is_numeric($mdata['maxLength'])) {
-            $maxlength = 'max="' . intval($mdata['maxLength']) . '" ';
-        }
+    private function renderBootstrapStyleNumberInputField(
+        array $mdata,
+        string $label,
+        string $tabIndex,
+        string $onclick,
+        string $onblur,
+        string $onchange,
+        string $onfocus,
+        string $onselect,
+        string $readonly
+    ): void {
         $icon = '';
-        if ($this->rootMdata['themebootstrapThemeEngine'] == 'bootstrap' && $this->rootMdata['themebootstrap'] == 'Azure') {
+        if (
+            $this->rootMdata['themebootstrapThemeEngine'] == 'bootstrap'
+            && $this->rootMdata['themebootstrap'] == 'Azure'
+        ) {
             if (!isset($mdata['icon']) || $mdata['icon'] == '') {
                 $icon = '<i class="fas fa-pencil iconf--fumi" aria-hidden="true"></i>';
             } else {
-                $icon = '<i class="fas ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8') . ' iconf--fumi" aria-hidden="true"></i>';
+                $icon = '<i class="fas ' . htmlentities($mdata['icon'], ENT_QUOTES, 'UTF-8')
+                    . ' iconf--fumi" aria-hidden="true"></i>';
             }
         }
-        /* translatables */
-
-        if (isset($mdata['placeholder_translation' . $this->language_tag]) && $mdata['placeholder_translation' . $this->language_tag] != '') {
-            $mdata['placeholder'] = '000';
-        }
-        /* translatables end */
-
         echo '<div class="' . $this->bsClass('controls') . ' ' . $this->bsClass('form-inline') . '">';
         echo '<div class="' . $this->bsClass('form-group') . '">';
         echo $label;
         echo $icon;
-        echo '<input ' . (isset($mdata['placeholder']) && $mdata['placeholder'] ? 'placeholder="' . htmlentities($mdata['placeholder'], ENT_QUOTES, 'UTF-8') . '" ' : '') . 'class="' . $this->bsClass('form-control') . ' ff_elem inputbox" ' . $tabIndex . $maxlength . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '" step="' . $mdata['step'] . '" max="' . $mdata['max'] . '" min="' . $mdata['min'] . '"/>' . "\n";
+        echo $this->quickModeTextFieldStrategy()->numberInput(
+            $mdata,
+            $this->language_tag,
+            $this->bsClass('form-control') . ' ff_elem inputbox',
+            $tabIndex,
+            $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+            'maxlength',
+            true
+        );
         echo '</div>';
         echo '</div>';
 
         // set size of element, number input doesn't allow size attr
         if ($mdata['size'] != '') {
-            RuntimeAssetLoader::script($this->p->app,
+            RuntimeAssetLoader::script(
+                $this->p->app,
                 Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-number-input.js'
             );
             echo '<script type="text/javascript">bfSetNumberInputWidth('
@@ -309,35 +384,63 @@ trait BootstrapStyleFieldTrait
     /**
      * @param array<string, mixed> $mdata
      */
-    private function renderBootstrapStyleCheckboxField(array $mdata, string $label, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
-    {
+    private function renderBootstrapStyleCheckboxField(
+        array $mdata,
+        string $label,
+        string $tabIndex,
+        string $onclick,
+        string $onblur,
+        string $onchange,
+        string $onfocus,
+        string $onselect,
+        string $readonly
+    ): void {
         echo '<div class="' . $this->bsClass('controls') . ' ' . $this->bsClass('form-inline') . '">';
         echo '<div class="' . $this->bsClass('form-group') . '">';
         echo $label;
         echo '<span class="' . $this->bsClass('nonform-control') . '">';
-        echo '<input class="ff_elem form-check-input" ' . ($mdata['checked'] ? 'checked="checked" ' : '') . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . ($readonly ? ' disabled="disabled" ' : '') . 'type="checkbox" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+        echo $this->quickModeCheckboxStrategy()->build(
+            $mdata,
+            'ff_elem form-check-input',
+            $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect,
+            $readonly !== ''
+        );
         echo '</span>';
         echo '</div>';
         echo '</div>';
         if ($mdata['mailbackAccept']) {
-            echo '<input type="hidden" class="ff_elem" name="mailbackConnectWith[' . $mdata['mailbackConnectWith'] . ']" value="true_' . $mdata['bfName'] . '"/>' . "\n";
+            echo '<input type="hidden" class="ff_elem" name="mailbackConnectWith['
+                . $mdata['mailbackConnectWith'] . ']" value="true_' . $mdata['bfName'] . '"/>' . "\n";
         }
     }
 
     /**
      * @param array<string, mixed> $mdata
      */
-    private function renderBootstrapStyleSelectField(array $mdata, string $label, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
-    {
+    private function renderBootstrapStyleSelectField(
+        array $mdata,
+        string $label,
+        string $tabIndex,
+        string $onclick,
+        string $onblur,
+        string $onchange,
+        string $onfocus,
+        string $onselect,
+        string $readonly
+    ): void {
         /* translatables */
-        if (isset($mdata['list_translation' . $this->language_tag]) && $mdata['list_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['list_translation' . $this->language_tag])
+            && $mdata['list_translation' . $this->language_tag] != ''
+        ) {
             $mdata['list'] = $mdata['list_translation' . $this->language_tag];
         }
         /* translatables end */
         if ($mdata['list'] != '') {
             $width = '';
             if (isset($mdata['width']) && $mdata['width'] != '') {
-                $width = 'width:' . htmlentities(strip_tags($mdata['width'])) . ' !important; min-width:' . htmlentities(strip_tags($mdata['width'])) . ' !important;';
+                $width = 'width:' . htmlentities(strip_tags($mdata['width']))
+                    . ' !important; min-width:' . htmlentities(strip_tags($mdata['width'])) . ' !important;';
             }
             $height = '';
             if (isset($mdata['height']) && $mdata['height'] != '') {
@@ -348,21 +451,18 @@ trait BootstrapStyleFieldTrait
                 $size = 'style="' . $width . $height . '" ';
             }
 
-            $mdata['list'] = str_replace("\r", '', $mdata['list']);
-            $gEx = explode("\n", $mdata['list']);
-            $lines = count($gEx);
             echo '<div class="' . $this->bsClass('controls') . ' ' . $this->bsClass('form-inline') . '">';
             echo '<div class="' . $this->bsClass('form-group') . '">';
             echo $label;
-            echo '<select data-chosen="no-chzn" class="' . $this->bsClass('form-select') . ' ff_elem chzn-done" ' . $size . ($mdata['multiple'] ? 'multiple="multiple" ' : '') . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '">' . "\n";
-            for ($i = 0; $i < $lines; $i++) {
-                $iEx = explode(";", $gEx[$i]);
-                $iCnt = count($iEx);
-                if ($iCnt == 3) {
-                    echo '<option ' . ($iEx[0] == 1 ? 'selected="selected" ' : '') . 'value="' . htmlentities(trim($iEx[2]), ENT_QUOTES, 'UTF-8') . '">' . htmlentities(trim($iEx[1]), ENT_QUOTES, 'UTF-8') . '</option>' . "\n";
-                }
-            }
-            echo '</select>' . "\n";
+            echo $this->quickModeSelectBuilder()->build(
+                $this->bsClass('form-select') . ' ff_elem chzn-done',
+                (string) $mdata['bfName'],
+                (int) $mdata['dbId'],
+                (string) $mdata['list'],
+                (bool) $mdata['multiple'],
+                $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+                $size
+            );
             echo '</div>';
             echo '</div>';
         }
@@ -371,13 +471,27 @@ trait BootstrapStyleFieldTrait
     /**
      * @param array<string, mixed> $mdata
      */
-    private function renderBootstrapStyleSubmitButtonField(array $mdata, string $label, string $tabIndex, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
-    {
+    private function renderBootstrapStyleSubmitButtonField(
+        array $mdata,
+        string $label,
+        string $tabIndex,
+        string $onblur,
+        string $onchange,
+        string $onfocus,
+        string $onselect,
+        string $readonly
+    ): void {
         /* translatables */
-        if (isset($mdata['src_translation' . $this->language_tag]) && $mdata['src_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['src_translation' . $this->language_tag])
+            && $mdata['src_translation' . $this->language_tag] != ''
+        ) {
             $mdata['src'] = $mdata['src_translation' . $this->language_tag];
         }
-        if (isset($mdata['value_translation' . $this->language_tag]) && $mdata['value_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['value_translation' . $this->language_tag])
+            && $mdata['value_translation' . $this->language_tag] != ''
+        ) {
             $mdata['value'] = $mdata['value_translation' . $this->language_tag];
         }
         /* translatables end */
@@ -398,14 +512,41 @@ trait BootstrapStyleFieldTrait
             $value = 'value="' . htmlentities(trim($mdata['value']), ENT_QUOTES, 'UTF-8') . '" ';
         }
         if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
-            $onclick = 'onclick="if(typeof bf_htmltextareainit != \'undefined\'){ bf_htmltextareainit() }populateSummarizers();if(document.getElementById(\'bfPaymentMethod\')){document.getElementById(\'bfPaymentMethod\').value=\'\';};' . $mdata['actionFunctionName'] . '(this,\'click\');return false;" ';
+            $onclick = 'onclick="if(typeof bf_htmltextareainit != \'undefined\'){ bf_htmltextareainit() }'
+                . 'populateSummarizers();'
+                . 'if(document.getElementById(\'bfPaymentMethod\')){'
+                . 'document.getElementById(\'bfPaymentMethod\').value=\'\';};'
+                . $mdata['actionFunctionName'] . '(this,\'click\');return false;" ';
         } else {
-            $onclick = 'onclick="if(typeof bf_htmltextareainit != \'undefined\'){ bf_htmltextareainit() }populateSummarizers();if(document.getElementById(\'bfPaymentMethod\')){document.getElementById(\'bfPaymentMethod\').value=\'\';};return false;" ';
+            $onclick = 'onclick="if(typeof bf_htmltextareainit != \'undefined\'){ bf_htmltextareainit() }'
+                . 'populateSummarizers();'
+                . 'if(document.getElementById(\'bfPaymentMethod\')){'
+                . 'document.getElementById(\'bfPaymentMethod\').value=\'\';};'
+                . 'return false;" ';
         }
         if ($src == '') {
-            echo '<button type="button" class="ff_elem ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . ' button bfCustomSubmitButton" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '">' . $mdata['value'] . '</button>' . "\n";
+            echo $this->quickModeSubmitButtonBuilder()->build(
+                'button',
+                'type="button" class="ff_elem ' . $this->bsClass('btn') . ' '
+                    . $this->bsClass('btn-primary') . ' button bfCustomSubmitButton"',
+                $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+                $type,
+                (string) $mdata['bfName'],
+                (int) $mdata['dbId'],
+                (string) $mdata['value']
+            );
         } else {
-            echo '<input type="button" class="ff_elem bfCustomSubmitButton" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" alt="" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '" value="' . $mdata['value'] . '"/>' . "\n";
+            echo $this->quickModeSubmitButtonBuilder()->build(
+                'input',
+                'type="button" class="ff_elem bfCustomSubmitButton"',
+                $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly,
+                $type,
+                (string) $mdata['bfName'],
+                (int) $mdata['dbId'],
+                '',
+                ' alt=""',
+                ' value="' . $mdata['value'] . '"'
+            );
         }
         echo '</span>';
         echo '</div>';
@@ -415,10 +556,21 @@ trait BootstrapStyleFieldTrait
     /**
      * @param array<string, mixed> $mdata
      */
-    private function renderBootstrapStyleStripeField(array $mdata, string $label, string $tabIndex, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
-    {
+    private function renderBootstrapStyleStripeField(
+        array $mdata,
+        string $label,
+        string $tabIndex,
+        string $onblur,
+        string $onchange,
+        string $onfocus,
+        string $onselect,
+        string $readonly
+    ): void {
         /* translatables */
-        if (isset($mdata['image_translation' . $this->language_tag]) && $mdata['image_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['image_translation' . $this->language_tag])
+            && $mdata['image_translation' . $this->language_tag] != ''
+        ) {
             $mdata['image'] = $mdata['image_translation' . $this->language_tag];
         }
         /* translatables end */
@@ -427,21 +579,22 @@ trait BootstrapStyleFieldTrait
         echo $label;
         echo '<span class="' . $this->bsClass('nonform-control') . '">';
 
-        $value = '';
-        $type = 'submit';
-        $src = '';
-        if ($mdata['image'] != '') {
-            $type = 'image';
-            $src = 'src="' . $mdata['image'] . '" alt="Stripe" ';
-        } else {
-            $value = 'value="Stripe" ';
-        }
-        if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
-            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Stripe\';' . $mdata['actionFunctionName'] . '(this,\'click\');" ';
-        } else {
-            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Stripe\';" ';
-        }
-        echo '<input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+        echo QuickModePaymentButtonBuilder::build(
+            'Stripe',
+            (string) $mdata['bfName'],
+            (int) $mdata['dbId'],
+            (string) $mdata['image'],
+            'Stripe',
+            'Stripe',
+            $tabIndex,
+            $onblur,
+            $onchange,
+            $onfocus,
+            $onselect,
+            $readonly,
+            isset($mdata['actionClick']) && $mdata['actionClick'] == 1,
+            (string) ($mdata['actionFunctionName'] ?? '')
+        );
         echo '</span>';
         echo '</div>';
         echo '</div>';
@@ -450,10 +603,21 @@ trait BootstrapStyleFieldTrait
     /**
      * @param array<string, mixed> $mdata
      */
-    private function renderBootstrapStylePayPalField(array $mdata, string $label, string $tabIndex, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
-    {
+    private function renderBootstrapStylePayPalField(
+        array $mdata,
+        string $label,
+        string $tabIndex,
+        string $onblur,
+        string $onchange,
+        string $onfocus,
+        string $onselect,
+        string $readonly
+    ): void {
         /* translatables */
-        if (isset($mdata['image_translation' . $this->language_tag]) && $mdata['image_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['image_translation' . $this->language_tag])
+            && $mdata['image_translation' . $this->language_tag] != ''
+        ) {
             $mdata['image'] = $mdata['image_translation' . $this->language_tag];
         }
         /* translatables end */
@@ -462,21 +626,22 @@ trait BootstrapStyleFieldTrait
         echo $label;
         echo '<span class="' . $this->bsClass('nonform-control') . '">';
 
-        $value = '';
-        $type = 'submit';
-        $src = '';
-        if ($mdata['image'] != '') {
-            $type = 'image';
-            $src = 'src="' . $mdata['image'] . '" alt="PayPal" ';
-        } else {
-            $value = 'value="PayPal" ';
-        }
-        if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
-            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'PayPal\';' . $mdata['actionFunctionName'] . '(this,\'click\');" ';
-        } else {
-            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'PayPal\';" ';
-        }
-        echo '<input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+        echo QuickModePaymentButtonBuilder::build(
+            'PayPal',
+            (string) $mdata['bfName'],
+            (int) $mdata['dbId'],
+            (string) $mdata['image'],
+            'PayPal',
+            'PayPal',
+            $tabIndex,
+            $onblur,
+            $onchange,
+            $onfocus,
+            $onselect,
+            $readonly,
+            isset($mdata['actionClick']) && $mdata['actionClick'] == 1,
+            (string) ($mdata['actionFunctionName'] ?? '')
+        );
         echo '</span>';
         echo '</div>';
         echo '</div>';
@@ -485,10 +650,21 @@ trait BootstrapStyleFieldTrait
     /**
      * @param array<string, mixed> $mdata
      */
-    private function renderBootstrapStyleSofortueberweisungField(array $mdata, string $label, string $tabIndex, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly): void
-    {
+    private function renderBootstrapStyleSofortueberweisungField(
+        array $mdata,
+        string $label,
+        string $tabIndex,
+        string $onblur,
+        string $onchange,
+        string $onfocus,
+        string $onselect,
+        string $readonly
+    ): void {
         /* translatables */
-        if (isset($mdata['image_translation' . $this->language_tag]) && $mdata['image_translation' . $this->language_tag] != '') {
+        if (
+            isset($mdata['image_translation' . $this->language_tag])
+            && $mdata['image_translation' . $this->language_tag] != ''
+        ) {
             $mdata['image'] = $mdata['image_translation' . $this->language_tag];
         }
         /* translatables end */
@@ -496,21 +672,22 @@ trait BootstrapStyleFieldTrait
         echo '<div class="' . $this->bsClass('form-group') . ' ' . $this->bsClass('other-form-group') . '">';
         echo $label;
         echo '<span class="' . $this->bsClass('nonform-control') . '">';
-        $value = '';
-        $type = 'submit';
-        $src = '';
-        if ($mdata['image'] != '') {
-            $type = 'image';
-            $src = 'src="' . $mdata['image'] . '" alt="Sofort.com" ';
-        } else {
-            $value = 'value="Sofortueberweisung" ';
-        }
-        if (isset($mdata['actionClick']) && $mdata['actionClick'] == 1) {
-            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Sofortueberweisung\';' . $mdata['actionFunctionName'] . '(this,\'click\');" ';
-        } else {
-            $onclick = 'onclick="document.getElementById(\'bfPaymentMethod\').value=\'Sofortueberweisung\';" ';
-        }
-        echo '<input class="ff_elem" ' . $value . $src . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . $readonly . 'type="' . $type . '" name="ff_nm_' . $mdata['bfName'] . '[]" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+        echo QuickModePaymentButtonBuilder::build(
+            'Sofortueberweisung',
+            (string) $mdata['bfName'],
+            (int) $mdata['dbId'],
+            (string) $mdata['image'],
+            'Sofortueberweisung',
+            'Sofort.com',
+            $tabIndex,
+            $onblur,
+            $onchange,
+            $onfocus,
+            $onselect,
+            $readonly,
+            isset($mdata['actionClick']) && $mdata['actionClick'] == 1,
+            (string) ($mdata['actionFunctionName'] ?? '')
+        );
         echo '</span>';
         echo '</div>';
         echo '</div>';
@@ -521,8 +698,14 @@ trait BootstrapStyleFieldTrait
      */
     private function renderBootstrapStyleSignatureField(array $mdata, string $label): void
     {
-        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/components/com_breezingformsng/libraries/js/signature.js');
-        RuntimeAssetLoader::script($this->p->app, Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-signature.js');
+        RuntimeAssetLoader::script(
+            $this->p->app,
+            Uri::root(true) . '/components/com_breezingformsng/libraries/js/signature.js'
+        );
+        RuntimeAssetLoader::script(
+            $this->p->app,
+            Uri::root(true) . '/media/com_breezingformsng/js/site/quickmode-signature.js'
+        );
         $this->p->app->getDocument()->getWebAssetManager()->addInlineScript(
             'bfSignatureInit(' . json_encode((int) $mdata['dbId']) . ');'
         );
@@ -532,13 +715,23 @@ trait BootstrapStyleFieldTrait
         echo $label;
         echo '<span class="' . $this->bsClass('nonform-control') . '">';
 
-        echo '<div class="bfSignature" id="bfSignature' . $mdata['dbId'] . '"><div class="bfSignatureCanvasBorder"><canvas></canvas></div>' . "\n";
-        echo '<button onclick="bfSignatureReset(' . json_encode((int) $mdata['dbId']) . ');" class="bfSignatureResetButton button ' . $this->bsClass('btn') . ' ' . $this->bsClass('btn-primary') . '"><span>' . Text::_('COM_BREEZINGFORMSNG_SIGNATURE_RESET_BUTTON') . '</span></button>' . "\n";
-        echo '</div>';
+        echo QuickModeSignatureMarkupBuilder::build(
+            (int) $mdata['dbId'],
+            (string) $mdata['bfName'],
+            'onclick="bfSignatureReset(' . json_encode((int) $mdata['dbId'])
+                . ');" class="bfSignatureResetButton button ' . $this->bsClass('btn') . ' '
+                . $this->bsClass('btn-primary') . '"',
+            Text::_('COM_BREEZINGFORMSNG_SIGNATURE_RESET_BUTTON'),
+            false
+        );
         echo '</span>';
         echo '</div>';
         echo '</div>';
-        echo '<input class="ff_elem" type="hidden" name="ff_nm_' . $mdata['bfName'] . '[]" value="" id="ff_elem' . $mdata['dbId'] . '"/>' . "\n";
+        echo QuickModeHiddenFieldBuilder::build([
+            'bfName' => $mdata['bfName'],
+            'value' => '',
+            'dbId' => $mdata['dbId'],
+        ]);
     }
 
     /**
@@ -551,86 +744,54 @@ trait BootstrapStyleFieldTrait
      *
      * @param array<string, mixed> $mdata
      */
-    private function renderBootstrapStyleRadioGroupField(array $mdata, string $label, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly, string $wrapClass = ''): void
-    {
-        /* translatables */
-        if (isset($mdata['group_translation' . $this->language_tag]) && $mdata['group_translation' . $this->language_tag] != '') {
-            $mdata['group'] = $mdata['group_translation' . $this->language_tag];
-        }
-        /* translatables end */
-
-        if ($mdata['group'] != '') {
-            echo '<div class="' . $this->bsClass('controls') . ' ' . $this->bsClass('form-inline') . '">';
-            echo '<div class="' . $this->bsClass('form-group') . ' ' . $this->bsClass('radio-form-group') . '">';
-            echo $label;
-            echo '<span class="' . $this->bsClass('nonform-control') . '">';
-            if ($mdata['wrap']) {
-                echo '<div' . ($wrapClass !== '' ? ' class="' . $wrapClass . '"' : '') . ' style="display: inline-block; vertical-align: top;">';
-            }
-            $mdata['group'] = str_replace("\r", '', $mdata['group']);
-            $gEx = explode("\n", $mdata['group']);
-            $lines = count($gEx);
-            for ($i = 0; $i < $lines; $i++) {
-                $idExt = $i != 0 ? '_' . $i : '';
-                $iEx = explode(";", $gEx[$i]);
-                $iCnt = count($iEx);
-                if ($iCnt == 3) {
-                    $inlineClass = $mdata['wrap'] ? '' : ' ' . $this->bsClass('inline');
-                    echo '<div class="form-check' . $inlineClass . '">';
-                    echo '<input ' . ($iEx[0] == 1 ? 'checked="checked" ' : '') . ' class="ff_elem form-check-input" ' . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . ($readonly ? ' disabled="disabled" ' : '') . 'type="radio" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($iEx[2]), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . $idExt . '"/>' . "\n";
-                    echo '<label class="' . $this->bsClass('radio') . '" id="bfGroupLabel' . $mdata['dbId'] . $idExt . '" for="ff_elem' . $mdata['dbId'] . $idExt . '">' . trim($iEx[1]) . '</label>';
-                    echo '</div>';
-                }
-            }
-            if ($mdata['wrap']) {
-                echo '</div>';
-            }
-            echo '</span>';
-            echo '</div>';
-            echo '</div>';
-        }
+    private function renderBootstrapStyleRadioGroupField(
+        array $mdata,
+        string $label,
+        string $tabIndex,
+        string $onclick,
+        string $onblur,
+        string $onchange,
+        string $onfocus,
+        string $onselect,
+        string $readonly,
+        string $wrapClass = ''
+    ): void {
+        echo $this->quickModeBootstrapChoiceGroupBuilder()->build(
+            'radio',
+            $mdata,
+            $this->language_tag,
+            $label,
+            $tabIndex,
+            $onclick . $onblur . $onchange . $onfocus . $onselect,
+            $readonly,
+            $wrapClass
+        );
     }
 
     /**
      * @param array<string, mixed> $mdata
      */
-    private function renderBootstrapStyleCheckboxGroupField(array $mdata, string $label, string $tabIndex, string $onclick, string $onblur, string $onchange, string $onfocus, string $onselect, string $readonly, string $wrapClass = ''): void
-    {
-        /* translatables */
-        if (isset($mdata['group_translation' . $this->language_tag]) && $mdata['group_translation' . $this->language_tag] != '') {
-            $mdata['group'] = $mdata['group_translation' . $this->language_tag];
-        }
-        /* translatables end */
-        if ($mdata['group'] != '') {
-            echo '<div class="' . $this->bsClass('controls') . ' ' . $this->bsClass('form-inline') . '">';
-            echo '<div class="' . $this->bsClass('form-group') . ' ' . $this->bsClass('radio-form-group') . '">';
-            echo $label;
-            echo '<span class="' . $this->bsClass('nonform-control') . '">';
-            if ($mdata['wrap']) {
-                echo '<div' . ($wrapClass !== '' ? ' class="' . $wrapClass . '"' : '') . ' style="display: inline-block; vertical-align: top;">';
-            }
-            $mdata['group'] = str_replace("\r", '', $mdata['group']);
-            $gEx = explode("\n", $mdata['group']);
-            $lines = count($gEx);
-
-            for ($i = 0; $i < $lines; $i++) {
-                $idExt = $i != 0 ? '_' . $i : '';
-                $iEx = explode(";", $gEx[$i]);
-                $iCnt = count($iEx);
-                if ($iCnt == 3) {
-                    $inlineClass = $mdata['wrap'] ? '' : ' ' . $this->bsClass('inline');
-                    echo '<div class="form-check' . $inlineClass . '">';
-                    echo '<input ' . ($iEx[0] == 1 ? 'checked="checked" ' : '') . ' class="ff_elem form-check-input" ' . $tabIndex . $onclick . $onblur . $onchange . $onfocus . $onselect . ($readonly ? ' disabled="disabled" ' : '') . 'type="checkbox" name="ff_nm_' . $mdata['bfName'] . '[]" value="' . htmlentities(trim($iEx[2]), ENT_QUOTES, 'UTF-8') . '" id="ff_elem' . $mdata['dbId'] . $idExt . '"/>' . "\n";
-                    echo '<label class="' . $this->bsClass('checkbox') . '" id="bfGroupLabel' . $mdata['dbId'] . $idExt . '" for="ff_elem' . $mdata['dbId'] . $idExt . '">' . trim($iEx[1]) . '</label>';
-                    echo '</div>';
-                }
-            }
-            if ($mdata['wrap']) {
-                echo '</div>';
-            }
-            echo '</span>';
-            echo '</div>';
-            echo '</div>';
-        }
+    private function renderBootstrapStyleCheckboxGroupField(
+        array $mdata,
+        string $label,
+        string $tabIndex,
+        string $onclick,
+        string $onblur,
+        string $onchange,
+        string $onfocus,
+        string $onselect,
+        string $readonly,
+        string $wrapClass = ''
+    ): void {
+        echo $this->quickModeBootstrapChoiceGroupBuilder()->build(
+            'checkbox',
+            $mdata,
+            $this->language_tag,
+            $label,
+            $tabIndex,
+            $onclick . $onblur . $onchange . $onfocus . $onselect,
+            $readonly,
+            $wrapClass
+        );
     }
 }

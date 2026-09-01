@@ -15,44 +15,24 @@ use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 use Joomla\Database\DatabaseInterface;
-use Joomla\Database\ParameterType;
-use Joomla\Event\Event;
-use Joomla\Event\EventInterface;
-use Joomla\CMS\Uri\Uri;
-use Joomla\Filesystem\Folder;
-use Joomla\Filesystem\File;
-use Joomla\CMS\Router\Route;
 use Joomla\CMS\Language\Text;
-use Joomla\CMS\Component\ComponentHelper;
-use Joomla\CMS\Language\LanguageHelper;
-use Joomla\Filesystem\Path;
 use Joomla\CMS\Environment\Browser;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\FormDisplayContextResolver;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\FormPathResolver;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RequestMetadataResolver;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampFactory;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\CodeToolsRuntime;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\ErrorHandlerRuntime;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\FormElementLoader;
+use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\TraceRuntime;
 use Vcmb\Component\BreezingformsNG\Site\Service\Scripting\ScriptingEngine;
 use Vcmb\Component\BreezingformsNG\Site\Service\Export\ExportEngine;
+use Vcmb\Component\BreezingformsNG\Site\Service\Integration\RecaptchaVerifier;
 use Vcmb\Component\BreezingformsNG\Site\Service\Notification\NotificationEngine;
 use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\RenderingEngine;
 use Vcmb\Component\BreezingformsNG\Site\Service\Submission\SubmissionEngine;
-use Vcmb\Component\BreezingformsNG\Site\Service\Upload\UploadError;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\UploadRuntime;
 use Vcmb\Component\BreezingformsNG\Site\Table\FormTable;
-use Joomla\CMS\HTML\HTMLHelper;
-use Joomla\CMS\Plugin\PluginHelper;
-use Joomla\CMS\Log\Log;
-use CB\Component\Contentbuilderng\Administrator\Helper\ContentbuilderngHelper;
-use CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory;
-use CB\Component\Contentbuilderng\Administrator\Service\ArticleService;
-use CB\Component\Contentbuilderng\Administrator\Service\ListSupportService;
-use CB\Component\Contentbuilderng\Administrator\Service\PermissionService;
-
-class bfMobile
-{
-    public $isMobile = false;
-}
 
 $ff_processor = null;
 
@@ -95,13 +75,6 @@ define('_FF_TRACEMODE_PRIORITY', 7);
 define('_FF_TRACEMODE_TOPIC', 120);
 define('_FF_TRACEMODE_VARIABLE', 248);
 
-// debugging flags
-define('_FF_DEBUG_PATCHEDCODE', 1);
-define('_FF_DEBUG_ENTER', 2);
-define('_FF_DEBUG_EXIT', 4);
-define('_FF_DEBUG_DIRECTIVE', 8);
-define('_FF_DEBUG', 0);
-
 $cbngBasePath = JPATH_ADMINISTRATOR . '/components/com_contentbuilderng';
 if (is_file($cbngBasePath . '/com_contentbuilderng.xml')) {
     require_once $cbngBasePath . '/src/Helper/ContentbuilderngHelper.php';
@@ -114,21 +87,11 @@ if (is_file($cbngBasePath . '/com_contentbuilderng.xml')) {
 function ff_trace($msg = null)
 {
     global $ff_processor;
-
-    if (
-        $ff_processor->dying ||
-        ($ff_processor->traceMode & _FF_TRACEMODE_DISABLE) ||
-        !($ff_processor->traceMode & _FF_TRACEMODE_MESSAGE)
-    )
+    if (!$ff_processor instanceof HTML_facileFormsProcessor) {
         return;
-    $level = count($ff_processor->traceStack);
-    $trc = '';
-    for ($l = 0; $l < $level; $l++)
-        $trc .= '  ';
-    $trc .= Text::_('COM_BREEZINGFORMSNG_PROCESS_MSGUNKNOWN') . ": $msg\n";
-    $ff_processor->traceBuffer .= htmlspecialchars($trc, ENT_QUOTES);
-    if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
-        $ff_processor->dumpTrace();
+    }
+
+    (new TraceRuntime($ff_processor))->trace($msg);
 }
 
 // ff_trace
@@ -136,22 +99,11 @@ function ff_trace($msg = null)
 function _ff_trace($line, $msg = null)
 {
     global $ff_processor;
-
-    // version for patched code
-    if ($ff_processor->dying || ($ff_processor->traceMode & _FF_TRACEMODE_DISABLE))
+    if (!$ff_processor instanceof HTML_facileFormsProcessor) {
         return;
-    $level = count($ff_processor->traceStack);
-    if ($msg && ($ff_processor->traceMode & _FF_TRACEMODE_MESSAGE)) {
-        $trc = '';
-        for ($l = 0; $l < $level; $l++)
-            $trc .= '  ';
-        $trc .= Text::_('COM_BREEZINGFORMSNG_PROCESS_LINE') . " $line: $msg\n";
-        $ff_processor->traceBuffer .= htmlspecialchars($trc, ENT_QUOTES);
-        if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
-            $ff_processor->dumpTrace();
-    } // if
-    if ($level)
-        $ff_processor->traceStack[$level - 1][3] = $line;
+    }
+
+    (new TraceRuntime($ff_processor))->traceLine($line, $msg);
 }
 
 // _ff_trace
@@ -159,36 +111,11 @@ function _ff_trace($line, $msg = null)
 function _ff_getMode(&$newmode, &$name)
 {
     global $ff_processor;
+    if (!$ff_processor instanceof HTML_facileFormsProcessor) {
+        return null;
+    }
 
-    $oldmode = $ff_processor->traceMode;
-    if (_FF_DEBUG & _FF_DEBUG_ENTER)
-        $ff_processor->traceBuffer .= htmlspecialchars(
-            "\n_FF_DEBUG_ENTER:" .
-            "\n  Name              = $name" .
-            "\n  Old mode before   = " . $ff_processor->dispTraceMode($oldmode) .
-            "\n  New mode before   = " . $ff_processor->dispTraceMode($newmode),
-            ENT_QUOTES
-        );
-    if (is_null($newmode) || ($newmode & _FF_TRACEMODE_PRIORITY) < ($oldmode & _FF_TRACEMODE_PRIORITY)) {
-        $newmode = $oldmode;
-        $ret = $oldmode;
-    } else {
-        $newmode = ($oldmode & ~_FF_TRACEMODE_VARIABLE) | ($newmode & _FF_TRACEMODE_VARIABLE);
-        if ($oldmode != $newmode)
-            $ff_processor->traceMode = $newmode;
-        $ret = ($newmode & _FF_TRACEMODE_LOCAL) ? $oldmode : $newmode;
-    } // if
-    if (_FF_DEBUG & _FF_DEBUG_ENTER) {
-        $ff_processor->traceBuffer .= htmlspecialchars(
-            "\n  Old mode compiled = " . $ff_processor->dispTraceMode($ret) .
-            "\n  New mode compiled = " . $ff_processor->dispTraceMode($newmode) .
-            "\n",
-            ENT_QUOTES
-        );
-        if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
-            $ff_processor->dumpTrace();
-    } // if
-    return $ret;
+    return (new TraceRuntime($ff_processor))->getMode($newmode, $name);
 }
 
 // _ff_getmode
@@ -196,22 +123,11 @@ function _ff_getMode(&$newmode, &$name)
 function _ff_tracePiece($newmode, $name, $line, $type, $id, $pane)
 {
     global $ff_processor;
-
-    if ($ff_processor->dying || ($ff_processor->traceMode & _FF_TRACEMODE_DISABLE))
+    if (!$ff_processor instanceof HTML_facileFormsProcessor) {
         return;
-    $oldmode = _ff_getMode($newmode, $name);
-    if ($newmode & _FF_TRACEMODE_PIECE) {
-        $level = count($ff_processor->traceStack);
-        for ($l = 0; $l < $level; $l++)
-            $ff_processor->traceBuffer .= '  ';
-        $ff_processor->traceBuffer .= htmlspecialchars(
-            "+" . Text::_('COM_BREEZINGFORMSNG_PROCESS_ENTER') . " $name " . Text::_('COM_BREEZINGFORMSNG_PROCESS_ATLINE') . " $line\n",
-            ENT_QUOTES
-        );
-        if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
-            $ff_processor->dumpTrace();
-    } // if
-    array_push($ff_processor->traceStack, array($oldmode, 'p', $name, $line, $type, $id, $pane));
+    }
+
+    (new TraceRuntime($ff_processor))->tracePiece($newmode, $name, $line, $type, $id, $pane);
 }
 
 // _ff_tracePiece
@@ -219,56 +135,11 @@ function _ff_tracePiece($newmode, $name, $line, $type, $id, $pane)
 function _ff_traceFunction($newmode, $name, $line, $type, $id, $pane, &$args)
 {
     global $ff_processor;
-
-    if ($ff_processor->dying || ($ff_processor->traceMode & _FF_TRACEMODE_DISABLE))
+    if (!$ff_processor instanceof HTML_facileFormsProcessor) {
         return;
-    $oldmode = _ff_getMode($newmode, $name);
-    if ($newmode & _FF_TRACEMODE_FUNCTION) {
-        $level = count($ff_processor->traceStack);
-        $trc = '';
-        for ($l = 0; $l < $level; $l++)
-            $trc .= '  ';
-        $trc .= "+" . Text::_('COM_BREEZINGFORMSNG_PROCESS_ENTER') . " $name(";
-        if ($args) {
-            $next = false;
-            foreach ($args as $arg) {
-                if ($next)
-                    $trc .= ', ';
-                else
-                    $next = true;
-                if (is_null($arg))
-                    $trc .= 'null';
-                else
-                    if (is_bool($arg)) {
-                        $trc .= $arg ? 'true' : 'false';
-                    } else
-                        if (is_numeric($arg))
-                            $trc .= $arg;
-                        else
-                            if (is_string($arg)) {
-                                $arg = preg_replace('/([\\s]+)/si', ' ', $arg);
-                                if (strlen($arg) > _FF_TRACE_NAMELIMIT)
-                                    $arg = substr($arg, 0, _FF_TRACE_NAMELIMIT - 3) . '...';
-                                $trc .= "'$arg'";
-                            } else
-                                if (is_array($arg))
-                                    $trc .= Text::_('COM_BREEZINGFORMSNG_PROCESS_ARRAY');
-                                else
-                                    if (is_object($arg))
-                                        $trc .= Text::_('COM_BREEZINGFORMSNG_PROCESS_OBJECT');
-                                    else
-                                        if (is_resource($arg))
-                                            $trc .= Text::_('COM_BREEZINGFORMSNG_PROCESS_RESOURCE');
-                                        else
-                                            $trc .= _FACILEFORMS_PROCESS_UNKTYPE;
-            } // foreach
-        } // if
-        $trc .= ") " . Text::_('COM_BREEZINGFORMSNG_PROCESS_ATLINE') . " $line\n";
-        $ff_processor->traceBuffer .= htmlspecialchars($trc, ENT_QUOTES);
-        if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
-            $ff_processor->dumpTrace();
-    } // if
-    array_push($ff_processor->traceStack, array($oldmode, 'f', $name, $line, $type, $id, $pane));
+    }
+
+    (new TraceRuntime($ff_processor))->traceFunction($newmode, $name, $line, $type, $id, $pane, $args);
 }
 
 // _ff_traceFunction
@@ -276,55 +147,11 @@ function _ff_traceFunction($newmode, $name, $line, $type, $id, $pane, &$args)
 function _ff_traceExit($line, $retval = null)
 {
     global $ff_processor;
+    if (!$ff_processor instanceof HTML_facileFormsProcessor) {
+        return $retval;
+    }
 
-    if ($ff_processor->dying || ($ff_processor->traceMode & _FF_TRACEMODE_DISABLE))
-        return;
-    $info = array_pop($ff_processor->traceStack);
-    if ($info) {
-        $oldmode = $ff_processor->traceMode;
-        $newmode = $info[0];
-        $kind = $info[1];
-        $name = $info[2];
-        $type = $info[4];
-        $id = $info[5];
-        $pane = $info[6];
-        if (_FF_DEBUG & _FF_DEBUG_EXIT) {
-            $ff_processor->traceBuffer .= htmlspecialchars(
-                "\n_FF_DEBUG_EXIT:" .
-                "\n  Info     = $kind $name at line $line" .
-                "\n  Old mode = " . $ff_processor->dispTraceMode($oldmode) .
-                "\n  New mode = " . $ff_processor->dispTraceMode($newmode) .
-                "\n",
-                ENT_QUOTES
-            );
-            if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
-                $ff_processor->dumpTrace();
-        } // if
-        if ($kind == 'p')
-            $visible = $oldmode & _FF_TRACEMODE_PIECE;
-        else
-            $visible = $oldmode & _FF_TRACEMODE_FUNCTION;
-        if ($visible) {
-            $level = count($ff_processor->traceStack);
-            for ($l = 0; $l < $level; $l++)
-                $ff_processor->traceBuffer .= '  ';
-            $ff_processor->traceBuffer .= htmlspecialchars(
-                "-" . Text::_('COM_BREEZINGFORMSNG_PROCESS_LEAVE') . " $name " . Text::_('COM_BREEZINGFORMSNG_PROCESS_ATLINE') . " $line\n",
-                ENT_QUOTES
-            );
-            if ($oldmode & _FF_TRACEMODE_DIRECT)
-                $ff_processor->dumpTrace();
-        } // if
-        if ($oldmode != $newmode)
-            $ff_processor->traceMode = ($oldmode & ~_FF_TRACEMODE_VARIABLE) | ($newmode & _FF_TRACEMODE_VARIABLE);
-    } else {
-        $ff_processor->traceBuffer .= htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_PROCESS_WARNSTK') . "\n", ENT_QUOTES);
-        if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
-            $ff_processor->dumpTrace();
-        $type = $id = $pane = null;
-        $name = Text::_('COM_BREEZINGFORMSNG_PROCESS_UNKNOWN');
-    } // if
-    return $retval;
+    return (new TraceRuntime($ff_processor))->traceExit($line, $retval);
 }
 
 // _ff_traceExit
@@ -332,160 +159,16 @@ function _ff_traceExit($line, $retval = null)
 function _ff_errorHandler($errno, $errstr, $errfile, $errline)
 {
     global $ff_processor, $ff_mossite;
-    $database = $ff_processor->database;
-
-    if (isset($ff_processor->dying) && $ff_processor->dying)
+    if (!$ff_processor instanceof HTML_facileFormsProcessor) {
         return;
-
-    $msg = "\n<strong>*** " . htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_PROCESS_EXCAUGHT'), ENT_QUOTES) . " ***</strong>\n" .
-        htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_PROCESS_PHPLEVEL') . ' ', ENT_QUOTES);
-    $fail = false;
-    if (!defined('E_DEPRECATED')) {
-        define('E_DEPRECATED', 8192);
     }
-    switch ($errno) {
-        case E_WARNING:
-            $msg .= "E_WARNING";
-            break;
-        case E_NOTICE:
-            $msg .= "E_NOTICE";
-            break;
-        case E_USER_ERROR:
-            $msg .= "E_USER_ERROR";
-            $fail = true;
-            break;
-        case E_USER_WARNING:
-            $msg .= "E_USER_WARNING";
-            break;
-        case E_USER_NOTICE:
-            $msg .= "E_USER_NOTICE";
-            break;
-        case E_DEPRECATED:
-            $msg .= "E_DEPRECATED";
-            break;
-        case 2048:
-            if (_FF_IGNORE_STRICT)
-                return;
-            $msg .= "E_STRICT";
-            break;
-        case 16384: // JLanguage deprecation error
-            return;
-            break;
-        default:
-            $msg .= $errno;
-            $fail = true;
-    } // switch
-    $msg .= htmlspecialchars(
-        "\n" . Text::_('COM_BREEZINGFORMSNG_PROCESS_PHPFILE') . " $errfile\n" .
-        Text::_('COM_BREEZINGFORMSNG_PROCESS_PHPLINE') . " $errline\n",
-        ENT_QUOTES
+
+    (new ErrorHandlerRuntime($ff_processor, (string) $ff_mossite))->handle(
+        (int) $errno,
+        (string) $errstr,
+        (string) $errfile,
+        (int) $errline
     );
-
-    $n = 0;
-    if (isset($ff_processor)) {
-        $n = (is_countable($ff_processor->traceStack)) ? count($ff_processor->traceStack) : 1;
-    }
-
-    if ($n) {
-        $info = $ff_processor->traceStack[$n - 1];
-        $name = htmlspecialchars($info[2] . ' ' . Text::_('COM_BREEZINGFORMSNG_PROCESS_ATLINE') . ' ' . $info[3], ENT_QUOTES);
-        $type = $info[4];
-        $id = $info[5];
-        $pane = $info[6];
-        if ($type && $id && $ff_processor->runmode != _FF_RUNMODE_FRONTEND) {
-            $url = $ff_mossite . '/administrator/index.php?option=com_breezingformsng&format=html&tmpl=component';
-            $what = $id;
-            switch ($type) {
-                case 'f':
-                    $url .= '&task=quickmode.display' .
-                        '&form=' . $ff_processor->form;
-                    if ($ff_processor->formrow->package != '')
-                        $url .= '&pkg=' . urlencode($ff_processor->formrow->package);
-                    if ($pane > 0)
-                        $url .= '&tabpane=' . $pane;
-                    $what = 'form ' . $ff_processor->formrow->name;
-                    break;
-                case 'e':
-                    $page = 1;
-                    foreach ($ff_processor->rows as $row)
-                        if ($row->id == $id) {
-                            $page = $row->page;
-                            $what = $row->name;
-                            break;
-                        } // if
-                    $what = 'element ' . $what;
-                    $url .= '&task=quickmode.display' .
-                        '&form=' . $ff_processor->form .
-                        '&page=' . $page;
-                    if ($ff_processor->formrow->package != '')
-                        $url .= '&pkg=' . urlencode($ff_processor->formrow->package);
-                    if ($pane > 0)
-                        $url .= '&tabpane=' . $pane;
-                    break;
-                case 'p':
-                    $package = '';
-                    $piecesQuery = $database->getQuery(true)
-                        ->select(['name', 'package'])
-                        ->from('#__facileforms_pieces')
-                        ->where($database->quoteName('id') . ' = :id')
-                        ->bind(':id', $id, ParameterType::INTEGER);
-                    $database->setQuery($piecesQuery);
-                    $rows = $database->loadObjectList();
-                    if (count($rows)) {
-                        $package = $rows[0]->package;
-                        $what = $rows[0]->name;
-                    }
-                    $what = 'piece ' . $what;
-                    $url .= '&task=pieces.edit' .
-                        '&ids[]=' . $id;
-                    if ($package != '')
-                        $url .= '&pkg=' . urlencode($package);
-                    break;
-                case 's':
-                    $package = '';
-                    $scriptsQuery = $database->getQuery(true)
-                        ->select(['name', 'package'])
-                        ->from('#__facileforms_scripts')
-                        ->where($database->quoteName('id') . ' = :id')
-                        ->bind(':id', $id, ParameterType::INTEGER);
-                    $database->setQuery($scriptsQuery);
-                    $rows = $database->loadObjectList();
-                    if (count($rows)) {
-                        $package = $rows[0]->package;
-                        $what = $rows[0]->name;
-                    }
-                    $what = 'script ' . $what;
-                    $url .= '&task=scripts.edit' .
-                        '&ids[]=' . $id;
-                    if ($package != '')
-                        $url .= '&pkg=' . urlencode($package);
-                    break;
-                default:
-                    $url = null;
-            } // switch
-            if ($url)
-                $name = '<a href="#" ' .
-                    'onMouseOver="window.status=\'Open ' . $what . '\';return true;" ' .
-                    'onMouseOut="window.status=\'\';return true;" ' .
-                    'onClick="ff_redirectParent(\'' . htmlspecialchars($url, ENT_QUOTES) . '\');return true;"' .
-                    '>' . $name . '</a>';
-        } // if
-        $msg .= htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_PROCESS_LASTPOS'), ENT_QUOTES) . ' ' . $name . "\n";
-    } // if
-    $msg .= htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_PROCESS_ERRMSG') . " $errstr\n\n", ENT_QUOTES);
-    if ($fail) {
-        if (isset($ff_processor)) {
-            $ff_processor->traceBuffer .= $msg;
-            $ff_processor->suicide();
-        }
-    } else
-        if (isset($ff_processor)) {
-            if (($ff_processor->traceMode & _FF_TRACEMODE_DISABLE) == 0) {
-                $ff_processor->traceBuffer .= $msg;
-                if ($ff_processor->traceMode & _FF_TRACEMODE_DIRECT)
-                    $ff_processor->dumpTrace();
-            }
-        } // if
 }
 
 // _ff_errorHandler
@@ -547,13 +230,12 @@ class HTML_facileFormsProcessor
     public $sendNotificationAfterPayment = false;
     public $opt_token = "9562384751";
     public $draggableDivIds = array();
-    public $isMobile = false;
     public $quickmode = null;
-    public $legacy_wrap = true;
     public $app;
     public $database;
     private ?UploadRuntime $uploadRuntimeService = null;
     private ?CodeToolsRuntime $codeToolsRuntimeService = null;
+    private ?TraceRuntime $traceRuntimeService = null;
     private ?ScriptingEngine $scriptingEngineService = null;
     private ?ExportEngine $exportEngineService = null;
     private ?NotificationEngine $notificationEngineService = null;
@@ -577,6 +259,7 @@ class HTML_facileFormsProcessor
         return $this->renderingEngine()->makeSafeFolder($path);
     }
 
+    /** @phpstan-impure */
     public function cbCheckPermissions()
     {
         return $this->renderingEngine()->cbCheckPermissions();
@@ -592,6 +275,7 @@ class HTML_facileFormsProcessor
         return $this->renderingEngineService ??= new RenderingEngine($this);
     }
 
+    /** @phpstan-impure */
     public function collectSubmitdata($cbResult = null)
     {
         return $this->submissionEngine()->collectSubmitdata($cbResult);
@@ -609,7 +293,11 @@ class HTML_facileFormsProcessor
 
     private function submissionEngine(): SubmissionEngine
     {
-        return $this->submissionEngineService ??= new SubmissionEngine($this, $this->mailerFactory);
+        return $this->submissionEngineService ??= new SubmissionEngine(
+            $this,
+            $this->mailerFactory,
+            new RecaptchaVerifier()
+        );
     }
 
     public function sendEmailNotification()
@@ -653,6 +341,7 @@ class HTML_facileFormsProcessor
         return $this->notificationEngineService ??= new NotificationEngine($this);
     }
 
+    /** @phpstan-impure */
     public function logToDatabase($cbResult = null)
     {
         return $this->exportEngine()->logToDatabase($cbResult);
@@ -721,6 +410,7 @@ class HTML_facileFormsProcessor
         return $this->scriptingEngine()->getPieceByName($name, $id);
     }
 
+    /** @phpstan-impure */
     public function execPiece($code, $name, $type, $id, $pane)
     {
         return $this->scriptingEngine()->execPiece($code, $name, $type, $id, $pane);
@@ -776,6 +466,7 @@ class HTML_facileFormsProcessor
         return $this->scriptingEngine()->compressJavascript($str);
     }
 
+    /** @phpstan-impure */
     public function linkcode($func, &$library, &$linked, $code, $type = null, $id = null, $pane = null)
     {
         return $this->scriptingEngine()->linkcode($func, $library, $linked, $code, $type, $id, $pane);
@@ -806,11 +497,13 @@ class HTML_facileFormsProcessor
         return $this->codeToolsRuntime()->dispTraceMode($mode);
     }
 
+    /** @phpstan-impure */
     public function trim(&$code)
     {
         return $this->codeToolsRuntime()->trim($code);
     }
 
+    /** @phpstan-impure */
     public function nonblank(&$code)
     {
         return $this->codeToolsRuntime()->nonblank($code);
@@ -833,22 +526,23 @@ class HTML_facileFormsProcessor
 
     public function dumpTrace()
     {
-        $this->codeToolsRuntime()->dumpTrace();
+        $this->traceRuntime()->dumpTrace();
     }
 
     public function traceEval($name)
     {
-        $this->codeToolsRuntime()->traceEval($name);
+        $this->traceRuntime()->traceEval($name);
     }
 
     public function suicide()
     {
-        return $this->codeToolsRuntime()->suicide();
+        return $this->traceRuntime()->suicide();
     }
 
+    /** @phpstan-impure */
     public function bury()
     {
-        return $this->codeToolsRuntime()->bury();
+        return $this->traceRuntime()->bury();
     }
 
     public function findToken(&$code, &$spos, &$offs)
@@ -876,57 +570,29 @@ class HTML_facileFormsProcessor
         return $this->codeToolsRuntimeService ??= new CodeToolsRuntime($this);
     }
 
+    private function traceRuntime(): TraceRuntime
+    {
+        return $this->traceRuntimeService ??= new TraceRuntime($this);
+    }
+
     /**
      * Historical upload facade retained for custom PHP stored with forms.
      */
     public function saveUpload($filename, $userfile_name, $destpath, $timestamp, $useUrl = false, $useUrlDownloadDirectory = '', $resize_target_width = 0, $resize_target_height = 0, $resize_type = '', $resize_bgcolor = '#ffffff', $field_name = '')
     {
-        global $mosConfig_fileperms;
-
-        if ($this->dying) {
-            return '';
-        }
-
-        $identity = $this->app->getIdentity();
-        $filemode = isset($mosConfig_fileperms)
-            ? ($mosConfig_fileperms === '' ? null : octdec($mosConfig_fileperms))
-            : 0644;
-        $result = $this->uploadRuntime()->store(
-            (string) $filename,
-            (string) $userfile_name,
-            (string) $destpath,
-            $this->findtags,
-            $this->replacetags,
-            $this->rows,
-            (string) $this->submitted,
-            (string) $this->app->get('offset'),
-            [
-                'username' => $identity->get('username'),
-                'id' => $identity->get('id'),
-                'name' => $identity->get('name'),
-            ],
-            (bool) $this->app->getSession()->get('bfFileUploadOverride', true),
-            $filemode,
-            (bool) $useUrl,
-            (int) $resize_target_width,
-            (int) $resize_target_height,
-            (string) $resize_type,
-            $resize_bgcolor === null ? null : (string) $resize_bgcolor
+        return $this->submissionEngine()->saveUpload(
+            $filename,
+            $userfile_name,
+            $destpath,
+            $timestamp,
+            $useUrl,
+            $useUrlDownloadDirectory,
+            $resize_target_width,
+            $resize_target_height,
+            $resize_type,
+            $resize_bgcolor,
+            $field_name
         );
-
-        if (!$result->isSuccessful()) {
-            $this->status = _FF_STATUS_UPLOAD_FAILED;
-            $this->message = Text::_(match ($result->error) {
-                UploadError::DirectoryMissing => 'COM_BREEZINGFORMSNG_PROCESS_DIRNOTEXISTS',
-                UploadError::FileExists => 'COM_BREEZINGFORMSNG_PROCESS_FILEEXISTS',
-                UploadError::MoveFailed => 'COM_BREEZINGFORMSNG_PROCESS_FILEMOVEFAILED',
-                UploadError::ChmodFailed => 'COM_BREEZINGFORMSNG_PROCESS_FILECHMODFAILED',
-            });
-
-            return '';
-        }
-
-        return ['default' => $result->path, 'server' => $result->serverPath];
     }
 
     public function exifImageType($filename)
@@ -968,9 +634,7 @@ class HTML_facileFormsProcessor
 
     public function measureTime()
     {
-        $time = explode(' ', microtime());
-
-        return ((float) $time[0] + $time[1]) / 1000;
+        return $this->submissionEngine()->measureTime();
     }
 
     private function uploadRuntime(): UploadRuntime
@@ -1046,18 +710,7 @@ class HTML_facileFormsProcessor
 
         if ($this->formrow->published) {
             $formId = (int) $this->form;
-            $query = $this->database->getQuery(true)
-                ->select('*')
-                ->from($this->database->quoteName('#__facileforms_elements'))
-                ->where($this->database->quoteName('form') . ' = :formId')
-                ->where($this->database->quoteName('published') . ' = 1')
-                ->order([
-                    $this->database->quoteName('page'),
-                    $this->database->quoteName('ordering'),
-                ])
-                ->bind(':formId', $formId, ParameterType::INTEGER);
-            $this->database->setQuery($query);
-            $this->rows = $this->database->loadObjectList();
+            $this->rows = (new FormElementLoader($this->database))->loadPublished($formId);
             $this->rowcount = count($this->rows);
         } // if
         $displayContext = (new FormDisplayContextResolver())->resolve(

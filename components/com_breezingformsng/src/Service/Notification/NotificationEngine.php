@@ -49,6 +49,7 @@ final class NotificationEngine
 {
     private ?TranslationResolver $quickModeTranslationResolverService = null;
     private ?SubmissionTimestampFormatter $notificationTimestampFormatterService = null;
+    private ?MailTemplateResolver $mailTemplateResolverService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -176,28 +177,15 @@ final class NotificationEngine
 
         if ($this->processor->formrow->email_type == 0) {
 
-            $foundTpl = false;
-            $tplFile = '';
-            $formTxtFile = JPATH_SITE . '/media/breezingforms/mailtpl/' . $this->processor->formrow->name . '.txt.php';
-            $formHtmlFile = JPATH_SITE . '/media/breezingforms/mailtpl/' . $this->processor->formrow->name . '.html.php';
-            $defaultTxtFile = JPATH_SITE . '/media/breezingforms/mailtpl/mailtpl.txt.php';
-            $defaultHtmlFile = JPATH_SITE . '/media/breezingforms/mailtpl/mailtpl.html.php';
-
-            if (@file_exists($formHtmlFile) && @is_readable($formHtmlFile)) {
-                $tplFile = $formHtmlFile;
-                $foundTpl = true;
-                $isHtml = true;
-            } else if (@file_exists($formTxtFile) && @is_readable($formTxtFile)) {
-                $tplFile = $formTxtFile;
-                $foundTpl = true;
-            } else if (@file_exists($defaultHtmlFile) && @is_readable($defaultHtmlFile)) {
-                $tplFile = $defaultHtmlFile;
-                $foundTpl = true;
-                $isHtml = true;
-            } else if (@file_exists($defaultTxtFile) && @is_readable($defaultTxtFile)) {
-                $tplFile = $defaultTxtFile;
-                $foundTpl = true;
-            }
+            $template = $this->mailTemplateResolver()->resolve(
+                JPATH_SITE . '/media/breezingforms/mailtpl',
+                $this->processor->formrow->name,
+                '',
+                'mailtpl'
+            );
+            $tplFile = $template['file'];
+            $foundTpl = $tplFile !== '';
+            $isHtml = $template['isHtml'];
 
             if ($foundTpl) {
 
@@ -904,28 +892,15 @@ final class NotificationEngine
 
         if ($this->processor->formrow->mb_email_type == 0) {
 
-            $foundTpl = false;
-            $tplFile = '';
-            $formTxtFile = JPATH_SITE . '/media/breezingforms/mailtpl/' . $this->processor->formrow->name . '_mailback.txt.php';
-            $formHtmlFile = JPATH_SITE . '/media/breezingforms/mailtpl/' . $this->processor->formrow->name . '_mailback.html.php';
-            $defaultTxtFile = JPATH_SITE . '/media/breezingforms/mailtpl/mailbacktpl.txt.php';
-            $defaultHtmlFile = JPATH_SITE . '/media/breezingforms/mailtpl/mailbacktpl.html.php';
-
-            if (@file_exists($formHtmlFile) && @is_readable($formHtmlFile)) {
-                $tplFile = $formHtmlFile;
-                $foundTpl = true;
-                $isHtml = true;
-            } else if (@file_exists($formTxtFile) && @is_readable($formTxtFile)) {
-                $tplFile = $formTxtFile;
-                $foundTpl = true;
-            } else if (@file_exists($defaultHtmlFile) && @is_readable($defaultHtmlFile)) {
-                $tplFile = $defaultHtmlFile;
-                $foundTpl = true;
-                $isHtml = true;
-            } else if (@file_exists($defaultTxtFile) && @is_readable($defaultTxtFile)) {
-                $tplFile = $defaultTxtFile;
-                $foundTpl = true;
-            }
+            $template = $this->mailTemplateResolver()->resolve(
+                JPATH_SITE . '/media/breezingforms/mailtpl',
+                $this->processor->formrow->name,
+                '_mailback',
+                'mailbacktpl'
+            );
+            $tplFile = $template['file'];
+            $foundTpl = $tplFile !== '';
+            $isHtml = $template['isHtml'];
 
             if ($foundTpl) {
 
@@ -1390,4 +1365,8 @@ final class NotificationEngine
         }
     }
 
+    private function mailTemplateResolver(): MailTemplateResolver
+    {
+        return $this->mailTemplateResolverService ??= new MailTemplateResolver();
+    }
 }

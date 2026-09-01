@@ -62,7 +62,7 @@ final class UploadStorage
             return UploadResult::failure(UploadError::MoveFailed);
         }
 
-        if ($permissions !== null && !@chmod($path, $permissions)) {
+        if ($permissions !== null && !chmod($path, $permissions)) {
             return UploadResult::failure(UploadError::ChmodFailed);
         }
 

@@ -29,6 +29,7 @@ final class CodeToolsRuntime
     private ?JavascriptValueExporter $javascriptValueExporterService = null;
     private ?CodeStringTools $codeStringToolsService = null;
     private ?TraceModeFormatter $traceModeFormatterService = null;
+    private ?TraceRuntime $traceRuntimeService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -82,80 +83,28 @@ final class CodeToolsRuntime
 
     public function dumpTrace(): void
     {
-        if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT) {
-            $html = ob_get_contents();
-            ob_end_clean();
-            echo htmlspecialchars($html, ENT_QUOTES) . $this->processor->traceBuffer;
-            ob_start();
-            $this->processor->traceBuffer = null;
-            return;
-        } // if
-        if (!$this->processor->traceBuffer)
-            return;
-        if ($this->processor->traceMode & _FF_TRACEMODE_APPEND) {
-            echo '<pre>' . $this->processor->traceBuffer . '</pre>';
-            $this->processor->traceBuffer = null;
-            return;
-        } // if
-        echo
-            '<script type="text/javascript">' . nl() .
-            '<!--' . nl();
-        if ($this->processor->dying)
-            echo 'console.log(' . json_encode($this->processor->traceBuffer) . ')' . nl();
-        echo
-            '-->' . nl() .
-            '</script>' . nl();
-        $this->processor->traceBuffer = null;
+        $this->traceRuntime()->dumpTrace();
     }
 
     // dumpTrace
 
     public function traceEval(mixed $name): void
     {
-        if (
-            ($this->processor->traceMode & _FF_TRACEMODE_DISABLE) ||
-            !($this->processor->traceMode & _FF_TRACEMODE_EVAL) ||
-            $this->processor->dying
-        )
-            return;
-        
-        $level = count($this->processor->traceStack);
-        for ($l = 0; $l < $level; $l++)
-            $this->processor->traceBuffer .= '  ';
-        
-            $this->processor->traceBuffer .= htmlspecialchars("eval($name)\n", ENT_QUOTES);
-        if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT)
-            $this->dumpTrace();
+        $this->traceRuntime()->traceEval($name);
     }
 
     // traceEval
 
     public function suicide(): bool
     {
-        if ($this->processor->dying)
-            return false;
-        $this->processor->dying = true;
-        $rep = 0;
-        $this->processor->errrep = error_reporting($rep);
-        return true;
+        return $this->traceRuntime()->suicide();
     }
 
     // suicide
 
     public function bury(): bool
     {
-        if (!$this->processor->dying)
-            return false;
-        if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT)
-            $this->dumpTrace();
-        ob_end_clean();
-        if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT)
-            echo '</pre>';
-        else
-            $this->dumpTrace();
-        error_reporting($this->processor->errrep);
-        restore_error_handler();
-        return true;
+        return $this->traceRuntime()->bury();
     }
 
     // bury
@@ -204,7 +153,11 @@ final class CodeToolsRuntime
                     break;
                 case '/*':
                     if (!$linecmt && !$quote)
-                        $longcmt = true;
+                        $blockcmt = true;
+                    break;
+                case '*/':
+                    if ($blockcmt)
+                        $blockcmt = false;
                     break;
                 case '"':
                 case "'":
@@ -341,21 +294,6 @@ final class CodeToolsRuntime
             $dst .= substr($code, $cpos, $spos - $cpos);
         $line--;
         $dst .= "_ff_traceExit($line);";
-        if (_FF_DEBUG & _FF_DEBUG_PATCHEDCODE) {
-            $this->processor->traceBuffer .= htmlspecialchars(
-                "\n_FF_DEBUG_PATCHEDCODE:" .
-                "\n  Mode = " . $this->dispTraceMode($mode) .
-                "\n  Name = $name" .
-                "\n  Link = $type $id $pane" .
-                "\n------ begin patched code ------" .
-                "\n$dst" .
-                "\n------- end patched code -------" .
-                "\n",
-                ENT_QUOTES
-            );
-            if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT)
-                $this->dumpTrace();
-        } // if
         return $dst;
     }
 
@@ -502,17 +440,6 @@ final class CodeToolsRuntime
                     } // if
                 } else
                     $disable = false;
-                if (_FF_DEBUG & _FF_DEBUG_DIRECTIVE) {
-                    $_deb = "\n_FF_DEBUG_DIRECTIVE:";
-                    if ($first)
-                        $_deb .= "\n  Previous mode=" . $this->dispTraceMode($oldMode);
-                    $_deb .= "\n  Trace mode   =" . $this->dispTraceMode($this->processor->traceMode) .
-                        "\n  New mode     =" . $this->dispTraceMode($mode) .
-                        "\n";
-                    $this->processor->traceBuffer .= htmlspecialchars($_deb, ENT_QUOTES);
-                    if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT)
-                        $this->dumpTrace();
-                } // if
             } // if trace directive
             if (!$disable) {
                 if (!$name) {
@@ -545,6 +472,11 @@ final class CodeToolsRuntime
     private function traceModeFormatter(): TraceModeFormatter
     {
         return $this->traceModeFormatterService ??= new TraceModeFormatter();
+    }
+
+    private function traceRuntime(): TraceRuntime
+    {
+        return $this->traceRuntimeService ??= new TraceRuntime($this->processor);
     }
 
     // prepareEvalCode

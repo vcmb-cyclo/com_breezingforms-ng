@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package BreezingFormsNG
  * @copyright Copyright (C) 2024-2026 by XDA+GIL
@@ -7,6 +8,8 @@
 
 \defined('_JEXEC') or die;
 
+/** @var \Vcmb\Component\BreezingformsNG\Administrator\View\Records\HtmlView $this */
+
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Factory;
@@ -14,35 +17,76 @@ use Joomla\CMS\Factory;
 $record = $this->record;
 $tz = Factory::getApplication()->get('offset');
 $submitted = htmlspecialchars((string) ($record->submitted ?? ''));
-$formSelection = Factory::getApplication()->getInput()->getInt('form_selection', 0);
+$formSelection = $this->formSelection;
+$searchTerm = $this->searchTerm;
+$listOrder = $this->listOrder;
+$listDirn = $this->listDirn;
+$limit = $this->limit;
+$limitStart = $this->limitStart;
+$recordUrl = static function (int $recordId) use ($formSelection, $searchTerm, $listOrder, $listDirn, $limit, $limitStart): string {
+  $query = [
+    'option'           => 'com_breezingformsng',
+    'view'             => 'records',
+    'layout'           => 'edit',
+    'record_id'        => $recordId,
+    'form_selection'   => $formSelection,
+    'filter_order'     => $listOrder,
+    'filter_order_Dir' => $listDirn,
+    'limit'            => $limit,
+    'limitstart'       => $limitStart,
+  ];
+  if ($searchTerm !== '') {
+    $query['searchterm'] = $searchTerm;
+  }
+
+  return 'index.php?' . http_build_query($query, '', '&', PHP_QUERY_RFC3986);
+};
 ?>
 <form action="index.php?option=com_breezingformsng" method="post" name="adminForm" id="adminForm">
 
   <div class="card mb-3">
-    <div class="card-header">
-      <strong><?= Text::_('COM_BREEZINGFORMSNG_RECORD_META'); ?></strong>
-    </div>
     <div class="card-body">
+      <div class="d-flex align-items-center mb-2">
+        <span
+          class="text-muted"
+          data-bs-toggle="tooltip"
+          data-bs-placement="top"
+          title="<?= htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_RECORD_META'), ENT_QUOTES, 'UTF-8'); ?>"
+          role="button"
+          aria-label="<?= htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_RECORD_META'), ENT_QUOTES, 'UTF-8'); ?>">
+          <i class="fas fa-info-circle"></i>
+        </span>
+      </div>
       <dl class="row mb-0">
-        <dt class="col-sm-3"><?= Text::_('COM_BREEZINGFORMSNG_ID'); ?></dt>
-        <dd class="col-sm-9"><?= (int) $record->id; ?></dd>
-        <dt class="col-sm-3"><?= Text::_('COM_BREEZINGFORMSNG_SUBMITTED'); ?></dt>
-        <dd class="col-sm-9"><?= $submitted; ?></dd>
-        <dt class="col-sm-3"><?= Text::_('COM_BREEZINGFORMSNG_FORM'); ?></dt>
-        <dd class="col-sm-9"><?= htmlspecialchars((string) ($record->form_title ?? '')); ?></dd>
-        <dt class="col-sm-3"><?= Text::_('COM_BREEZINGFORMSNG_USER'); ?></dt>
-        <dd class="col-sm-9"><?= htmlspecialchars((string) ($record->user_full_name ?: $record->username)); ?></dd>
-        <dt class="col-sm-3"><?= Text::_('COM_BREEZINGFORMSNG_IP'); ?></dt>
-        <dd class="col-sm-9"><?= htmlspecialchars((string) ($record->ip ?? '')); ?></dd>
+        <dt class="col-sm-2"><?= Text::_('COM_BREEZINGFORMSNG_ID'); ?></dt>
+        <dd class="col-sm-4"><?= (int) $record->id; ?></dd>
+        <dt class="col-sm-2"><?= Text::_('COM_BREEZINGFORMSNG_FORM'); ?></dt>
+        <dd class="col-sm-4"><?= htmlspecialchars((string) ($record->form_title ?? '')); ?></dd>
+      </dl>
+      <dl class="row mb-0">
+        <dt class="col-sm-2"><?= Text::_('COM_BREEZINGFORMSNG_SUBMITTED'); ?></dt>
+        <dd class="col-sm-4"><?= $submitted; ?></dd>
+        <dt class="col-sm-2"><?= Text::_('COM_BREEZINGFORMSNG_USER'); ?></dt>
+        <dd class="col-sm-2"><?= htmlspecialchars((string) ($record->user_full_name ?: $record->username)); ?></dd>
+        <dt class="col-sm-1"><?= Text::_('COM_BREEZINGFORMSNG_IP'); ?></dt>
+        <dd class="col-sm-1"><?= htmlspecialchars((string) ($record->ip ?? '')); ?></dd>
       </dl>
     </div>
   </div>
 
   <div class="card">
-    <div class="card-header">
-      <strong><?= Text::_('COM_BREEZINGFORMSNG_RECORD_VALUES'); ?></strong>
-    </div>
     <div class="card-body">
+      <div class="d-flex align-items-center mb-2">
+        <span
+          class="text-muted"
+          data-bs-toggle="tooltip"
+          data-bs-placement="top"
+          title="<?= htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_RECORD_VALUES'), ENT_QUOTES, 'UTF-8'); ?>"
+          role="button"
+          aria-label="<?= htmlspecialchars(Text::_('COM_BREEZINGFORMSNG_RECORD_VALUES'), ENT_QUOTES, 'UTF-8'); ?>">
+          <i class="fas fa-info-circle"></i>
+        </span>
+      </div>
       <?php foreach ($this->recordRows as $row): ?>
         <div class="row mb-3">
           <label class="col-sm-3 col-form-label" for="element_<?= (int) $row['element_id']; ?>">
@@ -54,8 +98,7 @@ $formSelection = Factory::getApplication()->getInput()->getInt('form_selection',
               id="element_<?= (int) $row['element_id']; ?>"
               name="element[<?= (int) $row['element_id']; ?>]"
               class="form-control"
-              rows="<?= (substr_count($row['value'], "\n") > 0) ? min(10, substr_count($row['value'], "\n") + 2) : 1; ?>"
-            ><?= htmlspecialchars($row['value']); ?></textarea>
+              rows="<?= (substr_count($row['value'], "\n") > 0) ? min(10, substr_count($row['value'], "\n") + 2) : 1; ?>"><?= htmlspecialchars($row['value']); ?></textarea>
           </div>
         </div>
       <?php endforeach; ?>
@@ -65,8 +108,33 @@ $formSelection = Factory::getApplication()->getInput()->getInt('form_selection',
   <input type="hidden" name="task" value="records.save">
   <input type="hidden" name="record_id" value="<?= (int) $record->id; ?>">
   <input type="hidden" name="form_selection" value="<?= $formSelection; ?>">
+  <input type="hidden" name="searchterm" value="<?= htmlspecialchars($searchTerm, ENT_QUOTES, 'UTF-8'); ?>">
+  <input type="hidden" name="filter_order" value="<?= htmlspecialchars($listOrder, ENT_QUOTES, 'UTF-8'); ?>">
+  <input type="hidden" name="filter_order_Dir" value="<?= htmlspecialchars($listDirn, ENT_QUOTES, 'UTF-8'); ?>">
+  <input type="hidden" name="limit" value="<?= $limit; ?>">
+  <input type="hidden" name="limitstart" value="<?= $limitStart; ?>">
   <?= HTMLHelper::_('form.token'); ?>
 </form>
+
+<nav class="d-flex justify-content-between mt-3" aria-label="<?= Text::_('JLIB_HTML_PAGINATION'); ?>">
+  <?php if ($this->prevRecordId !== null): ?>
+    <a class="btn btn-secondary"
+      href="<?= htmlspecialchars($recordUrl($this->prevRecordId), ENT_QUOTES, 'UTF-8'); ?>">
+      &laquo; <?= Text::_('JPREVIOUS'); ?>
+    </a>
+  <?php else: ?>
+    <span class="btn btn-secondary disabled">&laquo; <?= Text::_('JPREVIOUS'); ?></span>
+  <?php endif; ?>
+
+  <?php if ($this->nextRecordId !== null): ?>
+    <a class="btn btn-secondary"
+      href="<?= htmlspecialchars($recordUrl($this->nextRecordId), ENT_QUOTES, 'UTF-8'); ?>">
+      <?= Text::_('JNEXT'); ?> &raquo;
+    </a>
+  <?php else: ?>
+    <span class="btn btn-secondary disabled"><?= Text::_('JNEXT'); ?> &raquo;</span>
+  <?php endif; ?>
+</nav>
 
 <?php
 // Web assets for this view are registered in Records\HtmlView::prepareEditToolbar() —

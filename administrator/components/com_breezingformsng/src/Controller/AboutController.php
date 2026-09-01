@@ -9,6 +9,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Controller;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Controller\BaseController;
@@ -16,6 +17,7 @@ use Joomla\CMS\Router\Route;
 use Joomla\Database\DatabaseInterface;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\DatabaseAuditService;
 
+/** @property CMSApplication $app */
 class AboutController extends BaseController
 {
     private const ABOUT_LOG_FILES = ['breezingforms_install2.log', 'breezingforms_install.log'];

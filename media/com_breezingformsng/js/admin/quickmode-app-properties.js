@@ -2084,10 +2084,6 @@
 
                     mdata.joomlaHint = JQuery('#bfElementAdvancedJoomlaHint').attr('checked');
 
-                    mdata.mobileEnabled = JQuery('#bfElementAdvancedMobileEnabled').attr('checked');
-                    mdata.forceMobile = JQuery('#bfElementAdvancedForceMobile').attr('checked');
-                    mdata.forceMobileUrl = JQuery('#bfElementAdvancedForceMobileUrl').val();
-
                     mdata.useDefaultErrors = JQuery('#bfElementAdvancedUseDefaultErrors').attr('checked');
                     mdata.useBalloonErrors = JQuery('#bfElementAdvancedUseBalloonErrors').attr('checked');
                     mdata.lastPageThankYou = JQuery('#bfFormLastPageThankYou').attr('checked');
@@ -2121,10 +2117,6 @@
                         JQuery('#bfElementAdvancedUseErrorAlerts').attr('checked', mdata.useErrorAlerts);
 
                         JQuery('#bfElementAdvancedJoomlaHint').attr('checked', mdata.joomlaHint);
-
-                        JQuery('#bfElementAdvancedMobileEnabled').attr('checked', mdata.mobileEnabled);
-                        JQuery('#bfElementAdvancedForceMobile').attr('checked', mdata.forceMobile);
-                        JQuery('#bfElementAdvancedForceMobileUrl').val(mdata.forceMobileUrl);
 
                         JQuery('#bfElementAdvancedUseDefaultErrors').attr('checked', mdata.useDefaultErrors);
                         JQuery('#bfElementAdvancedUseBalloonErrors').attr('checked', mdata.useBalloonErrors);

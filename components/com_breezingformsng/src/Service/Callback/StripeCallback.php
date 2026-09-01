@@ -23,11 +23,15 @@ use Joomla\Filesystem\File;
  */
 final class StripeCallback
 {
+    private readonly PaymentDownloadPolicy $downloadPolicy;
+
     public function __construct(
         private readonly CMSApplication $application,
         private readonly DatabaseInterface $database,
         private readonly RedirectHelper $redirectHelper,
+        ?PaymentDownloadPolicy $downloadPolicy = null,
     ) {
+        $this->downloadPolicy = $downloadPolicy ?? new PaymentDownloadPolicy();
     }
 
     public function confirm(): void
@@ -112,7 +116,7 @@ final class StripeCallback
                         ];
                         if ($this->application->getSession()->get('emailfield', '') !== '') {
                             $stripearray += ['receipt_email' => $this->application->getSession()->get('emailfield', '')];
-                            $this->application->getSession()->clear('emailfield');
+                            $this->application->getSession()->remove('emailfield');
                         }
                         //$charge = \Stripe\Charge::create( $stripearray );
                         /*
@@ -132,7 +136,7 @@ final class StripeCallback
                           ]);*/
 
 
-                        $this->application->getSession()->clear('bf_stripe_last_payment_amount' . $record_id);
+                        $this->application->getSession()->remove('bf_stripe_last_payment_amount' . $record_id);
                     } else {
 
                         $exploded = explode(':', $exists);
@@ -272,7 +276,10 @@ final class StripeCallback
 
                     if (count($downloads) == 1) {
 
-                        if ($downloads[0]->paypal_download_tries < $options['downloadTries']) {
+                        if ($this->downloadPolicy->canDownload(
+                            (int) $downloads[0]->paypal_download_tries,
+                            (int) $options['downloadTries']
+                        )) {
 
                             $updateQuery = $db->getQuery(true)
                                 ->update($db->quoteName('#__facileforms_records'))

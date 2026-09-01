@@ -9,13 +9,19 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Quickmode;
 
 \defined('_JEXEC') or die;
 
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\MVC\Factory\MVCFactoryServiceInterface;
 use Joomla\CMS\MVC\View\HtmlView as BaseHtmlView;
 use Joomla\CMS\Session\Session;
 use Joomla\CMS\Toolbar\ToolbarHelper;
 use Joomla\CMS\Uri\Uri;
+use Joomla\CMS\Editor\Editor;
 use Vcmb\Component\BreezingformsNG\Administrator\Helper\BreadcrumbHelper;
+use Vcmb\Component\BreezingformsNG\Administrator\Helper\FormsAdvancedOptionsHtml;
+use Vcmb\Component\BreezingformsNG\Administrator\Model\FormModel;
+use Vcmb\Component\BreezingformsNG\Administrator\Model\FormsModel;
 use Vcmb\Component\BreezingformsNG\Administrator\Model\QuickmodeModel;
 
 class HtmlView extends BaseHtmlView
@@ -33,10 +39,29 @@ class HtmlView extends BaseHtmlView
     public array  $themes         = [];
     public array  $themesBootstrap  = [];
 
+    /**
+     * Backing data for the "Options" tab (fragment-3), which reuses the
+     * classic forms.edit&advanced=1 settings block. Null when the form has
+     * not been saved yet (formId === 0): that screen has no
+     * #__facileforms_forms row to read or write until the first QuickMode
+     * save creates one.
+     */
+    public ?\stdClass $advancedOptionsForm = null;
+    public $advancedOptionsEditor = null;
+    public array $advancedOptionsTabEntryCounts = [];
+    public array $advancedOptionsInitScripts = [];
+    public array $advancedOptionsSubmittedScripts = [];
+    public array $advancedOptionsPieceBefore = [];
+    public array $advancedOptionsPieceAfter = [];
+    public array $advancedOptionsPieceBeginSubmit = [];
+    public array $advancedOptionsPieceEndSubmit = [];
+
     public function display($tpl = null): void
     {
-        Factory::getApplication()->getInput()->set('hidemainmenu', 1);
-        $input  = Factory::getApplication()->getInput();
+        /** @var CMSApplication $app */
+        $app = Factory::getApplication();
+        $app->getInput()->set('hidemainmenu', 1);
+        $input  = $app->getInput();
         $layout = $input->getCmd('layout', '');
 
         if ($layout === 'editor') {
@@ -73,6 +98,22 @@ class HtmlView extends BaseHtmlView
         $this->themes          = $model->getThemes();
         $this->themesBootstrap = $model->getThemesBootstrap();
 
+        if ($formId > 0) {
+            $listModel = $this->getFormsModel();
+            $this->advancedOptionsForm = $this->getFormModel()->getForm($formId);
+
+            if ($this->advancedOptionsForm !== null) {
+                $this->advancedOptionsEditor           = Editor::getInstance('codemirror');
+                $this->advancedOptionsTabEntryCounts    = FormsAdvancedOptionsHtml::countEntries($this->advancedOptionsForm);
+                $this->advancedOptionsInitScripts       = $listModel->getScripts('Form Init');
+                $this->advancedOptionsSubmittedScripts  = $listModel->getScripts('Form Submitted');
+                $this->advancedOptionsPieceBefore       = $listModel->getPieces('Before Form');
+                $this->advancedOptionsPieceAfter        = $listModel->getPieces('After Form');
+                $this->advancedOptionsPieceBeginSubmit  = $listModel->getPieces('Begin Submit');
+                $this->advancedOptionsPieceEndSubmit    = $listModel->getPieces('End Submit');
+            }
+        }
+
         // Toolbar
         $pageTitle = BreadcrumbHelper::render([
             ['label' => Text::_('COM_BREEZINGFORMSNG'), 'url' => 'index.php?option=com_breezingformsng'],
@@ -80,7 +121,7 @@ class HtmlView extends BaseHtmlView
             ['label' => $this->formTitle !== '' ? $this->formTitle : Text::_('COM_BREEZINGFORMSNG_INSTALLER_UNKNOWN')],
         ]);
 
-        $doc = Factory::getApplication()->getDocument();
+        $doc = $app->getDocument();
         $doc->setTitle(strip_tags($pageTitle));
         $doc->getWebAssetManager()->addInlineStyle(
             '.icon-logo_left{
@@ -90,6 +131,8 @@ class HtmlView extends BaseHtmlView
             }'
         );
         $wa = $doc->getWebAssetManager();
+        $wa->useStyle('com_breezingformsng.tokens');
+        $wa->useStyle('com_breezingformsng.bfng-admin');
         $wa->useStyle('com_breezingformsng.quickmode-style');
         $wa->useStyle('com_breezingformsng.jtree-style');
         $wa->useStyle('com_breezingformsng.admin-style');
@@ -103,6 +146,7 @@ class HtmlView extends BaseHtmlView
         $wa->useScript('com_breezingformsng.quickmode-elements');
         $wa->useScript('com_breezingformsng.quickmode-app');
         $wa->useScript('com_breezingformsng.quickmode-yesno-switch');
+        $wa->useScript('com_breezingformsng.custom-js');
         $wa->registerAndUseScript(
             'com_breezingformsng.quickmode-form-state',
             'media/com_breezingformsng/js/admin/admin-toggle-published.js',
@@ -126,15 +170,49 @@ class HtmlView extends BaseHtmlView
 
     private function getQuickmodeModel(): QuickmodeModel
     {
-        $model = Factory::getApplication()
-            ->bootComponent('com_breezingformsng')
-            ->getMVCFactory()
-            ->createModel('Quickmode', 'Administrator', ['ignore_request' => true]);
+        $model = $this->getMVCFactory()->createModel('Quickmode', 'Administrator', ['ignore_request' => true]);
 
         if (!$model instanceof QuickmodeModel) {
             throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
         }
 
         return $model;
+    }
+
+    /**
+     * Loads the "Options" tab's backing row - same model the classic
+     * forms.edit&advanced=1 screen uses (View\Forms\HtmlView::display()).
+     */
+    private function getFormModel(): FormModel
+    {
+        $model = $this->getMVCFactory()->createModel('Form', 'Administrator', ['ignore_request' => true]);
+
+        if (!$model instanceof FormModel) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        return $model;
+    }
+
+    private function getFormsModel(): FormsModel
+    {
+        $model = $this->getMVCFactory()->createModel('Forms', 'Administrator', ['ignore_request' => true]);
+
+        if (!$model instanceof FormsModel) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        return $model;
+    }
+
+    private function getMVCFactory(): \Joomla\CMS\MVC\Factory\MVCFactoryInterface
+    {
+        $component = Factory::getApplication()->bootComponent('com_breezingformsng');
+
+        if (!$component instanceof MVCFactoryServiceInterface) {
+            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+        }
+
+        return $component->getMVCFactory();
     }
 }

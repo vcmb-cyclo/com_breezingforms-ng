@@ -34,6 +34,7 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Log\Log;
 use Exception;
+use Closure;
 use Vcmb\Component\BreezingformsNG\Site\Table\QueryColumn;
 use HTML_facileFormsProcessor;
 use CB\Component\Contentbuilderng\Administrator\Helper\ContentbuilderngHelper;
@@ -43,10 +44,6 @@ use CB\Component\Contentbuilderng\Administrator\Service\ListSupportService;
 use CB\Component\Contentbuilderng\Administrator\Service\PermissionService;
 use CB\Component\Contentbuilderng\Administrator\Helper\RuntimeContextHelper;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\TokenizedDirectoryResolver;
-use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\BootstrapRenderer;
-use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\ClassicRenderer;
-use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\MobileRenderer;
-use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\OnePageRenderer;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RuntimeAssetLoader;
 
 /**
@@ -56,6 +53,61 @@ final class RenderingEngine
 {
     private ?TokenizedDirectoryResolver $tokenizedDirectoryResolverService = null;
     private ?ProcessorHeaderRenderer $processorHeaderRendererService = null;
+    private ?ClassicStaticTextBuilder $classicStaticTextBuilderService = null;
+    private ?ClassicHiddenInputBuilder $classicHiddenInputBuilderService = null;
+    private ?ClassicTextInputBuilder $classicTextInputBuilderService = null;
+    private ?ClassicTextareaBuilder $classicTextareaBuilderService = null;
+    private ?ClassicChoiceBuilder $classicChoiceBuilderService = null;
+    private ?ClassicSelectBuilder $classicSelectBuilderService = null;
+    private ?ClassicRegularButtonBuilder $classicRegularButtonBuilderService = null;
+    private ?ClassicGraphicButtonBuilder $classicGraphicButtonBuilderService = null;
+    private ?ClassicFileUploadBuilder $classicFileUploadBuilderService = null;
+    private ?ClassicCaptchaBuilder $classicCaptchaBuilderService = null;
+    private ?ClassicQueryListSettingsBuilder $classicQueryListSettingsBuilderService = null;
+    private ?ClassicQueryListHeaderBuilder $classicQueryListHeaderBuilderService = null;
+    private ?ClassicQueryListCellBuilder $classicQueryListCellBuilderService = null;
+    private ?ClassicQueryListRowBuilder $classicQueryListRowBuilderService = null;
+    private ?ClassicQueryListFooterBuilder $classicQueryListFooterBuilderService = null;
+    private ?ClassicQueryListMarkupBuilder $classicQueryListMarkupBuilderService = null;
+    private ?ContentBuilderValueScriptBuilder $contentBuilderValueScriptBuilderService = null;
+    private ?EditableRecordHydrationScriptBuilder $editableRecordHydrationScriptBuilderService = null;
+    private ?HiddenFormFieldsBuilder $hiddenFormFieldsBuilderService = null;
+    private ?LegacyScriptTagWrapperBuilder $legacyScriptTagWrapperBuilderService = null;
+    private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
+    private ?EditableRecordLoader $editableRecordLoaderService = null;
+    private ?PostRenderScriptBuilder $postRenderScriptBuilderService = null;
+    private ?ContentBuilderTechnicalFieldsBuilder $contentBuilderTechnicalFieldsBuilderService = null;
+    private ?FormClosingMarkupBuilder $formClosingMarkupBuilderService = null;
+    private ?FormOpeningMarkupBuilder $formOpeningMarkupBuilderService = null;
+    private ?FormOptionalContextFieldsBuilder $formOptionalContextFieldsBuilderService = null;
+    private ?FormModeFinalizationBuilder $formModeFinalizationBuilderService = null;
+    private ?QuickModeFormTagBuilder $quickModeFormTagBuilderService = null;
+    private ?FileExtensionsCheckBuilder $fileExtensionsCheckBuilderService = null;
+    private ?QueryListSelectAllScriptBuilder $queryListSelectAllScriptBuilderService = null;
+    private ?QueryListNavigationBuilder $queryListNavigationBuilderService = null;
+    private ?QueryListRowsRefreshBuilder $queryListRowsRefreshBuilderService = null;
+    private ?QueryListPaginationTailBuilder $queryListPaginationTailBuilderService = null;
+    private ?QueryListStateLibraryBuilder $queryListStateLibraryBuilderService = null;
+    private ?QueryListRowStateBuilder $queryListRowStateBuilderService = null;
+    private ?PaymentProviderDetector $paymentProviderDetectorService = null;
+    private ?CaptchaSupportBuilder $captchaSupportBuilderService = null;
+    private ?CaptchaValidationRowSelector $captchaValidationRowSelectorService = null;
+    private ?CaptchaLegacyValidationScriptBuilder $captchaLegacyValidationScriptBuilderService = null;
+    private ?CaptchaReCaptchaValidationScriptBuilder $captchaReCaptchaValidationScriptBuilderService = null;
+    private ?CaptchaValidationScriptBuilder $captchaValidationScriptBuilderService = null;
+    private ?ContentBuilderEditableRecordScriptBuilder $contentBuilderEditableRecordScriptBuilderService = null;
+    private ?ContentBuilderNonEditableFieldsResolver $contentBuilderNonEditableFieldsResolverService = null;
+    private ?ContentBuilderFormAssociationLoader $contentBuilderFormAssociationLoaderService = null;
+    private ?ContentBuilderFormDataLoader $contentBuilderFormDataLoaderService = null;
+    private ?ContentBuilderPermissionChecker $contentBuilderPermissionCheckerService = null;
+    private ?ContentBuilderRecordLoader $contentBuilderRecordLoaderService = null;
+    private ?QuickModeRendererFactory $quickModeRendererFactoryService = null;
+    private ?FormOnloadScriptBuilder $formOnloadScriptBuilderService = null;
+    private ?QueryListRowPreparationService $queryListRowPreparationService = null;
+    private ?QueryListPageScriptBuilder $queryListPageScriptBuilderService = null;
+    private ?CallbackRegistrationService $callbackRegistrationService = null;
+    private ?FormPieceExecutionService $formPieceExecutionService = null;
+    private ?SubmittedCallbackNameResolver $submittedCallbackNameResolverService = null;
 
     public function __construct(private readonly HTML_facileFormsProcessor $processor)
     {
@@ -144,6 +196,366 @@ final class RenderingEngine
             new ProcessorHeaderRenderer(new JavascriptValueExporter());
     }
 
+    private function classicStaticTextBuilder(): ClassicStaticTextBuilder
+    {
+        return $this->classicStaticTextBuilderService ??= new ClassicStaticTextBuilder();
+    }
+
+    private function classicHiddenInputBuilder(): ClassicHiddenInputBuilder
+    {
+        return $this->classicHiddenInputBuilderService ??= new ClassicHiddenInputBuilder();
+    }
+
+    private function classicTextInputBuilder(): ClassicTextInputBuilder
+    {
+        return $this->classicTextInputBuilderService ??= new ClassicTextInputBuilder();
+    }
+
+    private function classicTextareaBuilder(): ClassicTextareaBuilder
+    {
+        return $this->classicTextareaBuilderService ??= new ClassicTextareaBuilder();
+    }
+
+    private function classicChoiceBuilder(): ClassicChoiceBuilder
+    {
+        return $this->classicChoiceBuilderService ??= new ClassicChoiceBuilder();
+    }
+
+    private function classicSelectBuilder(): ClassicSelectBuilder
+    {
+        return $this->classicSelectBuilderService ??= new ClassicSelectBuilder();
+    }
+
+    private function classicRegularButtonBuilder(): ClassicRegularButtonBuilder
+    {
+        return $this->classicRegularButtonBuilderService ??= new ClassicRegularButtonBuilder();
+    }
+
+    private function classicGraphicButtonBuilder(): ClassicGraphicButtonBuilder
+    {
+        return $this->classicGraphicButtonBuilderService ??= new ClassicGraphicButtonBuilder();
+    }
+
+    private function classicFileUploadBuilder(): ClassicFileUploadBuilder
+    {
+        return $this->classicFileUploadBuilderService ??= new ClassicFileUploadBuilder();
+    }
+
+    private function classicCaptchaBuilder(): ClassicCaptchaBuilder
+    {
+        return $this->classicCaptchaBuilderService ??= new ClassicCaptchaBuilder();
+    }
+
+    private function classicQueryListSettingsBuilder(): ClassicQueryListSettingsBuilder
+    {
+        return $this->classicQueryListSettingsBuilderService ??= new ClassicQueryListSettingsBuilder();
+    }
+
+    private function classicQueryListHeaderBuilder(): ClassicQueryListHeaderBuilder
+    {
+        return $this->classicQueryListHeaderBuilderService ??= new ClassicQueryListHeaderBuilder();
+    }
+
+    private function classicQueryListCellBuilder(): ClassicQueryListCellBuilder
+    {
+        return $this->classicQueryListCellBuilderService ??= new ClassicQueryListCellBuilder();
+    }
+
+    private function classicQueryListRowBuilder(): ClassicQueryListRowBuilder
+    {
+        return $this->classicQueryListRowBuilderService ??=
+            new ClassicQueryListRowBuilder($this->classicQueryListCellBuilder());
+    }
+
+    private function classicQueryListFooterBuilder(): ClassicQueryListFooterBuilder
+    {
+        return $this->classicQueryListFooterBuilderService ??= new ClassicQueryListFooterBuilder();
+    }
+
+    private function classicQueryListMarkupBuilder(): ClassicQueryListMarkupBuilder
+    {
+        return $this->classicQueryListMarkupBuilderService ??= new ClassicQueryListMarkupBuilder();
+    }
+
+    private function contentBuilderValueScriptBuilder(): ContentBuilderValueScriptBuilder
+    {
+        return $this->contentBuilderValueScriptBuilderService ??= new ContentBuilderValueScriptBuilder();
+    }
+
+    private function editableRecordHydrationScriptBuilder(): EditableRecordHydrationScriptBuilder
+    {
+        return $this->editableRecordHydrationScriptBuilderService ??= new EditableRecordHydrationScriptBuilder(
+            $this->contentBuilderValueScriptBuilder(),
+            fn(string $value): string => (string) InputFilter::getInstance([], [], 1, 1)->clean($value, 'html')
+        );
+    }
+
+    private function hiddenFormFieldsBuilder(): HiddenFormFieldsBuilder
+    {
+        return $this->hiddenFormFieldsBuilderService ??= new HiddenFormFieldsBuilder();
+    }
+
+    private function legacyScriptTagWrapperBuilder(): LegacyScriptTagWrapperBuilder
+    {
+        return $this->legacyScriptTagWrapperBuilderService ??= new LegacyScriptTagWrapperBuilder();
+    }
+
+    private function contentBuilderReadonlyScriptBuilder(): ContentBuilderReadonlyScriptBuilder
+    {
+        return $this->contentBuilderReadonlyScriptBuilderService ??= new ContentBuilderReadonlyScriptBuilder();
+    }
+
+    private function editableRecordLoader(): EditableRecordLoader
+    {
+        return $this->editableRecordLoaderService ??= new EditableRecordLoader($this->processor->database);
+    }
+
+    private function postRenderScriptBuilder(): PostRenderScriptBuilder
+    {
+        return $this->postRenderScriptBuilderService ??= new PostRenderScriptBuilder();
+    }
+
+
+    private function contentBuilderTechnicalFieldsBuilder(): ContentBuilderTechnicalFieldsBuilder
+    {
+        return $this->contentBuilderTechnicalFieldsBuilderService ??= new ContentBuilderTechnicalFieldsBuilder();
+    }
+
+    private function buildContentBuilderTechnicalFields(): string
+    {
+        $input = $this->processor->app->getInput();
+        $formId = $input->getInt('cb_form_id', 0);
+
+        return $formId
+            ? $this->contentBuilderTechnicalFieldsBuilder()->build(
+                '',
+                $formId,
+                $input->getInt('cb_record_id', 0),
+                $input->getBool('cbIsNew', false)
+            )
+            : '';
+    }
+
+    /**
+     * @return array<string, int|string>
+     */
+    private function buildFormContext(bool $includeRunmode): array
+    {
+        $input = $this->processor->app->getInput();
+        $context = [
+            'ff_contentid' => $input->getInt('ff_contentid', 0),
+            'ff_applic' => $input->getWord('ff_applic', ''),
+            'ff_record_id' => $this->processor->record_id,
+            'ff_module_id' => $input->getInt('ff_module_id', 0),
+        ];
+
+        if ($includeRunmode) {
+            $context['ff_runmode'] = $this->processor->runmode;
+        }
+
+        return $context;
+    }
+
+
+
+
+    private function formClosingMarkupBuilder(): FormClosingMarkupBuilder
+    {
+        return $this->formClosingMarkupBuilderService ??= new FormClosingMarkupBuilder();
+    }
+
+    private function formOpeningMarkupBuilder(): FormOpeningMarkupBuilder
+    {
+        return $this->formOpeningMarkupBuilderService ??= new FormOpeningMarkupBuilder();
+    }
+
+    private function formOptionalContextFieldsBuilder(): FormOptionalContextFieldsBuilder
+    {
+        return $this->formOptionalContextFieldsBuilderService ??= new FormOptionalContextFieldsBuilder();
+    }
+
+    private function formModeFinalizationBuilder(): FormModeFinalizationBuilder
+    {
+        return $this->formModeFinalizationBuilderService ??= new FormModeFinalizationBuilder();
+    }
+
+    private function quickModeFormTagBuilder(): QuickModeFormTagBuilder
+    {
+        return $this->quickModeFormTagBuilderService ??= new QuickModeFormTagBuilder();
+    }
+
+
+
+    private function fileExtensionsCheckBuilder(): FileExtensionsCheckBuilder
+    {
+        return $this->fileExtensionsCheckBuilderService ??= new FileExtensionsCheckBuilder();
+    }
+
+    private function queryListSelectAllScriptBuilder(): QueryListSelectAllScriptBuilder
+    {
+        return $this->queryListSelectAllScriptBuilderService ??= new QueryListSelectAllScriptBuilder();
+    }
+
+    private function queryListNavigationBuilder(): QueryListNavigationBuilder
+    {
+        return $this->queryListNavigationBuilderService ??= new QueryListNavigationBuilder();
+    }
+
+    private function queryListRowsRefreshBuilder(): QueryListRowsRefreshBuilder
+    {
+        return $this->queryListRowsRefreshBuilderService ??= new QueryListRowsRefreshBuilder();
+    }
+
+    private function queryListPaginationTailBuilder(): QueryListPaginationTailBuilder
+    {
+        return $this->queryListPaginationTailBuilderService ??= new QueryListPaginationTailBuilder();
+    }
+
+    private function queryListStateLibraryBuilder(): QueryListStateLibraryBuilder
+    {
+        return $this->queryListStateLibraryBuilderService ??= new QueryListStateLibraryBuilder();
+    }
+
+    private function queryListRowStateBuilder(): QueryListRowStateBuilder
+    {
+        return $this->queryListRowStateBuilderService ??= new QueryListRowStateBuilder();
+    }
+
+
+    private function paymentProviderDetector(): PaymentProviderDetector
+    {
+        return $this->paymentProviderDetectorService ??= new PaymentProviderDetector();
+    }
+
+    private function captchaSupportBuilder(): CaptchaSupportBuilder
+    {
+        return $this->captchaSupportBuilderService ??= new CaptchaSupportBuilder();
+    }
+
+    private function captchaValidationRowSelector(): CaptchaValidationRowSelector
+    {
+        return $this->captchaValidationRowSelectorService ??= new CaptchaValidationRowSelector();
+    }
+
+
+    private function captchaLegacyValidationScriptBuilder(): CaptchaLegacyValidationScriptBuilder
+    {
+        return $this->captchaLegacyValidationScriptBuilderService ??= new CaptchaLegacyValidationScriptBuilder();
+    }
+
+    private function captchaReCaptchaValidationScriptBuilder(): CaptchaReCaptchaValidationScriptBuilder
+    {
+        return $this->captchaReCaptchaValidationScriptBuilderService ??= new CaptchaReCaptchaValidationScriptBuilder();
+    }
+
+    private function captchaValidationScriptBuilder(): CaptchaValidationScriptBuilder
+    {
+        return $this->captchaValidationScriptBuilderService ??= new CaptchaValidationScriptBuilder(
+            $this->captchaSupportBuilder(),
+            $this->captchaValidationRowSelector(),
+            $this->captchaLegacyValidationScriptBuilder(),
+            $this->captchaReCaptchaValidationScriptBuilder()
+        );
+    }
+
+    private function contentBuilderEditableRecordScriptBuilder(): ContentBuilderEditableRecordScriptBuilder
+    {
+        return $this->contentBuilderEditableRecordScriptBuilderService ??= new ContentBuilderEditableRecordScriptBuilder(
+            fn(string $value): string => (string) InputFilter::getInstance([], [], 1, 1)->clean($value, 'html'),
+            fn(string $value, int $width, string $break, bool $cut): string =>
+                ContentbuilderngHelper::contentbuilderng_wordwrap($value, $width, $break, $cut)
+        );
+    }
+
+    private function contentBuilderNonEditableFieldsResolver(): ContentBuilderNonEditableFieldsResolver
+    {
+        return $this->contentBuilderNonEditableFieldsResolverService ??= new ContentBuilderNonEditableFieldsResolver(
+            static fn(int $contentBuilderId): array => ListSupportService::createFromRuntimeContext()
+                ->getListNonEditableElements($contentBuilderId)
+        );
+    }
+
+    private function contentBuilderFormAssociationLoader(): ContentBuilderFormAssociationLoader
+    {
+        return $this->contentBuilderFormAssociationLoaderService ??= new ContentBuilderFormAssociationLoader(
+            $this->processor->database
+        );
+    }
+
+    private function contentBuilderFormDataLoader(): ContentBuilderFormDataLoader
+    {
+        return $this->contentBuilderFormDataLoaderService ??= new ContentBuilderFormDataLoader(
+            $this->processor->database
+        );
+    }
+
+    private function contentBuilderPermissionChecker(): ContentBuilderPermissionChecker
+    {
+        return $this->contentBuilderPermissionCheckerService ??= new ContentBuilderPermissionChecker(
+            static fn(): ContentBuilderPermissionGateway => new ContentBuilderPermissionServiceAdapter(
+                PermissionService::createFromRuntimeContext()
+            )
+        );
+    }
+
+    private function contentBuilderRecordLoader(): ContentBuilderRecordLoader
+    {
+        return $this->contentBuilderRecordLoaderService ??= new ContentBuilderRecordLoader(
+            static function (string $referenceId, int $recordId, bool $publishedOnly, int $ownerId, bool $showAllLanguages): array {
+                $form = FormSourceFactory::getForm('com_breezingformsng', $referenceId);
+
+                return (array) $form->getRecord($recordId, $publishedOnly, $ownerId, $showAllLanguages);
+            }
+        );
+    }
+
+    private function quickModeRendererFactory(): QuickModeRendererFactory
+    {
+        return $this->quickModeRendererFactoryService ??= new QuickModeRendererFactory();
+    }
+
+    private function formOnloadScriptBuilder(): FormOnloadScriptBuilder
+    {
+        return $this->formOnloadScriptBuilderService ??= new FormOnloadScriptBuilder();
+    }
+
+    private function queryListRowPreparationService(): QueryListRowPreparationService
+    {
+        return $this->queryListRowPreparationService ??= new QueryListRowPreparationService(
+            $this->processor,
+            $this->queryListRowStateBuilder()
+        );
+    }
+
+    private function queryListPageScriptBuilder(): QueryListPageScriptBuilder
+    {
+        return $this->queryListPageScriptBuilderService ??= new QueryListPageScriptBuilder(
+            $this->queryListRowsRefreshBuilder(),
+            $this->queryListNavigationBuilder(),
+            $this->queryListPaginationTailBuilder()
+        );
+    }
+
+    private function callbackRegistrationService(): CallbackRegistrationService
+    {
+        return $this->callbackRegistrationService ??= new CallbackRegistrationService($this->processor);
+    }
+
+    private function formPieceExecutionService(): FormPieceExecutionService
+    {
+        return $this->formPieceExecutionService ??= new FormPieceExecutionService(
+            $this->processor,
+            $this->processor->database
+        );
+    }
+
+    private function submittedCallbackNameResolver(): SubmittedCallbackNameResolver
+    {
+        return $this->submittedCallbackNameResolverService ??= new SubmittedCallbackNameResolver(
+            $this->processor->database
+        );
+    }
+
     public function cbCheckPermissions(): array
     {
         // CONTENTBUILDER BEGIN
@@ -155,6 +567,7 @@ final class RenderingEngine
         $cbFull = false;
 
         if (file_exists(JPATH_ADMINISTRATOR . '/components/com_contentbuilderng/com_contentbuilderng.xml')) {
+            $input = $this->processor->app->getInput();
 
             if ($this->processor->app->isClient('administrator')) {
                 $cbFrontend = false;
@@ -167,18 +580,7 @@ final class RenderingEngine
             }
 
             $db = $this->processor->database;
-
-            $referenceId = (int) $this->processor->form;
-            $query = $db->getQuery(true)
-                ->select($db->quoteName('id'))
-                ->from($db->quoteName('#__contentbuilderng_forms'))
-                ->where($db->quoteName('type') . ' = ' . $db->quote('com_breezingformsng'))
-                ->where($db->quoteName('reference_id') . ' = :referenceId')
-                ->where($db->quoteName('published') . ' = 1')
-                ->bind(':referenceId', $referenceId, ParameterType::INTEGER);
-            $db->setQuery($query);
-
-            $cbForms = $db->loadColumn();
+            $cbForms = $this->contentBuilderFormAssociationLoader()->load((int) $this->processor->form);
 
             // if no BF form is associated with contentbuilder, we don't need no further checks
             if (!count($cbForms)) {
@@ -186,54 +588,40 @@ final class RenderingEngine
             }
 
             // test if all published contentbuilder views allow creating new submissions
-            if (!$this->processor->app->getInput()->getInt('cb_record_id', 0) || !$this->processor->app->getInput()->getInt('cb_form_id', 0)) {
+            if (!$input->getInt('cb_record_id', 0) || !$input->getInt('cb_form_id', 0)) {
 
-                $permissionService = PermissionService::createFromRuntimeContext();
-                $cbAuth = true;
-                foreach ($cbForms as $cbFormId) {
-                    $permissionService->setPermissions($cbFormId, 0, $cbFrontend ? '_fe' : '');
-                    $cbAuth = $cbFrontend
-                        ? $permissionService->authorizeFe('new')
-                        : $permissionService->authorize('new');
-                    if (!$cbAuth) {
-                        break;
-                    }
-                }
-
-                if (count($cbForms) && !$cbAuth) {
-                    throw new Exception(Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_NEW_NOT_ALLOWED'), 403);
-                }
+                $this->contentBuilderPermissionChecker()->assertCanCreate(
+                    $cbForms,
+                    $cbFrontend,
+                    Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_NEW_NOT_ALLOWED'),
+                    Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_NEW_NOT_ALLOWED')
+                );
             }
 
-            if ($this->processor->app->getInput()->getInt('cb_form_id', 0)) {
+            if ($input->getInt('cb_form_id', 0)) {
 
                 // test the permissions of given record
-                if ($this->processor->app->getInput()->getInt('cb_record_id', 0)) {
-                    (PermissionService::createFromRuntimeContext())->setPermissions($this->processor->app->getInput()->getInt('cb_form_id', 0), $this->processor->app->getInput()->getInt('cb_record_id', 0), $cbFrontend ? '_fe' : '');
-                    (PermissionService::createFromRuntimeContext())->checkPermissions('edit', Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_EDIT_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
-                } else {
-                    (PermissionService::createFromRuntimeContext())->setPermissions($this->processor->app->getInput()->getInt('cb_form_id', 0), 0, $cbFrontend ? '_fe' : '');
-                    (PermissionService::createFromRuntimeContext())->checkPermissions('new', Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_NEW_NOT_ALLOWED'), $cbFrontend ? '_fe' : '');
-                }
+                $permissionService = $this->contentBuilderPermissionChecker()->assertCanEditOrCreate(
+                    $input->getInt('cb_form_id', 0),
+                    $input->getInt('cb_record_id', 0),
+                    $cbFrontend,
+                    Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_EDIT_NOT_ALLOWED'),
+                    Text::_('COM_CONTENTBUILDERNG_PERMISSIONS_NEW_NOT_ALLOWED')
+                );
 
-                $cbFormId = $this->processor->app->getInput()->getInt('cb_form_id', 0);
-                $query = $db->getQuery(true)
-                    ->select('*')
-                    ->from($db->quoteName('#__contentbuilderng_forms'))
-                    ->where($db->quoteName('id') . ' = :cbFormId')
-                    ->where($db->quoteName('published') . ' = 1')
-                    ->bind(':cbFormId', $cbFormId, ParameterType::INTEGER);
-                $db->setQuery($query);
-                $cbData = $db->loadAssoc();
+                $cbFormId = $input->getInt('cb_form_id', 0);
+                $cbData = $this->contentBuilderFormDataLoader()->load($cbFormId);
                 if (is_array($cbData)) {
-                    $permissionService = PermissionService::createFromRuntimeContext();
-                    $cbFull = $cbFrontend ? $permissionService->authorizeFe('fullarticle') : $permissionService->authorize('fullarticle');
+                    $cbFull = $this->contentBuilderPermissionChecker()->canViewFullArticle($permissionService, $cbFrontend);
                     $cbForm = FormSourceFactory::getForm('com_breezingformsng', $cbData['reference_id']);
-                    $cbRecord = $cbForm->getRecord($this->processor->app->getInput()->getInt('cb_record_id', 0), $cbData['published_only'], $cbFrontend ? ($cbData['own_only_fe'] ? $this->processor->app->getIdentity()->get('id', 0) : -1) : ($cbData['own_only'] ? $this->processor->app->getIdentity()->get('id', 0) : -1), $cbFrontend ? $cbData['show_all_languages_fe'] : true);
-
-                    if (!count($cbRecord) && !$this->processor->app->getInput()->getBool('cbIsNew', false)) {
-                        throw new Exception(Text::_('COM_CONTENTBUILDERNG_RECORD_NOT_FOUND'), 404);
-                    }
+                    $cbRecord = $this->contentBuilderRecordLoader()->load(
+                        $cbData,
+                        $input->getInt('cb_record_id', 0),
+                        $cbFrontend,
+                        (int) $this->processor->app->getIdentity()->get('id', 0),
+                        $input->getBool('cbIsNew', false),
+                        Text::_('COM_CONTENTBUILDERNG_RECORD_NOT_FOUND')
+                    );
                 }
             }
         }
@@ -251,30 +639,9 @@ final class RenderingEngine
             return;
         }
 
-        $is_mobile_type = '';
-        $rootMdata = [];
+        require_once JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php';
 
-        if (trim($this->processor->formrow->template_code_processed) == 'QuickMode') {
-
-            $this->syncMobileSessionPreference();
-
-            require_once(JPATH_SITE . '/administrator/components/com_breezingformsng/libraries/crosstec/functions/helpers.php');
-
-            $rootMdata = $this->loadQuickModeMetadata();
-            $is_device = $this->applyMobileMode($rootMdata);
-
-            $is_mobile_type = $this->mobileChoiceType($is_device, $rootMdata);
-
-            if (!$this->processor->isMobile || ($this->processor->isMobile && $this->processor->app->getInput()->getString('ff_task', '') == 'submit')) {
-
-                // nothing
-            } else {
-
-                if ($this->processor->isMobile) {
-                    $quickMode = $this->createMobileRenderer($rootMdata);
-                }
-            }
-        }
+        $rootMdata = $this->loadQuickModeMetadata();
 
         // CONTENTBUILDER BEGIN
         $cbResult = $this->processor->cbCheckPermissions();
@@ -292,226 +659,35 @@ final class RenderingEngine
         echo $this->processor->header();
         $this->initializeFormRendering();
 
-        if ($this->executeBeforeFormPiece())
+        if ($this->executeBeforeFormPiece()) {
+            $this->abortViewRendering();
             return;
-
-        [$fileExtensionsCheck, $cntFiles] = $this->buildFileExtensionsCheck();
-
-        [$captchaError, $capFunc] = $this->createCaptchaDefaults();
-
-        for ($i = 0; $i < $this->processor->rowcount; $i++) {
-            $row = $this->processor->rows[$i];
-            if ($row->type == "Captcha") {
-                $capFunc = '
-
-				function bfAjaxObject101() {
-					this.createRequestObject = function() {
-						try {
-							var ro = new XMLHttpRequest();
-						}
-						catch (e) {
-							var ro = new ActiveXObject("Microsoft.XMLHTTP");
-						}
-						return ro;
-					}
-					this.sndReq = function(action, url, data) {
-					
-						if (action.toUpperCase() == "POST") {
-							this.http.open(action,url,true);
-							this.http.setRequestHeader("Content-Type","application/x-www-form-urlencoded");
-							this.http.onreadystatechange = this.handleResponse;
-							this.http.send(data);
-						}
-						else {
-							this.http.open(action,url + "?" + data,true);
-							this.http.onreadystatechange = this.handleResponse;
-							this.http.send(null);
-						}
-					}
-					this.handleResponse = function() {
-						if ( me.http.readyState == 4) {
-							if (typeof me.funcDone == "function") { me.funcDone();}
-							var rawdata = me.http.responseText.split("|");
-							for ( var i = 0; i < rawdata.length; i++ ) {
-								var item = (rawdata[i]).split("=>");
-								if (item[0] != "") {
-									if (item[1].substr(0,3) == "%V%" ) {
-										document.getElementById(item[0]).value = item[1].substring(3);
-									}
-									else {
-										if(item[1] == "true"){
-                                                                                    if(typeof bfDoFlashUpload != \'undefined\'){
-                                                                                        bfDoFlashUpload();
-                                                                                    } else {
-									   		ff_submitForm2();
-                                                                                    }
-									   } else {
-                                                                                if(typeof JQuery != "undefined" && JQuery("#bfSubmitMessage"))
-									        {
-                                                                                    JQuery("#bfSubmitMessage").css("visibility","hidden");
-                                                                                    JQuery("#bfSubmitMessage").css("display","none");
-									        }
-                                                                                if(typeof bfUseErrorAlerts == "undefined"){
-                                                                                    alert(' . $captchaError . ');
-									        } else {
-                                                                                   if(typeof inlineErrorElements != "undefined"){
-                                                                                     inlineErrorElements.push(["bfCaptchaEntry",' . $captchaError . ']);
-                                                                                   }
-									           bfShowErrors(' . $captchaError . ');
-									        }
-                                                                                if(typeof ladda_button != "undefined"){
-                                                                                    
-                                                                                    bf_restore_submitbutton();
-                                                                                }
-                                                                                
-                                                                                        document.getElementById(\'ff_capimgValue\').src = \'' . Uri::root(true) . ($this->processor->app->isClient('administrator') ? '/administrator' : '') . '/index.php?option=com_breezingformsng&bfCaptcha=1&bfMathRandom=\' + Math.random();
-                                                                                        document.getElementById(\'bfCaptchaEntry\').value = "";
-                                                                                        if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
-                                                                                        document.getElementById(\'bfCaptchaEntry\').focus();
-                                                                                        if(document.getElementById("bfSubmitButton")){
-                                                                                            document.getElementById("bfSubmitButton").disabled = false;
-                                                                                        }
-                                                                                        if(typeof JQuery != "undefined"){JQuery(".bfCustomSubmitButton").prop("disabled", false);}
-										}
-                                                                                
-									}
-								}
-							}
-						}
-						if ((me.http.readyState == 1) && (typeof me.funcWait == "function")) { me.funcWait(); }
-					}
-					var me = this;
-					this.http = this.createRequestObject();
-
-					var funcWait = null;
-					var funcDone = null;
-				}
-
-                                function bfCheckCaptcha(){
-                                        if(checkFileExtensions()){
-                                               var ao = new bfAjaxObject101();
-                                               ao.sndReq("get","' . Uri::root(true) . ($this->processor->app->isClient('administrator') ? '/administrator' : '') . '/index.php?raw=true&option=com_breezingformsng&checkCaptcha=true&Itemid=0&tmpl=component&value="+document.getElementById("bfCaptchaEntry").value,"");
-                                        }
-                                }';
-                break;
-            } else if ($row->type == "ReCaptcha") {
-
-                $capFunc = 'var bfReCaptchaLoaded = true;
-                                    function bfCheckCaptcha(){
-					if(checkFileExtensions()){
-                                                function bfValidateCaptcha()
-                                                {
-                                                    if(typeof bfInvisibleRecaptcha != "undefined" && bfInvisibleRecaptcha === false){
-														if(typeof bfDoFlashUpload != \'undefined\'){
-															bfDoFlashUpload();
-														} else {
-															ff_submitForm2();
-														}
-														return;
-                                                    }
-                                                    
-                                                    if(typeof onloadBFNewRecaptchaCallback == "undefined"){
-                                                        challengeField = JQuery("input#recaptcha_challenge_field").val();
-                                                        responseField = JQuery("input#recaptcha_response_field").val();
-                                                        var html = JQuery.ajax({
-                                                        type: "POST",
-                                                        url: "' . Route::_("index.php?raw=true&option=com_breezingformsng&bfReCaptcha=true&form=" . $this->processor->form . "&Itemid=0&tmpl=component") . '",
-                                                        data: "recaptcha_challenge_field=" + challengeField + "&recaptcha_response_field=" + responseField,
-                                                        async: false
-                                                        }).responseText;
-
-                                                        if (html.replace(/^\s+|\s+$/, "") == "success")
-                                                        {
-                                                            if(typeof bfDoFlashUpload != \'undefined\'){
-                                                                bfDoFlashUpload();
-                                                            } else {
-                                                                ff_submitForm2();
-                                                            }
-                                                        }
-                                                        else
-                                                        {
-                                                                if(typeof bfUseErrorAlerts == "undefined"){
-                                                                        alert(' . $captchaError . ');
-                                                                } else {
-                                                                    if(typeof inlineErrorElements != "undefined"){
-                                                                        inlineErrorElements.push(["bfReCaptchaEntry",' . $captchaError . ']);
-                                                                    }
-                                                                    bfShowErrors(' . $captchaError . ');
-                                                                }
-
-                                                                if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
-                                                                Recaptcha.focus_response_field();
-
-                                                                Recaptcha.reload();
-
-                                                                if(document.getElementById("bfSubmitButton")){
-                                                                    document.getElementById("bfSubmitButton").disabled = false;
-                                                                }
-                                                                if(typeof JQuery != "undefined"){JQuery(".bfCustomSubmitButton").prop("disabled", false);}
-                                                                if(typeof ladda_button != "undefined"){
-                                                                    bf_restore_submitbutton();
-                                                                }
-                                                                
-                                                        }
-                                                    }
-                                                    else{
-                                                        
-                                                        if(typeof bfInvisibleRecaptcha != "undefined"){
-                                                        
-                                                            grecaptcha.execute();
-                                                        }
-                                                        
-                                                        var gresponse = grecaptcha.getResponse();
-                                                        
-                                                        if(gresponse == ""){
-                                                            
-                                                            if(typeof bfInvisibleRecaptcha == "undefined"){
-                                                            
-	                                                            if(typeof bfUseErrorAlerts == "undefined"){
-	                                                                    alert(' . $captchaError . ');
-	                                                            } else {
-	                                                                if(typeof inlineErrorElements != "undefined"){
-	                                                                    inlineErrorElements.push(["bfReCaptchaEntry",' . $captchaError . ']);
-	                                                                }
-	                                                                bfShowErrors(' . $captchaError . ');
-	                                                            }
-                                                            
-                                                            
-                                                                if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
-                                                            }
-                                                            if(document.getElementById("bfSubmitButton")){
-                                                                document.getElementById("bfSubmitButton").disabled = false;
-                                                            }
-                                                            if(typeof JQuery != "undefined"){JQuery(".bfCustomSubmitButton").prop("disabled", false);}
-                                                            if(typeof ladda_button != "undefined"){
-                                                                bf_restore_submitbutton();
-                                                            }
-                                                            
-                                                            
-                                                        }else{
-               
-                                                            if(typeof bfDoFlashUpload != \'undefined\'){
-                                                                bfDoFlashUpload();
-                                                            } else {
-                                                                ff_submitForm2();
-                                                            }
-                                                        }
-                                                    }
-                                                }
-
-                                                bfValidateCaptcha();
-
-					}
-				}';
-            }
         }
 
-        echo
-            '<script type="text/javascript">' . nl() .
-            '<!--' . nl() .
-            '' . nl() .
-            $fileExtensionsCheck .
-            $capFunc;
+        [$fileExtensionsCheck, $cntFiles] = $this->fileExtensionsCheckBuilder()->build(
+            $this->processor->rows,
+            $this->processor->rowcount,
+            json_encode(
+                Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED'),
+                JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE
+            ),
+            trim((string) $this->processor->formrow->template_code) != ''
+        );
+
+        $capFunc = $this->captchaValidationScriptBuilder()->build(
+            Uri::root(true),
+            $this->processor->app->isClient('administrator'),
+            (int) $this->processor->form,
+            $this->processor->rows,
+            $this->processor->rowcount,
+            Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG')
+        );
+
+        echo $this->legacyScriptTagWrapperBuilder()->formValidationOpen(
+            $fileExtensionsCheck,
+            $capFunc,
+            nl()
+        );
 
         [$library, $linked] = $this->createScriptLibraryState();
 
@@ -520,12 +696,16 @@ final class RenderingEngine
         } else {
             $this->linkSubmittedOnload($library, $linked);
         } // if
-        if ($this->processor->bury())
+        if ($this->processor->bury()) {
+            $this->abortViewRendering();
             return;
+        }
 
         // add form scripts
-        if ($this->addFormScripts($library, $linked))
+        if ($this->addFormScripts($library, $linked)) {
+            $this->abortViewRendering();
             return;
+        }
 
         // all element scripts & static text/HTML
         $icons = 0;
@@ -538,277 +718,65 @@ final class RenderingEngine
 
             $this->processor->draggableDivIds[] = 'ff_div' . $row->id;
 
-            if ($row->type == "Icon")
-                $icons++;
-            if ($row->type == "Tooltip")
-                $tooltips++;
+            $this->collectElementMetadata($row, $icons, $tooltips);
             if ($row->type == "Query List") {
-                if ($row->flag2)
-                    $qcheckboxes++;
-
-                // load column definitions
-                $this->processor->queryCols['ff_' . $row->id] = array();
-                $cols = &$this->processor->queryCols['ff_' . $row->id];
-                if ($this->processor->trim($row->data3)) {
-                    $cls = explode("\n", $row->data3);
-                    for ($c = 0; $c < count($cls); $c++) {
-                        if ($cls[$c] != '') {
-                            $col = ''; // instead of unset
-                            $col = new QueryColumn;
-                            $col->unpack($cls[$c]);
-                            $this->processor->compileQueryCol($row, $col);
-                            $cols[] = $col;
-                        } // if
-                    } // for
-                } // if
-                $colcnt = count($cols);
-                $checkbox = 0;
-                if ($row->flag2)
-                    $checkbox = $row->flag2;
-                $header = 0;
-                if ($row->flag1)
-                    $header = 1;
-
-                // get pagenav
-                $pagenav = 1;
-                $settings = explode("\n", $row->data1);
-                if (count($settings) > 8 && $this->processor->trim($settings[8]))
-                    $pagenav = $settings[8];
-
-                // export the javascript parameters
-                $qcode .= nl() .
-                    'ff_queryCurrPage[' . $row->id . '] = 1;' . nl() .
-                    'ff_queryPageSize[' . $row->id . '] = ' . $row->height . ';' . nl() .
-                    'ff_queryCheckbox[' . $row->id . '] = ' . $checkbox . ';' . nl() .
-                    'ff_queryHeader[' . $row->id . '] = ' . $header . ';' . nl() .
-                    'ff_queryPagenav[' . $row->id . '] = ' . $pagenav . ';' . nl() .
-                    'ff_queryCols[' . $row->id . '] = [';
-                for ($c = 0; $c < $colcnt; $c++) {
-                    if ($cols[$c]->thspan > 0)
-                        $qcode .= '1';
-                    else
-                        $qcode .= '0';
-                    if ($c < $colcnt - 1)
-                        $qcode .= ',';
-                } // for
-                $qcode .= '];' . nl();
-
-                // execute the query and export it to javascript
-                $this->processor->queryRows['ff_' . $row->id] = array();
-                $this->processor->execQuery($row, $this->processor->queryRows['ff_' . $row->id], $cols);
-                $qcode .= 'ff_queryRows[' . $row->id . '] = ' . $this->processor->expJsValue($this->processor->queryRows['ff_' . $row->id]) . ';' . nl();
-
-                unset($cols);
-                if ($this->processor->bury())
+                $this->prepareQueryListRow($row, $qcheckboxes, $qcode);
+                if ($this->processor->bury()) {
+                    $this->abortViewRendering();
                     return;
+                }
             } // if
-            $this->processor->addFunction(
-                $row->script1cond,
-                $row->script1id,
-                'ff_' . $row->name . '_init',
-                $row->script1code,
-                $library,
-                $linked,
-                'e',
-                $row->id,
-                1
-            );
-            if ($this->processor->bury()) {
+            if ($this->registerElementCallbacks($row, $library, $linked)) {
                 unset($row);
+                $this->abortViewRendering();
                 return;
             }
-            $this->processor->addFunction(
-                $row->script2cond,
-                $row->script2id,
-                'ff_' . $row->name . '_action',
-                $row->script2code,
-                $library,
-                $linked,
-                'e',
-                $row->id,
-                1
-            );
-            if ($this->processor->bury()) {
-                unset($row);
-                return;
-            }
-            $this->processor->addFunction(
-                $row->script3cond,
-                $row->script3id,
-                'ff_' . $row->name . '_validate',
-                $row->script3code,
-                $library,
-                $linked,
-                'e',
-                $row->id,
-                1
-            );
-            if ($this->processor->bury()) {
-                ob_end_clean();
-                return;
-            }
-            if ($row->type == 'Static Text/HTML')
-                $this->processor->linkcode('#scanonly', $library, $linked, $row->data1);
+            $this->registerStaticTextScanCallback($row, $library, $linked);
             unset($row);
-            if ($this->processor->bury())
+            if ($this->processor->bury()) {
+                $this->abortViewRendering();
                 return;
+            }
         } // for
 
         if ($icons > 0) {
-            $this->processor->linkcode(
-                'ff_hideIconBorder',
-                $library,
-                $linked,
-                'function ff_hideIconBorder(element)' . nl() .
-                '{' . nl() .
-                '    element.style.border = "none";' . nl() .
-                '} // ff_hideIconBorder'
-            );
-            if ($this->processor->bury())
+            if ($this->registerIconBorderScripts($library, $linked)) {
+                $this->abortViewRendering();
                 return;
-            $this->processor->linkcode(
-                'ff_dispIconBorder',
-                $library,
-                $linked,
-                'function ff_dispIconBorder(element)' . nl() .
-                '{' . nl() .
-                '    element.style.border = "1px outset";' . nl() .
-                '} // ff_dispIconBorder'
-            );
-            if ($this->processor->bury())
-                return;
+            }
         } // if
 
         if ($qcode != '') {
-            $library[] = array('ff_queryCurrPage', 'var ff_queryCurrPage = new Array();');
-            $library[] = array('ff_queryPageSize', 'var ff_queryPageSize = new Array();');
-            $library[] = array('ff_queryCols', 'var ff_queryCols = new Array();');
-            $library[] = array('ff_queryCheckbox', 'var ff_queryCheckbox = new Array();');
-            $library[] = array('ff_queryHeader', 'var ff_queryHeader = new Array();');
-            $library[] = array('ff_queryPagenav', 'var ff_queryPagenav = new Array();');
-            $library[] = array('ff_queryRows', 'var ff_queryRows = new Array();' . nl() . $qcode);
+            foreach ($this->queryListStateLibraryBuilder()->build($qcode, nl()) as $entry) {
+                $library[] = $entry;
+            }
 
             $library[] = array(
                 'ff_selectAllQueryRows',
-                'function ff_selectAllQueryRows(id,checked)' . nl() .
-                '{' . nl() .
-                '    if (!ff_queryCheckbox[id]) return;' . nl() .
-                '    var cnt = ff_queryRows[id].length;' . nl() .
-                '    var pagesize = ff_queryPageSize[id];' . nl() .
-                '    if (pagesize > 0) {' . nl() .
-                '        lastpage = parseInt((cnt+pagesize-1)/pagesize);' . nl() .
-                '        if (lastpage == 1)' . nl() .
-                '           pagesize = cnt;' . nl() .
-                '        else {' . nl() .
-                '            var currpage = ff_queryCurrPage[id];' . nl() .
-                '            var p;' . nl() .
-                '            for (p = 1; p < currpage; p++) cnt -= pagesize;' . nl() .
-                '            if (cnt > pagesize) cnt = pagesize;' . nl() .
-                '        } // if' . nl() .
-                '    } // if' . nl() .
-                '    var curr;' . nl() .
-                '    for (curr = 0; curr < cnt; curr++)' . nl() .
-                '        document.getElementById(\'ff_cb\'+id+\'_\'+curr).checked = checked;' . nl() .
-                '    for (curr = cnt; curr < pagesize; curr++)' . nl() .
-                '        document.getElementById(\'ff_cb\'+id+\'_\'+curr).checked = false;' . nl() .
-                '    if (ff_queryCheckbox[id]==1)' . nl() .
-                '        document.getElementById(\'ff_cb\'+id).checked = checked;' . nl() .
-                '} // ff_selectAllQueryRows'
+                $this->queryListSelectAllScriptBuilder()->build(nl())
             );
 
-            $code = 'function ff_dispQueryPage(id,page)' . nl() .
-                '{' . nl() .
-                '    var forced = false;' . nl() .
-                '    if (arguments.length>2) forced = arguments[2];' . nl() .
-                '    var qrows = ff_queryRows[id];' . nl() .
-                '    var cnt = qrows.length;' . nl() .
-                '    var currpage = ff_queryCurrPage[id];' . nl() .
-                '    var pagesize = ff_queryPageSize[id];' . nl() .
-                '    var pagenav = ff_queryPagenav[id];' . nl() .
-                '    var lastpage = 1;' . nl() .
-                '    if (pagesize > 0) {' . nl() .
-                '        lastpage = parseInt((cnt+pagesize-1)/pagesize);' . nl() .
-                '        if (lastpage == 1) pagesize = cnt;' . nl() .
-                '    } // if' . nl() .
-                '    if (page < 1) page = 1;' . nl() .
-                '    if (page > lastpage) page = lastpage;' . nl() .
-                '    if (!forced && page == currpage) return;' . nl() .
-                '    var p, c;' . nl() .
-                '    for (p = 1; p < page; p++) cnt -= pagesize;' . nl() .
-                '    if (cnt > pagesize) cnt = pagesize;' . nl() .
-                '    var start = (page-1) * pagesize;' . nl() .
-                '    var rows = document.getElementById(\'ff_elem\'+id).rows;' . nl() .
-                '    var cols = ff_queryCols[id];' . nl() .
-                '    var checkbox = ff_queryCheckbox[id];' . nl() .
-                '    var header = ff_queryHeader[id];' . nl() .
-                '    for (p = 0; p < cnt; p++) {' . nl() .
-                '        var qrow = qrows[start+p];' . nl() .
-                '        var row = rows[header+p];' . nl() .
-                '        var cc = 0;' . nl() .
-                '        for (c = 0; c < cols.length; c++)' . nl() .
-                '            if (cols[c]) {' . nl() .
-                '                if (c==0 && checkbox>0) {' . nl() .
-                '                    document.getElementById(\'ff_cb\'+id+\'_\'+p).value = qrow[c];' . nl() .
-                '                    cc++;' . nl() .
-                '                } else' . nl() .
-                '                    row.cells[cc++].innerHTML = qrow[c];' . nl() .
-                '            } // if' . nl() .
-                '        row.style.display = \'\';' . nl() .
-                '    } // for' . nl() .
-                '    for (p = cnt; p < pagesize; p++) {' . nl() .
-                '        var row = rows[p+header];' . nl() .
-                '        row.style.display = \'none\';' . nl() .
-                '    } // for' . nl() .
-                '    if (pagenav > 0 && pagesize > 0) {' . nl() .
-                '        var navi = \'\';' . nl() .
-                '        if (pagenav<=4) {' . nl() .
-                '            if (page>1) navi += \'<a href="javascript:ff_dispQueryPage(\'+id+\',1);">\';' . nl() .
-                '            navi += \'&lt;&lt;\';' . nl() .
-                '            if (pagenav<=2) navi += \' ' . Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGESTART') . '\';' . nl() .
-                '            if (page>1) navi += \'<\/a>\';' . nl() .
-                '            navi += \' \';' . nl() .
-                '            if (page>1) navi += \'<a href="javascript:ff_dispQueryPage(\'+id+\',\'+(page-1)+\');">\';' . nl() .
-                '            navi += \'&lt;\';' . nl() .
-                '            if (pagenav<=2) navi += \' ' . Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV') . '\';' . nl() .
-                '            if (page>1) navi += \'<\/a>\';' . nl() .
-                '            navi += \' \';' . nl() .
-                '        } // if' . nl() .
-                '        if (pagenav % 2) {' . nl() .
-                '            for (p = 1; p <= lastpage; p++)' . nl() .
-                '                if (p == page) ' . nl() .
-                '                    navi += p+\' \';' . nl() .
-                '                else' . nl() .
-                '                    navi += \'<a href="javascript:ff_dispQueryPage(\'+id+\',\'+p+\');">\'+p+\'<\/a> \';' . nl() .
-                '        } // if' . nl() .
-                '        if (pagenav<=4) {' . nl() .
-                '            if (page<lastpage) navi += \'<a href="javascript:ff_dispQueryPage(\'+id+\',\'+(page+1)+\');">\';' . nl() .
-                '            if (pagenav<=2) navi += \'' . Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT') . ' \';' . nl() .
-                '            navi += \'&gt;\';' . nl() .
-                '            if (page<lastpage) navi += \'<\/a>\';' . nl() .
-                '            navi += \' \';' . nl() .
-                '            if (page<lastpage) navi += \'<a href="javascript:ff_dispQueryPage(\'+id+\',\'+lastpage+\');">\';' . nl() .
-                '            if (pagenav<=2) navi += \'' . Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEEND') . ' \';' . nl() .
-                '            navi += \'&gt;&gt;\';' . nl() .
-                '            if (page<lastpage) navi += \'<\/a>\';' . nl() .
-                '        } // if' . nl() .
-                '        rows[header+pagesize].cells[0].innerHTML = navi;' . nl() .
-                '    } // if' . nl() .
-                '    ff_queryCurrPage[id] = page;' . nl();
-            if ($qcheckboxes)
-                $code .= '    if (checkbox) ff_selectAllQueryRows(id, false);' . nl();
-            if ($this->processor->formrow->heightmode > 0)
-                $code .= '    ff_resizepage(' . $this->processor->formrow->heightmode . ', ' . $this->processor->formrow->height . ');' . nl();
-            if ($this->processor->inframe)
-                $code .= '    parent.window.scrollTo(0,0);' . nl();
-            $code .= '    window.scrollTo(0,0);' . nl() .
-                '} // ff_dispQueryPage';
+            $code = $this->queryListPageScriptBuilder()->build(
+                [
+                    'start' => Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGESTART'),
+                    'previous' => Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV'),
+                    'next' => Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT'),
+                    'end' => Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEEND'),
+                ],
+                (bool) $qcheckboxes,
+                (int) $this->processor->formrow->heightmode,
+                (int) $this->processor->formrow->height,
+                (bool) $this->processor->inframe,
+                nl()
+            );
             $this->processor->linkcode('ff_dispQueryPage', $library, $linked, $code);
-            if ($this->processor->bury())
+            if ($this->processor->bury()) {
+                $this->abortViewRendering();
                 return;
+            }
         } // if
 
-        echo '//-->' . nl() .
-            '</script>' . nl();
+        echo $this->legacyScriptTagWrapperBuilder()->formValidationClose(nl());
 
         if ($icons > 0) {
             RuntimeAssetLoader::script(
@@ -824,380 +792,67 @@ final class RenderingEngine
             $current_url = Uri::getInstance()->toString();
 
             $url = ($this->processor->inframe) ? $ff_mossite . '/index.php?format=html&tmpl=component' : (($this->processor->runmode == _FF_RUNMODE_FRONTEND) ? $current_url : 'index.php?format=html' . ($this->processor->app->getInput()->getCmd('tmpl', '') ? '&tmpl=' . $this->processor->app->getInput()->getCmd('tmpl', '') : $current_url));
-            $params = ' action="' . $url . '"' .
-                ' method="post"' .
-                ' name="' . $this->processor->form_id . '"' .
-                ' id="' . $this->processor->form_id . '"' .
-                ' enctype="multipart/form-data"';
-            if ($this->processor->formrow->class2 != '')
-                $params .= ' class="' . $this->processor->getClassName($this->processor->formrow->class2) . '"';
-            echo '<form data-ajax="false" ' . $params . ' accept-charset="utf-8" onsubmit="return false;" class="bfQuickMode">' . nl();
+            echo $this->quickModeFormTagBuilder()->build(
+                $url,
+                (string) $this->processor->form_id,
+                $this->processor->formrow->class2 != ''
+                    ? $this->processor->getClassName($this->processor->formrow->class2)
+                    : '',
+                nl()
+            );
         } // if
 
         $js = '';
         $cbJs = '';
 
         if ($this->processor->editable && $cbRecord === null) {
-            $db = $this->processor->database;
-            $formValue = $this->processor->form;
             $userId = $this->processor->app->getIdentity()->get('id', -1);
-            $query = $db->getQuery(true)
-                ->select(['id', 'form'])
-                ->from($db->quoteName('#__facileforms_records'))
-                ->where($db->quoteName('form') . ' = :formValue')
-                ->where($db->quoteName('user_id') . ' = :userId')
-                ->where($db->quoteName('user_id') . ' <> 0')
-                ->where($db->quoteName('archived') . ' = 0')
-                ->order($db->quoteName('id') . ' DESC')
-                ->bind(':formValue', $formValue, ParameterType::STRING)
-                ->bind(':userId', $userId, ParameterType::INTEGER);
-            $db->setQuery($query, 0, 1);
-            $recordsResult = $db->loadObjectList();
-            if (count($recordsResult) != 0) {
-                $this->processor->record_id = $recordsResult[0]->id;
-                $recordId = (int) $recordsResult[0]->id;
-                $subrecordsQuery = $db->getQuery(true)
-                    ->select('*')
-                    ->from($db->quoteName('#__facileforms_subrecords'))
-                    ->where($db->quoteName('record') . ' = :recordId')
-                    ->bind(':recordId', $recordId, ParameterType::INTEGER);
-                $db->setQuery($subrecordsQuery);
-                $recordEntries = $db->loadObjectList();
-                $js = '';
-                foreach ($recordEntries as $recordEntry) {
+            $editableRecord = $this->editableRecordLoader()->load((int) $this->processor->form, (int) $userId);
+            if ($editableRecord !== null) {
+                $this->processor->record_id = $editableRecord->id;
+                $recordEntries = $editableRecord->entries;
 
-                    //$recordEntry->value = $this->processor->removeDangerousHtml($recordEntry->value);
+                $js = $this->editableRecordHydrationScriptBuilder()->build($recordEntries, (int) $this->processor->form);
 
-                    /*
-                      $input = $this->processor->app->getInput();
-                      $input->set('cbCleanVar', $recordEntry->value);
-                      $recordEntry->value = $input->getHtml('cbCleanVar'); */
-
-                    $recordEntry->value = InputFilter::getInstance([], [], 1, 1)->clean((string) $recordEntry->value, 'html');
-
-                    switch ($recordEntry->type) {
-                        case 'Textarea':
-                        case 'Text':
-                        case 'Hidden Input':
-                        case 'Number Input':
-                        case 'Calendar':
-
-                            /*
-                              if($recordEntry->type == 'Textarea'){
-
-                              $dataObject = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
-                              $qmelement = $this->processor->findQuickModeElement($dataObject, $recordEntry->name);
-
-                              if(isset($recordEntry->value) && $qmelement !== null && isset($qmelement['properties']['is_html']) && $qmelement['properties']['is_html']) {
-
-                              $recordEntry->value = $this->processor->removeDangerousHtml($recordEntry->value);
-                              }
-                              } */
-
-                            $js .= 'if(typeof JQuery != "undefined"){JQuery("[name=\"ff_nm_' . $recordEntry->name . '[]\"]").val(' . json_encode($recordEntry->value) . ');if(typeof JQuery != "undefined")JQuery("[name=\"ff_nm_' . $recordEntry->name . '[]\"]").trigger("change");}else{';
-                            $js .= 'if(document.getElementById("ff_elem' . $recordEntry->element . '"))document.getElementById("ff_elem' . $recordEntry->element . '").value=' . json_encode($recordEntry->value) . ';if(typeof JQuery != "undefined")JQuery(document.getElementById("ff_elem' . $recordEntry->element . '")).trigger("change");' . "\n";
-                            $js .= '}';
-                            break;
-                        case 'Checkbox':
-                            if (!empty($recordEntry->value)) {
-                                $js .= 'if(document.getElementById("ff_elem' . $recordEntry->element . '") && !JQuery(document.getElementById("ff_elem' . $recordEntry->element . '")).attr("checked"))JQuery(document.getElementById("ff_elem' . $recordEntry->element . '")).click();' . "\n";
-                            }
-                            break;
-                        case 'Checkbox Group':
-                            $js .= '
-							for(var i = 0;i < document.ff_form' . $this->processor->form . '.elements.length;i++){
-								if(document.ff_form' . $this->processor->form . '.elements[i].type == "checkbox" && document.ff_form' . $this->processor->form . '.elements[i].name == "ff_nm_' . $recordEntry->name . '[]" && document.ff_form' . $this->processor->form . '.elements[i].value == ' . json_encode($recordEntry->value) . '){
-									if(typeof JQuery != "undefined" && !JQuery(document.ff_form' . $this->processor->form . '.elements[i]).attr("checked")){
-									    JQuery(document.ff_form' . $this->processor->form . '.elements[i]).click();
-									}
-								}
-							}' . "\n";
-                            break;
-                        case 'Radio Button':
-                        case 'Radio Group':
-                            $js .= '
-							for(var i = 0;i < document.ff_form' . $this->processor->form . '.elements.length;i++){
-								if(document.ff_form' . $this->processor->form . '.elements[i].type == "radio" && document.ff_form' . $this->processor->form . '.elements[i].name == "ff_nm_' . $recordEntry->name . '[]" && document.ff_form' . $this->processor->form . '.elements[i].value == ' . json_encode($recordEntry->value) . '){
-									if(typeof JQuery != "undefined" && !JQuery(document.ff_form' . $this->processor->form . '.elements[i]).attr("checked")){
-									    JQuery(document.ff_form' . $this->processor->form . '.elements[i]).click();
-									}
-								}
-							}' . "\n";
-                            break;
-                        case 'Select List':
-                            $js .= 'for(var i = 0; i < document.getElementById("ff_elem' . $recordEntry->element . '").options.length; i++){
-								if(document.getElementById("ff_elem' . $recordEntry->element . '").options[i].value == ' . json_encode($recordEntry->value) . '){
-									if(typeof JQuery != "undefined" && !JQuery(document.getElementById("ff_elem' . $recordEntry->element . '").options[i]).attr("selected")){
-									    JQuery(document.getElementById("ff_elem' . $recordEntry->element . '").options[i]).attr("selected", true).trigger("change");
-									}
-								}
-							}' . "\n";
-                            break;
-                    }
-                }
-
-                echo '
-				<script type="text/javascript">
-                                <!--' . nl() . '
-                                function bfLoadEditable(){
-                                    ' . $js . '
-                                    // legacy seccode removal
-                                    for(var i = 0;i < document.ff_form' . $this->processor->form . '.elements.length;i++){
-                                            if(document.ff_form' . $this->processor->form . '.elements[i].name == "ff_nm_seccode[]"){
-                                                    document.ff_form' . $this->processor->form . '.elements[i].value = "";
-                                            }
-                                    }
-                                }
-                                ' . nl() . '//-->
-				</script>
-				' . nl();
+                echo $this->legacyScriptTagWrapperBuilder()->editableRecord(
+                    (int) $this->processor->form,
+                    $js,
+                    nl()
+                );
             }
         }
 
         // CONTENTBUILDER BEGIN
 
         if ($cbRecord !== null) {
-
-            $cbNonEditableFields = ListSupportService::createFromRuntimeContext()->getListNonEditableElements($cbResult['data']['id']);
-            $cbFlashUploadValidationOverride = '';
-            foreach ($cbRecord as $cbEntry) {
-                if (!in_array($cbEntry->recElementId, $cbNonEditableFields)) {
-
-                    //$cbEntry->recValue = $this->processor->removeDangerousHtml($cbEntry->recValue);
-
-                    /*
-                      $input = $this->processor->app->getInput();
-                      $input->set('cbCleanVar', $cbEntry->recValue);
-                      $cbEntry->recValue = $input->getHtml('cbCleanVar'); */
-
-                    $cbEntry->recValue = InputFilter::getInstance([], [], 1, 1)->clean((string) $cbEntry->recValue, 'html');
-
-                    switch ($cbEntry->recType) {
-                        case 'File Upload':
-                            if (trim($this->processor->formrow->template_code_processed) == 'QuickMode') {
-
-                                if ($cbFlashUploadValidationOverride == '') {
-                                    $cbJs .= '
-                                            function ff_flashupload_not_empty(element, message)
-                                            {
-                                                if(typeof bfSummarizers == "undefined") { alert("Flash upload validation only available in QuickMode!"); return ""}
-                                                if(JQuery("#bfFlashFileQueue"+element.id.split("ff_elem")[1]).html() != "" || cbFlashElemCnt[element.id] != 0 ) return "";
-                                                if (message=="") message = "Please enter "+element.name+".\n";
-                                                ff_validationFocus(element.name);
-                                                return message;
-                                            }
-                                            ';
-                                }
-
-                                $cbOut = '';
-                                $cbFiles = explode("\n", str_replace("\r", "", $cbEntry->recValue));
-                                $i = 0;
-                                $cnt = count($cbFiles);
-                                $cbJs .= '
-                                    cbFlashElemCnt["ff_elem' . $cbEntry->recElementId . '"] = ' . $cnt . ';
-                                ';
-                                $cbDeac = '';
-                                foreach ($cbFiles as $cbFile) {
-                                    if (trim($cbFile)) {
-                                        $displayName = htmlspecialchars(
-                                            basename(ContentbuilderngHelper::contentbuilderng_wordwrap($cbFile->recValue, 150, '<br>', true)),
-                                            ENT_QUOTES,
-                                            'UTF-8'
-                                        );
-                                        $displayName = str_replace('&lt;br&gt;', '<br>', $displayName);
-                                        $cbOut .= '<div><input type=\"checkbox\" onchange=\"bfCheckUploadValidation(\'ff_elem' . $cbEntry->recElementId . '\', this, \'ff_nm_' . $cbEntry->recName . '[]\')\" value=\"1\" name=\"cb_delete_' . $cbEntry->recElementId . '[' . $i . ']\" id=\"cb_delete_' . $cbEntry->recElementId . '_' . $i . '\"/> <label style=\"margin-left: 5px; float: none !important; display: inline !important;\" for=\"cb_delete_' . $cbEntry->recElementId . '_' . $i . '\">' . $displayName . '</label></div>';
-                                        if ($cbDeac == '') {
-                                            $cbDeac = 'bfDeactivateField["ff_nm_' . $cbEntry->recName . '[]"]=true;' . nl();
-                                        }
-                                        $i++;
-                                    }
-                                }
-                                $js .= $cbDeac;
-                                $js .= '
-                                                    if (document.createTextNode){
-                                                        if(!document.getElementById("bfFlashFileQueue' . $cbEntry->recElementId . '")){
-                                                           var mydiv = document.createElement("div");
-                                                           mydiv.innerHTML = "<br/>' . $cbOut . '";
-                                                           JQuery("#ff_elem' . $cbEntry->recElementId . '_files").append(mydiv);
-                                                        } else {
-                                                           var mydiv = document.createElement("div");
-                                                           mydiv.innerHTML = "' . $cbOut . '";
-                                                           mydiv.innerHTML = "<br/>" + mydiv.innerHTML;
-                                                           JQuery("#bfFlashFileQueue' . $cbEntry->recElementId . '").after(mydiv);
-                                                        }
-                                                    }' . nl();
-                            }
-                            break;
-                        case 'Signature':
-
-                            $sig_path = JPATH_SITE . '/media/breezingforms/signatures/';
-
-                            if (strlen($cbEntry->recValue) > 0 && file_exists($sig_path . $cbEntry->recValue)) {
-
-                                $sig_encoded = bf_b64enc(file_get_contents($sig_path . $cbEntry->recValue));
-
-                                $base = 'ba' . 'se' . '64';
-
-                                $js .= '
-										JQuery(document).ready(function(){
-											if(typeof bf_signaturePad' . $cbEntry->recElementId . ' != "undefined"){
-												if(' . (strlen($sig_encoded) > 0 ? 'true' : 'false') . '){
-													JQuery("[name=\"ff_nm_' . $cbEntry->recName . '[]\"]").val(' . json_encode('data:image/png;' . $base . ',' . $sig_encoded) . ')
-													bf_signaturePad' . $cbEntry->recElementId . '.fromDataURL(' . json_encode('data:image/png;' . $base . ',' . $sig_encoded) . ');
-												}
-											}
-										});';
-                            }
-                            break;
-                        case 'Textarea':
-                        case 'Text':
-                        case 'Number Input':
-                        case 'Hidden Input':
-                        case 'Calendar':
-
-                            /*
-                              if($cbEntry->recType == 'Textarea'){
-
-                              $dataObject = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
-                              $qmelement = $this->processor->findQuickModeElement($dataObject, $cbEntry->recName);
-
-                              if(isset($cbEntry->recValue) && $qmelement !== null && isset($qmelement['properties']['is_html']) && $qmelement['properties']['is_html']) {
-
-                              $cbEntry->recValue = $this->processor->removeDangerousHtml($cbEntry->recValue);
-                              }
-                              } */
-
-                            if ($cbEntry->recType == 'Calendar') {
-                                $js .= "setTimeout(function(){";
-                            }
-                            $js .= 'if(typeof JQuery != "undefined"){';
-                            $js .= 'JQuery("[name=\"ff_nm_' . $cbEntry->recName . '[]\"]").val(' . json_encode($cbEntry->recValue) . ');if(typeof JQuery != "undefined")JQuery("[name=\"ff_nm_' . $cbEntry->recName . '[]\"]").trigger("change");';
-                            $js .= '}else{if(document.getElementById("ff_elem' . $cbEntry->recElementId . '"))document.getElementById("ff_elem' . $cbEntry->recElementId . '").value=' . json_encode($cbEntry->recValue) . ';if(typeof JQuery != "undefined")JQuery(document.getElementById("ff_elem' . $cbEntry->recElementId . '")).trigger("change");}' . nl();
-                            if ($cbEntry->recType == 'Calendar') {
-                                $js .= "}, 100);";
-                            }
-                            break;
-                        case 'Checkbox':
-                        case 'Checkbox Group':
-                            $cbValues = explode(',', $cbEntry->recValue);
-                            foreach ($cbValues as $cbValue) {
-                                $cbValue = trim($cbValue);
-                                $js .= '
-                                                for(var i = 0;i < document.ff_form' . $this->processor->form . '.elements.length;i++){
-                                                        if(document.ff_form' . $this->processor->form . '.elements[i].type == "checkbox" && document.ff_form' . $this->processor->form . '.elements[i].name == "ff_nm_' . $cbEntry->recName . '[]" && document.ff_form' . $this->processor->form . '.elements[i].value == ' . json_encode($cbValue) . '){
-                                                                if(typeof JQuery != "undefined" && !JQuery(document.ff_form' . $this->processor->form . '.elements[i]).attr("checked")){
-                                                                    JQuery(document.ff_form' . $this->processor->form . '.elements[i]).click();
-                                                                }
-                                                        }
-                                                }' . nl();
-                            }
-                            break;
-                        case 'Radio Button':
-                        case 'Radio Group':
-                            $cbValues = explode(',', $cbEntry->recValue);
-                            foreach ($cbValues as $cbValue) {
-                                $cbValue = trim($cbValue);
-                                $js .= '
-                                                for(var i = 0;i < document.ff_form' . $this->processor->form . '.elements.length;i++){
-                                                        if(document.ff_form' . $this->processor->form . '.elements[i].type == "radio" && document.ff_form' . $this->processor->form . '.elements[i].name == "ff_nm_' . $cbEntry->recName . '[]" && document.ff_form' . $this->processor->form . '.elements[i].value == ' . json_encode($cbValue) . '){
-                                                                if(typeof JQuery != "undefined" && !JQuery(document.ff_form' . $this->processor->form . '.elements[i]).attr("checked")){
-                                                                    JQuery(document.ff_form' . $this->processor->form . '.elements[i]).click();
-                                                                }
-                                                        }
-                                                }' . nl();
-                            }
-                            break;
-                        case 'Select List':
-                            $cbValues = explode(',', $cbEntry->recValue);
-                            foreach ($cbValues as $cbValue) {
-                                $cbValue = trim($cbValue);
-                                $js .= 'for(var i = 0; i < document.getElementById("ff_elem' . $cbEntry->recElementId . '").options.length; i++){
-                                                        if(document.getElementById("ff_elem' . $cbEntry->recElementId . '").options[i].value == ' . json_encode($cbValue) . '){
-                                                                if(typeof JQuery != "undefined" && !JQuery(document.getElementById("ff_elem' . $cbEntry->recElementId . '").options[i]).attr("selected")){
-                                                                    JQuery(document.getElementById("ff_elem' . $cbEntry->recElementId . '").options[i]).attr("selected", true).trigger("change");
-                                                                }
-                                                        }
-                                                }' . nl();
-                            }
-                            break;
-                    }
-                }
-            }
-
-            echo '
-                    <script type="text/javascript">
-                    <!--' . nl() . '
-                    var cbFlashElemCnt = new Array();
-                    function bfCheckUploadValidation(id, obj, deactivatable){
-                        if(obj.checked){
-                            cbFlashElemCnt[id]--;
-                        }else{
-                            cbFlashElemCnt[id]++;
-                        }
-                        if(cbFlashElemCnt[id] == 0){
-                            bfDeactivateField[deactivatable]=false;
-                        }else{
-                            bfDeactivateField[deactivatable]=true;
-                        }
-                    }
-                    ' . $cbJs . '
-                    function bfLoadContentBuilderEditable(){
-                        ' . $js . '
-                        // legacy seccode removal
-                        for(var i = 0;i < document.ff_form' . $this->processor->form . '.elements.length;i++){
-                                if(document.ff_form' . $this->processor->form . '.elements[i].name == "ff_nm_seccode[]"){
-                                        document.ff_form' . $this->processor->form . '.elements[i].value = "";
-                                }
-                        }
-                    }
-                    ' . nl() . '//-->
-                    </script>
-                    ' . nl();
+            $cbNonEditableFields = $this->contentBuilderNonEditableFieldsResolver()->resolve(
+                (int) $cbResult['data']['id']
+            );
+            $scripts = $this->contentBuilderEditableRecordScriptBuilder()->build(
+                $cbRecord,
+                $cbNonEditableFields,
+                trim((string) $this->processor->formrow->template_code_processed) === 'QuickMode',
+                (int) $this->processor->form,
+                JPATH_SITE . '/media/breezingforms/signatures/'
+            );
+            echo $this->legacyScriptTagWrapperBuilder()->contentBuilderEditable(
+                (int) $this->processor->form,
+                $scripts['contentBuilderScript'],
+                $scripts['javascript']
+            );
         }
 
-        $cbNonEditableFields = array();
+            $cbNonEditableFields = array();
         if ($cbForm !== null) {
-            $cbNonEditableFields = ListSupportService::createFromRuntimeContext()->getListNonEditableElements($cbResult['data']['id']);
+            $cbNonEditableFields = $this->contentBuilderNonEditableFieldsResolver()->resolve(
+                (int) $cbResult['data']['id']
+            );
             if (count($cbNonEditableFields)) {
                 $this->processor->app->getDocument()->getWebAssetManager()->addInlineScript('<!--' . nl() . 'var bfDeactivateField = new Array();' . nl() . '//-->');
-                echo '<script type="text/javascript">' . nl();
-                echo '<!--' . nl();
-                echo 'function bfContentBuilderFieldHasVisibleControl(fieldId){' . nl();
-                echo 'var wrap = JQuery("#bfElemWrap" + fieldId);' . nl();
-                echo 'if(!wrap.length){ return false; }' . nl();
-                echo 'var hasVisibleControl = false;' . nl();
-                echo 'wrap.find(".ff_elem").each(function(){' . nl();
-                echo 'if(typeof this.type != "undefined" && this.type != "hidden"){ hasVisibleControl = true; return false; }' . nl();
-                echo '});' . nl();
-                echo 'return hasVisibleControl;' . nl();
-                echo '}' . nl();
-                echo 'function bfDisableContentBuilderFields(){' . nl();
-            }
-            foreach ($cbNonEditableFields as $cbNonEditableField) {
-                echo 'if(typeof document.getElementById("ff_elem' . $cbNonEditableField . '").disabled != "undefined"){' . nl();
-                echo 'bfCbMainElement = document.getElementById("ff_elem' . $cbNonEditableField . '");' . nl();
-                echo 'bfCbRespectReadonly = (bfCbMainElement && typeof bfCbMainElement.readOnly != "undefined" && bfCbMainElement.readOnly);' . nl();
-                echo 'bfCbName = document.getElementById("ff_elem' . $cbNonEditableField . '").name;' . nl();
-                echo 'if(typeof document.getElementsByName != "undefined"){' . nl();
-                echo 'bfCbElements = document.getElementsByName(bfCbName);' . nl();
-                echo 'for(var i = 0; i < bfCbElements.length; i++){' . nl();
-                echo 'if(typeof bfCbElements[i].disabled != "undefined" && !bfCbRespectReadonly){' . nl();
-                echo 'bfCbElements[i].disabled = true;' . nl();
-                echo '}' . nl();
-                echo 'bfDeactivateField[bfCbName]=true;' . nl();
-                echo 'if(typeof JQuery != "undefined" && !bfContentBuilderFieldHasVisibleControl("' . $cbNonEditableField . '")){ JQuery("#bfElemWrap' . $cbNonEditableField . '").css("display", "none"); }' . nl();
-                echo '}' . nl();
-                echo '}else{' . nl();
-                echo 'if(!bfCbRespectReadonly){ document.getElementById("ff_elem' . $cbNonEditableField . '").disabled = true; }' . nl();
-                echo 'bfDeactivateField[bfCbName]=true;' . nl();
-                echo 'if(typeof JQuery != "undefined" && !bfContentBuilderFieldHasVisibleControl("' . $cbNonEditableField . '")){ JQuery("#bfElemWrap' . $cbNonEditableField . '").css("display", "none"); }' . nl();
-                echo '}' . nl();
-                echo '}' . nl();
-            }
-            if (count($cbNonEditableFields)) {
-                echo '}' . nl();
-                echo '//-->' . nl();
-                echo '</script>' . nl();
+                echo $this->legacyScriptTagWrapperBuilder()->contentBuilderReadonly(
+                    $this->contentBuilderReadonlyScriptBuilder()->build($cbNonEditableFields),
+                    nl()
+                );
             }
         }
 
@@ -1205,35 +860,31 @@ final class RenderingEngine
 
         if (trim($this->processor->formrow->template_code_processed) == '') {
 
-            // fixing J3 css
-            $this->processor->app->getDocument()->getWebAssetManager()->addInlineStyle(
-                '
-             .bfFormDiv input[type=checkbox][id^="ff_elem"], input[type=radio][id^="ff_elem"]{
-                vertical-align: text-bottom;
-             }
-             .bfFormDiv input[type=checkbox][id^="ff_elem"] + [id^="ff_lbl"], input[type=radio][id^="ff_elem"] + [id^="ff_lbl"]{
-                display: inline;
-                vertical-align: text-top;
-             }
-             '
-            );
-
             for ($i = 0; $i < $this->processor->rowcount; $i++) {
                 $row = &$this->processor->rows[$i];
+                $data1 = '';
+                $data2 = '';
+                $data3 = '';
                 if (!is_numeric($row->width))
                     $row->width = 0;
                 if (!is_numeric($row->height))
                     $row->height = 0;
                 if ($row->type != 'Query List') {
                     $data1 = $this->processor->replaceCode($row->data1, "data1 of $row->name", 'e', $row->id, 0);
-                    if ($this->processor->bury())
+                    if ($this->processor->bury()) {
+                        $this->abortViewRendering();
                         return;
+                    }
                     $data2 = $this->processor->replaceCode($row->data2, "data2 of $row->name", 'e', $row->id, 0);
-                    if ($this->processor->bury())
+                    if ($this->processor->bury()) {
+                        $this->abortViewRendering();
                         return;
+                    }
                     $data3 = $this->processor->replaceCode($row->data3, "data3 of $row->name", 'e', $row->id, 0);
-                    if ($this->processor->bury())
+                    if ($this->processor->bury()) {
+                        $this->abortViewRendering();
                         return;
+                    }
                 } // if
                 $attribs = 'position:absolute;z-index:' . $i . ';';
                 if ($row->posx >= 0)
@@ -1293,453 +944,288 @@ final class RenderingEngine
                     $attribs .= 'visibility:hidden;';
                 switch ($row->type) {
                     case 'Static Text/HTML':
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . $data1 . '</div>' . nl();
+                        echo $this->classicStaticTextBuilder()->build(
+                            (int) $row->id,
+                            $attribs,
+                            $class1,
+                            $data1,
+                            indentc(1),
+                            nl()
+                        );
                         break;
                     case 'Rectangle':
-                        if ($data1 != '')
-                            $attribs .= 'border:' . $data1 . ';';
-                        if ($data2 != '')
-                            $attribs .= 'background-color:' . $data2 . ';';
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="font-size:0px;' . $attribs . '"' . $class1 . '></div>' . nl();
+                        echo $this->classicStaticTextBuilder()->buildRectangle(
+                            (int) $row->id,
+                            $attribs,
+                            $class1,
+                            $data1,
+                            $data2,
+                            indentc(1),
+                            nl()
+                        );
                         break;
                     case 'Image':
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
-                        $attribs = '';
-                        if ($row->width > 0)
-                            $attribs .= 'width="' . $row->width . '" ';
-                        if ($row->height > 0)
-                            $attribs .= 'height="' . $row->height . '" ';
-                        echo indentc(2) . '<img id="ff_elem' . $row->id . '" src="' . $data1 . '"  alt="' . $data2 . '" border="0" ' . $attribs . $class2 . '/>' . nlc();
-                        echo indentc(1) . '</div>' . nl();
+                        echo $this->classicStaticTextBuilder()->buildImage(
+                            (int) $row->id,
+                            $attribs,
+                            $class1,
+                            $class2,
+                            $data1,
+                            $data2,
+                            (int) $row->width,
+                            (int) $row->height,
+                            indentc(1),
+                            nlc() ?? ''
+                        );
                         break;
                     case 'Tooltip':
-                        $tooltipTitle = '<strong>' . htmlspecialchars(strip_tags(trim((string) $row->title)), ENT_QUOTES, 'UTF-8') . '</strong><br />' . str_replace(
-                            ["\n", "\r"],
-                            ["", ""],
-                            htmlentities(trim((string) $data2), ENT_QUOTES, 'UTF-8')
+                        echo $this->classicStaticTextBuilder()->buildTooltip(
+                            (int) $row->id,
+                            $attribs,
+                            $class1,
+                            $class2,
+                            (string) $row->title,
+                            $data2,
+                            $data1,
+                            (int) $row->flag1,
+                            $ff_mossite,
+                            indentc(1),
+                            nlc() ?? ''
                         );
-                        $tooltipClass = $class1 !== ''
-                            ? str_replace(' class="', ' class="hasTooltip ', $class1)
-                            : ' class="hasTooltip"';
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '" title="' . $tooltipTitle . '"' . $tooltipClass . '>' . nlc();
-                        switch ($row->flag1) {
-                            case 0:
-                                $url = $ff_mossite . '/media/com_breezingformsng/images/site/tooltip.png';
-                                break;
-                            case 1:
-                                $url = $ff_mossite . '/media/com_breezingformsng/images/site/warning.png';
-                                break;
-                            default:
-                                $url = $data1;
-                        } // switch
-                        echo indentc(2) . '<img src="' . $url . '" alt="" border="0"' . $class2 . '/>' . nlc();
-                        echo indentc(1) . '</div>' . nl();
                         break;
                     case 'Hidden Input':
-                        echo indentc(1) . '<input id="ff_elem' . $row->id . '" type="hidden" name="ff_nm_' . $row->name . '[]" value="' . $data1 . '" />' . nl();
+                        echo $this->classicHiddenInputBuilder()->build(
+                            (int) $row->id,
+                            (string) $row->name,
+                            $data1,
+                            indentc(1),
+                            nl()
+                        );
                         break;
                     case 'Checkbox':
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
-                        $attribs = '';
-                        if ($row->flag1)
-                            $attribs .= ' checked="checked"';
-                        if ($row->flag2)
-                            $attribs .= ' disabled="disabled"';
-                        $attribs .= $this->processor->script2clause($row);
-                        echo indentc(2) . '<input id="ff_elem' . $row->id . '" type="checkbox" name="ff_nm_' . $row->name . '[]" value="' . $data1 . '"' . $attribs . $class2 . '/><label id="ff_lbl' . $row->id . '" for="ff_elem' . $row->id . '"> ' . $data2 . '</label>' . nlc();
-                        echo indentc(1) . '</div>' . nl();
+                        echo $this->classicChoiceBuilder()->build(
+                            'checkbox',
+                            (int) $row->id,
+                            (string) $row->name,
+                            $data1,
+                            $data2,
+                            $attribs,
+                            $class1,
+                            $class2,
+                            (bool) $row->flag1,
+                            (bool) $row->flag2,
+                            $this->processor->script2clause($row),
+                            indentc(1),
+                            nlc() ?? ''
+                        );
                         break;
                     case 'Radio Button':
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
-                        $attribs = '';
-                        if ($row->flag1)
-                            $attribs .= ' checked="checked"';
-                        if ($row->flag2)
-                            $attribs .= ' disabled="disabled"';
-                        $attribs .= $this->processor->script2clause($row);
-                        echo indentc(2) . '<input id="ff_elem' . $row->id . '" type="radio" name="ff_nm_' . $row->name . '[]" value="' . $data1 . '"' . $attribs . $class2 . '/><label id="ff_lbl' . $row->id . '" for="ff_elem' . $row->id . '"> ' . $data2 . '</label>' . nlc();
-                        echo indentc(1) . '</div>' . nl();
+                        echo $this->classicChoiceBuilder()->build(
+                            'radio',
+                            (int) $row->id,
+                            (string) $row->name,
+                            $data1,
+                            $data2,
+                            $attribs,
+                            $class1,
+                            $class2,
+                            (bool) $row->flag1,
+                            (bool) $row->flag2,
+                            $this->processor->script2clause($row),
+                            indentc(1),
+                            nlc() ?? ''
+                        );
                         break;
                     case 'Regular Button':
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
-                        $attribs = '';
-                        if ($row->flag2)
-                            $attribs .= ' disabled="disabled"';
-                        $attribs .= $this->processor->script2clause($row);
-                        echo indentc(2) . '<input id="ff_elem' . $row->id . '" type="button" name="ff_nm_' . $row->name . '" value="' . $data2 . '"' . $attribs . $class2 . '/>' . nlc();
-                        echo indentc(1) . '</div>' . nl();
+                        echo $this->classicRegularButtonBuilder()->build(
+                            (int) $row->id,
+                            (string) $row->name,
+                            $data2,
+                            $attribs,
+                            $class1,
+                            $class2,
+                            (bool) $row->flag2,
+                            $this->processor->script2clause($row),
+                            indentc(1),
+                            nlc() ?? ''
+                        );
                         break;
                     case 'Graphic Button':
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
-                        $attribs = '';
-                        if ($row->flag2)
-                            $attribs .= ' disabled="disabled"';
-                        $attribs .= $this->processor->script2clause($row);
-                        echo indentc(2) . '<button id="ff_elem' . $row->id . '" type="button" name="ff_nm_' . $row->name . '" value="' . $data2 . '"' . $attribs . $class2 . '>' . nlc();
-                        $attribs = '';
-                        if ($row->width > 0)
-                            $attribs .= 'width="' . $row->width . '" ';
-                        if ($row->height > 0)
-                            $attribs .= 'height="' . $row->height . '" ';
-                        switch ($row->flag1) {
-                            case 0: // none
-                                echo indentc(3) . '<table cellpadding="0" cellspacing="6" border="0">' . nlc();
-                                echo indentc(4) . '<tr><td>' . nlc();
-                                echo indentc(5) . '<img id="ff_img' . $row->id . '" src="' . $data1 . '"  alt="' . $data2 . '" border="0" ' . $attribs . '/>' . nlc();
-                                echo indentc(4) . '</td></tr>' . nlc();
-                                echo indentc(3) . '</table>' . nlc();
-                                break;
-                            case 1: // below
-                                echo indentc(3) . '<table cellpadding="0" cellspacing="6" border="0">' . nlc();
-                                echo indentc(4) . '<tr><td nowrap style="text-align:center">' . nlc();
-                                echo indentc(5) . '<img id="ff_img' . $row->id . '" src="' . $data1 . '" alt="" border="0" ' . $attribs . '/><br/>' . nlc();
-                                echo indentc(5) . $data2 . nlc();
-                                echo indentc(4) . '</td></tr>' . nlc();
-                                echo indentc(3) . '</table>' . nlc();
-                                break;
-                            case 2: // above
-                                echo indentc(3) . '<table cellpadding="0" cellspacing="6" border="0">' . nlc();
-                                echo indentc(4) . '<tr><td nowrap style="text-align:center">' . nlc();
-                                echo indentc(5) . $data2 . '<br/>' . nlc();
-                                echo indentc(5) . '<img id="ff_img' . $row->id . '" src="' . $data1 . '" alt="" border="0" ' . $attribs . '/>' . nlc();
-                                echo indentc(4) . '</td></tr>' . nlc();
-                                echo indentc(3) . '</table>.nlc()';
-                                break;
-                            case 3: // left
-                                echo indentc(3) . '<table cellpadding="0" cellspacing="6" border="0">' . nlc();
-                                echo indentc(4) . '<tr>' . nlc();
-                                echo indentc(5) . '<td>' . $data2 . '</td>' . nlc();
-                                echo indentc(5) . '<td><img id="ff_img' . $row->id . '" src="' . $data1 . '" alt="" border="0" ' . $attribs . '/></td>' . nlc();
-                                echo indentc(4) . '</tr>' . nlc();
-                                echo indentc(3) . '</table>' . nlc();
-                                break;
-                            default: // assume right
-                                echo indentc(3) . '<table cellpadding="0" cellspacing="6" border="0">' . nlc();
-                                echo indentc(4) . '<tr>' . nlc();
-                                echo indentc(5) . '<td><img id="ff_img' . $row->id . '" src="' . $data1 . '" alt="" border="0" ' . $attribs . '/></td>' . nlc();
-                                echo indentc(5) . '<td>' . $data2 . '</td>' . nlc();
-                                echo indentc(4) . '</tr>' . nlc();
-                                echo indentc(3) . '</table>' . nlc();
-                                break;
-                        } // switch
-                        echo indentc(2) . '</button>' . nlc();
-                        echo indentc(1) . '</div>' . nl();
+                        echo $this->classicGraphicButtonBuilder()->build(
+                            (int) $row->id,
+                            (string) $row->name,
+                            $data1,
+                            $data2,
+                            $attribs,
+                            $class1,
+                            $class2,
+                            (int) $row->width,
+                            (int) $row->height,
+                            (bool) $row->flag2,
+                            $this->processor->script2clause($row),
+                            (int) $row->flag1,
+                            indentc(1),
+                            nlc() ?? ''
+                        );
                         break;
                     case 'Icon':
-                        if ($row->flag2)
-                            echo indentc(1) . '<div id="ff_div' . $row->id . '" onmouseout="ff_hideIconBorder(this);" onmouseover="ff_dispIconBorder(this);" style="padding:3px;' . $attribs . '"' . $class1 . '>' . nlc();
-                        else
-                            echo indentc(1) . '<div id="ff_div' . $row->id . '"  style="' . $attribs . '"' . $class1 . '>' . nlc();
-                        $swap = '';
-                        if ($data3 != '')
-                            $swap = 'onmouseout="MM_swapImgRestore();" onmouseover="MM_swapImage(\'ff_img' . $row->id . '\',\'\',\'' . $data3 . '\',1);" ';
-
-                        $swap .= $this->processor->script2clause($row);
-                        $attribs = '';
-                        if ($row->width > 0)
-                            $attribs .= 'width="' . $row->width . '" ';
-                        if ($row->height > 0)
-                            $attribs .= 'height="' . $row->height . '" ';
-                        switch ($row->flag1) {
-                            case 0: // none
-                                echo indentc(2) . '<span id="ff_elem' . $row->id . '" ' . $swap . '>' . nlc();
-                                echo indentc(3) . '<img id="ff_img' . $row->id . '" src="' . $data1 . '" alt="" border="0" align="middle" ' . $attribs . $class2 . '/>' . nlc();
-                                echo indentc(2) . '</span>' . nlc();
-                                break;
-                            case 1: // below
-                                echo indentc(2) . '<table id="ff_elem' . $row->id . '" cellpadding="1" cellspacing="0" border="0" ' . $swap . '>' . nlc();
-                                echo indentc(3) . '<tr><td style="text-align:center;"><img id="ff_img' . $row->id . '" src="' . $data1 . '" alt="" border="0" align="middle" ' . $attribs . $class2 . '/></td></tr>' . nlc();
-                                echo indentc(3) . '<tr><td style="text-align:center;">' . $data2 . '</td></tr>' . nlc();
-                                echo indentc(2) . '</table>' . nlc();
-                                break;
-                            case 2: // above
-                                echo indentc(2) . '<table id="ff_elem' . $row->id . '" cellpadding="2" cellspacing="0" border="0" ' . $swap . '>' . nlc();
-                                echo indentc(3) . '<tr><td style="text-align:center;">' . $data2 . '</td></tr>' . nlc();
-                                echo indentc(3) . '<tr><td style="text-align:center;"><img id="ff_img' . $row->id . '" src="' . $data1 . '" alt="" border="0" align="middle" ' . $attribs . $class2 . '/></td></tr>' . nlc();
-                                echo indentc(2) . '</table>' . nlc();
-                                break;
-                            case 3: // left
-                                echo indentc(2) . '<span id="ff_elem' . $row->id . '" ' . $swap . ' style="vertical-align:middle;">' . nlc();
-                                echo indentc(3) . $data2 . ' &nbsp;<img id="ff_img' . $row->id . '" src="' . $data1 . '" alt="" border="0" align="middle" ' . $attribs . $class2 . '/>' . nlc();
-                                echo indentc(2) . '</span>' . nlc();
-                                break;
-                            default: // assume right
-                                echo indentc(2) . '<span id="ff_elem' . $row->id . '" ' . $swap . ' style="vertical-align:middle;">' . nlc();
-                                echo indentc(3) . '<img id="ff_img' . $row->id . '" src="' . $data1 . '" alt="" border="0" align="middle" ' . $attribs . $class2 . '/>&nbsp; ' . $data2 . nlc();
-                                echo indentc(2) . '</span>' . nlc();
-                                break;
-                        } // switch
-                        echo indentc(1) . '</div>' . nl();
+                        echo $this->classicStaticTextBuilder()->buildIcon(
+                            (int) $row->id,
+                            $attribs,
+                            $class1,
+                            $class2,
+                            $data1,
+                            $data2,
+                            $data3,
+                            $this->processor->script2clause($row),
+                            (int) $row->flag1,
+                            (bool) $row->flag2,
+                            (int) $row->width,
+                            (int) $row->height,
+                            indentc(1),
+                            nlc() ?? ''
+                        );
                         break;
                     case 'Select List':
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
-                        $attribs = '';
-                        $styles = '';
-                        if ($row->width > 0)
-                            $styles .= 'width:' . $row->width . 'px;';
-                        if ($row->height > 0)
-                            $styles .= 'height:' . $row->height . 'px;';
-                        if ($row->flag1)
-                            $attribs .= ' multiple="multiple"';
-                        if ($row->flag2)
-                            $attribs .= ' disabled="disabled"';
-                        $attribs .= $this->processor->script2clause($row);
-                        if ($data1 != '')
-                            $attribs .= ' size="' . $data1 . '"';
-                        if ($styles != '')
-                            $attribs .= ' style="' . $styles . '"';
-                        echo indentc(2) . '<select id="ff_elem' . $row->id . '" name="ff_nm_' . $row->name . '[]" ' . $attribs . $class2 . '>' . nlc();
-                        $options = explode('\n', preg_replace('/([\\r\\n])/s', '\n', $data2));
-                        $cnt = count($options);
-                        for ($o = 0; $o < $cnt; $o++) {
-                            $opt = explode(";", $options[$o]);
-                            $selected = '';
-                            switch (count($opt)) {
-                                case 0:
-                                    break;
-                                case 1:
-                                    if ($this->processor->trim($opt[0])) {
-                                        $selected = '0';
-                                        $value = $text = $opt[0];
-                                    } // if
-                                    break;
-                                case 2:
-                                    $selected = $opt[0];
-                                    $value = $text = $opt[1];
-                                    break;
-                                default:
-                                    $selected = $opt[0];
-                                    $text = $opt[1];
-                                    $value = $opt[2];
-                            } // switch
-                            if ($this->processor->trim($selected)) {
-                                $attribs = '';
-                                if ($this->processor->trim($value) != '') {
-                                    if ($value == '""' || $value == "''")
-                                        $value = '';
-                                    $attribs .= ' value="' . htmlspecialchars($value, ENT_QUOTES) . '"';
-                                } // if
-                                if ($selected == 1)
-                                    $attribs .= ' selected="selected"';
-                                echo indentc(3) . '<option' . $attribs . '>' . htmlspecialchars(trim($text), ENT_QUOTES) . '</option>' . nlc();
-                            } // if
-                        } // for
-                        echo indentc(2) . '</select>' . nlc();
-                        echo indentc(1) . '</div>' . nl();
+                        echo $this->classicSelectBuilder()->build(
+                            (int) $row->id,
+                            (string) $row->name,
+                            $attribs,
+                            $class1,
+                            $class2,
+                            (string) $data1,
+                            $data2,
+                            (int) $row->width,
+                            (int) $row->height,
+                            (bool) $row->flag1,
+                            (bool) $row->flag2,
+                            $this->processor->script2clause($row),
+                            indentc(1),
+                            nlc() ?? ''
+                        );
                         break;
                     case 'Text':
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
-                        $attribs = '';
-                        if ($row->width > 0) {
-                            if ($row->widthmode > 0)
-                                $attribs .= ' style="width:' . $row->width . 'px;"';
-                            else
-                                $attribs .= ' size="' . $row->width . '"';
-                        } // if
-                        if ($row->height > 0)
-                            $attribs .= ' maxlength="' . $row->height . '"';
-                        if ($row->flag1)
-                            $attribs .= ' type="password"';
-                        else
-                            $attribs .= ' type="text"';
-                        switch ($row->flag2) {
-                            case 1:
-                                $attribs .= ' disabled="disabled"';
-                                break;
-                            case 2:
-                                $attribs .= ' readonly="readonly"';
-                                break;
-                            default:
-                                break;
-                        } // switch
-                        $attribs .= $this->processor->script2clause($row);
-                        echo indentc(2) . '<input id="ff_elem' . $row->id . '"' . $attribs . ' name="ff_nm_' . $row->name . '[]" value="' . $data1 . '"' . $class2 . '/>' . nlc();
-                        echo indentc(1) . '</div>' . nl();
+                        echo $this->classicTextInputBuilder()->build(
+                            (int) $row->id,
+                            (string) $row->name,
+                            $data1,
+                            $attribs,
+                            $class1,
+                            $class2,
+                            (int) $row->width,
+                            (int) $row->widthmode,
+                            (int) $row->height,
+                            (bool) $row->flag1,
+                            (int) $row->flag2,
+                            $this->processor->script2clause($row),
+                            indentc(1),
+                            nlc() ?? ''
+                        );
                         break;
                     case 'Textarea':
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
-                        $attribs = '';
-                        $styles = '';
-                        switch ($row->flag2) {
-                            case 1:
-                                $attribs .= ' disabled="disabled"';
-                                break;
-                            case 2:
-                                $attribs .= ' readonly="readonly"';
-                                break;
-                            default:
-                                break;
-                        } // switch
-                        if ($row->width > 0) {
-                            if ($row->widthmode > 0)
-                                $styles .= 'width:' . $row->width . 'px;';
-                            else
-                                $attribs .= ' cols="' . $row->width . '"';
-                        } // if
-                        if ($row->height > 0) {
-                            if ($row->heightmode > 0)
-                                $styles .= 'height:' . $row->height . 'px;';
-                            else {
-                                $height = $row->height;
-                                if ($height > 1 && stristr($this->processor->browser, 'mozilla'))
-                                    $height--;
-                                $attribs .= ' rows="' . $height . '"';
-                            } // if
-                        } // if
-                        if ($styles != '')
-                            $attribs .= ' style="' . $styles . '"';
-                        $attribs .= $this->processor->script2clause($row);
-                        echo indentc(2) . '<textarea id="ff_elem' . $row->id . '" name="ff_nm_' . $row->name . '[]"' . $attribs . $class2 . '>' . $data1 . '</textarea>' . nlc();
-                        echo indentc(1) . '</div>' . nl();
+                        echo $this->classicTextareaBuilder()->build(
+                            (int) $row->id,
+                            (string) $row->name,
+                            $data1,
+                            $attribs,
+                            $class1,
+                            $class2,
+                            (int) $row->width,
+                            (int) $row->widthmode,
+                            (int) $row->height,
+                            (int) $row->heightmode,
+                            stristr($this->processor->browser, 'mozilla') !== false,
+                            (int) $row->flag2,
+                            $this->processor->script2clause($row),
+                            indentc(1),
+                            nlc() ?? ''
+                        );
                         break;
                     case 'File Upload':
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
-                        $attribs = '';
-                        if ($row->width > 0)
-                            $attribs .= ' size="' . $row->width . '"';
-                        if ($row->height > 0)
-                            $attribs .= ' maxlength="' . $row->height . '"';
-                        if ($row->flag2)
-                            $attribs .= ' disabled="disabled"';
-                        if ($row->data2 != '')
-                            $attribs .= ' accept="' . $data2 . '"';
-                        $attribs .= $this->processor->script2clause($row);
-                        echo indentc(2) . '<input id="ff_elem' . $row->id . '"' . $attribs . ' type="file" name="ff_nm_' . $row->name . '[]"' . $class2 . '/>' . nlc();
-                        echo indentc(1) . '</div>' . nl();
+                        echo $this->classicFileUploadBuilder()->build(
+                            (int) $row->id,
+                            (string) $row->name,
+                            $attribs,
+                            $class1,
+                            $class2,
+                            (int) $row->width,
+                            (int) $row->height,
+                            (bool) $row->flag2,
+                            $row->data2 !== '' ? $data2 : '',
+                            $this->processor->script2clause($row),
+                            indentc(1),
+                            nlc() ?? ''
+                        );
                         break;
                     case 'Captcha':
-                        $captcha_url = Uri::root(true)
-                            . ($this->processor->app->isClient('administrator') ? '/administrator' : '')
-                            . '/index.php?option=com_breezingformsng&bfCaptcha=1';
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
-                        $attribs = '';
-                        if ($row->width > 0)
-                            $attribs .= 'width:' . $row->width . 'px;';
-                        if ($row->height > 0)
-                            $attribs .= 'height:' . $row->height . 'px;';
-                        echo '<img id="ff_capimgValue" class="ff_capimg" src="' . $captcha_url . '"/>';
-                        echo '<br/>';
-                        echo '<input type="text" style="' . $attribs . '" name="bfCaptchaEntry" id="bfCaptchaEntry" />';
-                        //echo '<br/>';
-                        echo '<a href="#" onclick="document.getElementById(\'bfCaptchaEntry\').value=\'\';document.getElementById(\'bfCaptchaEntry\').focus();document.getElementById(\'ff_capimgValue\').src = \'' . $captcha_url . '&bfMathRandom=\' + Math.random(); return false"><img src="' . Uri::root() . 'media/com_breezingformsng/images/site/captcha/refresh-captcha.png" border="0" /></a>';
-                        echo indentc(1) . '</div>' . nl();
+                        $captcha_url = $this->captchaSupportBuilder()->endpoints(
+                            Uri::root(true),
+                            $this->processor->app->isClient('administrator'),
+                            (int) $this->processor->form
+                        )['captcha'];
+                        echo $this->classicCaptchaBuilder()->build(
+                            (int) $row->id,
+                            $attribs,
+                            $class1,
+                            $captcha_url,
+                            Uri::root(),
+                            (int) $row->width,
+                            (int) $row->height,
+                            indentc(1),
+                            nlc() ?? '',
+                            nl()
+                        );
                         break;
                     case 'Query List':
-                        echo indentc(1) . '<div id="ff_div' . $row->id . '" style="' . $attribs . '"' . $class1 . '>' . nlc();
-
-                        // unpack settings
-                        $settings = explode("\n", $row->data1);
-                        $scnt = count($settings);
-                        for ($s = 0; $s < $scnt; $s++)
-                            $this->processor->trim($settings[$s]);
-                        $trhclass = '';
-                        $tr1class = '';
-                        $tr2class = '';
-                        $trfclass = '';
-                        $tdfclass = '';
-                        $pagenav = 1;
-                        $attribs = '';
-                        if ($scnt > 0 && $settings[0] != '')
-                            $attribs .= ' border="' . $settings[0] . '"';
-                        if ($scnt > 1 && $settings[1] != '')
-                            $attribs .= ' cellspacing="' . $settings[1] . '"';
-                        if ($scnt > 2 && $settings[2] != '')
-                            $attribs .= ' cellpadding="' . $settings[2] . '"';
-                        if ($scnt > 3 && $settings[3] != '')
-                            $trhclass = ' class="' . $this->processor->getClassName($settings[3]) . '"';
-                        if ($scnt > 4 && $settings[4] != '')
-                            $tr1class = ' class="' . $this->processor->getClassName($settings[4]) . '"';
-                        if ($scnt > 5 && $settings[5] != '')
-                            $tr2class = ' class="' . $this->processor->getClassName($settings[5]) . '"';
-                        if ($scnt > 6 && $settings[6] != '')
-                            $trfclass = ' class="' . $this->processor->getClassName($settings[6]) . '"';
-                        if ($scnt > 7 && $settings[7] != '')
-                            $tdfclass = ' class="' . $this->processor->getClassName($settings[7]) . '"';
-                        if ($scnt > 8 && $settings[8] != '')
-                            $pagenav = $settings[8];
-
-                        if ($row->width > 0)
-                            $attribs .= ' width="100%"';
+                        $wrapperStyle = $attribs;
+                        $queryListSettings = $this->classicQueryListSettingsBuilder()->build(
+                            (string) $row->data1,
+                            (int) $row->width,
+                            fn (string $class): string => $this->processor->getClassName($class)
+                        );
+                        $trhclass = $queryListSettings['headerClass'];
+                        $tr1class = $queryListSettings['oddClass'];
+                        $tr2class = $queryListSettings['evenClass'];
+                        $trfclass = $queryListSettings['footerClass'];
+                        $tdfclass = $queryListSettings['footerCellClass'];
+                        $pagenav = $queryListSettings['pageNavigation'];
 
                         // display 1st page of table
-                        echo indentc(2) . '<table id="ff_elem' . $row->id . '"' . $attribs . $class2 . '>' . nl();
+                        echo $this->classicQueryListMarkupBuilder()->open(
+                            (int) $row->id,
+                            $wrapperStyle,
+                            $class1,
+                            $queryListSettings['tableAttributes'],
+                            $class2,
+                            indentc(1),
+                            indentc(2),
+                            nlc() ?? '',
+                            nl()
+                        );
 
                         $cols = &$this->processor->queryCols['ff_' . $row->id];
                         $colcnt = count($cols);
 
                         // display header
                         if ($row->flag1) {
-                            echo indentc(3) . '<tr' . $trhclass . '>' . nlc();
-                            $skip = 0;
-                            for ($c = 0; $c < $colcnt; $c++)
-                                if ($skip > 0)
-                                    $skip--;
-                                else {
-                                    $col = &$cols[$c];
-                                    if ($col->thspan > 0) {
-                                        $attribs = '';
-                                        $style = '';
-                                        switch ($col->thalign) {
-                                            case 1:
-                                                $style .= 'text-align:left;';
-                                                break;
-                                            case 2:
-                                                $style .= 'text-align:center;';
-                                                break;
-                                            case 3:
-                                                $style .= 'text-align:right;';
-                                                break;
-                                            case 4:
-                                                $style .= 'text-align:justify;';
-                                                break;
-                                            default:
-                                                ;
-                                        } // switch
-                                        switch ($col->thvalign) {
-                                            case 1:
-                                                $attribs .= ' valign="top"';
-                                                break;
-                                            case 2:
-                                                $attribs .= ' valign="middle"';
-                                                break;
-                                            case 3:
-                                                $attribs .= ' valign="bottom"';
-                                                break;
-                                            case 4:
-                                                $attribs .= ' valign="baseline"';
-                                                break;
-                                            default:
-                                                ;
-                                        } // switch
-                                        if ($col->thwrap == 1)
-                                            $attribs .= ' nowrap="nowrap"';
-                                        if ($col->thspan > 1) {
-                                            $attribs .= ' colspan="' . $col->thspan . '"';
-                                            $skip = $col->thspan - 1;
-                                        } // if
-                                        if ($col->class1 != '')
-                                            $attribs .= ' class="' . $this->processor->getClassName($col->class1) . '"';
-                                        if (intval($col->width) > 0 && !$skip) {
-                                            $style .= 'width:' . $col->width;
-                                            if ($col->widthmd)
-                                                $style .= '%;';
-                                            else
-                                                $style .= 'px;';
-                                        } // if
-                                        if ($style != '')
-                                            $attribs .= ' style="' . $style . '"';
-                                        if ($c == 0 && $row->flag2 > 0) {
-                                            if ($row->flag2 == 1)
-                                                echo indentc(4) . '<th' . $attribs . '><input type="checkbox" id="ff_cb' . $row->id . '" onclick="ff_selectAllQueryRows(' . $row->id . ',this.checked);" /></th>' . nlc();
-                                            else
-                                                echo indentc(4) . '<th' . $attribs . '></th>' . nlc();
-                                        } else
-                                            echo indentc(4) . '<th' . $attribs . '>' . $this->processor->replaceCode($col->title, Text::_('COM_BREEZINGFORMSNG_PROCESS_QTITLEOF') . " $row->name::$col->name", 'e', $row->id, 2) . '</th>' . nlc();
-                                    } // if
-                                    unset($col);
-                                } // if
-                            echo indentc(3) . '</tr>' . nl();
-                        } // if
+                            echo $this->classicQueryListHeaderBuilder()->build(
+                                $cols,
+                                (int) $row->id,
+                                (int) $row->flag2,
+                                $trhclass,
+                                fn (string $class): string => $this->processor->getClassName($class),
+                                fn (object $column): string => $this->processor->replaceCode(
+                                    $column->title,
+                                    Text::_('COM_BREEZINGFORMSNG_PROCESS_QTITLEOF') . " $row->name::$column->name",
+                                    'e',
+                                    $row->id,
+                                    2
+                                ),
+                                indentc(3),
+                                indentc(4),
+                                nlc() ?? ''
+                            );
+                        }
                         // display data rows
                         $qrows = &$this->processor->queryRows['ff_' . $row->id];
                         $qcnt = count($qrows);
@@ -1748,91 +1234,32 @@ final class RenderingEngine
                             $qcnt = $row->height;
                         for ($q = 0; $q < $qcnt; $q++) {
                             $qrow = &$qrows[$q];
-                            if ($k == 1)
-                                $cl = $tr1class;
-                            else
-                                $cl = $tr2class;
-                            echo indentc(3) . '<tr' . $cl . '>' . nlc();
-                            $skip = 0;
-                            for ($c = 0; $c < $colcnt; $c++) {
-                                $col = &$cols[$c];
-                                if ($col->thspan > 0) {
-                                    $attribs = '';
-                                    $style = '';
-                                    switch ($col->align) {
-                                        case 1:
-                                            $style .= 'text-align:left;';
-                                            break;
-                                        case 2:
-                                            $style .= 'text-align:center;';
-                                            break;
-                                        case 3:
-                                            $style .= 'text-align:right;';
-                                            break;
-                                        case 4:
-                                            $style .= 'text-align:justify;';
-                                            break;
-                                        default:
-                                            ;
-                                    } // switch
-                                    switch ($col->valign) {
-                                        case 1:
-                                            $attribs .= ' valign="top"';
-                                            break;
-                                        case 2:
-                                            $attribs .= ' valign="middle"';
-                                            break;
-                                        case 3:
-                                            $attribs .= ' valign="bottom"';
-                                            break;
-                                        case 4:
-                                            $attribs .= ' valign="baseline"';
-                                            break;
-                                        default:
-                                            ;
-                                    } // switch
-                                    if ($col->wrap == 1)
-                                        $attribs .= ' nowrap="nowrap"';
-                                    if ($k == 1)
-                                        $cl = $col->class2;
-                                    else
-                                        $cl = $col->class3;
-                                    if ($cl != '')
-                                        $attribs .= ' class="' . $this->processor->getClassName($cl) . '"';
-                                    if (!$skip && $col->thspan > 1)
-                                        $skip = $col->thspan;
-                                    if ($skip && $q == 0)
-                                        if (intval($col->width) > 0) {
-                                            $style .= 'width:' . $col->width;
-                                            if ($col->widthmd)
-                                                $style .= '%;';
-                                            else
-                                                $style .= 'px;';
-                                        } // if
-                                    if ($skip > 0)
-                                        $skip--;
-                                    if ($style != '')
-                                        $attribs .= ' style="' . $style . '"';
-                                    if ($c == 0 && $row->flag2 > 0) {
-                                        if ($row->flag2 == 1)
-                                            echo indentc(4) . '<td' . $attribs . '><input type="checkbox" id="ff_cb' . $row->id . '_' . $q . '" value="' . $qrow[$c] . '"  name="ff_nm_' . $row->name . '[]"/></td>' . nlc();
-                                        else
-                                            echo indentc(4) . '<td' . $attribs . '><input type="radio" id="ff_cb' . $row->id . '_' . $q . '" value="' . $qrow[$c] . '"  name="ff_nm_' . $row->name . '[]"/></td>' . nlc();
-                                    } else
-                                        echo indentc(4) . '<td' . $attribs . '>' . $qrow[$c] . '</td>' . nlc();
-                                } // if
-                                unset($col);
-                                if ($this->processor->dying)
-                                    break;
-                            } // for
-                            echo indentc(3) . '</tr>' . nl();
+                            $cl = $k == 1 ? $tr1class : $tr2class;
+                            echo $this->classicQueryListRowBuilder()->build(
+                                $cols,
+                                $qrow,
+                                (int) $row->id,
+                                $q,
+                                (string) $row->name,
+                                $cl,
+                                (int) $row->flag2,
+                                $k == 1,
+                                fn (string $class): string => $this->processor->getClassName($class),
+                                fn (): bool => $this->processor->dying,
+                                indentc(3),
+                                indentc(4),
+                                nlc() ?? '',
+                                nl()
+                            );
                             $k = 3 - $k;
                             unset($qrow);
                             if ($this->processor->dying)
                                 break;
                         } // for
-                        if ($this->processor->bury())
+                        if ($this->processor->bury()) {
+                            $this->abortViewRendering();
                             return;
+                        }
 
                         // display footer
                         if ($row->height > 0 && $pagenav > 0) {
@@ -1841,43 +1268,31 @@ final class RenderingEngine
                                 if ($cols[$c]->thspan > 0)
                                     $span++;
                             $pages = intval((count($qrows) + $row->height - 1) / $row->height);
-                            echo indentc(3) . '<tr' . $trfclass . '>' . nlc();
-                            echo indentc(4) . '<td colspan="' . $span . '"' . $tdfclass . '>' . nlc();
-                            if ($pages > 1) {
-                                echo indentc(5);
-                                if ($pagenav <= 4)
-                                    echo '&lt;&lt; ';
-                                if ($pagenav <= 2)
-                                    echo Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGESTART') . ' ';
-                                if ($pagenav <= 4)
-                                    echo '&lt; ';
-                                if ($pagenav <= 2)
-                                    echo Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV') . ' ';
-                                echo nlc();
-                                if ($pagenav % 2) {
-                                    echo indentc(5);
-                                    echo '1 ';
-                                    for ($p = 2; $p <= $pages; $p++)
-                                        echo indentc(5) . '<a href="javascript:ff_dispQueryPage(' . $row->id . ',' . $p . ');">' . $p . '</a> ' . nlc();
-                                    echo nlc();
-                                } // if
-                                if ($pagenav <= 4) {
-                                    echo indentc(5) . '<a href="javascript:ff_dispQueryPage(' . $row->id . ',2);">';
-                                    if ($pagenav <= 2)
-                                        echo Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT') . ' ';
-                                    echo '&gt;</a> ' . nlc();
-                                    echo indentc(5) . '<a href="javascript:ff_dispQueryPage(' . $row->id . ',' . $pages . ');">';
-                                    if ($pagenav <= 2)
-                                        echo Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEEND') . ' ';
-                                    echo '&gt;&gt;</a>' . nlc();
-                                } // if
-                            } // if
-                            echo indentc(4) . '</td>' . nlc();
-                            echo indentc(3) . '</tr>' . nl();
+                            echo $this->classicQueryListFooterBuilder()->build(
+                                (int) $row->id,
+                                $span,
+                                $pages,
+                                (int) $pagenav,
+                                $trfclass,
+                                $tdfclass,
+                                Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGESTART'),
+                                Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV'),
+                                Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT'),
+                                Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEEND'),
+                                indentc(3),
+                                indentc(4),
+                                indentc(5),
+                                nlc() ?? '',
+                                nl()
+                            );
                         } // if
                         // table end
-                        echo indentc(2) . '</table>' . nlc();
-                        echo indentc(1) . '</div>' . nl();
+                        echo $this->classicQueryListMarkupBuilder()->close(
+                            indentc(2),
+                            indentc(1),
+                            nlc() ?? '',
+                            nl()
+                        );
                         unset($qrows);
                         unset($cols);
                         break;
@@ -1888,72 +1303,22 @@ final class RenderingEngine
             } // for
         } else if (trim($this->processor->formrow->template_code_processed) == 'QuickMode') {
 
-            if ($this->processor->isMobile) {
-
-                // nothing
-            } else {
-                //if(true){
-
-                $quickMode = $this->createQuickModeRenderer($rootMdata);
-                $this->processor->quickmode = $quickMode;
-            }
-
-            if ($is_mobile_type == 'choose') {
-                $this->renderMobileChoice();
-            }
+            $quickMode = $this->quickModeRendererFactory()->create($this->processor, $rootMdata);
+            $this->processor->quickmode = $quickMode;
 
             $quickMode->render();
         }
 
         if ($this->processor->editable) {
-            echo '<script type="text/javascript"><!--' . nl() . 'if(typeof bfLoadEditable != "undefined") { 
-			    if(typeof JQuery != "undefined" && typeof bfToggleFieldsLoaded != "undefined" && typeof bfToggleFieldsLoaded != "undefined"){
-			        JQuery(document).ready(function(){
-			            let waitForToggleFields = setInterval(function(){
-			                if(bfToggleFieldsLoaded && bfToggleFieldsLoaded){
-			                    clearInterval(waitForToggleFields);
-			                    bfLoadEditable();
-			                }
-			            }, 100); 
-			        });
-			    }else{
-			        bfLoadEditable();
-			    }
-			}' . nl() . '//--></script>' . nl();
+            echo $this->postRenderScriptBuilder()->build('bfLoadEditable');
         }
 
         if ($cbRecord !== null) {
-            echo '<script type="text/javascript"><!--' . nl() . '
-			    if(typeof JQuery != "undefined" && typeof bfToggleFieldsLoaded != "undefined" && typeof bfToggleFieldsLoaded != "undefined"){
-			        JQuery(document).ready(function(){
-			            let waitForToggleFields = setInterval(function(){
-			                if(bfToggleFieldsLoaded && bfToggleFieldsLoaded){
-			                    clearInterval(waitForToggleFields);
-			                    bfLoadContentBuilderEditable();
-			                }
-			            }, 100); 
-			        });
-			    }else{
-			        bfLoadContentBuilderEditable();
-			    }
-			' . nl() . '//--></script>' . nl();
+            echo $this->postRenderScriptBuilder()->build('bfLoadContentBuilderEditable');
         }
 
         if ($cbForm !== null && count($cbNonEditableFields)) {
-            echo '<script type="text/javascript"><!--' . nl() . '
-			    if(typeof JQuery != "undefined" && typeof bfToggleFieldsLoaded != "undefined" && typeof bfToggleFieldsLoaded != "undefined"){
-			        JQuery(document).ready(function(){
-			            let waitForToggleFields = setInterval(function(){
-			                if(bfToggleFieldsLoaded && bfToggleFieldsLoaded){
-			                    clearInterval(waitForToggleFields);
-			                    bfDisableContentBuilderFields();
-			                }
-			            }, 100); 
-			        });
-			    }else{
-			        bfDisableContentBuilderFields();
-			    }
-			' . nl() . '//--></script>' . nl();
+            echo $this->postRenderScriptBuilder()->build('bfDisableContentBuilderFields');
         }
 
         // CONTENTBUILDER
@@ -1975,226 +1340,71 @@ final class RenderingEngine
             }
         }
 
-        $paymentMethod = '';
-        for ($i = 0; $i < $this->processor->rowcount; $i++) {
-            $row = $this->processor->rows[$i];
-            if ($row->type == "PayPal" || $row->type == "Sofortueberweisung" || $row->type == "Stripe") {
-                echo indentc(1) . '<input type="hidden" name="ff_payment_method" id="bfPaymentMethod" value=""/>' . nl();
-                break;
-            }
+        if ($this->paymentProviderDetector()->hasSupportedProvider($this->processor->rows)) {
+            echo $this->hiddenFormFieldsBuilder()->paymentMethod(indentc(1));
         }
 
         switch ($this->processor->runmode) {
             case _FF_RUNMODE_FRONTEND:
-                echo indentc(1) . '<input type="hidden" name="ff_contentid" value="' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_applic" value="' . $this->processor->app->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->processor->record_id . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_module_id" value="' . $this->processor->app->getInput()->getInt('ff_module_id', 0) . '"/>' . nl();
-                echo indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities((string) $this->processor->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
-                    indentc(1) . \Joomla\CMS\HTML\HTMLHelper::_('form.token') . nl();
-                if ($this->processor->target > 1)
-                    echo indentc(1) . '<input type="hidden" name="ff_target" value="' . htmlentities((string) $this->processor->target, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if ($this->processor->inframe)
-                    echo indentc(1) . '<input type="hidden" name="ff_frame" value="1"/>' . nl();
-                if ($this->processor->border)
-                    echo indentc(1) . '<input type="hidden" name="ff_border" value="1"/>' . nl();
-                if ($this->processor->page != 1)
-                    echo indentc(1) . '<input type="hidden" name="ff_page" value="' . htmlentities((string) $this->processor->page, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if ($this->processor->align != 1)
-                    echo indentc(1) . '<input type="hidden" name="ff_align" value="' . htmlentities((string) $this->processor->align, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if ($this->processor->top != 0)
-                    echo indentc(1) . '<input type="hidden" name="ff_top" value="' . htmlentities((string) $this->processor->top, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                reset($ff_otherparams);
-                // while (list($prop, $val) = each($ff_otherparams))
-                foreach ($ff_otherparams as $prop => $val) {
-                    echo indentc(1) . '<input type="hidden" name="' . htmlentities((string) $prop, ENT_QUOTES, 'UTF-8') . '" value="' . htmlentities(urlencode((string) $val), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                }
-                if ($this->processor->app->getInput()->getInt('cb_form_id', 0)) {
-                    echo '<input type="hidden" name="cb_form_id" value="' . $this->processor->app->getInput()->getInt('cb_form_id', 0) . '"/>' . nl();
-                    if ($this->processor->app->getInput()->getInt('cb_record_id', 0)) {
-                        echo '<input type="hidden" name="cb_record_id" value="' . $this->processor->app->getInput()->getInt('cb_record_id', 0) . '"/>' . nl();
-                    }
-                    if ($this->processor->app->getInput()->getBool('cbIsNew', false)) {
-                        echo '<input type="hidden" name="cbIsNew" value="1"/>' . nl();
-                    }
-                }
-                if ($this->processor->app->getInput()->getString('return', '') !== '') {
-                    echo '<input type="hidden" name="return" value="' . htmlentities($this->processor->app->getInput()->getString('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                }
-                if ($this->processor->app->getInput()->getString('tmpl', '') == 'component') {
-                    echo '<input type="hidden" name="tmpl" value="component"/>' . nl();
-                }
-                echo '</form>' . nl();
+                $input = $this->processor->app->getInput();
+                $context = $this->buildFormContext(false);
+                $routing = $this->hiddenFormFieldsBuilder()->routing($input->getString('return', ''), $input->getString('tmpl', ''), nl());
+                $technical = $this->buildContentBuilderTechnicalFields();
+                echo $this->formModeFinalizationBuilder()->frontend(
+                    $this->hiddenFormFieldsBuilder()->context($context, indentc(1)),
+                    $this->hiddenFormFieldsBuilder()->submission((int) $this->processor->form, indentc(1), nl()),
+                    $this->hiddenFormFieldsBuilder()->token(\Joomla\CMS\HTML\HTMLHelper::_('form.token'), indentc(1), nl()),
+                    $this->formOptionalContextFieldsBuilder()->build($this->processor->target, (bool) $this->processor->inframe, (bool) $this->processor->border, $this->processor->page, $this->processor->align, $this->processor->top, indentc(1), true, true, true, true, nl()),
+                    $this->hiddenFormFieldsBuilder()->additional($ff_otherparams, indentc(1), nl()),
+                    $technical,
+                    $routing,
+                    nl()
+                );
                 break;
 
             case _FF_RUNMODE_BACKEND:
-                echo indentc(1) . '<input type="hidden" name="option" value="com_breezingformsng"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="act" value="run"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities((string) $this->processor->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
-                    indentc(1) . \Joomla\CMS\HTML\HTMLHelper::_('form.token') . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_contentid" value="' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_applic" value="' . $this->processor->app->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->processor->record_id . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_module_id" value="' . $this->processor->app->getInput()->getInt('ff_module_id', 0) . '"/>' . nl() .
-                    indentc(1) . '<input type="hidden" name="ff_runmode" value="' . htmlentities((string) $this->processor->runmode, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if ($this->processor->target > 1)
-                    echo indentc(1) . '<input type="hidden" name="ff_target" value="' . htmlentities((string) $this->processor->target, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if ($this->processor->inframe)
-                    echo indentc(1) . '<input type="hidden" name="ff_frame" value="1"/>' . nl();
-                if ($this->processor->border)
-                    echo indentc(1) . '<input type="hidden" name="ff_border" value="1"/>' . nl();
-                if ($this->processor->page != 1)
-                    echo indentc(1) . '<input type="hidden" name="ff_page" value="' . htmlentities((string) $this->processor->page, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if ($this->processor->align != 1)
-                    echo indentc(1) . '<input type="hidden" name="ff_align" value="' . htmlentities((string) $this->processor->align, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if ($this->processor->top != 0)
-                    echo indentc(1) . '<input type="hidden" name="ff_top" value="' . htmlentities((string) $this->processor->top, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                if ($this->processor->app->getInput()->getInt('cb_form_id', 0)) {
-                    echo '<input type="hidden" name="cb_form_id" value="' . $this->processor->app->getInput()->getInt('cb_form_id', 0) . '"/>' . nl();
-                    if ($this->processor->app->getInput()->getInt('cb_record_id', 0)) {
-                        echo '<input type="hidden" name="cb_record_id" value="' . $this->processor->app->getInput()->getInt('cb_record_id', 0) . '"/>' . nl();
-                    }
-                    if ($this->processor->app->getInput()->getBool('cbIsNew', false)) {
-                        echo '<input type="hidden" name="cbIsNew" value="1"/>' . nl();
-                    }
-                }
-                if ($this->processor->app->getInput()->getString('return', '') !== '') {
-                    echo '<input type="hidden" name="return" value="' . htmlentities($this->processor->app->getInput()->getString('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                }
-                //echo '<input type="hidden" name="tmpl" value="' . $this->processor->app->getInput()->getCmd('tmpl', '') . '"/>' . nl();
-                if ($this->processor->app->getInput()->getString('tmpl', '') == 'component') {
-                    echo '<input type="hidden" name="tmpl" value="component"/>' . nl();
-                }
-                echo '</form>' . nl();
+                $input = $this->processor->app->getInput();
+                $context = $this->buildFormContext(true);
+                $routing = $this->hiddenFormFieldsBuilder()->routing($input->getString('return', ''), $input->getString('tmpl', ''), nl());
+                $technical = $this->buildContentBuilderTechnicalFields();
+                echo $this->formModeFinalizationBuilder()->backend(
+                    $this->hiddenFormFieldsBuilder()->submission((int) $this->processor->form, indentc(1), nl(), true),
+                    $this->hiddenFormFieldsBuilder()->token(\Joomla\CMS\HTML\HTMLHelper::_('form.token'), indentc(1), nl()),
+                    $this->hiddenFormFieldsBuilder()->context($context, indentc(1)),
+                    $this->formOptionalContextFieldsBuilder()->build($this->processor->target, (bool) $this->processor->inframe, (bool) $this->processor->border, $this->processor->page, $this->processor->align, $this->processor->top, indentc(1), true, true, true, true, nl()),
+                    $technical,
+                    $routing,
+                    nl()
+                );
                 break;
 
-            default: // _FF_RUNMODE_PREVIEW:
-                if ($this->processor->inframe) {
-                    echo indentc(1) . '<input type="hidden" name="option" value="com_breezingformsng"/>' . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_frame" value="1"/>' . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_form" value="' . htmlentities((string) $this->processor->form, ENT_QUOTES, 'UTF-8') . '"/>' . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_task" value="submit"/>' . nl() .
-                    indentc(1) . \Joomla\CMS\HTML\HTMLHelper::_('form.token') . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_contentid" value="' . $this->processor->app->getInput()->getInt('ff_contentid', 0) . '"/>' . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_applic" value="' . $this->processor->app->getInput()->getWord('ff_applic', '') . '"/>' . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_record_id" value="' . $this->processor->record_id . '"/>' . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_module_id" value="' . $this->processor->app->getInput()->getInt('ff_module_id', 0) . '"/>' . nl() .
-                        indentc(1) . '<input type="hidden" name="ff_runmode" value="' . htmlentities((string) $this->processor->runmode, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                    if ($this->processor->page != 1)
-                        echo indentc(1) . '<input type="hidden" name="ff_page" value="' . htmlentities((string) $this->processor->page, ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                    if ($this->processor->app->getInput()->getInt('cb_form_id', 0)) {
-                        echo '<input type="hidden" name="cb_form_id" value="' . $this->processor->app->getInput()->getInt('cb_form_id', 0) . '"/>' . nl();
-                        if ($this->processor->app->getInput()->getInt('cb_record_id', 0)) {
-                            echo '<input type="hidden" name="cb_record_id" value="' . $this->processor->app->getInput()->getInt('cb_record_id', 0) . '"/>' . nl();
-                        }
-                        if ($this->processor->app->getInput()->getBool('cbIsNew', false)) {
-                            echo '<input type="hidden" name="cbIsNew" value="1"/>' . nl();
-                        }
-                    }
-                    if ($this->processor->app->getInput()->getString('return', '') !== '') {
-                        echo '<input type="hidden" name="return" value="' . htmlentities($this->processor->app->getInput()->getString('return', ''), ENT_QUOTES, 'UTF-8') . '"/>' . nl();
-                    }
-                    if ($this->processor->app->getInput()->getString('tmpl', '') == 'component') {
-                        echo '<input type="hidden" name="tmpl" value="component"/>' . nl();
-                    }
-                    echo '</form>' . nl();
-                } // if
-        } // if
-        if ($this->executeAfterFormPiece())
+            default:
+                if (!$this->processor->inframe) {
+                    break;
+                }
+                $input = $this->processor->app->getInput();
+                $context = $this->buildFormContext(true);
+                $routing = $this->hiddenFormFieldsBuilder()->routing($input->getString('return', ''), $input->getString('tmpl', ''), nl());
+                $technical = $this->buildContentBuilderTechnicalFields();
+                echo $this->formModeFinalizationBuilder()->preview(
+                    true,
+                    $this->hiddenFormFieldsBuilder()->submission((int) $this->processor->form, indentc(1), nl(), false, true),
+                    $this->hiddenFormFieldsBuilder()->token(\Joomla\CMS\HTML\HTMLHelper::_('form.token'), indentc(1), nl()),
+                    $this->hiddenFormFieldsBuilder()->context($context, indentc(1)),
+                    $this->formOptionalContextFieldsBuilder()->build($this->processor->target, (bool) $this->processor->inframe, (bool) $this->processor->border, $this->processor->page, $this->processor->align, $this->processor->top, indentc(1), false, true, false, false, nl()),
+                    $technical,
+                    $routing,
+                    nl()
+                );
+        }
+        if ($this->executeAfterFormPiece()) {
+            $this->abortViewRendering();
             return;
+        }
 
         $this->closeFormRendering();
-        if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT) {
-            $this->processor->dumpTrace();
-            ob_end_flush();
-            echo '</pre>';
-        } else {
-            ob_end_flush();
-            $this->processor->dumpTrace();
-        } // if
-        restore_error_handler();
+        $this->finishViewRendering();
 
-    }
-
-    /**
-     * Create the renderer selected by the QuickMode theme settings.
-     *
-     * @param array<string, mixed> $rootMdata
-     */
-    private function createQuickModeRenderer(array $rootMdata): object
-    {
-        if (isset($rootMdata['themebootstrapThemeEngine']) && $rootMdata['themebootstrapThemeEngine'] == 'bootstrap') {
-            if (isset($rootMdata['themebootstrapMode']) && $rootMdata['themebootstrapMode']) {
-                return new OnePageRenderer($this->processor);
-            }
-
-            return new BootstrapRenderer($this->processor);
-        }
-
-        return new ClassicRenderer($this->processor);
-    }
-
-    /**
-     * Create and configure the renderer used for a mobile QuickMode request.
-     *
-     * @param array<string, mixed> $rootMdata
-     */
-    private function createMobileRenderer(array $rootMdata): MobileRenderer
-    {
-        $quickMode = new MobileRenderer($this->processor);
-
-        if (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile']) {
-            $quickMode->forceMobileUrl = isset($rootMdata['forceMobileUrl']) ? $rootMdata['forceMobileUrl'] : 'index.php';
-        }
-
-        return $quickMode;
-    }
-
-    private function renderMobileChoice(): void
-    {
-        $currentUrl = Uri::getInstance()->toString();
-        $returnUrl = $currentUrl;
-        $returnUrl = (strstr($returnUrl, '?non_mobile=1') !== false ? str_replace('?non_mobile=1', '', $returnUrl) : str_replace('&non_mobile=1', '', $returnUrl));
-        $returnUrl = $returnUrl . (strstr($returnUrl, '?') !== false ? '&' : '?') . 'mobile=1';
-        echo '<script type="text/javascript">
-                <!--
-                var bf_mobile_url = ' . json_encode($returnUrl) . ';
-                //-->
-                </script>';
-        echo '<div style="display: block; text-align: center;"><button class="ff_elem btn btn-primary" onclick="location.href=bf_mobile_url;"><span>' . Text::_('COM_BREEZINGFORMSNG_MOBILE_VERSION') . '</span></button></div><div></div>';
-    }
-
-    private function syncMobileSessionPreference(): void
-    {
-        if ($this->processor->app->getInput()->getBool('non_mobile', false)) {
-            $this->processor->app->getSession()->clear('com_breezingformsng.mobile');
-        } elseif ($this->processor->app->getInput()->getBool('mobile', false)) {
-            $this->processor->app->getSession()->set('com_breezingformsng.mobile', true);
-        }
-    }
-
-    /**
-     * Apply the mobile mode selected by the request and template settings.
-     *
-     * @param array<string, mixed> $rootMdata
-     */
-    private function applyMobileMode(array $rootMdata): bool
-    {
-        if ($this->processor->app->getInput()->getString('ff_applic', '') != 'mod_facileforms' && $this->processor->app->getInput()->getInt('ff_frame', 0) != 1 && bf_is_mobile()) {
-            $this->processor->isMobile = isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $rootMdata['forceMobile'] ? true : (isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && $this->processor->app->getSession()->get('com_breezingformsng.mobile', false) ? true : false);
-
-            return true;
-        }
-
-        $this->processor->isMobile = false;
-
-        if (isset($rootMdata['themebootstrapThemeEngine']) && $rootMdata['themebootstrapThemeEngine'] == 'bootstrap') {
-            $this->processor->legacy_wrap = false;
-        }
-
-        return false;
     }
 
     /**
@@ -2207,20 +1417,6 @@ final class RenderingEngine
         $dataObject = json_decode(bf_b64dec($this->processor->formrow->template_code), true);
 
         return $dataObject['properties'];
-    }
-
-    /**
-     * Determine whether the visitor should be offered the mobile version.
-     *
-     * @param array<string, mixed> $rootMdata
-     */
-    private function mobileChoiceType(bool $isDevice, array $rootMdata): string
-    {
-        if ($isDevice && isset($rootMdata['mobileEnabled']) && isset($rootMdata['forceMobile']) && $rootMdata['mobileEnabled'] && !$rootMdata['forceMobile']) {
-            return 'choose';
-        }
-
-        return '';
     }
 
     /**
@@ -2245,18 +1441,12 @@ final class RenderingEngine
      */
     private function linkInitialOnload(array &$library, array &$linked): void
     {
-        $code = "onload = function()" . nl() .
-            "{" . nl() .
-            "    ff_initialize('formentry');" . nl() .
-            "    ff_initialize('pageentry');" . nl();
-        if ($this->processor->formrow->heightmode) {
-            $code .= "    ff_resizepage(" . $this->processor->formrow->heightmode . ", " . $this->processor->formrow->height . ");" . nl();
-        }
-        if ($this->processor->showgrid) {
-            $code .= "    ff_showgrid();" . nl();
-        }
-        $code .= "    if (ff_processor && ff_processor.traceBuffer) ff_traceWindow();" . nl() .
-            "} // onload";
+        $code = $this->formOnloadScriptBuilder()->initial(
+            $this->processor->formrow->heightmode,
+            $this->processor->formrow->height,
+            (bool) $this->processor->showgrid,
+            nl()
+        );
         $this->processor->linkcode('onload', $library, $linked, $code);
     }
 
@@ -2265,17 +1455,12 @@ final class RenderingEngine
         $this->processor->queryCols = [];
         $this->processor->queryRows = [];
 
-        if (trim($this->processor->formrow->template_code_processed) == 'QuickMode' && $this->processor->legacy_wrap) {
-            echo '<table style="display:none;width:100%;" id="bfReCaptchaWrap"><tr><td><div id="bfReCaptchaDiv"></div></td></tr></table>';
-        }
-
-        echo '<div id="ff_formdiv' . $this->processor->form . '"';
-        echo ' class="bfFormDiv' . ($this->processor->formrow->class1 != '' ? ' ' . $this->processor->getClassName($this->processor->formrow->class1) : '') . '"';
-        if ($this->processor->legacy_wrap) {
-            echo '><div class="bfPage-tl"><div class="bfPage-tr"><div class="bfPage-t"></div></div></div><div class="bfPage-l"><div class="bfPage-r"><div class="bfPage-m bfClearfix">' . nl();
-        } else {
-            echo '>';
-        }
+        echo $this->formOpeningMarkupBuilder()->build(
+            (string) $this->processor->form,
+            $this->processor->formrow->class1 != ''
+                ? $this->processor->getClassName($this->processor->formrow->class1)
+                : ''
+        );
 
         $this->processor->status = $this->processor->app->getInput()->getCmd('ff_status', '');
         $this->processor->message = $this->processor->app->getInput()->getString('ff_message', '');
@@ -2283,79 +1468,47 @@ final class RenderingEngine
 
     private function closeFormRendering(): void
     {
-        if ($this->processor->legacy_wrap) {
-            echo '</div></div></div><div class="bfPage-bl"><div class="bfPage-br"><div class="bfPage-b"></div></div></div></div><!-- form end -->' . nl();
+        echo $this->formClosingMarkupBuilder()->build(nl());
+    }
 
-            return;
+    private function abortViewRendering(): void
+    {
+        ob_end_flush();
+        restore_error_handler();
+    }
+
+    private function finishViewRendering(): void
+    {
+        if ($this->processor->traceMode & _FF_TRACEMODE_DIRECT) {
+            $this->processor->dumpTrace();
+            ob_end_flush();
+            echo '</pre>';
+        } else {
+            ob_end_flush();
+            $this->processor->dumpTrace();
         }
 
-        echo '</div><!-- form end -->' . nl();
+        restore_error_handler();
     }
 
     private function executeBeforeFormPiece(): bool
     {
-        switch ($this->processor->formrow->piece1cond) {
-            case 1:
-                $piece1id = (int) $this->processor->formrow->piece1id;
-                $query = $this->processor->database->getQuery(true)
-                    ->select(['name', 'code'])
-                    ->from($this->processor->database->quoteName('#__facileforms_pieces'))
-                    ->where($this->processor->database->quoteName('id') . ' = :piece1id')
-                    ->where($this->processor->database->quoteName('published') . ' = 1')
-                    ->bind(':piece1id', $piece1id, ParameterType::INTEGER);
-                $this->processor->database->setQuery($query);
-                $rows = $this->processor->database->loadObjectList();
-                if (count($rows)) {
-                    echo $this->processor->execPiece($rows[0]->code, Text::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECE') . ' ' . $rows[0]->name, 'p', $this->processor->formrow->piece1id, null);
-                }
-                break;
-            case 2:
-                echo $this->processor->execPiece($this->processor->formrow->piece1code, Text::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECEC'), 'f', $this->processor->form, 2);
-                break;
-            default:
-                break;
-        }
-
-        return $this->processor->bury();
+        return $this->formPieceExecutionService()->executeBefore(
+            $this->processor->formrow,
+            Text::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECE'),
+            Text::_('COM_BREEZINGFORMSNG_PROCESS_BFPIECEC'),
+            (int) $this->processor->form
+        );
     }
 
     private function executeAfterFormPiece(): bool
     {
-        switch ($this->processor->formrow->piece2cond) {
-            case 1:
-                $piece2id = (int) $this->processor->formrow->piece2id;
-                $query = $this->processor->database->getQuery(true)
-                    ->select(['name', 'code'])
-                    ->from($this->processor->database->quoteName('#__facileforms_pieces'))
-                    ->where($this->processor->database->quoteName('id') . ' = :piece2id')
-                    ->where($this->processor->database->quoteName('published') . ' = 1')
-                    ->bind(':piece2id', $piece2id, ParameterType::INTEGER);
-                $this->processor->database->setQuery($query);
-                $rows = $this->processor->database->loadObjectList();
-                if (count($rows)) {
-                    echo $this->processor->execPiece(
-                        $rows[0]->code,
-                        Text::_('COM_BREEZINGFORMSNG_PROCESS_AFPIECE') . ' ' . $rows[0]->name,
-                        'p',
-                        $this->processor->formrow->piece2id,
-                        null
-                    );
-                }
-                break;
-            case 2:
-                echo $this->processor->execPiece(
-                    $this->processor->formrow->piece2code,
-                    Text::_('COM_BREEZINGFORMSNG_PROCESS_AFPIECEC'),
-                    'f',
-                    $this->processor->form,
-                    2
-                );
-                break;
-            default:
-                break;
-        }
-
-        return $this->processor->bury();
+        return $this->formPieceExecutionService()->executeAfter(
+            $this->processor->formrow,
+            Text::_('COM_BREEZINGFORMSNG_PROCESS_AFPIECE'),
+            Text::_('COM_BREEZINGFORMSNG_PROCESS_AFPIECEC'),
+            (int) $this->processor->form
+        );
     }
 
     /**
@@ -2366,118 +1519,91 @@ final class RenderingEngine
      */
     private function linkSubmittedOnload(array &$library, array &$linked): void
     {
-        $functionName = '';
+        $functionName = $this->submittedCallbackNameResolver()->resolve($this->processor->formrow);
 
-        switch ($this->processor->formrow->script2cond) {
-            case 1:
-                $script2id = (int) $this->processor->formrow->script2id;
-                $query = $this->processor->database->getQuery(true)
-                    ->select('name')
-                    ->from($this->processor->database->quoteName('#__facileforms_scripts'))
-                    ->where($this->processor->database->quoteName('id') . ' = :script2id')
-                    ->where($this->processor->database->quoteName('published') . ' = 1')
-                    ->bind(':script2id', $script2id, ParameterType::INTEGER);
-                $this->processor->database->setQuery($query);
-                $functionName = $this->processor->database->loadResult();
-                break;
-            case 2:
-                $functionName = 'ff_' . $this->processor->formrow->name . '_submitted';
-                break;
-            default:
-                break;
-        }
-
-        if ($functionName == '' && !$this->processor->formrow->heightmode && !$this->processor->showgrid) {
+        $code = $this->formOnloadScriptBuilder()->submitted(
+            (string) $functionName,
+            $this->processor->formrow->heightmode,
+            $this->processor->formrow->height,
+            (bool) $this->processor->showgrid,
+            $this->processor->status,
+            (string) $this->processor->message,
+            nl()
+        );
+        if ($code === null) {
             return;
         }
-
-        $code = "onload = function()" . nl() .
-            "{" . nl();
-        if ($this->processor->formrow->heightmode) {
-            $code .= "    ff_resizepage(" . $this->processor->formrow->heightmode . ", " . $this->processor->formrow->height . ");" . nl();
-        }
-        if ($this->processor->showgrid) {
-            $code .= "    ff_showgrid();" . nl();
-        }
-        if ($functionName != '') {
-            $jsonReturn = json_encode($this->processor->message, JSON_HEX_QUOT | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS);
-            if (trim($jsonReturn) === '') {
-                $jsonReturn = '""';
-            }
-            $code .= "    " . $functionName . "(" . $this->processor->status . "," . $jsonReturn . ");" . nl();
-        }
-        $code .= '} // onload';
         $this->processor->linkcode('onload', $library, $linked, $code);
     }
 
     /**
-     * Build the client-side file extension validator.
-     *
-     * @return array{0: string, 1: int}
+     * Prepare the client-side state for one classic Query List element.
      */
-    private function buildFileExtensionsCheck(): array
+    private function prepareQueryListRow(object $row, int &$queryCheckboxCount, string &$queryCode): void
     {
-        $cntFiles = 0;
-        $fileExtensionError = json_encode(
-            Text::_('COM_BREEZINGFORMSNG_FILE_EXTENSION_NOT_ALLOWED'),
-            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE
-        );
-        $fileExtensionsCheck = 'function checkFileExtensions(){';
-        for ($i = 0; $i < $this->processor->rowcount; $i++) {
-            $row = $this->processor->rows[$i];
-            if ($row->type == 'File Upload' && trim($this->processor->formrow->template_code) != '') {
-                if (trim($row->data2) != '') {
-                    $exts = explode(',', $row->data2);
-                    $extsCount = count($exts);
-                    $fileExtensionsCheck .= 'var ff_elem' . $row->id . 'Exts = false;';
-                    for ($x = 0; $x < $extsCount; $x++) {
-                        $fileExtensionsCheck .= '
-							if(!ff_elem' . $row->id . 'Exts && document.getElementById("ff_elem' . $row->id . '").value.toLowerCase().lastIndexOf(".' . strtolower(trim($exts[$x])) . '") != -1){
-								ff_elem' . $row->id . 'Exts = true;
-							}else if(!ff_elem' . $row->id . 'Exts && document.getElementById("ff_elem' . $row->id . '").value == ""){
-								ff_elem' . $row->id . 'Exts = true;
-							}';
-                    }
-                    $fileExtensionsCheck .= '
-					if(!ff_elem' . $row->id . 'Exts){
-						if(typeof bfUseErrorAlerts == "undefined"){
-							alert(' . $fileExtensionError . ');
-						} else {
-							bfShowErrors(' . $fileExtensionError . ');
-						}
-						if(ff_currentpage != ' . $row->page . ')ff_switchpage(' . $row->page . ');
-                                                if(document.getElementById("bfSubmitButton")){
-                                                    document.getElementById("bfSubmitButton").disabled = false;
-                                                }
-                                                if(typeof JQuery != "undefined"){JQuery(".bfCustomSubmitButton").prop("disabled", false);}
-						return false;
-					}
-					';
-                    $cntFiles++;
-                }
-            }
+        if ($row->flag2) {
+            $queryCheckboxCount++;
         }
-        $fileExtensionsCheck .= '
-			return true;
-		}
-		';
 
-        return [$fileExtensionsCheck, $cntFiles];
+        $prepared = $this->queryListRowPreparationService()->prepare($row, nl());
+        $this->processor->queryCols[$prepared['key']] = $prepared['columns'];
+        $this->processor->queryRows[$prepared['key']] = $prepared['rows'];
+        $queryCode .= $prepared['script'];
     }
 
     /**
-     * Create the default CAPTCHA error payload and submit callback.
+     * Link the icon border hover callbacks used when the form has at least
+     * one "Icon" row. Returns whether view() should bury/return - mirrors
+     * the original inline control flow exactly: the second linkcode() call
+     * never runs if bury() is already true after the first.
      *
-     * @return array{0: string, 1: string}
+     * @param array<int|string, mixed> $library
+     * @param array<int|string, mixed> $linked
      */
-    private function createCaptchaDefaults(): array
+    private function registerIconBorderScripts(array &$library, array &$linked): bool
     {
-        $captchaError = json_encode(
-            Text::_('COM_BREEZINGFORMSNG_CAPTCHA_MISSING_WRONG'),
-            JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE
-        );
+        return $this->callbackRegistrationService()->registerIconBorders($library, $linked, nl());
+    }
 
-        return [$captchaError, 'function bfCheckCaptcha(){if(checkFileExtensions())ff_submitForm2();}'];
+    /**
+     * Register the three callbacks associated with one classic element.
+     *
+     * The callback order and early-return behavior are part of the historical
+     * rendering contract. The validation callback also closes the active
+     * output buffer when it triggers bury().
+     *
+     * @param object $row Classic element row.
+     * @param array<int|string, mixed> $library
+     * @param array<int|string, mixed> $linked
+     */
+    private function registerElementCallbacks(object $row, array &$library, array &$linked): bool
+    {
+        return $this->callbackRegistrationService()->registerElement($row, $library, $linked);
+    }
+
+    /**
+     * Count the element types that require post-render assets or behavior.
+     */
+    private function collectElementMetadata(object $row, int &$icons, int &$tooltips): void
+    {
+        if ($row->type == "Icon") {
+            $icons++;
+        }
+
+        if ($row->type == "Tooltip") {
+            $tooltips++;
+        }
+    }
+
+    /**
+     * Register the scan-only callback used by static HTML elements.
+     *
+     * @param array<int|string, mixed> $library
+     * @param array<int|string, mixed> $linked
+     */
+    private function registerStaticTextScanCallback(object $row, array &$library, array &$linked): void
+    {
+        $this->callbackRegistrationService()->registerStaticTextScan($row, $library, $linked);
     }
 
     /**
@@ -2488,34 +1614,12 @@ final class RenderingEngine
      */
     private function addFormScripts(array &$library, array &$linked): bool
     {
-        $this->processor->addFunction(
-            $this->processor->formrow->script1cond,
-            $this->processor->formrow->script1id,
-            'ff_' . $this->processor->formrow->name . '_init',
-            $this->processor->formrow->script1code,
+        return $this->callbackRegistrationService()->registerForm(
+            $this->processor->formrow,
             $library,
             $linked,
-            'f',
-            $this->processor->form,
-            1
+            (int) $this->processor->form
         );
-        if ($this->processor->bury()) {
-            return true;
-        }
-
-        $this->processor->addFunction(
-            $this->processor->formrow->script2cond,
-            $this->processor->formrow->script2id,
-            'ff_' . $this->processor->formrow->name . '_submitted',
-            $this->processor->formrow->script2code,
-            $library,
-            $linked,
-            'f',
-            $this->processor->form,
-            1
-        );
-
-        return $this->processor->bury();
     }
 
     // view

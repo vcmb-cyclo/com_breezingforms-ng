@@ -29,6 +29,37 @@ require_once __DIR__ . '/joomla-cmsapplication-stub.php';
  */
 final class OnePageRendererCharacterizationTest extends TestCase
 {
+    public function testPageNavigationRendersSharedOnePageNextAction(): void
+    {
+        $renderer = $this->makeRenderer();
+        $this->setPrivate($renderer, 'rootMdata', [
+            'themebootstrapThemeEngine' => 'bootstrap',
+            'themebootstrap' => '',
+            'useErrorAlerts' => true,
+            'lastPageThankYou' => false,
+            'pagingInclude' => true,
+            'pagingNextLabel' => 'Next',
+            'submitInclude' => false,
+            'cancelInclude' => false,
+        ]);
+        $this->setPrivate($renderer, 'dataObject', ['children' => [[], [], []]]);
+
+        ob_start();
+        try {
+            $node = [
+                'attributes' => ['id' => 'page2'],
+                'properties' => ['type' => 'page', 'pageNumber' => 2, 'pageIntro' => ''],
+            ];
+            $renderer->process($node);
+            $html = ob_get_contents();
+        } finally {
+            ob_end_clean();
+        }
+
+        self::assertStringContainsString('bfNextButton', (string) $html);
+        self::assertStringContainsString('ff_currentpage = 2;bf_validate_nextpage(3);', (string) $html);
+    }
+
     private const SNAPSHOT_DIR = __DIR__ . '/__snapshots__';
 
     public function testTextfieldElement(): void
@@ -232,6 +263,23 @@ final class OnePageRendererCharacterizationTest extends TestCase
         self::assertStringContainsString('"sitekey":"6Lc-test-pubkey"', $html);
     }
 
+    public function testInvisibleReCaptchaElement(): void
+    {
+        $html = $this->renderElement('bfReCaptcha', [
+            'dbId' => 59,
+            'hideLabel' => true,
+            'pubkey' => '6Lc-test-pubkey',
+            'invisibleCaptcha' => true,
+            'theme' => 'invisible_inline',
+        ], '_invisible');
+
+        self::assertStringContainsString('bfInvisibleReCaptchaContainer', $html);
+        self::assertStringContainsString(
+            'bfInitInvisibleReCaptcha({"sitekey":"6Lc-test-pubkey","badge":"inline","hasFlashUpload":false,"resetFlagOnCallback":false});',
+            $html
+        );
+    }
+
     public function testCalendarElement(): void
     {
         $html = $this->renderElement('bfCalendar', [
@@ -368,7 +416,10 @@ final class OnePageRendererCharacterizationTest extends TestCase
     {
         yield 'bfTextfield' => ['bfTextfield', ['bfName' => 'name']];
         yield 'bfTextarea' => ['bfTextarea', ['bfName' => 'message', 'width' => '', 'height' => '']];
-        yield 'bfNumberInput' => ['bfNumberInput', ['bfName' => 'age', 'range' => false, 'step' => 1, 'max' => 120, 'min' => 0]];
+        yield 'bfNumberInput' => [
+            'bfNumberInput',
+            ['bfName' => 'age', 'range' => false, 'step' => 1, 'max' => 120, 'min' => 0],
+        ];
     }
 
     public function testSummarizeElement(): void
@@ -444,7 +495,7 @@ final class OnePageRendererCharacterizationTest extends TestCase
     /**
      * @param array<string, mixed> $overrides
      */
-    private function renderElement(string $bfType, array $overrides): string
+    private function renderElement(string $bfType, array $overrides, string $snapshotSuffix = ''): string
     {
         $renderer = $this->makeRenderer();
 
@@ -483,7 +534,7 @@ final class OnePageRendererCharacterizationTest extends TestCase
         }
 
         self::assertIsString($html);
-        $this->assertMatchesSnapshot('onepage_' . $bfType . '.html', $html);
+        $this->assertMatchesSnapshot('onepage_' . $bfType . $snapshotSuffix . '.html', $html);
 
         return $html;
     }
@@ -507,8 +558,12 @@ final class OnePageRendererCharacterizationTest extends TestCase
         $this->setPrivate($renderer, 'language_tag', 'zz-ZZ');
         $this->setPrivate($renderer, 'bsClasses', [5 => [
             'controls' => '',
+            'alert' => 'alert',
+            'alert-error' => 'alert-error',
             'form-inline' => 'bf-form-inline',
             'form-group' => 'bf-form-group mb-3',
+            'form-actions' => 'form-actions',
+            'form-actions-buttons' => 'form-actions-buttons',
             'control-group' => 'mb-3',
             'control-label' => 'form-label',
             'form-control' => 'form-control',
@@ -532,6 +587,8 @@ final class OnePageRendererCharacterizationTest extends TestCase
             'well' => 'card',
             'well-small' => 'card-body',
             'icon-calendar' => 'fas fa-calendar',
+            'float-start' => 'float-start',
+            'float-end' => 'float-end',
         ]]);
 
         return $renderer;

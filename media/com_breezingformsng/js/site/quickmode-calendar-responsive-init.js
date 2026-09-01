@@ -3,9 +3,7 @@
    responsive calendar field. Only the per-field config (dbId, pickadate
    format/selectYears/firstDay, and whether the year-scroller buttons are
    available on this theme) is dynamic; everything else was byte-identical
-   across ClassicRenderer/BootstrapRenderer/OnePageRenderer, and
-   MobileRenderer's only difference was the missing onOpen year-scroller
-   hook (no bf_add_yearscroller asset loaded on that theme). Called once per
+   across ClassicRenderer/BootstrapRenderer/OnePageRenderer. Called once per
    field right after it is rendered. */
 function bfInitCalendarResponsive(dbId, options) {
 	JQuery(document).ready(function () {

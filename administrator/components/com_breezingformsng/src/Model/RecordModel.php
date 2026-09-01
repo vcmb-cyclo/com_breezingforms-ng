@@ -267,8 +267,12 @@ class RecordModel extends BaseDatabaseModel
                     if ($articleIds) {
                         $articleModel = $contentFactory->createModel('Article', 'Administrator');
 
-                        if (!$articleModel || !$articleModel->delete($articleIds)) {
-                            throw new \RuntimeException((string) ($articleModel?->getError() ?: Text::_('JERROR_AN_ERROR_HAS_OCCURRED')));
+                        if (!$articleModel instanceof \Joomla\CMS\MVC\Model\AdminModel) {
+                            throw new \RuntimeException(Text::_('JERROR_AN_ERROR_HAS_OCCURRED'));
+                        }
+
+                        if (!$articleModel->delete($articleIds)) {
+                            throw new \RuntimeException((string) ($articleModel->getError() ?: Text::_('JERROR_AN_ERROR_HAS_OCCURRED')));
                         }
                     }
                 }

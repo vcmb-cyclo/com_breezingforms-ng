@@ -9,6 +9,7 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Integration;
 
 \defined('_JEXEC') or die;
 
+use JsonException;
 use Joomla\Http\Http;
 use Joomla\Http\HttpFactory;
 
@@ -18,7 +19,7 @@ final class RecaptchaVerifier
 
     public function __construct(?Http $http = null)
     {
-        $this->http = $http ?? HttpFactory::getHttp();
+        $this->http = $http ?? (new HttpFactory())->getHttp();
     }
 
     public function verify(string $secret, string $response, string $remoteIp): bool
@@ -31,8 +32,17 @@ final class RecaptchaVerifier
             'https://www.google.com/recaptcha/api/siteverify',
             ['secret' => $secret, 'response' => $response, 'remoteip' => $remoteIp]
         );
-        $payload = json_decode((string) $result->body, true, 512, JSON_THROW_ON_ERROR);
 
-        return $result->code === 200 && ($payload['success'] ?? false) === true;
+        if ($result->getStatusCode() !== 200) {
+            return false;
+        }
+
+        try {
+            $payload = json_decode((string) $result->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            return false;
+        }
+
+        return ($payload['success'] ?? false) === true;
     }
 }

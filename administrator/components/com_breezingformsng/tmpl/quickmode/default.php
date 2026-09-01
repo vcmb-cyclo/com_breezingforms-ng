@@ -7,6 +7,7 @@
 
 \defined('_JEXEC') or die;
 
+/** @var \Vcmb\Component\BreezingformsNG\Administrator\View\Quickmode\HtmlView $this */
 use Joomla\CMS\Uri\Uri;
 use Vcmb\Component\BreezingformsNG\Administrator\Helper\QuickmodeHtml;
 
@@ -55,10 +56,7 @@ if ($this->formId === 0 || $this->templateCode === '') {
             useErrorAlerts: false,
             useDefaultErrors: true,
             useBalloonErrors: false,
-            joomlaHint: false,
-            mobileEnabled: false,
-            forceMobile: false,
-            forceMobileUrl: "index.php"
+            joomlaHint: false
         },
         state: "open",
         data: { title: "' . $formNameJs . '", icon: "' . $iconBase . 'icon_form.png" },
@@ -80,5 +78,16 @@ echo QuickmodeHtml::showApplication(
     $o,
     $this->elementScripts,
     $this->themes,
-    $this->themesBootstrap
+    $this->themesBootstrap,
+    [
+        'form' => $this->advancedOptionsForm,
+        'editor' => $this->advancedOptionsEditor,
+        'tabEntryCounts' => $this->advancedOptionsTabEntryCounts,
+        'initScripts' => $this->advancedOptionsInitScripts,
+        'submittedScripts' => $this->advancedOptionsSubmittedScripts,
+        'pieceBefore' => $this->advancedOptionsPieceBefore,
+        'pieceAfter' => $this->advancedOptionsPieceAfter,
+        'pieceBeginSubmit' => $this->advancedOptionsPieceBeginSubmit,
+        'pieceEndSubmit' => $this->advancedOptionsPieceEndSubmit,
+    ]
 );

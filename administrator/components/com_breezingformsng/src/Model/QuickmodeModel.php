@@ -141,13 +141,17 @@ class QuickmodeModel extends BaseDatabaseModel
     {
         $themes = [];
 
-        if ($handle = @opendir($folder)) {
-            while (false !== ($file = readdir($handle))) {
-                if (!in_array($file, ['.', '..', 'images', 'img', '.csv', '.svn'], true) && is_dir($folder . $file)) {
-                    $themes[] = $file;
-                }
+        if (!is_dir($folder) || !is_readable($folder)) {
+            return $themes;
+        }
+
+        foreach (new \DirectoryIterator($folder) as $file) {
+            $filename = $file->getFilename();
+            if (!$file->isDir() || in_array($filename, ['.', '..', 'images', 'img', '.csv', '.svn'], true)) {
+                continue;
             }
-            closedir($handle);
+
+            $themes[] = $filename;
         }
 
         return $themes;
@@ -633,12 +637,7 @@ class QuickmodeModel extends BaseDatabaseModel
                     ->bind(':form', $form, ParameterType::INTEGER);
                 $this->db->setQuery($checkQuery);
 
-                $elementCheck = [];
-                try {
-                    $elementCheck = $this->db->loadObjectList();
-                } catch (\InvalidArgumentException $e) {
-                    // ignore
-                }
+                $elementCheck = $this->db->loadObjectList();
 
                 foreach ($elementCheck as $check) {
                     if ((int) $check->id !== (int) $element['dbId']) {

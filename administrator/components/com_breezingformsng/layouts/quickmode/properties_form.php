@@ -7,6 +7,12 @@
 
 defined('_JEXEC') or die;
 
+/** @var string $active_language_code */
+/** @var string $formDesc */
+/** @var string $formEmailadr */
+/** @var int $formEmailntf */
+/** @var string $formName */
+/** @var string $formTitle */
 use Joomla\CMS\Language\Text;
 ?>
                                     <!-- FORM PROPERTIES BEGIN -->
@@ -17,8 +23,8 @@ use Joomla\CMS\Language\Text;
                                             <legend>
                                                 <?php echo Text::_('COM_BREEZINGFORMSNG_FORM_PROPERTIES'); ?>
                                             </legend>
-                                            <div class="bfPropertyWrap">
-                                                <label class="bfPropertyLabel hasTooltip"
+                                            <div class="bfPropertyWrap bfng-field">
+                                                <label class="bfPropertyLabel hasTooltip bfng-field__label"
                                                     title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_FORM_TITLE')); ?>"
                                                     for="bfFormTitle">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_FORM_TITLE'); ?>
@@ -28,8 +34,8 @@ use Joomla\CMS\Language\Text;
                                                     id="bfFormTitle" />
                                             </div>
 
-                                            <div class="bfPropertyWrap bfTrans">
-                                                <label class="bfPropertyLabel hasTooltip"
+                                            <div class="bfPropertyWrap bfTrans bfng-field">
+                                                <label class="bfPropertyLabel hasTooltip bfng-field__label"
                                                     title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_FORM_TITLE')); ?>"
                                                     for="bfFormTitleTrans">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_FORM_TITLE'); ?>
@@ -40,8 +46,8 @@ use Joomla\CMS\Language\Text;
                                                 <input type="text" value="" id="bfFormTitleTrans" />
                                             </div>
 
-                                            <div class="bfPropertyWrap">
-                                                <label class="bfPropertyLabel hasTooltip"
+                                            <div class="bfPropertyWrap bfng-field">
+                                                <label class="bfPropertyLabel hasTooltip bfng-field__label"
                                                     title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_FORM_NAME')); ?>"
                                                     for="bfFormName">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_FORM_NAME'); ?>
@@ -50,8 +56,8 @@ use Joomla\CMS\Language\Text;
                                                     value="<?php echo htmlentities($formName, ENT_QUOTES, 'UTF-8') ?>"
                                                     id="bfFormName" />
                                             </div>
-                                            <div class="bfPropertyWrap">
-                                                <label class="bfPropertyLabel hasTooltip"
+                                            <div class="bfPropertyWrap bfng-field">
+                                                <label class="bfPropertyLabel hasTooltip bfng-field__label"
                                                     title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_FORM_DESCRIPTION')); ?>"
                                                     for="bfFormDescription">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_FORM_DESC'); ?>
@@ -59,16 +65,16 @@ use Joomla\CMS\Language\Text;
                                                 <textarea
                                                     id="bfFormDescription"><?php echo htmlentities($formDesc, ENT_QUOTES, 'UTF-8') ?></textarea>
                                             </div>
-                                            <div class="bfPropertyWrap">
-                                                <label class="bfPropertyLabel hasTooltip"
+                                            <div class="bfPropertyWrap bfng-field">
+                                                <label class="bfPropertyLabel hasTooltip bfng-field__label"
                                                     title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_FORM_LASTPAGE')); ?>"
                                                     for="bfFormLastPageThankYou">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_LAST_PAGE_THANK_YOU'); ?>
                                                 </label>
                                                 <input type="checkbox" value="" id="bfFormLastPageThankYou" />
                                             </div>
-                                            <div class="bfPropertyWrap">
-                                                <label class="bfPropertyLabel hasTooltip"
+                                            <div class="bfPropertyWrap bfng-field">
+                                                <label class="bfPropertyLabel hasTooltip bfng-field__label"
                                                     title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_FORM_EMAIL_NOTIFICATION')); ?>""
                                                        for=" bfFormMailNotification">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_MAIL_NOTIFICATION'); ?>
@@ -77,8 +83,8 @@ use Joomla\CMS\Language\Text;
                                                     value="<?php echo htmlentities($formEmailntf, ENT_QUOTES, 'UTF-8') ?>"
                                                     id="bfFormMailNotification" />
                                             </div>
-                                            <div class="bfPropertyWrap">
-                                                <label class="bfPropertyLabel hasTooltip"
+                                            <div class="bfPropertyWrap bfng-field">
+                                                <label class="bfPropertyLabel hasTooltip bfng-field__label"
                                                     title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_FORM_EMAIL_NOTIFICATION_ADDRESS')); ?>"
                                                     for="bfFormMailRecipient">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_MAIL_RECIPIENT'); ?>
@@ -87,8 +93,8 @@ use Joomla\CMS\Language\Text;
                                                     value="<?php echo htmlentities($formEmailadr, ENT_QUOTES, 'UTF-8') ?>"
                                                     id="bfFormMailRecipient" />
                                             </div>
-                                            <div class="bfPropertyWrap">
-                                                <label class="bfPropertyLabel hasTooltip"
+                                            <div class="bfPropertyWrap bfng-field">
+                                                <label class="bfPropertyLabel hasTooltip bfng-field__label"
                                                     title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_FORM_SUBMIT_INCLUDE')); ?>"
                                                     for="bfSubmitIncludeYes">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_FORM_SUBMIT_INCLUDE'); ?>
@@ -99,8 +105,8 @@ use Joomla\CMS\Language\Text;
                                                 <input type="radio" name="bfSubmitInclude" value="" id="bfSubmitIncludeNo" />
                                                 <?php echo Text::_('COM_BREEZINGFORMSNG_NO'); ?>
                                             </div>
-                                            <div class="bfPropertyWrap">
-                                                <label class="bfPropertyLabel hasTooltip"
+                                            <div class="bfPropertyWrap bfng-field">
+                                                <label class="bfPropertyLabel hasTooltip bfng-field__label"
                                                     title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_FORM_SUBMIT_LABEL')); ?>"
                                                     for="bfFormSubmitLabel">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_FORM_SUBMIT_LABEL'); ?>
@@ -108,8 +114,8 @@ use Joomla\CMS\Language\Text;
                                                 <input type="text" value="save" id="bfFormSubmitLabel" />
                                             </div>
 
-                                            <div class="bfPropertyWrap bfTrans">
-                                                <label class="bfPropertyLabel hasTooltip"
+                                            <div class="bfPropertyWrap bfTrans bfng-field">
+                                                <label class="bfPropertyLabel hasTooltip bfng-field__label"
                                                     title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_FORM_SUBMIT_LABEL')); ?>"
                                                     for="bfFormSubmitLabelTrans">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_FORM_SUBMIT_LABEL'); ?>
@@ -120,8 +126,8 @@ use Joomla\CMS\Language\Text;
                                                 <input type="text" value="save" id="bfFormSubmitLabelTrans" />
                                             </div>
 
-                                            <div class="bfPropertyWrap">
-                                                <label class="bfPropertyLabel hasTooltip"
+                                            <div class="bfPropertyWrap bfng-field">
+                                                <label class="bfPropertyLabel hasTooltip bfng-field__label"
                                                     title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_FORM_PAGING_INCLUDE')); ?>"
                                                     for="bfPagingIncludeYes">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_FORM_PAGING_INCLUDE'); ?>
@@ -132,8 +138,8 @@ use Joomla\CMS\Language\Text;
                                                 <input type="radio" name="bfPagingInclude" value="" id="bfPagingIncludeNo" />
                                                 <?php echo Text::_('COM_BREEZINGFORMSNG_NO'); ?>
                                             </div>
-                                            <div class="bfPropertyWrap">
-                                                <label class="bfPropertyLabel hasTooltip"
+                                            <div class="bfPropertyWrap bfng-field">
+                                                <label class="bfPropertyLabel hasTooltip bfng-field__label"
                                                     title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_FORM_PAGING_NEXT_LABEL')); ?>"
                                                     for="bfFormPagingNextLabel">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_FORM_PAGING_NEXT_LABEL'); ?>
@@ -141,8 +147,8 @@ use Joomla\CMS\Language\Text;
                                                 <input type="text" value="next" id="bfFormPagingNextLabel" />
                                             </div>
 
-                                            <div class="bfPropertyWrap bfTrans">
-                                                <label class="bfPropertyLabel hasTooltip"
+                                            <div class="bfPropertyWrap bfTrans bfng-field">
+                                                <label class="bfPropertyLabel hasTooltip bfng-field__label"
                                                     title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_FORM_PAGING_NEXT_LABEL')); ?>"
                                                     for="bfFormPagingNextLabelTrans">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_FORM_PAGING_NEXT_LABEL'); ?>
@@ -153,8 +159,8 @@ use Joomla\CMS\Language\Text;
                                                 <input type="text" value="next" id="bfFormPagingNextLabelTrans" />
                                             </div>
 
-                                            <div class="bfPropertyWrap">
-                                                <label class="bfPropertyLabel hasTooltip"
+                                            <div class="bfPropertyWrap bfng-field">
+                                                <label class="bfPropertyLabel hasTooltip bfng-field__label"
                                                     title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_FORM_PAGING_PREV_LABEL')); ?>"
                                                     for="bfFormPagingPrevLabel">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_FORM_PAGING_PREV_LABEL'); ?>
@@ -162,8 +168,8 @@ use Joomla\CMS\Language\Text;
                                                 <input type="text" value="back" id="bfFormPagingPrevLabel" />
                                             </div>
 
-                                            <div class="bfPropertyWrap bfTrans">
-                                                <label class="bfPropertyLabel hasTooltip"
+                                            <div class="bfPropertyWrap bfTrans bfng-field">
+                                                <label class="bfPropertyLabel hasTooltip bfng-field__label"
                                                     title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_FORM_PAGING_PREV_LABEL')); ?>"
                                                     for="bfFormPagingPrevLabelTrans">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_FORM_PAGING_PREV_LABEL'); ?>
@@ -174,8 +180,8 @@ use Joomla\CMS\Language\Text;
                                                 <input type="text" value="back" id="bfFormPagingPrevLabelTrans" />
                                             </div>
 
-                                            <div class="bfPropertyWrap">
-                                                <label class="bfPropertyLabel hasTooltip"
+                                            <div class="bfPropertyWrap bfng-field">
+                                                <label class="bfPropertyLabel hasTooltip bfng-field__label"
                                                     title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_FORM_CANCEL_INCLUDE')); ?>"
                                                     for="bfCancelIncludeYes">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_FORM_CANCEL_INCLUDE'); ?>
@@ -186,8 +192,8 @@ use Joomla\CMS\Language\Text;
                                                 <input type="radio" name="bfCancelInclude" value="" id="bfCancelIncludeNo" />
                                                 <?php echo Text::_('COM_BREEZINGFORMSNG_NO'); ?>
                                             </div>
-                                            <div class="bfPropertyWrap">
-                                                <label class="bfPropertyLabel hasTooltip"
+                                            <div class="bfPropertyWrap bfng-field">
+                                                <label class="bfPropertyLabel hasTooltip bfng-field__label"
                                                     title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_FORM_CANCEL_LABEL')); ?>"
                                                     for="bfFormCancelLabel">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_FORM_CANCEL_LABEL'); ?>
@@ -195,8 +201,8 @@ use Joomla\CMS\Language\Text;
                                                 <input type="text" value="reset" id="bfFormCancelLabel" />
                                             </div>
 
-                                            <div class="bfPropertyWrap bfTrans">
-                                                <label class="bfPropertyLabel hasTooltip"
+                                            <div class="bfPropertyWrap bfTrans bfng-field">
+                                                <label class="bfPropertyLabel hasTooltip bfng-field__label"
                                                     title="<?php echo bf_tooltipText(Text::_('COM_BREEZINGFORMSNG_QM_FORM_CANCEL_LABEL')); ?>"
                                                     for="bfFormCancelLabelTrans">
                                                     <?php echo Text::_('COM_BREEZINGFORMSNG_FORM_CANCEL_LABEL'); ?>

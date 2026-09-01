@@ -1,0 +1,274 @@
+# Plan — Rapatrier « Plus d'options » comme onglet « Options » dans QuickMode
+
+> Demande du 2026-08-30 : le lien « Plus d'options » de l'écran QuickMode
+> (`task=quickmode.display&form=...`) doit devenir un onglet normal appelé
+> « Options » dans ce même écran, au lieu de naviguer vers l'écran classique.
+> Approche retenue : **réutiliser le contenu existant** (recommandée,
+> confirmée par l'utilisateur) — pas de réécriture des réglages en propriétés
+> QuickMode natives, pas d'iframe.
+
+## État actuel
+
+### Deux écrans, deux modèles de persistance distincts
+
+- **QuickMode** (`task=quickmode.display&form=ID`) — `QuickmodeHtml::showApplication()`
+  affiche un éditeur d'arbre avec deux onglets Bootstrap dans `#menutab` :
+  - `fragment-1` « Propriétés » (`COM_BREEZINGFORMSNG_PROPERTIES`)
+  - `fragment-2` « Avancé » (`COM_BREEZINGFORMSNG_ADVANCED`), qui contient
+    `advanced_form.php` — celui-ci affiche le lien « Plus d'options »
+    (`COM_BREEZINGFORMSNG_MORE_OPTIONS`) pointant vers
+    `task=forms.edit&id=ID&advanced=1`.
+  - Les deux onglets sont **imbriqués dans `<form name="bfForm" onsubmit="return false">`**.
+    Leurs boutons « Enregistrer » (`bfPropertySaveButton*`,
+    `bfAdvancedSaveButton*`) sont des `<input type="submit">` mais la
+    soumission native est bloquée ; un handler jQuery
+    (`appScope.saveButton`, `media/com_breezingformsng/js/admin/quickmode-app.js:527-539`)
+    sérialise l'arbre en mémoire. La persistance réelle se fait ailleurs
+    (action globale « Enregistrer » du toolbar), en un seul blob JSON
+    (`template_code`) couvrant tout le formulaire.
+- **Écran classique** (`task=forms.edit&id=ID&advanced=1`, routé par
+  `FormsController::edit()` uniquement quand `advanced=1`) —
+  `tmpl/forms/edit.php` (489 lignes) affiche un **second** système d'onglets
+  Bootstrap indépendant (`#bfFormTabs`) : Général, Email, Scripts, Pièces
+  formulaire/soumission, MailChimp, Salesforce, Dropbox. Le tout est dans
+  **son propre** `<form id="adminForm" name="adminForm" method="post"
+  action="index.php?option=com_breezingformsng">`, soumis nativement vers
+  `task=forms.save` (`FormsController::save()`), qui écrit directement des
+  dizaines de colonnes SQL sur `#__facileforms_forms` (aucun rapport avec le
+  JSON `template_code`).
+- Les données de `forms/edit.php` viennent de
+  `FormModel::getForm(int $id): ?\stdClass` (`administrator/.../src/Model/FormModel.php:44`),
+  chargé dans `View\Forms\HtmlView::display()`.
+- Aucun recouvrement de contenu entre les deux écrans : les réglages de
+  l'écran classique (email, scripts globaux, pièces, intégrations
+  MailChimp/Salesforce/Dropbox) ne sont **pas** dupliqués dans les onglets
+  Propriétés/Avancé de QuickMode.
+
+### Contrainte HTML bloquante
+
+`fragment-3` (le futur onglet « Options ») devra contenir le même balisage
+que `forms/edit.php`, y compris **son propre `<form>`**. Comme `fragment-1`
+et `fragment-2` sont aujourd'hui imbriqués dans `<form name="bfForm">`, on ne
+peut pas ajouter `fragment-3` au même endroit sans imbriquer deux `<form>`
+(interdit en HTML, comportement de soumission indéterminé selon les
+navigateurs). Il faut resserrer `<form name="bfForm">` autour de
+`fragment-1`/`fragment-2` uniquement, et laisser `fragment-3` en dehors —
+tout en restant un enfant direct de `.tab-content` (Bootstrap bascule les
+`.tab-pane` par classe, pas par profondeur DOM, donc ce déplacement est safe
+pour le comportement des onglets).
+
+## Étapes proposées, dans l'ordre
+
+1. **Extraire le contenu de `forms/edit.php` en layout réutilisable**, sans
+   changement de comportement sur l'écran classique lui-même : sortir le
+   bloc `<ul id="bfFormTabs">...` + `<div class="tab-content">...</div>`
+   (tout sauf le `<form>` englobant et le bouton Enregistrer final) dans
+   `administrator/components/com_breezingformsng/layouts/forms/advanced_options.php`,
+   appelé via `LayoutHelper::render()` avec les mêmes variables (`$f`, `$pkg`,
+   `$editor`, `$tabEntryCounts`, les fonctions locales `bfSel`/`$countConfigured`
+   à convertir en méthodes statiques ou closures passées en paramètre).
+   `forms/edit.php` l'inclut à la place du bloc inline.
+   - Vérification : capture HTML avant/après (`ob_start`/`ob_get_clean`) sur
+     un rendu contrôlé, diff strict, aucun octet différent.
+2. **Resserrer `<form name="bfForm">`** dans `QuickmodeHtml::showApplication()`
+   pour qu'il n'entoure que `fragment-1` et `fragment-2` (pas tout
+   `#menutab`). Vérifier en direct que les onglets Propriétés/Avancé
+   fonctionnent toujours (sélection d'un nœud, edition d'une propriété,
+   sauvegarde) — c'est le point le plus sensible du plan, à isoler dans son
+   propre commit avec vérification navigateur avant d'ajouter quoi que ce
+   soit d'autre.
+3. **Charger la ligne complète du formulaire dans le contrôleur/la vue
+   QuickMode.** `QuickmodeController`/`QuickmodeModel` n'exposent
+   aujourd'hui que `getFormOptions()`/`getTemplateCode()` (métadonnées
+   QuickMode). Ajouter un appel à `FormModel::getForm($formId)` (même modèle
+   que l'écran classique) et transmettre `$f` à la vue, uniquement quand
+   `$formId !== 0` (formulaire déjà créé — un nouveau formulaire non
+   enregistré n'a pas encore de ligne `#__facileforms_forms` à côté du JSON).
+4. **Ajouter l'onglet `fragment-3` « Options »** dans `#menutab` :
+   - Bouton `nav-link` avec le libellé `COM_BREEZINGFORMSNG_OPTIONS` (clé
+     déjà traduite dans les 8 langues, aucune nouvelle chaîne nécessaire
+     pour le libellé lui-même).
+   - Pane `<div id="fragment-3">` contenant **son propre**
+     `<form id="bfOptionsForm" method="post"
+     action="index.php?option=com_breezingformsng">` avec le layout extrait
+     à l'étape 1, un champ caché `task=forms.save`, le jeton CSRF Joomla, et
+     `id`/`pkg` déjà connus du contexte QuickMode.
+   - Comportement de sauvegarde : soumission native de `bfOptionsForm`
+     (rechargement de page, cohérent avec le comportement actuel de l'écran
+     classique) plutôt qu'une tentative de fusion AJAX avec le flux
+     QuickMode — évite de dupliquer la logique de `FormsController::save()`
+     et respecte le choix « réutiliser le contenu existant ».
+     `FormsController::save()` redirige déjà vers
+     `task=quickmode.display&form=ID` après écriture ; à ajuster pour
+     revenir spécifiquement sur l'onglet Options (ancre `#fragment-3` ou
+     paramètre de requête lu par `quickmode-app.js` au chargement).
+5. **Retirer le lien « Plus d'options »** de `advanced_form.php` (et son CSS
+   dédié `.btn-more-options` dans `custom.js`), maintenant que son contenu
+   est atteignable sans quitter l'écran. Garder la route
+   `task=forms.edit&advanced=1` elle-même active (pas de suppression) : elle
+   reste le point d'entrée pour la création d'un formulaire (`id<=0`) via
+   `FormsController::edit()`, cas hors périmètre de cette demande.
+6. **Traductions** : mettre à jour les 8 fichiers `.ini`
+   (en-GB/fr-FR/de-DE/it-IT/es-ES/hu-HU/nl-NL/tr-TR) uniquement si de
+   nouvelles chaînes apparaissent (aide contextuelle sur l'onglet, message de
+   confirmation) — à date, `COM_BREEZINGFORMSNG_OPTIONS` suffit pour le
+   libellé de l'onglet lui-même.
+7. **Vérification complète** avant commit, comme pour chaque lot de cette
+   migration : `php -l` sur les fichiers touchés, suite PHPUnit complète,
+   PHPStan niveau courant, vérification navigateur en direct (ouvrir
+   QuickMode sur un formulaire existant, onglet Options, modifier un champ
+   type Email, enregistrer, recharger, confirmer la persistance), build +
+   validation du package.
+
+## Risques identifiés
+
+- **Imbrication de deux systèmes d'onglets Bootstrap** (le `#menutab` de
+  QuickMode et le `#bfFormTabs` de l'écran classique, une fois copié dans
+  `fragment-3`) : les identifiants sont déjà uniques entre les deux écrans
+  (`tab-general`/`pane-general` côté classique, `fragment-1`/`fragment-2`
+  côté QuickMode), donc pas de collision attendue, mais à confirmer en
+  direct après l'étape 4.
+- **Deux formulaires HTML sur une même page** (`bfForm` restreint aux
+  onglets Propriétés/Avancé, `bfOptionsForm` pour Options) : `document.adminForm`
+  est utilisé ailleurs dans `quickmode-app.js` (ligne 931, pour lire
+  `active_language_code`) — vérifier qu'aucun script ne suppose qu'un seul
+  `<form>` existe sur la page avant de renommer/dupliquer des noms de champs.
+- **CodeMirror** : les instances de l'écran classique utilisent le préfixe
+  `jf_` (`jf_script1code`, `jf_script2code`, `jf_<piece>code`), distinct des
+  identifiants QuickMode (`bf*`) — pas de collision identifiée, à confirmer
+  une fois les deux écrans rendus simultanément.
+- **Redirection post-sauvegarde** de `FormsController::save()` : actuellement
+  pensée pour un écran plein-page ; à ajuster pour rouvrir QuickMode sur
+  l'onglet Options plutôt que sur l'onglet Propriétés par défaut.
+- **Formulaire non encore créé** (`$formId === 0`) : l'onglet Options n'a pas
+  de ligne SQL à afficher/enregistrer tant que le formulaire n'existe pas.
+  Décision à confirmer : griser l'onglet, ou le masquer, jusqu'à la première
+  sauvegarde QuickMode qui crée la ligne.
+
+## Critère de sortie
+
+`task=quickmode.display&form=ID` expose un troisième onglet « Options »
+donnant accès à l'intégralité des réglages actuellement uniquement
+disponibles via `task=forms.edit&advanced=1`, sans quitter l'écran QuickMode
+et sans dupliquer la logique de sauvegarde de `FormsController::save()`. Le
+lien « Plus d'options » a disparu de l'onglet Avancé.
+
+## État — clos le 2026-08-30
+
+Les 7 étapes sont terminées et vérifiées (`php -l`, suite PHPUnit complète,
+PHPStan sans erreur, vérification navigateur en direct à chaque étape,
+build + validation du package) :
+
+1. Contenu extrait dans `layouts/forms/advanced_options.php` et
+   `FormsAdvancedOptionsHtml` (`bfSel()`, `countEntries()`), branché dans
+   `forms/edit.php` sans changement de comportement.
+2. `<form name="bfForm">` resserré autour de `fragment-1`/`fragment-2`
+   uniquement dans `QuickmodeHtml`.
+3. `View\Quickmode\HtmlView` charge la ligne complète du formulaire via
+   `FormModel::getForm()` plus scripts/pièces via `FormsModel`, uniquement
+   quand `formId > 0`.
+4. Onglet `fragment-3` « Options » ajouté, avec son propre `<form
+   id="bfOptionsForm">` soumis à `forms.save` ; message de substitution
+   traduit (`COM_BREEZINGFORMSNG_QM_OPTIONS_SAVE_FIRST`, 8 langues) quand le
+   formulaire n'est pas encore enregistré.
+5. Lien « Plus d'options » retiré (`advanced_form.php`, `custom.js`,
+   `custom.css`) — la route `forms.edit&advanced=1` reste active pour la
+   création de formulaire.
+6. Traductions : seule `COM_BREEZINGFORMSNG_QM_OPTIONS_SAVE_FIRST` était
+   nouvelle, ajoutée aux 8 langues.
+7. Risque « redirection post-sauvegarde » également résolu : `bfOptionsForm`
+   porte `return_tab=options`, `FormsController::save()` ajoute `#fragment-3`
+   à la redirection dans ce cas, et `quickmode-app.js` réactive l'onglet
+   Options au chargement via l'API Bootstrap Tab. Vérifié de bout en bout
+   (soumission sans modification, `afterUrl` se termine par `#fragment-3`,
+   onglet actif après rechargement, valeur du titre inchangée).
+
+Commits : extraction du layout, resserrement de `bfForm`, ajout de
+`fragment-3`, retrait du lien, redirection post-sauvegarde — tous sur
+`rendering-engine-captcha-script-extraction`.
+
+### Correctif du 2026-08-30 — onglet Avancé vide en production
+
+Retour utilisateur en direct : l'onglet « Avancé » apparaissait vide après
+mise en ligne. Cause réelle, non anticipée par ce plan : Bootstrap 5 masque
+les onglets inactifs via le sélecteur CSS `.tab-content > .tab-pane`
+(enfant direct). L'étape 2 (resserrement de `bfForm`) avait imbriqué
+`fragment-1`/`fragment-2` un niveau plus profond (dans `<form>`, lui-même
+dans `.tab-content`) — ce sélecteur ne les ciblait plus, les deux onglets
+s'affichaient donc simultanément l'un sous l'autre, poussant le contenu
+réel de « Avancé » à ~900px plus bas dans la page.
+
+Correctif : `bfForm` reprend l'intégralité de `#menutab` (les trois
+`.tab-pane` restent enfants directs de `.tab-content`, ce que Bootstrap
+exige). `fragment-3` perd son `<form>` imbriqué (qui aurait recréé le même
+problème) au profit d'un simple `div#bfOptionsFieldsWrap` ; un gestionnaire
+de clic déplace ces champs (jamais un clone — `cloneNode()` perdrait les
+modifications en cours) vers un `<form>` créé via `document.createElement()`
+et ajouté à `document.body`, avant de le soumettre nativement. Un second
+bug trouvé au passage : `jQuery('<form>', {method: 'post', ...})` n'appliquait
+pas silencieusement `method`, transformant la sauvegarde en GET 404 — corrigé
+en fixant `tempForm.method` comme propriété DOM directe après
+`createElement()`.
+
+Vérifié par capture réseau (méthode POST confirmée, redirection vers
+`#fragment-3`) et par l'état `display`/`active` calculé de chaque
+`.tab-pane` (un seul visible à la fois, positions normales).
+
+### Correctif du 2026-08-31 — mise en forme manquante sur l'onglet Options
+
+Retour utilisateur en direct : les Oui/Non et autres contrôles de l'onglet
+Options apparaissaient sans mise en forme. Deux feuilles de style héritées
+(`admin.css`, `custom.css`), jamais conçues pour cohabiter avec du contenu
+Bootstrap réel, ciblaient `#bfQuickModeWrapper`/`main input`/`main select`
+sans exclusion, avec un usage massif de `!important`. Le pire cas :
+`main input[type="checkbox"]:not(old), input[type="radio"]` fixe
+`opacity: 0 !important` en s'appuyant sur un habillage `<label><span>`
+personnalisé — absent du balisage `.form-check` de `forms/edit.php` —
+rendant tous les Oui/Non de l'onglet Options invisibles. Un commentaire
+existant documentait déjà exactement ce problème pour `.bfPropertyWrap`
+(les propres bascules Oui/Non de QuickMode). Correctif : exclusion de
+`#bfOptionsFieldsWrap` sur chaque règle concernée, dans les deux fichiers,
+suivant ce précédent — aucun autre écran admin n'est affecté. Vérifié via
+`getComputedStyle()` et l'inspection des règles CSS réellement appliquées
+(pas seulement une impression visuelle) : bordures/arrondis/fonds Bootstrap
+corrects sur les champs texte, cases/boutons radio à leur taille normale.
+
+### Correctif du 2026-08-31 — bouton « Enregistrer » standard
+
+Demande utilisateur : remplacer les 6 boutons inline « Enregistrer les
+propriétés » (Propriétés/Avancé, haut/bas) et le bouton de l'onglet
+Options par le bouton « Enregistrer » standard de la barre d'outils Joomla,
+en un seul clic pour tout sauvegarder. Détails complets dans le message de
+commit `9719e0a1` ; résumé :
+
+- `ToolbarHelper::custom('save', ...)` (icônes PNG héritées, libellé
+  non standard) → `ToolbarHelper::apply('save', 'JTOOLBAR_APPLY')`
+  (« Enregistrer » — `JTOOLBAR_SAVE` donne « Enregistrer & Fermer »,
+  sémantique erronée ici).
+- Découverte bloquante : les boutons inline n'étaient pas cosmétiques —
+  changer de nœud dans l'arbre écrase les champs affichés avec les
+  données de l'arbre JSON, et seul un clic sur ces boutons committait
+  l'inverse. Retenu : commit automatique du nœud sortant à chaque
+  changement de sélection (`onselect`), sans validation des champs
+  obligatoires (choix explicite de l'utilisateur).
+- Sauvegarde Options unifiée sans rechargement de page intermédiaire :
+  les champs sont déplacés vers un `<form>` soumis dans un iframe caché
+  (`bfOptionsSaveFrame`), enchaîné après la sauvegarde JSON QuickMode
+  existante, avant la redirection finale (qui préserve désormais l'onglet
+  actif au moment du clic).
+- Bug d'intégrité trouvé en testant en direct : `title`/`name`/`description`
+  existent à la fois dans l'arbre JSON QuickMode et comme colonnes SQL
+  propres, écrites aussi par le formulaire Options — poster l'instantané
+  périmé de l'onglet Options écrasait silencieusement ce que la sauvegarde
+  JSON venait d'écrire. Corrigé en synchronisant ces trois champs depuis
+  QuickMode juste avant l'envoi (QuickMode fait autorité sur ces trois
+  champs partagés).
+- Bug non lié trouvé au passage : `</div>` de fermeture de
+  `#bfQuickModeRight` dupliqué depuis le correctif précédent — corrigé.
+
+Vérifié en direct de bout en bout : édition d'un champ Propriétés suivie
+d'un changement de nœud sans sauvegarde (aucune perte), sauvegarde unique
+persistant à la fois les propriétés QuickMode et un champ MailChimp de
+l'onglet Options, retour sur l'onglet actif au moment du clic, et
+confirmation explicite du bug de préséance title/name/description avant
+et après correctif.

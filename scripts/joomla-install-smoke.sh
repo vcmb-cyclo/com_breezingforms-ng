@@ -3,6 +3,7 @@
 set -euo pipefail
 
 archive="${1:?Usage: scripts/joomla-install-smoke.sh path/to/package.zip}"
+contentbuilder_archive="${CONTENTBUILDER_ARCHIVE:-}"
 joomla_image="${JOOMLA_IMAGE:-joomla:6.0-apache}"
 mysql_image="${MYSQL_IMAGE:-mysql:8.4}"
 run_id="${GITHUB_RUN_ID:-local}-$$"
@@ -94,14 +95,32 @@ docker exec "${web_container}" php -r '
 '
 
 docker cp "${archive}" "${web_container}:${container_archive}" >/dev/null
+
+if [[ -n "${contentbuilder_archive}" ]]; then
+    contentbuilder_container_archive="/tmp/com_contentbuilderng.zip"
+    docker cp "${contentbuilder_archive}" "${web_container}:${contentbuilder_container_archive}" >/dev/null
+    docker exec -e HTTP_HOST=localhost "${web_container}" php /var/www/html/cli/joomla.php extension:install \
+        --path="${contentbuilder_container_archive}" \
+        --live-site=http://localhost \
+        --quiet \
+        --no-interaction
+fi
+
 docker exec -e HTTP_HOST=localhost "${web_container}" php /var/www/html/cli/joomla.php extension:install \
     --path="${container_archive}" \
     --live-site=http://localhost \
     --quiet \
     --no-interaction
 
+for theme_file in themes/default/theme.css themes/aqua/theme.css; do
+    if ! docker exec "${web_container}" test -f "/var/www/html/media/breezingforms/${theme_file}"; then
+        echo "Installed package is missing /media/breezingforms/${theme_file}." >&2
+        exit 1
+    fi
+done
+
 table_prefix="$(
-    docker exec "${web_container}" php -r '
+    docker exec -e HTTP_HOST=localhost "${web_container}" php -r '
         require "/var/www/html/configuration.php";
         $config = new JConfig();
         echo $config->dbprefix;
@@ -118,6 +137,184 @@ if [[ "${component_count}" -ne 1 ]]; then
     docker exec -e MYSQL_PWD=joomla "${db_container}" mysql -N -ujoomla joomla \
         -e "SELECT extension_id, type, element, name FROM \`${table_prefix}extensions\` WHERE element LIKE '%breezingform%' OR name LIKE '%BreezingForms%';" >&2
     exit 1
+fi
+
+if [[ -n "${contentbuilder_archive}" ]]; then
+    contentbuilder_count="$(
+        docker exec -e MYSQL_PWD=joomla "${db_container}" mysql -N -ujoomla joomla \
+            -e "SELECT COUNT(*) FROM \`${table_prefix}extensions\` WHERE type = 'component' AND element = 'com_contentbuilderng';"
+    )"
+
+    if [[ "${contentbuilder_count}" -ne 1 ]]; then
+        echo "ContentBuilder NG component registration was not found." >&2
+        exit 1
+    fi
+
+    contentbuilder_forms_table_count="$(
+        docker exec -e MYSQL_PWD=joomla "${db_container}" mysql -N -ujoomla joomla \
+            -e "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = '${table_prefix}contentbuilderng_forms';"
+    )"
+
+    if [[ "${contentbuilder_forms_table_count}" -ne 1 ]]; then
+        echo "ContentBuilder NG forms table was not installed correctly." >&2
+        exit 1
+    fi
+
+    # Exercise the packaged BFNG ContentBuilder SQL loaders against the real
+    # Joomla database API. The temporary row is removed before the smoke test
+    # continues, so this does not alter the installed test fixture.
+    docker exec "${web_container}" php -r '
+        define("_JEXEC", 1);
+        require "/var/www/html/includes/defines.php";
+        require "/var/www/html/includes/framework.php";
+        $container = \Joomla\CMS\Factory::getContainer();
+        $container->alias("session.web", "session.web.site")
+            ->alias("session", "session.web.site")
+            ->alias("JSession", "session.web.site")
+            ->alias(\Joomla\CMS\Session\Session::class, "session.web.site")
+            ->alias(\Joomla\Session\Session::class, "session.web.site")
+            ->alias(\Joomla\Session\SessionInterface::class, "session.web.site");
+        $app = $container->get(\Joomla\CMS\Application\SiteApplication::class);
+        \Joomla\CMS\Factory::$application = $app;
+        require "/var/www/html/administrator/components/com_contentbuilderng/src/Helper/RuntimeContextHelper.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFormAssociationLoader.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFormDataLoader.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderRecordLoader.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderChoiceHydrationScriptBuilder.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderEditableRecordScriptBuilder.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFileHydrationScriptBuilder.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFileSupportBuilder.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFileUploadScriptBuilder.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFlashUploadValidationBuilder.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderSelectHydrationScriptBuilder.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderSignatureImageEncoder.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderSignatureScriptBuilder.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderValueHydrationScriptBuilder.php";
+        require "/var/www/html/components/com_breezingformsng/src/Support/processor_facade.php";
+
+        $db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
+        $referenceId = 987654;
+        $query = $db->getQuery(true)
+            ->insert($db->quoteName("#__contentbuilderng_forms"))
+            ->columns($db->quoteName(["type", "reference_id", "name", "published"]))
+            ->values(implode(",", [
+                $db->quote("com_breezingformsng"),
+                $referenceId,
+                $db->quote("BFNG smoke association"),
+                1,
+            ]));
+        $db->setQuery($query);
+        $db->execute();
+        $formId = (int) $db->insertid();
+
+        $sourceQuery = $db->getQuery(true)
+            ->insert($db->quoteName("#__facileforms_forms"))
+            ->columns($db->quoteName(["name", "title", "published", "template_code"]))
+            ->values(implode(",", [
+                $db->quote("BFNG smoke source"),
+                $db->quote("BFNG smoke source"),
+                1,
+                $db->quote(""),
+            ]));
+        $db->setQuery($sourceQuery);
+        $db->execute();
+        $sourceId = (int) $db->insertid();
+
+        try {
+            $associationLoader = new \Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderFormAssociationLoader($db);
+            $dataLoader = new \Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderFormDataLoader($db);
+            if (!in_array($formId, $associationLoader->load($referenceId), true)) {
+                throw new \RuntimeException("ContentBuilder association loader returned no inserted form");
+            }
+            $data = $dataLoader->load($formId);
+            if (!is_array($data) || (int) ($data["reference_id"] ?? 0) !== $referenceId) {
+                throw new \RuntimeException("ContentBuilder form data loader returned unexpected data");
+            }
+
+            $source = \CB\Component\Contentbuilderng\Administrator\Helper\FormSourceFactory::getForm(
+                "com_breezingformsng",
+                $sourceId
+            );
+            if (!is_object($source)) {
+                throw new \RuntimeException("ContentBuilder source factory returned no BFNG form");
+            }
+            $recordLoader = new \Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderRecordLoader(
+                static function (string $sourceReferenceId, int $recordId, bool $publishedOnly, int $ownerId, bool $allLanguages) use ($source): array {
+                    return (array) $source->getRecord($recordId, $publishedOnly, $ownerId, $allLanguages);
+                }
+            );
+            if ($recordLoader->load(
+                [
+                    "reference_id" => $sourceId,
+                    "published_only" => 0,
+                    "own_only_fe" => 0,
+                    "show_all_languages_fe" => 1,
+                ],
+                0,
+                true,
+                0,
+                true,
+                "record not found"
+            ) !== []) {
+                throw new \RuntimeException("ContentBuilder record loader returned an unexpected new-record payload");
+            }
+
+            $signatureDirectory = "/var/www/html/media/breezingforms/signatures";
+            if (!is_dir($signatureDirectory) && !mkdir($signatureDirectory, 0775, true) && !is_dir($signatureDirectory)) {
+                throw new \RuntimeException("Unable to create the ContentBuilder signature directory");
+            }
+            $signatureFileName = "bfng-smoke-" . getmypid() . ".png";
+            $signaturePath = $signatureDirectory . "/" . $signatureFileName;
+            file_put_contents($signaturePath, "BFNG smoke signature");
+
+            try {
+                $fileRecord = (object) [
+                    "recElementId" => 701,
+                    "recName" => "documents",
+                    "recType" => "File Upload",
+                    "recValue" => "existing.pdf\r\nsecond.jpg",
+                ];
+                $signatureRecord = (object) [
+                    "recElementId" => 702,
+                    "recName" => "signature",
+                    "recType" => "Signature",
+                    "recValue" => $signatureFileName,
+                ];
+                $editableBuilder = new \Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderEditableRecordScriptBuilder(
+                    static fn (string $value): string => $value,
+                    static fn (string $value, int $width, string $break, bool $cut): string => wordwrap($value, $width, $break, $cut)
+                );
+                $rendered = $editableBuilder->build(
+                    [$fileRecord, $signatureRecord],
+                    [],
+                    true,
+                    7,
+                    $signatureDirectory
+                );
+                if (!str_contains($rendered["contentBuilderScript"], "cbFlashElemCnt[\"ff_elem701\"] = 2;")) {
+                    throw new \RuntimeException("ContentBuilder file upload count was not rendered");
+                }
+                if (!str_contains($rendered["javascript"], "existing.pdf")
+                    || !str_contains($rendered["javascript"], "data:image")
+                    || !str_contains($rendered["javascript"], base64_encode("BFNG smoke signature"))) {
+                    throw new \RuntimeException("ContentBuilder file or signature hydration was not rendered");
+                }
+            } finally {
+                if (is_file($signaturePath)) {
+                    unlink($signaturePath);
+                }
+            }
+        } finally {
+            $db->setQuery($db->getQuery(true)
+                ->delete($db->quoteName("#__contentbuilderng_forms"))
+                ->where($db->quoteName("id") . " = " . $formId));
+            $db->execute();
+            $db->setQuery($db->getQuery(true)
+                ->delete($db->quoteName("#__facileforms_forms"))
+                ->where($db->quoteName("id") . " = " . $sourceId));
+            $db->execute();
+        }
+    '
 fi
 
 plugin_count="$(

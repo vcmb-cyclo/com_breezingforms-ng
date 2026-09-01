@@ -1,0 +1,55 @@
+<?php
+
+/**
+ * BreezingForms NG - A Joomla Forms Application
+ *
+ * @package BreezingFormsNG
+ * @copyright Copyright (C) 2024-2026 by XDA+GIL
+ * @license GNU General Public License version 2 or later; see LICENSE.txt
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ **/
+
+namespace Vcmb\Component\BreezingformsNG\Tests\Site\Service\Rendering\QuickMode;
+
+use PHPUnit\Framework\TestCase;
+use Vcmb\Component\BreezingformsNG\Site\Service\Rendering\QuickMode\QuickModeSelectBuilder;
+
+final class QuickModeSelectBuilderTest extends TestCase
+{
+    public function testBuildsSelectedEscapedOptionsAndAttributes(): void
+    {
+        $builder = new QuickModeSelectBuilder();
+
+        self::assertSame(
+            '<select data-chosen="no-chzn" class="ff_elem form-select" style="width:10px;" multiple="multiple" '
+            . 'tabindex="1" name="ff_nm_choice[]" id="ff_elem14">' . "\n"
+            . '<option selected="selected" value="a&amp;b">A &amp; B</option>' . "\n"
+            . '</select>' . "\n",
+            $builder->build('ff_elem form-select', 'choice', 14, "1;A & B;a&b\r\ninvalid", true, 'tabindex="1" ', 'style="width:10px;" ')
+        );
+    }
+
+    public function testBuildsNonMultipleSelectWithoutOptions(): void
+    {
+        self::assertSame(
+            '<select data-chosen="no-chzn" class="ff_elem" name="ff_nm_empty[]" id="ff_elem15">' . "\n"
+            . '</select>' . "\n",
+            (new QuickModeSelectBuilder())->build('ff_elem', 'empty', 15, '', false)
+        );
+    }
+
+    public function testEscapesClassAndFieldName(): void
+    {
+        $html = (new QuickModeSelectBuilder())->build(
+            'ff_elem" onfocus="alert(1)',
+            'choice" onfocus="alert(2)',
+            14,
+            '',
+            false
+        );
+
+        self::assertStringContainsString('ff_elem&quot; onfocus=&quot;alert(1)', $html);
+        self::assertStringContainsString('ff_nm_choice&quot; onfocus=&quot;alert(2)[]', $html);
+    }
+}

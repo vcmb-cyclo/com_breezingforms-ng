@@ -6,8 +6,10 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service\Integration;
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
+use Joomla\CMS\Factory;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Database\ParameterType;
+use Vcmb\Component\BreezingformsNG\Site\Service\Scripting\StoredPhpExecutor;
 
 /**
  * BreezingForms NG - A Joomla Forms Application
@@ -27,11 +29,11 @@ use Joomla\Database\ParameterType;
  **/
 class IntegratorRuntime
 {
+    private ?StoredPhpExecutor $codeExecutorService = null;
+
     private DatabaseInterface $db;
 
     private $rules = array();
-
-    private $formId = -1;
 
     private $data = array();
 
@@ -39,7 +41,6 @@ class IntegratorRuntime
     {
         $this->db = $database;
         $this->rules = $this->getRules($formId);
-        $this->formId = $formId;
     }
 
     public function getRules($formId)
@@ -123,6 +124,7 @@ class IntegratorRuntime
         try {
             $ret = $db->setQuery($query)->loadObjectList();
         } catch (\Exception $e) {
+            $ret = [];
             echo $e->getMessage();
         } // try
 
@@ -178,7 +180,7 @@ class IntegratorRuntime
     public function handleCode($value, $code)
     {
         if (trim($code) != '') {
-            @eval($code);
+            $this->codeExecutor()->execute($this, $code, ['value' => $value]);
         }
         return $value;
     }
@@ -186,8 +188,13 @@ class IntegratorRuntime
     public function handleFinalizeCode($code)
     {
         if (trim($code) != '') {
-            @eval($code);
+            $this->codeExecutor()->execute($this, $code);
         }
+    }
+
+    private function codeExecutor(): StoredPhpExecutor
+    {
+        return $this->codeExecutorService ??= new StoredPhpExecutor();
     }
 
     public function commit()

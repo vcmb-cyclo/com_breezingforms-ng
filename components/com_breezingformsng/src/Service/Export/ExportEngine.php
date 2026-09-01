@@ -47,6 +47,7 @@ use CB\Component\Contentbuilderng\Administrator\Service\ArticleService;
 use CB\Component\Contentbuilderng\Administrator\Service\ListSupportService;
 use CB\Component\Contentbuilderng\Administrator\Service\PermissionService;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\PdfDocument;
+use Vcmb\Component\BreezingformsNG\Administrator\Service\PdfFontDirectoryScanner;
 use Vcmb\Component\BreezingformsNG\Site\Service\Notification\MailSender;
 use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\SubmissionTimestampFormatter;
 
@@ -244,20 +245,18 @@ final class ExportEngine
                                 $_i++;
                             }
                         } else {
-                            if (true) {
-                                $next = count($this->processor->savedata);
-                                $this->processor->savedata[$next] = array();
-                                $this->processor->savedata[$next][_FF_DATA_ID] = $_rec->recElementId;
-                                $this->processor->savedata[$next][_FF_DATA_NAME] = $_rec->recName;
-                                $this->processor->savedata[$next][_FF_DATA_TITLE] = strip_tags($_rec->recTitle);
-                                $this->processor->savedata[$next][_FF_DATA_TYPE] = $_rec->recType;
-                                $this->processor->savedata[$next][_FF_DATA_VALUE] = '';
-                                $_is_values = explode("\n", $_rec->recValue);
-                                foreach ($_is_values as $_is_value) {
-                                    $this->processor->savedata[$next][_FF_DATA_VALUE] .= $_is_value . "\n";
-                                }
-                                $this->processor->savedata[$next][_FF_DATA_VALUE] = rtrim($this->processor->savedata[$next][_FF_DATA_VALUE]);
+                            $next = count($this->processor->savedata);
+                            $this->processor->savedata[$next] = array();
+                            $this->processor->savedata[$next][_FF_DATA_ID] = $_rec->recElementId;
+                            $this->processor->savedata[$next][_FF_DATA_NAME] = $_rec->recName;
+                            $this->processor->savedata[$next][_FF_DATA_TITLE] = strip_tags($_rec->recTitle);
+                            $this->processor->savedata[$next][_FF_DATA_TYPE] = $_rec->recType;
+                            $this->processor->savedata[$next][_FF_DATA_VALUE] = '';
+                            $_is_values = explode("\n", $_rec->recValue);
+                            foreach ($_is_values as $_is_value) {
+                                $this->processor->savedata[$next][_FF_DATA_VALUE] .= $_is_value . "\n";
                             }
+                            $this->processor->savedata[$next][_FF_DATA_VALUE] = rtrim($this->processor->savedata[$next][_FF_DATA_VALUE]);
                         }
                     }
                 }
@@ -417,7 +416,7 @@ final class ExportEngine
                     if (!$res) {
 
                         $is_future = 0;
-                        $created_up = $created_up->toSql();
+                        $created_up = (new \Joomla\CMS\Date\Date())->toSql();
                         if (intval($cbData->default_publish_up_days) != 0) {
                             $is_future = 1;
                             $date = new \Joomla\CMS\Date\Date(strtotime('now +' . intval($cbData->default_publish_up_days) . ' days'));
@@ -715,8 +714,7 @@ final class ExportEngine
         if (is_dir(JPATH_SITE . '/media/breezingforms/pdftpl/fonts/')) {
 
             $sourcePath = JPATH_SITE . '/media/breezingforms/pdftpl/fonts/';
-            if (@file_exists($sourcePath) && @is_readable($sourcePath) && @is_dir($sourcePath) && $handle = @opendir($sourcePath)) {
-                while (false !== ($file = @readdir($handle))) {
+            foreach ((new PdfFontDirectoryScanner())->scan($sourcePath) as $file) {
                     if ($file != "." && $file != ".." && $this->processor->endsWith(strtolower($file), '.php')) {
                         $file_sep = explode('.', $file);
                         if (count($file_sep) > 1) {
@@ -749,8 +747,6 @@ final class ExportEngine
                             }
                         }
                     }
-                }
-                @closedir($handle);
             }
         }
 
@@ -783,7 +779,7 @@ final class ExportEngine
         $regex = '<!--(.+?)=(.+?)-->';
         preg_match_all($regex, str_replace(' ', '', $c), $matches_array);
 
-        if (isset($matches_array[1]) && isset($matches_array[1][0]) && trim($matches_array[1][0]) == 'fm' && isset($matches_array[2]) && isset($matches_array[2][0])) {
+        if (isset($matches_array[1][0]) && trim($matches_array[1][0]) == 'fm' && isset($matches_array[2][0])) {
 
             $fm = $matches_array[2][0];
 

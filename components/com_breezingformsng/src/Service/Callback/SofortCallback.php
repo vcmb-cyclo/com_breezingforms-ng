@@ -17,6 +17,7 @@ use Joomla\CMS\Uri\Uri;
 use Joomla\Database\ParameterType;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Filesystem\File;
+use Joomla\CMS\Mail\Mail;
 use Joomla\CMS\Mail\MailerFactoryInterface;
 
 /**
@@ -25,12 +26,16 @@ use Joomla\CMS\Mail\MailerFactoryInterface;
  */
 final class SofortCallback
 {
+    private readonly PaymentDownloadPolicy $downloadPolicy;
+
     public function __construct(
         private readonly CMSApplication $application,
         private readonly DatabaseInterface $database,
         private readonly RedirectHelper $redirectHelper,
         private readonly MailerFactoryInterface $mailerFactory,
+        ?PaymentDownloadPolicy $downloadPolicy = null,
     ) {
+        $this->downloadPolicy = $downloadPolicy ?? new PaymentDownloadPolicy();
     }
 
     public function success(): void
@@ -231,6 +236,7 @@ final class SofortCallback
 
                             $recipients = explode('###', $input->getString('user_variable_2', ''));
                             $recipientsSize = count($recipients);
+                            /** @var Mail $mailer */
                             $mailer = $this->mailerFactory->createMailer();
                             $mailer->Subject = Text::_('COM_BREEZINGFORMSNG_YOUR_PAYMENT_AT_SU');
                             $mailer->Body = Text::_('COM_BREEZINGFORMSNG_HALLO') . "\n\n";
@@ -265,8 +271,8 @@ final class SofortCallback
 
                             for ($i = 0; $i < $recipientsSize; $i++) {
                                 if (bf_is_email($recipients[$i])) {
-                                    $mailer->AddAddress($recipients[$i]);
-                                    $mailer->Send();
+                                    $mailer->addRecipient($recipients[$i]);
+                                    $mailer->send();
                                 }
                             }
 
@@ -342,7 +348,10 @@ final class SofortCallback
 
                     if (count($downloads) == 1) {
 
-                        if ($downloads[0]->paypal_download_tries < $options['downloadTries']) {
+                        if ($this->downloadPolicy->canDownload(
+                            (int) $downloads[0]->paypal_download_tries,
+                            (int) $options['downloadTries']
+                        )) {
 
                             $updateQuery = $db->getQuery(true)
                                 ->update($db->quoteName('#__facileforms_records'))

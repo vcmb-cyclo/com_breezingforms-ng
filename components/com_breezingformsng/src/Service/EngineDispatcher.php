@@ -16,6 +16,7 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Callback\FlashUploadCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Upload\FlashUploadSizeValidator;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\OptCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\PayPalCallback;
+use Vcmb\Component\BreezingformsNG\Site\Service\Callback\PaymentDownloadPolicy;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\SofortCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\StripeCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Support\RedirectHelper;
@@ -26,13 +27,17 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Runtime\RequestParameterParser;
  */
 final class EngineDispatcher
 {
+    private readonly PaymentDownloadPolicy $paymentDownloadPolicy;
+
     public function __construct(
         private readonly Input $input,
         private readonly CMSApplication $application,
         private readonly DatabaseInterface $database,
         private readonly MailerFactoryInterface $mailerFactory,
         private readonly CacheControllerFactoryInterface $cacheControllerFactory,
+        ?PaymentDownloadPolicy $paymentDownloadPolicy = null,
     ) {
+        $this->paymentDownloadPolicy = $paymentDownloadPolicy ?? new PaymentDownloadPolicy();
     }
 
     public function dispatch(array $engineContext, string $application): void
@@ -54,23 +59,23 @@ final class EngineDispatcher
         } elseif ($this->input->getBool('checkCaptcha', false)) {
             (new CaptchaCallback($this->application))->check();
         } elseif ($this->input->getBool('confirmPayPalIpn', false) && $application === '') {
-            (new PayPalCallback($this->application, $this->database, $this->redirectHelper()))->confirmIpn();
+            (new PayPalCallback($this->application, $this->database, $this->redirectHelper(), null, $this->paymentDownloadPolicy))->confirmIpn();
         } elseif ($this->input->getBool('confirmStripe', false) && $application === '') {
-            (new StripeCallback($this->application, $this->database, $this->redirectHelper()))->confirm();
+            (new StripeCallback($this->application, $this->database, $this->redirectHelper(), $this->paymentDownloadPolicy))->confirm();
         } elseif ($this->input->getBool('stripeDownload', false) && $application === '') {
-            (new StripeCallback($this->application, $this->database, $this->redirectHelper()))->download();
+            (new StripeCallback($this->application, $this->database, $this->redirectHelper(), $this->paymentDownloadPolicy))->download();
         } elseif ($this->input->getBool('confirmPayPal', false) && $application === '') {
-            (new PayPalCallback($this->application, $this->database, $this->redirectHelper()))->confirm();
+            (new PayPalCallback($this->application, $this->database, $this->redirectHelper(), null, $this->paymentDownloadPolicy))->confirm();
         } elseif ($this->input->getBool('paypalDownload', false) && $application === '') {
-            (new PayPalCallback($this->application, $this->database, $this->redirectHelper()))->download();
+            (new PayPalCallback($this->application, $this->database, $this->redirectHelper(), null, $this->paymentDownloadPolicy))->download();
         } elseif ($this->input->getBool('showPayPalConnectMsg', false)) {
-            (new PayPalCallback($this->application, $this->database, $this->redirectHelper()))->connectMessage();
+            (new PayPalCallback($this->application, $this->database, $this->redirectHelper(), null, $this->paymentDownloadPolicy))->connectMessage();
         } elseif ($this->input->getBool('successSofortueberweisung', false)) {
-            (new SofortCallback($this->application, $this->database, $this->redirectHelper(), $this->mailerFactory))->success();
+            (new SofortCallback($this->application, $this->database, $this->redirectHelper(), $this->mailerFactory, $this->paymentDownloadPolicy))->success();
         } elseif ($this->input->getBool('confirmSofortueberweisung', false)) {
-            (new SofortCallback($this->application, $this->database, $this->redirectHelper(), $this->mailerFactory))->confirm();
+            (new SofortCallback($this->application, $this->database, $this->redirectHelper(), $this->mailerFactory, $this->paymentDownloadPolicy))->confirm();
         } elseif ($this->input->getBool('sofortueberweisungDownload', false) && $application === '') {
-            (new SofortCallback($this->application, $this->database, $this->redirectHelper(), $this->mailerFactory))->download();
+            (new SofortCallback($this->application, $this->database, $this->redirectHelper(), $this->mailerFactory, $this->paymentDownloadPolicy))->download();
         } elseif ($this->input->getBool('flashUpload', false)) {
             (new FlashUploadCallback($this->application, $this->database, new FlashUploadSizeValidator()))->handle();
         } elseif ($this->input->getString('opt_in', '') === 'true') {

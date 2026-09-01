@@ -20,6 +20,22 @@ use Closure;
  */
 final class StoredPhpExecutor
 {
+    /**
+     * Executes a trusted snippet in the scope of the supplied runtime object.
+     *
+     * @param array<string, mixed> $variables
+     */
+    public function execute(object $scope, string $code, array $variables = []): mixed
+    {
+        $executor = function () use ($code, $variables) {
+            extract($variables, EXTR_SKIP);
+
+            return eval($code);
+        };
+
+        return $executor->call($scope);
+    }
+
     public function executePiece(
         object $processor,
         string $code,

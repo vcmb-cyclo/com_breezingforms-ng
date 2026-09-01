@@ -15,6 +15,7 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\View\Pieces;
 
 defined('_JEXEC') or die('Direct Access to this location is not allowed.');
 
+use Joomla\CMS\Application\CMSApplication;
 use Joomla\CMS\Editor\Editor;
 use Joomla\CMS\Factory;
 use Joomla\CMS\HTML\HTMLHelper;
@@ -54,7 +55,9 @@ class Renderer
 
 	static function edit($option, $pkg, &$row, &$typelist)
 	{
-		Factory::getApplication()->getInput()->set('hidemainmenu', 1);
+		/** @var CMSApplication $app */
+		$app = Factory::getApplication();
+		$app->getInput()->set('hidemainmenu', 1);
 		$action = $row->id ? Text::_('COM_BREEZINGFORMSNG_PIECES_EDITPIECE') : Text::_('COM_BREEZINGFORMSNG_PIECES_ADDPIECE');
 
 		$pageTitle = BreadcrumbHelper::render([
@@ -62,7 +65,7 @@ class Renderer
 			['label' => Text::_('COM_BREEZINGFORMSNG_MANAGEPIECES'), 'url' => 'index.php?option=com_breezingformsng&view=pieces'],
 			['label' => $row->id && $row->name !== '' ? (string) $row->name : Text::_('COM_BREEZINGFORMSNG_PIECES_ADDPIECE')],
 		]);
-		Factory::getApplication()->getDocument()->setTitle(strip_tags($pageTitle));
+		$app->getDocument()->setTitle(strip_tags($pageTitle));
 		ToolbarHelper::title($pageTitle, 'logo_left');
 
 		$hasPersistedUnitTests = $row->id && trim((string) $row->unit_tests) !== '';
@@ -89,7 +92,7 @@ class Renderer
 		ToolBarHelper::custom('pieces.cancel', 'cancel.png', 'cancel_f2.png', Text::_('COM_BREEZINGFORMSNG_TOOLBAR_QUICKMODE_CLOSE'), false);
 		?>
 		<?php
-		$document = Factory::getApplication()->getDocument();
+		$document = $app->getDocument();
 		$document->getWebAssetManager()->useScript('com_breezingformsng.areautils');
 		$document->getWebAssetManager()->useScript('com_breezingformsng.pieces-edit');
 		$document->addScriptOptions('com_breezingformsng.pieces-edit', [
@@ -438,7 +441,9 @@ class Renderer
 
 	static function test($option, $pkg, &$row, $functionName, $paramNames, $paramDefaults, $paramValues = array(), $result = null, $output = '', $error = '', $safeMode = 1, $autoRun = false, $errorDetails = array(), $testMode = '', $unitTestResult = array(), $autoOpened = 0)
 	{
-		Factory::getApplication()->getInput()->set('hidemainmenu', 1);
+		/** @var CMSApplication $app */
+		$app = Factory::getApplication();
+		$app->getInput()->set('hidemainmenu', 1);
 		ToolBarHelper::custom('pieces.edit', 'undo', '', Text::_('COM_BREEZINGFORMSNG_TEST_BACK'), false);
 		ToolBarHelper::custom('pieces.previous', 'arrow-left', '', Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGEPREV'), false);
 		ToolBarHelper::custom('pieces.next', 'arrow-right', '', Text::_('COM_BREEZINGFORMSNG_PROCESS_PAGENEXT'), false);
@@ -454,7 +459,7 @@ class Renderer
 			$autoOpenUnitWarningText = $autoOpenUnitFailureCount > 0
 				? Text::plural('COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES', $autoOpenUnitFailureCount)
 				: Text::_('COM_BREEZINGFORMSNG_TEST_UNIT_FAILURES_ON_OPEN');
-			$document = Factory::getApplication()->getDocument();
+			$document = $app->getDocument();
 			$document->getWebAssetManager()->useScript('com_breezingformsng.pieces-test');
 			$document->addScriptOptions('com_breezingformsng.pieces-test', [
 				'autoSubmit' => $autoRun || $testMode === 'unit' || $shouldAutoRunUnitTestsOnly,

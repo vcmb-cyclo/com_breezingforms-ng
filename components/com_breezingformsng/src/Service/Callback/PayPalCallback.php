@@ -16,7 +16,6 @@ use Joomla\CMS\Uri\Uri;
 use Joomla\Database\ParameterType;
 use Joomla\Database\DatabaseInterface;
 use Joomla\Http\Http;
-use Joomla\Http\HttpFactory;
 
 /**
  * PayPal payment callbacks: IPN notification, return-URL confirmation,
@@ -24,16 +23,13 @@ use Joomla\Http\HttpFactory;
  */
 final class PayPalCallback
 {
-    private readonly Http $http;
-
     public function __construct(
         private readonly CMSApplication $application,
         private readonly DatabaseInterface $database,
         private readonly RedirectHelper $redirectHelper,
         private readonly PaymentDownloadService $paymentDownloadService,
-        ?Http $http = null,
+        private readonly Http $http,
     ) {
-        $this->http = $http ?? (new HttpFactory())->getHttp();
     }
 
     public function confirmIpn(): void

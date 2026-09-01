@@ -32,6 +32,38 @@ final class EngineDispatcherContainerTest extends TestCase
         self::assertStringContainsString('RedirectHelper::class', $source);
         self::assertStringContainsString('FlashUploadSizeValidator::class', $source);
         self::assertStringContainsString('UploadFileCleaner::class', $source);
+        self::assertStringContainsString(
+            '$container->share(' . "\n            PaymentDownloadPolicy::class",
+            $source
+        );
+        self::assertStringContainsString(
+            '$container->share(' . "\n            PaymentDownloadService::class",
+            $source
+        );
+        self::assertStringContainsString(
+            '$container->share(' . "\n            RedirectHelper::class",
+            $source
+        );
+
+        $dispatcherProvider = substr($source, strpos($source, 'EngineDispatcher::class'));
+        self::assertIsString($dispatcherProvider);
+        self::assertStringContainsString(
+            'static function () use ($container): FormRenderer',
+            $dispatcherProvider
+        );
+        self::assertStringContainsString(
+            'static function () use ($container): PayPalCallback',
+            $dispatcherProvider
+        );
+        self::assertStringNotContainsString(
+            "                    \$container->get(FormRenderer::class),",
+            $dispatcherProvider
+        );
+        self::assertStringNotContainsString(
+            "                    \$container->get(PayPalCallback::class),",
+            $dispatcherProvider
+        );
+        self::assertStringContainsString('(new HttpFactory())->getHttp()', $source);
 
         $dispatcher = file_get_contents(
             __DIR__ . '/../../../components/com_breezingformsng/src/Service/EngineDispatcher.php'

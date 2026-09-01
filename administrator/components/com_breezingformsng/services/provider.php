@@ -21,6 +21,7 @@ use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\Database\DatabaseInterface;
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
+use Joomla\Http\HttpFactory;
 use Vcmb\Component\BreezingformsNG\Administrator\Extension\BreezingFormsNGComponent;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\CaptchaCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\FlashUploadCallback;
@@ -53,12 +54,12 @@ return new class implements ServiceProviderInterface
             static fn(): RequestParameterParser => new RequestParameterParser(),
         );
 
-        $container->set(
+        $container->share(
             PaymentDownloadPolicy::class,
             static fn(): PaymentDownloadPolicy => new PaymentDownloadPolicy(),
         );
 
-        $container->set(
+        $container->share(
             PaymentDownloadService::class,
             static function (Container $container) use ($application): PaymentDownloadService {
                 return new PaymentDownloadService(
@@ -70,7 +71,7 @@ return new class implements ServiceProviderInterface
             },
         );
 
-        $container->set(
+        $container->share(
             RedirectHelper::class,
             static function () use ($application): RedirectHelper {
                 return new RedirectHelper($application);
@@ -116,7 +117,7 @@ return new class implements ServiceProviderInterface
                     $container->get(DatabaseInterface::class),
                     $container->get(RedirectHelper::class),
                     $container->get(PaymentDownloadService::class),
-                    null,
+                    (new HttpFactory())->getHttp(),
                 );
             }
         );
@@ -172,13 +173,27 @@ return new class implements ServiceProviderInterface
             static function (Container $container) use ($application): EngineDispatcher {
                 return new EngineDispatcher(
                     $application->getInput(),
-                    $container->get(FormRenderer::class),
-                    $container->get(CaptchaCallback::class),
-                    $container->get(PayPalCallback::class),
-                    $container->get(StripeCallback::class),
-                    $container->get(SofortCallback::class),
-                    $container->get(FlashUploadCallback::class),
-                    $container->get(OptCallback::class),
+                    static function () use ($container): FormRenderer {
+                        return $container->get(FormRenderer::class);
+                    },
+                    static function () use ($container): CaptchaCallback {
+                        return $container->get(CaptchaCallback::class);
+                    },
+                    static function () use ($container): PayPalCallback {
+                        return $container->get(PayPalCallback::class);
+                    },
+                    static function () use ($container): StripeCallback {
+                        return $container->get(StripeCallback::class);
+                    },
+                    static function () use ($container): SofortCallback {
+                        return $container->get(SofortCallback::class);
+                    },
+                    static function () use ($container): FlashUploadCallback {
+                        return $container->get(FlashUploadCallback::class);
+                    },
+                    static function () use ($container): OptCallback {
+                        return $container->get(OptCallback::class);
+                    },
                 );
             }
         );

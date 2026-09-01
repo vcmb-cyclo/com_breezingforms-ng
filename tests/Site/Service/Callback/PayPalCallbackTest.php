@@ -83,6 +83,14 @@ final class PayPalCallbackTest extends TestCase
         );
     }
 
+    public function testHttpClientIsRequiredAsAnInjectedDependency(): void
+    {
+        $parameter = (new ReflectionMethod(PayPalCallback::class, '__construct'))->getParameters()[4];
+
+        self::assertFalse($parameter->allowsNull());
+        self::assertSame(Http::class, (string) $parameter->getType());
+    }
+
     private function invokeRequestVerification(Http $http, string $paypalUrl, string $body): string
     {
         $application = new CMSApplication();

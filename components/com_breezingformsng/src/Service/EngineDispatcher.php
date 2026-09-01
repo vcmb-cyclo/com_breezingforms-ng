@@ -6,6 +6,7 @@ namespace Vcmb\Component\BreezingformsNG\Site\Service;
 
 defined('_JEXEC') or die;
 
+use Closure;
 use Joomla\Input\Input;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\CaptchaCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\FlashUploadCallback;
@@ -21,52 +22,59 @@ final class EngineDispatcher
 {
     public function __construct(
         private readonly Input $input,
-        private readonly FormRenderer $formRenderer,
-        private readonly CaptchaCallback $captchaCallback,
-        private readonly PayPalCallback $payPalCallback,
-        private readonly StripeCallback $stripeCallback,
-        private readonly SofortCallback $sofortCallback,
-        private readonly FlashUploadCallback $flashUploadCallback,
-        private readonly OptCallback $optCallback,
+        /** @var Closure(): FormRenderer */
+        private readonly Closure $formRendererFactory,
+        /** @var Closure(): CaptchaCallback */
+        private readonly Closure $captchaCallbackFactory,
+        /** @var Closure(): PayPalCallback */
+        private readonly Closure $payPalCallbackFactory,
+        /** @var Closure(): StripeCallback */
+        private readonly Closure $stripeCallbackFactory,
+        /** @var Closure(): SofortCallback */
+        private readonly Closure $sofortCallbackFactory,
+        /** @var Closure(): FlashUploadCallback */
+        private readonly Closure $flashUploadCallbackFactory,
+        /** @var Closure(): OptCallback */
+        private readonly Closure $optCallbackFactory,
     ) {
     }
 
     public function dispatch(array $engineContext, string $application): void
     {
         if (!$this->isCallbackRequest()) {
-            $this->formRenderer->render($engineContext);
+            ($this->formRendererFactory)()->render($engineContext);
 
             return;
         }
 
         if ($this->input->getBool('bfCaptcha', false)) {
-            $this->captchaCallback->image();
+            ($this->captchaCallbackFactory)()->image();
         } elseif ($this->input->getBool('checkCaptcha', false)) {
-            $this->captchaCallback->check();
+            ($this->captchaCallbackFactory)()->check();
         } elseif ($this->input->getBool('confirmPayPalIpn', false) && $application === '') {
-            $this->payPalCallback->confirmIpn();
+            ($this->payPalCallbackFactory)()->confirmIpn();
         } elseif ($this->input->getBool('confirmStripe', false) && $application === '') {
-            $this->stripeCallback->confirm();
+            ($this->stripeCallbackFactory)()->confirm();
         } elseif ($this->input->getBool('stripeDownload', false) && $application === '') {
-            $this->stripeCallback->download();
+            ($this->stripeCallbackFactory)()->download();
         } elseif ($this->input->getBool('confirmPayPal', false) && $application === '') {
-            $this->payPalCallback->confirm();
+            ($this->payPalCallbackFactory)()->confirm();
         } elseif ($this->input->getBool('paypalDownload', false) && $application === '') {
-            $this->payPalCallback->download();
+            ($this->payPalCallbackFactory)()->download();
         } elseif ($this->input->getBool('showPayPalConnectMsg', false)) {
-            $this->payPalCallback->connectMessage();
+            ($this->payPalCallbackFactory)()->connectMessage();
         } elseif ($this->input->getBool('successSofortueberweisung', false)) {
-            $this->sofortCallback->success();
+            ($this->sofortCallbackFactory)()->success();
         } elseif ($this->input->getBool('confirmSofortueberweisung', false)) {
-            $this->sofortCallback->confirm();
+            ($this->sofortCallbackFactory)()->confirm();
         } elseif ($this->input->getBool('sofortueberweisungDownload', false) && $application === '') {
-            $this->sofortCallback->download();
+            ($this->sofortCallbackFactory)()->download();
         } elseif ($this->input->getBool('flashUpload', false)) {
-            $this->flashUploadCallback->handle();
+            ($this->flashUploadCallbackFactory)()->handle();
         } elseif ($this->input->getString('opt_in', '') === 'true') {
-            $this->optCallback->optIn();
+            ($this->optCallbackFactory)()->optIn();
         } elseif ($this->input->getString('opt_out', '') === 'true') {
-            $this->optCallback->optOut();
+            ($this->optCallbackFactory)()->optOut();
         }
     }
 

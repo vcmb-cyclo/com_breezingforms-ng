@@ -58,7 +58,7 @@ final class RenderingEngine
     private ?EditableRecordHydrationScriptBuilder $editableRecordHydrationScriptBuilderService = null;
     private ?HiddenFormFieldsBuilder $hiddenFormFieldsBuilderService = null;
     private ?LegacyScriptTagWrapperBuilder $legacyScriptTagWrapperBuilderService = null;
-    private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
+    private ?ContentBuilderHydrationScriptBuilder $contentBuilderHydrationScriptBuilderService = null;
     private ?EditableRecordLoader $editableRecordLoaderService = null;
     private ?PostRenderScriptBuilder $postRenderScriptBuilderService = null;
     private ?FormEnvelopeMarkupBuilder $formEnvelopeMarkupBuilderService = null;
@@ -73,7 +73,6 @@ final class RenderingEngine
     private ?CaptchaLegacyValidationScriptBuilder $captchaLegacyValidationScriptBuilderService = null;
     private ?CaptchaReCaptchaValidationScriptBuilder $captchaReCaptchaValidationScriptBuilderService = null;
     private ?CaptchaValidationScriptBuilder $captchaValidationScriptBuilderService = null;
-    private ?ContentBuilderEditableRecordScriptBuilder $contentBuilderEditableRecordScriptBuilderService = null;
     private ?ContentBuilderNonEditableFieldsResolver $contentBuilderNonEditableFieldsResolverService = null;
     private ?ContentBuilderFormMetadataLoader $contentBuilderFormMetadataLoaderService = null;
     private ?ContentBuilderPermissionChecker $contentBuilderPermissionCheckerService = null;
@@ -201,9 +200,13 @@ final class RenderingEngine
         return $this->legacyScriptTagWrapperBuilderService ??= new LegacyScriptTagWrapperBuilder();
     }
 
-    private function contentBuilderReadonlyScriptBuilder(): ContentBuilderReadonlyScriptBuilder
+    private function contentBuilderHydrationScriptBuilder(): ContentBuilderHydrationScriptBuilder
     {
-        return $this->contentBuilderReadonlyScriptBuilderService ??= new ContentBuilderReadonlyScriptBuilder();
+        return $this->contentBuilderHydrationScriptBuilderService ??= new ContentBuilderHydrationScriptBuilder(
+            fn(string $value): string => (string) InputFilter::getInstance([], [], 1, 1)->clean($value, 'html'),
+            fn(string $value, int $width, string $break, bool $cut): string =>
+                ContentbuilderngHelper::contentbuilderng_wordwrap($value, $width, $break, $cut)
+        );
     }
 
     private function editableRecordLoader(): EditableRecordLoader
@@ -321,15 +324,6 @@ final class RenderingEngine
             $this->captchaValidationRowSelector(),
             $this->captchaLegacyValidationScriptBuilder(),
             $this->captchaReCaptchaValidationScriptBuilder()
-        );
-    }
-
-    private function contentBuilderEditableRecordScriptBuilder(): ContentBuilderEditableRecordScriptBuilder
-    {
-        return $this->contentBuilderEditableRecordScriptBuilderService ??= new ContentBuilderEditableRecordScriptBuilder(
-            fn(string $value): string => (string) InputFilter::getInstance([], [], 1, 1)->clean($value, 'html'),
-            fn(string $value, int $width, string $break, bool $cut): string =>
-                ContentbuilderngHelper::contentbuilderng_wordwrap($value, $width, $break, $cut)
         );
     }
 
@@ -683,7 +677,7 @@ final class RenderingEngine
             $cbNonEditableFields = $this->contentBuilderNonEditableFieldsResolver()->resolve(
                 (int) $cbResult['data']['id']
             );
-            $scripts = $this->contentBuilderEditableRecordScriptBuilder()->build(
+            $scripts = $this->contentBuilderHydrationScriptBuilder()->buildEditable(
                 $cbRecord,
                 $cbNonEditableFields,
                 trim((string) $this->processor->formrow->template_code_processed) === 'QuickMode',
@@ -705,7 +699,7 @@ final class RenderingEngine
             if (count($cbNonEditableFields)) {
                 $this->processor->app->getDocument()->getWebAssetManager()->addInlineScript('<!--' . nl() . 'var bfDeactivateField = new Array();' . nl() . '//-->');
                 echo $this->legacyScriptTagWrapperBuilder()->contentBuilderReadonly(
-                    $this->contentBuilderReadonlyScriptBuilder()->build($cbNonEditableFields),
+                    $this->contentBuilderHydrationScriptBuilder()->buildReadonly($cbNonEditableFields),
                     nl()
                 );
             }

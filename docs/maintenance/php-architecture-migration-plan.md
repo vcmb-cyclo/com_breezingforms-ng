@@ -127,6 +127,7 @@
 | Rendu — cycle de formulaire et champs techniques | L’enveloppe des trois modes est regroupée dans `FormEnvelopeMarkupBuilder` et les champs optionnels/ContentBuilder rejoignent `HiddenFormFieldsBuilder` | Phase 32, tests de rendu fusionnés |
 | Rendu — pagination Query List | Le rafraîchissement des lignes, la navigation et la fin de pagination sont regroupés dans `QueryListPageScriptBuilder`, seul assembleur de la callback complète | Phase 33, `QueryListPageScriptBuilderTest` |
 | ContentBuilder — métadonnées de formulaire | Les deux chargeurs de métadonnées sont regroupés dans `ContentBuilderFormMetadataLoader`, avec leurs requêtes association/définition conservées | Phase 34, `ContentBuilderFormMetadataLoaderTest` |
+| ContentBuilder — hydratation des enregistrements | Les scripts d’édition, de fichiers, de signature, de valeurs, de choix, de listes et de lecture seule sont regroupés dans `ContentBuilderHydrationScriptBuilder` | Phase 35, `ContentBuilderHydrationScriptBuilderTest` |
 | PHPCS | Actif sur les services modernes, les builders ContentBuilder, Classic et `HiddenFieldTrait` | `phpcs.xml.dist`, 155 fichiers configurés |
 | PHPStan | Niveau 4 validé sur le composant, sans diagnostic résiduel | `phpstan.neon.dist`, baseline vide |
 | Navigation des enregistrements admin | Les liens précédent/suivant réutilisent le formulaire, la recherche et le tri de la liste courante ; l'état est conservé pendant l'édition | `RecordsModel::getAdjacentRecordId()`, `tests/Administrator/RecordsNavigationTest.php` |
@@ -1014,9 +1015,9 @@ et options de calendrier. `ClassicRenderer` conserve son
 
 Les getters et propriétés devenus orphelins de `RenderingEngine` pour les
 builders de scripts, d'hydratation, de fichiers et de signature sont également
-supprimés ; leurs implémentations restent utilisées par
-`ContentBuilderEditableRecordScriptBuilder`. Les tests de caractérisation des
-trois renderers et de `RenderingEngine::view()` passent toujours (119 tests,
+supprimés ; les fragments d'hydratation restent alors regroupés dans
+`ContentBuilderHydrationScriptBuilder`. Les tests de caractérisation des trois
+renderers et de `RenderingEngine::view()` passent toujours (119 tests,
 339 assertions). L'audit PHPStan niveau 4 passe de 89 à 63 diagnostics, les
 autres diagnostics étant hors de ce nettoyage ciblé.
 
@@ -1833,6 +1834,32 @@ avec un seul appelant commun dans `cbCheckPermissions()`.
 
 `ContentBuilderFormMetadataLoaderTest` couvre les résultats vide/non vide, les
 filtres de publication et les bindings des deux requêtes.
+
+## Phase 35 — Regrouper l’hydratation ContentBuilder
+
+Ajoutée le 2026-09-01 après la Phase 34. Les scripts d’hydratation et de
+désactivation ContentBuilder étaient répartis dans huit builders, alors que
+leurs sorties appartiennent au même parcours de rendu et que les fragments
+avaient un appelant commun dans `RenderingEngine` ou dans l’orchestrateur des
+enregistrements.
+
+### Périmètre
+
+- `ContentBuilderHydrationScriptBuilder` porte les parcours `buildEditable()`
+  et `buildReadonly()`, ainsi que les fragments de validation Flash, contrôles
+  de fichiers, hydratation de fichiers, signatures, valeurs, choix et listes.
+- `ContentBuilderFileSupportBuilder` et
+  `ContentBuilderSignatureImageEncoder` restent séparés : ils sont des
+  utilitaires utilisés au-delà d’un fragment unique.
+- `RenderingEngine` conserve un seul service lazy et l’ordre historique des
+  scripts générés.
+
+### Filet de sécurité et vérification
+
+Les tests des huit anciens builders sont fusionnés dans
+`ContentBuilderHydrationScriptBuilderTest`. Ils couvrent les sorties
+JavaScript historiques, les valeurs multiples, l’échappement, les signatures,
+les files d’upload QuickMode et la désactivation des champs non éditables.
 
 ## Travail en parallèle
 

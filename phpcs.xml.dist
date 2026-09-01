@@ -37,20 +37,12 @@
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicTextareaBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicSelectBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderValueScriptBuilder.php</file>
-    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderReadonlyScriptBuilder.php</file>
-    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderSignatureScriptBuilder.php</file>
-    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderFileUploadScriptBuilder.php</file>
-    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderChoiceHydrationScriptBuilder.php</file>
-    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderFileHydrationScriptBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderHydrationScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderFileSupportBuilder.php</file>
-    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderSelectHydrationScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderSignatureImageEncoder.php</file>
-    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderValueHydrationScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/EditableRecord.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/EditableRecordLoader.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/PostRenderScriptBuilder.php</file>
-    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderFlashUploadValidationBuilder.php</file>
-    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderEditableRecordScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderFormMetadataLoader.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickModeRendererFactory.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/FormOnloadScriptBuilder.php</file>

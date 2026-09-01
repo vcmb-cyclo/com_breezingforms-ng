@@ -36,7 +36,7 @@ final class JoomlaInstallSmokeScriptTest extends TestCase
         $source = file_get_contents(__DIR__ . '/../../scripts/joomla-install-smoke.sh');
 
         self::assertIsString($source);
-        self::assertStringContainsString('ContentBuilderEditableRecordScriptBuilder.php', $source);
+        self::assertStringContainsString('ContentBuilderHydrationScriptBuilder.php', $source);
         self::assertStringContainsString('ff_elem701', $source);
         self::assertStringContainsString('data:image', $source);
         self::assertStringContainsString('unlink($signaturePath);', $source);

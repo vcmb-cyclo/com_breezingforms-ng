@@ -179,16 +179,9 @@ if [[ -n "${contentbuilder_archive}" ]]; then
         require "/var/www/html/administrator/components/com_contentbuilderng/src/Helper/RuntimeContextHelper.php";
         require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFormMetadataLoader.php";
         require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderRecordLoader.php";
-        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderChoiceHydrationScriptBuilder.php";
-        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderEditableRecordScriptBuilder.php";
-        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFileHydrationScriptBuilder.php";
+        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderHydrationScriptBuilder.php";
         require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFileSupportBuilder.php";
-        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFileUploadScriptBuilder.php";
-        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderFlashUploadValidationBuilder.php";
-        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderSelectHydrationScriptBuilder.php";
         require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderSignatureImageEncoder.php";
-        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderSignatureScriptBuilder.php";
-        require "/var/www/html/components/com_breezingformsng/src/Service/Rendering/ContentBuilderValueHydrationScriptBuilder.php";
         require "/var/www/html/components/com_breezingformsng/src/Support/processor_facade.php";
 
         $db = \Joomla\CMS\Factory::getContainer()->get(\Joomla\Database\DatabaseInterface::class);
@@ -278,11 +271,11 @@ if [[ -n "${contentbuilder_archive}" ]]; then
                     "recType" => "Signature",
                     "recValue" => $signatureFileName,
                 ];
-                $editableBuilder = new \Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderEditableRecordScriptBuilder(
+                $hydrationBuilder = new \Vcmb\Component\BreezingformsNG\Site\Service\Rendering\ContentBuilderHydrationScriptBuilder(
                     static fn (string $value): string => $value,
                     static fn (string $value, int $width, string $break, bool $cut): string => wordwrap($value, $width, $break, $cut)
                 );
-                $rendered = $editableBuilder->build(
+                $rendered = $hydrationBuilder->buildEditable(
                     [$fileRecord, $signatureRecord],
                     [],
                     true,

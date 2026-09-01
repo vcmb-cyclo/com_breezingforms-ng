@@ -124,4 +124,43 @@ final class HiddenFormFieldsBuilderTest extends TestCase
     {
         self::assertSame('', (new HiddenFormFieldsBuilder())->context([], ''));
     }
+
+    public function testOptionalContextBuildsFieldsInHistoricalOrder(): void
+    {
+        self::assertSame(
+            "\t<input type=\"hidden\" name=\"ff_target\" value=\"2\"/>\n"
+            . "\t<input type=\"hidden\" name=\"ff_frame\" value=\"1\"/>\n"
+            . "\t<input type=\"hidden\" name=\"ff_border\" value=\"1\"/>\n"
+            . "\t<input type=\"hidden\" name=\"ff_page\" value=\"3\"/>\n"
+            . "\t<input type=\"hidden\" name=\"ff_align\" value=\"2\"/>\n"
+            . "\t<input type=\"hidden\" name=\"ff_top\" value=\"4\"/>\n",
+            (new HiddenFormFieldsBuilder())->optionalContext(2, true, true, 3, 2, 4, "\t", true, true, true, true, "\n")
+        );
+    }
+
+    public function testOptionalContextOmitsPreviewDefaults(): void
+    {
+        $builder = new HiddenFormFieldsBuilder();
+
+        self::assertSame(
+            "<input type=\"hidden\" name=\"ff_page\" value=\"2\"/>\r\n",
+            $builder->optionalContext(1, false, false, 2, 2, 4, '', false, false, false, false)
+        );
+        self::assertSame('', $builder->optionalContext(1, false, false, 1, 1, 0, '', false, false, false, false));
+    }
+
+    public function testContentBuilderTechnicalBuildsRecordMarkers(): void
+    {
+        $builder = new HiddenFormFieldsBuilder();
+
+        self::assertSame(
+            "    <input type=\"hidden\" name=\"cb_form_id\" value=\"12\"/>\n"
+            . "    <input type=\"hidden\" name=\"cb_record_id\" value=\"34\"/>\n"
+            . "    <input type=\"hidden\" name=\"cbIsNew\" value=\"1\"/>\n",
+            $builder->contentBuilderTechnical('    ', 12, 34, true)
+        );
+
+        self::assertSame("<input type=\"hidden\" name=\"cb_form_id\" value=\"12\"/>\n", $builder->contentBuilderTechnical('', 12, 0, false));
+        self::assertSame('', $builder->contentBuilderTechnical('    ', 0, 34, true));
+    }
 }

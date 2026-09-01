@@ -61,11 +61,7 @@ final class RenderingEngine
     private ?ContentBuilderReadonlyScriptBuilder $contentBuilderReadonlyScriptBuilderService = null;
     private ?EditableRecordLoader $editableRecordLoaderService = null;
     private ?PostRenderScriptBuilder $postRenderScriptBuilderService = null;
-    private ?ContentBuilderTechnicalFieldsBuilder $contentBuilderTechnicalFieldsBuilderService = null;
-    private ?FormClosingMarkupBuilder $formClosingMarkupBuilderService = null;
-    private ?FormOpeningMarkupBuilder $formOpeningMarkupBuilderService = null;
-    private ?FormOptionalContextFieldsBuilder $formOptionalContextFieldsBuilderService = null;
-    private ?FormModeFinalizationBuilder $formModeFinalizationBuilderService = null;
+    private ?FormEnvelopeMarkupBuilder $formEnvelopeMarkupBuilderService = null;
     private ?QuickModeFormTagBuilder $quickModeFormTagBuilderService = null;
     private ?FileExtensionsCheckBuilder $fileExtensionsCheckBuilderService = null;
     private ?QueryListSelectAllScriptBuilder $queryListSelectAllScriptBuilderService = null;
@@ -225,18 +221,13 @@ final class RenderingEngine
     }
 
 
-    private function contentBuilderTechnicalFieldsBuilder(): ContentBuilderTechnicalFieldsBuilder
-    {
-        return $this->contentBuilderTechnicalFieldsBuilderService ??= new ContentBuilderTechnicalFieldsBuilder();
-    }
-
     private function buildContentBuilderTechnicalFields(): string
     {
         $input = $this->processor->app->getInput();
         $formId = $input->getInt('cb_form_id', 0);
 
         return $formId
-            ? $this->contentBuilderTechnicalFieldsBuilder()->build(
+            ? $this->hiddenFormFieldsBuilder()->contentBuilderTechnical(
                 '',
                 $formId,
                 $input->getInt('cb_record_id', 0),
@@ -268,24 +259,9 @@ final class RenderingEngine
 
 
 
-    private function formClosingMarkupBuilder(): FormClosingMarkupBuilder
+    private function formEnvelopeMarkupBuilder(): FormEnvelopeMarkupBuilder
     {
-        return $this->formClosingMarkupBuilderService ??= new FormClosingMarkupBuilder();
-    }
-
-    private function formOpeningMarkupBuilder(): FormOpeningMarkupBuilder
-    {
-        return $this->formOpeningMarkupBuilderService ??= new FormOpeningMarkupBuilder();
-    }
-
-    private function formOptionalContextFieldsBuilder(): FormOptionalContextFieldsBuilder
-    {
-        return $this->formOptionalContextFieldsBuilderService ??= new FormOptionalContextFieldsBuilder();
-    }
-
-    private function formModeFinalizationBuilder(): FormModeFinalizationBuilder
-    {
-        return $this->formModeFinalizationBuilderService ??= new FormModeFinalizationBuilder();
+        return $this->formEnvelopeMarkupBuilderService ??= new FormEnvelopeMarkupBuilder();
     }
 
     private function quickModeFormTagBuilder(): QuickModeFormTagBuilder
@@ -824,11 +800,11 @@ final class RenderingEngine
                 $context = $this->buildFormContext(false);
                 $routing = $this->hiddenFormFieldsBuilder()->routing($input->getString('return', ''), $input->getString('tmpl', ''), nl());
                 $technical = $this->buildContentBuilderTechnicalFields();
-                echo $this->formModeFinalizationBuilder()->frontend(
+                echo $this->formEnvelopeMarkupBuilder()->frontend(
                     $this->hiddenFormFieldsBuilder()->context($context, indentc(1)),
                     $this->hiddenFormFieldsBuilder()->submission((int) $this->processor->form, indentc(1), nl()),
                     $this->hiddenFormFieldsBuilder()->token(\Joomla\CMS\HTML\HTMLHelper::_('form.token'), indentc(1), nl()),
-                    $this->formOptionalContextFieldsBuilder()->build($this->processor->target, (bool) $this->processor->inframe, (bool) $this->processor->border, $this->processor->page, $this->processor->align, $this->processor->top, indentc(1), true, true, true, true, nl()),
+                    $this->hiddenFormFieldsBuilder()->optionalContext($this->processor->target, (bool) $this->processor->inframe, (bool) $this->processor->border, $this->processor->page, $this->processor->align, $this->processor->top, indentc(1), true, true, true, true, nl()),
                     $this->hiddenFormFieldsBuilder()->additional($ff_otherparams, indentc(1), nl()),
                     $technical,
                     $routing,
@@ -841,11 +817,11 @@ final class RenderingEngine
                 $context = $this->buildFormContext(true);
                 $routing = $this->hiddenFormFieldsBuilder()->routing($input->getString('return', ''), $input->getString('tmpl', ''), nl());
                 $technical = $this->buildContentBuilderTechnicalFields();
-                echo $this->formModeFinalizationBuilder()->backend(
+                echo $this->formEnvelopeMarkupBuilder()->backend(
                     $this->hiddenFormFieldsBuilder()->submission((int) $this->processor->form, indentc(1), nl(), true),
                     $this->hiddenFormFieldsBuilder()->token(\Joomla\CMS\HTML\HTMLHelper::_('form.token'), indentc(1), nl()),
                     $this->hiddenFormFieldsBuilder()->context($context, indentc(1)),
-                    $this->formOptionalContextFieldsBuilder()->build($this->processor->target, (bool) $this->processor->inframe, (bool) $this->processor->border, $this->processor->page, $this->processor->align, $this->processor->top, indentc(1), true, true, true, true, nl()),
+                    $this->hiddenFormFieldsBuilder()->optionalContext($this->processor->target, (bool) $this->processor->inframe, (bool) $this->processor->border, $this->processor->page, $this->processor->align, $this->processor->top, indentc(1), true, true, true, true, nl()),
                     $technical,
                     $routing,
                     nl()
@@ -860,12 +836,12 @@ final class RenderingEngine
                 $context = $this->buildFormContext(true);
                 $routing = $this->hiddenFormFieldsBuilder()->routing($input->getString('return', ''), $input->getString('tmpl', ''), nl());
                 $technical = $this->buildContentBuilderTechnicalFields();
-                echo $this->formModeFinalizationBuilder()->preview(
+                echo $this->formEnvelopeMarkupBuilder()->preview(
                     true,
                     $this->hiddenFormFieldsBuilder()->submission((int) $this->processor->form, indentc(1), nl(), false, true),
                     $this->hiddenFormFieldsBuilder()->token(\Joomla\CMS\HTML\HTMLHelper::_('form.token'), indentc(1), nl()),
                     $this->hiddenFormFieldsBuilder()->context($context, indentc(1)),
-                    $this->formOptionalContextFieldsBuilder()->build($this->processor->target, (bool) $this->processor->inframe, (bool) $this->processor->border, $this->processor->page, $this->processor->align, $this->processor->top, indentc(1), false, true, false, false, nl()),
+                    $this->hiddenFormFieldsBuilder()->optionalContext($this->processor->target, (bool) $this->processor->inframe, (bool) $this->processor->border, $this->processor->page, $this->processor->align, $this->processor->top, indentc(1), false, true, false, false, nl()),
                     $technical,
                     $routing,
                     nl()
@@ -929,7 +905,7 @@ final class RenderingEngine
         $this->processor->queryCols = [];
         $this->processor->queryRows = [];
 
-        echo $this->formOpeningMarkupBuilder()->build(
+        echo $this->formEnvelopeMarkupBuilder()->opening(
             (string) $this->processor->form,
             $this->processor->formrow->class1 != ''
                 ? $this->processor->getClassName($this->processor->formrow->class1)
@@ -942,7 +918,7 @@ final class RenderingEngine
 
     private function closeFormRendering(): void
     {
-        echo $this->formClosingMarkupBuilder()->build(nl());
+        echo $this->formEnvelopeMarkupBuilder()->closing(nl());
     }
 
     private function abortViewRendering(): void

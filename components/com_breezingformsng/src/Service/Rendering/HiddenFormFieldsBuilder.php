@@ -104,4 +104,59 @@ final class HiddenFormFieldsBuilder
 
         return $output;
     }
+
+    public function optionalContext(
+        int $target,
+        bool $inFrame,
+        bool $border,
+        int $page,
+        int $align,
+        int $top,
+        string $indentation,
+        bool $includeTarget = true,
+        bool $includeFrame = true,
+        bool $includeBorder = true,
+        bool $includeLayoutFields = true,
+        string $newline = "\r\n"
+    ): string {
+        $fields = [];
+
+        if ($includeTarget && $target > 1) {
+            $fields['ff_target'] = $target;
+        }
+        if ($includeFrame && $inFrame) {
+            $fields['ff_frame'] = 1;
+        }
+        if ($includeBorder && $border) {
+            $fields['ff_border'] = 1;
+        }
+        if ($page !== 1) {
+            $fields['ff_page'] = $page;
+        }
+        if ($includeLayoutFields && $align !== 1) {
+            $fields['ff_align'] = $align;
+        }
+        if ($includeLayoutFields && $top !== 0) {
+            $fields['ff_top'] = $top;
+        }
+
+        return $this->context($fields, $indentation, $newline);
+    }
+
+    public function contentBuilderTechnical(string $indentation, int $formId, int $recordId, bool $isNew): string
+    {
+        if ($formId === 0) {
+            return '';
+        }
+
+        $fields = '<input type="hidden" name="cb_form_id" value="' . $formId . '"/>' . "\n";
+        if ($recordId !== 0) {
+            $fields .= '<input type="hidden" name="cb_record_id" value="' . $recordId . '"/>' . "\n";
+        }
+        if ($isNew) {
+            $fields .= '<input type="hidden" name="cbIsNew" value="1"/>' . "\n";
+        }
+
+        return $indentation . str_replace("\n", "\n" . $indentation, rtrim($fields, "\n")) . "\n";
+    }
 }

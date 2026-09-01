@@ -4,9 +4,20 @@ declare(strict_types=1);
 
 namespace Vcmb\Component\BreezingformsNG\Site\Service\Rendering;
 
-/** Assembles the final hidden fields for each form execution mode. */
-final class FormModeFinalizationBuilder
+/** Assembles the form wrapper and its mode-specific closing markup. */
+final class FormEnvelopeMarkupBuilder
 {
+    public function opening(string $formId, string $className): string
+    {
+        return '<div id="ff_formdiv' . $formId . '" class="bfFormDiv'
+            . ($className !== '' ? ' ' . $className : '') . '">';
+    }
+
+    public function closing(string $newline = "\r\n"): string
+    {
+        return '</div><!-- form end -->' . $newline;
+    }
+
     public function frontend(
         string $context,
         string $submission,

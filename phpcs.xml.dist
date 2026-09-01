@@ -28,10 +28,7 @@
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicGraphicButtonBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicCaptchaBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ClassicStaticTextBuilder.php</file>
-    <file>components/com_breezingformsng/src/Service/Rendering/FormClosingMarkupBuilder.php</file>
-    <file>components/com_breezingformsng/src/Service/Rendering/FormModeFinalizationBuilder.php</file>
-    <file>components/com_breezingformsng/src/Service/Rendering/FormOpeningMarkupBuilder.php</file>
-    <file>components/com_breezingformsng/src/Service/Rendering/FormOptionalContextFieldsBuilder.php</file>
+    <file>components/com_breezingformsng/src/Service/Rendering/FormEnvelopeMarkupBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/FileExtensionsCheckBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/EditableRecordHydrationScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/HiddenFormFieldsBuilder.php</file>
@@ -52,7 +49,6 @@
     <file>components/com_breezingformsng/src/Service/Rendering/EditableRecord.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/EditableRecordLoader.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/PostRenderScriptBuilder.php</file>
-    <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderTechnicalFieldsBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderFlashUploadValidationBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/ContentBuilderEditableRecordScriptBuilder.php</file>
     <file>components/com_breezingformsng/src/Service/Rendering/QuickModeRendererFactory.php</file>

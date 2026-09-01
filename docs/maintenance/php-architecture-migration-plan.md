@@ -124,6 +124,7 @@
 | Nettoyage — fichiers temporaires et cache de paiement | Le parcours commun de purge est regroupé dans `UploadFileCleaner`, injecté dans `FormRenderer`, avec les deux règles de nommage historiques conservées | Phase 29, `UploadFileCleanerTest` |
 | QuickMode — consolidation des builders mono-appelant | Les attributs d’image paiement, le markup checkbox et les deux fragments internes `FilesAdded` sont repliés dans leurs appelants ; le composeur upload partagé est conservé | Phase 30, tests QuickMode fusionnés |
 | Admin — préparation commune des bibliothèques de packages | `PieceModel` et `ScriptModel` délèguent leur préparation de liste à `PackageModel`, avec uniquement leur table et leur préfixe de session spécifiques | Phase 31, `PackageLibraryUiRegressionTest` |
+| Rendu — cycle de formulaire et champs techniques | L’enveloppe des trois modes est regroupée dans `FormEnvelopeMarkupBuilder` et les champs optionnels/ContentBuilder rejoignent `HiddenFormFieldsBuilder` | Phase 32, tests de rendu fusionnés |
 | PHPCS | Actif sur les services modernes, les builders ContentBuilder, Classic et `HiddenFieldTrait` | `phpcs.xml.dist`, 155 fichiers configurés |
 | PHPStan | Niveau 4 validé sur le composant, sans diagnostic résiduel | `phpstan.neon.dist`, baseline vide |
 | Navigation des enregistrements admin | Les liens précédent/suivant réutilisent le formulaire, la recherche et le tri de la liste courante ; l'état est conservé pendant l'édition | `RecordsModel::getAdjacentRecordId()`, `tests/Administrator/RecordsNavigationTest.php` |
@@ -1771,6 +1772,28 @@ table et le préfixe de session.
 `PackageLibraryUiRegressionTest` vérifie le partage de la préparation et la
 conservation des préfixes `pieces` et `scripts`. Les tâches, assets et vues
 Admin restent couverts par les tests de régression existants.
+
+## Phase 32 — Regrouper l’enveloppe du formulaire et ses champs techniques
+
+Ajoutée le 2026-09-01 après la Phase 31. L’ouverture, la fermeture et la
+finalisation des modes du formulaire étaient réparties dans trois builders,
+et deux builders de champs cachés n’avaient qu’un appelant commun.
+
+### Périmètre
+
+- `FormEnvelopeMarkupBuilder` regroupe l’ouverture, la fermeture et les
+  assemblages frontend, backend et preview.
+- `HiddenFormFieldsBuilder` absorbe les champs de contexte optionnels et les
+  marqueurs techniques ContentBuilder.
+- `RenderingEngine` conserve les décisions liées au contexte Joomla et
+  l’ordre historique des fragments, tout en utilisant ces deux points
+  d’entrée fonctionnels.
+
+### Filet de sécurité et vérification
+
+Les tests d’enveloppe et de champs cachés sont regroupés autour des deux
+builders conservés. Les sorties exactes des trois modes, l’absence de preview
+hors iframe et l’indentation des champs techniques restent couvertes.
 
 ## Travail en parallèle
 

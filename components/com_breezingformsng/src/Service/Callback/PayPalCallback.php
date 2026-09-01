@@ -254,7 +254,7 @@ final class PayPalCallback
 
                         $success = false;
                         $msg = Text::_('COM_BREEZINGFORMSNG_PAYMENT_AMOUNT_CURRENCY_INVALID');
-                        require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
+                        require_once (JPATH_SITE . '/components/com_breezingformsng/downloadtpl/error.php');
                     } else {
 
                         $recordId = $input->getInt('record_id', -1);
@@ -305,7 +305,7 @@ final class PayPalCallback
                                     $record_id = $input->getInt('record_id', -1);
                                     $tries = $options['downloadTries'];
                                     $form_id = $input->getInt('form_id', -1);
-                                    require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/download.php');
+                                    require_once (JPATH_SITE . '/components/com_breezingformsng/downloadtpl/download.php');
                                 } else {
 
                                     if ($options['thankYouPage'] != '') {
@@ -322,7 +322,7 @@ final class PayPalCallback
                                     $record_id = $input->getInt('record_id', -1);
                                     $tries = $options['downloadTries'];
                                     $form_id = $input->getInt('form_id', -1);
-                                    require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/download.php');
+                                    require_once (JPATH_SITE . '/components/com_breezingformsng/downloadtpl/download.php');
                                 } else {
                                     if ($options['useIpn']) {
                                         if ($options['thankYouPage'] != '') {
@@ -333,24 +333,24 @@ final class PayPalCallback
                                     } else {
                                         $success = false;
                                         $msg = Text::_('COM_BREEZINGFORMSNG_PAYMENT_TRANSACTION_ALREADY_PROCESSED');
-                                        require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
+                                        require_once (JPATH_SITE . '/components/com_breezingformsng/downloadtpl/error.php');
                                     }
                                 }
                             }
                         } else {
                             $success = false;
                             $msg = Text::_('COM_BREEZINGFORMSNG_PAYMENT_RECORD_NOT_FOUND');
-                            require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
+                            require_once (JPATH_SITE . '/components/com_breezingformsng/downloadtpl/error.php');
                         }
                     }
                 } else if (strcmp($lines[0], "FAIL") == 0) {
                     $success = false;
                     $msg = Text::_('COM_BREEZINGFORMSNG_PAYMENT_VERIFICATION_FAILED');
-                    require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
+                    require_once (JPATH_SITE . '/components/com_breezingformsng/downloadtpl/error.php');
                 } else {
                     $success = false;
                     $msg = Text::_('COM_BREEZINGFORMSNG_PAYMENT_VERIFICATION_EMPTY');
-                    require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
+                    require_once (JPATH_SITE . '/components/com_breezingformsng/downloadtpl/error.php');
                 }
 
                 break;

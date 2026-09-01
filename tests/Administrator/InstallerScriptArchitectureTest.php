@@ -34,14 +34,25 @@ final class InstallerScriptArchitectureTest extends TestCase
         $source = file_get_contents(__DIR__ . '/../../script.php');
 
         self::assertIsString($source);
-        self::assertStringContainsString(
+        foreach ([
+            "JPATH_SITE . '/language/fr-FR/fr-FR.com_breezingforms.ini'",
+            "JPATH_SITE . '/language/en-GB/en-GB.com_breezingforms.ini'",
+            "JPATH_SITE . '/media/breezingforms/pdftpl/pdf_attachment.php'",
             "JPATH_SITE . '/media/breezingforms/pdftpl/export_pdf.php'",
-            $source
-        );
-        self::assertStringContainsString(
-            'This generic Joomla 3 PDF template is superseded',
-            $source
-        );
+            "JPATH_SITE . '/media/breezingforms/downloadtpl/download.php'",
+            "JPATH_SITE . '/media/breezingforms/downloadtpl/sofort_download.php'",
+            "JPATH_SITE . '/media/breezingforms/downloadtpl/sofort_success.php'",
+            "JPATH_SITE . '/media/breezingforms/downloadtpl/stripe_download.php'",
+            "JPATH_SITE . '/media/breezingforms/downloadtpl/error.php'",
+            "JPATH_ADMINISTRATOR . '/language/fr-FR/fr-FR.com_breezingforms.ini'",
+            "JPATH_ADMINISTRATOR . '/language/fr-FR/fr-FR.com_breezingforms.sys.ini'",
+            "JPATH_ADMINISTRATOR . '/language/en-GB/en-GB.com_breezingforms.sys.ini'",
+            "JPATH_ADMINISTRATOR . '/language/en-GB/en-GB.com_breezingforms.ini'",
+        ] as $obsoletePath) {
+            self::assertStringContainsString($obsoletePath, $source);
+        }
+
+        self::assertStringContainsString('This generic Joomla 3 PDF template is superseded', $source);
         self::assertStringContainsString(
             '$this->removeObsoleteComponentFiles();',
             $source

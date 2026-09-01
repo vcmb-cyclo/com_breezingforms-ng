@@ -151,7 +151,7 @@ final class StripeCallback
 
                         $msg = Text::_("COM_BREEZINGFORMSNG_STRIPE_DECLINED");
 
-                        require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
+                        require_once (JPATH_SITE . '/components/com_breezingformsng/downloadtpl/error.php');
                     } else {
                         /** get payment intend id and creation time */
                         $stripe_pi_id = $session->payment_intent; //payment intent id from last session also replacing tx_token/charge->id with paymentIntents->id
@@ -199,7 +199,7 @@ final class StripeCallback
                             $record_id = $input->getInt('record_id', -1);
                             $tries = $options['downloadTries'];
                             $form_id = $input->getInt('form_id', -1);
-                            require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/stripe_download.php');
+                            require_once (JPATH_SITE . '/components/com_breezingformsng/downloadtpl/stripe_download.php');
                         } else {
 
                             if ($options['thankYouPage'] != '') {
@@ -212,7 +212,7 @@ final class StripeCallback
                 } catch (\Stripe\Exception\CardException $e) {
 
                     $msg = Text::_("COM_BREEZINGFORMSNG_STRIPE_DECLINED");
-                    require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
+                    require_once (JPATH_SITE . '/components/com_breezingformsng/downloadtpl/error.php');
                 }
 
                 break;

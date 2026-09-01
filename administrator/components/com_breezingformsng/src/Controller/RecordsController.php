@@ -175,9 +175,6 @@ class RecordsController extends BaseController
 
         $file = JPATH_SITE . '/media/breezingforms/pdftpl/export_custom_pdf.php';
         if (!file_exists($file)) {
-            $file = JPATH_SITE . '/media/breezingforms/pdftpl/export_pdf.php';
-        }
-        if (!file_exists($file)) {
             $file = JPATH_ADMINISTRATOR . '/components/com_breezingformsng/pdftpl/export_pdf.php';
         }
         if ($formName !== '') {

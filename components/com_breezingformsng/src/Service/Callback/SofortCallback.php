@@ -45,7 +45,7 @@ final class SofortCallback
     $tx_token = $input->getString('tx', '');
     if ($tx_token == '') {
         $msg = Text::_('COM_BREEZINGFORMSNG_PAYMENT_TRANSACTION_ID_EMPTY');
-        require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
+        require_once (JPATH_SITE . '/components/com_breezingformsng/downloadtpl/error.php');
     } else {
 
         $formId = $input->getInt('user_variable_0', '');
@@ -100,7 +100,7 @@ final class SofortCallback
                                 $confirmed = true;
                             }
 
-                            require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/sofort_download.php');
+                            require_once (JPATH_SITE . '/components/com_breezingformsng/downloadtpl/sofort_download.php');
                         } else {
                             if ($options['thankYouPage'] != '') {
                                 $this->redirectHelper->to($options['thankYouPage']);
@@ -119,7 +119,7 @@ final class SofortCallback
             if ($input->getString('tx', '') != '') {
                 $tx_token = $input->getString('tx', '');
             }
-            require_once (JPATH_SITE . '/media/breezingforms/downloadtpl/error.php');
+            require_once (JPATH_SITE . '/components/com_breezingformsng/downloadtpl/error.php');
         }
     }
     }

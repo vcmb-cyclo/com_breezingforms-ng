@@ -97,6 +97,14 @@ final class ContentBuilderHydrationScriptBuilderTest extends TestCase
 
         self::assertSame(1, substr_count($result['contentBuilderScript'], 'function ff_flashupload_not_empty'));
         self::assertStringContainsString('cbFlashElemCnt["ff_elem31"] = 2;', $result['contentBuilderScript']);
+        self::assertStringContainsString(
+            'cbFlashElemCnt["ff_elem31"] = 2;' . "\n                                ",
+            $result['contentBuilderScript']
+        );
+        self::assertStringNotContainsString(
+            'cbFlashElemCnt["ff_elem31"] = 2;\\n',
+            $result['contentBuilderScript']
+        );
         self::assertStringContainsString('cb_delete_31[0]', $result['javascript']);
         self::assertStringContainsString('cb_delete_31[1]', $result['javascript']);
         self::assertStringContainsString('bfDeactivateField["ff_nm_document[]"]', $result['javascript']);

@@ -52,9 +52,9 @@ final class ContentBuilderHydrationScriptBuilder
                     $fileSupport = new ContentBuilderFileSupportBuilder();
                     $fileValue = $fileSupport->parseValue($recordValue);
                     $count = $fileValue['count'];
-                    $contentBuilderScript .= '\\n'
+                    $contentBuilderScript .= '\n'
                         . '                                    cbFlashElemCnt["ff_elem' . $entry->recElementId . '"] = '
-                        . $count . ";\\n                                ";
+                        . $count . ";\n                                ";
                     $displayNames = [];
                     foreach ($fileValue['files'] as $file) {
                         if (trim($file)) {

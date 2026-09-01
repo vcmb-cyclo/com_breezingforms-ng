@@ -87,7 +87,11 @@ final class EngineDispatcherContainerTest extends TestCase
         );
 
         self::assertIsString($source);
-        self::assertStringContainsString('$container->get(EngineDispatcher::class)', $source);
+        self::assertStringContainsString(
+            "->getContainer()\n    ->get(EngineDispatcher::class)",
+            $source
+        );
+        self::assertStringContainsString("\$mainframe->bootComponent('com_breezingformsng')", $source);
         self::assertStringNotContainsString('new EngineDispatcher(', $source);
     }
 }

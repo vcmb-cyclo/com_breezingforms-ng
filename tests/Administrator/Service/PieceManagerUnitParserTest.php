@@ -6,9 +6,14 @@ namespace Vcmb\Component\BreezingformsNG\Tests\Administrator\Service;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Joomla\Database\DatabaseInterface;
 use ReflectionClass;
 use ReflectionMethod;
 use Vcmb\Component\BreezingformsNG\Administrator\Service\PieceManager;
+
+if (!interface_exists(DatabaseInterface::class)) {
+    eval('namespace Joomla\\Database; interface DatabaseInterface {}');
+}
 
 final class PieceManagerUnitParserTest extends TestCase
 {
@@ -37,6 +42,30 @@ final class PieceManagerUnitParserTest extends TestCase
         self::assertFalse($this->invokeStatic('valuesEqual', 5, false));
         self::assertTrue($this->invokeStatic('valuesEqual', ['a' => 1], ['a' => 1]));
         self::assertFalse($this->invokeStatic('valuesEqual', ['a' => 1], ['a' => 2]));
+    }
+
+    public function testPieceExecutionProvidesTheLegacyProcessorGlobal(): void
+    {
+        $row = (object) [
+            'code' => '<?php function ff_dying() { global $ff_processor; return $ff_processor->dying; }',
+        ];
+        $database = self::createStub(DatabaseInterface::class);
+        $previousProcessor = $GLOBALS['ff_processor'] ?? null;
+        $hadProcessor = array_key_exists('ff_processor', $GLOBALS);
+
+        try {
+            $GLOBALS['ff_processor'] = (object) ['dying' => true];
+            $execution = $this->invokeStatic('executePieceCode', $row, 'ff_dying', [], $database);
+        } finally {
+            if ($hadProcessor) {
+                $GLOBALS['ff_processor'] = $previousProcessor;
+            } else {
+                unset($GLOBALS['ff_processor']);
+            }
+        }
+
+        self::assertSame(false, $execution['result']);
+        self::assertSame('', $execution['error']);
     }
 
     private function invokeStatic(string $methodName, mixed ...$arguments): mixed

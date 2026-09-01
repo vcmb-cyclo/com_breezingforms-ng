@@ -110,7 +110,9 @@ $bfEngineContext = [
 ];
 
 $input = $mainframe->getInput();
-$container->get(EngineDispatcher::class)
+$mainframe->bootComponent('com_breezingformsng')
+    ->getContainer()
+    ->get(EngineDispatcher::class)
     ->dispatch($bfEngineContext, (string) $ff_applic);
 
 if ($input->getBool('raw', false)) {

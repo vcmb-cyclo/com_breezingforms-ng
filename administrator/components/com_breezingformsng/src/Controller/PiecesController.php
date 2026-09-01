@@ -132,6 +132,7 @@ class PiecesController extends BaseController
 
         $document = $this->app->getDocument();
         $document->setTitle($title);
+        $document->getWebAssetManager()->getRegistry()->addExtensionRegistryFile('com_breezingformsng');
         $document->getWebAssetManager()->addInlineStyle(
             '.icon-logo_left{'
             . 'background-image:url(' . Uri::root(true) . '/media/com_breezingformsng/images/logo_left.png);'

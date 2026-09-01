@@ -32,6 +32,7 @@ class BFAdminPieceTestContext
 	private DatabaseInterface $db;
 	public $formrow;
 	public $form_id;
+	public bool $dying = false;
 
 	public function __construct(DatabaseInterface $db)
 	{
@@ -107,6 +108,9 @@ class PieceManager
 		$output = '';
 		$error = '';
 		$errorDetails = array();
+		$hadProcessor = array_key_exists('ff_processor', $GLOBALS);
+		$previousProcessor = $GLOBALS['ff_processor'] ?? null;
+		$GLOBALS['ff_processor'] = $context;
 
 		ob_start();
 		try {
@@ -137,6 +141,12 @@ class PieceManager
 				'line' => $e->getLine(),
 				'trace' => $e->getTraceAsString(),
 			);
+		} finally {
+			if ($hadProcessor) {
+				$GLOBALS['ff_processor'] = $previousProcessor;
+			} else {
+				unset($GLOBALS['ff_processor']);
+			}
 		}
 		$output = ob_get_clean();
 

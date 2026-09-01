@@ -1638,9 +1638,9 @@ déjà dans le conteneur Joomla.
 - `EngineDispatcher` est enregistré dans
   `administrator/components/com_breezingformsng/services/provider.php` avec
   l'application, l'entrée, la base, le mailer et le contrôleur de cache natifs.
-- `components/com_breezingformsng/breezingformsng.php` résout désormais cette
-  instance depuis le conteneur ; la construction racine n'est plus dupliquée
-  dans le point d'entrée.
+- `components/com_breezingformsng/breezingformsng.php` démarre le composant et
+  résout désormais cette instance depuis son conteneur enfant ; la
+  construction racine n'est plus dupliquée dans le point d'entrée.
 - Le smoke Joomla charge `VendorHelper`, puis vérifie après installation que
   Securimage, TCPDF et `PdfDocument` sont réellement autoloadables. Le
   validateur de package exige aussi l'autoloader Composer et le fichier TCPDF.

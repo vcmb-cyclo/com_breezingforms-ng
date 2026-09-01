@@ -768,7 +768,7 @@ final class RenderingEngine
                     $this->hiddenFormFieldsBuilder()->context($context, indentc(1)),
                     $this->hiddenFormFieldsBuilder()->submission((int) $this->processor->form, indentc(1), nl()),
                     $this->hiddenFormFieldsBuilder()->token(\Joomla\CMS\HTML\HTMLHelper::_('form.token'), indentc(1), nl()),
-                    $this->hiddenFormFieldsBuilder()->optionalContext($this->processor->target, (bool) $this->processor->inframe, (bool) $this->processor->border, $this->processor->page, $this->processor->align, $this->processor->top, indentc(1), true, true, true, true, nl()),
+                    $this->hiddenFormFieldsBuilder()->optionalContext($this->processor->target, (bool) $this->processor->inframe, (bool) $this->processor->border, (int) $this->processor->page, $this->processor->align, $this->processor->top, indentc(1), true, true, true, true, nl()),
                     $this->hiddenFormFieldsBuilder()->additional($ff_otherparams, indentc(1), nl()),
                     $technical,
                     $routing,
@@ -785,7 +785,7 @@ final class RenderingEngine
                     $this->hiddenFormFieldsBuilder()->submission((int) $this->processor->form, indentc(1), nl(), true),
                     $this->hiddenFormFieldsBuilder()->token(\Joomla\CMS\HTML\HTMLHelper::_('form.token'), indentc(1), nl()),
                     $this->hiddenFormFieldsBuilder()->context($context, indentc(1)),
-                    $this->hiddenFormFieldsBuilder()->optionalContext($this->processor->target, (bool) $this->processor->inframe, (bool) $this->processor->border, $this->processor->page, $this->processor->align, $this->processor->top, indentc(1), true, true, true, true, nl()),
+                    $this->hiddenFormFieldsBuilder()->optionalContext($this->processor->target, (bool) $this->processor->inframe, (bool) $this->processor->border, (int) $this->processor->page, $this->processor->align, $this->processor->top, indentc(1), true, true, true, true, nl()),
                     $technical,
                     $routing,
                     nl()
@@ -805,7 +805,7 @@ final class RenderingEngine
                     $this->hiddenFormFieldsBuilder()->submission((int) $this->processor->form, indentc(1), nl(), false, true),
                     $this->hiddenFormFieldsBuilder()->token(\Joomla\CMS\HTML\HTMLHelper::_('form.token'), indentc(1), nl()),
                     $this->hiddenFormFieldsBuilder()->context($context, indentc(1)),
-                    $this->hiddenFormFieldsBuilder()->optionalContext($this->processor->target, (bool) $this->processor->inframe, (bool) $this->processor->border, $this->processor->page, $this->processor->align, $this->processor->top, indentc(1), false, true, false, false, nl()),
+                    $this->hiddenFormFieldsBuilder()->optionalContext($this->processor->target, (bool) $this->processor->inframe, (bool) $this->processor->border, (int) $this->processor->page, $this->processor->align, $this->processor->top, indentc(1), false, true, false, false, nl()),
                     $technical,
                     $routing,
                     nl()

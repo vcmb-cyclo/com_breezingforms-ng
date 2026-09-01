@@ -119,7 +119,7 @@ $ff_request = array();
         } else if ($ff_applic == 'plg_facileforms') {
 
             $formname = htmlentities($this->application->getInput()->getString('ff_name', ''), ENT_QUOTES, 'UTF-8');
-            $page = htmlentities((string) $this->application->getInput()->getString('ff_page', 1), ENT_QUOTES, 'UTF-8');
+            $page = $this->application->getInput()->getInt('ff_page', 1);
             $inframe = htmlentities($this->application->getInput()->getString('ff_frame', ''), ENT_QUOTES, 'UTF-8');
             $border = htmlentities($this->application->getInput()->getString('ff_border', ''), ENT_QUOTES, 'UTF-8');
             $align = htmlentities($this->application->getInput()->getString('ff_align', ''), ENT_QUOTES, 'UTF-8');
@@ -190,7 +190,7 @@ $ff_request = array();
             $formname = null;
 
         $task = $this->application->getInput()->getString('ff_task', $task);
-        $page = $this->application->getInput()->getString('ff_page', $page);
+        $page = $this->application->getInput()->getInt('ff_page', $page);
         $inframe = $this->application->getInput()->getString('ff_frame', $inframe);
         $border = $this->application->getInput()->getString('ff_border', $border);
         $align1 = $this->application->getInput()->getString('ff_align', -1);

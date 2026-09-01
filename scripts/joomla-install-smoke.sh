@@ -378,11 +378,21 @@ if [[ "${frontend_status}" != "200" ]]; then
     exit 1
 fi
 
-# Generate an image with the bundled CAPTCHA runtime. This catches missing
-# Securimage support files and PHP/GD incompatibilities after library updates.
+# Exercise the installed Composer autoloader through the component's loader.
+# This catches packages that are present in source but missing from a clean
+# Joomla installation, including Securimage and TCPDF.
 docker exec "${web_container}" php -r '
     define("_JEXEC", 1);
-    require "/var/www/html/administrator/components/com_breezingformsng/vendor/bgli100/securimage/securimage.php";
+    define("JPATH_ADMINISTRATOR", "/var/www/html/administrator");
+    require "/var/www/html/administrator/components/com_breezingformsng/src/Helper/VendorHelper.php";
+    \Vcmb\Component\BreezingformsNG\Administrator\Helper\VendorHelper::load();
+    if (!class_exists("Securimage") || !class_exists("TCPDF")) {
+        exit(1);
+    }
+    require "/var/www/html/administrator/components/com_breezingformsng/src/Service/PdfDocument.php";
+    if (!class_exists("\\Vcmb\\Component\\BreezingformsNG\\Administrator\\Service\\PdfDocument")) {
+        exit(1);
+    }
     $captcha = new Securimage(["no_exit" => true, "send_headers" => false]);
     ob_start();
     $captcha->show();

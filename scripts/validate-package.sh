@@ -21,6 +21,8 @@ required=(
     "administrator/components/com_breezingformsng/vendor/bgli100/securimage/securimage.php"
     "administrator/components/com_breezingformsng/vendor/bgli100/securimage/CaptchaObject.php"
     "administrator/components/com_breezingformsng/vendor/bgli100/securimage/StorageAdapter/Session.php"
+    "administrator/components/com_breezingformsng/vendor/autoload.php"
+    "administrator/components/com_breezingformsng/vendor/tecnickcom/tcpdf/tcpdf.php"
     "components/com_breezingformsng/breezingformsng.php"
     "components/com_breezingformsng/src/Service/Rendering/QuickMode/QuickModeSubmittedValueHydrator.php"
     "media/com_breezingformsng/css/custom.css"

@@ -8,15 +8,21 @@
 \defined('_JEXEC') or die;
 
 use Joomla\CMS\Component\Router\RouterFactoryInterface;
+use Joomla\CMS\Application\CMSApplication;
+use Joomla\CMS\Cache\CacheControllerFactoryInterface;
 use Joomla\CMS\Dispatcher\ComponentDispatcherFactoryInterface;
 use Joomla\CMS\Extension\ComponentInterface;
 use Joomla\CMS\Extension\Service\Provider\ComponentDispatcherFactory;
 use Joomla\CMS\Extension\Service\Provider\MVCFactory;
 use Joomla\CMS\Extension\Service\Provider\RouterFactory;
+use Joomla\CMS\Factory;
+use Joomla\CMS\Mail\MailerFactoryInterface;
+use Joomla\Database\DatabaseInterface;
 use Joomla\CMS\MVC\Factory\MVCFactoryInterface;
 use Joomla\DI\Container;
 use Joomla\DI\ServiceProviderInterface;
 use Vcmb\Component\BreezingformsNG\Administrator\Extension\BreezingFormsNGComponent;
+use Vcmb\Component\BreezingformsNG\Site\Service\EngineDispatcher;
 
 return new class implements ServiceProviderInterface
 {
@@ -27,6 +33,22 @@ return new class implements ServiceProviderInterface
         $container->registerServiceProvider(new MVCFactory($namespace));
         $container->registerServiceProvider(new ComponentDispatcherFactory($namespace));
         $container->registerServiceProvider(new RouterFactory($namespace));
+
+        $container->set(
+            EngineDispatcher::class,
+            static function (Container $container): EngineDispatcher {
+                /** @var CMSApplication $application */
+                $application = Factory::getApplication();
+
+                return new EngineDispatcher(
+                    $application->getInput(),
+                    $application,
+                    $container->get(DatabaseInterface::class),
+                    $container->get(MailerFactoryInterface::class),
+                    $container->get(CacheControllerFactoryInterface::class),
+                );
+            }
+        );
 
         $container->set(
             ComponentInterface::class,

@@ -118,6 +118,7 @@
 | Soumission — opérations internes et uploads | Le pipeline utilise directement ses opérations de collecte/enregistrement et `UploadRuntime`, sans round-trip par la façade | Phase 23, `SubmissionEngineArchitectureTest` |
 | Soumission — orchestration des moteurs | Le pipeline reçoit directement `ScriptingEngine`, `ExportEngine` et `NotificationEngine` pour les pièces, exports et notifications | Phase 24, `SubmissionEngineArchitectureTest` |
 | QuickMode — hydratation des valeurs enregistrées | La recherche de lignes, l’exécution de `data1/data2`, les traductions et l’état checkbox sont mutualisés pour les trois renderers actifs | Phase 25, `QuickModeSubmittedValueHydratorTest` |
+| Bootstrap Joomla — dispatcher et autoload Composer | `EngineDispatcher` est enregistré dans le provider Joomla 6, le front controller le résout par conteneur, et le smoke/package validator vérifient l’autoload installé de Securimage/TCPDF | Phase 26, `EngineDispatcherContainerTest` et `JoomlaInstallSmokeScriptTest` |
 | PHPCS | Actif sur les services modernes, les builders ContentBuilder, Classic et `HiddenFieldTrait` | `phpcs.xml.dist`, 155 fichiers configurés |
 | PHPStan | Niveau 4 validé sur le composant, sans diagnostic résiduel | `phpstan.neon.dist`, baseline vide |
 | Navigation des enregistrements admin | Les liens précédent/suivant réutilisent le formulaire, la recherche et le tri de la liste courante ; l'état est conservé pendant l'édition | `RecordsModel::getAdjacentRecordId()`, `tests/Administrator/RecordsNavigationTest.php` |
@@ -1627,6 +1628,36 @@ La suite complète passe avec 662 tests et 2 129 assertions. PHPCS passe sur
 155 fichiers configurés, PHPStan niveau 4 ne signale aucune erreur, les
 fichiers ajoutés et modifiés passent `php -l` et `git diff --check` est vert.
 
+## Phase 26 — Raccorder le dispatcher au conteneur Joomla 6
+
+Ajoutée le 2026-09-01 après l'audit du bootstrap Joomla, du provider de
+l'extension et du chargeur Composer. Le dispatcher était encore construit
+manuellement dans le front controller alors que ses cinq dépendances existent
+déjà dans le conteneur Joomla.
+
+### Périmètre
+
+- `EngineDispatcher` est enregistré dans
+  `administrator/components/com_breezingformsng/services/provider.php` avec
+  l'application, l'entrée, la base, le mailer et le contrôleur de cache natifs.
+- `components/com_breezingformsng/breezingformsng.php` résout désormais cette
+  instance depuis le conteneur ; la construction racine n'est plus dupliquée
+  dans le point d'entrée.
+- Le smoke Joomla charge `VendorHelper`, puis vérifie après installation que
+  Securimage, TCPDF et `PdfDocument` sont réellement autoloadables. Le
+  validateur de package exige aussi l'autoloader Composer et le fichier TCPDF.
+
+### Filet de sécurité et vérification
+
+`EngineDispatcherContainerTest` vérifie l'enregistrement du service et la
+résolution depuis le front controller. `JoomlaInstallSmokeScriptTest` verrouille
+le chemin d'autoload du smoke. Le smoke Docker reste le test d'installation
+réelle lorsqu'un moteur Docker est disponible.
+
+Le graphe interne construit par `EngineDispatcher` (callbacks, renderer et
+services spécialisés) reste le prochain périmètre d'injection ; cette phase
+ne change pas ses contrats ni son ordre d'initialisation.
+
 ## Travail en parallèle
 
 | Couloir | Fichiers principaux | Peut avancer avec |
@@ -1679,12 +1710,16 @@ Règles de coordination :
 9. ~~Comparer les trois renderers QuickMode actifs et mutualiser uniquement
    l'hydratation réellement commune des valeurs enregistrées.~~
    Terminé par la Phase 25.
-10. Sécuriser le bootstrap Composer et enregistrer le graphe des services
+10. ~~Sécuriser le bootstrap Composer et enregistrer le graphe des services
     Joomla 6 : prouver l'autoload réel après installation, enregistrer les
     services runtime dans le provider, supprimer les constructions manuelles
-    du dispatcher et ajouter un test de résolution par le conteneur. Ce lot
-    précède l'extraction d'un contexte d'exécution typé partagé par les
-    moteurs, qui devra être caractérisée séparément.
+    du dispatcher et ajouter un test de résolution par le conteneur.~~
+    Terminé par la Phase 26. Le graphe interne du dispatcher reste à injecter
+    progressivement, après caractérisation de ses contrats.
+11. Caractériser puis injecter le graphe interne d'`EngineDispatcher` par
+    parcours fonctionnel (callbacks, rendu, soumission et runtime), sans
+    modifier les contrats publics de la façade ni refactoriser plusieurs
+    frontières dans un même lot.
 
 Le rendu Classic des groupes radio et checkbox est désormais mutualisé dans
 `ClassicChoiceGroupBuilder` (`478e1c24a`), avec couverture dédiée des wrappers,

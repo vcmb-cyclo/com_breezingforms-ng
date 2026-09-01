@@ -298,93 +298,16 @@ final class SofortCallback
 
     public function download(): void
     {
-        $db = $this->database;
-
-
-
-    $input = $this->application->getInput();
-    $formIdForDownload = $input->getInt('form', -1);
-    $formQueryForDownload = $db->getQuery(true)
-        ->select('*')
-        ->from($db->quoteName('#__facileforms_forms'))
-        ->where($db->quoteName('id') . ' = :formIdForDownload')
-        ->bind(':formIdForDownload', $formIdForDownload, ParameterType::INTEGER);
-    $db->setQuery($formQueryForDownload);
-    $list = $db->loadObjectList();
-    if (count($list) == 0) {
-        $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_FORM_DOES_NOT_EXIST'));
-        $this->application->close();
-    }
-
-    $form = $list[0];
-
-    $areas = json_decode($form->template_areas, true);
-    if (!is_array($areas)) {
-        $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYMENT_DATA'));
-    }
-
-    foreach ($areas as $area) {
-        foreach ($area['elements'] as $element) {
-            if ($element['internalType'] == 'bfSofortueberweisung') {
-
-                $options = $element['options'];
-
-                if ($options['downloadableFile']) {
-
-                    $file = $options['filepath'];
-
-                    $downloadRecordId = $input->getInt('record_id', -1);
-                    $sofortDownloadTx = 'Sofortüberweisung: ' . $input->getString('tx', '');
-                    $selectQuery = $db->getQuery(true)
-                        ->select($db->quoteName('paypal_download_tries'))
-                        ->from($db->quoteName('#__facileforms_records'))
-                        ->where($db->quoteName('id') . ' = :downloadRecordId')
-                        ->where($db->quoteName('paypal_tx_id') . ' = :sofortDownloadTx')
-                        ->bind(':downloadRecordId', $downloadRecordId, ParameterType::INTEGER)
-                        ->bind(':sofortDownloadTx', $sofortDownloadTx, ParameterType::STRING);
-                    $db->setQuery($selectQuery);
-
-                    $downloads = $db->loadObjectList();
-
-                    if (count($downloads) == 1) {
-
-                        if ($this->downloadPolicy->canDownload(
-                            (int) $downloads[0]->paypal_download_tries,
-                            (int) $options['downloadTries']
-                        )) {
-
-                            $updateQuery = $db->getQuery(true)
-                                ->update($db->quoteName('#__facileforms_records'))
-                                ->set($db->quoteName('paypal_download_tries') . ' = ' . $db->quoteName('paypal_download_tries') . ' + 1')
-                                ->where($db->quoteName('id') . ' = :downloadRecordId')
-                                ->where($db->quoteName('paypal_tx_id') . ' = :sofortDownloadTx')
-                                ->bind(':downloadRecordId', $downloadRecordId, ParameterType::INTEGER)
-                                ->bind(':sofortDownloadTx', $sofortDownloadTx, ParameterType::STRING);
-                            $db->setQuery($updateQuery);
-
-                            $db->execute();
-
-                            if (!file_exists($file)) {
-                                $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_COULD_NOT_FIND_DOWNLOAD_FILE'));
-                            }
-
-                            \Vcmb\Component\BreezingformsNG\Site\Service\Support\DownloadHelper::stream($this->application, $file);
-                        } else {
-
-                            $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_MAX_DOWNLOAD_TRIES_REACHED'));
-                        }
-                    } else {
-
-                        $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_DOWNLOAD_NOT_POSSIBLE'));
-                    }
-                } else {
-
-                    $this->redirectHelper->to(Uri::root(), Text::_('COM_BREEZINGFORMSNG_NO_DOWNLOADABLE_PRODUCT'));
-                }
-
-                break;
-            }
-        }
-    }
+        (new PaymentDownloadService(
+            $this->application,
+            $this->database,
+            $this->redirectHelper,
+            $this->downloadPolicy
+        ))->download(
+            'bfSofortueberweisung',
+            'COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYMENT_DATA',
+            'tx',
+            'Sofortüberweisung'
+        );
     }
 }

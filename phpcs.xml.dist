@@ -125,6 +125,7 @@
     <file>components/com_breezingformsng/src/Service/Notification/MailTemplateResolver.php</file>
     <file>components/com_breezingformsng/src/Service/Callback/CaptchaCallback.php</file>
     <file>components/com_breezingformsng/src/Service/Callback/PaymentDownloadPolicy.php</file>
+    <file>components/com_breezingformsng/src/Service/Callback/PaymentDownloadService.php</file>
 
     <exclude-pattern>*/vendor/*</exclude-pattern>
     <exclude-pattern>*/node_modules/*</exclude-pattern>

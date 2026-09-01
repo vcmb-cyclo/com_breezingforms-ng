@@ -1475,6 +1475,38 @@ l'absence des appels récursifs correspondants vers le processeur. La suite
 complète passe avec 647 tests et 2 042 assertions. PHPStan niveau 4, PHPCS,
 `php -l` et `git diff --check` sont verts.
 
+## Phase 21 — Mutualiser le téléchargement des fichiers payants
+
+Ajoutée le 2026-09-01 après caractérisation des trois callbacks de paiement.
+`StripeCallback`, `PayPalCallback` et `SofortCallback` reproduisaient chacun
+le même parcours de téléchargement sécurisé, avec plusieurs dizaines de
+lignes identiques et seules les données fournisseur variant.
+
+### Périmètre
+
+- `PaymentDownloadService` centralise le chargement du formulaire, la recherche
+  de l'élément de paiement, la vérification de la transaction, le quota, la
+  mise à jour atomique du compteur et le streaming du fichier.
+- Le type d'élément, la clé de message, le nom du paramètre transactionnel, le
+  préfixe de transaction et l'alternative PayPal `(VALID)` sont des paramètres
+  explicites du parcours partagé.
+- Les callbacks ne conservent que leur configuration fournisseur et leurs
+  autres parcours (`confirm`, `success`, IPN) ; aucune logique de téléchargement
+  n'est dupliquée.
+- Les contrôles Joomla Query Builder, les paramètres liés et
+  `PaymentDownloadPolicy` restent dans le service commun.
+
+### Filet de sécurité et vérification
+
+`PaymentDownloadServiceTest` couvre le formulaire absent, la transaction
+inconnue, le quota atteint, les bindings des variantes PayPal et l'ignorance
+des éléments non concernés. `PaymentCallbackRegressionTest` vérifie la
+délégation des trois callbacks au service commun.
+
+La suite complète passe avec 651 tests et 2 058 assertions. PHPCS passe sur
+154 fichiers configurés, PHPStan niveau 4 ne signale aucune erreur, les
+callbacks passent `php -l` et `git diff --check` est vert.
+
 ## Travail en parallèle
 
 | Couloir | Fichiers principaux | Peut avancer avec |
@@ -1522,7 +1554,8 @@ Règles de coordination :
    service transversal complet seulement si la frontière couvre plusieurs
    opérations liées et dispose d'un test de comportement. Le couplage interne
    du moteur scripting est réduit par la Phase 20 ; les autres parcours
-   restent à caractériser avant extraction.
+   restent à caractériser avant extraction. Le parcours partagé des
+   téléchargements payants est extrait et couvert par la Phase 21.
 
 Le rendu Classic des groupes radio et checkbox est désormais mutualisé dans
 `ClassicChoiceGroupBuilder` (`478e1c24a`), avec couverture dédiée des wrappers,

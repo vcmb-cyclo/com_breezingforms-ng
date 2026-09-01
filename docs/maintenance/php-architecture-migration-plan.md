@@ -1448,6 +1448,33 @@ La suite complète passe avec 646 tests et 2 030 assertions. PHPCS passe sur
 153 fichiers configurés, PHPStan niveau 4 ne signale aucune erreur, les
 fichiers ajoutés et modifiés passent `php -l` et `git diff --check` est vert.
 
+## Phase 20 — Fermer les appels récursifs du moteur scripting
+
+Ajoutée le 2026-09-01 pendant l'audit des appelants de la façade. Les
+opérations de `ScriptingEngine` repassaient encore par
+`HTML_facileFormsProcessor` pour invoquer une autre opération du même moteur,
+ce qui entretenait une boucle inutile dans la façade historique.
+
+### Périmètre
+
+- Les résolutions et exécutions de pièces utilisent directement les méthodes
+  du moteur (`getPieceById`, `getPieceByName`, `execPiece`).
+- Le remplacement de code et les valeurs de Query List utilisent directement
+  `execPiece` et `execQueryValue`.
+- La liaison des bibliothèques et l'enregistrement des fonctions utilisent
+  directement `linkcode`, tandis que l'émission de scripts appelle les
+  opérations locales `replaceCode` et `compressJavascript`.
+- Les appels externes continuent d'emprunter la façade publique ; seul le
+  round-trip interne est supprimé. Les annotations `@phpstan-impure` rendent
+  explicites les effets de `execPiece` et `linkcode`.
+
+### Filet de sécurité et vérification
+
+`ScriptingEngineArchitectureTest` vérifie la présence des chemins internes et
+l'absence des appels récursifs correspondants vers le processeur. La suite
+complète passe avec 647 tests et 2 042 assertions. PHPStan niveau 4, PHPCS,
+`php -l` et `git diff --check` sont verts.
+
 ## Travail en parallèle
 
 | Couloir | Fichiers principaux | Peut avancer avec |
@@ -1493,7 +1520,9 @@ Règles de coordination :
 7. Caractériser le prochain parcours fonctionnel de la façade (soumission,
    scripting, export ou upload) avec ses appelants réels, puis extraire un
    service transversal complet seulement si la frontière couvre plusieurs
-   opérations liées et dispose d'un test de comportement.
+   opérations liées et dispose d'un test de comportement. Le couplage interne
+   du moteur scripting est réduit par la Phase 20 ; les autres parcours
+   restent à caractériser avant extraction.
 
 Le rendu Classic des groupes radio et checkbox est désormais mutualisé dans
 `ClassicChoiceGroupBuilder` (`478e1c24a`), avec couverture dédiée des wrappers,

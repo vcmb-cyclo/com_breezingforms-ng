@@ -86,6 +86,7 @@ final class ScriptingEngine
 
     // getPieceByName
 
+    /** @phpstan-impure */
     function execPiece($code, $name, $type, $id, $pane)
     {
         $ret = '';
@@ -108,8 +109,8 @@ final class ScriptingEngine
     function execPieceById($id)
     {
         $name = null;
-        $code = $this->processor->getPieceById($id, $name);
-        return $this->processor->execPiece($code, Text::_('COM_BREEZINGFORMSNG_PROCESS_PIECE') . " $name", 'p', $id, null);
+        $code = $this->getPieceById($id, $name);
+        return $this->execPiece($code, Text::_('COM_BREEZINGFORMSNG_PROCESS_PIECE') . " $name", 'p', $id, null);
     }
 
     // execPieceById
@@ -117,8 +118,8 @@ final class ScriptingEngine
     function execPieceByName($name)
     {
         $id = null;
-        $code = $this->processor->getPieceByName($name, $id);
-        return $this->processor->execPiece($code, Text::_('COM_BREEZINGFORMSNG_PROCESS_PIECE') . " $name", 'p', $id, null);
+        $code = $this->getPieceByName($name, $id);
+        return $this->execPiece($code, Text::_('COM_BREEZINGFORMSNG_PROCESS_PIECE') . " $name", 'p', $id, null);
     }
 
     // execPieceByName
@@ -144,7 +145,7 @@ final class ScriptingEngine
                 if ($p2 === false)
                     $p2 = $l;
                 $n++;
-                $c .= $this->processor->execPiece(substr($code, $p1, $p2 - $p1), $name . "[$n]", $type, $id, $pane);
+                $c .= $this->execPiece(substr($code, $p1, $p2 - $p1), $name . "[$n]", $type, $id, $pane);
                 if ($this->processor->dying)
                     return '';
                 $p1 = $p2 + 2;
@@ -263,7 +264,7 @@ final class ScriptingEngine
                     else {
                         $val = '';
                         for ($x = 0; $x < $xcnt; $x++) {
-                            $val .= $coldef->comp[$x][0] ? $this->processor->execQueryValue($coldef->comp[$x][1], $elem, $row, $coldef, $value) : $coldef->comp[$x][1];
+                            $val .= $coldef->comp[$x][0] ? $this->execQueryValue($coldef->comp[$x][1], $elem, $row, $coldef, $value) : $coldef->comp[$x][1];
                             if ($this->processor->dying)
                                 break;
                         } // for
@@ -787,6 +788,7 @@ final class ScriptingEngine
 
     // compressJavascript
 
+    /** @phpstan-impure */
     function linkcode($func, &$library, &$linked, $code, $type = null, $id = null, $pane = null)
     {
         global $ff_config;
@@ -814,7 +816,7 @@ final class ScriptingEngine
                     $lid = $library[$i][3];
                     $lpane = $library[$i][4];
                 } // if
-                $this->processor->linkcode($libname, $library, $linked, $library[$i][1], $ltype, $lid, $lpane);
+                $this->linkcode($libname, $library, $linked, $library[$i][1], $ltype, $lid, $lpane);
                 if ($this->processor->dying)
                     return '';
             } // if
@@ -823,11 +825,11 @@ final class ScriptingEngine
         if ($func != '#scanonly') {
             // emit the code
             if ($ff_config->compress)
-                echo $this->processor->compressJavascript(
-                    $this->processor->replaceCode($code, Text::_('COM_BREEZINGFORMSNG_PROCESS_SCRIPT') . " $func", $type, $id, $pane)
+                echo $this->compressJavascript(
+                    $this->replaceCode($code, Text::_('COM_BREEZINGFORMSNG_PROCESS_SCRIPT') . " $func", $type, $id, $pane)
                 );
             else
-                echo $this->processor->replaceCode($code, Text::_('COM_BREEZINGFORMSNG_PROCESS_SCRIPT') . " $func", $type, $id, $pane) . nl() . nl();
+                echo $this->replaceCode($code, Text::_('COM_BREEZINGFORMSNG_PROCESS_SCRIPT') . " $func", $type, $id, $pane) . nl() . nl();
         } // if
     }
 
@@ -845,7 +847,7 @@ final class ScriptingEngine
                     $scriptCode = $script->code;
 
                     if ($this->processor->trim($scriptName) && $this->processor->nonblank($scriptCode)) {
-                        $this->processor->linkcode($scriptName, $library, $linked, $scriptCode, 's', $id, null);
+                        $this->linkcode($scriptName, $library, $linked, $scriptCode, 's', $id, null);
                         if ($this->processor->dying)
                             return;
                     } // if
@@ -853,7 +855,7 @@ final class ScriptingEngine
                 break;
             case 2:
                 if ($this->processor->trim($name) && $this->processor->nonblank($code)) {
-                    $this->processor->linkcode($name, $library, $linked, $code, $type, $rowid, $pane);
+                    $this->linkcode($name, $library, $linked, $code, $type, $rowid, $pane);
                     if ($this->processor->dying)
                         return;
                 } // if

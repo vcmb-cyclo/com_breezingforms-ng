@@ -11,6 +11,8 @@ use Joomla\Database\DatabaseInterface;
 use PHPUnit\Framework\TestCase;
 use ReflectionMethod;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\PayPalCallback;
+use Vcmb\Component\BreezingformsNG\Site\Service\Callback\PaymentDownloadPolicy;
+use Vcmb\Component\BreezingformsNG\Site\Service\Callback\PaymentDownloadService;
 use Vcmb\Component\BreezingformsNG\Site\Service\Support\RedirectHelper;
 
 require_once __DIR__ . '/../Rendering/QuickMode/joomla-cmsapplication-stub.php';
@@ -84,11 +86,18 @@ final class PayPalCallbackTest extends TestCase
     private function invokeRequestVerification(Http $http, string $paypalUrl, string $body): string
     {
         $application = new CMSApplication();
+        $database = new class implements DatabaseInterface {
+        };
         $callback = new PayPalCallback(
             $application,
-            new class implements DatabaseInterface {
-            },
+            $database,
             new RedirectHelper($application),
+            new PaymentDownloadService(
+                $application,
+                $database,
+                new RedirectHelper($application),
+                new PaymentDownloadPolicy()
+            ),
             $http
         );
 

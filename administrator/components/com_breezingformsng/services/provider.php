@@ -27,6 +27,7 @@ use Vcmb\Component\BreezingformsNG\Site\Service\Callback\FlashUploadCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\OptCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\PayPalCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\PaymentDownloadPolicy;
+use Vcmb\Component\BreezingformsNG\Site\Service\Callback\PaymentDownloadService;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\SofortCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\Callback\StripeCallback;
 use Vcmb\Component\BreezingformsNG\Site\Service\EngineDispatcher;
@@ -54,6 +55,18 @@ return new class implements ServiceProviderInterface
         $container->set(
             PaymentDownloadPolicy::class,
             static fn(): PaymentDownloadPolicy => new PaymentDownloadPolicy(),
+        );
+
+        $container->set(
+            PaymentDownloadService::class,
+            static function (Container $container) use ($application): PaymentDownloadService {
+                return new PaymentDownloadService(
+                    $application,
+                    $container->get(DatabaseInterface::class),
+                    $container->get(RedirectHelper::class),
+                    $container->get(PaymentDownloadPolicy::class),
+                );
+            },
         );
 
         $container->set(
@@ -95,8 +108,8 @@ return new class implements ServiceProviderInterface
                     $application,
                     $container->get(DatabaseInterface::class),
                     $container->get(RedirectHelper::class),
+                    $container->get(PaymentDownloadService::class),
                     null,
-                    $container->get(PaymentDownloadPolicy::class),
                 );
             }
         );
@@ -108,7 +121,7 @@ return new class implements ServiceProviderInterface
                     $application,
                     $container->get(DatabaseInterface::class),
                     $container->get(RedirectHelper::class),
-                    $container->get(PaymentDownloadPolicy::class),
+                    $container->get(PaymentDownloadService::class),
                 );
             }
         );
@@ -121,7 +134,7 @@ return new class implements ServiceProviderInterface
                     $container->get(DatabaseInterface::class),
                     $container->get(RedirectHelper::class),
                     $container->get(MailerFactoryInterface::class),
-                    $container->get(PaymentDownloadPolicy::class),
+                    $container->get(PaymentDownloadService::class),
                 );
             }
         );

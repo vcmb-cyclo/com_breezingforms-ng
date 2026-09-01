@@ -76,7 +76,8 @@ final class PaymentCallbackRegressionTest extends TestCase
         foreach (['StripeCallback', 'PayPalCallback', 'SofortCallback'] as $callback) {
             $source = $this->read("components/com_breezingformsng/src/Service/Callback/{$callback}.php");
 
-            self::assertStringContainsString('new PaymentDownloadService(', $source, $callback);
+            self::assertStringContainsString('PaymentDownloadService $paymentDownloadService', $source, $callback);
+            self::assertStringNotContainsString('new PaymentDownloadService(', $source, $callback);
             self::assertStringContainsString('->download(', $source, $callback);
             self::assertStringNotContainsString(
                 'paypal_download_tries < $options[\'downloadTries\']',
@@ -95,7 +96,9 @@ final class PaymentCallbackRegressionTest extends TestCase
         $source = $this->read('administrator/components/com_breezingformsng/services/provider.php');
 
         self::assertStringContainsString('PaymentDownloadPolicy::class', $source);
-        self::assertSame(3, substr_count($source, '$container->get(PaymentDownloadPolicy::class)'));
+        self::assertStringContainsString('PaymentDownloadService::class', $source);
+        self::assertSame(1, substr_count($source, '$container->get(PaymentDownloadPolicy::class)'));
+        self::assertSame(3, substr_count($source, '$container->get(PaymentDownloadService::class)'));
 
         $dispatcher = $this->read('components/com_breezingformsng/src/Service/EngineDispatcher.php');
 

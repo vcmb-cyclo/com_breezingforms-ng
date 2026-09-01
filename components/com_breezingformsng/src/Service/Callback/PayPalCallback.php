@@ -25,17 +25,15 @@ use Joomla\Http\HttpFactory;
 final class PayPalCallback
 {
     private readonly Http $http;
-    private readonly PaymentDownloadPolicy $downloadPolicy;
 
     public function __construct(
         private readonly CMSApplication $application,
         private readonly DatabaseInterface $database,
         private readonly RedirectHelper $redirectHelper,
+        private readonly PaymentDownloadService $paymentDownloadService,
         ?Http $http = null,
-        ?PaymentDownloadPolicy $downloadPolicy = null,
     ) {
         $this->http = $http ?? (new HttpFactory())->getHttp();
-        $this->downloadPolicy = $downloadPolicy ?? new PaymentDownloadPolicy();
     }
 
     public function confirmIpn(): void
@@ -363,12 +361,7 @@ final class PayPalCallback
 
     public function download(): void
     {
-        (new PaymentDownloadService(
-            $this->application,
-            $this->database,
-            $this->redirectHelper,
-            $this->downloadPolicy
-        ))->download(
+        $this->paymentDownloadService->download(
             'bfPayPal',
             'COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYPAL_DATA',
             'tx',

@@ -23,15 +23,12 @@ use Joomla\Filesystem\File;
  */
 final class StripeCallback
 {
-    private readonly PaymentDownloadPolicy $downloadPolicy;
-
     public function __construct(
         private readonly CMSApplication $application,
         private readonly DatabaseInterface $database,
         private readonly RedirectHelper $redirectHelper,
-        ?PaymentDownloadPolicy $downloadPolicy = null,
+        private readonly PaymentDownloadService $paymentDownloadService,
     ) {
-        $this->downloadPolicy = $downloadPolicy ?? new PaymentDownloadPolicy();
     }
 
     public function confirm(): void
@@ -226,12 +223,7 @@ final class StripeCallback
 
     public function download(): void
     {
-        (new PaymentDownloadService(
-            $this->application,
-            $this->database,
-            $this->redirectHelper,
-            $this->downloadPolicy
-        ))->download(
+        $this->paymentDownloadService->download(
             'bfStripe',
             'COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYMENT_DATA',
             'token',

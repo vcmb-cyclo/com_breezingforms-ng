@@ -26,16 +26,13 @@ use Joomla\CMS\Mail\MailerFactoryInterface;
  */
 final class SofortCallback
 {
-    private readonly PaymentDownloadPolicy $downloadPolicy;
-
     public function __construct(
         private readonly CMSApplication $application,
         private readonly DatabaseInterface $database,
         private readonly RedirectHelper $redirectHelper,
         private readonly MailerFactoryInterface $mailerFactory,
-        ?PaymentDownloadPolicy $downloadPolicy = null,
+        private readonly PaymentDownloadService $paymentDownloadService,
     ) {
-        $this->downloadPolicy = $downloadPolicy ?? new PaymentDownloadPolicy();
     }
 
     public function success(): void
@@ -298,12 +295,7 @@ final class SofortCallback
 
     public function download(): void
     {
-        (new PaymentDownloadService(
-            $this->application,
-            $this->database,
-            $this->redirectHelper,
-            $this->downloadPolicy
-        ))->download(
+        $this->paymentDownloadService->download(
             'bfSofortueberweisung',
             'COM_BREEZINGFORMSNG_COULD_NOT_FIND_PAYMENT_DATA',
             'tx',

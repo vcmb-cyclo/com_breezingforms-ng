@@ -120,6 +120,7 @@
 | QuickMode — hydratation des valeurs enregistrées | La recherche de lignes, l’exécution de `data1/data2`, les traductions et l’état checkbox sont mutualisés pour les trois renderers actifs | Phase 25, `QuickModeSubmittedValueHydratorTest` |
 | Bootstrap Joomla — dispatcher et autoload Composer | `EngineDispatcher` est enregistré dans le provider Joomla 6, le front controller le résout par conteneur, et le smoke/package validator vérifient l’autoload installé de Securimage/TCPDF | Phase 26, `EngineDispatcherContainerTest` et `JoomlaInstallSmokeScriptTest` |
 | Bootstrap Joomla — graphe interne du dispatcher | Le renderer, les callbacks et leurs services partagés sont enregistrés dans le provider puis injectés dans `EngineDispatcher`, sans constructions manuelles dans le dispatcher | Phase 27, `EngineDispatcherContainerTest` |
+| Paiements — téléchargement des fichiers payants | `PaymentDownloadService` et sa politique sont enregistrés dans le conteneur puis partagés par les callbacks PayPal, Stripe et Sofort, sans construction locale | Phase 28, `PaymentCallbackRegressionTest` |
 | PHPCS | Actif sur les services modernes, les builders ContentBuilder, Classic et `HiddenFieldTrait` | `phpcs.xml.dist`, 155 fichiers configurés |
 | PHPStan | Niveau 4 validé sur le composant, sans diagnostic résiduel | `phpstan.neon.dist`, baseline vide |
 | Navigation des enregistrements admin | Les liens précédent/suivant réutilisent le formulaire, la recherche et le tri de la liste courante ; l'état est conservé pendant l'édition | `RecordsModel::getAdjacentRecordId()`, `tests/Administrator/RecordsNavigationTest.php` |
@@ -1680,6 +1681,28 @@ renderer et chaque callback, ainsi que leurs dépendances partagées.
 `EngineDispatcherContainerTest` vérifie le graphe enregistré et l'absence des
 constructions manuelles dans le dispatcher. Les tests de callbacks existants
 restent indépendants et continuent de couvrir leurs contrats propres.
+
+## Phase 28 — Injecter le parcours partagé de téléchargement des paiements
+
+Ajoutée le 2026-09-01 après la Phase 27. Les callbacks PayPal, Stripe et
+Sofort déléguaient encore chacun la construction de `PaymentDownloadService`,
+ce qui recréait le service partagé à chaque appel.
+
+### Périmètre
+
+- `PaymentDownloadService` est enregistré dans le provider Joomla 6 avec sa
+  `PaymentDownloadPolicy` et ses dépendances communes.
+- Les callbacks PayPal, Stripe et Sofort reçoivent le service par
+  constructeur et lui délèguent leur parcours de téléchargement.
+- Les contrats et paramètres propres à chaque moyen de paiement restent
+  inchangés ; aucun changement de sortie ou de règle de quota n'est introduit.
+
+### Filet de sécurité et vérification
+
+`PaymentCallbackRegressionTest` vérifie l'absence de constructions locales,
+le partage du service depuis le provider et la conservation de la politique
+de quota. Les tests ciblés des téléchargements et du callback PayPal couvrent
+les contrats d'exécution concernés.
 
 ## Travail en parallèle
 

@@ -102,6 +102,7 @@
 | Rendu HTML classique — Query List lignes | Boucle de ligne extraite, réutilisant le builder de cellule et conservant l’arrêt `dying` | Commit `58dec7178` |
 | Rendu HTML classique — Query List pied et pagination | Markup du pied de tableau et liens de pagination extrait, avec variantes de navigation et mode compact couverts | Commit `76351beae` |
 | Rendu HTML classique — Query List enveloppe | Ouverture/fermeture du conteneur et du tableau extraite et couverte avec styles, attributs et formatage historiques | Commit `bd59533be` |
+| Rendu HTML classique — orchestration | Les 21 types de nœuds et Query List sont orchestrés par `ClassicFormRenderer`; `RenderingEngine::view()` ne conserve que le branchement et l'arrêt `bury()` | Commit de la Phase 18, `ClassicFormRendererTest` |
 | `RenderingEngine::view()` — scripts d'icônes | Extraction committée et trois chemins `bury()` couverts | Commit `0a908143` |
 | `RenderingEngine::view()` — callbacks d'éléments | Extraction committée ; ordre `init` / `action` / `validate` et trois arrêts `bury()` couverts | Commit `413cb1cb` |
 | `RenderingEngine::view()` — métadonnées classiques | Comptage icônes/infobulles et scan `Static Text/HTML` extraits et couverts | Commit `51e86824` |
@@ -113,8 +114,8 @@
 | ContentBuilder — chargement d’enregistrement | Calcul des scopes propriétaire/langue et contrôle 404 délégués à `ContentBuilderRecordLoader`, avec variantes frontend/admin et nouveau testées | Commit `c6e5855ec` |
 | ContentBuilder — loaders runtime | Le smoke Joomla insère puis relit une association publiée avec les loaders BFNG via l’API Database réelle, avant nettoyage de la fixture | Commit `3e22ac75d` |
 | ContentBuilder — source/enregistrement runtime | Le smoke résout une source BreezingForms réelle via `FormSourceFactory` et exerce `ContentBuilderRecordLoader` sur le parcours nouveau, avec nettoyage de la fixture | Validé par le smoke Joomla |
-| PHPCS | Actif sur les services modernes, les builders ContentBuilder et `HiddenFieldTrait` | `phpcs.xml.dist`, commit `2e58c4bb` |
-| PHPStan | Niveau 2 sur le composant, avec baseline | `phpstan.neon.dist`, 11 entrées dans la baseline |
+| PHPCS | Actif sur les services modernes, les builders ContentBuilder, Classic et `HiddenFieldTrait` | `phpcs.xml.dist`, 151 fichiers configurés |
+| PHPStan | Niveau 4 validé sur le composant, sans diagnostic résiduel | `phpstan.neon.dist`, baseline vide |
 | Navigation des enregistrements admin | Les liens précédent/suivant réutilisent le formulaire, la recherche et le tri de la liste courante ; l'état est conservé pendant l'édition | `RecordsModel::getAdjacentRecordId()`, `tests/Administrator/RecordsNavigationTest.php` |
 
 ## Phase 1 — Terminer la préparation des éléments classiques
@@ -945,8 +946,8 @@ Analyse quantitative (branches conditionnelles + nombre de fichiers
 appelants, sur l'ensemble des classes `*Builder` de
 `components/com_breezingformsng/src/Service/Rendering`) : cinq
 regroupements cohérents sont désormais réalisés. Les classes restantes sans
-partenaire honnête (`ClassNameResolver`, `MobileChoiceMarkupBuilder`,
-`QueryListStateLibraryBuilder`, `ProcessorHeaderRenderer`) restent isolées.
+partenaire honnête (`ClassNameResolver`, `QueryListStateLibraryBuilder`,
+`ProcessorHeaderRenderer`) restent isolées.
 
 ### 8.1 `HiddenFormFieldsBuilder` — champs `<input type="hidden">`
 
@@ -1378,6 +1379,44 @@ de l'état dans les templates. La suite complète passe avec 638 tests et 1 989
 assertions ; PHPCS (150 fichiers configurés), PHPStan niveau 2, `php -l` sur
 les fichiers modifiés et `git diff --check` sont verts.
 
+## Phase 18 — Orchestration du rendu HTML Classic
+
+Ajoutée le 2026-09-01 pour terminer la frontière de la branche Classic sans
+continuer le micro-découpage des builders. Les builders de types de champs et
+de Query List étaient déjà testés individuellement, mais leur boucle de
+coordination restait dans `RenderingEngine::view()` et maintenait 16
+propriétés/getters lazy-init dans l'orchestrateur.
+
+### Périmètre
+
+- `ClassicFormRenderer` prend en charge la boucle complète des 21 types de
+  nœuds historiques : remplacement de `data1`/`data2`/`data3`, géométrie du
+  wrapper, classes CSS, dispatch vers les builders et composition Query List.
+- La frontière Query List reste dans le même service : réglages, en-tête,
+  cellules, lignes, pied et pagination sont coordonnés sans créer un service
+  par étape.
+- `RenderingEngine::view()` conserve le choix du chemin Classic/QuickMode et
+  la gestion commune de l'arrêt `bury()`, mais ne construit plus le HTML d'un
+  nœud et ne possède plus les builders Classic.
+- Les opérateurs, l'ordre des remplacements, les accès aux tableaux préparés
+  et les sorties HTML sont conservés ; le service retourne `null` uniquement
+  lorsque le processeur demande l'arrêt historique.
+
+### Filet de sécurité
+
+`ClassicFormRendererTest` couvre plusieurs familles de contrôles dans un seul
+parcours, une table Query List préparée et l'arrêt pendant le remplacement
+des valeurs. `RenderingEngineViewCharacterizationTest` reste le test de
+caractérisation du cycle complet, tandis que les tests existants des builders
+verrouillent leurs sorties exactes. `RenderingEngineArchitectureTest` vérifie
+que la boucle ne revient pas dans `RenderingEngine`.
+
+### Vérification
+
+La suite complète passe avec 643 tests et 2 012 assertions. PHPCS passe sur
+151 fichiers configurés, PHPStan niveau 4 ne signale aucune erreur, les deux
+fichiers de production passent `php -l` et `git diff --check` est vert.
+
 ## Travail en parallèle
 
 | Couloir | Fichiers principaux | Peut avancer avec |
@@ -1401,14 +1440,22 @@ Règles de coordination :
 1. ~~Harnais ContentBuilder pour le parcours complet des fichiers et des
    signatures, puis validation de la lecture SQL de l'enregistrement.~~
    Terminé par `72a4d2632` et `fe1d09532`.
-2. Poursuivre les stratégies de contrôles restantes dans les wrappers
+2. ~~Poursuivre les stratégies de contrôles restantes dans les wrappers
    Classic et Bootstrap/OnePage, après les branchements déjà réalisés
-   (`065cef94`, `f3d04e55`).
+   (`065cef94`, `f3d04e55`).~~
+   Les familles de contrôles prioritaires sont mutualisées et couvertes par
+   les lots de la Phase 5.
 3. ~~Harnais ContentBuilder pour les parcours runtime fichiers/signatures.~~
    Terminé par `fe1d09532`.
-4. Rendu HTML classique par famille de nœuds.
-5. Réduction progressive des avertissements PHPCS et PHPStan après chaque
-   extraction fonctionnelle.
+4. ~~Rendu HTML classique par famille de nœuds.~~
+   Les builders et l'orchestration complète sont terminés par la Phase 18.
+5. ~~Réduction progressive des avertissements PHPCS et PHPStan après chaque
+   extraction fonctionnelle.~~
+   Le périmètre PHPCS configuré est vert et PHPStan niveau 4 est sans erreur.
+6. Auditer la façade publique `HTML_facileFormsProcessor` et ses appelants
+   avant toute nouvelle extraction : caractériser les méthodes encore
+   appelées par le PHP stocké, puis sélectionner un lot runtime transversal
+   qui ne duplique pas les frontières déjà établies.
 
 Le rendu Classic des groupes radio et checkbox est désormais mutualisé dans
 `ClassicChoiceGroupBuilder` (`478e1c24a`), avec couverture dédiée des wrappers,

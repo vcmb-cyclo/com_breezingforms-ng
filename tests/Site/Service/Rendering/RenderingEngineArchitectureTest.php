@@ -51,4 +51,19 @@ final class RenderingEngineArchitectureTest extends TestCase
         self::assertStringNotContainsString('vertical-align: text-bottom', $source);
         self::assertStringNotContainsString('vertical-align: text-top', $source);
     }
+
+    public function testClassicViewDelegatesTheCompleteBranchToOneOrchestrator(): void
+    {
+        $source = file_get_contents(
+            __DIR__ . '/../../../../components/com_breezingformsng/src/Service/Rendering/RenderingEngine.php'
+        );
+
+        self::assertIsString($source);
+        self::assertStringContainsString(
+            '$this->classicFormRenderer()->render($ff_mossite)',
+            $source
+        );
+        self::assertStringNotContainsString('classicStaticTextBuilder()', $source);
+        self::assertStringNotContainsString('classicQueryListRowBuilder()', $source);
+    }
 }

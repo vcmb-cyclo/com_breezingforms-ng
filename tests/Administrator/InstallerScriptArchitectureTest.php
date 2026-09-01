@@ -29,6 +29,25 @@ final class InstallerScriptArchitectureTest extends TestCase
         self::assertSame(2, substr_count($source, "->uninstall('plugin', \$"));
     }
 
+    public function testPostflightRemovesTheObsoleteGlobalPdfTemplate(): void
+    {
+        $source = file_get_contents(__DIR__ . '/../../script.php');
+
+        self::assertIsString($source);
+        self::assertStringContainsString(
+            "JPATH_SITE . '/media/breezingforms/pdftpl/export_pdf.php'",
+            $source
+        );
+        self::assertStringContainsString(
+            'This generic Joomla 3 PDF template is superseded',
+            $source
+        );
+        self::assertStringContainsString(
+            '$this->removeObsoleteComponentFiles();',
+            $source
+        );
+    }
+
     private function sectionBefore(string $source, string $needle): string
     {
         $position = strpos($source, $needle);

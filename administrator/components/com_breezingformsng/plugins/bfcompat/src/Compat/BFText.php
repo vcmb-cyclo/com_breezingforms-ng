@@ -79,16 +79,7 @@ final class BFText
 			$bftext->language->load(BFText::COMPONENT_NAME);
 		}
 
-		$resolvedName = $name;
-		if (!$bftext->language->hasKey($resolvedName) && str_starts_with($name, 'COM_BREEZINGFORMS_')) {
-			$modernName = 'COM_BREEZINGFORMSNG_' . substr($name, strlen('COM_BREEZINGFORMS_'));
-
-			if ($bftext->language->hasKey($modernName)) {
-				$resolvedName = $modernName;
-			}
-		}
-
 		// ok, loaded and ready to go
-		return Text::_($resolvedName);
+		return Text::_($name);
 	}
 }

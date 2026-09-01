@@ -2005,6 +2005,9 @@ class com_breezingformsngInstallerScript
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/libraries/crosstec/classes/BFText.php',
             JPATH_SITE . '/media/com_breezingformsng/images/site/captcha/securimage_show.php',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/images/captcha/securimage_show.php',
+            // This generic Joomla 3 PDF template is superseded by the
+            // packaged administrator template. Keep user-specific templates.
+            JPATH_SITE . '/media/breezingforms/pdftpl/export_pdf.php',
             JPATH_SITE . '/components/com_breezingformsng/facileforms.class.php',
             JPATH_SITE . '/components/com_breezingformsng/facileforms.process.php',
             JPATH_ADMINISTRATOR . '/components/com_breezingformsng/sql/create_sql.php',

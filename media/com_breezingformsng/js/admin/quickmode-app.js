@@ -758,7 +758,7 @@ import { JoomlaEditor } from 'editor-api';
                 // needed, data-bs-toggle="tab" wires it up on its own.
             }
 
-            window.onload = function () {
+            window.addEventListener('load', function () {
 
                 // works around a bug in Firefox 40.0 that prevents you from selecting anything in the editor
                 if (JQuery.browser.mozilla) {
@@ -794,7 +794,8 @@ import { JoomlaEditor } from 'editor-api';
                         item.properties = mdata;
                     }
                 }
-            };
+                window.dispatchEvent(new CustomEvent('bfqm:ready'));
+            });
 
             function createInitCode() {
                 var mdata = app.getProperties(app.selectedTreeElement);

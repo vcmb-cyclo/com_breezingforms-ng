@@ -17,6 +17,7 @@ final class QuickmodeFormDirtyInitializationTest extends TestCase
         self::assertIsString($source);
         self::assertStringContainsString('var initialState = null;', $source);
         self::assertStringContainsString('if (!window.BFQMApp)', $source);
+        self::assertStringContainsString("window.addEventListener('bfqm:ready', sync);", $source);
         self::assertStringContainsString("window.addEventListener('load', sync);", $source);
         self::assertStringNotContainsString('var initialState = formState();', $source);
     }

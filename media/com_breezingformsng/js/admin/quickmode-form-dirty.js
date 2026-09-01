@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return new URLSearchParams(new FormData(form)).toString() + ' ' + editorValues() + ' ' + treeState();
     }
 
-    // quickmode-app.js creates BFQMApp from window.onload. Capturing the
+    // quickmode-app.js creates BFQMApp during the load event. Capturing the
     // baseline at DOMContentLoaded would therefore record an empty tree and
     // mark the form as dirty as soon as the QuickMode app is initialized.
     var initialState = null;
@@ -81,6 +81,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     form.addEventListener('input', sync);
     form.addEventListener('change', sync);
+    window.addEventListener('bfqm:ready', sync);
     window.addEventListener('load', sync);
 
     // Neither CodeMirror (via JoomlaEditor) nor tree structure

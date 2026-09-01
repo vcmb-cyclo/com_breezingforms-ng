@@ -123,6 +123,7 @@
 | Paiements — téléchargement des fichiers payants | `PaymentDownloadService` et sa politique sont enregistrés dans le conteneur puis partagés par les callbacks PayPal, Stripe et Sofort, sans construction locale | Phase 28, `PaymentCallbackRegressionTest` |
 | Nettoyage — fichiers temporaires et cache de paiement | Le parcours commun de purge est regroupé dans `UploadFileCleaner`, injecté dans `FormRenderer`, avec les deux règles de nommage historiques conservées | Phase 29, `UploadFileCleanerTest` |
 | QuickMode — consolidation des builders mono-appelant | Les attributs d’image paiement, le markup checkbox et les deux fragments internes `FilesAdded` sont repliés dans leurs appelants ; le composeur upload partagé est conservé | Phase 30, tests QuickMode fusionnés |
+| Admin — préparation commune des bibliothèques de packages | `PieceModel` et `ScriptModel` délèguent leur préparation de liste à `PackageModel`, avec uniquement leur table et leur préfixe de session spécifiques | Phase 31, `PackageLibraryUiRegressionTest` |
 | PHPCS | Actif sur les services modernes, les builders ContentBuilder, Classic et `HiddenFieldTrait` | `phpcs.xml.dist`, 155 fichiers configurés |
 | PHPStan | Niveau 4 validé sur le composant, sans diagnostic résiduel | `phpstan.neon.dist`, baseline vide |
 | Navigation des enregistrements admin | Les liens précédent/suivant réutilisent le formulaire, la recherche et le tri de la liste courante ; l'état est conservé pendant l'édition | `RecordsModel::getAdjacentRecordId()`, `tests/Administrator/RecordsNavigationTest.php` |
@@ -1749,6 +1750,27 @@ possédaient qu'un appelant et n'exprimaient pas une frontière réutilisable.
 Les tests des builders supprimés sont fusionnés dans les tests des appelants.
 Les snapshots de paiement, checkbox et upload restent inchangés. Les fichiers
 retirés ne figurent plus dans le périmètre PHPCS.
+
+## Phase 31 — Factoriser la préparation des modèles de packages Admin
+
+Ajoutée le 2026-09-01 après la Phase 30. `PieceModel` et `ScriptModel`
+contenaient la même préparation de liste ; leurs seules différences étaient la
+table et le préfixe de session.
+
+### Périmètre
+
+- `PackageModel` porte désormais la préparation commune de la liste, des
+  filtres, du tri, de la pagination et de l'état de session.
+- `PieceModel` et `ScriptModel` conservent uniquement leurs paramètres propres
+  via deux hooks protégés.
+- Les contrôleurs et les vues restent distincts, car leurs différences ne
+  relèvent pas du même contrat MVC.
+
+### Filet de sécurité et vérification
+
+`PackageLibraryUiRegressionTest` vérifie le partage de la préparation et la
+conservation des préfixes `pieces` et `scripts`. Les tâches, assets et vues
+Admin restent couverts par les tests de régression existants.
 
 ## Travail en parallèle
 

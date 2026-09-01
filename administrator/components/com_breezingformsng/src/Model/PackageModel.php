@@ -12,9 +12,122 @@ namespace Vcmb\Component\BreezingformsNG\Administrator\Model;
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\Database\ParameterType;
 use Joomla\Database\QueryInterface;
+use Joomla\Input\Input;
+use Joomla\Session\SessionInterface;
 
 abstract class PackageModel extends ListModel
 {
+    public function prepareList(string $package, Input $input, SessionInterface $session): array
+    {
+        $prefix = $this->getSessionPrefix();
+        $packages = $this->getPackages();
+
+        $packageOk = $package === '';
+
+        foreach ($packages as $packageEntry) {
+            if ((string) $packageEntry->name === $package) {
+                $packageOk = true;
+                break;
+            }
+        }
+
+        if (!$packageOk) {
+            $package = '';
+        }
+
+        $packageList = [[
+            $package === '',
+            '',
+        ]];
+
+        foreach ($packages as $packageEntry) {
+            $packageName = (string) $packageEntry->name;
+            $packageList[] = [
+                $packageName === $package,
+                $packageName,
+            ];
+        }
+
+        if (!$input->exists('search')) {
+            $search = (string) $session->get('bf.' . $prefix . '_search', '');
+        } else {
+            $search = trim($input->getString('search', ''));
+            $session->set('bf.' . $prefix . '_search', $search);
+        }
+
+        $filterOrderInput = trim($input->getString('filter_order', ''));
+        $filterOrderDirInput = strtoupper(trim($input->getString('filter_order_Dir', '')));
+
+        if ($filterOrderInput !== '') {
+            $sort = $filterOrderInput;
+            $session->set('bf.' . $prefix . '_sort', $sort);
+        } elseif (!$input->exists('sort')) {
+            $sort = (string) $session->get('bf.' . $prefix . '_sort', 'a.name');
+        } else {
+            $sort = $input->getCmd('sort', 'a.name');
+            $session->set('bf.' . $prefix . '_sort', $sort);
+        }
+
+        if ($filterOrderDirInput !== '') {
+            $direction = $filterOrderDirInput === 'DESC' ? 'DESC' : 'ASC';
+            $session->set('bf.' . $prefix . '_dir', $direction);
+        } elseif (!$input->exists('dir')) {
+            $direction = strtoupper((string) $session->get('bf.' . $prefix . '_dir', 'ASC'));
+        } else {
+            $direction = strtoupper($input->getCmd('dir', 'ASC'));
+            $session->set('bf.' . $prefix . '_dir', $direction);
+        }
+
+        $direction = $direction === 'DESC' ? 'DESC' : 'ASC';
+
+        $filterStateInput = strtoupper(trim($input->getString('filter_state', '')));
+        if ($input->exists('filter_state')) {
+            $filterState = in_array($filterStateInput, ['P', 'U'], true) ? $filterStateInput : '';
+            $session->set('bf.' . $prefix . '_filter_state', $filterState);
+        } else {
+            $filterState = (string) $session->get('bf.' . $prefix . '_filter_state', '');
+        }
+
+        $pageSizes = [0, 5, 10, 15, 20, 25, 30, 50, 100, 200, 500];
+        $list = (array) $input->get('list', [], 'array');
+        $limitRequest = isset($list['limit']) ? (int) $list['limit'] : $input->getInt('limit', -1);
+
+        if ($limitRequest >= 0 && in_array($limitRequest, $pageSizes, true)) {
+            $limit = $limitRequest;
+            $session->set('bf.' . $prefix . '_limit', $limit);
+        } else {
+            $limit = (int) $session->get('bf.' . $prefix . '_limit', 10);
+
+            if (!in_array($limit, $pageSizes, true)) {
+                $limit = 10;
+            }
+        }
+
+        $limitStartRequest = isset($list['start']) ? (int) $list['start'] : $input->getInt('limitstart', -1);
+        $limitStart = $limitStartRequest >= 0 ? $limitStartRequest : (int) $session->get('bf.' . $prefix . '_limitstart', 0);
+        $limitStart = max(0, $limitStart);
+
+        $listData = $this->getListData($package, $search, $sort, $direction, $limit, $limitStart, $filterState);
+        $session->set('bf.' . $prefix . '_limitstart', $listData['limitstart']);
+
+        $listOrder = (string) $this->getState('list.ordering', 'a.name');
+        $listDirn = strtolower((string) $this->getState('list.direction', 'asc'));
+
+        return [
+            'package' => $package,
+            'packageList' => $packageList,
+            'search' => $search,
+            'total' => $listData['total'],
+            'limit' => $limit,
+            'limitStart' => $listData['limitstart'],
+            'rows' => $listData['rows'],
+            'pagination' => $listData['pagination'],
+            'listOrder' => $listOrder,
+            'listDirn' => $listDirn,
+            'filterState' => $filterState,
+        ];
+    }
+
     public function deleteByIds(array $ids): int
     {
         $ids = $this->filterIds($ids);
@@ -138,6 +251,8 @@ abstract class PackageModel extends ListModel
     }
 
     abstract protected function getTableName(): string;
+
+    abstract protected function getSessionPrefix(): string;
 
     private function applyListFilters(QueryInterface $query): void
     {

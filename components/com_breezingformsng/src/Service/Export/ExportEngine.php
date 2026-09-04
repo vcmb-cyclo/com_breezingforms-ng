@@ -86,6 +86,17 @@ final class ExportEngine
             $records = $this->processor->database->loadObjectList();
             foreach ($records as $record) {
                 $recordIdToDelete = (int) $record->id;
+                if (file_exists(JPATH_ADMINISTRATOR . '/components/com_contentbuilderng/com_contentbuilderng.xml')) {
+                    $deleteContentBuilderRecordQuery = $this->processor->database->getQuery(true)
+                        ->delete($this->processor->database->quoteName('#__contentbuilderng_records'))
+                        ->where($this->processor->database->quoteName('type') . ' = ' . $this->processor->database->quote('com_breezingformsng'))
+                        ->where($this->processor->database->quoteName('reference_id') . ' = :deletedFormId')
+                        ->where($this->processor->database->quoteName('record_id') . ' = :deletedRecordId')
+                        ->bind(':deletedFormId', $editableFormValue, ParameterType::INTEGER)
+                        ->bind(':deletedRecordId', $recordIdToDelete, ParameterType::INTEGER);
+                    $this->processor->database->setQuery($deleteContentBuilderRecordQuery);
+                    $this->processor->database->execute();
+                }
                 $delSubrecordsQuery = $this->processor->database->getQuery(true)
                     ->delete($this->processor->database->quoteName('#__facileforms_subrecords'))
                     ->where($this->processor->database->quoteName('record') . ' = :recordIdToDelete')

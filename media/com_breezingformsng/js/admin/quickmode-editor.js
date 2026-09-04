@@ -1,15 +1,45 @@
 var __bfOpts = Joomla.getOptions('com_breezingformsng.quickmode-editor') || {};
 var bfLangSuffix = __bfOpts.langSuffix || '';
 
+function bfEditorInstance() {
+	if (typeof JoomlaEditor === 'undefined') {
+		return null;
+	}
+
+	return JoomlaEditor.get('bfEditor');
+}
+
 function bfEditorGet() {
-	return Joomla.editors.instances['bfEditor'].getValue();
+	var editor = bfEditorInstance();
+
+	return editor ? editor.getValue() : '';
 }
 
 function bfEditorSet(value) {
-	Joomla.editors.instances['bfEditor'].setValue(value);
+	var editor = bfEditorInstance();
+
+	if (!editor) {
+		return false;
+	}
+
+	editor.setValue(value);
+
+	return true;
 }
 
-function bfLoadText() {
+function bfLoadText(attempt) {
+	attempt = attempt || 0;
+
+	if (!bfEditorInstance()) {
+		if (attempt < 50) {
+			setTimeout(function () {
+				bfLoadText(attempt + 1);
+			}, 100);
+		}
+
+		return;
+	}
+
 	var keyPageIntro = 'pageIntro' + bfLangSuffix;
 	var keyDescription = 'description' + bfLangSuffix;
 
@@ -128,4 +158,4 @@ function setDescription() {
 	bfEditorSet('' + item.properties[key] + '');
 }
 
-setTimeout(bfLoadText, 500);
+bfLoadText(0);

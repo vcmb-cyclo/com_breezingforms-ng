@@ -129,3 +129,47 @@ COM_CONTENTBUILDERNG_MSG_REINDEXED="%1$s Elemente in %2$s Sekunden neu indiziert
   périmètre, cf. `AGENTS.md`/`CLAUDE.md`).
 - La logique de fallback de langue Joomla (gérée nativement par le cœur,
   pas de workaround à coder).
+
+## Terminologie des paramètres par défaut et généraux — BF / CB
+
+Pour les options de réglage par défaut ou hérité, appliquer la terminologie
+commune à BreezingForms NG et ContentBuilder NG :
+
+| Langue | Paramètre par défaut | Paramètres généraux |
+|---|---|---|
+| en-GB | Use Default (%s) | Use Global (%s) |
+| fr-FR | Paramètre par défaut (%s) | Paramètres généraux (%s) |
+| de-DE | Standardeinstellung (%s) | Globale Einstellungen (%s) |
+| es-ES | Configuración predeterminada (%s) | Configuración global (%s) |
+| hu-HU | Alapértelmezett beállítás (%s) | Globális beállítások (%s) |
+| it-IT | Impostazione predefinita (%s) | Impostazioni globali (%s) |
+| nl-NL | Standaardinstelling (%s) | Algemene instellingen (%s) |
+| tr-TR | Varsayılan ayar (%s) | Genel ayarlar (%s) |
+
+- Cette règle couvre les huit langues imposées par AGENTS.md, y compris lorsque
+  une section plus ancienne de cette spécification ne cite que FR, DE et GB.
+- Réserver la seconde colonne de libellés aux options qui héritent réellement
+  des paramètres généraux. Un héritage du formulaire ou de la vue conserve
+  le libellé de paramètre par défaut.
+- Conserver les placeholders et afficher la valeur réellement héritée entre
+  parenthèses. Sans valeur disponible, indiquer la source traduite lorsque
+  le champ la précise déjà. Ne pas ajouter de placeholder sans argument fourni.
+- Pour ces options, remplacer « Utiliser la valeur par défaut » et
+  « Standard verwenden » par les libellés ci-dessus, descriptions comprises.
+- Ne pas remplacer indistinctement les expressions « par défaut » : une valeur
+  initiale de champ, un thème ou des messages d’erreur par défaut ne désignent
+  pas nécessairement un paramètre hérité.
+- Ainsi, « Use default error messages » se traduit en français par
+  « Utiliser les messages d’erreur par défaut » et en allemand par
+  « Standardfehlermeldungen verwenden ».
+- Vérifier toutes les copies des clés concernées dans les fichiers de langue
+  administrateur, site, modules et plugins existants. Préserver les clés, la
+  logique d’héritage et les traductions natives de Joomla.
+
+## Priorité en cas de conflit
+
+En cas de divergence entre les instructions de Gilles, `AGENTS.md`, cette
+spécification, Joomla et une traduction amont, appliquer cet ordre : instructions
+explicites de Gilles et `AGENTS.md`, règles de cette skill, conventions Joomla 6,
+puis valeur amont. Conserver les clés et placeholders existants et signaler une
+divergence qui nécessiterait de modifier le comportement.
